@@ -1,7 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utvideo", "utvideo\utvideo.vcproj", "{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}.Debug|Win32.Build.0 = Debug|Win32
+		{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}.Release|Win32.ActiveCfg = Release|Win32
+		{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
