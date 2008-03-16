@@ -78,4 +78,3 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 #ifdef _MANAGED
 #pragma managed(pop)
 #endif
-
