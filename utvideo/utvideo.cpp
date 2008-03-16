@@ -44,7 +44,6 @@
 #pragma managed(push, off)
 #endif
 
-const DWORD fccVIDC = FCC('VIDC');
 const DWORD fccUAY2 = FCC('UAY2');
 
 HMODULE hModule;
@@ -59,15 +58,21 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 BOOL APIENTRY ICInstallSelf(void)
 {
-	char szFilename[MAX_PATH];
+	char szLongFilename[MAX_PATH];
+	char szShortFilename[MAX_PATH];
 
-	GetModuleFileName(hModule, szFilename, sizeof(szFilename));
-	return ICInstall(fccVIDC, fccUAY2, (LPARAM)szFilename, NULL, ICINSTALL_DRIVER);
+	/*
+	 * 何故か長いファイル名ではダメ（登録はできるがロードに失敗する）で、
+	 * 8.3 形式のファイル名で登録しなければならない。
+	 */
+	GetModuleFileName(hModule, szLongFilename, sizeof(szLongFilename));
+	GetShortPathName(szLongFilename, szShortFilename, sizeof(szShortFilename));
+	return ICInstall(ICTYPE_VIDEO, fccUAY2, (LPARAM)szShortFilename, NULL, ICINSTALL_DRIVER);
 }
 
 BOOL APIENTRY ICRemoveSelf(void)
 {
-	return ICRemove(fccVIDC, fccUAY2, 0);
+	return ICRemove(ICTYPE_VIDEO, fccUAY2, 0);
 }
 
 /*
