@@ -70,6 +70,21 @@ BOOL APIENTRY ICRemoveSelf(void)
 	return ICRemove(fccVIDC, fccUAY2, 0);
 }
 
+/*
+ * ICInstall()/ICRemove() の返り値は信用できない（常に nonzero が返る）ので、
+ * エラーチェックは行わない。
+ */
+
+void CALLBACK ICInstallByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
+{
+	ICInstallSelf();
+}
+
+void CALLBACK ICRemoveByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
+{
+	ICRemoveSelf();
+}
+
 LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lParam1, LPARAM lParam2)
 {
 	return DefDriverProc(dwDriverId, hdrvr, uMsg, lParam1, lParam2);
