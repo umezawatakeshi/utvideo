@@ -62,6 +62,5 @@
 // Windows ヘッダー ファイル:
 #include <windows.h>
 
-
-
-// TODO: プログラムに必要な追加ヘッダーをここで参照してください。
+#include <vfw.h>
+#include <aviriff.h>

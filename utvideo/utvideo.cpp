@@ -40,14 +40,39 @@
 
 #include "stdafx.h"
 
-
 #ifdef _MANAGED
 #pragma managed(push, off)
 #endif
 
+const DWORD fccVIDC = FCC('VIDC');
+const DWORD fccUAY2 = FCC('UAY2');
+
+HMODULE hModule;
+
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 {
+	if (dwReason == DLL_PROCESS_ATTACH)
+		::hModule = hModule;
+
 	return TRUE;
+}
+
+BOOL APIENTRY ICInstallSelf(void)
+{
+	char szFilename[MAX_PATH];
+
+	GetModuleFileName(hModule, szFilename, sizeof(szFilename));
+	return ICInstall(fccVIDC, fccUAY2, (LPARAM)szFilename, NULL, ICINSTALL_DRIVER);
+}
+
+BOOL APIENTRY ICRemoveSelf(void)
+{
+	return ICRemove(fccVIDC, fccUAY2, 0);
+}
+
+LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lParam1, LPARAM lParam2)
+{
+	return DefDriverProc(dwDriverId, hdrvr, uMsg, lParam1, lParam2);
 }
 
 #ifdef _MANAGED
