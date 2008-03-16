@@ -63,6 +63,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="vfw32.lib winmm.lib"
 				LinkIncremental="2"
+				ModuleDefinitionFile="utvideo.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -138,6 +139,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="vfw32.lib winmm.lib"
 				LinkIncremental="1"
+				ModuleDefinitionFile="utvideo.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -200,6 +202,10 @@
 			</File>
 			<File
 				RelativePath=".\utvideo.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\utvideo.def"
 				>
 			</File>
 		</Filter>

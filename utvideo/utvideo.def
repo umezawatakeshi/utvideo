@@ -1,0 +1,8 @@
+LIBRARY	"utvideo"
+
+EXPORTS
+	DriverProc
+	ICInstallSelf
+	ICInstallByRundll
+	ICRemoveSelf
+	ICRemoveByRundll
