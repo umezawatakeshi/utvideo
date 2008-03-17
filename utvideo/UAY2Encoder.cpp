@@ -72,7 +72,7 @@ DWORD CUAY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADE
 
 	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER);
 	pbmihOut->biWidth         = pbmihIn->biWidth;
-	pbmihOut->biHeight        = pbmihOut->biHeight;
+	pbmihOut->biHeight        = pbmihIn->biHeight;
 	pbmihOut->biPlanes        = 1;
 	pbmihOut->biBitCount      = 16;
 	pbmihOut->biCompression   = FCC('UAY2');
