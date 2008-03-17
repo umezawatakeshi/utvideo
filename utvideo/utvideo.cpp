@@ -97,6 +97,7 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 
 	switch (uMsg)
 	{
+	/* Driver Messages */
 	case DRV_LOAD:
 		return TRUE;
 
@@ -110,6 +111,32 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 		if (pCodec != NULL)
 			delete pCodec;
 		return TRUE;
+
+	/* Codec Messages */
+	case ICM_ABOUT:
+	case ICM_GETINFO:
+
+	/* Encoder Messages */
+	case ICM_CONFIGURE:
+	case ICM_GETSTATE:
+	case ICM_SETSTATE:
+	case ICM_COMPRESS:
+	case ICM_COMPRESS_BEGIN:
+	case ICM_COMPRESS_END:
+	case ICM_COMPRESS_FRAMES_INFO:
+	case ICM_COMPRESS_GET_FORMAT:
+	case ICM_COMPRESS_GET_SIZE:
+	case ICM_COMPRESS_QUERY:
+
+	/* Decoder Messages */
+	case ICM_DECOMPRESS:
+	case ICM_DECOMPRESS_BEGIN:
+	case ICM_DECOMPRESS_END:
+	case ICM_DECOMPRESS_GET_FORMAT:
+	case ICM_DECOMPRESS_GET_PALETTE:
+	case ICM_DECOMPRESS_QUERY:
+	case ICM_DECOMPRESS_SET_PALETTE:
+		;
 	}
 
 	return DefDriverProc(dwDriverId, hdrvr, uMsg, lParam1, lParam2);
