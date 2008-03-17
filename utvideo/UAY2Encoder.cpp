@@ -1,5 +1,5 @@
 /* •¶ŽšƒR[ƒh‚Í‚r‚i‚h‚r ‰üsƒR[ƒh‚Í‚b‚q‚k‚e */
-/* $Id:$ */
+/* $Id$ */
 /*
  * Ut Video Codec Suite
  * Copyright (C) 2008  UMEZAWA Takeshi
@@ -47,4 +47,53 @@ CUAY2Encoder::CUAY2Encoder(void)
 
 CUAY2Encoder::~CUAY2Encoder(void)
 {
+}
+
+DWORD CUAY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
+{
+	memcpy(icc->lpOutput, icc->lpInput, icc->lpbiInput->biSizeImage);
+	return ICERR_OK;
+}
+
+DWORD CUAY2Encoder::CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	return ICERR_OK;
+}
+
+DWORD CUAY2Encoder::CompressEnd(void)
+{
+	return ICERR_OK;
+}
+
+DWORD CUAY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	if (pbmihOut == NULL)
+		return sizeof(BITMAPINFOHEADER);
+
+	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER);
+	pbmihOut->biWidth         = pbmihIn->biWidth;
+	pbmihOut->biHeight        = pbmihOut->biHeight;
+	pbmihOut->biPlanes        = 1;
+	pbmihOut->biBitCount      = 16;
+	pbmihOut->biCompression   = FCC('UAY2');
+	pbmihOut->biSizeImage     = pbmihIn->biSizeImage;
+	//pbmihOut->biXPelsPerMeter
+	//pbmihOut->biYPelsPerMeter
+	//pbmihOut->biClrUsed
+	//pbmihOut->biClrImportant
+
+	return ICERR_OK;
+}
+
+DWORD CUAY2Encoder::CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	return pbmihIn->biSizeImage;
+}
+
+DWORD CUAY2Encoder::CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	if (pbmihIn->biCompression == FCC('YUY2'))
+		return ICERR_OK;
+	else
+		return ICERR_BADFORMAT;
 }

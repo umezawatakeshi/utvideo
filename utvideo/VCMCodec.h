@@ -61,4 +61,10 @@ public:
 
 	DWORD QueryConfigure(void);
 	DWORD Configure(HWND hwnd);
+	DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);
+	DWORD CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+	DWORD CompressEnd(void);
+	DWORD CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+	DWORD CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+	DWORD CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
 };

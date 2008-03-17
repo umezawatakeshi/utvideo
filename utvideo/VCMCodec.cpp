@@ -110,3 +110,33 @@ DWORD CVCMCodec::Configure(HWND hwnd)
 {
 	return ICERR_UNSUPPORTED;
 }
+
+DWORD CVCMCodec::Compress(ICCOMPRESS *icc, DWORD dwSize)
+{
+	return m_pEncoder->Compress(icc, dwSize);
+}
+
+DWORD CVCMCodec::CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	return m_pEncoder->CompressBegin(pbmihIn, pbmihOut);
+}
+
+DWORD CVCMCodec::CompressEnd(void)
+{
+	return m_pEncoder->CompressEnd();
+}
+
+DWORD CVCMCodec::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	return m_pEncoder->CompressGetFormat(pbmihIn, pbmihOut);
+}
+
+DWORD CVCMCodec::CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	return m_pEncoder->CompressGetSize(pbmihIn, pbmihOut);
+}
+
+DWORD CVCMCodec::CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	return m_pEncoder->CompressQuery(pbmihIn, pbmihOut);
+}

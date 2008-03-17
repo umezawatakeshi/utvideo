@@ -129,15 +129,26 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 		else
 			return pCodec->Configure((HWND)lParam1);
 
-	case ICM_GETSTATE:
-	case ICM_SETSTATE:
+	//case ICM_GETSTATE:
+	//case ICM_SETSTATE:
+
 	case ICM_COMPRESS:
+		return pCodec->Compress((ICCOMPRESS *)lParam1, (DWORD)lParam2);
+
 	case ICM_COMPRESS_BEGIN:
+		return pCodec->CompressBegin((BITMAPINFOHEADER *)lParam1, (BITMAPINFOHEADER *)lParam2);
+
 	case ICM_COMPRESS_END:
-	case ICM_COMPRESS_FRAMES_INFO:
+		return pCodec->CompressEnd();
+
 	case ICM_COMPRESS_GET_FORMAT:
+		return pCodec->CompressGetFormat((BITMAPINFOHEADER *)lParam1, (BITMAPINFOHEADER *)lParam2);
+
 	case ICM_COMPRESS_GET_SIZE:
+		return pCodec->CompressGetSize((BITMAPINFOHEADER *)lParam1, (BITMAPINFOHEADER *)lParam2);
+
 	case ICM_COMPRESS_QUERY:
+		return pCodec->CompressQuery((BITMAPINFOHEADER *)lParam1, (BITMAPINFOHEADER *)lParam2);
 
 	/* Decoder Messages */
 	case ICM_DECOMPRESS:
