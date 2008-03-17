@@ -57,6 +57,8 @@ public:
 
 	DWORD QueryAbout(void);
 	DWORD About(HWND hwnd);
-
 	DWORD GetInfo(ICINFO *icinfo, DWORD dwSize);
+
+	DWORD QueryConfigure(void);
+	DWORD Configure(HWND hwnd);
 };

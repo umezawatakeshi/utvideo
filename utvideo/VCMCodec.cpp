@@ -100,3 +100,13 @@ DWORD CVCMCodec::GetInfo(ICINFO *icinfo, DWORD dwSize)
 
 	return sizeof(ICINFO);
 }
+
+DWORD CVCMCodec::QueryConfigure(void)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CVCMCodec::Configure(HWND hwnd)
+{
+	return ICERR_UNSUPPORTED;
+}

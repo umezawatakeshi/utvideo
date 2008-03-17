@@ -124,6 +124,11 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 
 	/* Encoder Messages */
 	case ICM_CONFIGURE:
+		if (lParam1 == -1)
+			return pCodec->QueryConfigure();
+		else
+			return pCodec->Configure((HWND)lParam1);
+
 	case ICM_GETSTATE:
 	case ICM_SETSTATE:
 	case ICM_COMPRESS:
