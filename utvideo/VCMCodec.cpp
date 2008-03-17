@@ -1,5 +1,5 @@
 /* •¶šƒR[ƒh‚Í‚r‚i‚h‚r ‰üsƒR[ƒh‚Í‚b‚q‚k‚e */
-/* $Id:$ */
+/* $Id$ */
 /*
  * Ut Video Codec Suite
  * Copyright (C) 2008  UMEZAWA Takeshi
@@ -67,4 +67,15 @@ CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)
 		fccHandler = (DWORD)-1;
 
 	return new CVCMCodec(fccHandler);
+}
+
+DWORD CVCMCodec::QueryAbout(void)
+{
+	return ICERR_OK;
+}
+
+DWORD CVCMCodec::About(HWND hwnd)
+{
+	MessageBox(hwnd, "Ut Video Codec Suite\nCopyright (C) 2008  UMEZAWA Takeshi", "Ut Video Codec Suite", MB_OK);
+	return ICERR_OK;
 }

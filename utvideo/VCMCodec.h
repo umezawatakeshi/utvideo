@@ -1,5 +1,5 @@
 /* •¶šƒR[ƒh‚Í‚r‚i‚h‚r ‰üsƒR[ƒh‚Í‚b‚q‚k‚e */
-/* $Id:$ */
+/* $Id$ */
 /*
  * Ut Video Codec Suite
  * Copyright (C) 2008  UMEZAWA Takeshi
@@ -53,4 +53,7 @@ public:
 
 public:
 	static CVCMCodec *Open(ICOPEN *icopen);
+
+	DWORD QueryAbout(void);
+	DWORD About(HWND hwnd);
 };
