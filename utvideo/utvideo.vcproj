@@ -181,6 +181,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Encoder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -201,11 +205,19 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\UAY2Encoder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\utvideo.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\utvideo.def"
+				>
+			</File>
+			<File
+				RelativePath=".\VCMCodec.cpp"
 				>
 			</File>
 		</Filter>
@@ -215,7 +227,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\Encoder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UAY2Encoder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VCMCodec.h"
 				>
 			</File>
 		</Filter>

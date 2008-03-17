@@ -1,5 +1,5 @@
 /* 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ */
-/* $Id$ */
+/* $Id:$ */
 /*
  * Ut Video Codec Suite
  * Copyright (C) 2008  UMEZAWA Takeshi
@@ -38,83 +38,33 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。
  */
 
-#include "stdafx.h"
+#include "StdAfx.h"
 #include "VCMCodec.h"
+#include "UAY2Encoder.h"
 
-#ifdef _MANAGED
-#pragma managed(push, off)
-#endif
-
-const DWORD fccUAY2 = FCC('UAY2');
-
-HMODULE hModule;
-
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
+CVCMCodec::CVCMCodec(DWORD fccHandler)
 {
-	if (dwReason == DLL_PROCESS_ATTACH)
-		::hModule = hModule;
-
-	return TRUE;
+	m_pEncoder = new CUAY2Encoder();
 }
 
-BOOL APIENTRY ICInstallSelf(void)
+CVCMCodec::~CVCMCodec(void)
 {
-	char szLongFilename[MAX_PATH];
-	char szShortFilename[MAX_PATH];
-
-	/*
-	 * 何故か長いファイル名ではダメ（登録はできるがロードに失敗する）で、
-	 * 8.3 形式のファイル名で登録しなければならない。
-	 */
-	GetModuleFileName(hModule, szLongFilename, sizeof(szLongFilename));
-	GetShortPathName(szLongFilename, szShortFilename, sizeof(szShortFilename));
-	return ICInstall(ICTYPE_VIDEO, fccUAY2, (LPARAM)szShortFilename, NULL, ICINSTALL_DRIVER);
+	delete m_pEncoder;
 }
 
-BOOL APIENTRY ICRemoveSelf(void)
+CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)
 {
-	return ICRemove(ICTYPE_VIDEO, fccUAY2, 0);
-}
+	DWORD fccHandler;
 
-/*
- * ICInstall()/ICRemove() の返り値は信用できない（常に nonzero が返る）ので、
- * エラーチェックは行わない。
- */
-
-void CALLBACK ICInstallByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
-{
-	ICInstallSelf();
-}
-
-void CALLBACK ICRemoveByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
-{
-	ICRemoveSelf();
-}
-
-LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lParam1, LPARAM lParam2)
-{
-	CVCMCodec *pCodec = (CVCMCodec *)dwDriverId;
-
-	switch (uMsg)
+	if (icopen != NULL)
 	{
-	case DRV_LOAD:
-		return TRUE;
-
-	case DRV_FREE:
-		return TRUE;
-
-	case DRV_OPEN:
-		return (LRESULT)CVCMCodec::Open((ICOPEN *)lParam2);
-
-	case DRV_CLOSE:
-		if (pCodec != NULL)
-			delete pCodec;
-		return TRUE;
+		if (icopen->fccType != ICTYPE_VIDEO)
+			return NULL;
+		fccHandler = icopen->fccHandler;
+		icopen->dwError = ICERR_OK;
 	}
+	else
+		fccHandler = (DWORD)-1;
 
-	return DefDriverProc(dwDriverId, hdrvr, uMsg, lParam1, lParam2);
+	return new CVCMCodec(fccHandler);
 }
-
-#ifdef _MANAGED
-#pragma managed(pop)
-#endif
