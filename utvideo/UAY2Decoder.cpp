@@ -38,41 +38,60 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)B
  */
 
-#pragma once
-#include "Encoder.h"
-#include "Decoder.h"
+#include "StdAfx.h"
+#include "UAY2Decoder.h"
 
-class CVCMCodec
+CUAY2Decoder::CUAY2Decoder(void)
 {
-private:
-	DWORD m_fccHandler;
-	CEncoder *m_pEncoder;
-	CDecoder *m_pDecoder;
+}
 
-private:
-	CVCMCodec(DWORD fccHandler);
-public:
-	~CVCMCodec(void);
+CUAY2Decoder::~CUAY2Decoder(void)
+{
+}
 
-public:
-	static CVCMCodec *Open(ICOPEN *icopen);
+DWORD CUAY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
+{
+	memcpy(icd->lpOutput, icd->lpInput, icd->lpbiInput->biSizeImage);
+	return ICERR_OK;
+}
 
-	DWORD QueryAbout(void);
-	DWORD About(HWND hwnd);
-	DWORD GetInfo(ICINFO *icinfo, DWORD dwSize);
+DWORD CUAY2Decoder::DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	return ICERR_OK;
+}
 
-	DWORD QueryConfigure(void);
-	DWORD Configure(HWND hwnd);
-	DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);
-	DWORD CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD CompressEnd(void);
-	DWORD CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+DWORD CUAY2Decoder::DecompressEnd(void)
+{
+	return ICERR_OK;
+}
 
-	DWORD Decompress(ICDECOMPRESS *icd, DWORD dwSize);
-	DWORD DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD DecompressEnd(void);
-	DWORD DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-};
+DWORD CUAY2Decoder::DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	if (pbmihOut == NULL)
+		return sizeof(BITMAPINFOHEADER);
+
+	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER);
+	pbmihOut->biWidth         = pbmihIn->biWidth;
+	pbmihOut->biHeight        = pbmihIn->biHeight;
+	pbmihOut->biPlanes        = 1;
+	pbmihOut->biBitCount      = 16;
+	pbmihOut->biCompression   = FCC('YUY2');
+	pbmihOut->biSizeImage     = pbmihIn->biSizeImage;
+	//pbmihOut->biXPelsPerMeter
+	//pbmihOut->biYPelsPerMeter
+	//pbmihOut->biClrUsed
+	//pbmihOut->biClrImportant
+
+	return ICERR_OK;
+}
+
+DWORD CUAY2Decoder::DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	if (pbmihIn->biCompression != FCC('UAY2'))
+		return ICERR_BADFORMAT;
+
+	if (pbmihOut != NULL && pbmihOut->biCompression != FCC('YUY2'))
+		return ICERR_BADFORMAT;
+
+	return ICERR_OK;
+}

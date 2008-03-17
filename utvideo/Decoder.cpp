@@ -38,41 +38,13 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)ÅB
  */
 
-#pragma once
-#include "Encoder.h"
+#include "StdAfx.h"
 #include "Decoder.h"
 
-class CVCMCodec
+CDecoder::CDecoder(void)
 {
-private:
-	DWORD m_fccHandler;
-	CEncoder *m_pEncoder;
-	CDecoder *m_pDecoder;
+}
 
-private:
-	CVCMCodec(DWORD fccHandler);
-public:
-	~CVCMCodec(void);
-
-public:
-	static CVCMCodec *Open(ICOPEN *icopen);
-
-	DWORD QueryAbout(void);
-	DWORD About(HWND hwnd);
-	DWORD GetInfo(ICINFO *icinfo, DWORD dwSize);
-
-	DWORD QueryConfigure(void);
-	DWORD Configure(HWND hwnd);
-	DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);
-	DWORD CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD CompressEnd(void);
-	DWORD CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-
-	DWORD Decompress(ICDECOMPRESS *icd, DWORD dwSize);
-	DWORD DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD DecompressEnd(void);
-	DWORD DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-};
+CDecoder::~CDecoder(void)
+{
+}

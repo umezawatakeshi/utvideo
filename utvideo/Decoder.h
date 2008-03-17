@@ -39,40 +39,17 @@
  */
 
 #pragma once
-#include "Encoder.h"
-#include "Decoder.h"
 
-class CVCMCodec
+class CDecoder
 {
-private:
-	DWORD m_fccHandler;
-	CEncoder *m_pEncoder;
-	CDecoder *m_pDecoder;
-
-private:
-	CVCMCodec(DWORD fccHandler);
 public:
-	~CVCMCodec(void);
+	CDecoder(void);
+	virtual ~CDecoder(void);
 
 public:
-	static CVCMCodec *Open(ICOPEN *icopen);
-
-	DWORD QueryAbout(void);
-	DWORD About(HWND hwnd);
-	DWORD GetInfo(ICINFO *icinfo, DWORD dwSize);
-
-	DWORD QueryConfigure(void);
-	DWORD Configure(HWND hwnd);
-	DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);
-	DWORD CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD CompressEnd(void);
-	DWORD CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-
-	DWORD Decompress(ICDECOMPRESS *icd, DWORD dwSize);
-	DWORD DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD DecompressEnd(void);
-	DWORD DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	DWORD DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+	virtual DWORD Decompress(ICDECOMPRESS *icd, DWORD dwSize) = 0;
+	virtual DWORD DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut) = 0;
+	virtual DWORD DecompressEnd(void) = 0;
+	virtual DWORD DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut) = 0;
+	virtual DWORD DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut) = 0;
 };

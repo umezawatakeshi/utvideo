@@ -41,16 +41,19 @@
 #include "StdAfx.h"
 #include "VCMCodec.h"
 #include "UAY2Encoder.h"
+#include "UAY2Decoder.h"
 
 CVCMCodec::CVCMCodec(DWORD fccHandler)
 {
 	m_fccHandler = fccHandler;
 	m_pEncoder = new CUAY2Encoder();
+	m_pDecoder = new CUAY2Decoder();
 }
 
 CVCMCodec::~CVCMCodec(void)
 {
 	delete m_pEncoder;
+	delete m_pDecoder;
 }
 
 CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)
@@ -139,4 +142,29 @@ DWORD CVCMCodec::CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pb
 DWORD CVCMCodec::CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
 {
 	return m_pEncoder->CompressQuery(pbmihIn, pbmihOut);
+}
+
+DWORD CVCMCodec::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
+{
+	return m_pDecoder->Decompress(icd, dwSize);
+}
+
+DWORD CVCMCodec::DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	return m_pDecoder->DecompressBegin(pbmihIn, pbmihOut);
+}
+
+DWORD CVCMCodec::DecompressEnd(void)
+{
+	return m_pDecoder->DecompressEnd();
+}
+
+DWORD CVCMCodec::DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	return m_pDecoder->DecompressGetFormat(pbmihIn, pbmihOut);
+}
+
+DWORD CVCMCodec::DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+{
+	return m_pDecoder->DecompressQuery(pbmihIn, pbmihOut);
 }

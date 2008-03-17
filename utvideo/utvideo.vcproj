@@ -181,6 +181,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Decoder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Encoder.cpp"
 				>
 			</File>
@@ -205,6 +209,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\UAY2Decoder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\UAY2Encoder.cpp"
 				>
 			</File>
@@ -227,11 +235,19 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\Decoder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Encoder.h"
 				>
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UAY2Decoder.h"
 				>
 			</File>
 			<File

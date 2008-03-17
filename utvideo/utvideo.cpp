@@ -152,13 +152,19 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 
 	/* Decoder Messages */
 	case ICM_DECOMPRESS:
+		return pCodec->Decompress((ICDECOMPRESS *)lParam1, (DWORD)lParam2);
+
 	case ICM_DECOMPRESS_BEGIN:
+		return pCodec->DecompressBegin((BITMAPINFOHEADER *)lParam1, (BITMAPINFOHEADER *)lParam2);
+
 	case ICM_DECOMPRESS_END:
+		return pCodec->DecompressEnd();
+
 	case ICM_DECOMPRESS_GET_FORMAT:
-	case ICM_DECOMPRESS_GET_PALETTE:
+		return pCodec->DecompressGetFormat((BITMAPINFOHEADER *)lParam1, (BITMAPINFOHEADER *)lParam2);
+
 	case ICM_DECOMPRESS_QUERY:
-	case ICM_DECOMPRESS_SET_PALETTE:
-		;
+		return pCodec->DecompressQuery((BITMAPINFOHEADER *)lParam1, (BITMAPINFOHEADER *)lParam2);
 	}
 
 	return DefDriverProc(dwDriverId, hdrvr, uMsg, lParam1, lParam2);
