@@ -44,6 +44,7 @@
 class CVCMCodec
 {
 private:
+	DWORD m_fccHandler;
 	CEncoder *m_pEncoder;
 
 private:
@@ -56,4 +57,6 @@ public:
 
 	DWORD QueryAbout(void);
 	DWORD About(HWND hwnd);
+
+	DWORD GetInfo(ICINFO *icinfo, DWORD dwSize);
 };

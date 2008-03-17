@@ -44,6 +44,7 @@
 
 CVCMCodec::CVCMCodec(DWORD fccHandler)
 {
+	m_fccHandler = fccHandler;
 	m_pEncoder = new CUAY2Encoder();
 }
 
@@ -78,4 +79,24 @@ DWORD CVCMCodec::About(HWND hwnd)
 {
 	MessageBox(hwnd, "Ut Video Codec Suite\nCopyright (C) 2008  UMEZAWA Takeshi", "Ut Video Codec Suite", MB_OK);
 	return ICERR_OK;
+}
+
+DWORD CVCMCodec::GetInfo(ICINFO *icinfo, DWORD dwSize)
+{
+	if (icinfo == NULL)
+		return sizeof(ICINFO);
+
+	if (dwSize < sizeof(ICINFO))
+		return 0;
+
+	icinfo->dwSize       = sizeof(ICINFO);
+	icinfo->fccType      = ICTYPE_VIDEO;
+	icinfo->fccHandler   = m_fccHandler;
+	icinfo->dwFlags      = 0;
+	icinfo->dwVersion    = 1;
+	icinfo->dwVersionICM = ICVERSION;
+	wsprintfW(icinfo->szName, L"%S", "Ut Video Codec");
+	wsprintfW(icinfo->szDescription, L"%S", "Ut Video Codec Packed YUV422 (VCM)");
+
+	return sizeof(ICINFO);
 }
