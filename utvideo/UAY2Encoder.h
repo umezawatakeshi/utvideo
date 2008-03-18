@@ -40,10 +40,14 @@
 
 #pragma once
 #include "Encoder.h"
+#include "FrameBuffer.h"
 
 class CUAY2Encoder :
 	public CEncoder
 {
+private:
+	CFrameBuffer *m_pPrevFrame;
+
 public:
 	CUAY2Encoder(void);
 	virtual ~CUAY2Encoder(void);

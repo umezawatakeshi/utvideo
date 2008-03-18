@@ -43,6 +43,7 @@
 
 CUAY2Encoder::CUAY2Encoder(void)
 {
+	m_pPrevFrame = NULL;
 }
 
 CUAY2Encoder::~CUAY2Encoder(void)
@@ -51,17 +52,32 @@ CUAY2Encoder::~CUAY2Encoder(void)
 
 DWORD CUAY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 {
+	if (icc->lpckid != NULL)
+		*icc->lpckid = FCC('dcdc');
+
+	if (!(icc->dwFlags & ICCOMPRESS_KEYFRAME) && memcmp(m_pPrevFrame->GetBuffer(), icc->lpInput, icc->lpbiInput->biSizeImage) == 0)
+	{
+		icc->lpbiOutput->biSizeImage = 0;
+		*icc->lpdwFlags = 0;
+		return ICERR_OK;
+	}
+
 	memcpy(icc->lpOutput, icc->lpInput, icc->lpbiInput->biSizeImage);
+	memcpy(m_pPrevFrame->GetBuffer(), icc->lpInput, icc->lpbiInput->biSizeImage);
+	icc->lpbiOutput->biSizeImage = icc->lpbiInput->biSizeImage;
+	*icc->lpdwFlags = AVIIF_KEYFRAME;
 	return ICERR_OK;
 }
 
 DWORD CUAY2Encoder::CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
 {
+	m_pPrevFrame = CFrameBuffer::NewBuffer(pbmihIn->biWidth * pbmihIn->biHeight * 2, pbmihIn->biWidth * 2);
 	return ICERR_OK;
 }
 
 DWORD CUAY2Encoder::CompressEnd(void)
 {
+	delete m_pPrevFrame;
 	return ICERR_OK;
 }
 
