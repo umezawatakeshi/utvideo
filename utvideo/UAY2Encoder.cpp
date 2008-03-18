@@ -40,6 +40,7 @@
 
 #include "StdAfx.h"
 #include "UAY2Encoder.h"
+#include "utvideo.h"
 
 CUAY2Encoder::CUAY2Encoder(void)
 {
@@ -83,8 +84,10 @@ DWORD CUAY2Encoder::CompressEnd(void)
 
 DWORD CUAY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
 {
+	BITMAPINFOHEADER_EXTRA *pbmiheOut;
+
 	if (pbmihOut == NULL)
-		return sizeof(BITMAPINFOHEADER);
+		return sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA);
 
 	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER);
 	pbmihOut->biWidth         = pbmihIn->biWidth;
@@ -97,6 +100,12 @@ DWORD CUAY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADE
 	//pbmihOut->biYPelsPerMeter
 	//pbmihOut->biClrUsed
 	//pbmihOut->biClrImportant
+
+	pbmiheOut = (BITMAPINFOHEADER_EXTRA *)(pbmihOut + 1);
+	pbmiheOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
+	pbmiheOut->fccOriginalFormat = pbmihIn->biCompression;
+	pbmiheOut->dwFlags0          = 0;
+	pbmiheOut->dwFlags1          = 0;
 
 	return ICERR_OK;
 }

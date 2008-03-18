@@ -263,6 +263,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\utvideo.h"
+				>
+			</File>
+			<File
 				RelativePath=".\VCMCodec.h"
 				>
 			</File>
