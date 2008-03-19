@@ -89,7 +89,7 @@ DWORD CUAY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADE
 	if (pbmihOut == NULL)
 		return sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA);
 
-	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER);
+	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA);
 	pbmihOut->biWidth         = pbmihIn->biWidth;
 	pbmihOut->biHeight        = pbmihIn->biHeight;
 	pbmihOut->biPlanes        = 1;
