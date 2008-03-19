@@ -46,16 +46,9 @@ struct BITMAPINFOHEADER_EXTRA
 {
 	DWORD dwEncoderVersion;
 	DWORD fccOriginalFormat;
-	DWORD dwFlags0;
-	DWORD dwFlags1;
-	DWORD dwFlags2;
-	DWORD dwFlags3;
 };
 
-#define BMIHE_FLAGS0_RESERVED 0xffffffff
-#define BMIHE_FLAGS1_RESERVED 0xffffffff
-#define BMIHE_FLAGS2_RESERVED 0xffffffff
-#define BMIHE_FLAGS3_RESERVED 0xffffffff
+#define BMIHE_VERSION_MASK 0xffffff00
 
 struct FRAMEHEADER
 {

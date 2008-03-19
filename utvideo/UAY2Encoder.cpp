@@ -104,8 +104,6 @@ DWORD CUAY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADE
 	pbmiheOut = (BITMAPINFOHEADER_EXTRA *)(pbmihOut + 1);
 	pbmiheOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
 	pbmiheOut->fccOriginalFormat = pbmihIn->biCompression;
-	pbmiheOut->dwFlags0          = 0;
-	pbmiheOut->dwFlags1          = 0;
 
 	return ICERR_OK;
 }
