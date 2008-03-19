@@ -1,5 +1,5 @@
 /* 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ */
-/* $Id: */
+/* $Id:$ */
 /*
  * Ut Video Codec Suite
  * Copyright (C) 2008  UMEZAWA Takeshi
