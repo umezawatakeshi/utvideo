@@ -53,6 +53,8 @@ CUAY2Encoder::~CUAY2Encoder(void)
 
 DWORD CUAY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 {
+	CFrameBuffer *pCurFrame;
+
 	if (icc->lpckid != NULL)
 		*icc->lpckid = FCC('dcdc');
 
@@ -63,10 +65,16 @@ DWORD CUAY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 		return ICERR_OK;
 	}
 
-	memcpy(icc->lpOutput, icc->lpInput, icc->lpbiInput->biSizeImage);
-	memcpy(m_pPrevFrame->GetBuffer(), icc->lpInput, icc->lpbiInput->biSizeImage);
+	pCurFrame = CFrameBuffer::NewBuffer(icc->lpbiInput->biWidth * icc->lpbiInput->biHeight * 2, icc->lpbiInput->biWidth * 2);
+	memcpy(pCurFrame->GetBuffer(), icc->lpInput, icc->lpbiInput->biSizeImage);
+
+	memcpy(icc->lpOutput, pCurFrame->GetBuffer(), icc->lpbiInput->biSizeImage);
 	icc->lpbiOutput->biSizeImage = icc->lpbiInput->biSizeImage;
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
+
+	delete m_pPrevFrame;
+	m_pPrevFrame = pCurFrame;
+
 	return ICERR_OK;
 }
 
