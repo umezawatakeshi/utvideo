@@ -1,5 +1,5 @@
 /* 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ */
-/* $Id:$ */
+/* $Id$ */
 /*
  * Ut Video Codec Suite
  * Copyright (C) 2008  UMEZAWA Takeshi
@@ -68,3 +68,9 @@ struct FRAMEHEADER
 
 #define FH_FLAGS0_RESERVED                        0xff00007f
 #define FH_FLAGS1_RESERVED                        0xffffffff
+
+
+inline DWORD ROUNDUP(DWORD a, DWORD b)
+{
+	return ((a + b - 1) / b) * b;
+}

@@ -39,12 +39,8 @@
  */
 
 #include "StdAfx.h"
+#include "utvideo.h"
 #include "FrameBuffer.h"
-
-inline DWORD ROUNDUP(DWORD a, DWORD b)
-{
-	return ((a + b - 1) / b) * b;
-}
 
 CFrameBuffer::CFrameBuffer(void)
 {
