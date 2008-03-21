@@ -44,6 +44,10 @@
 class CUAY2Decoder :
 	public CDecoder
 {
+private:
+	DWORD m_dwFrameSize;
+	DWORD m_dwFrameStride;
+
 public:
 	CUAY2Decoder(void);
 	virtual ~CUAY2Decoder(void);

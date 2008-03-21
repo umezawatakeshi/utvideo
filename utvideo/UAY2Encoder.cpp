@@ -58,18 +58,18 @@ DWORD CUAY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	if (icc->lpckid != NULL)
 		*icc->lpckid = FCC('dcdc');
 
-	if (!(icc->dwFlags & ICCOMPRESS_KEYFRAME) && memcmp(m_pPrevFrame->GetBuffer(), icc->lpInput, icc->lpbiInput->biSizeImage) == 0)
+	if (!(icc->dwFlags & ICCOMPRESS_KEYFRAME) && memcmp(m_pPrevFrame->GetBuffer(), icc->lpInput, m_dwFrameSize) == 0)
 	{
 		icc->lpbiOutput->biSizeImage = 0;
 		*icc->lpdwFlags = 0;
 		return ICERR_OK;
 	}
 
-	pCurFrame = CFrameBuffer::NewBuffer(icc->lpbiInput->biWidth * icc->lpbiInput->biHeight * 2, icc->lpbiInput->biWidth * 2);
-	memcpy(pCurFrame->GetBuffer(), icc->lpInput, icc->lpbiInput->biSizeImage);
+	pCurFrame = CFrameBuffer::NewBuffer(m_dwFrameSize, m_dwFrameStride);
+	memcpy(pCurFrame->GetBuffer(), icc->lpInput, m_dwFrameSize);
 
-	memcpy(icc->lpOutput, pCurFrame->GetBuffer(), icc->lpbiInput->biSizeImage);
-	icc->lpbiOutput->biSizeImage = icc->lpbiInput->biSizeImage;
+	memcpy(icc->lpOutput, pCurFrame->GetBuffer(), m_dwFrameSize);
+	icc->lpbiOutput->biSizeImage = m_dwFrameSize;
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
 
 	delete m_pPrevFrame;
@@ -80,7 +80,11 @@ DWORD CUAY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 
 DWORD CUAY2Encoder::CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
 {
-	m_pPrevFrame = CFrameBuffer::NewBuffer(pbmihIn->biWidth * pbmihIn->biHeight * 2, pbmihIn->biWidth * 2);
+	m_dwFrameSize = pbmihIn->biSizeImage;
+	m_dwFrameStride = ROUNDUP(pbmihIn->biWidth, 2) * 2;
+
+	m_pPrevFrame = CFrameBuffer::NewBuffer(m_dwFrameSize, m_dwFrameStride);
+
 	return ICERR_OK;
 }
 

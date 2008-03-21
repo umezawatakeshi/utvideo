@@ -47,6 +47,8 @@ class CUAY2Encoder :
 {
 private:
 	CFrameBuffer *m_pPrevFrame;
+	DWORD m_dwFrameSize;
+	DWORD m_dwFrameStride;
 
 public:
 	CUAY2Encoder(void);

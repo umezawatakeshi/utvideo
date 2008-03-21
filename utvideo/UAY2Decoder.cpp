@@ -39,6 +39,7 @@
  */
 
 #include "StdAfx.h"
+#include "utvideo.h"
 #include "UAY2Decoder.h"
 
 CUAY2Decoder::CUAY2Decoder(void)
@@ -51,12 +52,15 @@ CUAY2Decoder::~CUAY2Decoder(void)
 
 DWORD CUAY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 {
-	memcpy(icd->lpOutput, icd->lpInput, icd->lpbiInput->biSizeImage);
+	memcpy(icd->lpOutput, icd->lpInput, m_dwFrameSize);
 	return ICERR_OK;
 }
 
 DWORD CUAY2Decoder::DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
 {
+	m_dwFrameSize = pbmihIn->biSizeImage;
+	m_dwFrameStride = ROUNDUP(pbmihIn->biWidth, 2) * 2;
+
 	return ICERR_OK;
 }
 
