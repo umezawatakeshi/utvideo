@@ -56,7 +56,7 @@ struct FRAMEHEADER
 	DWORD dwFlags1;
 };
 
-#define FH_FLAGS0_KEYFRAME                        0x00000080
+#define FH_FLAGS0_KEYFRAME                        0x00000001
 
 #define FH_FLAGS0_COMPRESS_MASK                   0x0000ff00
 #define FH_FLAGS0_COMPRESS_NONE                   0x00000000
@@ -66,8 +66,10 @@ struct FRAMEHEADER
 #define FH_FLAGS0_INTRAFRAME_PREDICT_NONE         0x00000000
 #define FH_FLAGS0_INTRAFRAME_PREDICT_ABOVE        0x00010000
 
-#define FH_FLAGS0_RESERVED                        0xff00007f
-#define FH_FLAGS1_RESERVED                        0xffffffff
+#define FH_FLAGS1_DIVIDE_COUNT_MASK               0x000000ff
+
+#define FH_FLAGS0_RESERVED                        0xff0000fe
+#define FH_FLAGS1_RESERVED                        0xffffff00
 
 
 inline DWORD ROUNDUP(DWORD a, DWORD b)
