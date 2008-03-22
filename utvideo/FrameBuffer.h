@@ -43,8 +43,8 @@
 class CFrameBuffer
 {
 private:
-	void *m_pAllocatedAddr;
-	void *m_pBufferAddr;
+	BYTE *m_pAllocatedAddr;
+	BYTE *m_pBufferAddr;
 
 private:
 	CFrameBuffer(void);
@@ -64,11 +64,11 @@ public:
 	}
 
 public:
-	inline void *GetBuffer()
+	inline BYTE *GetBuffer()
 	{
 		return m_pBufferAddr;
 	}
-	inline const void *GetBuffer() const
+	inline const BYTE *GetBuffer() const
 	{
 		return m_pBufferAddr;
 	}

@@ -69,13 +69,13 @@ CFrameBuffer *CFrameBuffer::InternalNewBuffer(DWORD dwSize, DWORD dwMarginSize, 
 	dwAllocateSize = dwPrecedingMarginSize + ROUNDUP(dwSize + dwMarginSize, dwPageSize);
 
 	pBuffer = new CFrameBuffer();
-	pBuffer->m_pAllocatedAddr = VirtualAlloc(NULL, dwAllocateSize, MEM_COMMIT | MEM_RESERVE, flProtect);
+	pBuffer->m_pAllocatedAddr = (BYTE *)VirtualAlloc(NULL, dwAllocateSize, MEM_COMMIT | MEM_RESERVE, flProtect);
 	if (pBuffer->m_pAllocatedAddr == NULL)
 	{
 		delete pBuffer;
 		return NULL;
 	}
-	pBuffer->m_pBufferAddr = ((char *)pBuffer->m_pAllocatedAddr) + dwPrecedingMarginSize;
+	pBuffer->m_pBufferAddr = pBuffer->m_pAllocatedAddr + dwPrecedingMarginSize;
 
 	return pBuffer;
 }
