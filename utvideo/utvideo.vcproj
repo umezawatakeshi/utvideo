@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PrefixCode.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -248,6 +252,10 @@
 			</File>
 			<File
 				RelativePath=".\FrameBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PrefixCode.h"
 				>
 			</File>
 			<File
