@@ -193,6 +193,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Predict.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PrefixCode.cpp"
 				>
 			</File>
@@ -252,6 +256,10 @@
 			</File>
 			<File
 				RelativePath=".\FrameBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Predict.h"
 				>
 			</File>
 			<File
