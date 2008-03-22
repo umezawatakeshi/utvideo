@@ -43,4 +43,22 @@
 
 void PredictAbove(BYTE *pDst, BYTE *pSrcStart, BYTE *pSrcEnd, DWORD dwStride)
 {
+	BYTE *p = pSrcStart;
+	BYTE *q = pDst;
+
+	for (; p < pSrcEnd; p++, q++)
+	{
+		*q = *p - *(p - dwStride);
+	}
+}
+
+void RestoreAbove(BYTE *pDst, BYTE *pSrcStart, BYTE *pSrcEnd, DWORD dwStride)
+{
+	BYTE *p = pSrcStart;
+	BYTE *q = pDst;
+
+	for (; p < pSrcEnd; p++, q++)
+	{
+		*q = *(q - dwStride) + *p;
+	}
 }
