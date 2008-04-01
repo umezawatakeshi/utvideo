@@ -193,11 +193,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Predict.cpp"
+				RelativePath=".\HuffmanCode.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\PrefixCode.cpp"
+				RelativePath=".\Predict.cpp"
 				>
 			</File>
 			<File
@@ -259,11 +259,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Predict.h"
+				RelativePath=".\HuffmanCode.h"
 				>
 			</File>
 			<File
-				RelativePath=".\PrefixCode.h"
+				RelativePath=".\Predict.h"
 				>
 			</File>
 			<File

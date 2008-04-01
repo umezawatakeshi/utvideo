@@ -40,16 +40,16 @@
 
 #pragma once
 
-struct PREFIX_ENCODE_TABLE
+struct HUFFMAN_ENCODE_TABLE
 {
 	DWORD dwTableMux[256];
 };
 
-struct PREFIX_DECODE_TABLE
+struct HUFFMAN_DECODE_TABLE
 {
 	// XXX
 };
 
-void GenerateCodeLengthTable(BYTE *pCodeLengthTable, const int *pCountTable);
-void GenerateEncodeTable(PREFIX_ENCODE_TABLE *pEncodeTable, const BYTE *pCodeLengthTable);
-void GenerateDecodeTable(PREFIX_DECODE_TABLE *pDecodeTable, const BYTE *pCodeLengthTable);
+void GenerateHuffmanCodeLengthTable(BYTE *pCodeLengthTable, const DWORD *pCountTable);
+void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *pCodeLengthTable);
+void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *pCodeLengthTable);

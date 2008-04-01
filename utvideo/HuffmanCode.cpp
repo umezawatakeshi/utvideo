@@ -39,16 +39,16 @@
  */
 
 #include "StdAfx.h"
-#include "PrefixCode.h"
+#include "HuffmanCode.h"
 
-void GenerateCodeLengthTable(BYTE *pCodeLengthTable, const int *pCountTable)
+void GenerateHuffmanCodeLengthTable(BYTE *pCodeLengthTable, const DWORD *pCountTable)
 {
 }
 
-void GenerateEncodeTable(PREFIX_ENCODE_TABLE *pEncodeTable, const BYTE *pCodeLengthTable)
+void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *pCodeLengthTable)
 {
 }
 
-void GenerateDecodeTable(PREFIX_DECODE_TABLE *pDecodeTable, const BYTE *pCodeLengthTable)
+void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *pCodeLengthTable)
 {
 }
