@@ -56,20 +56,20 @@ struct FRAMEHEADER
 	DWORD dwFlags1;
 };
 
-#define FH_FLAGS0_KEYFRAME                        0x00000001
+#define FH_FLAGS0_DELTAFRAME                    0x00000001
 
-#define FH_FLAGS0_COMPRESS_MASK                   0x0000ff00
-#define FH_FLAGS0_COMPRESS_NONE                   0x00000000
-#define FH_FLAGS0_COMPRESS_8BITSYMBOL_PREFIX_CODE 0x00000100
+#define FH_FLAGS0_COMPRESS_MASK                 0x00000100
+#define FH_FLAGS0_COMPRESS_NONE                 0x00000000
+#define FH_FLAGS0_COMPRESS_HUFFMAN_CODE         0x00000100
 
-#define FH_FLAGS0_INTRAFRAME_PREDICT_MASK         0x00ff0000
-#define FH_FLAGS0_INTRAFRAME_PREDICT_NONE         0x00000000
-#define FH_FLAGS0_INTRAFRAME_PREDICT_ABOVE        0x00010000
+#define FH_FLAGS1_DIVIDE_COUNT_MASK             0x000000ff
 
-#define FH_FLAGS1_DIVIDE_COUNT_MASK               0x000000ff
+#define FH_FLAGS1_INTRAFRAME_PREDICT_MASK       0x00000100
+#define FH_FLAGS1_INTRAFRAME_PREDICT_NONE       0x00000000
+#define FH_FLAGS1_INTRAFRAME_PREDICT_ABOVE      0x00000100
 
-#define FH_FLAGS0_RESERVED                        0xff0000fe
-#define FH_FLAGS1_RESERVED                        0xffffff00
+#define FH_FLAGS0_RESERVED                      0xfffffefe
+#define FH_FLAGS1_RESERVED                      0xfffffe00
 
 
 inline DWORD ROUNDUP(DWORD a, DWORD b)
