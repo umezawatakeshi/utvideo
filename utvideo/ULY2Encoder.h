@@ -42,7 +42,7 @@
 #include "Encoder.h"
 #include "FrameBuffer.h"
 
-class CUAY2Encoder :
+class CULY2Encoder :
 	public CEncoder
 {
 private:
@@ -51,8 +51,8 @@ private:
 	DWORD m_dwFrameStride;
 
 public:
-	CUAY2Encoder(void);
-	virtual ~CUAY2Encoder(void);
+	CULY2Encoder(void);
+	virtual ~CULY2Encoder(void);
 
 public:
 	virtual DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);

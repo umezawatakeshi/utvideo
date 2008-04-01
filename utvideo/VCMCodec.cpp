@@ -40,14 +40,14 @@
 
 #include "StdAfx.h"
 #include "VCMCodec.h"
-#include "UAY2Encoder.h"
-#include "UAY2Decoder.h"
+#include "ULY2Encoder.h"
+#include "ULY2Decoder.h"
 
 CVCMCodec::CVCMCodec(DWORD fccHandler)
 {
 	m_fccHandler = fccHandler;
-	m_pEncoder = new CUAY2Encoder();
-	m_pDecoder = new CUAY2Decoder();
+	m_pEncoder = new CULY2Encoder();
+	m_pDecoder = new CULY2Decoder();
 }
 
 CVCMCodec::~CVCMCodec(void)
@@ -99,7 +99,7 @@ DWORD CVCMCodec::GetInfo(ICINFO *icinfo, DWORD dwSize)
 	icinfo->dwVersion    = 1;
 	icinfo->dwVersionICM = ICVERSION;
 	wsprintfW(icinfo->szName, L"%S", "Ut Video Codec");
-	wsprintfW(icinfo->szDescription, L"%S", "Ut Video Codec Packed YUV422 (VCM)");
+	wsprintfW(icinfo->szDescription, L"%S", "Ut Video Codec YUV422 (VCM)");
 
 	return sizeof(ICINFO);
 }

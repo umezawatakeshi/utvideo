@@ -41,7 +41,7 @@
 #pragma once
 #include "decoder.h"
 
-class CUAY2Decoder :
+class CULY2Decoder :
 	public CDecoder
 {
 private:
@@ -49,8 +49,8 @@ private:
 	DWORD m_dwFrameStride;
 
 public:
-	CUAY2Decoder(void);
-	virtual ~CUAY2Decoder(void);
+	CULY2Decoder(void);
+	virtual ~CULY2Decoder(void);
 
 public:
 	virtual DWORD Decompress(ICDECOMPRESS *icd, DWORD dwSize);

@@ -39,96 +39,63 @@
  */
 
 #include "StdAfx.h"
-#include "UAY2Encoder.h"
 #include "utvideo.h"
+#include "ULY2Decoder.h"
 
-CUAY2Encoder::CUAY2Encoder(void)
-{
-	m_pPrevFrame = NULL;
-}
-
-CUAY2Encoder::~CUAY2Encoder(void)
+CULY2Decoder::CULY2Decoder(void)
 {
 }
 
-DWORD CUAY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
+CULY2Decoder::~CULY2Decoder(void)
 {
-	CFrameBuffer *pCurFrame;
+}
 
-	if (icc->lpckid != NULL)
-		*icc->lpckid = FCC('dcdc');
-
-	if (!(icc->dwFlags & ICCOMPRESS_KEYFRAME) && memcmp(m_pPrevFrame->GetBuffer(), icc->lpInput, m_dwFrameSize) == 0)
-	{
-		icc->lpbiOutput->biSizeImage = 0;
-		*icc->lpdwFlags = 0;
-		return ICERR_OK;
-	}
-
-	pCurFrame = CFrameBuffer::NewBuffer(m_dwFrameSize, m_dwFrameStride);
-	memcpy(pCurFrame->GetBuffer(), icc->lpInput, m_dwFrameSize);
-
-	memcpy(icc->lpOutput, pCurFrame->GetBuffer(), m_dwFrameSize);
-	icc->lpbiOutput->biSizeImage = m_dwFrameSize;
-	*icc->lpdwFlags = AVIIF_KEYFRAME;
-
-	delete m_pPrevFrame;
-	m_pPrevFrame = pCurFrame;
-
+DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
+{
+	memcpy(icd->lpOutput, icd->lpInput, m_dwFrameSize);
 	return ICERR_OK;
 }
 
-DWORD CUAY2Encoder::CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CULY2Decoder::DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
 {
 	m_dwFrameSize = pbmihIn->biSizeImage;
 	m_dwFrameStride = ROUNDUP(pbmihIn->biWidth, 2) * 2;
 
-	m_pPrevFrame = CFrameBuffer::NewBuffer(m_dwFrameSize, m_dwFrameStride);
-
 	return ICERR_OK;
 }
 
-DWORD CUAY2Encoder::CompressEnd(void)
+DWORD CULY2Decoder::DecompressEnd(void)
 {
-	delete m_pPrevFrame;
 	return ICERR_OK;
 }
 
-DWORD CUAY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CULY2Decoder::DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
 {
-	BITMAPINFOHEADER_EXTRA *pbmiheOut;
-
 	if (pbmihOut == NULL)
-		return sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA);
+		return sizeof(BITMAPINFOHEADER);
 
-	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA);
+	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER);
 	pbmihOut->biWidth         = pbmihIn->biWidth;
 	pbmihOut->biHeight        = pbmihIn->biHeight;
 	pbmihOut->biPlanes        = 1;
 	pbmihOut->biBitCount      = 16;
-	pbmihOut->biCompression   = FCC('UAY2');
+	pbmihOut->biCompression   = FCC('YUY2');
 	pbmihOut->biSizeImage     = pbmihIn->biSizeImage;
 	//pbmihOut->biXPelsPerMeter
 	//pbmihOut->biYPelsPerMeter
 	//pbmihOut->biClrUsed
 	//pbmihOut->biClrImportant
 
-	pbmiheOut = (BITMAPINFOHEADER_EXTRA *)(pbmihOut + 1);
-	pbmiheOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
-	pbmiheOut->fccOriginalFormat = pbmihIn->biCompression;
-
 	return ICERR_OK;
 }
 
-DWORD CUAY2Encoder::CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CULY2Decoder::DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
 {
-	return pbmihIn->biSizeImage;
-}
-
-DWORD CUAY2Encoder::CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
-{
-	if (pbmihIn->biCompression == FCC('YUY2'))
-		return ICERR_OK;
-	else
+	if (pbmihIn->biCompression != FCC('ULY2'))
 		return ICERR_BADFORMAT;
+
+	if (pbmihOut != NULL && pbmihOut->biCompression != FCC('YUY2'))
+		return ICERR_BADFORMAT;
+
+	return ICERR_OK;
 }

@@ -45,7 +45,7 @@
 #pragma managed(push, off)
 #endif
 
-const DWORD fccUAY2 = FCC('UAY2');
+const DWORD fccULY2 = FCC('ULY2');
 
 HMODULE hModule;
 
@@ -68,12 +68,12 @@ BOOL APIENTRY ICInstallSelf(void)
 	 */
 	GetModuleFileName(hModule, szLongFilename, sizeof(szLongFilename));
 	GetShortPathName(szLongFilename, szShortFilename, sizeof(szShortFilename));
-	return ICInstall(ICTYPE_VIDEO, fccUAY2, (LPARAM)szShortFilename, NULL, ICINSTALL_DRIVER);
+	return ICInstall(ICTYPE_VIDEO, fccULY2, (LPARAM)szShortFilename, NULL, ICINSTALL_DRIVER);
 }
 
 BOOL APIENTRY ICRemoveSelf(void)
 {
-	return ICRemove(ICTYPE_VIDEO, fccUAY2, 0);
+	return ICRemove(ICTYPE_VIDEO, fccULY2, 0);
 }
 
 /*
