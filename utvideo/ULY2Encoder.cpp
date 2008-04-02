@@ -44,7 +44,6 @@
 
 CULY2Encoder::CULY2Encoder(void)
 {
-	m_pPrevFrame = NULL;
 }
 
 CULY2Encoder::~CULY2Encoder(void)
@@ -58,13 +57,6 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	if (icc->lpckid != NULL)
 		*icc->lpckid = FCC('dcdc');
 
-	if (!(icc->dwFlags & ICCOMPRESS_KEYFRAME) && memcmp(m_pPrevFrame->GetBuffer(), icc->lpInput, m_dwFrameSize) == 0)
-	{
-		icc->lpbiOutput->biSizeImage = 0;
-		*icc->lpdwFlags = 0;
-		return ICERR_OK;
-	}
-
 	pCurFrame = CFrameBuffer::NewBuffer(m_dwFrameSize, m_dwFrameStride);
 	memcpy(pCurFrame->GetBuffer(), icc->lpInput, m_dwFrameSize);
 
@@ -72,8 +64,7 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	icc->lpbiOutput->biSizeImage = m_dwFrameSize;
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
 
-	delete m_pPrevFrame;
-	m_pPrevFrame = pCurFrame;
+	delete pCurFrame;
 
 	return ICERR_OK;
 }
@@ -83,14 +74,11 @@ DWORD CULY2Encoder::CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *p
 	m_dwFrameSize = pbmihIn->biSizeImage;
 	m_dwFrameStride = ROUNDUP(pbmihIn->biWidth, 2) * 2;
 
-	m_pPrevFrame = CFrameBuffer::NewBuffer(m_dwFrameSize, m_dwFrameStride);
-
 	return ICERR_OK;
 }
 
 DWORD CULY2Encoder::CompressEnd(void)
 {
-	delete m_pPrevFrame;
 	return ICERR_OK;
 }
 

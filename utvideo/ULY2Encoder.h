@@ -46,7 +46,6 @@ class CULY2Encoder :
 	public CEncoder
 {
 private:
-	CFrameBuffer *m_pPrevFrame;
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
 
