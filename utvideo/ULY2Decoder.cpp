@@ -74,6 +74,8 @@ DWORD CULY2Decoder::DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEA
 	if (pbmihOut == NULL)
 		return sizeof(BITMAPINFOHEADER);
 
+	memset(pbmihOut, 0, sizeof(BITMAPINFOHEADER));
+
 	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER);
 	pbmihOut->biWidth         = pbmihIn->biWidth;
 	pbmihOut->biHeight        = pbmihIn->biHeight;
