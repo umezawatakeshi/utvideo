@@ -48,6 +48,10 @@ class CULY2Encoder :
 private:
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
+	DWORD m_dwYPlaneSize;
+	DWORD m_dwYPlaneStride;
+	DWORD m_dwCPlaneSize;
+	DWORD m_dwCPlaneStride;
 
 public:
 	CULY2Encoder(void);
@@ -60,4 +64,7 @@ public:
 	virtual DWORD CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
 	virtual DWORD CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
 	virtual DWORD CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+
+private:
+	void ConvertFromYUY2ToPlanar(CFrameBuffer *pBuffer, const void *pSrc, DWORD dwFrameSize);
 };

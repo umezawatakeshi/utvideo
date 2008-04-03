@@ -53,15 +53,24 @@ CULY2Encoder::~CULY2Encoder(void)
 DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 {
 	CFrameBuffer *pCurFrame;
+	FRAMEHEADER fh;
 
 	if (icc->lpckid != NULL)
 		*icc->lpckid = FCC('dcdc');
 
-	pCurFrame = new CFrameBuffer();
-	pCurFrame->AddPlane(m_dwFrameSize, m_dwFrameStride);
-	memcpy(pCurFrame->GetBuffer(), icc->lpInput, m_dwFrameSize);
+	memset(&fh, 0, sizeof(FRAMEHEADER));
 
-	memcpy(icc->lpOutput, pCurFrame->GetBuffer(), m_dwFrameSize);
+	pCurFrame = new CFrameBuffer();
+	pCurFrame->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
+	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
+	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
+
+	ConvertFromYUY2ToPlanar(pCurFrame, icc->lpInput, m_dwFrameSize);
+
+	memcpy(icc->lpOutput, pCurFrame->GetPlane(0), m_dwYPlaneSize);
+	memcpy(((BYTE *)icc->lpOutput) + m_dwYPlaneSize, pCurFrame->GetPlane(1), m_dwCPlaneSize);
+	memcpy(((BYTE *)icc->lpOutput) + m_dwYPlaneSize + m_dwCPlaneSize, pCurFrame->GetPlane(2), m_dwCPlaneSize);
+
 	icc->lpbiOutput->biSizeImage = m_dwFrameSize;
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
 
@@ -72,8 +81,14 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 
 DWORD CULY2Encoder::CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
 {
-	m_dwFrameSize = pbmihIn->biSizeImage;
 	m_dwFrameStride = ROUNDUP(pbmihIn->biWidth, 2) * 2;
+	m_dwFrameSize = m_dwFrameStride * pbmihIn->biHeight;
+
+	m_dwYPlaneStride = ROUNDUP(pbmihIn->biWidth, 2);
+	m_dwYPlaneSize = m_dwYPlaneStride * pbmihIn->biHeight;
+
+	m_dwCPlaneStride = ROUNDUP(pbmihIn->biWidth, 2) / 2;
+	m_dwCPlaneSize = m_dwCPlaneStride * pbmihIn->biHeight;
 
 	return ICERR_OK;
 }
@@ -107,6 +122,9 @@ DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADE
 	pbmiheOut = (BITMAPINFOHEADER_EXTRA *)(pbmihOut + 1);
 	pbmiheOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
 	pbmiheOut->fccOriginalFormat = pbmihIn->biCompression;
+	pbmiheOut->wExtraSize        = sizeof(BITMAPINFOHEADER_EXTRA);
+	pbmiheOut->wFrameHeaderSize  = sizeof(FRAMEHEADER);
+	pbmiheOut->dwFlags0          = BMIHE_FLAGS0_COMPRESS_NONE;
 
 	return ICERR_OK;
 }
@@ -122,4 +140,25 @@ DWORD CULY2Encoder::CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *p
 		return ICERR_OK;
 	else
 		return ICERR_BADFORMAT;
+}
+
+void CULY2Encoder::ConvertFromYUY2ToPlanar(CFrameBuffer *pBuffer, const void *pSrc, DWORD dwFrameSize)
+{
+	BYTE *p, *y, *u, *v;
+	BYTE *pSrcBegin;
+	BYTE *pSrcEnd;
+
+	pSrcBegin = (BYTE *)pSrc;
+	pSrcEnd = pSrcBegin + dwFrameSize;
+	y = pBuffer->GetPlane(0);
+	u = pBuffer->GetPlane(1);
+	v = pBuffer->GetPlane(2);
+
+	for (p = pSrcBegin; p < pSrcEnd; p += 4)
+	{
+		*y++ = *p;
+		*u++ = *(p+1);
+		*y++ = *(p+2);
+		*v++ = *(p+3);
+	}
 }
