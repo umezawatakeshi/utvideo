@@ -41,6 +41,7 @@
 #include "StdAfx.h"
 #include "ULY2Encoder.h"
 #include "utvideo.h"
+#include "HuffmanCode.h"
 
 CULY2Encoder::CULY2Encoder(void)
 {
@@ -53,25 +54,28 @@ CULY2Encoder::~CULY2Encoder(void)
 DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 {
 	CFrameBuffer *pCurFrame;
-	FRAMEHEADER fh;
+	FRAMEHEADER *pfh;
+	BYTE *p;
 
 	if (icc->lpckid != NULL)
 		*icc->lpckid = FCC('dcdc');
-
-	memset(&fh, 0, sizeof(FRAMEHEADER));
 
 	pCurFrame = new CFrameBuffer();
 	pCurFrame->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
 	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
 	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
+	pfh = (FRAMEHEADER *)icc->lpOutput;
+	memset(pfh, 0, sizeof(FRAMEHEADER));
+	p = (BYTE *)(pfh + 1);
 
-	ConvertFromYUY2ToPlanar(pCurFrame, icc->lpInput, m_dwFrameSize);
+	ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
+	p += EncodePlane(p, pCurFrame->GetPlane(0), pCurFrame->GetPlane(0) + m_dwYPlaneSize, m_dwYPlaneStride);
+	p += EncodePlane(p, pCurFrame->GetPlane(1), pCurFrame->GetPlane(1) + m_dwCPlaneSize, m_dwCPlaneStride);
+	p += EncodePlane(p, pCurFrame->GetPlane(2), pCurFrame->GetPlane(2) + m_dwCPlaneSize, m_dwCPlaneStride);
+	memset(p, 0, 8);
+	p += 8;
 
-	memcpy(icc->lpOutput, pCurFrame->GetPlane(0), m_dwYPlaneSize);
-	memcpy(((BYTE *)icc->lpOutput) + m_dwYPlaneSize, pCurFrame->GetPlane(1), m_dwCPlaneSize);
-	memcpy(((BYTE *)icc->lpOutput) + m_dwYPlaneSize + m_dwCPlaneSize, pCurFrame->GetPlane(2), m_dwCPlaneSize);
-
-	icc->lpbiOutput->biSizeImage = m_dwFrameSize;
+	icc->lpbiOutput->biSizeImage = p - ((BYTE *)icc->lpOutput);
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
 
 	delete pCurFrame;
@@ -124,7 +128,7 @@ DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADE
 	pbmiheOut->fccOriginalFormat = pbmihIn->biCompression;
 	pbmiheOut->wExtraSize        = sizeof(BITMAPINFOHEADER_EXTRA);
 	pbmiheOut->wFrameHeaderSize  = sizeof(FRAMEHEADER);
-	pbmiheOut->dwFlags0          = BMIHE_FLAGS0_COMPRESS_NONE;
+	pbmiheOut->dwFlags0          = BMIHE_FLAGS0_COMPRESS_HUFFMAN_CODE;
 
 	return ICERR_OK;
 }
@@ -142,13 +146,11 @@ DWORD CULY2Encoder::CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *p
 		return ICERR_BADFORMAT;
 }
 
-void CULY2Encoder::ConvertFromYUY2ToPlanar(CFrameBuffer *pBuffer, const void *pSrc, DWORD dwFrameSize)
+void CULY2Encoder::ConvertFromYUY2ToPlanar(CFrameBuffer *pBuffer, const BYTE *pSrcBegin, DWORD dwFrameSize)
 {
-	BYTE *p, *y, *u, *v;
-	BYTE *pSrcBegin;
-	BYTE *pSrcEnd;
+	BYTE *y, *u, *v;
+	const BYTE *pSrcEnd, *p;
 
-	pSrcBegin = (BYTE *)pSrc;
 	pSrcEnd = pSrcBegin + dwFrameSize;
 	y = pBuffer->GetPlane(0);
 	u = pBuffer->GetPlane(1);
@@ -161,4 +163,27 @@ void CULY2Encoder::ConvertFromYUY2ToPlanar(CFrameBuffer *pBuffer, const void *pS
 		*y++ = *(p+2);
 		*v++ = *(p+3);
 	}
+}
+
+DWORD CULY2Encoder::EncodePlane(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwFrameStride)
+{
+	const BYTE *p;
+	DWORD count[256];
+	BYTE *pCodeLengthTable;
+	HUFFMAN_ENCODE_TABLE het;
+	DWORD cbEncoded;
+
+	pCodeLengthTable = pDst;
+
+	for (int i = 0; i < 256; i++)
+		count[i] = 0;
+
+	for (p = pSrcBegin; p < pSrcEnd; p++)
+		count[*p]++;
+
+	GenerateHuffmanCodeLengthTable(pCodeLengthTable, count);
+	GenerateHuffmanEncodeTable(&het, pCodeLengthTable);
+	cbEncoded = HuffmanEncode(pDst + 256 + 4, pSrcBegin, pSrcEnd, &het);
+	*(DWORD *)(pDst + 256) = cbEncoded + 256 + 4;
+	return cbEncoded + 256 + 4;
 }

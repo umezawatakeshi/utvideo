@@ -66,5 +66,6 @@ public:
 	virtual DWORD CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
 
 private:
-	void ConvertFromYUY2ToPlanar(CFrameBuffer *pBuffer, const void *pSrc, DWORD dwFrameSize);
+	void ConvertFromYUY2ToPlanar(CFrameBuffer *pBuffer, const BYTE *pSrc, DWORD dwFrameSize);
+	DWORD EncodePlane(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwFrameStride);
 };
