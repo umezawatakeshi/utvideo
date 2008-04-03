@@ -64,3 +64,6 @@
 
 #include <vfw.h>
 #include <aviriff.h>
+
+#include <algorithm>
+using namespace std;
