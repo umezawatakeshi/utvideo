@@ -43,33 +43,28 @@
 class CFrameBuffer
 {
 private:
-	BYTE *m_pAllocatedAddr;
-	BYTE *m_pBufferAddr;
+	static const int MAX_PLANE = 4;
 
 private:
-	CFrameBuffer(void);
+	int m_nPlanes;
+	BYTE *m_pAllocatedAddr[MAX_PLANE];
+	BYTE *m_pBufferAddr[MAX_PLANE];
+
 public:
+	CFrameBuffer(void);
 	~CFrameBuffer(void);
 
-private:
-	static CFrameBuffer *InternalNewBuffer(DWORD dwSize, DWORD dwMarginSize, DWORD flProtect);
 public:
-	static inline CFrameBuffer *NewBuffer(DWORD dwSize, DWORD dwMarginSize)
-	{
-		return InternalNewBuffer(dwSize, dwMarginSize, PAGE_READWRITE);
-	}
-	static inline const CFrameBuffer *NewZeroBuffer(DWORD dwSize, DWORD dwMarginSize)
-	{
-		return InternalNewBuffer(dwSize, dwMarginSize, PAGE_READONLY);
-	}
+	void AddPlane(DWORD dwSize, DWORD dwMarginSize);
 
 public:
-	inline BYTE *GetBuffer()
+	inline BYTE *GetPlane(int n)
 	{
-		return m_pBufferAddr;
+		return m_pBufferAddr[n];
 	}
-	inline const BYTE *GetBuffer() const
+
+	inline BYTE *GetBuffer(void)
 	{
-		return m_pBufferAddr;
+		return GetPlane(0);
 	}
 };

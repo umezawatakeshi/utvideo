@@ -57,7 +57,8 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	if (icc->lpckid != NULL)
 		*icc->lpckid = FCC('dcdc');
 
-	pCurFrame = CFrameBuffer::NewBuffer(m_dwFrameSize, m_dwFrameStride);
+	pCurFrame = new CFrameBuffer();
+	pCurFrame->AddPlane(m_dwFrameSize, m_dwFrameStride);
 	memcpy(pCurFrame->GetBuffer(), icc->lpInput, m_dwFrameSize);
 
 	memcpy(icc->lpOutput, pCurFrame->GetBuffer(), m_dwFrameSize);

@@ -44,23 +44,30 @@
 
 CFrameBuffer::CFrameBuffer(void)
 {
-	m_pAllocatedAddr = NULL;
-	m_pBufferAddr = NULL;
+	for (int i = 0; i < MAX_PLANE; i++)
+	{
+		m_pAllocatedAddr[i] = NULL;
+		m_pBufferAddr[i] = NULL;
+	}
+	m_nPlanes = 0;
 }
 
 CFrameBuffer::~CFrameBuffer(void)
 {
-	if (m_pAllocatedAddr != NULL)
-		VirtualFree(m_pAllocatedAddr, 0, MEM_RELEASE);
+	for (int i = 0; i < MAX_PLANE; i++)
+	{
+		if (m_pAllocatedAddr[i] != NULL)
+			VirtualFree(m_pAllocatedAddr[i], 0, MEM_RELEASE);
+	}
 }
 
-CFrameBuffer *CFrameBuffer::InternalNewBuffer(DWORD dwSize, DWORD dwMarginSize, DWORD flProtect)
+void CFrameBuffer::AddPlane(DWORD dwSize, DWORD dwMarginSize)
 {
-	CFrameBuffer *pBuffer;
 	SYSTEM_INFO si;
 	DWORD dwPageSize;
 	DWORD dwPrecedingMarginSize;
 	DWORD dwAllocateSize;
+	BYTE *pAllocatedAddr;
 
 	GetSystemInfo(&si);
 	dwPageSize = si.dwPageSize;
@@ -68,14 +75,13 @@ CFrameBuffer *CFrameBuffer::InternalNewBuffer(DWORD dwSize, DWORD dwMarginSize, 
 	dwPrecedingMarginSize = ROUNDUP(dwMarginSize, dwPageSize);
 	dwAllocateSize = dwPrecedingMarginSize + ROUNDUP(dwSize + dwMarginSize, dwPageSize);
 
-	pBuffer = new CFrameBuffer();
-	pBuffer->m_pAllocatedAddr = (BYTE *)VirtualAlloc(NULL, dwAllocateSize, MEM_COMMIT | MEM_RESERVE, flProtect);
-	if (pBuffer->m_pAllocatedAddr == NULL)
-	{
-		delete pBuffer;
-		return NULL;
-	}
-	pBuffer->m_pBufferAddr = pBuffer->m_pAllocatedAddr + dwPrecedingMarginSize;
+	pAllocatedAddr = (BYTE *)VirtualAlloc(NULL, dwAllocateSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	if (pAllocatedAddr == NULL)
+		return;
 
-	return pBuffer;
+	m_pAllocatedAddr[m_nPlanes] = pAllocatedAddr;
+	m_pBufferAddr[m_nPlanes] = pAllocatedAddr + dwPrecedingMarginSize;
+	m_nPlanes++;
+
+	return;
 }
