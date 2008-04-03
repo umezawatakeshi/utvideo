@@ -44,32 +44,31 @@
 
 struct BITMAPINFOHEADER_EXTRA
 {
+	WORD wExtraSize;
+	WORD wFrameHeaderSize;
 	DWORD dwEncoderVersion;
 	DWORD fccOriginalFormat;
+	DWORD dwFlags0;
 };
 
-#define BMIHE_VERSION_MASK 0xffffff00
+#define BMIHE_FLAGS0_COMPRESS_MASK              0x00000001
+#define BMIHE_FLAGS0_COMPRESS_NONE              0x00000000
+#define BMIHE_FLAGS0_COMPRESS_HUFFMAN_CODE      0x00000001
 
 struct FRAMEHEADER
 {
 	DWORD dwFlags0;
-	DWORD dwFlags1;
 };
 
-#define FH_FLAGS0_DELTAFRAME                    0x00000001
+#define FH_FLAGS0_DELTAFRAME                    0x80000000
 
-#define FH_FLAGS0_COMPRESS_MASK                 0x00000100
-#define FH_FLAGS0_COMPRESS_NONE                 0x00000000
-#define FH_FLAGS0_COMPRESS_HUFFMAN_CODE         0x00000100
+#define FH_FLAGS0_DIVIDE_COUNT_MASK             0x000000ff
 
-#define FH_FLAGS1_DIVIDE_COUNT_MASK             0x000000ff
+#define FH_FLAGS0_INTRAFRAME_PREDICT_MASK       0x00000100
+#define FH_FLAGS0_INTRAFRAME_PREDICT_NONE       0x00000000
+#define FH_FLAGS0_INTRAFRAME_PREDICT_ABOVE      0x00000100
 
-#define FH_FLAGS1_INTRAFRAME_PREDICT_MASK       0x00000100
-#define FH_FLAGS1_INTRAFRAME_PREDICT_NONE       0x00000000
-#define FH_FLAGS1_INTRAFRAME_PREDICT_ABOVE      0x00000100
-
-#define FH_FLAGS0_RESERVED                      0xfffffefe
-#define FH_FLAGS1_RESERVED                      0xfffffe00
+#define FH_FLAGS0_RESERVED                      0x7ffffe00
 
 
 inline DWORD ROUNDUP(DWORD a, DWORD b)
