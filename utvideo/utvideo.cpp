@@ -167,7 +167,10 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 		return pCodec->DecompressQuery((BITMAPINFOHEADER *)lParam1, (BITMAPINFOHEADER *)lParam2);
 	}
 
-	return DefDriverProc(dwDriverId, hdrvr, uMsg, lParam1, lParam2);
+	if (uMsg < DRV_USER)
+		return DefDriverProc(dwDriverId, hdrvr, uMsg, lParam1, lParam2);
+	else
+		return ICERR_UNSUPPORTED;
 }
 
 #ifdef _MANAGED
