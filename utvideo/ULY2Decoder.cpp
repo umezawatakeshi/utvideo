@@ -73,6 +73,8 @@ DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 
 	icd->lpbiOutput->biSizeImage = m_dwFrameSize;
 
+	delete pCurFrame;
+
 	return ICERR_OK;
 }
 
