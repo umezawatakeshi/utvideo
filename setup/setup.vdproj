@@ -297,6 +297,17 @@
             "Property" = "8:ProgramMenuFolder"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_31C7B3BCDC0B4CE5B3D14E73D404DB1B"
+                    {
+                    "Name" = "8:Ut Video Codec Suite"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_8719728C2F4144B496ECB39B32B03683"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
             "{1525181F-901A-416C-8A58-119130FE478E}:_F9DAA2C9D8B84BFC84B7C995A236E944"
@@ -325,14 +336,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite"
-        "ProductCode" = "8:{D650283B-9B74-4701-B6AD-DF4EC22BDB63}"
-        "PackageCode" = "8:{6B642B62-2A6A-4582-90AD-ADBD9B5D8E5D}"
+        "ProductCode" = "8:{94282DE9-AB27-40BC-A7B2-6DFCFCA0417D}"
+        "PackageCode" = "8:{30638ED4-4D71-4518-BBAC-9D607F47F028}"
         "UpgradeCode" = "8:{BD16A4A2-9AB5-4C0C-A763-DB7F9EAA4B1E}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.00.0001"
+        "ProductVersion" = "8:1.00.0002"
         "Manufacturer" = "8:UMEZAWA Takeshi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://umezawa.dyndns.info/"
@@ -445,6 +456,48 @@
         }
         "Shortcut"
         {
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_05481BD296EE42D6B8191DE6A4B46C18"
+            {
+            "Name" = "8:License Agreement (English)"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_1F878E1DA1B34589B3F68E6439C694A7"
+            "Folder" = "8:_31C7B3BCDC0B4CE5B3D14E73D404DB1B"
+            "WorkingFolder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_6B7D01DD01E54740A1D6A1244B2D92E5"
+            {
+            "Name" = "8:License Agreement (English, RTF)"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_77361C4AEFD64A5287A1863D384FBC11"
+            "Folder" = "8:_31C7B3BCDC0B4CE5B3D14E73D404DB1B"
+            "WorkingFolder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_B833FA5828B34E64A3FC7030B6D0D83D"
+            {
+            "Name" = "8:License Agreement (Japanese)"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_8C3447F14F014BBBB83BB1282D1EFA61"
+            "Folder" = "8:_31C7B3BCDC0B4CE5B3D14E73D404DB1B"
+            "WorkingFolder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
         }
         "UserInterface"
         {
