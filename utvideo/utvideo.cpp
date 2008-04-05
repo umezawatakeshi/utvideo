@@ -57,7 +57,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 	return TRUE;
 }
 
-BOOL APIENTRY ICInstallSelf(void)
+int APIENTRY ICInstallSelf(void)
 {
 	char szLongFilename[MAX_PATH];
 	char szShortFilename[MAX_PATH];
@@ -68,18 +68,15 @@ BOOL APIENTRY ICInstallSelf(void)
 	 */
 	GetModuleFileName(hModule, szLongFilename, sizeof(szLongFilename));
 	GetShortPathName(szLongFilename, szShortFilename, sizeof(szShortFilename));
-	return ICInstall(ICTYPE_VIDEO, fccULY2, (LPARAM)szShortFilename, NULL, ICINSTALL_DRIVER);
+	ICInstall(ICTYPE_VIDEO, fccULY2, (LPARAM)szShortFilename, NULL, ICINSTALL_DRIVER);
+	return 0;
 }
 
-BOOL APIENTRY ICRemoveSelf(void)
+int APIENTRY ICRemoveSelf(void)
 {
-	return ICRemove(ICTYPE_VIDEO, fccULY2, 0);
+	ICRemove(ICTYPE_VIDEO, fccULY2, 0);
+	return 0;
 }
-
-/*
- * ICInstall()/ICRemove() の返り値は信用できない（常に nonzero が返る）ので、
- * エラーチェックは行わない。
- */
 
 void CALLBACK ICInstallByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
 {
