@@ -91,6 +91,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;rundll32 $(TargetFileName),ICInstallByRundll"
 			/>
 		</Configuration>
 		<Configuration
@@ -169,6 +170,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;rundll32 $(TargetFileName),ICInstallByRundll"
 			/>
 		</Configuration>
 	</Configurations>
