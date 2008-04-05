@@ -179,6 +179,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 	if (cls[0].codelen == 0)
 	{
 		memset(pDecodeTable, 0, sizeof(HUFFMAN_DECODE_TABLE));
+		pDecodeTable->dwSymbol[0] = cls[0].symbol;
 		return;
 	}
 
@@ -254,6 +255,12 @@ void HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const 
 	DWORD *pSrc;
 	BYTE *p;
 	DWORD code;
+
+	if (pDecodeTable->nCodeLength[0] == 0)
+	{
+		memset(pDstBegin, pDecodeTable->dwSymbol[0], pDstEnd-pDstBegin);
+		return;
+	}
 
 	nBits = 0;
 	pSrc = (DWORD *)pSrcBegin;
