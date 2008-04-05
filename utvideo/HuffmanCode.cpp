@@ -39,6 +39,9 @@
  */
 
 #include "StdAfx.h"
+//#include <windows.h>
+//#include <algorithm>
+//using namespace std;
 #include "HuffmanCode.h"
 
 struct hufftree {
@@ -143,8 +146,75 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *
 	}
 }
 
+// IA-32 の BSR 命令
+// 本物の BSR 命令では入力が 0 の場合に出力が不定になる。
+// ここでは（バグを検出するのを容易にするために）メッセージボックスを開いたあとに不定な値を返している。
+inline int bsr(DWORD curcode)
+{
+	for (int i = 31; i >= 0; i--)
+		if (curcode & (0x80000000 >> (31 - i)))
+			return i;
+	MessageBox(NULL, "BSR NullPo", "Ut Video Codec", MB_ICONSTOP|MB_OK);
+	return rand() % 32;
+}
+
 void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *pCodeLengthTable)
 {
+	struct CODE_LENGTH_SORT cls[256];
+	int nLastIndex;
+	int j;
+	int base;
+	DWORD curcode;
+	int nextfillidx;
+	int prevbsrval;
+
+	for (int i = 0; i < 256; i++)
+	{
+		cls[i].symbol = i;
+		cls[i].codelen = pCodeLengthTable[i];
+	}
+
+	sort(cls, cls+256, codelengthsort_lt);
+
+	if (cls[0].codelen == 0)
+	{
+		memset(pDecodeTable, 0, sizeof(HUFFMAN_DECODE_TABLE));
+		return;
+	}
+
+	// 最も長い符号長を持つシンボルの cls 上での位置を求める
+	for (nLastIndex = 255; nLastIndex >= 0; nLastIndex--)
+	{
+		if (cls[nLastIndex].codelen != 255)
+			break;
+	}
+
+	curcode = 1;
+	j = 0;
+	base = 0;
+	nextfillidx = 0;
+	prevbsrval = 0;
+	for (int i = nLastIndex; i >= 0; i--)
+	{
+		int bsrval = bsr(curcode);
+		if (bsrval != prevbsrval)
+		{
+			base = nextfillidx - (curcode >> (32 - cls[i].codelen));
+		}
+		for (; j <= bsrval; j++)
+		{
+			pDecodeTable->nCodeShift[j] = 32 - cls[i].codelen;
+			pDecodeTable->dwSymbolBase[j] = base;
+		}
+		for (int k = 0; k < (1 << (32 - pDecodeTable->nCodeShift[bsrval] - cls[i].codelen)); k++)
+		{
+			pDecodeTable->dwSymbol[nextfillidx] = cls[i].symbol;
+			pDecodeTable->nCodeLength[nextfillidx] = cls[i].codelen;
+			nextfillidx++;
+		}
+		curcode += 0x80000000 >> (cls[i].codelen - 1);
+		prevbsrval = bsrval;
+	}
 }
 
 DWORD HuffmanEncode(BYTE *pDst_, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable)
@@ -176,4 +246,35 @@ DWORD HuffmanEncode(BYTE *pDst_, const BYTE *pSrcBegin, const BYTE *pSrcEnd, con
 		*pDst++ = dwEncoded;
 
 	return ((BYTE *)pDst) - pDst_;
+}
+
+void HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
+{
+	int nBits;
+	DWORD *pSrc;
+	BYTE *p;
+	DWORD code;
+
+	nBits = 0;
+	pSrc = (DWORD *)pSrcBegin;
+
+	for (p = pDstBegin; p < pDstEnd; p++)
+	{
+		if (nBits == 0)
+			code = (*pSrc) | 0x00000001;
+		else
+			code = ((*pSrc) << nBits) | ((*(pSrc+1)) >> (32 - nBits)) | 0x00000001;
+		int bsrval = bsr(code);
+		int codeshift = pDecodeTable->nCodeShift[bsrval];
+		code >>= codeshift;
+		DWORD symbol = pDecodeTable->dwSymbol[pDecodeTable->dwSymbolBase[bsrval] + code];
+		*p = symbol;
+		int codelen = pDecodeTable->nCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code];;
+		nBits += codelen;
+		if (nBits >= 32)
+		{
+			nBits -= 32;
+			pSrc++;
+		}
+	}
 }

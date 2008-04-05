@@ -47,10 +47,14 @@ struct HUFFMAN_ENCODE_TABLE
 
 struct HUFFMAN_DECODE_TABLE
 {
-	// XXX
+	BYTE nCodeShift[32];
+	DWORD dwSymbolBase[32];
+	DWORD dwSymbol[1024];
+	BYTE nCodeLength[1024];
 };
 
 void GenerateHuffmanCodeLengthTable(BYTE *pCodeLengthTable, const DWORD *pCountTable);
 void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *pCodeLengthTable);
 void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *pCodeLengthTable);
 DWORD HuffmanEncode(BYTE *pDst_, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
+void HuffmanDecode(BYTE *pDstBegin_, BYTE *pDstEnd_, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
