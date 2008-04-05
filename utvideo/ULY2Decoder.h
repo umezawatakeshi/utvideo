@@ -40,6 +40,7 @@
 
 #pragma once
 #include "decoder.h"
+#include "FrameBuffer.h"
 
 class CULY2Decoder :
 	public CDecoder
@@ -47,6 +48,10 @@ class CULY2Decoder :
 private:
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
+	DWORD m_dwYPlaneSize;
+	DWORD m_dwYPlaneStride;
+	DWORD m_dwCPlaneSize;
+	DWORD m_dwCPlaneStride;
 
 public:
 	CULY2Decoder(void);
@@ -58,4 +63,8 @@ public:
 	virtual DWORD DecompressEnd(void);
 	virtual DWORD DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
 	virtual DWORD DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+
+private:
+	void ConvertFromPlanarToYUY2(BYTE *pDstBegin, CFrameBuffer *pBuffer, DWORD dwFrameSize);
+	DWORD DecodePlane(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, DWORD dwFrameStride);
 };

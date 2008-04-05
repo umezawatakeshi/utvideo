@@ -41,6 +41,7 @@
 #include "StdAfx.h"
 #include "utvideo.h"
 #include "ULY2Decoder.h"
+#include "HuffmanCode.h"
 
 CULY2Decoder::CULY2Decoder(void)
 {
@@ -52,14 +53,39 @@ CULY2Decoder::~CULY2Decoder(void)
 
 DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 {
-	memcpy(icd->lpOutput, icd->lpInput, m_dwFrameSize);
+	CFrameBuffer *pCurFrame;
+	FRAMEHEADER *pfh;
+	const BYTE *p;
+
+	pCurFrame = new CFrameBuffer();
+	pCurFrame->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
+	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
+	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
+
+	pfh = (FRAMEHEADER *)icd->lpInput;
+	p = (BYTE *)(pfh + 1);
+
+	p += DecodePlane(pCurFrame->GetPlane(0), pCurFrame->GetPlane(0) + m_dwYPlaneSize, p, m_dwYPlaneStride);
+	p += DecodePlane(pCurFrame->GetPlane(1), pCurFrame->GetPlane(1) + m_dwCPlaneSize, p, m_dwCPlaneStride);
+	p += DecodePlane(pCurFrame->GetPlane(2), pCurFrame->GetPlane(2) + m_dwCPlaneSize, p, m_dwCPlaneStride);
+
+	ConvertFromPlanarToYUY2((BYTE *)icd->lpOutput, pCurFrame, m_dwFrameSize);
+
+	icd->lpbiOutput->biSizeImage = m_dwFrameSize;
+
 	return ICERR_OK;
 }
 
 DWORD CULY2Decoder::DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
 {
-	m_dwFrameSize = pbmihIn->biSizeImage;
 	m_dwFrameStride = ROUNDUP(pbmihIn->biWidth, 2) * 2;
+	m_dwFrameSize = m_dwFrameStride * pbmihIn->biHeight;
+
+	m_dwYPlaneStride = ROUNDUP(pbmihIn->biWidth, 2);
+	m_dwYPlaneSize = m_dwYPlaneStride * pbmihIn->biHeight;
+
+	m_dwCPlaneStride = ROUNDUP(pbmihIn->biWidth, 2) / 2;
+	m_dwCPlaneSize = m_dwCPlaneStride * pbmihIn->biHeight;
 
 	return ICERR_OK;
 }
@@ -100,4 +126,37 @@ DWORD CULY2Decoder::DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER 
 		return ICERR_BADFORMAT;
 
 	return ICERR_OK;
+}
+
+void CULY2Decoder::ConvertFromPlanarToYUY2(BYTE *pDstBegin, CFrameBuffer *pBuffer, DWORD dwFrameSize)
+{
+	const BYTE *y, *u, *v;
+	BYTE *pDstEnd, *p;
+
+	pDstEnd = pDstBegin + dwFrameSize;
+	y = pBuffer->GetPlane(0);
+	u = pBuffer->GetPlane(1);
+	v = pBuffer->GetPlane(2);
+
+	for (p = pDstBegin; p < pDstEnd; p += 4)
+	{
+		*p     = *y++;
+		*(p+1) = *u++;
+		*(p+2) = *y++;
+		*(p+3) = *v++;
+	}
+}
+
+DWORD CULY2Decoder::DecodePlane(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, DWORD dwFrameStride)
+{
+	const BYTE *pCodeLengthTable;
+	HUFFMAN_DECODE_TABLE hdt;
+	DWORD cbEncoded;
+
+	pCodeLengthTable = pSrcBegin;
+	cbEncoded = *(DWORD *)(pSrcBegin + 256);
+
+	GenerateHuffmanDecodeTable(&hdt, pCodeLengthTable);
+	HuffmanDecode(pDstBegin, pDstEnd, pSrcBegin + 256 + 4, &hdt);
+	return cbEncoded + 256 + 4;
 }
