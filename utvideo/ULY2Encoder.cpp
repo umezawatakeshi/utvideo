@@ -184,6 +184,6 @@ DWORD CULY2Encoder::EncodePlane(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *p
 	GenerateHuffmanCodeLengthTable(pCodeLengthTable, count);
 	GenerateHuffmanEncodeTable(&het, pCodeLengthTable);
 	cbEncoded = HuffmanEncode(pDst + 256 + 4, pSrcBegin, pSrcEnd, &het);
-	*(DWORD *)(pDst + 256) = cbEncoded + 256 + 4;
+	*(DWORD *)(pDst + 256) = cbEncoded;
 	return cbEncoded + 256 + 4;
 }
