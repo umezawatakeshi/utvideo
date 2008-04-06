@@ -41,24 +41,30 @@
 #include "StdAfx.h"
 #include "Predict.h"
 
-void PredictAbove(BYTE *pDst, BYTE *pSrcStart, BYTE *pSrcEnd, DWORD dwStride)
+inline BYTE median(BYTE a, BYTE b, BYTE c)
 {
-	BYTE *p = pSrcStart;
+	return max(min(max(a,b),c),min(a,b));
+}
+
+void PredictMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD dwStride)
+{
+	const BYTE *p = pSrcStart;
 	BYTE *q = pDst;
 
 	for (; p < pSrcEnd; p++, q++)
 	{
-		*q = *p - *(p - dwStride);
+		// *q = *p - *(p - dwStride) - *(p - 1) + *(p - 1 - dwStride); // gradient
+		*q = *p - median(*(p - dwStride), *(p - 1), *(p - dwStride)+ *(p - 1) - *(p - 1 - dwStride));
 	}
 }
 
-void RestoreAbove(BYTE *pDst, BYTE *pSrcStart, BYTE *pSrcEnd, DWORD dwStride)
+void RestoreMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD dwStride)
 {
-	BYTE *p = pSrcStart;
+	const BYTE *p = pSrcStart;
 	BYTE *q = pDst;
 
 	for (; p < pSrcEnd; p++, q++)
 	{
-		*q = *(q - dwStride) + *p;
+		*q = *p + median(*(q - dwStride), *(q - 1), *(q - dwStride)+ *(q - 1) - *(q - 1 - dwStride));
 	}
 }

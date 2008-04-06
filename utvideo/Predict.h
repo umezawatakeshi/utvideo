@@ -41,5 +41,5 @@
 #pragma once
 
 // intra-frame prediction
-void PredictAbove(BYTE *pDst, BYTE *pSrcStart, BYTE *pSrcEnd, DWORD dwStride);
-void RestoreAbove(BYTE *pDst, BYTE *pSrcStart, BYTE *pSrcEnd, DWORD dwStride);
+void PredictMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD dwStride);
+void RestoreMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD dwStride);
