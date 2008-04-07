@@ -120,30 +120,28 @@ DWORD CULY2Encoder::CompressEnd(void)
 
 DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	BITMAPINFOHEADER_EXTRA *pbiheOut;
+	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
 
 	if (pbihOut == NULL)
-		return sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA);
+		return sizeof(BITMAPINFOEXT);
 
-	memset(pbihOut, 0, sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA));
+	memset(pbihOut, 0, sizeof(BITMAPINFOEXT));
 
-	pbihOut->biSize          = sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA);
-	pbihOut->biWidth         = pbihIn->biWidth;
-	pbihOut->biHeight        = pbihIn->biHeight;
-	pbihOut->biPlanes        = 1;
-	pbihOut->biBitCount      = 16;
-	pbihOut->biCompression   = FCC('ULY2');
-	pbihOut->biSizeImage     = pbihIn->biSizeImage;
-	//pbihOut->biXPelsPerMeter
-	//pbihOut->biYPelsPerMeter
-	//pbihOut->biClrUsed
-	//pbihOut->biClrImportant
-
-	pbiheOut = (BITMAPINFOHEADER_EXTRA *)(pbihOut + 1);
-	pbiheOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
-	pbiheOut->fccOriginalFormat = pbihIn->biCompression;
-	pbiheOut->dwFrameHeaderSize = sizeof(FRAMEHEADER);
-	pbiheOut->dwFlags0          = BMIHE_FLAGS0_COMPRESS_HUFFMAN_CODE;
+	pbieOut->bih.biSize          = sizeof(BITMAPINFOEXT);
+	pbieOut->bih.biWidth         = pbihIn->biWidth;
+	pbieOut->bih.biHeight        = pbihIn->biHeight;
+	pbieOut->bih.biPlanes        = 1;
+	pbieOut->bih.biBitCount      = 16;
+	pbieOut->bih.biCompression   = FCC('ULY2');
+	pbieOut->bih.biSizeImage     = pbihIn->biSizeImage;
+	//pbihOut->bih.biXPelsPerMeter
+	//pbihOut->bih.biYPelsPerMeter
+	//pbihOut->bih.biClrUsed
+	//pbihOut->bih.biClrImportant
+	pbieOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
+	pbieOut->fccOriginalFormat = pbihIn->biCompression;
+	pbieOut->dwFrameHeaderSize = sizeof(FRAMEHEADER);
+	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE;
 
 	return ICERR_OK;
 }
