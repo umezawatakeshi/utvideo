@@ -57,6 +57,8 @@ struct BITMAPINFOEXT
 #define BIE_FLAGS0_COMPRESS_NONE                0x00000000
 #define BIE_FLAGS0_COMPRESS_HUFFMAN_CODE        0x00000001
 
+#define BIE_FLAGS0_RESERVED                     0xfffffffe
+
 struct FRAMEHEADER
 {
 	DWORD dwFlags0;
