@@ -121,10 +121,25 @@ DWORD CULY2Decoder::DecompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEAD
 
 DWORD CULY2Decoder::DecompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
+	BITMAPINFOEXT bieIn;
+
 	if (pbihIn->biCompression != FCC('ULY2'))
 		return ICERR_BADFORMAT;
 
 	if (pbihOut != NULL && pbihOut->biCompression != FCC('YUY2'))
+		return ICERR_BADFORMAT;
+
+	if (pbihIn->biSize < BIE_MIN_SIZE)
+		return ICERR_BADFORMAT;
+
+	for (char *p = ((char *)pbihIn) + sizeof(BITMAPINFOEXT); p < ((char *)pbihIn) + pbihIn->biSize; p++)
+		if (*p != 0)
+			return ICERR_BADFORMAT;
+
+	memset(&bieIn, 0, sizeof(BITMAPINFOEXT));
+	memcpy(&bieIn, pbihIn, min(sizeof(BITMAPINFOEXT), pbihIn->biSize));
+
+	if (bieIn.dwFlags0 & BIE_FLAGS0_RESERVED)
 		return ICERR_BADFORMAT;
 
 	return ICERR_OK;
