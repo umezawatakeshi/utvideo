@@ -142,8 +142,7 @@ DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADE
 	pbmiheOut = (BITMAPINFOHEADER_EXTRA *)(pbmihOut + 1);
 	pbmiheOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
 	pbmiheOut->fccOriginalFormat = pbmihIn->biCompression;
-	pbmiheOut->wExtraSize        = sizeof(BITMAPINFOHEADER_EXTRA);
-	pbmiheOut->wFrameHeaderSize  = sizeof(FRAMEHEADER);
+	pbmiheOut->dwFrameHeaderSize = sizeof(FRAMEHEADER);
 	pbmiheOut->dwFlags0          = BMIHE_FLAGS0_COMPRESS_HUFFMAN_CODE;
 
 	return ICERR_OK;

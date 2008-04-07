@@ -44,8 +44,7 @@
 
 struct BITMAPINFOHEADER_EXTRA
 {
-	WORD wExtraSize;
-	WORD wFrameHeaderSize;
+	DWORD dwFrameHeaderSize;
 	DWORD dwEncoderVersion;
 	DWORD fccOriginalFormat;
 	DWORD dwFlags0;
