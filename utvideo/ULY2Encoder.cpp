@@ -42,6 +42,7 @@
 #include "ULY2Encoder.h"
 #include "utvideo.h"
 #include "HuffmanCode.h"
+#include "Predict.h"
 
 CULY2Encoder::CULY2Encoder(void)
 {
@@ -54,6 +55,7 @@ CULY2Encoder::~CULY2Encoder(void)
 DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 {
 	CFrameBuffer *pCurFrame;
+	CFrameBuffer *pMedianPredicted;
 	FRAMEHEADER *pfh;
 	BYTE *p;
 
@@ -64,21 +66,35 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	pCurFrame->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
 	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
 	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
+
+	pMedianPredicted = new CFrameBuffer();
+	pMedianPredicted->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
+	pMedianPredicted->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
+	pMedianPredicted->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
+
 	pfh = (FRAMEHEADER *)icc->lpOutput;
 	memset(pfh, 0, sizeof(FRAMEHEADER));
 	p = (BYTE *)(pfh + 1);
 
 	ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
-	p += EncodePlane(p, pCurFrame->GetPlane(0), pCurFrame->GetPlane(0) + m_dwYPlaneSize, m_dwYPlaneStride);
-	p += EncodePlane(p, pCurFrame->GetPlane(1), pCurFrame->GetPlane(1) + m_dwCPlaneSize, m_dwCPlaneStride);
-	p += EncodePlane(p, pCurFrame->GetPlane(2), pCurFrame->GetPlane(2) + m_dwCPlaneSize, m_dwCPlaneStride);
+
+	PredictMedian(pMedianPredicted->GetPlane(0), pCurFrame->GetPlane(0), pCurFrame->GetPlane(0) + m_dwYPlaneSize, m_dwYPlaneStride);
+	PredictMedian(pMedianPredicted->GetPlane(1), pCurFrame->GetPlane(1), pCurFrame->GetPlane(1) + m_dwCPlaneSize, m_dwCPlaneStride);
+	PredictMedian(pMedianPredicted->GetPlane(2), pCurFrame->GetPlane(2), pCurFrame->GetPlane(2) + m_dwCPlaneSize, m_dwCPlaneStride);
+
+	p += EncodePlane(p, pMedianPredicted->GetPlane(0), pMedianPredicted->GetPlane(0) + m_dwYPlaneSize, m_dwYPlaneStride);
+	p += EncodePlane(p, pMedianPredicted->GetPlane(1), pMedianPredicted->GetPlane(1) + m_dwCPlaneSize, m_dwCPlaneStride);
+	p += EncodePlane(p, pMedianPredicted->GetPlane(2), pMedianPredicted->GetPlane(2) + m_dwCPlaneSize, m_dwCPlaneStride);
 	memset(p, 0, 8);
 	p += 8;
+
+	pfh->dwFlags0 = FH_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 
 	icc->lpbiOutput->biSizeImage = p - ((BYTE *)icc->lpOutput);
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
 
 	delete pCurFrame;
+	delete pMedianPredicted;
 
 	return ICERR_OK;
 }
