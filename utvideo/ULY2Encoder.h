@@ -59,11 +59,11 @@ public:
 
 public:
 	virtual DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);
-	virtual DWORD CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+	virtual DWORD CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	virtual DWORD CompressEnd(void);
-	virtual DWORD CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	virtual DWORD CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	virtual DWORD CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+	virtual DWORD CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual DWORD CompressGetSize(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual DWORD CompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 
 private:
 	void ConvertFromYUY2ToPlanar(CFrameBuffer *pBuffer, const BYTE *pSrc, DWORD dwFrameSize);

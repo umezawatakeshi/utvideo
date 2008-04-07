@@ -119,9 +119,9 @@ DWORD CVCMCodec::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	return m_pEncoder->Compress(icc, dwSize);
 }
 
-DWORD CVCMCodec::CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CVCMCodec::CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	return m_pEncoder->CompressBegin(pbmihIn, pbmihOut);
+	return m_pEncoder->CompressBegin(pbihIn, pbihOut);
 }
 
 DWORD CVCMCodec::CompressEnd(void)
@@ -129,19 +129,19 @@ DWORD CVCMCodec::CompressEnd(void)
 	return m_pEncoder->CompressEnd();
 }
 
-DWORD CVCMCodec::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CVCMCodec::CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	return m_pEncoder->CompressGetFormat(pbmihIn, pbmihOut);
+	return m_pEncoder->CompressGetFormat(pbihIn, pbihOut);
 }
 
-DWORD CVCMCodec::CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CVCMCodec::CompressGetSize(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	return m_pEncoder->CompressGetSize(pbmihIn, pbmihOut);
+	return m_pEncoder->CompressGetSize(pbihIn, pbihOut);
 }
 
-DWORD CVCMCodec::CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CVCMCodec::CompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	return m_pEncoder->CompressQuery(pbmihIn, pbmihOut);
+	return m_pEncoder->CompressQuery(pbihIn, pbihOut);
 }
 
 DWORD CVCMCodec::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
@@ -149,9 +149,9 @@ DWORD CVCMCodec::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 	return m_pDecoder->Decompress(icd, dwSize);
 }
 
-DWORD CVCMCodec::DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CVCMCodec::DecompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	return m_pDecoder->DecompressBegin(pbmihIn, pbmihOut);
+	return m_pDecoder->DecompressBegin(pbihIn, pbihOut);
 }
 
 DWORD CVCMCodec::DecompressEnd(void)
@@ -159,12 +159,12 @@ DWORD CVCMCodec::DecompressEnd(void)
 	return m_pDecoder->DecompressEnd();
 }
 
-DWORD CVCMCodec::DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CVCMCodec::DecompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	return m_pDecoder->DecompressGetFormat(pbmihIn, pbmihOut);
+	return m_pDecoder->DecompressGetFormat(pbihIn, pbihOut);
 }
 
-DWORD CVCMCodec::DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CVCMCodec::DecompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	return m_pDecoder->DecompressQuery(pbmihIn, pbmihOut);
+	return m_pDecoder->DecompressQuery(pbihIn, pbihOut);
 }

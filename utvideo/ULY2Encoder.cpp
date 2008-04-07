@@ -99,16 +99,16 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	return ICERR_OK;
 }
 
-DWORD CULY2Encoder::CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CULY2Encoder::CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	m_dwFrameStride = ROUNDUP(pbmihIn->biWidth, 2) * 2;
-	m_dwFrameSize = m_dwFrameStride * pbmihIn->biHeight;
+	m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
+	m_dwFrameSize = m_dwFrameStride * pbihIn->biHeight;
 
-	m_dwYPlaneStride = ROUNDUP(pbmihIn->biWidth, 2);
-	m_dwYPlaneSize = m_dwYPlaneStride * pbmihIn->biHeight;
+	m_dwYPlaneStride = ROUNDUP(pbihIn->biWidth, 2);
+	m_dwYPlaneSize = m_dwYPlaneStride * pbihIn->biHeight;
 
-	m_dwCPlaneStride = ROUNDUP(pbmihIn->biWidth, 2) / 2;
-	m_dwCPlaneSize = m_dwCPlaneStride * pbmihIn->biHeight;
+	m_dwCPlaneStride = ROUNDUP(pbihIn->biWidth, 2) / 2;
+	m_dwCPlaneSize = m_dwCPlaneStride * pbihIn->biHeight;
 
 	return ICERR_OK;
 }
@@ -118,44 +118,44 @@ DWORD CULY2Encoder::CompressEnd(void)
 	return ICERR_OK;
 }
 
-DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	BITMAPINFOHEADER_EXTRA *pbmiheOut;
+	BITMAPINFOHEADER_EXTRA *pbiheOut;
 
-	if (pbmihOut == NULL)
+	if (pbihOut == NULL)
 		return sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA);
 
-	memset(pbmihOut, 0, sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA));
+	memset(pbihOut, 0, sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA));
 
-	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA);
-	pbmihOut->biWidth         = pbmihIn->biWidth;
-	pbmihOut->biHeight        = pbmihIn->biHeight;
-	pbmihOut->biPlanes        = 1;
-	pbmihOut->biBitCount      = 16;
-	pbmihOut->biCompression   = FCC('ULY2');
-	pbmihOut->biSizeImage     = pbmihIn->biSizeImage;
-	//pbmihOut->biXPelsPerMeter
-	//pbmihOut->biYPelsPerMeter
-	//pbmihOut->biClrUsed
-	//pbmihOut->biClrImportant
+	pbihOut->biSize          = sizeof(BITMAPINFOHEADER) + sizeof(BITMAPINFOHEADER_EXTRA);
+	pbihOut->biWidth         = pbihIn->biWidth;
+	pbihOut->biHeight        = pbihIn->biHeight;
+	pbihOut->biPlanes        = 1;
+	pbihOut->biBitCount      = 16;
+	pbihOut->biCompression   = FCC('ULY2');
+	pbihOut->biSizeImage     = pbihIn->biSizeImage;
+	//pbihOut->biXPelsPerMeter
+	//pbihOut->biYPelsPerMeter
+	//pbihOut->biClrUsed
+	//pbihOut->biClrImportant
 
-	pbmiheOut = (BITMAPINFOHEADER_EXTRA *)(pbmihOut + 1);
-	pbmiheOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
-	pbmiheOut->fccOriginalFormat = pbmihIn->biCompression;
-	pbmiheOut->dwFrameHeaderSize = sizeof(FRAMEHEADER);
-	pbmiheOut->dwFlags0          = BMIHE_FLAGS0_COMPRESS_HUFFMAN_CODE;
+	pbiheOut = (BITMAPINFOHEADER_EXTRA *)(pbihOut + 1);
+	pbiheOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
+	pbiheOut->fccOriginalFormat = pbihIn->biCompression;
+	pbiheOut->dwFrameHeaderSize = sizeof(FRAMEHEADER);
+	pbiheOut->dwFlags0          = BMIHE_FLAGS0_COMPRESS_HUFFMAN_CODE;
 
 	return ICERR_OK;
 }
 
-DWORD CULY2Encoder::CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CULY2Encoder::CompressGetSize(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	return pbmihIn->biSizeImage;
+	return pbihIn->biSizeImage;
 }
 
-DWORD CULY2Encoder::CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CULY2Encoder::CompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	if (pbmihIn->biCompression == FCC('YUY2'))
+	if (pbihIn->biCompression == FCC('YUY2'))
 		return ICERR_OK;
 	else
 		return ICERR_BADFORMAT;

@@ -48,9 +48,9 @@ public:
 
 public:
 	virtual DWORD Compress(ICCOMPRESS *icc, DWORD dwSize) = 0;
-	virtual DWORD CompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut) = 0;
+	virtual DWORD CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
 	virtual DWORD CompressEnd(void) = 0;
-	virtual DWORD CompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut) = 0;
-	virtual DWORD CompressGetSize(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut) = 0;
-	virtual DWORD CompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut) = 0;
+	virtual DWORD CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
+	virtual DWORD CompressGetSize(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
+	virtual DWORD CompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
 };

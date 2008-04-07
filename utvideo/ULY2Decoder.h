@@ -59,10 +59,10 @@ public:
 
 public:
 	virtual DWORD Decompress(ICDECOMPRESS *icd, DWORD dwSize);
-	virtual DWORD DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+	virtual DWORD DecompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	virtual DWORD DecompressEnd(void);
-	virtual DWORD DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
-	virtual DWORD DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut);
+	virtual DWORD DecompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual DWORD DecompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 
 private:
 	void ConvertFromPlanarToYUY2(BYTE *pDstBegin, CFrameBuffer *pBuffer, DWORD dwFrameSize);

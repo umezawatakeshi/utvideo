@@ -48,8 +48,8 @@ public:
 
 public:
 	virtual DWORD Decompress(ICDECOMPRESS *icd, DWORD dwSize) = 0;
-	virtual DWORD DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut) = 0;
+	virtual DWORD DecompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
 	virtual DWORD DecompressEnd(void) = 0;
-	virtual DWORD DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut) = 0;
-	virtual DWORD DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut) = 0;
+	virtual DWORD DecompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
+	virtual DWORD DecompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
 };

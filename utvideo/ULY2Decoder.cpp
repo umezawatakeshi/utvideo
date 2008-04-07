@@ -78,16 +78,16 @@ DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 	return ICERR_OK;
 }
 
-DWORD CULY2Decoder::DecompressBegin(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CULY2Decoder::DecompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	m_dwFrameStride = ROUNDUP(pbmihIn->biWidth, 2) * 2;
-	m_dwFrameSize = m_dwFrameStride * pbmihIn->biHeight;
+	m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
+	m_dwFrameSize = m_dwFrameStride * pbihIn->biHeight;
 
-	m_dwYPlaneStride = ROUNDUP(pbmihIn->biWidth, 2);
-	m_dwYPlaneSize = m_dwYPlaneStride * pbmihIn->biHeight;
+	m_dwYPlaneStride = ROUNDUP(pbihIn->biWidth, 2);
+	m_dwYPlaneSize = m_dwYPlaneStride * pbihIn->biHeight;
 
-	m_dwCPlaneStride = ROUNDUP(pbmihIn->biWidth, 2) / 2;
-	m_dwCPlaneSize = m_dwCPlaneStride * pbmihIn->biHeight;
+	m_dwCPlaneStride = ROUNDUP(pbihIn->biWidth, 2) / 2;
+	m_dwCPlaneSize = m_dwCPlaneStride * pbihIn->biHeight;
 
 	return ICERR_OK;
 }
@@ -97,34 +97,34 @@ DWORD CULY2Decoder::DecompressEnd(void)
 	return ICERR_OK;
 }
 
-DWORD CULY2Decoder::DecompressGetFormat(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CULY2Decoder::DecompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	if (pbmihOut == NULL)
+	if (pbihOut == NULL)
 		return sizeof(BITMAPINFOHEADER);
 
-	memset(pbmihOut, 0, sizeof(BITMAPINFOHEADER));
+	memset(pbihOut, 0, sizeof(BITMAPINFOHEADER));
 
-	pbmihOut->biSize          = sizeof(BITMAPINFOHEADER);
-	pbmihOut->biWidth         = pbmihIn->biWidth;
-	pbmihOut->biHeight        = pbmihIn->biHeight;
-	pbmihOut->biPlanes        = 1;
-	pbmihOut->biBitCount      = 16;
-	pbmihOut->biCompression   = FCC('YUY2');
-	pbmihOut->biSizeImage     = pbmihIn->biSizeImage;
-	//pbmihOut->biXPelsPerMeter
-	//pbmihOut->biYPelsPerMeter
-	//pbmihOut->biClrUsed
-	//pbmihOut->biClrImportant
+	pbihOut->biSize          = sizeof(BITMAPINFOHEADER);
+	pbihOut->biWidth         = pbihIn->biWidth;
+	pbihOut->biHeight        = pbihIn->biHeight;
+	pbihOut->biPlanes        = 1;
+	pbihOut->biBitCount      = 16;
+	pbihOut->biCompression   = FCC('YUY2');
+	pbihOut->biSizeImage     = pbihIn->biSizeImage;
+	//pbihOut->biXPelsPerMeter
+	//pbihOut->biYPelsPerMeter
+	//pbihOut->biClrUsed
+	//pbihOut->biClrImportant
 
 	return ICERR_OK;
 }
 
-DWORD CULY2Decoder::DecompressQuery(BITMAPINFOHEADER *pbmihIn, BITMAPINFOHEADER *pbmihOut)
+DWORD CULY2Decoder::DecompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	if (pbmihIn->biCompression != FCC('ULY2'))
+	if (pbihIn->biCompression != FCC('ULY2'))
 		return ICERR_BADFORMAT;
 
-	if (pbmihOut != NULL && pbmihOut->biCompression != FCC('YUY2'))
+	if (pbihOut != NULL && pbihOut->biCompression != FCC('YUY2'))
 		return ICERR_BADFORMAT;
 
 	return ICERR_OK;
