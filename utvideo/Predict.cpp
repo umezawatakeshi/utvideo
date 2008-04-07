@@ -51,9 +51,27 @@ void PredictMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD
 	const BYTE *p = pSrcStart;
 	BYTE *q = pDst;
 
+	// 最初のラインの最初のピクセルはそのまま。
+	*q++ = *p++;
+
+	// 最初のラインの残りのピクセルは predict left と同じ。
+	for (; p < pSrcStart + dwStride; p++, q++)
+	{
+		*q = *p - *(p - 1);
+	}
+
+	// 1 ラインしかない場合はここで終了。
+	if (p == pSrcEnd)
+		return;
+
+	// 次のラインの最初のピクセルはそのまま。
+	// predict left/above するほどのものではないと思うし、
+	// こうしておくとアセンブラ化した時に処理が若干簡単になる。
+	*q++ = *p++;
+
+	// 残りのピクセルが predict median の本番
 	for (; p < pSrcEnd; p++, q++)
 	{
-		// *q = *p - *(p - dwStride) - *(p - 1) + *(p - 1 - dwStride); // gradient
 		*q = *p - median(*(p - dwStride), *(p - 1), *(p - dwStride)+ *(p - 1) - *(p - 1 - dwStride));
 	}
 }
@@ -62,6 +80,18 @@ void RestoreMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD
 {
 	const BYTE *p = pSrcStart;
 	BYTE *q = pDst;
+
+	*q++ = *p++;
+
+	for (; p < pSrcStart + dwStride; p++, q++)
+	{
+		*q = *p + *(q - 1);
+	}
+
+	if (p == pSrcEnd)
+		return;
+
+	*q++ = *p++;
 
 	for (; p < pSrcEnd; p++, q++)
 	{
