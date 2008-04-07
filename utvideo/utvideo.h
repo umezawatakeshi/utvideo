@@ -45,10 +45,16 @@
 struct BITMAPINFOEXT
 {
 	BITMAPINFOHEADER bih;
-	DWORD dwFrameHeaderSize;
 	DWORD dwEncoderVersion;
 	DWORD fccOriginalFormat;
 	DWORD dwFlags0;
+	DWORD dwFlags1;
+	DWORD dwFlags2;
+	DWORD dwFlags3;
+	DWORD dwFlags4;
+	DWORD dwFlags5;
+	DWORD dwFlags6;
+	DWORD dwFlags7;
 };
 
 #define BIE_MIN_SIZE (sizeof(BITMAPINFOHEADER) + sizeof(DWORD) * 3)
@@ -58,10 +64,21 @@ struct BITMAPINFOEXT
 #define BIE_FLAGS0_COMPRESS_HUFFMAN_CODE        0x00000001
 
 #define BIE_FLAGS0_RESERVED                     0xfffffffe
+#define BIE_FLAGS1_RESERVED                     0xffffffff
+#define BIE_FLAGS2_RESERVED                     0xffffffff
+#define BIE_FLAGS3_RESERVED                     0xffffffff
+#define BIE_FLAGS4_RESERVED                     0xffffffff
+#define BIE_FLAGS5_RESERVED                     0xffffffff
+#define BIE_FLAGS6_RESERVED                     0xffffffff
+#define BIE_FLAGS7_RESERVED                     0xffffffff
+
 
 struct FRAMEHEADER
 {
 	DWORD dwFlags0;
+	DWORD dwFlags1;
+	DWORD dwFlags2;
+	DWORD dwFlags3;
 };
 
 #define FH_FLAGS0_DELTAFRAME                    0x80000000
@@ -75,6 +92,9 @@ struct FRAMEHEADER
 #define FH_FLAGS0_INTRAFRAME_PREDICT_MEDIAN     0x00000300
 
 #define FH_FLAGS0_RESERVED                      0x7ffffc00
+#define FH_FLAGS1_RESERVED                      0xffffffff
+#define FH_FLAGS2_RESERVED                      0xffffffff
+#define FH_FLAGS3_RESERVED                      0xffffffff
 
 
 inline DWORD ROUNDUP(DWORD a, DWORD b)
