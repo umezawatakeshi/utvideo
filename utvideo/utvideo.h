@@ -81,9 +81,7 @@ struct FRAMEHEADER
 	DWORD dwFlags3;
 };
 
-#define FH_FLAGS0_DELTAFRAME                    0x80000000
-
-#define FH_FLAGS0_DIVIDE_COUNT_MASK             0x000000ff
+//#define FH_FLAGS0_DIVIDE_COUNT_MASK             0x000000ff
 
 #define FH_FLAGS0_INTRAFRAME_PREDICT_MASK       0x00000300
 #define FH_FLAGS0_INTRAFRAME_PREDICT_NONE       0x00000000
@@ -91,7 +89,7 @@ struct FRAMEHEADER
 #define FH_FLAGS0_INTRAFRAME_PREDICT_GRADIENT   0x00000200
 #define FH_FLAGS0_INTRAFRAME_PREDICT_MEDIAN     0x00000300
 
-#define FH_FLAGS0_RESERVED                      0x7ffffc00
+#define FH_FLAGS0_RESERVED                      0xfffffcff
 #define FH_FLAGS1_RESERVED                      0xffffffff
 #define FH_FLAGS2_RESERVED                      0xffffffff
 #define FH_FLAGS3_RESERVED                      0xffffffff
