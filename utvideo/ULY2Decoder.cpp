@@ -42,6 +42,7 @@
 #include "utvideo.h"
 #include "ULY2Decoder.h"
 #include "HuffmanCode.h"
+#include "Predict.h"
 
 CULY2Decoder::CULY2Decoder(void)
 {
@@ -53,22 +54,44 @@ CULY2Decoder::~CULY2Decoder(void)
 
 DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 {
+	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)icd->lpbiInput;
 	CFrameBuffer *pCurFrame;
+	CFrameBuffer *pDecodedFrame;
 	FRAMEHEADER *pfh;
 	const BYTE *p;
 
-	pCurFrame = new CFrameBuffer();
-	pCurFrame->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
-	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
-	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
+	pDecodedFrame = new CFrameBuffer();
+	pDecodedFrame->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
+	pDecodedFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
+	pDecodedFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
 
 	pfh = (FRAMEHEADER *)icd->lpInput;
 	p = (BYTE *)(pfh + 1);
 
-	p += DecodePlane(pCurFrame->GetPlane(0), pCurFrame->GetPlane(0) + m_dwYPlaneSize, p, m_dwYPlaneStride);
-	p += DecodePlane(pCurFrame->GetPlane(1), pCurFrame->GetPlane(1) + m_dwCPlaneSize, p, m_dwCPlaneStride);
-	p += DecodePlane(pCurFrame->GetPlane(2), pCurFrame->GetPlane(2) + m_dwCPlaneSize, p, m_dwCPlaneStride);
+	p += DecodePlane(pDecodedFrame->GetPlane(0), pDecodedFrame->GetPlane(0) + m_dwYPlaneSize, p, m_dwYPlaneStride);
+	p += DecodePlane(pDecodedFrame->GetPlane(1), pDecodedFrame->GetPlane(1) + m_dwCPlaneSize, p, m_dwCPlaneStride);
+	p += DecodePlane(pDecodedFrame->GetPlane(2), pDecodedFrame->GetPlane(2) + m_dwCPlaneSize, p, m_dwCPlaneStride);
 
+	switch (pfh->dwFlags0 & FH_FLAGS0_INTRAFRAME_PREDICT_MASK)
+	{
+	case FH_FLAGS0_INTRAFRAME_PREDICT_NONE:
+		pCurFrame = pDecodedFrame;
+		break;
+	case FH_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
+		{
+			pCurFrame = new CFrameBuffer();
+			pCurFrame->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
+			pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
+			pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
+			RestoreMedian(pCurFrame->GetPlane(0), pDecodedFrame->GetPlane(0), pDecodedFrame->GetPlane(0) + m_dwYPlaneSize, m_dwYPlaneStride);
+			RestoreMedian(pCurFrame->GetPlane(1), pDecodedFrame->GetPlane(1), pDecodedFrame->GetPlane(1) + m_dwCPlaneSize, m_dwCPlaneStride);
+			RestoreMedian(pCurFrame->GetPlane(2), pDecodedFrame->GetPlane(2), pDecodedFrame->GetPlane(2) + m_dwCPlaneSize, m_dwCPlaneStride);
+			delete pDecodedFrame;
+		}
+		break;
+	default:
+		return ICERR_ABORT;
+	}
 	ConvertFromPlanarToYUY2((BYTE *)icd->lpOutput, pCurFrame, m_dwFrameSize);
 
 	icd->lpbiOutput->biSizeImage = m_dwFrameSize;
