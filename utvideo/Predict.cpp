@@ -72,7 +72,7 @@ void PredictMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD
 	// 残りのピクセルが predict median の本番
 	for (; p < pSrcEnd; p++, q++)
 	{
-		*q = *p - median(*(p - dwStride), *(p - 1), *(p - dwStride)+ *(p - 1) - *(p - 1 - dwStride));
+		*q = *p - median(*(p - dwStride), *(p - 1), *(p - dwStride) + *(p - 1) - *(p - 1 - dwStride));
 	}
 }
 
@@ -95,6 +95,6 @@ void RestoreMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD
 
 	for (; p < pSrcEnd; p++, q++)
 	{
-		*q = *p + median(*(q - dwStride), *(q - 1), *(q - dwStride)+ *(q - 1) - *(q - 1 - dwStride));
+		*q = *p + median(*(q - dwStride), *(q - 1), *(q - dwStride) + *(q - 1) - *(q - 1 - dwStride));
 	}
 }
