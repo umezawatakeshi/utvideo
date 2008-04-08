@@ -225,6 +225,9 @@ DWORD HuffmanEncode(BYTE *pDst_, const BYTE *pSrcBegin, const BYTE *pSrcEnd, con
 	DWORD *pDst;
 	const BYTE *p;
 
+	if (pEncodeTable->dwTableMux[0] == 0)
+		return 0;
+
 	nBits = 0;
 	dwEncoded = 0;
 	pDst = (DWORD *)pDst_;
