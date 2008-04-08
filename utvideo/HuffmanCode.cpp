@@ -279,7 +279,7 @@ void HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const 
 		code >>= codeshift;
 		DWORD symbol = pDecodeTable->dwSymbol[pDecodeTable->dwSymbolBase[bsrval] + code];
 		*p = symbol;
-		int codelen = pDecodeTable->nCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code];;
+		int codelen = pDecodeTable->nCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code];
 		nBits += codelen;
 		if (nBits >= 32)
 		{
