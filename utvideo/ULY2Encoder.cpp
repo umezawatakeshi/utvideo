@@ -89,9 +89,6 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	p += 8;
 
 	pfh->dwFlags0 = FH_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
-	//pfh->dwFlags1
-	//pfh->dwFlags2
-	//pfh->dwFlags3
 
 	icc->lpbiOutput->biSizeImage = p - ((BYTE *)icc->lpOutput);
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
@@ -143,14 +140,8 @@ DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER
 	//pbieOut->bih.biClrImportant
 	pbieOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
 	pbieOut->fccOriginalFormat = pbihIn->biCompression;
+	pbieOut->dwFrameHeaderSize = sizeof(FRAMEHEADER);
 	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE;
-	//pbieOut->dwFlags1
-	//pbieOut->dwFlags2
-	//pbieOut->dwFlags3
-	//pbieOut->dwFlags4
-	//pbieOut->dwFlags5
-	//pbieOut->dwFlags6
-	//pbieOut->dwFlags7
 
 	return ICERR_OK;
 }

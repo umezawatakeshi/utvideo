@@ -152,17 +152,11 @@ DWORD CULY2Decoder::DecompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *
 	if (pbihOut != NULL && pbihOut->biCompression != FCC('YUY2'))
 		return ICERR_BADFORMAT;
 
-	if (pbihIn->biSize != sizeof(BITMAPINFOEXT))
+	if (pbihIn->biSize > sizeof(BITMAPINFOEXT))
 		return ICERR_BADFORMAT;
-
-	if (	(pbieIn->dwFlags0 & BIE_FLAGS0_RESERVED) ||
-			(pbieIn->dwFlags1 & BIE_FLAGS1_RESERVED) ||
-			(pbieIn->dwFlags2 & BIE_FLAGS2_RESERVED) ||
-			(pbieIn->dwFlags3 & BIE_FLAGS3_RESERVED) ||
-			(pbieIn->dwFlags4 & BIE_FLAGS4_RESERVED) ||
-			(pbieIn->dwFlags5 & BIE_FLAGS5_RESERVED) ||
-			(pbieIn->dwFlags6 & BIE_FLAGS6_RESERVED) ||
-			(pbieIn->dwFlags7 & BIE_FLAGS7_RESERVED))
+	if (pbieIn->dwFrameHeaderSize > sizeof(FRAMEHEADER))
+		return ICERR_BADFORMAT;
+	if (pbieIn->dwFlags0 & BIE_FLAGS0_RESERVED)
 		return ICERR_BADFORMAT;
 
 	return ICERR_OK;
