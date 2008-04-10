@@ -39,6 +39,7 @@
  */
 
 #include "StdAfx.h"
+#include "utvideo.h"
 #include "VCMCodec.h"
 #include "ULY2Encoder.h"
 #include "ULY2Decoder.h"
@@ -96,7 +97,7 @@ DWORD CVCMCodec::GetInfo(ICINFO *icinfo, DWORD dwSize)
 	icinfo->fccType      = ICTYPE_VIDEO;
 	icinfo->fccHandler   = m_fccHandler;
 	icinfo->dwFlags      = 0;
-	icinfo->dwVersion    = 1;
+	icinfo->dwVersion    = UTVIDEO_ENCODER_VERSION;
 	icinfo->dwVersionICM = ICVERSION;
 	wsprintfW(icinfo->szName, L"%S", "Ut Video Codec");
 	wsprintfW(icinfo->szDescription, L"%S", "Ut Video Codec YUV422 (VCM)");
