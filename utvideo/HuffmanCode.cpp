@@ -56,14 +56,22 @@ inline bool hufftree_gt(const struct hufftree *a, const struct hufftree *b)
 	return (a->count > b->count);
 }
 
-void generate_code_length(BYTE *codelen, const struct hufftree *node, BYTE curlen)
+bool generate_code_length(BYTE *codelen, const struct hufftree *node, BYTE curlen)
 {
 	if (node->left == NULL) {
 		codelen[node->symbol] = curlen;
+		return (curlen > 24);
 	} else {
-		generate_code_length(codelen, node->left, curlen+1);
-		generate_code_length(codelen, node->right, curlen+1);
+		return
+			generate_code_length(codelen, node->left, curlen+1) ||
+			generate_code_length(codelen, node->right, curlen+1);
 	}
+}
+
+static void GenerateLengthLimitedHuffmanCodeLengthTable(BYTE *pCodeLengthTable)
+{
+	// Ç∆ÇËÇ†Ç¶Ç∏Ç±ÇÍÇ≈ì¶Ç∞ÇÈÅB
+	memset(pCodeLengthTable, 8, 256);
 }
 
 void GenerateHuffmanCodeLengthTable(BYTE *pCodeLengthTable, const DWORD *pCountTable)
@@ -100,7 +108,8 @@ void GenerateHuffmanCodeLengthTable(BYTE *pCodeLengthTable, const DWORD *pCountT
 		*insptr = &huffnode[i];
 	}
 
-	generate_code_length(pCodeLengthTable, huffsort[0], 0);
+	if (generate_code_length(pCodeLengthTable, huffsort[0], 0))
+		GenerateLengthLimitedHuffmanCodeLengthTable(pCodeLengthTable);
 }
 
 struct CODE_LENGTH_SORT
