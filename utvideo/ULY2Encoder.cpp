@@ -148,7 +148,7 @@ DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER
 
 DWORD CULY2Encoder::CompressGetSize(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
-	return pbihIn->biSizeImage;
+	return pbihIn->biSizeImage + 2048; // +2048 ÇÕÇ«ÇÒÇ‘ÇËä®íËÅB
 }
 
 DWORD CULY2Encoder::CompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
