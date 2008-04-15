@@ -161,7 +161,7 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *
 inline int bsr(DWORD curcode)
 {
 	for (int i = 31; i >= 0; i--)
-		if (curcode & (0x80000000 >> (31 - i)))
+		if (curcode & (1 << i))
 			return i;
 	MessageBox(NULL, "BSR NullPo", "Ut Video Codec", MB_ICONSTOP|MB_OK);
 	return rand() % 32;
