@@ -56,7 +56,7 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 {
 	CFrameBuffer *pCurFrame;
 	CFrameBuffer *pMedianPredicted;
-	FRAMEINFO *pfi;
+	FRAMEINFO fi;
 	BYTE *p;
 
 	if (icc->lpckid != NULL)
@@ -72,23 +72,23 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	pMedianPredicted->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
 	pMedianPredicted->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
 
-	pfi = (FRAMEINFO *)icc->lpOutput;
-	memset(pfi, 0, sizeof(FRAMEINFO));
-	p = (BYTE *)(pfi + 1);
+	memset(&fi, 0, sizeof(FRAMEINFO));
 
 	ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
 
-	PredictMedian(pMedianPredicted->GetPlane(0), pCurFrame->GetPlane(0), pCurFrame->GetPlane(0) + m_dwYPlaneSize, m_dwYPlaneStride);
-	PredictMedian(pMedianPredicted->GetPlane(1), pCurFrame->GetPlane(1), pCurFrame->GetPlane(1) + m_dwCPlaneSize, m_dwCPlaneStride);
-	PredictMedian(pMedianPredicted->GetPlane(2), pCurFrame->GetPlane(2), pCurFrame->GetPlane(2) + m_dwCPlaneSize, m_dwCPlaneStride);
+	fi.dwPredictionHint0 = *pCurFrame->GetPlane(0) | (*pCurFrame->GetPlane(1) << 8) | (*pCurFrame->GetPlane(2) << 16);
+	PredictMedian(pMedianPredicted->GetPlane(0), pCurFrame->GetPlane(0), pCurFrame->GetPlane(0) + m_dwYPlaneSize, m_dwYPlaneStride, *pCurFrame->GetPlane(0));
+	PredictMedian(pMedianPredicted->GetPlane(1), pCurFrame->GetPlane(1), pCurFrame->GetPlane(1) + m_dwCPlaneSize, m_dwCPlaneStride, *pCurFrame->GetPlane(1));
+	PredictMedian(pMedianPredicted->GetPlane(2), pCurFrame->GetPlane(2), pCurFrame->GetPlane(2) + m_dwCPlaneSize, m_dwCPlaneStride, *pCurFrame->GetPlane(2));
+	fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 
+	p = (BYTE *)icc->lpOutput;
 	p += EncodePlane(p, pMedianPredicted->GetPlane(0), pMedianPredicted->GetPlane(0) + m_dwYPlaneSize, m_dwYPlaneStride);
 	p += EncodePlane(p, pMedianPredicted->GetPlane(1), pMedianPredicted->GetPlane(1) + m_dwCPlaneSize, m_dwCPlaneStride);
 	p += EncodePlane(p, pMedianPredicted->GetPlane(2), pMedianPredicted->GetPlane(2) + m_dwCPlaneSize, m_dwCPlaneStride);
-	memset(p, 0, 8);
-	p += 8;
 
-	pfi->dwFlags0 = FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
+	memcpy(p, &fi, sizeof(FRAMEINFO));
+	p += sizeof(FRAMEINFO);
 
 	icc->lpbiOutput->biSizeImage = p - ((BYTE *)icc->lpOutput);
 	*icc->lpdwFlags = AVIIF_KEYFRAME;

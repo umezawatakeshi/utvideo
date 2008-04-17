@@ -46,13 +46,13 @@ inline BYTE median(BYTE a, BYTE b, BYTE c)
 	return max(min(max(a,b),c),min(a,b));
 }
 
-void PredictMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD dwStride)
+void PredictMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD dwStride, BYTE byFirstPrediction)
 {
 	const BYTE *p = pSrcStart;
 	BYTE *q = pDst;
 
-	// 最初のラインの最初のピクセルはそのまま。
-	*q++ = *p++;
+	// 最初のラインの最初のピクセルは指定された値を使う。
+	*q++ = *p++ - byFirstPrediction;
 
 	// 最初のラインの残りのピクセルは predict left と同じ。
 	for (; p < pSrcStart + dwStride; p++, q++)
@@ -77,12 +77,12 @@ void PredictMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD
 	}
 }
 
-void RestoreMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD dwStride)
+void RestoreMedian(BYTE *pDst, const BYTE *pSrcStart, const BYTE *pSrcEnd, DWORD dwStride, BYTE byFirstPrediction)
 {
 	const BYTE *p = pSrcStart;
 	BYTE *q = pDst;
 
-	*q++ = *p++;
+	*q++ = *p++ + byFirstPrediction;
 
 	for (; p < pSrcStart + dwStride; p++, q++)
 	{
