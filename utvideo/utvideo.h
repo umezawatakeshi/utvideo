@@ -61,7 +61,6 @@ struct BITMAPINFOEXT
 struct FRAMEINFO
 {
 	DWORD dwFlags0;
-	DWORD dwPredictionHint0;
 };
 
 //#define FI_FLAGS0_DIVIDE_COUNT_MASK             0x000000ff
