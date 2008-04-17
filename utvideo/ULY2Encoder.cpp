@@ -56,7 +56,7 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 {
 	CFrameBuffer *pCurFrame;
 	CFrameBuffer *pMedianPredicted;
-	FRAMEHEADER *pfh;
+	FRAMEINFO *pfi;
 	BYTE *p;
 
 	if (icc->lpckid != NULL)
@@ -72,9 +72,9 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	pMedianPredicted->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
 	pMedianPredicted->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
 
-	pfh = (FRAMEHEADER *)icc->lpOutput;
-	memset(pfh, 0, sizeof(FRAMEHEADER));
-	p = (BYTE *)(pfh + 1);
+	pfi = (FRAMEINFO *)icc->lpOutput;
+	memset(pfi, 0, sizeof(FRAMEINFO));
+	p = (BYTE *)(pfi + 1);
 
 	ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
 
@@ -88,7 +88,7 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	memset(p, 0, 8);
 	p += 8;
 
-	pfh->dwFlags0 = FH_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
+	pfi->dwFlags0 = FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 
 	icc->lpbiOutput->biSizeImage = p - ((BYTE *)icc->lpOutput);
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
@@ -140,7 +140,7 @@ DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER
 	//pbieOut->bih.biClrImportant
 	pbieOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
 	pbieOut->fccOriginalFormat = pbihIn->biCompression;
-	pbieOut->dwFrameHeaderSize = sizeof(FRAMEHEADER);
+	pbieOut->dwFrameInfoSize   = sizeof(FRAMEINFO);
 	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE;
 
 	return ICERR_OK;

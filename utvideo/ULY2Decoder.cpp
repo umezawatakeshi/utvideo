@@ -57,7 +57,7 @@ DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)icd->lpbiInput;
 	CFrameBuffer *pCurFrame;
 	CFrameBuffer *pDecodedFrame;
-	FRAMEHEADER *pfh;
+	FRAMEINFO *pfi;
 	const BYTE *p;
 
 	pDecodedFrame = new CFrameBuffer();
@@ -65,19 +65,19 @@ DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 	pDecodedFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
 	pDecodedFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
 
-	pfh = (FRAMEHEADER *)icd->lpInput;
-	p = (BYTE *)(pfh + 1);
+	pfi = (FRAMEINFO *)icd->lpInput;
+	p = (BYTE *)(pfi + 1);
 
 	p += DecodePlane(pDecodedFrame->GetPlane(0), pDecodedFrame->GetPlane(0) + m_dwYPlaneSize, p, m_dwYPlaneStride);
 	p += DecodePlane(pDecodedFrame->GetPlane(1), pDecodedFrame->GetPlane(1) + m_dwCPlaneSize, p, m_dwCPlaneStride);
 	p += DecodePlane(pDecodedFrame->GetPlane(2), pDecodedFrame->GetPlane(2) + m_dwCPlaneSize, p, m_dwCPlaneStride);
 
-	switch (pfh->dwFlags0 & FH_FLAGS0_INTRAFRAME_PREDICT_MASK)
+	switch (pfi->dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 	{
-	case FH_FLAGS0_INTRAFRAME_PREDICT_NONE:
+	case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
 		pCurFrame = pDecodedFrame;
 		break;
-	case FH_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
+	case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
 		{
 			pCurFrame = new CFrameBuffer();
 			pCurFrame->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
@@ -154,7 +154,7 @@ DWORD CULY2Decoder::DecompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *
 
 	if (pbihIn->biSize > sizeof(BITMAPINFOEXT))
 		return ICERR_BADFORMAT;
-	if (pbieIn->dwFrameHeaderSize > sizeof(FRAMEHEADER))
+	if (pbieIn->dwFrameInfoSize > sizeof(FRAMEINFO))
 		return ICERR_BADFORMAT;
 	if (pbieIn->dwFlags0 & BIE_FLAGS0_RESERVED)
 		return ICERR_BADFORMAT;
