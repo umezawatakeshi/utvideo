@@ -1,0 +1,52 @@
+<html>
+<!-- $Id: $ -->
+<head>
+<title>Ut Video Codec Suite 1.1.2 readme (English)</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+</head>
+<body>
+<h1>Ut Video Codec Suite 1.1.2 readme (English)</h1>
+<hr>
+<h2 id="copyright_notice">Copyright Notice</h2>
+<p>Ut Video Codec Suite<br>Copyright &copy; 2008  UMEZAWA Takeshi</p>
+<p>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
+<h2 id="overview">Overview</h2>
+<p>Ut Video Codec Suite is a lossless video codec for Windows, which is implemented as a VCM codec (also called "VfW codec").
+It can currently encode YUV422 sources.</p>
+<h2 id="environment">Environment</h2>
+<h3>Minimum requirement</h3>
+<dl>
+<dt>OS</dt><dd>Windows XP or later</dd>
+<dt>CPU</dt><dd>i686-compatible CPU with SSE2 support<br>(e.g. Pentium 4 or later)</dd>
+</dl>
+<p><a href="http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=200b2fd9-ae1a-4a14-984d-389c36f85647">Microsoft Visual C++ 2005 SP1 Redistributable Package (x86)</a> is also required.</p>
+<h2 id="implementation_goal">Implementation goal</h2>
+<ul>
+<li>Realtime high definition capture with Core 2 Duo class CPU</li>
+<li>Better compression ratio than Huffyuv</li>
+<li>Near compression ratio as Lagarith, if possible</li>
+</ul>
+<h3>Achievement</h3>
+<ul>
+<li>Far from realtime high definition capture because written in C++ only and not optimized well.</li>
+<li>Usually better compression ratio than Huffyuv (Predict median) for progressive sources.</li>
+<li>May worse compression ratio than Huffyuv for interlace sources whose height is greater than 288 pixels.</li>
+<li>Usually worse compression ratio than Lagarith, but rarely better.</li>
+</ul>
+<h2 id="history">Version history</h2>
+<h3>Version 1.1.2</h3>
+<p>First public release</p>
+<hr>
+<address><a href="http://umezawa.dyndns.info/">Author's site</a></address>
+</body>
+</html>
