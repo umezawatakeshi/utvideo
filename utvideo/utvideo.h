@@ -40,7 +40,7 @@
 
 #pragma once
 
-#define UTVIDEO_ENCODER_VERSION 0x01010200 /* 1.1.2 */
+#define UTVIDEO_ENCODER_VERSION 0x01010300 /* 1.1.3 */
 
 struct BITMAPINFOEXT
 {
