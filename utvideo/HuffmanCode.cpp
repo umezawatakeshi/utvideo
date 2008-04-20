@@ -227,7 +227,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 	}
 }
 
-DWORD HuffmanEncode(BYTE *pDst_, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable)
+DWORD HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable)
 {
 	int nBits;
 	DWORD dwEncoded;
@@ -239,7 +239,7 @@ DWORD HuffmanEncode(BYTE *pDst_, const BYTE *pSrcBegin, const BYTE *pSrcEnd, con
 
 	nBits = 0;
 	dwEncoded = 0;
-	pDst = (DWORD *)pDst_;
+	pDst = (DWORD *)pDstBegin;
 
 	for (p = pSrcBegin; p < pSrcEnd; p++)
 	{
@@ -258,7 +258,7 @@ DWORD HuffmanEncode(BYTE *pDst_, const BYTE *pSrcBegin, const BYTE *pSrcEnd, con
 	if (nBits != 0)
 		*pDst++ = dwEncoded;
 
-	return ((BYTE *)pDst) - pDst_;
+	return ((BYTE *)pDst) - pDstBegin;
 }
 
 void HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
