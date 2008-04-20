@@ -46,6 +46,7 @@ class CULY2Encoder :
 	public CEncoder
 {
 private:
+	ENCODERCONF m_ec;
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
 	DWORD m_dwYPlaneSize;
@@ -58,6 +59,9 @@ public:
 	virtual ~CULY2Encoder(void);
 
 public:
+	virtual DWORD Configure(HWND hwnd);
+	virtual DWORD GetState(void *pState, DWORD dwSize);
+	virtual DWORD SetState(void *pState, DWORD dwSize);
 	virtual DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);
 	virtual DWORD CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	virtual DWORD CompressEnd(void);

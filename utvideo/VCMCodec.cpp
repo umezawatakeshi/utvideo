@@ -107,27 +107,29 @@ DWORD CVCMCodec::GetInfo(ICINFO *icinfo, DWORD dwSize)
 
 DWORD CVCMCodec::QueryConfigure(void)
 {
-	return ICERR_UNSUPPORTED;
+	return ICERR_OK;
 }
 
 DWORD CVCMCodec::Configure(HWND hwnd)
 {
-	return ICERR_UNSUPPORTED;
+	return m_pEncoder->Configure(hwnd);
 }
 
 DWORD CVCMCodec::GetStateSize(void)
 {
-	return ICERR_UNSUPPORTED;
+	return sizeof(ENCODERCONF);
 }
 
 DWORD CVCMCodec::GetState(void *pState, DWORD dwSize)
 {
-	return ICERR_UNSUPPORTED;
+	_RPT0(_CRT_WARN, "CVCMCodec::GetState()\n");
+	return m_pEncoder->GetState(pState, dwSize);
 }
 
 DWORD CVCMCodec::SetState(void *pState, DWORD dwSize)
 {
-	return ICERR_UNSUPPORTED;
+	_RPT0(_CRT_WARN, "CVCMCodec::SetState()\n");
+	return m_pEncoder->SetState(pState, dwSize);
 }
 
 DWORD CVCMCodec::Compress(ICCOMPRESS *icc, DWORD dwSize)

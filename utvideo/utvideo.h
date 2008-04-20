@@ -74,6 +74,16 @@ struct FRAMEINFO
 #define FI_FLAGS0_RESERVED                      0xfffffcff
 
 
+struct ENCODERCONF
+{
+	DWORD dwFlags0;
+};
+
+#define EC_FLAGS0_DIVIDE_COUNT_MASK             0x000000ff
+
+#define EC_FLAGS0_RESERVED                      0xffffff00
+
+
 inline DWORD ROUNDUP(DWORD a, DWORD b)
 {
 	return ((a + b - 1) / b) * b;

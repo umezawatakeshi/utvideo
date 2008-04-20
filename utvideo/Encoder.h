@@ -47,6 +47,9 @@ public:
 	virtual ~CEncoder(void);
 
 public:
+	virtual DWORD Configure(HWND hwnd) = 0;
+	virtual DWORD GetState(void *pState, DWORD dwSize) = 0;
+	virtual DWORD SetState(void *pState, DWORD dwSize) = 0;
 	virtual DWORD Compress(ICCOMPRESS *icc, DWORD dwSize) = 0;
 	virtual DWORD CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
 	virtual DWORD CompressEnd(void) = 0;

@@ -39,17 +39,43 @@
  */
 
 #include "StdAfx.h"
-#include "ULY2Encoder.h"
 #include "utvideo.h"
+#include "ULY2Encoder.h"
 #include "HuffmanCode.h"
 #include "Predict.h"
 
 CULY2Encoder::CULY2Encoder(void)
 {
+	memset(&m_ec, 0, sizeof(ENCODERCONF));
 }
 
 CULY2Encoder::~CULY2Encoder(void)
 {
+}
+
+DWORD CULY2Encoder::Configure(HWND hwnd)
+{
+	MessageBox(hwnd, "Žc”O‚Å‚µ‚½", "ULY2", MB_OK);
+	return ICERR_OK;
+}
+
+DWORD CULY2Encoder::GetState(void *pState, DWORD dwSize)
+{
+	if (dwSize < sizeof(ENCODERCONF))
+		return ICERR_BADSIZE;
+
+	memcpy(pState, &m_ec, sizeof(ENCODERCONF));
+	return ICERR_OK;
+}
+
+DWORD CULY2Encoder::SetState(void *pState, DWORD dwSize)
+{
+	memset(&m_ec, 0, sizeof(ENCODERCONF));
+
+	memcpy(&m_ec, pState, min(sizeof(ENCODERCONF), dwSize));
+	m_ec.dwFlags0 &= ~EC_FLAGS0_RESERVED;
+
+	return min(sizeof(ENCODERCONF), dwSize);
 }
 
 DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
