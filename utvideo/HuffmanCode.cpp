@@ -157,13 +157,13 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *
 
 // IA-32 の BSR 命令
 // 本物の BSR 命令では入力が 0 の場合に出力が不定になる。
-// ここでは（バグを検出するのを容易にするために）メッセージボックスを開いたあとに不定な値を返している。
 inline int bsr(DWORD curcode)
 {
+	_ASSERT(curcode != 0);
+
 	for (int i = 31; i >= 0; i--)
 		if (curcode & (1 << i))
 			return i;
-	MessageBox(NULL, "BSR NullPo", "Ut Video Codec", MB_ICONSTOP|MB_OK);
 	return rand() % 32;
 }
 
