@@ -115,6 +115,21 @@ DWORD CVCMCodec::Configure(HWND hwnd)
 	return ICERR_UNSUPPORTED;
 }
 
+DWORD CVCMCodec::GetStateSize(void)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CVCMCodec::GetState(void *pState, DWORD dwSize)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CVCMCodec::SetState(void *pState, DWORD dwSize)
+{
+	return ICERR_UNSUPPORTED;
+}
+
 DWORD CVCMCodec::Compress(ICCOMPRESS *icc, DWORD dwSize)
 {
 	return m_pEncoder->Compress(icc, dwSize);

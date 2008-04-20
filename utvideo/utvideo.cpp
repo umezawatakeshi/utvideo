@@ -126,8 +126,14 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 		else
 			return pCodec->Configure((HWND)lParam1);
 
-	//case ICM_GETSTATE:
-	//case ICM_SETSTATE:
+	case ICM_GETSTATE:
+		if (lParam1 == 0)
+			return pCodec->GetStateSize();
+		else
+			return pCodec->GetState((void *)lParam1, lParam2);
+
+	case ICM_SETSTATE:
+		return pCodec->SetState((void *)lParam1, lParam2);
 
 	case ICM_COMPRESS:
 		return pCodec->Compress((ICCOMPRESS *)lParam1, (DWORD)lParam2);

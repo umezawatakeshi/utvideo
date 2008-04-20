@@ -63,6 +63,9 @@ public:
 
 	DWORD QueryConfigure(void);
 	DWORD Configure(HWND hwnd);
+	DWORD GetStateSize(void);
+	DWORD GetState(void *pState, DWORD dwSize);
+	DWORD SetState(void *pState, DWORD dwSize);
 	DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);
 	DWORD CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	DWORD CompressEnd(void);
