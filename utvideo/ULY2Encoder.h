@@ -47,6 +47,8 @@ class CULY2Encoder :
 {
 private:
 	ENCODERCONF m_ec;
+	DWORD m_dwNumStrides;
+	DWORD m_dwDivideCount;
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
 	DWORD m_dwYPlaneSize;

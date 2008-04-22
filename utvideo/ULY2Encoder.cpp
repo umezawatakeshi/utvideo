@@ -164,6 +164,9 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 
 DWORD CULY2Encoder::CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
+	m_dwNumStrides = pbihIn->biHeight;
+	m_dwDivideCount = min(m_dwNumStrides, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
+
 	m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
 	m_dwFrameSize = m_dwFrameStride * pbihIn->biHeight;
 
