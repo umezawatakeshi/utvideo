@@ -49,11 +49,11 @@ public:
 public:
 	virtual DWORD Configure(HWND hwnd) = 0;
 	virtual DWORD GetState(void *pState, DWORD dwSize) = 0;
-	virtual DWORD SetState(void *pState, DWORD dwSize) = 0;
-	virtual DWORD Compress(ICCOMPRESS *icc, DWORD dwSize) = 0;
-	virtual DWORD CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
+	virtual DWORD SetState(const void *pState, DWORD dwSize) = 0;
+	virtual DWORD Compress(const ICCOMPRESS *icc, DWORD dwSize) = 0;
+	virtual DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 	virtual DWORD CompressEnd(void) = 0;
-	virtual DWORD CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
-	virtual DWORD CompressGetSize(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
-	virtual DWORD CompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
+	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
+	virtual DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
+	virtual DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 };

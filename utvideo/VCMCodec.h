@@ -65,17 +65,17 @@ public:
 	DWORD Configure(HWND hwnd);
 	DWORD GetStateSize(void);
 	DWORD GetState(void *pState, DWORD dwSize);
-	DWORD SetState(void *pState, DWORD dwSize);
-	DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);
-	DWORD CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	DWORD SetState(const void *pState, DWORD dwSize);
+	DWORD Compress(const ICCOMPRESS *icc, DWORD dwSize);
+	DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	DWORD CompressEnd(void);
-	DWORD CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	DWORD CompressGetSize(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	DWORD CompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
-	DWORD Decompress(ICDECOMPRESS *icd, DWORD dwSize);
-	DWORD DecompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize);
+	DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	DWORD DecompressEnd(void);
-	DWORD DecompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	DWORD DecompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	DWORD DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 };

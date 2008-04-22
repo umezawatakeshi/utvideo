@@ -47,9 +47,9 @@ public:
 	virtual ~CDecoder(void);
 
 public:
-	virtual DWORD Decompress(ICDECOMPRESS *icd, DWORD dwSize) = 0;
-	virtual DWORD DecompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
+	virtual DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize) = 0;
+	virtual DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 	virtual DWORD DecompressEnd(void) = 0;
-	virtual DWORD DecompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
-	virtual DWORD DecompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
+	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
+	virtual DWORD DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 };

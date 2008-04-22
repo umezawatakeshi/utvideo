@@ -62,13 +62,13 @@ public:
 	virtual DWORD Configure(HWND hwnd);
 	static int CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual DWORD GetState(void *pState, DWORD dwSize);
-	virtual DWORD SetState(void *pState, DWORD dwSize);
-	virtual DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);
-	virtual DWORD CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual DWORD SetState(const void *pState, DWORD dwSize);
+	virtual DWORD Compress(const ICCOMPRESS *icc, DWORD dwSize);
+	virtual DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual DWORD CompressEnd(void);
-	virtual DWORD CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressGetSize(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
 private:
 	void ConvertFromYUY2ToPlanar(CFrameBuffer *pBuffer, const BYTE *pSrc, DWORD dwFrameSize);

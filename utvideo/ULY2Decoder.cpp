@@ -52,7 +52,7 @@ CULY2Decoder::~CULY2Decoder(void)
 {
 }
 
-DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
+DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)icd->lpbiInput;
 	CFrameBuffer *pCurFrame;
@@ -113,7 +113,7 @@ DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 	return ICERR_OK;
 }
 
-DWORD CULY2Decoder::DecompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+DWORD CULY2Decoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	m_dwNumStrides = pbihIn->biHeight;
 
@@ -137,7 +137,7 @@ DWORD CULY2Decoder::DecompressEnd(void)
 	return ICERR_OK;
 }
 
-DWORD CULY2Decoder::DecompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+DWORD CULY2Decoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	if (pbihOut == NULL)
 		return sizeof(BITMAPINFOHEADER);
@@ -159,7 +159,7 @@ DWORD CULY2Decoder::DecompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEAD
 	return ICERR_OK;
 }
 
-DWORD CULY2Decoder::DecompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+DWORD CULY2Decoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
 

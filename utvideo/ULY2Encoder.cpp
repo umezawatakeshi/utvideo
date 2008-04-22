@@ -106,7 +106,7 @@ DWORD CULY2Encoder::GetState(void *pState, DWORD dwSize)
 	return ICERR_OK;
 }
 
-DWORD CULY2Encoder::SetState(void *pState, DWORD dwSize)
+DWORD CULY2Encoder::SetState(const void *pState, DWORD dwSize)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 
@@ -116,7 +116,7 @@ DWORD CULY2Encoder::SetState(void *pState, DWORD dwSize)
 	return min(sizeof(ENCODERCONF), dwSize);
 }
 
-DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
+DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 {
 	CFrameBuffer *pCurFrame;
 	CFrameBuffer *pMedianPredicted;
@@ -171,7 +171,7 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 	return ICERR_OK;
 }
 
-DWORD CULY2Encoder::CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+DWORD CULY2Encoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	m_dwNumStrides = pbihIn->biHeight;
 	m_dwDivideCount = min(m_dwNumStrides, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
@@ -196,7 +196,7 @@ DWORD CULY2Encoder::CompressEnd(void)
 	return ICERR_OK;
 }
 
-DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+DWORD CULY2Encoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
 
@@ -224,12 +224,12 @@ DWORD CULY2Encoder::CompressGetFormat(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER
 	return ICERR_OK;
 }
 
-DWORD CULY2Encoder::CompressGetSize(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+DWORD CULY2Encoder::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return pbihIn->biSizeImage + 2048; // +2048 ‚Í‚Ç‚ñ‚Ô‚èŠ¨’èB
 }
 
-DWORD CULY2Encoder::CompressQuery(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+DWORD CULY2Encoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	if (pbihIn->biCompression == FCC('YUY2'))
 		return ICERR_OK;
