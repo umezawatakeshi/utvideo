@@ -138,11 +138,20 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
+	fi.dwFlags0 = (m_dwDivideCount - 1) & FI_FLAGS0_DIVIDE_COUNT_MASK;
+
 	ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
 
-	PredictMedian(pMedianPredicted->GetPlane(0), pCurFrame->GetPlane(0), pCurFrame->GetPlane(0) + m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	PredictMedian(pMedianPredicted->GetPlane(1), pCurFrame->GetPlane(1), pCurFrame->GetPlane(1) + m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	PredictMedian(pMedianPredicted->GetPlane(2), pCurFrame->GetPlane(2), pCurFrame->GetPlane(2) + m_dwPlaneSize[2], m_dwPlaneStride[2]);
+	for (DWORD i = 0; i < m_dwDivideCount; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			DWORD dwPlaneBegin = (m_dwNumStrides *  i      / m_dwDivideCount) * m_dwPlaneStride[j];
+			DWORD dwPlaneEnd   = (m_dwNumStrides * (i + 1) / m_dwDivideCount) * m_dwPlaneStride[j];
+
+			PredictMedian(pMedianPredicted->GetPlane(j) + dwPlaneBegin, pCurFrame->GetPlane(j) + dwPlaneBegin, pCurFrame->GetPlane(j) + dwPlaneEnd, m_dwPlaneStride[j]);
+		}
+	}
 	fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 
 	p = (BYTE *)icc->lpOutput;

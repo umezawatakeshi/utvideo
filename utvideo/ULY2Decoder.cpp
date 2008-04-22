@@ -59,6 +59,7 @@ DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 	CFrameBuffer *pDecodedFrame;
 	FRAMEINFO fi;
 	const BYTE *p;
+	DWORD dwDivideCount;
 
 	pDecodedFrame = new CFrameBuffer();
 	pDecodedFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
@@ -67,6 +68,9 @@ DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 	memcpy(&fi, ((BYTE *)icd->lpInput) + pbieIn->bih.biSizeImage - pbieIn->dwFrameInfoSize, pbieIn->dwFrameInfoSize);
+
+	dwDivideCount =	(fi.dwFlags0 & FI_FLAGS0_DIVIDE_COUNT_MASK) + 1;
+	_RPT1(_CRT_WARN, "divide count = %d\n", dwDivideCount);
 
 	p = (BYTE *)icd->lpInput;
 	p += DecodePlane(pDecodedFrame->GetPlane(0), pDecodedFrame->GetPlane(0) + m_dwPlaneSize[0], p, m_dwPlaneStride[0]);
@@ -84,9 +88,16 @@ DWORD CULY2Decoder::Decompress(ICDECOMPRESS *icd, DWORD dwSize)
 			pCurFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
 			pCurFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
 			pCurFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
-			RestoreMedian(pCurFrame->GetPlane(0), pDecodedFrame->GetPlane(0), pDecodedFrame->GetPlane(0) + m_dwPlaneSize[0], m_dwPlaneStride[0]);
-			RestoreMedian(pCurFrame->GetPlane(1), pDecodedFrame->GetPlane(1), pDecodedFrame->GetPlane(1) + m_dwPlaneSize[1], m_dwPlaneStride[1]);
-			RestoreMedian(pCurFrame->GetPlane(2), pDecodedFrame->GetPlane(2), pDecodedFrame->GetPlane(2) + m_dwPlaneSize[2], m_dwPlaneStride[2]);
+			for (DWORD i = 0; i < dwDivideCount; i++)
+			{
+				for (int j = 0; j < 3; j++)
+				{
+					DWORD dwPlaneBegin = (m_dwNumStrides *  i      / dwDivideCount) * m_dwPlaneStride[j];
+					DWORD dwPlaneEnd   = (m_dwNumStrides * (i + 1) / dwDivideCount) * m_dwPlaneStride[j];
+
+					RestoreMedian(pCurFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneEnd, m_dwPlaneStride[j]);
+				}
+			}
 			delete pDecodedFrame;
 		}
 		break;
