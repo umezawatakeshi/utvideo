@@ -46,12 +46,11 @@ class CULY2Decoder :
 	public CDecoder
 {
 private:
+	DWORD m_dwNumStrides;
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
-	DWORD m_dwYPlaneSize;
-	DWORD m_dwYPlaneStride;
-	DWORD m_dwCPlaneSize;
-	DWORD m_dwCPlaneStride;
+	DWORD m_dwPlaneSize[3];
+	DWORD m_dwPlaneStride[3];
 
 public:
 	CULY2Decoder(void);
