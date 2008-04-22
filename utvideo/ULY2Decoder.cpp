@@ -72,38 +72,25 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	dwDivideCount =	(fi.dwFlags0 & FI_FLAGS0_DIVIDE_COUNT_MASK) + 1;
 	_RPT1(_CRT_WARN, "divide count = %d\n", dwDivideCount);
 
-	p = (BYTE *)icd->lpInput;
-	p += DecodePlane(pDecodedFrame->GetPlane(0), pDecodedFrame->GetPlane(0) + m_dwPlaneSize[0], p, m_dwPlaneStride[0]);
-	p += DecodePlane(pDecodedFrame->GetPlane(1), pDecodedFrame->GetPlane(1) + m_dwPlaneSize[1], p, m_dwPlaneStride[1]);
-	p += DecodePlane(pDecodedFrame->GetPlane(2), pDecodedFrame->GetPlane(2) + m_dwPlaneSize[2], p, m_dwPlaneStride[2]);
-
 	switch (fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 	{
 	case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
 		pCurFrame = pDecodedFrame;
 		break;
 	case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-		{
-			pCurFrame = new CFrameBuffer();
-			pCurFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-			pCurFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-			pCurFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
-			for (DWORD i = 0; i < dwDivideCount; i++)
-			{
-				for (int j = 0; j < 3; j++)
-				{
-					DWORD dwPlaneBegin = (m_dwNumStrides *  i      / dwDivideCount) * m_dwPlaneStride[j];
-					DWORD dwPlaneEnd   = (m_dwNumStrides * (i + 1) / dwDivideCount) * m_dwPlaneStride[j];
-
-					RestoreMedian(pCurFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneEnd, m_dwPlaneStride[j]);
-				}
-			}
-			delete pDecodedFrame;
-		}
+		pCurFrame = new CFrameBuffer();
+		pCurFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
+		pCurFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
+		pCurFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
 		break;
 	default:
 		return ICERR_ABORT;
 	}
+
+	p = (BYTE *)icd->lpInput;
+	p += DecodePlane(pDecodedFrame->GetPlane(0), pDecodedFrame->GetPlane(0) + m_dwPlaneSize[0], p, m_dwPlaneStride[0]);
+	p += DecodePlane(pDecodedFrame->GetPlane(1), pDecodedFrame->GetPlane(1) + m_dwPlaneSize[1], p, m_dwPlaneStride[1]);
+	p += DecodePlane(pDecodedFrame->GetPlane(2), pDecodedFrame->GetPlane(2) + m_dwPlaneSize[2], p, m_dwPlaneStride[2]);
 
 	for (DWORD i = 0; i < dwDivideCount; i++)
 	{
@@ -111,6 +98,21 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 		DWORD dwStrideEnd   = m_dwNumStrides * (i + 1) / dwDivideCount;
 		const BYTE *y, *u, *v;
 		BYTE *pDstBegin, *pDstEnd, *p;
+
+		switch (fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+		{
+		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
+			{
+				for (int j = 0; j < 3; j++)
+				{
+					DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[j];
+					DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[j];
+
+					RestoreMedian(pCurFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneEnd, m_dwPlaneStride[j]);
+				}
+			}
+			break;
+		}
 
 		pDstBegin = ((BYTE *)icd->lpOutput) + dwStrideBegin * m_dwFrameStride;
 		pDstEnd   = ((BYTE *)icd->lpOutput) + dwStrideEnd   * m_dwFrameStride;
@@ -130,6 +132,12 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 
 	icd->lpbiOutput->biSizeImage = m_dwFrameSize;
 
+	switch (fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+	{
+	case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
+		delete pDecodedFrame;
+		break;
+	}
 	delete pCurFrame;
 
 	return ICERR_OK;
