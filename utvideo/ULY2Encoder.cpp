@@ -140,14 +140,33 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 
 	fi.dwFlags0 = (m_dwDivideCount - 1) & FI_FLAGS0_DIVIDE_COUNT_MASK;
 
-	ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
+	//ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
 
 	for (DWORD i = 0; i < m_dwDivideCount; i++)
 	{
+		DWORD dwStrideBegin = m_dwNumStrides *  i      / m_dwDivideCount;
+		DWORD dwStrideEnd   = m_dwNumStrides * (i + 1) / m_dwDivideCount;
+		BYTE *y, *u, *v;
+		const BYTE *pSrcBegin, *pSrcEnd, *p;
+
+		pSrcBegin = ((BYTE *)icc->lpInput) + dwStrideBegin * m_dwFrameStride;
+		pSrcEnd   = ((BYTE *)icc->lpInput) + dwStrideEnd   * m_dwFrameStride;
+		y = pCurFrame->GetPlane(0) + dwStrideBegin * m_dwPlaneStride[0];
+		u = pCurFrame->GetPlane(1) + dwStrideBegin * m_dwPlaneStride[1];
+		v = pCurFrame->GetPlane(2) + dwStrideBegin * m_dwPlaneStride[2];
+
+		for (p = pSrcBegin; p < pSrcEnd; p += 4)
+		{
+			*y++ = *p;
+			*u++ = *(p+1);
+			*y++ = *(p+2);
+			*v++ = *(p+3);
+		}
+
 		for (int j = 0; j < 3; j++)
 		{
-			DWORD dwPlaneBegin = (m_dwNumStrides *  i      / m_dwDivideCount) * m_dwPlaneStride[j];
-			DWORD dwPlaneEnd   = (m_dwNumStrides * (i + 1) / m_dwDivideCount) * m_dwPlaneStride[j];
+			DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[j];
+			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[j];
 
 			PredictMedian(pMedianPredicted->GetPlane(j) + dwPlaneBegin, pCurFrame->GetPlane(j) + dwPlaneBegin, pCurFrame->GetPlane(j) + dwPlaneEnd, m_dwPlaneStride[j]);
 		}
