@@ -127,28 +127,28 @@ DWORD CULY2Encoder::Compress(ICCOMPRESS *icc, DWORD dwSize)
 		*icc->lpckid = FCC('dcdc');
 
 	pCurFrame = new CFrameBuffer();
-	pCurFrame->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
-	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
-	pCurFrame->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
+	pCurFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
+	pCurFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
+	pCurFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
 
 	pMedianPredicted = new CFrameBuffer();
-	pMedianPredicted->AddPlane(m_dwYPlaneSize, m_dwYPlaneStride); // Y
-	pMedianPredicted->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // U
-	pMedianPredicted->AddPlane(m_dwCPlaneSize, m_dwCPlaneStride); // V
+	pMedianPredicted->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
+	pMedianPredicted->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
+	pMedianPredicted->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
 	ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
 
-	PredictMedian(pMedianPredicted->GetPlane(0), pCurFrame->GetPlane(0), pCurFrame->GetPlane(0) + m_dwYPlaneSize, m_dwYPlaneStride);
-	PredictMedian(pMedianPredicted->GetPlane(1), pCurFrame->GetPlane(1), pCurFrame->GetPlane(1) + m_dwCPlaneSize, m_dwCPlaneStride);
-	PredictMedian(pMedianPredicted->GetPlane(2), pCurFrame->GetPlane(2), pCurFrame->GetPlane(2) + m_dwCPlaneSize, m_dwCPlaneStride);
+	PredictMedian(pMedianPredicted->GetPlane(0), pCurFrame->GetPlane(0), pCurFrame->GetPlane(0) + m_dwPlaneSize[0], m_dwPlaneStride[0]);
+	PredictMedian(pMedianPredicted->GetPlane(1), pCurFrame->GetPlane(1), pCurFrame->GetPlane(1) + m_dwPlaneSize[1], m_dwPlaneStride[1]);
+	PredictMedian(pMedianPredicted->GetPlane(2), pCurFrame->GetPlane(2), pCurFrame->GetPlane(2) + m_dwPlaneSize[2], m_dwPlaneStride[2]);
 	fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 
 	p = (BYTE *)icc->lpOutput;
-	p += EncodePlane(p, pMedianPredicted->GetPlane(0), pMedianPredicted->GetPlane(0) + m_dwYPlaneSize, m_dwYPlaneStride);
-	p += EncodePlane(p, pMedianPredicted->GetPlane(1), pMedianPredicted->GetPlane(1) + m_dwCPlaneSize, m_dwCPlaneStride);
-	p += EncodePlane(p, pMedianPredicted->GetPlane(2), pMedianPredicted->GetPlane(2) + m_dwCPlaneSize, m_dwCPlaneStride);
+	p += EncodePlane(p, pMedianPredicted->GetPlane(0), pMedianPredicted->GetPlane(0) + m_dwPlaneSize[0], m_dwPlaneStride[0]);
+	p += EncodePlane(p, pMedianPredicted->GetPlane(1), pMedianPredicted->GetPlane(1) + m_dwPlaneSize[1], m_dwPlaneStride[1]);
+	p += EncodePlane(p, pMedianPredicted->GetPlane(2), pMedianPredicted->GetPlane(2) + m_dwPlaneSize[2], m_dwPlaneStride[2]);
 
 	memcpy(p, &fi, sizeof(FRAMEINFO));
 	p += sizeof(FRAMEINFO);
@@ -170,11 +170,14 @@ DWORD CULY2Encoder::CompressBegin(BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pb
 	m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
 	m_dwFrameSize = m_dwFrameStride * pbihIn->biHeight;
 
-	m_dwYPlaneStride = ROUNDUP(pbihIn->biWidth, 2);
-	m_dwYPlaneSize = m_dwYPlaneStride * pbihIn->biHeight;
+	m_dwPlaneStride[0] = ROUNDUP(pbihIn->biWidth, 2);
+	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * pbihIn->biHeight;
 
-	m_dwCPlaneStride = ROUNDUP(pbihIn->biWidth, 2) / 2;
-	m_dwCPlaneSize = m_dwCPlaneStride * pbihIn->biHeight;
+	m_dwPlaneStride[1] = ROUNDUP(pbihIn->biWidth, 2) / 2;
+	m_dwPlaneSize[1]   = m_dwPlaneStride[1] * pbihIn->biHeight;
+
+	m_dwPlaneStride[2] = m_dwPlaneStride[1];
+	m_dwPlaneSize[2]   = m_dwPlaneSize[1];
 
 	return ICERR_OK;
 }
