@@ -60,6 +60,7 @@ public:
 
 public:
 	virtual DWORD Configure(HWND hwnd);
+	static int CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual DWORD GetState(void *pState, DWORD dwSize);
 	virtual DWORD SetState(void *pState, DWORD dwSize);
 	virtual DWORD Compress(ICCOMPRESS *icc, DWORD dwSize);

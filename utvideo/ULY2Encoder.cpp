@@ -43,6 +43,7 @@
 #include "ULY2Encoder.h"
 #include "HuffmanCode.h"
 #include "Predict.h"
+#include "resource.h"
 
 CULY2Encoder::CULY2Encoder(void)
 {
@@ -55,8 +56,45 @@ CULY2Encoder::~CULY2Encoder(void)
 
 DWORD CULY2Encoder::Configure(HWND hwnd)
 {
-	MessageBox(hwnd, "Žc”O‚Å‚µ‚½", "ULY2", MB_OK);
+	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_CONFIG_DIALOG), hwnd, DialogProc, (LPARAM)this);
 	return ICERR_OK;
+}
+
+int CALLBACK CULY2Encoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	CULY2Encoder *pThis = (CULY2Encoder *)GetWindowLong(hwnd, DWL_USER);
+	char buf[256];
+	int	n;
+
+	switch(uMsg)
+	{
+	case WM_INITDIALOG:
+		SetWindowLong(hwnd, DWL_USER, lParam);
+		pThis = (CULY2Encoder *)lParam;
+		wsprintf(buf, "%d", (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
+		SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
+		return TRUE;
+	case WM_COMMAND:
+		switch(LOWORD(wParam))
+		{
+		case IDOK:
+			GetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf, sizeof(buf));
+			n = atoi(buf);
+			if (n < 1 || n > 256)
+			{
+				MessageBox(hwnd, "1 <= DIVIDE_COUNT <= 256", "ERR", MB_ICONERROR);
+				return TRUE;
+			}
+			pThis->m_ec.dwFlags0 = (n - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
+			/* FALLTHROUGH */
+		case IDCANCEL:
+			EndDialog(hwnd, 0);
+			return TRUE;
+		}
+		break;
+	}
+
+	return FALSE;
 }
 
 DWORD CULY2Encoder::GetState(void *pState, DWORD dwSize)

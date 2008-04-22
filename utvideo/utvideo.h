@@ -42,6 +42,8 @@
 
 #define UTVIDEO_ENCODER_VERSION 0x01010300 /* 1.1.3 */
 
+extern HINSTANCE hModule;
+
 struct BITMAPINFOEXT
 {
 	BITMAPINFOHEADER bih;

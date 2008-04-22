@@ -91,7 +91,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd $(OutDir)&#x0D;&#x0A;rundll32 $(TargetFileName),ICInstallByRundll"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -170,7 +170,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd $(OutDir)&#x0D;&#x0A;rundll32 $(TargetFileName),ICInstallByRundll"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -269,6 +269,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\resource.h"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.h"
 				>
 			</File>
@@ -294,6 +298,10 @@
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+			<File
+				RelativePath=".\utvideo.rc"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
