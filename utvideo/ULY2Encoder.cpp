@@ -142,10 +142,10 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 
 	//ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
 
-	for (DWORD i = 0; i < m_dwDivideCount; i++)
+	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 	{
-		DWORD dwStrideBegin = m_dwNumStrides *  i      / m_dwDivideCount;
-		DWORD dwStrideEnd   = m_dwNumStrides * (i + 1) / m_dwDivideCount;
+		DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
+		DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
 		BYTE *y, *u, *v;
 		const BYTE *pSrcBegin, *pSrcEnd, *p;
 

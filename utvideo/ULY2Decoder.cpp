@@ -92,10 +92,10 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	p += DecodePlane(pDecodedFrame->GetPlane(1), pDecodedFrame->GetPlane(1) + m_dwPlaneSize[1], p, m_dwPlaneStride[1]);
 	p += DecodePlane(pDecodedFrame->GetPlane(2), pDecodedFrame->GetPlane(2) + m_dwPlaneSize[2], p, m_dwPlaneStride[2]);
 
-	for (DWORD i = 0; i < dwDivideCount; i++)
+	for (DWORD nBandIndex = 0; nBandIndex < dwDivideCount; nBandIndex++)
 	{
-		DWORD dwStrideBegin = m_dwNumStrides *  i      / dwDivideCount;
-		DWORD dwStrideEnd   = m_dwNumStrides * (i + 1) / dwDivideCount;
+		DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / dwDivideCount;
+		DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / dwDivideCount;
 		const BYTE *y, *u, *v;
 		BYTE *pDstBegin, *pDstEnd, *p;
 
