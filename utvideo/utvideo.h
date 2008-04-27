@@ -53,11 +53,13 @@ struct BITMAPINFOEXT
 	DWORD dwFlags0;
 };
 
-#define BIE_FLAGS0_COMPRESS_MASK                0x00000001
-#define BIE_FLAGS0_COMPRESS_NONE                0x00000000
-#define BIE_FLAGS0_COMPRESS_HUFFMAN_CODE        0x00000001
+#define BIE_FLAGS0_DIVIDE_COUNT_MASK            0x000000ff
 
-#define BIE_FLAGS0_RESERVED                     0xfffffffe
+#define BIE_FLAGS0_COMPRESS_MASK                0x00000100
+#define BIE_FLAGS0_COMPRESS_NONE                0x00000000
+#define BIE_FLAGS0_COMPRESS_HUFFMAN_CODE        0x00000100
+
+#define BIE_FLAGS0_RESERVED                     0xfffffe00
 
 
 struct FRAMEINFO
@@ -65,15 +67,13 @@ struct FRAMEINFO
 	DWORD dwFlags0;
 };
 
-#define FI_FLAGS0_DIVIDE_COUNT_MASK             0x000000ff
-
 #define FI_FLAGS0_INTRAFRAME_PREDICT_MASK       0x00000300
 #define FI_FLAGS0_INTRAFRAME_PREDICT_NONE       0x00000000
 #define FI_FLAGS0_INTRAFRAME_PREDICT_LEFT       0x00000100
 #define FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT   0x00000200
 #define FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN     0x00000300
 
-#define FI_FLAGS0_RESERVED                      0xfffffc00
+#define FI_FLAGS0_RESERVED                      0xfffffcff
 
 
 struct ENCODERCONF

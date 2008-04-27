@@ -47,6 +47,7 @@ class CULY2Decoder :
 {
 private:
 	DWORD m_dwNumStrides;
+	DWORD m_dwDivideCount;
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
 	DWORD m_dwPlaneSize[3];

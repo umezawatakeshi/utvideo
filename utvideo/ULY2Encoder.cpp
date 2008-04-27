@@ -145,7 +145,6 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
-	fi.dwFlags0 = (m_dwDivideCount - 1) & FI_FLAGS0_DIVIDE_COUNT_MASK;
 	counts = (COUNTS *)malloc(sizeof(COUNTS) * m_dwDivideCount);
 
 	//ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
@@ -246,8 +245,12 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 
 DWORD CULY2Encoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
+
 	m_dwNumStrides = pbihIn->biHeight;
-	m_dwDivideCount = min(m_dwNumStrides, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
+	m_dwDivideCount = (pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) + 1;
+
+	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 
 	m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
 	m_dwFrameSize = m_dwFrameStride * pbihIn->biHeight;
@@ -272,11 +275,16 @@ DWORD CULY2Encoder::CompressEnd(void)
 DWORD CULY2Encoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
+	DWORD dwDivideCount;
 
 	if (pbihOut == NULL)
 		return sizeof(BITMAPINFOEXT);
 
 	memset(pbihOut, 0, sizeof(BITMAPINFOEXT));
+
+	dwDivideCount = min(ROUNDUP(pbihIn->biHeight, 2) / 2, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
+
+	_ASSERT(dwDivideCount >= 1 && dwDivideCount <= 256);
 
 	pbieOut->bih.biSize          = sizeof(BITMAPINFOEXT);
 	pbieOut->bih.biWidth         = pbihIn->biWidth;
@@ -292,7 +300,7 @@ DWORD CULY2Encoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFO
 	pbieOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
 	pbieOut->fccOriginalFormat = pbihIn->biCompression;
 	pbieOut->dwFrameInfoSize   = sizeof(FRAMEINFO);
-	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE;
+	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | (dwDivideCount - 1);
 
 	return ICERR_OK;
 }

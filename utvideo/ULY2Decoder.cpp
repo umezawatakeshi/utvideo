@@ -59,7 +59,6 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	CFrameBuffer *pDecodedFrame;
 	FRAMEINFO fi;
 	const BYTE *p;
-	DWORD dwDivideCount;
 	HUFFMAN_DECODE_TABLE hdt[3];
 	const BYTE *pCodeLengthTable[3];
 
@@ -70,9 +69,6 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 	memcpy(&fi, ((BYTE *)icd->lpInput) + pbieIn->bih.biSizeImage - pbieIn->dwFrameInfoSize, pbieIn->dwFrameInfoSize);
-
-	dwDivideCount =	(fi.dwFlags0 & FI_FLAGS0_DIVIDE_COUNT_MASK) + 1;
-	_RPT1(_CRT_WARN, "divide count = %d\n", dwDivideCount);
 
 	switch (fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 	{
@@ -94,14 +90,14 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	{
 		pCodeLengthTable[nPlaneIndex] = p;
 		GenerateHuffmanDecodeTable(&hdt[nPlaneIndex], pCodeLengthTable[nPlaneIndex]);
-		p += 256 + sizeof(DWORD) * dwDivideCount;
+		p += 256 + sizeof(DWORD) * m_dwDivideCount;
 		p += ((const DWORD *)p)[-1];
 	}
 
-	for (DWORD nBandIndex = 0; nBandIndex < dwDivideCount; nBandIndex++)
+	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 	{
-		DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / dwDivideCount;
-		DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / dwDivideCount;
+		DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
+		DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
 
 		const BYTE *y, *u, *v;
 		BYTE *pDstBegin, *pDstEnd, *p;
@@ -115,7 +111,7 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 				dwDstOffset = 0;
 			else
 				dwDstOffset = ((const DWORD *)(pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
-			HuffmanDecode(pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * dwDivideCount + dwDstOffset, &hdt[nPlaneIndex]);
+			HuffmanDecode(pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, &hdt[nPlaneIndex]);
 
 			switch (fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 			{
@@ -156,7 +152,13 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 
 DWORD CULY2Decoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
+
 	m_dwNumStrides = pbihIn->biHeight;
+	m_dwDivideCount = (pbieIn->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) + 1;
+
+	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
+	_RPT1(_CRT_WARN, "divide count = %d\n", m_dwDivideCount);
 
 	m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
 	m_dwFrameSize = m_dwFrameStride * pbihIn->biHeight;
