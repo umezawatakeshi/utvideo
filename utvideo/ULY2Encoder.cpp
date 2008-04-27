@@ -122,6 +122,13 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 	CFrameBuffer *pMedianPredicted;
 	FRAMEINFO fi;
 	BYTE *p;
+	struct COUNTS
+	{
+		DWORD dwCount[3][256];
+	} *counts;
+	DWORD count[256];
+	BYTE *pCodeLengthTable[3];
+	HUFFMAN_ENCODE_TABLE het[3];
 
 	if (icc->lpckid != NULL)
 		*icc->lpckid = FCC('dcdc');
@@ -139,6 +146,7 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
 	fi.dwFlags0 = (m_dwDivideCount - 1) & FI_FLAGS0_DIVIDE_COUNT_MASK;
+	counts = (COUNTS *)malloc(sizeof(COUNTS) * m_dwDivideCount);
 
 	//ConvertFromYUY2ToPlanar(pCurFrame, (BYTE *)icc->lpInput, m_dwFrameSize);
 
@@ -169,17 +177,63 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[j];
 
 			PredictMedian(pMedianPredicted->GetPlane(j) + dwPlaneBegin, pCurFrame->GetPlane(j) + dwPlaneBegin, pCurFrame->GetPlane(j) + dwPlaneEnd, m_dwPlaneStride[j]);
+
+			for (int i = 0; i < 256; i++)
+				counts[nBandIndex].dwCount[j][i] = 0;
+
+			for (p = pMedianPredicted->GetPlane(j) + dwPlaneBegin; p < pMedianPredicted->GetPlane(j) + dwPlaneEnd; p++)
+				counts[nBandIndex].dwCount[j][*p]++;
 		}
 	}
 	fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 
 	p = (BYTE *)icc->lpOutput;
-	p += EncodePlane(p, pMedianPredicted->GetPlane(0), pMedianPredicted->GetPlane(0) + m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	p += EncodePlane(p, pMedianPredicted->GetPlane(1), pMedianPredicted->GetPlane(1) + m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	p += EncodePlane(p, pMedianPredicted->GetPlane(2), pMedianPredicted->GetPlane(2) + m_dwPlaneSize[2], m_dwPlaneStride[2]);
+
+	for (int j = 0; j < 3; j++)
+	{
+		DWORD dwCurrentOffset;
+		for (int i = 0; i < 256; i++)
+			count[i] = 0;
+		for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+			for (int i = 0; i < 256; i++)
+				count[i] += counts[nBandIndex].dwCount[j][i];
+		pCodeLengthTable[j] = p;
+		GenerateHuffmanCodeLengthTable(pCodeLengthTable[j], count);
+		GenerateHuffmanEncodeTable(&het[j], pCodeLengthTable[j]);
+		p += 256;
+		dwCurrentOffset = 0;
+		for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+		{
+			DWORD dwBits;
+			dwBits = 0;
+			for (int i = 0; i < 256; i++)
+				dwBits += pCodeLengthTable[j][i] * counts[nBandIndex].dwCount[j][i];
+			dwCurrentOffset += ROUNDUP(dwBits, 32) / 8;
+			*(DWORD *)p = dwCurrentOffset;
+			p += 4;
+		}
+		p += dwCurrentOffset;
+	}
 
 	memcpy(p, &fi, sizeof(FRAMEINFO));
 	p += sizeof(FRAMEINFO);
+
+	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+	{
+		DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
+		DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
+		for (int j = 0; j < 3; j++)
+		{
+			DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[j];
+			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[j];
+			DWORD dwDstOffset;
+			if (nBandIndex == 0)
+				dwDstOffset = 0;
+			else
+				dwDstOffset = ((DWORD *)(pCodeLengthTable[j] + 256))[nBandIndex - 1];
+			HuffmanEncode(pCodeLengthTable[j] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, pMedianPredicted->GetPlane(j) + dwPlaneBegin, pMedianPredicted->GetPlane(j) + dwPlaneEnd, &het[j]);
+		}
+	}
 
 	icc->lpbiOutput->biSizeImage = p - ((BYTE *)icc->lpOutput);
 	*icc->lpdwFlags = AVIIF_KEYFRAME;

@@ -60,6 +60,8 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	FRAMEINFO fi;
 	const BYTE *p;
 	DWORD dwDivideCount;
+	HUFFMAN_DECODE_TABLE hdt[3];
+	const BYTE *pCodeLengthTable[3];
 
 	pDecodedFrame = new CFrameBuffer();
 	pDecodedFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
@@ -88,30 +90,39 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	}
 
 	p = (BYTE *)icd->lpInput;
-	p += DecodePlane(pDecodedFrame->GetPlane(0), pDecodedFrame->GetPlane(0) + m_dwPlaneSize[0], p, m_dwPlaneStride[0]);
-	p += DecodePlane(pDecodedFrame->GetPlane(1), pDecodedFrame->GetPlane(1) + m_dwPlaneSize[1], p, m_dwPlaneStride[1]);
-	p += DecodePlane(pDecodedFrame->GetPlane(2), pDecodedFrame->GetPlane(2) + m_dwPlaneSize[2], p, m_dwPlaneStride[2]);
+	for (int j = 0; j < 3; j++)
+	{
+		pCodeLengthTable[j] = p;
+		GenerateHuffmanDecodeTable(&hdt[j], pCodeLengthTable[j]);
+		p += 256 + sizeof(DWORD) * dwDivideCount;
+		p += ((const DWORD *)p)[-1];
+	}
 
 	for (DWORD nBandIndex = 0; nBandIndex < dwDivideCount; nBandIndex++)
 	{
 		DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / dwDivideCount;
 		DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / dwDivideCount;
+
 		const BYTE *y, *u, *v;
 		BYTE *pDstBegin, *pDstEnd, *p;
 
-		switch (fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+		for (int j = 0; j < 3; j++)
 		{
-		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			{
-				for (int j = 0; j < 3; j++)
-				{
-					DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[j];
-					DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[j];
+			DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[j];
+			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[j];
+			DWORD dwDstOffset;
+			if (nBandIndex == 0)
+				dwDstOffset = 0;
+			else
+				dwDstOffset = ((const DWORD *)(pCodeLengthTable[j] + 256))[nBandIndex - 1];
+			HuffmanDecode(pDecodedFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneEnd, pCodeLengthTable[j] + 256 + sizeof(DWORD) * dwDivideCount + dwDstOffset, &hdt[j]);
 
-					RestoreMedian(pCurFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneEnd, m_dwPlaneStride[j]);
-				}
+			switch (fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+			{
+			case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
+				RestoreMedian(pCurFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneEnd, m_dwPlaneStride[j]);
+				break;
 			}
-			break;
 		}
 
 		pDstBegin = ((BYTE *)icd->lpOutput) + dwStrideBegin * m_dwFrameStride;
