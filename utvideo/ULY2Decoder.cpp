@@ -221,36 +221,3 @@ DWORD CULY2Decoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	return ICERR_OK;
 }
-
-void CULY2Decoder::ConvertFromPlanarToYUY2(BYTE *pDstBegin, CFrameBuffer *pBuffer, DWORD dwFrameSize)
-{
-	const BYTE *y, *u, *v;
-	BYTE *pDstEnd, *p;
-
-	pDstEnd = pDstBegin + dwFrameSize;
-	y = pBuffer->GetPlane(0);
-	u = pBuffer->GetPlane(1);
-	v = pBuffer->GetPlane(2);
-
-	for (p = pDstBegin; p < pDstEnd; p += 4)
-	{
-		*p     = *y++;
-		*(p+1) = *u++;
-		*(p+2) = *y++;
-		*(p+3) = *v++;
-	}
-}
-
-DWORD CULY2Decoder::DecodePlane(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, DWORD dwFrameStride)
-{
-	const BYTE *pCodeLengthTable;
-	HUFFMAN_DECODE_TABLE hdt;
-	DWORD cbEncoded;
-
-	pCodeLengthTable = pSrcBegin;
-	cbEncoded = *(DWORD *)(pSrcBegin + 256);
-
-	GenerateHuffmanDecodeTable(&hdt, pCodeLengthTable);
-	HuffmanDecode(pDstBegin, pDstEnd, pSrcBegin + 256 + 4, &hdt);
-	return cbEncoded + 256 + 4;
-}

@@ -69,8 +69,4 @@ public:
 	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	virtual DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-
-private:
-	void ConvertFromYUY2ToPlanar(CFrameBuffer *pBuffer, const BYTE *pSrc, DWORD dwFrameSize);
-	DWORD EncodePlane(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwFrameStride);
 };
