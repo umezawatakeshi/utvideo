@@ -237,6 +237,8 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 	icc->lpbiOutput->biSizeImage = p - ((BYTE *)icc->lpOutput);
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
 
+	free(counts);
+
 	delete pCurFrame;
 	delete pMedianPredicted;
 
