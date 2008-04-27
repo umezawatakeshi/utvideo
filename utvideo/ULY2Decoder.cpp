@@ -90,10 +90,10 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	}
 
 	p = (BYTE *)icd->lpInput;
-	for (int j = 0; j < 3; j++)
+	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
 	{
-		pCodeLengthTable[j] = p;
-		GenerateHuffmanDecodeTable(&hdt[j], pCodeLengthTable[j]);
+		pCodeLengthTable[nPlaneIndex] = p;
+		GenerateHuffmanDecodeTable(&hdt[nPlaneIndex], pCodeLengthTable[nPlaneIndex]);
 		p += 256 + sizeof(DWORD) * dwDivideCount;
 		p += ((const DWORD *)p)[-1];
 	}
@@ -106,21 +106,21 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 		const BYTE *y, *u, *v;
 		BYTE *pDstBegin, *pDstEnd, *p;
 
-		for (int j = 0; j < 3; j++)
+		for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
 		{
-			DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[j];
-			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[j];
+			DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
+			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];
 			DWORD dwDstOffset;
 			if (nBandIndex == 0)
 				dwDstOffset = 0;
 			else
-				dwDstOffset = ((const DWORD *)(pCodeLengthTable[j] + 256))[nBandIndex - 1];
-			HuffmanDecode(pDecodedFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneEnd, pCodeLengthTable[j] + 256 + sizeof(DWORD) * dwDivideCount + dwDstOffset, &hdt[j]);
+				dwDstOffset = ((const DWORD *)(pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
+			HuffmanDecode(pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * dwDivideCount + dwDstOffset, &hdt[nPlaneIndex]);
 
 			switch (fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 			{
 			case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-				RestoreMedian(pCurFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneBegin, pDecodedFrame->GetPlane(j) + dwPlaneEnd, m_dwPlaneStride[j]);
+				RestoreMedian(pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex]);
 				break;
 			}
 		}

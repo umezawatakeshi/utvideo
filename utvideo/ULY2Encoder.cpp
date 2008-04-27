@@ -171,35 +171,35 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 			*v++ = *(p+3);
 		}
 
-		for (int j = 0; j < 3; j++)
+		for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
 		{
-			DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[j];
-			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[j];
+			DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
+			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];
 
-			PredictMedian(pMedianPredicted->GetPlane(j) + dwPlaneBegin, pCurFrame->GetPlane(j) + dwPlaneBegin, pCurFrame->GetPlane(j) + dwPlaneEnd, m_dwPlaneStride[j]);
+			PredictMedian(pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex]);
 
 			for (int i = 0; i < 256; i++)
-				counts[nBandIndex].dwCount[j][i] = 0;
+				counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
 
-			for (p = pMedianPredicted->GetPlane(j) + dwPlaneBegin; p < pMedianPredicted->GetPlane(j) + dwPlaneEnd; p++)
-				counts[nBandIndex].dwCount[j][*p]++;
+			for (p = pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin; p < pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneEnd; p++)
+				counts[nBandIndex].dwCount[nPlaneIndex][*p]++;
 		}
 	}
 	fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 
 	p = (BYTE *)icc->lpOutput;
 
-	for (int j = 0; j < 3; j++)
+	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
 	{
 		DWORD dwCurrentOffset;
 		for (int i = 0; i < 256; i++)
 			count[i] = 0;
 		for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 			for (int i = 0; i < 256; i++)
-				count[i] += counts[nBandIndex].dwCount[j][i];
-		pCodeLengthTable[j] = p;
-		GenerateHuffmanCodeLengthTable(pCodeLengthTable[j], count);
-		GenerateHuffmanEncodeTable(&het[j], pCodeLengthTable[j]);
+				count[i] += counts[nBandIndex].dwCount[nPlaneIndex][i];
+		pCodeLengthTable[nPlaneIndex] = p;
+		GenerateHuffmanCodeLengthTable(pCodeLengthTable[nPlaneIndex], count);
+		GenerateHuffmanEncodeTable(&het[nPlaneIndex], pCodeLengthTable[nPlaneIndex]);
 		p += 256;
 		dwCurrentOffset = 0;
 		for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
@@ -207,7 +207,7 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 			DWORD dwBits;
 			dwBits = 0;
 			for (int i = 0; i < 256; i++)
-				dwBits += pCodeLengthTable[j][i] * counts[nBandIndex].dwCount[j][i];
+				dwBits += pCodeLengthTable[nPlaneIndex][i] * counts[nBandIndex].dwCount[nPlaneIndex][i];
 			dwCurrentOffset += ROUNDUP(dwBits, 32) / 8;
 			*(DWORD *)p = dwCurrentOffset;
 			p += 4;
@@ -222,16 +222,16 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 	{
 		DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
 		DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
-		for (int j = 0; j < 3; j++)
+		for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
 		{
-			DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[j];
-			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[j];
+			DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
+			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];
 			DWORD dwDstOffset;
 			if (nBandIndex == 0)
 				dwDstOffset = 0;
 			else
-				dwDstOffset = ((DWORD *)(pCodeLengthTable[j] + 256))[nBandIndex - 1];
-			HuffmanEncode(pCodeLengthTable[j] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, pMedianPredicted->GetPlane(j) + dwPlaneBegin, pMedianPredicted->GetPlane(j) + dwPlaneEnd, &het[j]);
+				dwDstOffset = ((DWORD *)(pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
+			HuffmanEncode(pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneEnd, &het[nPlaneIndex]);
 		}
 	}
 
