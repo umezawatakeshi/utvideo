@@ -155,7 +155,7 @@ DWORD CULY2Decoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
 
 	m_dwNumStrides = pbihIn->biHeight;
-	m_dwDivideCount = (pbieIn->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) + 1;
+	m_dwDivideCount = ((pbieIn->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 	_RPT1(_CRT_WARN, "divide count = %d\n", m_dwDivideCount);

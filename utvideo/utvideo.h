@@ -53,13 +53,14 @@ struct BITMAPINFOEXT
 	DWORD dwFlags0;
 };
 
-#define BIE_FLAGS0_DIVIDE_COUNT_MASK            0x000000ff
+#define BIE_FLAGS0_DIVIDE_COUNT_MASK            0xff000000
+#define BIE_FLAGS0_DIVIDE_COUNT_SHIFT           24
 
-#define BIE_FLAGS0_COMPRESS_MASK                0x00000100
+#define BIE_FLAGS0_COMPRESS_MASK                0x00000001
 #define BIE_FLAGS0_COMPRESS_NONE                0x00000000
-#define BIE_FLAGS0_COMPRESS_HUFFMAN_CODE        0x00000100
+#define BIE_FLAGS0_COMPRESS_HUFFMAN_CODE        0x00000001
 
-#define BIE_FLAGS0_RESERVED                     0xfffffe00
+#define BIE_FLAGS0_RESERVED                     0x00fffffe
 
 
 struct FRAMEINFO

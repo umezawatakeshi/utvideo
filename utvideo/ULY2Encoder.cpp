@@ -248,7 +248,7 @@ DWORD CULY2Encoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
 
 	m_dwNumStrides = pbihIn->biHeight;
-	m_dwDivideCount = (pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) + 1;
+	m_dwDivideCount = ((pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 
@@ -300,7 +300,7 @@ DWORD CULY2Encoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFO
 	pbieOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
 	pbieOut->fccOriginalFormat = pbihIn->biCompression;
 	pbieOut->dwFrameInfoSize   = sizeof(FRAMEINFO);
-	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | (dwDivideCount - 1);
+	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | ((dwDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT);
 
 	return ICERR_OK;
 }
