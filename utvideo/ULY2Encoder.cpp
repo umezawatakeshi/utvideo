@@ -253,13 +253,13 @@ DWORD CULY2Encoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 
 	m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
-	m_dwFrameSize = m_dwFrameStride * pbihIn->biHeight;
+	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
 
 	m_dwPlaneStride[0] = ROUNDUP(pbihIn->biWidth, 2);
-	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * pbihIn->biHeight;
+	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * m_dwNumStrides;
 
 	m_dwPlaneStride[1] = ROUNDUP(pbihIn->biWidth, 2) / 2;
-	m_dwPlaneSize[1]   = m_dwPlaneStride[1] * pbihIn->biHeight;
+	m_dwPlaneSize[1]   = m_dwPlaneStride[1] * m_dwNumStrides;
 
 	m_dwPlaneStride[2] = m_dwPlaneStride[1];
 	m_dwPlaneSize[2]   = m_dwPlaneSize[1];
