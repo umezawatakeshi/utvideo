@@ -135,7 +135,6 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 			*(p+3) = *v++;
 		}
 	}
-	//ConvertFromPlanarToYUY2((BYTE *)icd->lpOutput, pCurFrame, m_dwFrameSize);
 
 	icd->lpbiOutput->biSizeImage = m_dwFrameSize;
 
