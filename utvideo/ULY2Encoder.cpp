@@ -224,11 +224,20 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 			DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
 			DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];
 			DWORD dwDstOffset;
+#ifdef _DEBUG
+			DWORD dwDstEnd;
+			DWORD dwEncodedSize;
+#endif
 			if (nBandIndex == 0)
 				dwDstOffset = 0;
 			else
 				dwDstOffset = ((DWORD *)(pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
+#ifdef _DEBUG
+			dwDstEnd = ((DWORD *)(pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex];
+			dwEncodedSize =
+#endif
 			HuffmanEncode(pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneEnd, &het[nPlaneIndex]);
+			_ASSERT(dwEncodedSize == dwDstEnd - dwDstOffset);
 		}
 	}
 
