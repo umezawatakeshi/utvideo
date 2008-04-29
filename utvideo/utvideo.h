@@ -40,7 +40,7 @@
 
 #pragma once
 
-#define UTVIDEO_ENCODER_VERSION 0x01010300 /* 1.1.3 */
+#define UTVIDEO_ENCODER_VERSION 0x02000000 /* 2.0.0 */
 
 extern HINSTANCE hModule;
 
