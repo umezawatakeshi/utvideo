@@ -40,6 +40,13 @@
 
 #pragma once
 
+class CThreadJob
+{
+public:
+	CThreadJob(void);
+	virtual ~CThreadJob(void) = 0;
+};
+
 class CThreadManager
 {
 private:
@@ -47,8 +54,11 @@ private:
 
 private:
 	int m_nNumThreads;
-	HANDLE m_hThread[32];
-	DWORD m_dwThreadId[32];
+	HANDLE m_hThread[MAX_THREAD];
+	DWORD m_dwThreadId[MAX_THREAD];
+	HANDLE m_hThreadSemaphore[MAX_THREAD];
+	queue<CThreadJob *> m_queueJob[MAX_THREAD];
+	CRITICAL_SECTION m_csJob;
 
 public:
 	CThreadManager(void);
@@ -56,5 +66,5 @@ public:
 
 private:
 	static DWORD WINAPI StaticThreadProc(LPVOID lpParameter);
-	DWORD ThreadProc(void);
+	DWORD ThreadProc(int nThreadIndex);
 };

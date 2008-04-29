@@ -46,9 +46,13 @@ CThreadManager::CThreadManager(void)
 	DWORD dwProcessAffinityMask;
 	DWORD dwSystemAffinityMask;
 
+	_RPT1(_CRT_WARN, "enter CThreadManager::CThreadManager() this=%p\n", this);
 	m_nNumThreads = 0;
 	for (int i = 0; i < MAX_THREAD; i++)
+	{
 		m_hThread[i] = NULL;
+		m_hThreadSemaphore[i] = NULL;
+	}
 
 	GetProcessAffinityMask(GetCurrentProcess(), &dwProcessAffinityMask, &dwSystemAffinityMask);
 	for (DWORD dwThreadAffinityMask = 1; dwThreadAffinityMask != 0; dwThreadAffinityMask <<= 1)
@@ -57,29 +61,69 @@ CThreadManager::CThreadManager(void)
 		{
 			m_hThread[m_nNumThreads] = CreateThread(NULL, 0, StaticThreadProc, this, CREATE_SUSPENDED, &m_dwThreadId[m_nNumThreads]);
 			SetThreadAffinityMask(m_hThread[m_nNumThreads], dwThreadAffinityMask);
+			m_hThreadSemaphore[m_nNumThreads] = CreateSemaphore(NULL, 0, 0x7fffffff, NULL);
 			m_nNumThreads++;
 		}
 	}
 
+	InitializeCriticalSection(&m_csJob);
+
 	for (int i = 0; i < m_nNumThreads; i++)
 		ResumeThread(m_hThread[i]);
+	_RPT1(_CRT_WARN, "leave CThreadManager::CThreadManager() this=%p\n", this);
 }
 
 CThreadManager::~CThreadManager(void)
 {
+	_RPT1(_CRT_WARN, "enter CThreadManager::~CThreadManager() this=%p\n", this);
+	EnterCriticalSection(&m_csJob);
+	for (int i = 0; i < m_nNumThreads; i++)
+	{
+		m_queueJob[i].push(NULL);
+		ReleaseSemaphore(m_hThreadSemaphore[i], 1, 0);
+	}
+	LeaveCriticalSection(&m_csJob);
+
 	WaitForMultipleObjects(m_nNumThreads, m_hThread, TRUE, INFINITE);
 	for (int i = 0; i < m_nNumThreads; i++)
+	{
 		CloseHandle(m_hThread[i]);
+		CloseHandle(m_hThreadSemaphore[i]);
+	}
+	DeleteCriticalSection(&m_csJob);
+	_RPT1(_CRT_WARN, "leave CThreadManager::~CThreadManager() this=%p\n", this);
 }
 
 DWORD WINAPI CThreadManager::StaticThreadProc(LPVOID lpParameter)
 {
 	CThreadManager *pThis = (CThreadManager *)lpParameter;
-	return pThis->ThreadProc();
+	DWORD dwThreadId;
+	int nThreadIndex;
+
+	dwThreadId = GetCurrentThreadId();
+	for (nThreadIndex = 0; nThreadIndex < pThis->m_nNumThreads; nThreadIndex++)
+		if (pThis->m_dwThreadId[nThreadIndex] == dwThreadId)
+			break;
+	_ASSERT(nThreadIndex < pThis->m_nNumThreads);
+	return pThis->ThreadProc(nThreadIndex);
 }
 
-DWORD CThreadManager::ThreadProc()
+DWORD CThreadManager::ThreadProc(int nThreadIndex)
 {
-	_RPT0(_CRT_WARN, "CThreadManager::ThreadProc()\n");
+	_RPT2(_CRT_WARN, "enter CThreadManager::ThreadProc() this=%p ID=%08X\n", this, GetCurrentThreadId());
+	for (;;)
+	{
+		CThreadJob *pJob;
+
+		WaitForSingleObject(m_hThreadSemaphore[nThreadIndex], INFINITE);
+		EnterCriticalSection(&m_csJob);
+		pJob = m_queueJob[nThreadIndex].front();
+		m_queueJob[nThreadIndex].pop();
+		LeaveCriticalSection(&m_csJob);
+		if (pJob == NULL)
+			break;
+		_ASSERT(false); // XXX
+	}
+	_RPT2(_CRT_WARN, "leave CThreadManager::ThreadProc() this=%p ID=%08X\n", this, GetCurrentThreadId());
 	return 0;
 }
