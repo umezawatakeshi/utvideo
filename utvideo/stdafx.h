@@ -65,5 +65,6 @@
 #include <vfw.h>
 #include <aviriff.h>
 
+#include <queue>
 #include <algorithm>
 using namespace std;
