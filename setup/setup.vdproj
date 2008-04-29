@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_62C06F02104B4B4CBF52D1B9266D895D"
+        "OwnerKey" = "8:_E83DAA20B61A4656BBC85A0ECA813999"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_67FF26C1533B4A68B1BFF893D8408718"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -71,12 +77,6 @@
         {
         "MsmKey" = "8:_B772FE269DB54B0089929FEF0AB169F2"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_B772FE269DB54B0089929FEF0AB169F2"
-        "OwnerKey" = "8:_E83DAA20B61A4656BBC85A0ECA813999"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -388,14 +388,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite"
-        "ProductCode" = "8:{273A40BF-F51A-4785-B9FA-2546F6ACBA43}"
-        "PackageCode" = "8:{13744DFC-75B3-4AAE-968F-E6A81E94395C}"
+        "ProductCode" = "8:{21851C7C-3C05-4523-B3DC-2F010086DDBB}"
+        "PackageCode" = "8:{82A2426C-E001-4AF2-A75F-E6148E95484E}"
         "UpgradeCode" = "8:{BD16A4A2-9AB5-4C0C-A763-DB7F9EAA4B1E}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.01.0302"
+        "ProductVersion" = "8:2.00.0000"
         "Manufacturer" = "8:UMEZAWA Takeshi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://umezawa.dyndns.info/"
