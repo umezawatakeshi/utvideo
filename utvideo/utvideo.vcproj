@@ -223,6 +223,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\Thread.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ULY2Decoder.cpp"
 				>
 			</File>
@@ -274,6 +278,10 @@
 			</File>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Thread.h"
 				>
 			</File>
 			<File
