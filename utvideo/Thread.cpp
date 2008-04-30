@@ -158,3 +158,11 @@ void CThreadManager::WaitForJobCompletion(void)
 		CloseHandle(m_hCompletionEvent[i]);
 	m_nNumJobs = 0;
 }
+
+CThreadJob::CThreadJob(void)
+{
+}
+
+CThreadJob::~CThreadJob(void)
+{
+}
