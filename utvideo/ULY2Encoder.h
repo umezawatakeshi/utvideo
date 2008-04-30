@@ -41,6 +41,8 @@
 #pragma once
 #include "Encoder.h"
 #include "FrameBuffer.h"
+#include "HuffmanCode.h"
+#include "Thread.h"
 
 class CULY2Encoder :
 	public CEncoder
@@ -53,6 +55,17 @@ private:
 	DWORD m_dwFrameStride;
 	DWORD m_dwPlaneSize[3];
 	DWORD m_dwPlaneStride[3];
+
+	CThreadManager m_tm;
+	const ICCOMPRESS *m_icc;
+	CFrameBuffer *m_pCurFrame;
+	CFrameBuffer *m_pMedianPredicted;
+	struct COUNTS
+	{
+		DWORD dwCount[3][256];
+	} *m_counts;
+	BYTE *m_pCodeLengthTable[3];
+	HUFFMAN_ENCODE_TABLE m_het[3];
 
 public:
 	CULY2Encoder(void);
@@ -69,4 +82,41 @@ public:
 	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	virtual DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+
+private:
+	void PredictProc(DWORD nBandIndex);
+	class CPredictJob : public CThreadJob
+	{
+	private:
+		DWORD m_nBandIndex;
+		CULY2Encoder *m_pEncoder;
+	public:
+		CPredictJob(CULY2Encoder *pEncoder, DWORD nBandIndex)
+		{
+			m_nBandIndex = nBandIndex;
+			m_pEncoder = pEncoder;
+		}
+		void JobProc(CThreadManager *)
+		{
+			m_pEncoder->PredictProc(m_nBandIndex);
+		}
+	};
+
+	void EncodeProc(DWORD nBandIndex);
+	class CEncodeJob : public CThreadJob
+	{
+	private:
+		DWORD m_nBandIndex;
+		CULY2Encoder *m_pEncoder;
+	public:
+		CEncodeJob(CULY2Encoder *pEncoder, DWORD nBandIndex)
+		{
+			m_nBandIndex = nBandIndex;
+			m_pEncoder = pEncoder;
+		}
+		void JobProc(CThreadManager *)
+		{
+			m_pEncoder->EncodeProc(m_nBandIndex);
+		}
+	};
 };
