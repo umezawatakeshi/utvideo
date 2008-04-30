@@ -48,6 +48,7 @@ CThreadManager::CThreadManager(void)
 
 	_RPT1(_CRT_WARN, "enter CThreadManager::CThreadManager() this=%p\n", this);
 	m_nNumThreads = 0;
+	m_nNumJobs = 0;
 	for (int i = 0; i < MAX_THREAD; i++)
 	{
 		m_hThread[i] = NULL;
@@ -75,6 +76,7 @@ CThreadManager::CThreadManager(void)
 
 CThreadManager::~CThreadManager(void)
 {
+	_ASSERT(m_nNumJobs == 0);
 	_RPT1(_CRT_WARN, "enter CThreadManager::~CThreadManager() this=%p\n", this);
 	EnterCriticalSection(&m_csJob);
 	for (int i = 0; i < m_nNumThreads; i++)
@@ -110,7 +112,7 @@ DWORD WINAPI CThreadManager::StaticThreadProc(LPVOID lpParameter)
 
 DWORD CThreadManager::ThreadProc(int nThreadIndex)
 {
-	_RPT2(_CRT_WARN, "enter CThreadManager::ThreadProc() this=%p ID=%08X\n", this, GetCurrentThreadId());
+	_RPT3(_CRT_WARN, "enter CThreadManager::ThreadProc() this=%p index=%d ID=%08X\n", this, nThreadIndex, GetCurrentThreadId());
 	for (;;)
 	{
 		CThreadJob *pJob;
@@ -122,8 +124,37 @@ DWORD CThreadManager::ThreadProc(int nThreadIndex)
 		LeaveCriticalSection(&m_csJob);
 		if (pJob == NULL)
 			break;
-		_ASSERT(false); // XXX
+		pJob->JobProc(this);
+		SetEvent(pJob->m_hCompletionEvent);
+		delete pJob;
 	}
-	_RPT2(_CRT_WARN, "leave CThreadManager::ThreadProc() this=%p ID=%08X\n", this, GetCurrentThreadId());
+	_RPT3(_CRT_WARN, "leave CThreadManager::ThreadProc() this=%p index=%d ID=%08X\n", this, nThreadIndex, GetCurrentThreadId());
 	return 0;
+}
+
+void CThreadManager::SubmitJob(CThreadJob *pJob, DWORD dwAffinityHint)
+{
+	HANDLE hCompletionEvent;
+	int nThreadIndex;
+
+	_ASSERT(pJob != NULL);
+	_ASSERT(m_nNumJobs < MAX_JOB);
+
+	hCompletionEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+	pJob->m_hCompletionEvent = hCompletionEvent;
+	nThreadIndex = dwAffinityHint % m_nNumThreads;
+	m_hCompletionEvent[m_nNumJobs++] = hCompletionEvent;
+	EnterCriticalSection(&m_csJob);
+	m_queueJob[nThreadIndex].push(pJob);
+	LeaveCriticalSection(&m_csJob);
+	ReleaseSemaphore(m_hThreadSemaphore[nThreadIndex], 1, NULL);
+}
+
+void CThreadManager::WaitForJobCompletion(void)
+{
+	// 待機中にジョブが追加されることは考慮していない。
+	WaitForMultipleObjects(m_nNumJobs, m_hCompletionEvent, TRUE, INFINITE);
+	for (int i = 0; i < m_nNumJobs; i++)
+		CloseHandle(m_hCompletionEvent[i]);
+	m_nNumJobs = 0;
 }
