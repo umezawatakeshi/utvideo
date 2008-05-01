@@ -1,11 +1,11 @@
 <html>
 <!-- $Id$ -->
 <head>
-<title>Ut Video Codec Suite 2.0.0 readme （日本語）</title>
+<title>Ut Video Codec Suite 2.1.0 readme （日本語）</title>
 <meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
 </head>
 <body>
-<h1>Ut Video Codec Suite 2.0.0 readme （日本語）</h1>
+<h1>Ut Video Codec Suite 2.1.0 readme （日本語）</h1>
 <hr>
 <h2 id="copyright_notice">著作権表示</h2>
 <h3>英語</h3>
@@ -52,12 +52,16 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 </ul>
 <h3>目標の達成度合い</h3>
 <ul>
-<li>まだ C++ だけで書いてあって遅いので、リアルタイム HD キャプチャには程遠いです。リアルタイム SD キャプチャなら場合によっては可能のようです。</li>
+<li>マルチスレッド化したもののまだ C++ だけで書いてあって遅いので、リアルタイム HD キャプチャには若干足りません（クアッドコアの場合）。リアルタイム SD キャプチャなら可能のようです。</li>
 <li>プログレッシブ映像の場合は、普通は Huffyuv (Predict median) より圧縮率は高くなります。</li>
 <li>インターレース映像の場合は、高さが 288 ピクセルを超える場合は Huffyuv の方が圧縮率が高い場合があります。</li>
 <li>Lagarith の圧縮率には基本的に届きませんが、稀に超えます。</li>
 </ul>
 <h2 id="history">改版履歴</h2>
+<h3>バージョン 2.1.0</h3>
+<ul>
+<li>マルチスレッド化した。</li>
+</ul>
 <h3>バージョン 2.0.0</h3>
 <ul>
 <li>フレームを分割して処理するようにした。</li>
