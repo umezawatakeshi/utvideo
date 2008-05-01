@@ -126,16 +126,6 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 	if (icc->lpckid != NULL)
 		*icc->lpckid = FCC('dcdc');
 
-	m_pCurFrame = new CFrameBuffer();
-	m_pCurFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	m_pCurFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	m_pCurFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
-
-	m_pMedianPredicted = new CFrameBuffer();
-	m_pMedianPredicted->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	m_pMedianPredicted->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	m_pMedianPredicted->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
-
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
 	m_counts = (COUNTS *)malloc(sizeof(COUNTS) * m_dwDivideCount);
@@ -185,9 +175,6 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 
 	free(m_counts);
 
-	delete m_pCurFrame;
-	delete m_pMedianPredicted;
-
 	return ICERR_OK;
 }
 
@@ -212,11 +199,24 @@ DWORD CULY2Encoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 	m_dwPlaneStride[2] = m_dwPlaneStride[1];
 	m_dwPlaneSize[2]   = m_dwPlaneSize[1];
 
+	m_pCurFrame = new CFrameBuffer();
+	m_pCurFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
+	m_pCurFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
+	m_pCurFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
+
+	m_pMedianPredicted = new CFrameBuffer();
+	m_pMedianPredicted->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
+	m_pMedianPredicted->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
+	m_pMedianPredicted->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
+
 	return ICERR_OK;
 }
 
 DWORD CULY2Encoder::CompressEnd(void)
 {
+	delete m_pCurFrame;
+	delete m_pMedianPredicted;
+
 	return ICERR_OK;
 }
 
