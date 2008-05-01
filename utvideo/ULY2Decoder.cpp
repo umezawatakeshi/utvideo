@@ -58,28 +58,8 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 
 	m_icd = icd;
 
-	m_pDecodedFrame = new CFrameBuffer();
-	m_pDecodedFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	m_pDecodedFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	m_pDecodedFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
-
 	memset(&m_fi, 0, sizeof(FRAMEINFO));
 	memcpy(&m_fi, ((BYTE *)icd->lpInput) + pbieIn->bih.biSizeImage - pbieIn->dwFrameInfoSize, pbieIn->dwFrameInfoSize);
-
-	switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
-	{
-	case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
-		m_pCurFrame = m_pDecodedFrame;
-		break;
-	case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-		m_pCurFrame = new CFrameBuffer();
-		m_pCurFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-		m_pCurFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-		m_pCurFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
-		break;
-	default:
-		return ICERR_ABORT;
-	}
 
 	p = (BYTE *)icd->lpInput;
 	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
@@ -95,14 +75,6 @@ DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	m_tm.WaitForJobCompletion();
 
 	icd->lpbiOutput->biSizeImage = m_dwFrameSize;
-
-	switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
-	{
-	case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-		delete m_pDecodedFrame;
-		break;
-	}
-	delete m_pCurFrame;
 
 	return ICERR_OK;
 }
@@ -129,11 +101,23 @@ DWORD CULY2Decoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	m_dwPlaneStride[2] = m_dwPlaneStride[1];
 	m_dwPlaneSize[2]   = m_dwPlaneSize[1];
 
+	m_pCurFrame = new CFrameBuffer();
+	m_pCurFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
+	m_pCurFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
+	m_pCurFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
+	m_pDecodedFrame = new CFrameBuffer();
+	m_pDecodedFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
+	m_pDecodedFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
+	m_pDecodedFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
+
 	return ICERR_OK;
 }
 
 DWORD CULY2Decoder::DecompressEnd(void)
 {
+	delete m_pCurFrame;
+	delete m_pDecodedFrame;
+
 	return ICERR_OK;
 }
 
@@ -181,6 +165,8 @@ DWORD CULY2Decoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 void CULY2Decoder::DecodeProc(DWORD nBandIndex)
 {
+	CFrameBuffer *pCurFrame;
+
 	DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
 	DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
 
@@ -200,17 +186,20 @@ void CULY2Decoder::DecodeProc(DWORD nBandIndex)
 
 		switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
+		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
+			pCurFrame = m_pDecodedFrame;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			RestoreMedian(m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex]);
+			pCurFrame = m_pCurFrame;
+			RestoreMedian(pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex]);
 			break;
 		}
 	}
 
 	pDstBegin = ((BYTE *)m_icd->lpOutput) + dwStrideBegin * m_dwFrameStride;
 	pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwStrideEnd   * m_dwFrameStride;
-	y = m_pCurFrame->GetPlane(0) + dwStrideBegin * m_dwPlaneStride[0];
-	u = m_pCurFrame->GetPlane(1) + dwStrideBegin * m_dwPlaneStride[1];
-	v = m_pCurFrame->GetPlane(2) + dwStrideBegin * m_dwPlaneStride[2];
+	y = pCurFrame->GetPlane(0) + dwStrideBegin * m_dwPlaneStride[0];
+	u = pCurFrame->GetPlane(1) + dwStrideBegin * m_dwPlaneStride[1];
+	v = pCurFrame->GetPlane(2) + dwStrideBegin * m_dwPlaneStride[2];
 
 	for (p = pDstBegin; p < pDstEnd; p += 4)
 	{
