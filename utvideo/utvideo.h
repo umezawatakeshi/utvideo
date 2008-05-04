@@ -91,3 +91,22 @@ inline DWORD ROUNDUP(DWORD a, DWORD b)
 {
 	return ((a + b - 1) / b) * b;
 }
+
+inline bool IS_ALIGNED(DWORD v, DWORD a)
+{
+	_ASSERT(
+		a == 2 ||
+		a == 4 ||
+		a == 8 ||
+		a == 16 ||
+		a == 32 ||
+		a == 64 ||
+		a == 128 ||
+		a == 256);
+	return (v & (a - 1)) == 0;
+}
+
+inline bool IS_ALIGNED(const void *p, DWORD a)
+{
+	return IS_ALIGNED((DWORD)p, a);
+}
