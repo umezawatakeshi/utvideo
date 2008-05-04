@@ -62,7 +62,7 @@ private:
 	CFrameBuffer *m_pMedianPredicted;
 	struct COUNTS
 	{
-		DWORD dwCount[3][256];
+		DWORD dwCount[4][256]; // 3 ‚Å‚Í‚È‚­ 4 ‚È‚Ì‚ÍƒAƒ‰ƒCƒƒ“ƒg‚Ì“s‡
 	} *m_counts;
 	BYTE *m_pCodeLengthTable[3];
 	HUFFMAN_ENCODE_TABLE m_het[3];
