@@ -292,13 +292,10 @@ void CULY2Encoder::PredictProc(DWORD nBandIndex)
 		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
 		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];
 
-		PredictMedian(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex]);
-
 		for (int i = 0; i < 256; i++)
 			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
 
-		for (p = m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin; p < m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneEnd; p++)
-			m_counts[nBandIndex].dwCount[nPlaneIndex][*p]++;
+		PredictMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 	}
 }
 
