@@ -40,10 +40,14 @@
 
 #pragma once
 
+struct HUFFMAN_ENCODE_TABLE;
+struct HUFFMAN_DECODE_TABLE;
+
 struct TUNEDFUNC
 {
 	void (*pfnPredictMedian_align16)(BYTE *, const BYTE *, const BYTE *, DWORD);
 	void (*pfnRestoreMedian_align1)(BYTE *, const BYTE *, const BYTE *, DWORD);
+	DWORD (*pfnHuffmanEncode_align1)(BYTE *, const BYTE *, const BYTE *, const HUFFMAN_ENCODE_TABLE *);
 };
 
 extern TUNEDFUNC tfn;

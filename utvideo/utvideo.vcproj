@@ -208,6 +208,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HuffmanCode_asm.asm"
+				>
+			</File>
+			<File
 				RelativePath=".\Predict.cpp"
 				>
 			</File>

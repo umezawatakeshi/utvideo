@@ -41,30 +41,36 @@
 #include "StdAfx.h"
 #include "TunedFunc.h"
 #include "Predict.h"
+#include "HuffmanCode.h"
 
 const TUNEDFUNC tfnCPP = {
 	cpp_PredictMedian,
 	cpp_RestoreMedian,
+	cpp_HuffmanEncode,
 };
 
 const TUNEDFUNC tfnI686 = {
 	cpp_PredictMedian,
 	i686_RestoreMedian_align1,
+	i686_HuffmanEncode_align1,
 };
 
 const TUNEDFUNC tfnSSE2 = {
 	sse2_PredictMedian_align16,
 	i686_RestoreMedian_align1,
+	i686_HuffmanEncode_align1,
 };
 
 const TUNEDFUNC tfnSSE3 = {
 	sse2_PredictMedian_align16,
 	i686_RestoreMedian_align1,
+	i686_HuffmanEncode_align1,
 };
 
 const TUNEDFUNC tfnSSSE3 = {
 	sse2_PredictMedian_align16,
 	i686_RestoreMedian_align1,
+	i686_HuffmanEncode_align1,
 };
 
 TUNEDFUNC tfn;
