@@ -128,8 +128,6 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
-	m_counts = (COUNTS *)malloc(sizeof(COUNTS) * m_dwDivideCount);
-
 	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		m_tm.SubmitJob(new CPredictJob(this, nBandIndex), nBandIndex);
 	m_tm.WaitForJobCompletion();
@@ -173,8 +171,6 @@ DWORD CULY2Encoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 	icc->lpbiOutput->biSizeImage = p - ((BYTE *)icc->lpOutput);
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
 
-	free(m_counts);
-
 	return ICERR_OK;
 }
 
@@ -209,6 +205,8 @@ DWORD CULY2Encoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 	m_pMedianPredicted->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
 	m_pMedianPredicted->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
 
+	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+
 	return ICERR_OK;
 }
 
@@ -216,6 +214,8 @@ DWORD CULY2Encoder::CompressEnd(void)
 {
 	delete m_pCurFrame;
 	delete m_pMedianPredicted;
+
+	VirtualFree(m_counts, 0, MEM_RELEASE);
 
 	return ICERR_OK;
 }
