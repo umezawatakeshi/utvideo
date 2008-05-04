@@ -128,4 +128,73 @@ label2:
 
 _sse2_PredictMedian_align16	endp
 
+
+; void i686_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+_i686_RestoreMedian_align1	proc
+
+	push		ebx
+	push		esi
+	push		edi
+	push		ebp
+
+	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pSrcBegin
+	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDst
+	mov			eax, esi
+	mov			ebp, dword ptr [esp + 16 + 4 + 12]	; dwStride
+	add			eax, ebp
+	neg			ebp
+
+	mov			edx, 80h
+
+	align		64
+label1:
+	add			dl, byte ptr [esi]
+	mov			byte ptr [edi], dl
+	inc 		esi
+	inc			edi
+	cmp			esi, eax
+	jb			label1
+
+	mov			eax, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+
+	xor			ecx, ecx
+	xor			edx, edx
+
+	align		64
+label2:
+	mov			bl, dl
+	sub			bl, cl
+	mov			cl, byte ptr [edi+ebp]
+	add			bl, cl		; bl = grad
+	rol			ebx, 16
+
+	mov			bl, dl
+	cmp			dl, cl
+	cmovb		bx, cx		; bl = max(dl,cl) ; ebx の上位 16bit は保護する必要があるので、ここは cmovb ebx, ecx ではいけない。また、cmov は 8bit オペランドをサポートしないので、そもそも cmovb bl, cl とは書けない。
+	cmovae		edx, ecx	; dl = min(dl,cl)
+
+	rol			ebx, 16
+	cmp			dl, bl
+	cmovb		edx, ebx	; dl = max(dl,bl)
+	rol			ebx, 16
+	cmp			dl, bl
+	cmovae		edx, ebx	; dl = min(dl,bl)
+
+	add			dl, byte ptr [esi]
+	mov			byte ptr [edi], dl
+
+	inc			esi
+	inc			edi
+	cmp			esi, eax
+	jb			label2
+
+	pop			ebp
+	pop			edi
+	pop			esi
+	pop			ebx
+	ret
+
+_i686_RestoreMedian_align1	endp
+
+
 end
