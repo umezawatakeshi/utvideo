@@ -42,6 +42,7 @@
 
 struct TUNEDFUNC
 {
+	void (*pfnPredictMedian_align16)(BYTE *, const BYTE *, const BYTE *, DWORD);
 };
 
 extern TUNEDFUNC tfn;

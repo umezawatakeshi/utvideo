@@ -13,6 +13,9 @@
 		/>
 	</Platforms>
 	<ToolFiles>
+		<DefaultToolFile
+			FileName="masm.rules"
+		/>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
@@ -27,6 +30,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -107,6 +113,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -200,6 +209,10 @@
 			</File>
 			<File
 				RelativePath=".\Predict.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Predict_asm.asm"
 				>
 			</File>
 			<File

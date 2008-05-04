@@ -40,20 +40,26 @@
 
 #include "StdAfx.h"
 #include "TunedFunc.h"
+#include "Predict.h"
 
 const TUNEDFUNC tfnCPP = {
+	cpp_PredictMedian,
 };
 
 const TUNEDFUNC tfnI686 = {
+	cpp_PredictMedian,
 };
 
 const TUNEDFUNC tfnSSE2 = {
+	sse2_PredictMedian_align16,
 };
 
 const TUNEDFUNC tfnSSE3 = {
+	sse2_PredictMedian_align16,
 };
 
 const TUNEDFUNC tfnSSSE3 = {
+	sse2_PredictMedian_align16,
 };
 
 TUNEDFUNC tfn;

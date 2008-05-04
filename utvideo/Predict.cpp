@@ -39,7 +39,9 @@
  */
 
 #include "StdAfx.h"
+#include "utvideo.h"
 #include "Predict.h"
+#include "TunedFunc.h"
 
 inline BYTE median(BYTE a, BYTE b, BYTE c)
 {
@@ -47,6 +49,14 @@ inline BYTE median(BYTE a, BYTE b, BYTE c)
 }
 
 void PredictMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+{
+	if (IS_ALIGNED(pDst, 16) && IS_ALIGNED(pSrcBegin, 16) && IS_ALIGNED(dwStride, 16))
+		tfn.pfnPredictMedian_align16(pDst, pSrcBegin, pSrcEnd, dwStride);
+	else
+		cpp_PredictMedian(pDst, pSrcBegin, pSrcEnd, dwStride);
+}
+
+void cpp_PredictMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
 {
 	const BYTE *p = pSrcBegin;
 	BYTE *q = pDst;
