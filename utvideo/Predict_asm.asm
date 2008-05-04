@@ -45,7 +45,7 @@
 
 _TEXT_ASM	SEGMENT	page public flat 'CODE'
 
-; void PredictMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+; void sse2_PredictMedian_align16(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
 public	_sse2_PredictMedian_align16
 _sse2_PredictMedian_align16	proc
 
