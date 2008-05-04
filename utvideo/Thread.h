@@ -82,6 +82,6 @@ private:
 	DWORD ThreadProc(int nThreadIndex);
 
 public:
-	void SubmitJob(CThreadJob *pJob, DWORD dwHint);
+	void SubmitJob(CThreadJob *pJob, DWORD dwAffinityHint);
 	void WaitForJobCompletion(void);
 };
