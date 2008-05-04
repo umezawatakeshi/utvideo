@@ -40,6 +40,7 @@
 
 #include "stdafx.h"
 #include "VCMCodec.h"
+#include "TunedFunc.h"
 
 #ifdef _MANAGED
 #pragma managed(push, off)
@@ -52,7 +53,10 @@ HMODULE hModule;
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 {
 	if (dwReason == DLL_PROCESS_ATTACH)
+	{
 		::hModule = hModule;
+		InitializeTunedFunc();
+	}
 
 	return TRUE;
 }

@@ -227,6 +227,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TunedFunc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ULY2Decoder.cpp"
 				>
 			</File>
@@ -282,6 +286,10 @@
 			</File>
 			<File
 				RelativePath=".\Thread.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TunedFunc.h"
 				>
 			</File>
 			<File
