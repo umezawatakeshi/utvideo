@@ -46,6 +46,7 @@
 const TUNEDFUNC tfnCPP = {
 	cpp_PredictMedian,
 	cpp_PredictMedianAndCount,
+	cpp_PredictMedianAndCount,
 	cpp_RestoreMedian,
 	cpp_HuffmanEncode,
 	cpp_HuffmanDecode,
@@ -53,6 +54,7 @@ const TUNEDFUNC tfnCPP = {
 
 const TUNEDFUNC tfnI686 = {
 	cpp_PredictMedian,
+	cpp_PredictMedianAndCount,
 	cpp_PredictMedianAndCount,
 	i686_RestoreMedian_align1,
 	i686_HuffmanEncode_align1,
@@ -62,6 +64,7 @@ const TUNEDFUNC tfnI686 = {
 const TUNEDFUNC tfnSSE2 = {
 	sse2_PredictMedian_align16,
 	sse2_PredictMedianAndCount_align16,
+	sse2_PredictMedianAndCount_align1,
 	i686_RestoreMedian_align1,
 	i686_HuffmanEncode_align1,
 	i686_HuffmanDecode_align1,
@@ -70,6 +73,7 @@ const TUNEDFUNC tfnSSE2 = {
 const TUNEDFUNC tfnSSE3 = {
 	sse2_PredictMedian_align16,
 	sse2_PredictMedianAndCount_align16,
+	sse2_PredictMedianAndCount_align1,
 	i686_RestoreMedian_align1,
 	i686_HuffmanEncode_align1,
 	i686_HuffmanDecode_align1,
@@ -78,6 +82,7 @@ const TUNEDFUNC tfnSSE3 = {
 const TUNEDFUNC tfnSSSE3 = {
 	sse2_PredictMedian_align16,
 	sse2_PredictMedianAndCount_align16,
+	sse2_PredictMedianAndCount_align1,
 	i686_RestoreMedian_align1,
 	i686_HuffmanEncode_align1,
 	i686_HuffmanDecode_align1,
