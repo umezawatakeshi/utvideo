@@ -58,6 +58,8 @@ _i686_HuffmanEncode_align1	proc
 	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDstBegin
 	mov			edx, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
 	mov			ebp, dword ptr [esp + 16 + 4 + 12]	; pEncodeTable
+	cmp			dword ptr [ebp], 0
+	je			label3
 	mov			cl, -32
 	xor			eax, eax
 
