@@ -1,11 +1,11 @@
 <html>
 <!-- $Id$ -->
 <head>
-<title>Ut Video Codec Suite 2.1.0 readme (English)</title>
+<title>Ut Video Codec Suite 2.2.0 readme (English)</title>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
 </head>
 <body>
-<h1>Ut Video Codec Suite 2.1.0 readme (English)</h1>
+<h1>Ut Video Codec Suite 2.2.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008  UMEZAWA Takeshi</p>
@@ -38,12 +38,16 @@ It can currently encode YUV422 sources.</p>
 </ul>
 <h3>Achievement</h3>
 <ul>
-<li>Far from realtime high definition capture because written in C++ only and not optimized well.</li>
+<li>Enough speed for realtime high definition capture because of multithreading and assembly language.</li>
 <li>Usually better compression ratio than Huffyuv (Predict median) for progressive sources.</li>
 <li>May worse compression ratio than Huffyuv for interlace sources whose height is greater than 288 pixels.</li>
 <li>Usually worse compression ratio than Lagarith, but rarely better.</li>
 </ul>
 <h2 id="history">Version history</h2>
+<h3>Version 2.2.0</h3>
+<ul>
+<li>Replaced many routines with assembly language version.</li>
+</ul>
 <h3>Version 2.1.0</h3>
 <ul>
 <li>Add support for multithreading.</li>
