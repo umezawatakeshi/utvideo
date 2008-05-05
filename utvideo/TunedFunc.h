@@ -49,6 +49,7 @@ struct TUNEDFUNC
 	void (*pfnPredictMedianAndCount_align16)(BYTE *, const BYTE *, const BYTE *, DWORD, DWORD *);
 	void (*pfnRestoreMedian_align1)(BYTE *, const BYTE *, const BYTE *, DWORD);
 	DWORD (*pfnHuffmanEncode_align1)(BYTE *, const BYTE *, const BYTE *, const HUFFMAN_ENCODE_TABLE *);
+	void (*pfnHuffmanDecode_align1)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
 };
 
 extern TUNEDFUNC tfn;
