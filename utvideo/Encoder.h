@@ -57,3 +57,22 @@ public:
 	virtual DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 	virtual DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 };
+
+class CDummyEncoder :
+	public CEncoder
+{
+public:
+	CDummyEncoder(void);
+	~CDummyEncoder(void);
+
+public:
+	virtual DWORD Configure(HWND hwnd);
+	virtual DWORD GetState(void *pState, DWORD dwSize);
+	virtual DWORD SetState(const void *pState, DWORD dwSize);
+	virtual DWORD Compress(const ICCOMPRESS *icc, DWORD dwSize);
+	virtual DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual DWORD CompressEnd(void);
+	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+};

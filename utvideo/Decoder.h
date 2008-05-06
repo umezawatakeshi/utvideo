@@ -53,3 +53,18 @@ public:
 	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
 	virtual DWORD DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 };
+
+class CDummyDecoder :
+	public CDecoder
+{
+public:
+	CDummyDecoder(void);
+	~CDummyDecoder(void);
+
+public:
+	virtual DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize);
+	virtual DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual DWORD DecompressEnd(void);
+	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual DWORD DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+};

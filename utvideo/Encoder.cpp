@@ -1,5 +1,5 @@
 /* ï∂éöÉRÅ[ÉhÇÕÇrÇiÇhÇr â¸çsÉRÅ[ÉhÇÕÇbÇqÇkÇe */
-/* $Id:$ */
+/* $Id$ */
 /*
  * Ut Video Codec Suite
  * Copyright (C) 2008  UMEZAWA Takeshi
@@ -47,4 +47,57 @@ CEncoder::CEncoder(void)
 
 CEncoder::~CEncoder(void)
 {
+}
+
+CDummyEncoder::CDummyEncoder(void)
+{
+}
+
+CDummyEncoder::~CDummyEncoder(void)
+{
+}
+
+DWORD CDummyEncoder::Configure(HWND hwnd)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyEncoder::GetState(void *pState, DWORD dwSize)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyEncoder::SetState(const void *pState, DWORD dwSize)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyEncoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyEncoder::CompressEnd(void)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyEncoder::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+{
+	return ICERR_UNSUPPORTED;
 }

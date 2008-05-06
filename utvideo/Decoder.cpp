@@ -48,3 +48,36 @@ CDecoder::CDecoder(void)
 CDecoder::~CDecoder(void)
 {
 }
+
+CDummyDecoder::CDummyDecoder(void)
+{
+}
+
+CDummyDecoder::~CDummyDecoder(void)
+{
+}
+
+DWORD CDummyDecoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyDecoder::DecompressEnd(void)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyDecoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+{
+	return ICERR_UNSUPPORTED;
+}
+
+DWORD CDummyDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+{
+	return ICERR_UNSUPPORTED;
+}
