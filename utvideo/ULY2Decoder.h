@@ -66,6 +66,7 @@ private:
 public:
 	CULY2Decoder(void);
 	virtual ~CULY2Decoder(void);
+	static CDecoder *CreateInstance(void);
 
 public:
 	virtual DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize);

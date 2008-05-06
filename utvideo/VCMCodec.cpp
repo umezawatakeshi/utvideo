@@ -44,11 +44,28 @@
 #include "ULY2Encoder.h"
 #include "ULY2Decoder.h"
 
+CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
+	{ -1,          "",       CDummyEncoder::CreateInstance, CDummyDecoder::CreateInstance },
+	{ FCC('ULY2'), "YUV422", CULY2Encoder::CreateInstance,  CULY2Decoder::CreateInstance  },
+};
+
 CVCMCodec::CVCMCodec(DWORD fccHandler)
 {
-	m_fccHandler = fccHandler;
-	m_pEncoder = new CULY2Encoder();
-	m_pDecoder = new CULY2Decoder();
+	int idx;
+
+	for (idx = 0; idx < _countof(m_codeclist); idx++)
+	{
+		if (m_codeclist[idx].fcc == fccHandler)
+			break;
+	}
+	if (idx == _countof(m_codeclist))
+		idx = 0;
+
+	m_fccHandler         = m_codeclist[idx].fcc;
+	m_pszColorFormatName = m_codeclist[idx].pszColorFormatName;
+	m_pEncoder           = m_codeclist[idx].pfnCreateEncoder();
+	m_pDecoder           = m_codeclist[idx].pfnCreateDecoder();
+	_RPT2(_CRT_WARN, "infcc=%08X foundfcc=%08X\n", fccHandler, m_fccHandler);
 }
 
 CVCMCodec::~CVCMCodec(void)
@@ -59,13 +76,20 @@ CVCMCodec::~CVCMCodec(void)
 
 CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)
 {
-	DWORD fccHandler;
+	union
+	{
+		DWORD fccHandler;
+		char fccChar[4];
+	};
 
 	if (icopen != NULL)
 	{
 		if (icopen->fccType != ICTYPE_VIDEO)
 			return NULL;
 		fccHandler = icopen->fccHandler;
+		// Ç»Ç∫Ç©è¨ï∂éöÇ≈ìnÇ≥ÇÍÇÈÇ±Ç∆Ç™Ç†ÇÈÇÃÇ≈ÅAç≈èâÇ…ëÂï∂éöâªÇµÇƒÇ®Ç≠ÅB
+		for (int i = 0; i < 4; i++)
+			fccChar[i] = toupper(fccChar[i]);
 		icopen->dwError = ICERR_OK;
 	}
 	else
@@ -99,8 +123,8 @@ DWORD CVCMCodec::GetInfo(ICINFO *icinfo, DWORD dwSize)
 	icinfo->dwFlags      = 0;
 	icinfo->dwVersion    = UTVIDEO_ENCODER_VERSION;
 	icinfo->dwVersionICM = ICVERSION;
-	wsprintfW(icinfo->szName, L"%S", "Ut Video Codec");
-	wsprintfW(icinfo->szDescription, L"%S", "Ut Video Codec YUV422 (VCM)");
+	wsprintfW(icinfo->szName, L"Ut Video Codec");
+	wsprintfW(icinfo->szDescription, L"Ut Video Codec %S (VCM)", m_pszColorFormatName);
 
 	return sizeof(ICINFO);
 }
@@ -139,26 +163,31 @@ DWORD CVCMCodec::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 
 DWORD CVCMCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	_RPT0(_CRT_WARN, "CVCMCodec::CompressBegin()\n");
 	return m_pEncoder->CompressBegin(pbihIn, pbihOut);
 }
 
 DWORD CVCMCodec::CompressEnd(void)
 {
+	_RPT0(_CRT_WARN, "CVCMCodec::CompressEnd()\n");
 	return m_pEncoder->CompressEnd();
 }
 
 DWORD CVCMCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
+	_RPT0(_CRT_WARN, "CVCMCodec::CompressGetFormat()\n");
 	return m_pEncoder->CompressGetFormat(pbihIn, pbihOut);
 }
 
 DWORD CVCMCodec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	_RPT0(_CRT_WARN, "CVCMCodec::CompressGetSize()\n");
 	return m_pEncoder->CompressGetSize(pbihIn, pbihOut);
 }
 
 DWORD CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	_RPT0(_CRT_WARN, "CVCMCodec::CompressQuery()\n");
 	return m_pEncoder->CompressQuery(pbihIn, pbihOut);
 }
 
@@ -169,20 +198,24 @@ DWORD CVCMCodec::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 
 DWORD CVCMCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	_RPT0(_CRT_WARN, "CVCMCodec::DecompressBegin()\n");
 	return m_pDecoder->DecompressBegin(pbihIn, pbihOut);
 }
 
 DWORD CVCMCodec::DecompressEnd(void)
 {
+	_RPT0(_CRT_WARN, "CVCMCodec::DecompressEnd()\n");
 	return m_pDecoder->DecompressEnd();
 }
 
 DWORD CVCMCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
+	_RPT0(_CRT_WARN, "CVCMCodec::DecompressGetFormat()\n");
 	return m_pDecoder->DecompressGetFormat(pbihIn, pbihOut);
 }
 
 DWORD CVCMCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	_RPT0(_CRT_WARN, "CVCMCodec::DecompressQuery()\n");
 	return m_pDecoder->DecompressQuery(pbihIn, pbihOut);
 }

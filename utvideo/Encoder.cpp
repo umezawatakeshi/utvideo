@@ -57,6 +57,11 @@ CDummyEncoder::~CDummyEncoder(void)
 {
 }
 
+CEncoder *CDummyEncoder::CreateInstance(void)
+{
+	return new CDummyEncoder();
+}
+
 DWORD CDummyEncoder::Configure(HWND hwnd)
 {
 	return ICERR_UNSUPPORTED;

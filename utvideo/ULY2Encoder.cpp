@@ -53,6 +53,11 @@ CULY2Encoder::~CULY2Encoder(void)
 {
 }
 
+CEncoder *CULY2Encoder::CreateInstance(void)
+{
+	return new CULY2Encoder();
+}
+
 DWORD CULY2Encoder::Configure(HWND hwnd)
 {
 	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_CONFIG_DIALOG), hwnd, DialogProc, (LPARAM)this);

@@ -70,6 +70,7 @@ private:
 public:
 	CULY2Encoder(void);
 	virtual ~CULY2Encoder(void);
+	static CEncoder *CreateInstance(void);
 
 public:
 	virtual DWORD Configure(HWND hwnd);

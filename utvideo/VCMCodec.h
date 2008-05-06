@@ -45,7 +45,19 @@
 class CVCMCodec
 {
 private:
+	struct CODECLIST
+	{
+		DWORD fcc;
+		const char *pszColorFormatName;
+		CEncoder *(*pfnCreateEncoder)(void);
+		CDecoder *(*pfnCreateDecoder)(void);
+	};
+
+	static CODECLIST m_codeclist[];
+
+private:
 	DWORD m_fccHandler;
+	const char *m_pszColorFormatName;
 	CEncoder *m_pEncoder;
 	CDecoder *m_pDecoder;
 

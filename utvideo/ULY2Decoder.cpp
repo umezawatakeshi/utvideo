@@ -51,6 +51,11 @@ CULY2Decoder::~CULY2Decoder(void)
 {
 }
 
+CDecoder *CULY2Decoder::CreateInstance(void)
+{
+	return new CULY2Decoder();
+}
+
 DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)icd->lpbiInput;

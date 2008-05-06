@@ -64,6 +64,7 @@ class CDummyEncoder :
 public:
 	CDummyEncoder(void);
 	~CDummyEncoder(void);
+	static CEncoder *CreateInstance(void);
 
 public:
 	virtual DWORD Configure(HWND hwnd);

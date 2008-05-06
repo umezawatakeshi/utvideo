@@ -57,6 +57,11 @@ CDummyDecoder::~CDummyDecoder(void)
 {
 }
 
+CDecoder *CDummyDecoder::CreateInstance(void)
+{
+	return new CDummyDecoder();
+}
+
 DWORD CDummyDecoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 {
 	return ICERR_UNSUPPORTED;

@@ -60,6 +60,7 @@ class CDummyDecoder :
 public:
 	CDummyDecoder(void);
 	~CDummyDecoder(void);
+	static CDecoder *CreateInstance(void);
 
 public:
 	virtual DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize);
