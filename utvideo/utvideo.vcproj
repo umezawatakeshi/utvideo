@@ -13,9 +13,6 @@
 		/>
 	</Platforms>
 	<ToolFiles>
-		<DefaultToolFile
-			FileName="masm.rules"
-		/>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
@@ -30,9 +27,6 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -113,9 +107,6 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="MASM"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -210,6 +201,24 @@
 			<File
 				RelativePath=".\HuffmanCode_asm.asm"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\HuffmanCode_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta HuffmanCode_asm.asm"
+						Outputs="$(IntDir)\HuffmanCode_asm.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\HuffmanCode_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta HuffmanCode_asm.asm"
+						Outputs="$(IntDir)\HuffmanCode_asm.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Predict.cpp"
@@ -218,6 +227,24 @@
 			<File
 				RelativePath=".\Predict_asm.asm"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Predict_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Predict_asm.asm"
+						Outputs="$(IntDir)\Predict_asm.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Predict_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Predict_asm.asm"
+						Outputs="$(IntDir)\Predict_asm.obj"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp"
