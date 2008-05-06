@@ -39,6 +39,7 @@
  */
 
 #include "stdafx.h"
+#include "utvideo.h"
 #include "VCMCodec.h"
 #include "TunedFunc.h"
 
