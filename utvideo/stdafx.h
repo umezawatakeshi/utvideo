@@ -61,8 +61,11 @@
 #define WIN32_LEAN_AND_MEAN		// Windows ヘッダーから使用されていない部分を除外します。
 // Windows ヘッダー ファイル:
 #include <windows.h>
-
+// mmreg.h に「現在のコードページで表示できない文字」が含まれていて警告が出るので、それを抑制する。
+#pragma warning(push)
+#pragma warning(disable:4819)
 #include <vfw.h>
+#pragma warning(pop)
 
 #include <queue>
 #include <algorithm>
