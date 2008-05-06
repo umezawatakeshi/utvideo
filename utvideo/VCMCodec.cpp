@@ -49,6 +49,27 @@ const CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
 	{ FCC('ULY2'), "YUV422", CULY2Encoder::CreateInstance,  CULY2Decoder::CreateInstance  },
 };
 
+void CVCMCodec::ICInstallAll(void)
+{
+	char szLongFilename[MAX_PATH];
+	char szShortFilename[MAX_PATH];
+
+	/*
+	 * 何故か長いファイル名ではダメ（登録はできるがロードに失敗する）で、
+	 * 8.3 形式のファイル名で登録しなければならない。
+	 */
+	GetModuleFileName(hModule, szLongFilename, sizeof(szLongFilename));
+	GetShortPathName(szLongFilename, szShortFilename, sizeof(szShortFilename));
+	for (int i = 1; i < _countof(m_codeclist); i++)
+		ICInstall(ICTYPE_VIDEO, m_codeclist[i].fcc, (LPARAM)szShortFilename, NULL, ICINSTALL_DRIVER);
+}
+
+void CVCMCodec::ICRemoveAll(void)
+{
+	for (int i = 1; i < _countof(m_codeclist); i++)
+		ICRemove(ICTYPE_VIDEO, m_codeclist[i].fcc, 0);
+}
+
 CVCMCodec::CVCMCodec(DWORD fccHandler)
 {
 	int idx;

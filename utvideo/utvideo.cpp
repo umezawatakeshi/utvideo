@@ -47,8 +47,6 @@
 #pragma managed(push, off)
 #endif
 
-const DWORD fccULY2 = FCC('ULY2');
-
 HMODULE hModule;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
@@ -64,33 +62,24 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 int APIENTRY ICInstallSelf(void)
 {
-	char szLongFilename[MAX_PATH];
-	char szShortFilename[MAX_PATH];
-
-	/*
-	 * 何故か長いファイル名ではダメ（登録はできるがロードに失敗する）で、
-	 * 8.3 形式のファイル名で登録しなければならない。
-	 */
-	GetModuleFileName(hModule, szLongFilename, sizeof(szLongFilename));
-	GetShortPathName(szLongFilename, szShortFilename, sizeof(szShortFilename));
-	ICInstall(ICTYPE_VIDEO, fccULY2, (LPARAM)szShortFilename, NULL, ICINSTALL_DRIVER);
+	CVCMCodec::ICInstallAll();
 	return 0;
 }
 
 int APIENTRY ICRemoveSelf(void)
 {
-	ICRemove(ICTYPE_VIDEO, fccULY2, 0);
+	CVCMCodec::ICRemoveAll();
 	return 0;
 }
 
 void CALLBACK ICInstallByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
 {
-	ICInstallSelf();
+	CVCMCodec::ICInstallAll();
 }
 
 void CALLBACK ICRemoveByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
 {
-	ICRemoveSelf();
+	CVCMCodec::ICRemoveAll();
 }
 
 LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lParam1, LPARAM lParam2)

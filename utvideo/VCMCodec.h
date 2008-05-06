@@ -55,6 +55,10 @@ private:
 
 	static const CODECLIST m_codeclist[];
 
+public:
+	static void ICInstallAll(void);
+	static void ICRemoveAll(void);
+
 private:
 	DWORD m_fccHandler;
 	const char *m_pszColorFormatName;
