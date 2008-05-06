@@ -53,7 +53,7 @@ private:
 		CDecoder *(*pfnCreateDecoder)(void);
 	};
 
-	static CODECLIST m_codeclist[];
+	static const CODECLIST m_codeclist[];
 
 private:
 	DWORD m_fccHandler;
