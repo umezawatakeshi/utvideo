@@ -63,7 +63,6 @@
 #include <windows.h>
 
 #include <vfw.h>
-#include <aviriff.h>
 
 #include <queue>
 #include <algorithm>

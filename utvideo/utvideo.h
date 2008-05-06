@@ -40,6 +40,14 @@
 
 #pragma once
 
+#ifndef FCC
+#define FCC(fcc) ( \
+	(((DWORD)(fcc) & 0x000000ff) << 24) | \
+	(((DWORD)(fcc) & 0x0000ff00) <<  8) | \
+	(((DWORD)(fcc) & 0x00ff0000) >>  8) | \
+	(((DWORD)(fcc) & 0xff000000) >> 24))
+#endif
+
 #define UTVIDEO_ENCODER_VERSION 0x02020000 /* 2.2.0 */
 
 extern HINSTANCE hModule;
