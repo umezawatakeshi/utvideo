@@ -326,10 +326,10 @@ _sse2_PredictMedianAndCount_align1	proc
 	align		64
 label1:
 	movdqu		xmm0, oword ptr [esi]
-	movdqu		xmm2, xmm0
+	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
-	movdqu		xmm1, xmm0
+	movdqa		xmm1, xmm0
 	psrldq		xmm1, 15
 
 	psubb		xmm0, xmm2
@@ -389,7 +389,7 @@ label1:
 	jae			label4
 
 	movdqu		xmm0, oword ptr [esi]
-	movdqu		xmm2, xmm0
+	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
 	psubb		xmm0, xmm2
@@ -420,24 +420,24 @@ label4:
 	align		64
 label2:
 	movdqu		xmm0, oword ptr [esi]
-	movdqu		xmm2, xmm0
+	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
-	movdqu		xmm1, xmm0
+	movdqa		xmm1, xmm0
 	psrldq		xmm1, 15
 
 	movdqu		xmm4, oword ptr [esi+edx]
-	movdqu		xmm6, xmm4
+	movdqa		xmm6, xmm4
 	pslldq		xmm6, 1
 	por			xmm6, xmm5
-	movdqu		xmm5, xmm4
+	movdqa		xmm5, xmm4
 	psrldq		xmm5, 15
 
-	movdqu		xmm7, xmm2
+	movdqa		xmm7, xmm2
 	paddb		xmm7, xmm4
 	psubb		xmm7, xmm6
 
-	movdqu		xmm3, xmm2
+	movdqa		xmm3, xmm2
 	pminub		xmm2, xmm4
 	pmaxub		xmm3, xmm4
 	pmaxub		xmm7, xmm2
@@ -499,20 +499,20 @@ label2:
 	jae			label6
 
 	movdqu		xmm0, oword ptr [esi]
-	movdqu		xmm2, xmm0
+	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
 
 	movdqu		xmm4, oword ptr [esi+edx]
-	movdqu		xmm6, xmm4
+	movdqa		xmm6, xmm4
 	pslldq		xmm6, 1
 	por			xmm6, xmm5
 
-	movdqu		xmm7, xmm2
+	movdqa		xmm7, xmm2
 	paddb		xmm7, xmm4
 	psubb		xmm7, xmm6
 
-	movdqu		xmm3, xmm2
+	movdqa		xmm3, xmm2
 	pminub		xmm2, xmm4
 	pmaxub		xmm3, xmm4
 	pmaxub		xmm7, xmm2
