@@ -44,6 +44,12 @@
 #include "ULY2Encoder.h"
 #include "ULY2Decoder.h"
 
+#define FCC4PRINTF(fcc) \
+	(BYTE)(m_fccHandler), \
+	(BYTE)(m_fccHandler >> 8), \
+	(BYTE)(m_fccHandler >> 16), \
+	(BYTE)(m_fccHandler >> 24)
+
 const CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
 	{ -1,          "",       CDummyEncoder::CreateInstance, CDummyDecoder::CreateInstance },
 	{ FCC('ULY2'), "YUV422", CULY2Encoder::CreateInstance,  CULY2Decoder::CreateInstance  },
@@ -144,8 +150,8 @@ DWORD CVCMCodec::GetInfo(ICINFO *icinfo, DWORD dwSize)
 	icinfo->dwFlags      = 0;
 	icinfo->dwVersion    = UTVIDEO_ENCODER_VERSION;
 	icinfo->dwVersionICM = ICVERSION;
-	wsprintfW(icinfo->szName, L"Ut Video Codec");
-	wsprintfW(icinfo->szDescription, L"Ut Video Codec %S (VCM)", m_pszColorFormatName);
+	wsprintfW(icinfo->szName, L"Ut Video (%C%C%C%C)", FCC4PRINTF(m_fccHandler));
+	wsprintfW(icinfo->szDescription, L"Ut Video Codec %S (%C%C%C%C) VCM", m_pszColorFormatName, FCC4PRINTF(m_fccHandler));
 
 	return sizeof(ICINFO);
 }
