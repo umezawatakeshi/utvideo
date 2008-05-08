@@ -43,6 +43,8 @@
 #include "VCMCodec.h"
 #include "ULY2Encoder.h"
 #include "ULY2Decoder.h"
+#include "ULRGEncoder.h"
+#include "ULRGDecoder.h"
 
 #define FCC4PRINTF(fcc) \
 	(BYTE)(m_fccHandler), \
@@ -53,6 +55,7 @@
 const CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
 	{ -1,          "",       CDummyEncoder::CreateInstance, CDummyDecoder::CreateInstance },
 	{ FCC('ULY2'), "YUV422", CULY2Encoder::CreateInstance,  CULY2Decoder::CreateInstance  },
+	{ FCC('ULRG'), "RGB",    CULRGEncoder::CreateInstance,  CULRGDecoder::CreateInstance  },
 };
 
 void CVCMCodec::ICInstallAll(void)

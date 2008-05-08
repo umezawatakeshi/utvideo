@@ -206,7 +206,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\HuffmanCode_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta HuffmanCode_asm.asm"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\HuffmanCode_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta HuffmanCode_asm.asm&#x0D;&#x0A;"
 						Outputs="$(IntDir)\HuffmanCode_asm.obj"
 					/>
 				</FileConfiguration>
@@ -215,7 +215,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\HuffmanCode_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta HuffmanCode_asm.asm"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\HuffmanCode_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta HuffmanCode_asm.asm&#x0D;&#x0A;"
 						Outputs="$(IntDir)\HuffmanCode_asm.obj"
 					/>
 				</FileConfiguration>
@@ -232,7 +232,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Predict_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Predict_asm.asm"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Predict_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Predict_asm.asm&#x0D;&#x0A;"
 						Outputs="$(IntDir)\Predict_asm.obj"
 					/>
 				</FileConfiguration>
@@ -241,7 +241,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Predict_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Predict_asm.asm"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Predict_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Predict_asm.asm&#x0D;&#x0A;"
 						Outputs="$(IntDir)\Predict_asm.obj"
 					/>
 				</FileConfiguration>
@@ -272,6 +272,14 @@
 			</File>
 			<File
 				RelativePath=".\TunedFunc.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ULRGDecoder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ULRGEncoder.cpp"
 				>
 			</File>
 			<File
@@ -334,6 +342,14 @@
 			</File>
 			<File
 				RelativePath=".\TunedFunc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ULRGDecoder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ULRGEncoder.h"
 				>
 			</File>
 			<File
