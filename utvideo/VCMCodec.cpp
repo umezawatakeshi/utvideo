@@ -47,10 +47,10 @@
 #include "ULRGDecoder.h"
 
 #define FCC4PRINTF(fcc) \
-	(BYTE)(m_fccHandler), \
-	(BYTE)(m_fccHandler >> 8), \
-	(BYTE)(m_fccHandler >> 16), \
-	(BYTE)(m_fccHandler >> 24)
+	(BYTE)(fcc), \
+	(BYTE)(fcc >> 8), \
+	(BYTE)(fcc >> 16), \
+	(BYTE)(fcc >> 24)
 
 const CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
 	{ -1,          "",       CDummyEncoder::CreateInstance, CDummyDecoder::CreateInstance },
