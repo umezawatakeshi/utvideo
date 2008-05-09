@@ -208,7 +208,8 @@ void CULRGDecoder::DecodeProc(DWORD nBandIndex)
 
 	for (pStrideBegin = pDstEnd - m_dwFrameStride; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwFrameStride)
 	{
-		for (p = pStrideBegin; p < pStrideBegin + m_icd->lpbiInput->biWidth * 3; p += 3)
+		BYTE *pStrideEnd = pStrideBegin + m_icd->lpbiInput->biWidth * 3;
+		for (p = pStrideBegin; p < pStrideEnd; p += 3)
 		{
 			*(p+1) = *g;
 			*(p+0) = *b + *g - 0x80;

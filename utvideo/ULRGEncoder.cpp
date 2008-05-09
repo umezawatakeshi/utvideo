@@ -286,7 +286,8 @@ void CULRGEncoder::PredictProc(DWORD nBandIndex)
 
 	for (pStrideBegin = pSrcEnd - m_dwFrameStride; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwFrameStride)
 	{
-		for (p = pStrideBegin; p < pStrideBegin + m_icc->lpbiInput->biWidth * 3; p += 3)
+		const BYTE *pStrideEnd = pStrideBegin + m_icc->lpbiInput->biWidth * 3;
+		for (p = pStrideBegin; p < pStrideEnd; p += 3)
 		{
 			*g++ = *(p+1);
 			*b++ = *(p+0) - *(p+1) + 0x80;
