@@ -1,11 +1,11 @@
 <html>
 <!-- $Id$ -->
 <head>
-<title>Ut Video Codec Suite 2.2.0 readme （日本語）</title>
+<title>Ut Video Codec Suite 3.0.0 readme （日本語）</title>
 <meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
 </head>
 <body>
-<h1>Ut Video Codec Suite 2.2.0 readme （日本語）</h1>
+<h1>Ut Video Codec Suite 3.0.0 readme （日本語）</h1>
 <hr>
 <h2 id="copyright_notice">著作権表示</h2>
 <h3>英語</h3>
@@ -36,7 +36,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 ア財団まで請求してください(宛先は the Free Software Foundation,
 Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 <h2 id="overview">概要</h2>
-<p>Ut Video Codec Suite は、VCM コーデック（一般的には VfW コーデックと呼ばれる）として実装された Windows 用ロスレス映像コーデックです。現在のところは YUV422 のみ（より正確には FOURCC が YUY2 であるもののみ）をエンコードできます。"Suite" となっているのは、将来的には YUV420 や RGB8 をエンコードできるようにしようと考えているからです。</p>
+<p>Ut Video Codec Suite は、VCM コーデック（一般的には VfW コーデックと呼ばれる）として実装された Windows 用ロスレス映像コーデックです。現在のところは YUV422 (YUY2) と RGB (RGB24) のみをエンコードできます。</p>
 <h2 id="environment">動作環境</h2>
 <h3>必須環境</h3>
 <dl>
@@ -58,6 +58,10 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 <li>Lagarith の圧縮率には基本的に届きませんが、稀に超えます。</li>
 </ul>
 <h2 id="history">改版履歴</h2>
+<h3>バージョン 3.0.0</h3>
+<ul>
+<li>RGB のためのコーデック (FOURCC: ULRG) を追加した。</li>
+</ul>
 <h3>バージョン 2.2.0</h3>
 <ul>
 <li>多くの処理をアセンブラ化した。</li>
