@@ -155,8 +155,11 @@ DWORD CULRGDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	if (pbihIn->biCompression != FCC('ULRG'))
 		return ICERR_BADFORMAT;
 
-	if (pbihOut != NULL && (pbihOut->biCompression != BI_RGB || pbihOut->biBitCount != 24 || pbihOut->biHeight <= 0))
-		return ICERR_BADFORMAT;
+	if (pbihOut != NULL)
+	{
+		if (pbihOut->biCompression != BI_RGB || pbihOut->biBitCount != 24 || pbihOut->biHeight != pbihIn->biHeight || pbihOut->biWidth != pbihIn->biWidth)
+			return ICERR_BADFORMAT;
+	}
 
 	if (pbihIn->biSize > sizeof(BITMAPINFOEXT))
 		return ICERR_BADFORMAT;

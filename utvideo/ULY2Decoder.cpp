@@ -155,8 +155,11 @@ DWORD CULY2Decoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	if (pbihIn->biCompression != FCC('ULY2'))
 		return ICERR_BADFORMAT;
 
-	if (pbihOut != NULL && pbihOut->biCompression != FCC('YUY2'))
-		return ICERR_BADFORMAT;
+	if (pbihOut != NULL)
+	{
+		if (pbihOut->biCompression != FCC('YUY2') || pbihOut->biBitCount != 16 || pbihOut->biHeight != pbihIn->biHeight || pbihOut->biWidth != pbihIn->biWidth)
+			return ICERR_BADFORMAT;
+	}
 
 	if (pbihIn->biSize > sizeof(BITMAPINFOEXT))
 		return ICERR_BADFORMAT;
