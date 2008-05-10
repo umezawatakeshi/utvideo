@@ -179,7 +179,7 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 {
 	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
 
-	m_dwNumStrides = pbihIn->biHeight;
+	m_dwNumStrides = abs(pbihIn->biHeight);
 	m_dwDivideCount = ((pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
@@ -221,13 +221,13 @@ DWORD CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 
 	memset(pbihOut, 0, sizeof(BITMAPINFOEXT));
 
-	dwDivideCount = min(ROUNDUP(pbihIn->biHeight, 2) / 2, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
+	dwDivideCount = min(ROUNDUP(abs(pbihIn->biHeight), 2) / 2, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
 
 	_ASSERT(dwDivideCount >= 1 && dwDivideCount <= 256);
 
 	pbieOut->bih.biSize          = sizeof(BITMAPINFOEXT);
 	pbieOut->bih.biWidth         = pbihIn->biWidth;
-	pbieOut->bih.biHeight        = pbihIn->biHeight;
+	pbieOut->bih.biHeight        = abs(pbihIn->biHeight);
 	pbieOut->bih.biPlanes        = 1;
 	pbieOut->bih.biBitCount      = GetOutputBitCount();
 	pbieOut->bih.biCompression   = GetOutputFCC();
