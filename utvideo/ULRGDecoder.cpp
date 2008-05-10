@@ -62,7 +62,6 @@ CDecoder *CULRGDecoder::CreateInstance(void)
 
 void CULRGDecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn)
 {
-
 	m_dwFrameStride = ROUNDUP(pbihIn->biWidth * 3, 4);
 	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
 
