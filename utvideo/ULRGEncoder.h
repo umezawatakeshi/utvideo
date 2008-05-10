@@ -49,7 +49,7 @@ class CULRGEncoder :
 	public CPlanarEncoder
 {
 private:
-	static const INPUTFORMAT m_infmts[1];
+	static const INPUTFORMAT m_infmts[2];
 
 public:
 	CULRGEncoder(void);

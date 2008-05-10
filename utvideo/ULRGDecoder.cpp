@@ -43,8 +43,9 @@
 #include "ULRGDecoder.h"
 #include "Predict.h"
 
-const CPlanarDecoder::OUTPUTFORMAT CULRGDecoder::m_outfmts[1] = {
+const CPlanarDecoder::OUTPUTFORMAT CULRGDecoder::m_outfmts[2] = {
 	{ BI_RGB, 24, FALSE },
+	{ BI_RGB, 32, FALSE },
 };
 
 CULRGDecoder::CULRGDecoder(void)
@@ -62,7 +63,21 @@ CDecoder *CULRGDecoder::CreateInstance(void)
 
 void CULRGDecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut)
 {
-	m_dwFrameStride = ROUNDUP(pbihOut->biWidth * 3, 4);
+	switch (pbihOut->biCompression)
+	{
+	case BI_RGB:
+		switch (pbihOut->biBitCount)
+		{
+		case 24:
+			m_dwFrameStride = ROUNDUP(pbihOut->biWidth * 3, 4);
+			break;
+		case 32:
+			m_dwFrameStride = pbihOut->biWidth * 4;
+			break;
+		}
+		break;
+	}
+
 	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
 
 	m_dwPlaneStride[0] = pbihOut->biWidth;
@@ -89,15 +104,38 @@ void CULRGDecoder::ConvertFromPlanar(DWORD nBandIndex)
 	b = m_pCurFrame->GetPlane(1) + dwStrideBegin * m_dwPlaneStride[1];
 	r = m_pCurFrame->GetPlane(2) + dwStrideBegin * m_dwPlaneStride[2];
 
-	for (pStrideBegin = pDstEnd - m_dwFrameStride; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwFrameStride)
+	switch (m_icd->lpbiOutput->biCompression)
 	{
-		BYTE *pStrideEnd = pStrideBegin + m_icd->lpbiInput->biWidth * 3;
-		for (p = pStrideBegin; p < pStrideEnd; p += 3)
+	case BI_RGB:
+		switch (m_icd->lpbiOutput->biBitCount)
 		{
-			*(p+1) = *g;
-			*(p+0) = *b + *g - 0x80;
-			*(p+2) = *r + *g - 0x80;
-			g++; b++; r++;
+		case 24:
+			for (pStrideBegin = pDstEnd - m_dwFrameStride; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwFrameStride)
+			{
+				BYTE *pStrideEnd = pStrideBegin + m_icd->lpbiOutput->biWidth * 3;
+				for (p = pStrideBegin; p < pStrideEnd; p += 3)
+				{
+					*(p+1) = *g;
+					*(p+0) = *b + *g - 0x80;
+					*(p+2) = *r + *g - 0x80;
+					g++; b++; r++;
+				}
+			}
+			break;
+		case 32:
+			for (pStrideBegin = pDstEnd - m_dwFrameStride; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwFrameStride)
+			{
+				BYTE *pStrideEnd = pStrideBegin + m_icd->lpbiOutput->biWidth * 4;
+				for (p = pStrideBegin; p < pStrideEnd; p += 4)
+				{
+					*(p+1) = *g;
+					*(p+0) = *b + *g - 0x80;
+					*(p+2) = *r + *g - 0x80;
+					g++; b++; r++;
+				}
+			}
+			break;
 		}
+		break;
 	}
 }

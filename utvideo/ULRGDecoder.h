@@ -49,7 +49,7 @@ class CULRGDecoder :
 	public CPlanarDecoder
 {
 private:
-	static const OUTPUTFORMAT m_outfmts[1];
+	static const OUTPUTFORMAT m_outfmts[2];
 
 public:
 	CULRGDecoder(void);

@@ -44,8 +44,9 @@
 #include "Predict.h"
 #include "resource.h"
 
-const CPlanarEncoder::INPUTFORMAT CULRGEncoder::m_infmts[1] = {
+const CPlanarEncoder::INPUTFORMAT CULRGEncoder::m_infmts[2] = {
 	{ BI_RGB, 24, FALSE },
+	{ BI_RGB, 32, FALSE },
 };
 
 CULRGEncoder::CULRGEncoder(void)
@@ -63,7 +64,21 @@ CEncoder *CULRGEncoder::CreateInstance(void)
 
 void CULRGEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn)
 {
-	m_dwFrameStride = ROUNDUP(pbihIn->biWidth * 3, 4);
+	switch (pbihIn->biCompression)
+	{
+	case BI_RGB:
+		switch (pbihIn->biBitCount)
+		{
+		case 24:
+			m_dwFrameStride = ROUNDUP(pbihIn->biWidth * 3, 4);
+			break;
+		case 32:
+			m_dwFrameStride = pbihIn->biWidth * 4;
+			break;
+		}
+		break;
+	}
+
 	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
 
 	m_dwPlaneStride[0] = pbihIn->biWidth;
@@ -89,14 +104,36 @@ void CULRGEncoder::ConvertToPlanar(DWORD nBandIndex)
 	b = m_pCurFrame->GetPlane(1) + dwStrideBegin * m_dwPlaneStride[1];
 	r = m_pCurFrame->GetPlane(2) + dwStrideBegin * m_dwPlaneStride[2];
 
-	for (pStrideBegin = pSrcEnd - m_dwFrameStride; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwFrameStride)
+	switch (m_icc->lpbiInput->biCompression)
 	{
-		const BYTE *pStrideEnd = pStrideBegin + m_icc->lpbiInput->biWidth * 3;
-		for (p = pStrideBegin; p < pStrideEnd; p += 3)
+	case BI_RGB:
+		switch (m_icc->lpbiInput->biBitCount)
 		{
-			*g++ = *(p+1);
-			*b++ = *(p+0) - *(p+1) + 0x80;
-			*r++ = *(p+2) - *(p+1) + 0x80;
+		case 24:
+			for (pStrideBegin = pSrcEnd - m_dwFrameStride; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwFrameStride)
+			{
+				const BYTE *pStrideEnd = pStrideBegin + m_icc->lpbiInput->biWidth * 3;
+				for (p = pStrideBegin; p < pStrideEnd; p += 3)
+				{
+					*g++ = *(p+1);
+					*b++ = *(p+0) - *(p+1) + 0x80;
+					*r++ = *(p+2) - *(p+1) + 0x80;
+				}
+			}
+			break;
+		case 32:
+			for (pStrideBegin = pSrcEnd - m_dwFrameStride; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwFrameStride)
+			{
+				const BYTE *pStrideEnd = pStrideBegin + m_icc->lpbiInput->biWidth * 4;
+				for (p = pStrideBegin; p < pStrideEnd; p += 4)
+				{
+					*g++ = *(p+1);
+					*b++ = *(p+0) - *(p+1) + 0x80;
+					*r++ = *(p+2) - *(p+1) + 0x80;
+				}
+			}
+			break;
 		}
+		break;
 	}
 }
