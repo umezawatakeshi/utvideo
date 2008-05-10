@@ -49,7 +49,7 @@ class CULY2Encoder :
 	public CPlanarEncoder
 {
 private:
-	static const INPUTFORMAT m_infmts[1];
+	static const INPUTFORMAT m_infmts[7];
 
 public:
 	CULY2Encoder(void);

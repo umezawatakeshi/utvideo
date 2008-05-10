@@ -44,8 +44,11 @@
 #include "Predict.h"
 #include "resource.h"
 
-const CPlanarEncoder::INPUTFORMAT CULY2Encoder::m_infmts[1] = {
-	{ FCC('YUY2'), 16, TRUE },
+const CPlanarEncoder::INPUTFORMAT CULY2Encoder::m_infmts[7] = {
+	{ FCC('YUY2'), 16, TRUE }, { FCC('YUYV'), 16, TRUE }, { FCC('YUNV'), 16, TRUE },
+	{ FCC('UYVY'), 16, TRUE }, { FCC('UYNV'), 16, TRUE },
+	{ FCC('YVYU'), 16, TRUE },
+	{ FCC('VYUY'), 16, TRUE },
 };
 
 CULY2Encoder::CULY2Encoder(void)
@@ -89,11 +92,46 @@ void CULY2Encoder::ConvertToPlanar(DWORD nBandIndex)
 	u = m_pCurFrame->GetPlane(1) + dwStrideBegin * m_dwPlaneStride[1];
 	v = m_pCurFrame->GetPlane(2) + dwStrideBegin * m_dwPlaneStride[2];
 
-	for (p = pSrcBegin; p < pSrcEnd; p += 4)
+	switch (m_icc->lpbiInput->biCompression)
 	{
-		*y++ = *p;
-		*u++ = *(p+1);
-		*y++ = *(p+2);
-		*v++ = *(p+3);
+	case FCC('YUY2'):
+	case FCC('YUYV'):
+	case FCC('YUNV'):
+		for (p = pSrcBegin; p < pSrcEnd; p += 4)
+		{
+			*y++ = *p;
+			*u++ = *(p+1);
+			*y++ = *(p+2);
+			*v++ = *(p+3);
+		}
+		break;
+	case FCC('UYVY'):
+	case FCC('UYNV'):
+		for (p = pSrcBegin; p < pSrcEnd; p += 4)
+		{
+			*u++ = *p;
+			*y++ = *(p+1);
+			*v++ = *(p+2);
+			*y++ = *(p+3);
+		}
+		break;
+	case FCC('YVYU'):
+		for (p = pSrcBegin; p < pSrcEnd; p += 4)
+		{
+			*y++ = *p;
+			*v++ = *(p+1);
+			*y++ = *(p+2);
+			*u++ = *(p+3);
+		}
+		break;
+	case FCC('VYUY'):
+		for (p = pSrcBegin; p < pSrcEnd; p += 4)
+		{
+			*v++ = *p;
+			*y++ = *(p+1);
+			*u++ = *(p+2);
+			*y++ = *(p+3);
+		}
+		break;
 	}
 }
