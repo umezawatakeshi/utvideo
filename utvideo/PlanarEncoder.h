@@ -97,7 +97,7 @@ protected:
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) = 0;
 	virtual int GetNumSupportedInputFormats(void) = 0;
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn) = 0;
-	virtual void ConvertToPlanar(DWORD dwBandIndex) = 0;
+	virtual void ConvertToPlanar(DWORD nBandIndex) = 0;
 
 private:
 	void PredictProc(DWORD nBandIndex);
