@@ -89,7 +89,7 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 	_RPT1(_CRT_WARN, "divide count = %d\n", m_dwDivideCount);
 
-	CalcPlaneSizes(pbihIn);
+	CalcPlaneSizes(pbihOut);
 
 	m_pRestoredFrame = new CFrameBuffer();
 	m_pRestoredFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);

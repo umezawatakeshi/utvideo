@@ -60,12 +60,12 @@ CDecoder *CULRGDecoder::CreateInstance(void)
 	return new CULRGDecoder();
 }
 
-void CULRGDecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn)
+void CULRGDecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut)
 {
-	m_dwFrameStride = ROUNDUP(pbihIn->biWidth * 3, 4);
+	m_dwFrameStride = ROUNDUP(pbihOut->biWidth * 3, 4);
 	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
 
-	m_dwPlaneStride[0] = pbihIn->biWidth;
+	m_dwPlaneStride[0] = pbihOut->biWidth;
 	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * m_dwNumStrides;
 
 	m_dwPlaneStride[1] = m_dwPlaneStride[0];
