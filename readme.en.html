@@ -1,11 +1,11 @@
 <html>
 <!-- $Id$ -->
 <head>
-<title>Ut Video Codec Suite 3.0.0 readme (English)</title>
+<title>Ut Video Codec Suite 3.1.0 readme (English)</title>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
 </head>
 <body>
-<h1>Ut Video Codec Suite 3.0.0 readme (English)</h1>
+<h1>Ut Video Codec Suite 3.1.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008  UMEZAWA Takeshi</p>
@@ -22,7 +22,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <h2 id="overview">Overview</h2>
 <p>Ut Video Codec Suite is a lossless video codec for Windows, which is implemented as a VCM codec (also called "VfW codec").
-It can currently encode YUV422 (YUY2) and RGB (RGB24) sources.</p>
+It can currently encode YUV422 and RGB sources.</p>
 <h2 id="environment">Environment</h2>
 <h3>Minimum requirement</h3>
 <dl>
@@ -44,6 +44,16 @@ It can currently encode YUV422 (YUY2) and RGB (RGB24) sources.</p>
 <li>Usually worse compression ratio than Lagarith, but rarely better.</li>
 </ul>
 <h2 id="history">Version history</h2>
+<h3>Version 3.1.0</h3>
+<dl>
+<dt>New features</dt><dd><ul>
+<li>ULY2: Add support for YUYV, YUNV, UYVY, UYNV, YVYU and VYUY.</li>
+<li>ULRG: Add support for RGB32.</li>
+</ul></dd>
+<dt>Buf fixes</dt><dd><ul>
+<li>ULRG: WMP crashes for ULRG-encoded files.</li>
+</ul></dd>
+</dl>
 <h3>Version 3.0.0</h3>
 <ul>
 <li>Add codec for RGB (FOURCC: ULRG).</li>
