@@ -40,84 +40,27 @@
 
 #pragma once
 #include "Encoder.h"
+#include "PlanarEncoder.h"
 #include "FrameBuffer.h"
 #include "HuffmanCode.h"
 #include "Thread.h"
 
 class CULRGEncoder :
-	public CEncoder
+	public CPlanarEncoder
 {
 private:
-	ENCODERCONF m_ec;
-	DWORD m_dwNumStrides;
-	DWORD m_dwDivideCount;
-	DWORD m_dwFrameSize;
-	DWORD m_dwFrameStride;
-	DWORD m_dwPlaneSize[3];
-	DWORD m_dwPlaneStride[3];
-
-	CThreadManager m_tm;
-	const ICCOMPRESS *m_icc;
-	CFrameBuffer *m_pCurFrame;
-	CFrameBuffer *m_pMedianPredicted;
-	struct COUNTS
-	{
-		DWORD dwCount[4][256]; // 3 ‚Å‚Í‚È‚­ 4 ‚È‚Ì‚ÍƒAƒ‰ƒCƒƒ“ƒg‚Ì“s‡
-	} *m_counts;
-	BYTE *m_pCodeLengthTable[3];
-	HUFFMAN_ENCODE_TABLE m_het[3];
+	static const INPUTFORMAT m_infmts[1];
 
 public:
 	CULRGEncoder(void);
 	virtual ~CULRGEncoder(void);
 	static CEncoder *CreateInstance(void);
 
-public:
-	virtual DWORD Configure(HWND hwnd);
-	static int CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	virtual DWORD GetState(void *pState, DWORD dwSize);
-	virtual DWORD SetState(const void *pState, DWORD dwSize);
-	virtual DWORD Compress(const ICCOMPRESS *icc, DWORD dwSize);
-	virtual DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressEnd(void);
-	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-
-private:
-	void PredictProc(DWORD nBandIndex);
-	class CPredictJob : public CThreadJob
-	{
-	private:
-		DWORD m_nBandIndex;
-		CULRGEncoder *m_pEncoder;
-	public:
-		CPredictJob(CULRGEncoder *pEncoder, DWORD nBandIndex)
-		{
-			m_nBandIndex = nBandIndex;
-			m_pEncoder = pEncoder;
-		}
-		void JobProc(CThreadManager *)
-		{
-			m_pEncoder->PredictProc(m_nBandIndex);
-		}
-	};
-
-	void EncodeProc(DWORD nBandIndex);
-	class CEncodeJob : public CThreadJob
-	{
-	private:
-		DWORD m_nBandIndex;
-		CULRGEncoder *m_pEncoder;
-	public:
-		CEncodeJob(CULRGEncoder *pEncoder, DWORD nBandIndex)
-		{
-			m_nBandIndex = nBandIndex;
-			m_pEncoder = pEncoder;
-		}
-		void JobProc(CThreadManager *)
-		{
-			m_pEncoder->EncodeProc(m_nBandIndex);
-		}
-	};
+protected:
+	virtual DWORD GetOutputFCC(void) { return FCC('ULRG'); }
+	virtual WORD GetOutputBitCount(void) { return 24; }
+	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; };
+	virtual int GetNumSupportedInputFormats(void) { return _countof(m_infmts); };
+	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn);
+	virtual void ConvertToPlanar(DWORD nBandIndex);
 };
