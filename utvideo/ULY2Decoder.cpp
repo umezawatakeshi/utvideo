@@ -43,6 +43,10 @@
 #include "ULY2Decoder.h"
 #include "Predict.h"
 
+const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[1] = {
+	{ FCC('YUY2'), 16, TRUE },
+};
+
 CULY2Decoder::CULY2Decoder(void)
 {
 }
@@ -56,43 +60,8 @@ CDecoder *CULY2Decoder::CreateInstance(void)
 	return new CULY2Decoder();
 }
 
-DWORD CULY2Decoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
+void CULY2Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn)
 {
-	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)icd->lpbiInput;
-	const BYTE *p;
-
-	m_icd = icd;
-
-	memset(&m_fi, 0, sizeof(FRAMEINFO));
-	memcpy(&m_fi, ((BYTE *)icd->lpInput) + pbieIn->bih.biSizeImage - pbieIn->dwFrameInfoSize, pbieIn->dwFrameInfoSize);
-
-	p = (BYTE *)icd->lpInput;
-	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
-	{
-		m_pCodeLengthTable[nPlaneIndex] = p;
-		GenerateHuffmanDecodeTable(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
-		p += 256 + sizeof(DWORD) * m_dwDivideCount;
-		p += ((const DWORD *)p)[-1];
-	}
-
-	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-		m_tm.SubmitJob(new CDecodeJob(this, nBandIndex), nBandIndex);
-	m_tm.WaitForJobCompletion();
-
-	icd->lpbiOutput->biSizeImage = m_dwFrameSize;
-
-	return ICERR_OK;
-}
-
-DWORD CULY2Decoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
-{
-	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
-
-	m_dwNumStrides = pbihIn->biHeight;
-	m_dwDivideCount = ((pbieIn->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
-
-	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
-	_RPT1(_CRT_WARN, "divide count = %d\n", m_dwDivideCount);
 
 	m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
 	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
@@ -105,109 +74,21 @@ DWORD CULY2Decoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	m_dwPlaneStride[2] = m_dwPlaneStride[1];
 	m_dwPlaneSize[2]   = m_dwPlaneSize[1];
-
-	m_pCurFrame = new CFrameBuffer();
-	m_pCurFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	m_pCurFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	m_pCurFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
-	m_pDecodedFrame = new CFrameBuffer();
-	m_pDecodedFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	m_pDecodedFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	m_pDecodedFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
-
-	return ICERR_OK;
 }
 
-DWORD CULY2Decoder::DecompressEnd(void)
+void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)
 {
-	delete m_pCurFrame;
-	delete m_pDecodedFrame;
-
-	return ICERR_OK;
-}
-
-DWORD CULY2Decoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
-{
-	if (pbihOut == NULL)
-		return sizeof(BITMAPINFOHEADER);
-
-	memset(pbihOut, 0, sizeof(BITMAPINFOHEADER));
-
-	pbihOut->biSize          = sizeof(BITMAPINFOHEADER);
-	pbihOut->biWidth         = pbihIn->biWidth;
-	pbihOut->biHeight        = pbihIn->biHeight;
-	pbihOut->biPlanes        = 1;
-	pbihOut->biBitCount      = 16;
-	pbihOut->biCompression   = FCC('YUY2');
-	pbihOut->biSizeImage     = pbihIn->biSizeImage;
-	//pbihOut->biXPelsPerMeter
-	//pbihOut->biYPelsPerMeter
-	//pbihOut->biClrUsed
-	//pbihOut->biClrImportant
-
-	return ICERR_OK;
-}
-
-DWORD CULY2Decoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
-{
-	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
-
-	if (pbihIn->biCompression != FCC('ULY2'))
-		return ICERR_BADFORMAT;
-
-	if (pbihOut != NULL)
-	{
-		if (pbihOut->biCompression != FCC('YUY2') || pbihOut->biBitCount != 16 || abs(pbihOut->biHeight) != pbihIn->biHeight || pbihOut->biWidth != pbihIn->biWidth)
-			return ICERR_BADFORMAT;
-	}
-
-	if (pbihIn->biSize > sizeof(BITMAPINFOEXT))
-		return ICERR_BADFORMAT;
-	if (pbieIn->dwFrameInfoSize > sizeof(FRAMEINFO))
-		return ICERR_BADFORMAT;
-	if (pbieIn->dwFlags0 & BIE_FLAGS0_RESERVED)
-		return ICERR_BADFORMAT;
-
-	return ICERR_OK;
-}
-
-void CULY2Decoder::DecodeProc(DWORD nBandIndex)
-{
-	CFrameBuffer *pCurFrame;
-
 	DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
 	DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
 
 	const BYTE *y, *u, *v;
 	BYTE *pDstBegin, *pDstEnd, *p;
 
-	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
-	{
-		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
-		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];
-		DWORD dwDstOffset;
-		if (nBandIndex == 0)
-			dwDstOffset = 0;
-		else
-			dwDstOffset = ((const DWORD *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
-		HuffmanDecode(m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, &m_hdt[nPlaneIndex]);
-
-		switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
-		{
-		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
-			pCurFrame = m_pDecodedFrame;
-		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			pCurFrame = m_pCurFrame;
-			RestoreMedian(pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex]);
-			break;
-		}
-	}
-
 	pDstBegin = ((BYTE *)m_icd->lpOutput) + dwStrideBegin * m_dwFrameStride;
 	pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwStrideEnd   * m_dwFrameStride;
-	y = pCurFrame->GetPlane(0) + dwStrideBegin * m_dwPlaneStride[0];
-	u = pCurFrame->GetPlane(1) + dwStrideBegin * m_dwPlaneStride[1];
-	v = pCurFrame->GetPlane(2) + dwStrideBegin * m_dwPlaneStride[2];
+	y = m_pCurFrame->GetPlane(0) + dwStrideBegin * m_dwPlaneStride[0];
+	u = m_pCurFrame->GetPlane(1) + dwStrideBegin * m_dwPlaneStride[1];
+	v = m_pCurFrame->GetPlane(2) + dwStrideBegin * m_dwPlaneStride[2];
 
 	for (p = pDstBegin; p < pDstEnd; p += 4)
 	{

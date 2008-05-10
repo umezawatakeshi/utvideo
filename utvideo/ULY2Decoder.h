@@ -39,58 +39,28 @@
  */
 
 #pragma once
-#include "decoder.h"
+#include "Decoder.h"
+#include "PlanarDecoder.h"
 #include "FrameBuffer.h"
 #include "Thread.h"
 #include "HuffmanCode.h"
 
 class CULY2Decoder :
-	public CDecoder
+	public CPlanarDecoder
 {
 private:
-	DWORD m_dwNumStrides;
-	DWORD m_dwDivideCount;
-	DWORD m_dwFrameSize;
-	DWORD m_dwFrameStride;
-	DWORD m_dwPlaneSize[3];
-	DWORD m_dwPlaneStride[3];
-
-	CThreadManager m_tm;
-	CFrameBuffer *m_pCurFrame;
-	CFrameBuffer *m_pDecodedFrame;
-	FRAMEINFO m_fi;
-	HUFFMAN_DECODE_TABLE m_hdt[3];
-	const BYTE *m_pCodeLengthTable[3];
-	const ICDECOMPRESS *m_icd;
+	static const OUTPUTFORMAT m_outfmts[1];
 
 public:
 	CULY2Decoder(void);
 	virtual ~CULY2Decoder(void);
 	static CDecoder *CreateInstance(void);
 
-public:
-	virtual DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize);
-	virtual DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual DWORD DecompressEnd(void);
-	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	virtual DWORD DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-
-private:
-	void DecodeProc(DWORD nBandIndex);
-	class CDecodeJob : public CThreadJob
-	{
-	private:
-		DWORD m_nBandIndex;
-		CULY2Decoder *m_pDecoder;
-	public:
-		CDecodeJob(CULY2Decoder *pDecoder, DWORD nBandIndex)
-		{
-			m_nBandIndex = nBandIndex;
-			m_pDecoder = pDecoder;
-		}
-		void JobProc(CThreadManager *)
-		{
-			m_pDecoder->DecodeProc(m_nBandIndex);
-		}
-	};
+protected:
+	virtual DWORD GetInputFCC(void) { return FCC('ULY2'); }
+	virtual WORD GetInputBitCount(void) { return 16; }
+	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) { return m_outfmts; };
+	virtual int GetNumSupportedOutputFormats(void) { return _countof(m_outfmts); };
+	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn);
+	virtual void ConvertFromPlanar(DWORD nBandIndex);
 };

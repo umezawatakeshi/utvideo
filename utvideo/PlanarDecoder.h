@@ -40,27 +40,73 @@
 
 #pragma once
 #include "Decoder.h"
-#include "PlanarDecoder.h"
 #include "FrameBuffer.h"
 #include "Thread.h"
 #include "HuffmanCode.h"
 
-class CULRGDecoder :
-	public CPlanarDecoder
+class CPlanarDecoder :
+	public CDecoder
 {
-private:
-	static const OUTPUTFORMAT m_outfmts[1];
+protected:
+	DWORD m_dwNumStrides;
+	DWORD m_dwDivideCount;
+	DWORD m_dwFrameSize;
+	DWORD m_dwFrameStride;
+	DWORD m_dwPlaneSize[3];
+	DWORD m_dwPlaneStride[3];
+
+	CThreadManager m_tm;
+	CFrameBuffer *m_pCurFrame;
+	CFrameBuffer *m_pRestoredFrame;
+	CFrameBuffer *m_pDecodedFrame;
+	FRAMEINFO m_fi;
+	HUFFMAN_DECODE_TABLE m_hdt[3];
+	const BYTE *m_pCodeLengthTable[3];
+	const ICDECOMPRESS *m_icd;
 
 public:
-	CULRGDecoder(void);
-	virtual ~CULRGDecoder(void);
-	static CDecoder *CreateInstance(void);
+	struct OUTPUTFORMAT
+	{
+		DWORD fcc;
+		WORD nBitCount;
+		BOOL bNegativeHeightAllowed;
+	};
+
+public:
+	CPlanarDecoder(void);
+	virtual ~CPlanarDecoder(void);
+
+public:
+	virtual DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize);
+	virtual DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual DWORD DecompressEnd(void);
+	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual DWORD DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
 protected:
-	virtual DWORD GetInputFCC(void) { return FCC('ULRG'); }
-	virtual WORD GetInputBitCount(void) { return 24; }
-	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) { return m_outfmts; };
-	virtual int GetNumSupportedOutputFormats(void) { return _countof(m_outfmts); };
-	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn);
-	virtual void ConvertFromPlanar(DWORD nBandIndex);
+	virtual DWORD GetInputFCC(void) = 0;
+	virtual WORD GetInputBitCount(void) = 0;
+	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) = 0;
+	virtual int GetNumSupportedOutputFormats(void) = 0;
+	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn) = 0;
+	virtual void ConvertFromPlanar(DWORD nBandIndex) = 0;
+
+private:
+	void DecodeProc(DWORD nBandIndex);
+	class CDecodeJob : public CThreadJob
+	{
+	private:
+		DWORD m_nBandIndex;
+		CPlanarDecoder *m_pDecoder;
+	public:
+		CDecodeJob(CPlanarDecoder *pDecoder, DWORD nBandIndex)
+		{
+			m_nBandIndex = nBandIndex;
+			m_pDecoder = pDecoder;
+		}
+		void JobProc(CThreadManager *)
+		{
+			m_pDecoder->DecodeProc(m_nBandIndex);
+		}
+	};
 };

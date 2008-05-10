@@ -221,6 +221,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\PlanarDecoder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PlanarEncoder.cpp"
 				>
 			</File>
@@ -326,6 +330,10 @@
 			</File>
 			<File
 				RelativePath=".\HuffmanCode.h"
+				>
+			</File>
+			<File
+				RelativePath=".\PlanarDecoder.h"
 				>
 			</File>
 			<File
