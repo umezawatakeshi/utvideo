@@ -74,6 +74,9 @@ private:
 	HANDLE m_hCompletionEvent[MAX_JOB];
 
 public:
+	static int GetNumProcessors(void);
+
+public:
 	CThreadManager(void);
 	~CThreadManager(void);
 

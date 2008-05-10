@@ -47,6 +47,7 @@
 CULY2Encoder::CULY2Encoder(void)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
+	m_ec.dwFlags0 = CThreadManager::GetNumProcessors() - 1;
 }
 
 CULY2Encoder::~CULY2Encoder(void)

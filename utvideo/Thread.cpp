@@ -41,6 +41,23 @@
 #include "StdAfx.h"
 #include "Thread.h"
 
+int CThreadManager::GetNumProcessors(void)
+{
+	DWORD dwProcessAffinityMask;
+	DWORD dwSystemAffinityMask;
+	int nNumProcessors;
+
+	GetProcessAffinityMask(GetCurrentProcess(), &dwProcessAffinityMask, &dwSystemAffinityMask);
+	nNumProcessors = 0;
+	for (DWORD dwAffinityMask = 1; dwAffinityMask != 0; dwAffinityMask <<= 1)
+	{
+		if (dwProcessAffinityMask & dwAffinityMask)
+			nNumProcessors++;
+	}
+
+	return nNumProcessors;
+}
+
 CThreadManager::CThreadManager(void)
 {
 	DWORD dwProcessAffinityMask;
