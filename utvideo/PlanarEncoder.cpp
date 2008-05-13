@@ -184,6 +184,33 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 
+	switch (pbihIn->biCompression)
+	{
+	case BI_RGB:
+		switch (pbihIn->biBitCount)
+		{
+		case 24:
+			m_dwFrameStride = ROUNDUP(pbihIn->biWidth * 3, 4);
+			break;
+		case 32:
+			m_dwFrameStride = pbihIn->biWidth * 4;
+			break;
+		}
+		break;
+	case FCC('YUY2'):
+	case FCC('YUYV'):
+	case FCC('YUNV'):
+	case FCC('UYVY'):
+	case FCC('UYNV'):
+	case FCC('YVYU'):
+	case FCC('VYUY'):
+		m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
+		break;
+	default:
+		return ICERR_BADFORMAT;
+	}
+	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
+
 	CalcPlaneSizes(pbihIn);
 
 	m_pCurFrame = new CFrameBuffer();

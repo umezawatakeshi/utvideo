@@ -66,9 +66,6 @@ CEncoder *CULY2Encoder::CreateInstance(void)
 
 void CULY2Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn)
 {
-	m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
-	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
-
 	m_dwPlaneStride[0] = ROUNDUP(pbihIn->biWidth, 2);
 	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * m_dwNumStrides;
 

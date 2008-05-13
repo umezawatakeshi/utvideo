@@ -89,6 +89,33 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 	_RPT1(_CRT_WARN, "divide count = %d\n", m_dwDivideCount);
 
+	switch (pbihOut->biCompression)
+	{
+	case BI_RGB:
+		switch (pbihOut->biBitCount)
+		{
+		case 24:
+			m_dwFrameStride = ROUNDUP(pbihOut->biWidth * 3, 4);
+			break;
+		case 32:
+			m_dwFrameStride = pbihOut->biWidth * 4;
+			break;
+		}
+		break;
+	case FCC('YUY2'):
+	case FCC('YUYV'):
+	case FCC('YUNV'):
+	case FCC('UYVY'):
+	case FCC('UYNV'):
+	case FCC('YVYU'):
+	case FCC('VYUY'):
+		m_dwFrameStride = ROUNDUP(pbihOut->biWidth, 2) * 2;
+		break;
+	default:
+		return ICERR_BADFORMAT;
+	}
+	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
+
 	CalcPlaneSizes(pbihOut);
 
 	m_pRestoredFrame = new CFrameBuffer();

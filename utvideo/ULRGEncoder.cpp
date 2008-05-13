@@ -64,23 +64,6 @@ CEncoder *CULRGEncoder::CreateInstance(void)
 
 void CULRGEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn)
 {
-	switch (pbihIn->biCompression)
-	{
-	case BI_RGB:
-		switch (pbihIn->biBitCount)
-		{
-		case 24:
-			m_dwFrameStride = ROUNDUP(pbihIn->biWidth * 3, 4);
-			break;
-		case 32:
-			m_dwFrameStride = pbihIn->biWidth * 4;
-			break;
-		}
-		break;
-	}
-
-	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
-
 	m_dwPlaneStride[0] = pbihIn->biWidth;
 	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * m_dwNumStrides;
 
