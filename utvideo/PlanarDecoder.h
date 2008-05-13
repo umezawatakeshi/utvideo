@@ -56,7 +56,7 @@ protected:
 	DWORD m_dwPlaneSize[3];
 	DWORD m_dwPlaneStride[3];
 
-	CThreadManager m_tm;
+	CThreadManager *m_ptm;
 	CFrameBuffer *m_pCurFrame;
 	CFrameBuffer *m_pRestoredFrame;
 	CFrameBuffer *m_pDecodedFrame;

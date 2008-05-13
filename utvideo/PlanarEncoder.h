@@ -57,7 +57,7 @@ protected:
 	DWORD m_dwPlaneSize[3];
 	DWORD m_dwPlaneStride[3];
 
-	CThreadManager m_tm;
+	CThreadManager *m_ptm;
 	const ICCOMPRESS *m_icc;
 	CFrameBuffer *m_pCurFrame;
 	CFrameBuffer *m_pMedianPredicted;

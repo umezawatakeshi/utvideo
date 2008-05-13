@@ -130,8 +130,8 @@ DWORD CPlanarEncoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
 	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-		m_tm.SubmitJob(new CPredictJob(this, nBandIndex), nBandIndex);
-	m_tm.WaitForJobCompletion();
+		m_ptm->SubmitJob(new CPredictJob(this, nBandIndex), nBandIndex);
+	m_ptm->WaitForJobCompletion();
 	fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 
 	p = (BYTE *)icc->lpOutput;
@@ -166,8 +166,8 @@ DWORD CPlanarEncoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 	p += sizeof(FRAMEINFO);
 
 	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-		m_tm.SubmitJob(new CEncodeJob(this, nBandIndex), nBandIndex);
-	m_tm.WaitForJobCompletion();
+		m_ptm->SubmitJob(new CEncodeJob(this, nBandIndex), nBandIndex);
+	m_ptm->WaitForJobCompletion();
 
 	icc->lpbiOutput->biSizeImage = p - ((BYTE *)icc->lpOutput);
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
@@ -228,6 +228,8 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
+	m_ptm = new CThreadManager();
+
 	return ICERR_OK;
 }
 
@@ -237,6 +239,8 @@ DWORD CPlanarEncoder::CompressEnd(void)
 	delete m_pMedianPredicted;
 
 	VirtualFree(m_counts, 0, MEM_RELEASE);
+
+	delete m_ptm;
 
 	return ICERR_OK;
 }

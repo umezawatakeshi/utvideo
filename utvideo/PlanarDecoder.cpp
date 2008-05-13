@@ -71,8 +71,8 @@ DWORD CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	}
 
 	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-		m_tm.SubmitJob(new CDecodeJob(this, nBandIndex), nBandIndex);
-	m_tm.WaitForJobCompletion();
+		m_ptm->SubmitJob(new CDecodeJob(this, nBandIndex), nBandIndex);
+	m_ptm->WaitForJobCompletion();
 
 	icd->lpbiOutput->biSizeImage = m_dwFrameSize;
 
@@ -130,6 +130,8 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	m_pDecodedFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
 	m_pDecodedFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
 
+	m_ptm = new CThreadManager();
+
 	return ICERR_OK;
 }
 
@@ -137,6 +139,8 @@ DWORD CPlanarDecoder::DecompressEnd(void)
 {
 	delete m_pRestoredFrame;
 	delete m_pDecodedFrame;
+
+	delete m_ptm;
 
 	return ICERR_OK;
 }
