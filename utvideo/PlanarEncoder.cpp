@@ -184,6 +184,7 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 
+	m_bBottomUpFrame = FALSE;
 	switch (pbihIn->biCompression)
 	{
 	case BI_RGB:
@@ -196,6 +197,8 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 			m_dwFrameStride = pbihIn->biWidth * 4;
 			break;
 		}
+		if (pbihIn->biHeight > 0)
+			m_bBottomUpFrame = TRUE;
 		break;
 	case FCC('YUY2'):
 	case FCC('YUYV'):

@@ -48,6 +48,7 @@ class CPlanarDecoder :
 	public CDecoder
 {
 protected:
+	BOOL m_bBottomUpFrame;
 	DWORD m_dwNumStrides;
 	DWORD m_dwDivideCount;
 	DWORD m_dwFrameSize;

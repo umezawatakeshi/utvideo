@@ -89,6 +89,7 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 	_RPT1(_CRT_WARN, "divide count = %d\n", m_dwDivideCount);
 
+	m_bBottomUpFrame = FALSE;
 	switch (pbihOut->biCompression)
 	{
 	case BI_RGB:
@@ -101,6 +102,8 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 			m_dwFrameStride = pbihOut->biWidth * 4;
 			break;
 		}
+		if (pbihIn->biHeight > 0)
+			m_bBottomUpFrame = TRUE;
 		break;
 	case FCC('YUY2'):
 	case FCC('YUYV'):

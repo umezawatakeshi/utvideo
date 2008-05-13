@@ -49,6 +49,7 @@ class CPlanarEncoder :
 {
 protected:
 	ENCODERCONF m_ec;
+	BOOL m_bBottomUpFrame;
 	DWORD m_dwNumStrides;
 	DWORD m_dwDivideCount;
 	DWORD m_dwFrameSize;
