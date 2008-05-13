@@ -43,11 +43,12 @@
 #include "ULY2Decoder.h"
 #include "Predict.h"
 
-const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[7] = {
+const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[8] = {
 	{ FCC('YUY2'), 16, TRUE }, { FCC('YUYV'), 16, TRUE }, { FCC('YUNV'), 16, TRUE },
 	{ FCC('UYVY'), 16, TRUE }, { FCC('UYNV'), 16, TRUE },
 	{ FCC('YVYU'), 16, TRUE },
 	{ FCC('VYUY'), 16, TRUE },
+	{ BI_RGB, 32, TRUE },
 };
 
 CULY2Decoder::CULY2Decoder(void)
@@ -77,17 +78,29 @@ void CULY2Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut)
 
 void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)
 {
-	DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwPlaneStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
+	DWORD dwPlaneStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwFrameStrideBegin, dwFrameStrideEnd;
 
 	const BYTE *y, *u, *v;
 	BYTE *pDstBegin, *pDstEnd, *p;
 
-	pDstBegin = ((BYTE *)m_icd->lpOutput) + dwStrideBegin * m_dwFrameStride;
-	pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwStrideEnd   * m_dwFrameStride;
-	y = m_pCurFrame->GetPlane(0) + dwStrideBegin * m_dwPlaneStride[0];
-	u = m_pCurFrame->GetPlane(1) + dwStrideBegin * m_dwPlaneStride[1];
-	v = m_pCurFrame->GetPlane(2) + dwStrideBegin * m_dwPlaneStride[2];
+	if (!m_bBottomUpFrame)
+	{
+		dwFrameStrideBegin = dwPlaneStrideBegin;
+		dwFrameStrideEnd   = dwPlaneStrideEnd;
+	}
+	else
+	{
+		dwFrameStrideBegin = m_dwNumStrides - dwPlaneStrideEnd;
+		dwFrameStrideEnd   = m_dwNumStrides - dwPlaneStrideBegin;
+	}
+
+	pDstBegin = ((BYTE *)m_icd->lpOutput) + dwFrameStrideBegin * m_dwFrameStride;
+	pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwFrameStrideEnd   * m_dwFrameStride;
+	y = m_pCurFrame->GetPlane(0) + dwPlaneStrideBegin * m_dwPlaneStride[0];
+	u = m_pCurFrame->GetPlane(1) + dwPlaneStrideBegin * m_dwPlaneStride[1];
+	v = m_pCurFrame->GetPlane(2) + dwPlaneStrideBegin * m_dwPlaneStride[2];
 
 	switch (m_icd->lpbiOutput->biCompression)
 	{
@@ -128,6 +141,33 @@ void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)
 			*(p+1) = *y++;
 			*(p+2) = *u++;
 			*(p+3) = *y++;
+		}
+		break;
+	case BI_RGB:
+		switch (m_icd->lpbiOutput->biBitCount)
+		{
+		case 32:
+			for (BYTE *pStrideBegin = pDstEnd - m_dwFrameStride; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwFrameStride)
+			{
+				BYTE *pStrideEnd = pStrideBegin + m_icd->lpbiOutput->biWidth * 4;
+				for (p = pStrideBegin; p < pStrideEnd; p += 8)
+				{
+//R = 1.164(Y-16)                 + 1.596(Cr-128)
+//G = 1.164(Y-16) - 0.391(Cb-128) - 0.813(Cr-128)
+//B = 1.164(Y-16) + 2.018(Cb-128)
+					*(p+1) = (*y-16)*1.164;
+					*(p+0) = (*y-16)*1.164;
+					*(p+2) = (*y-16)*1.164;
+					y++;
+					if (p+4 >= pStrideEnd)
+						break;
+					*(p+5) = (*y-16)*1.164;
+					*(p+4) = (*y-16)*1.164;
+					*(p+6) = (*y-16)*1.164;
+					y++; u++; v++;
+				}
+			}
+			break;
 		}
 		break;
 	}
