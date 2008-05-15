@@ -575,13 +575,13 @@ label1:
 
 	align		64
 label2:
-	mov			bl, dl
-	sub			bl, cl
-	mov			cl, byte ptr [edi+ebp]
-	add			bl, cl		; bl = grad
+	mov			ebx, edx
+	sub			ebx, ecx
+	movzx		ecx, byte ptr [edi+ebp]
+	add			ebx, ecx	; bl = grad
 	rol			ebx, 16
 
-	mov			bl, dl
+	mov			bx, dx
 	cmp			dl, cl
 	cmovb		bx, cx		; bl = max(dl,cl) ; ebx の上位 16bit は保護する必要があるので、ここは cmovb ebx, ecx ではいけない。また、cmov は 8bit オペランドをサポートしないので、そもそも cmovb bl, cl とは書けない。
 	cmovae		edx, ecx	; dl = min(dl,cl)
@@ -593,7 +593,8 @@ label2:
 	cmp			dl, bl
 	cmovae		edx, ebx	; dl = min(dl,bl)
 
-	add			dl, byte ptr [esi]
+	movzx		ebx, byte ptr [esi]
+	add			edx, ebx
 	mov			byte ptr [edi], dl
 
 	inc			esi
