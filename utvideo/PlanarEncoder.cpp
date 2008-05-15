@@ -177,7 +177,12 @@ DWORD CPlanarEncoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 
 DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	DWORD dwRet;
 	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
+
+	dwRet = CompressQuery(pbihIn, pbihOut);
+	if (dwRet != ICERR_OK)
+		return dwRet;
 
 	m_dwNumStrides = abs(pbihIn->biHeight);
 	m_dwDivideCount = ((pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;

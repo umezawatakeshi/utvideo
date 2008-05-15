@@ -81,7 +81,12 @@ DWORD CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 
 DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	DWORD dwRet;
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
+
+	dwRet = DecompressQuery(pbihIn, pbihOut);
+	if (dwRet != ICERR_OK)
+		return dwRet;
 
 	m_dwNumStrides = pbihIn->biHeight;
 	m_dwDivideCount = ((pbieIn->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
