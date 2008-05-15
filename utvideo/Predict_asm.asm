@@ -568,8 +568,6 @@ label1:
 	cmp			esi, eax
 	jb			label1
 
-	mov			eax, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
-
 	xor			ecx, ecx
 	xor			edx, edx
 
@@ -579,19 +577,16 @@ label2:
 	sub			ebx, ecx
 	movzx		ecx, byte ptr [edi+ebp]
 	add			ebx, ecx	; bl = grad
-	rol			ebx, 16
 
-	mov			bx, dx
+	mov			eax, edx
 	cmp			dl, cl
-	cmovb		bx, cx		; bl = max(dl,cl) ; ebx の上位 16bit は保護する必要があるので、ここは cmovb ebx, ecx ではいけない。また、cmov は 8bit オペランドをサポートしないので、そもそも cmovb bl, cl とは書けない。
 	cmovae		edx, ecx	; dl = min(dl,cl)
+	cmovb		eax, ecx	; al = max(dl,cl) ; ebx の上位 16bit は保護する必要があるので、ここは cmovb ebx, ecx ではいけない。また、cmov は 8bit オペランドをサポートしないので、そもそも cmovb bl, cl とは書けない。
 
-	rol			ebx, 16
 	cmp			dl, bl
 	cmovb		edx, ebx	; dl = max(dl,bl)
-	rol			ebx, 16
-	cmp			dl, bl
-	cmovae		edx, ebx	; dl = min(dl,bl)
+	cmp			dl, al
+	cmovae		edx, eax	; dl = min(dl,al)
 
 	movzx		ebx, byte ptr [esi]
 	add			edx, ebx
@@ -599,7 +594,7 @@ label2:
 
 	inc			esi
 	inc			edi
-	cmp			esi, eax
+	cmp			esi, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
 	jb			label2
 
 	pop			ebp
