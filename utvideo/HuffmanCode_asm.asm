@@ -63,36 +63,34 @@ _i686_HuffmanEncode_align1	proc
 	mov			ebp, dword ptr [esp + 16 + 4 + 12]	; pEncodeTable
 	cmp			dword ptr [ebp], 0
 	je			label3
-	mov			cl, -32
-	xor			eax, eax
+
+	mov			bl, -32
+	mov			cl, 0
 
 	align		64
 label1:
+	shld		eax, ecx, cl
 	cmp			esi, edx
 	jnb			label4
-	movzx		edx, byte ptr [esi]
+	movzx		ecx, byte ptr [esi]
 	inc			esi
-	mov			edx, dword ptr [ebp+edx*4]
-	mov			ch, dl
-	and			edx, 0ffffff00h
-	mov			ebx, edx
-	shr			edx, cl
-	or			eax, edx
-	mov			edx, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
-	add			cl, ch
+	mov			ecx, dword ptr [ebp+ecx*4]
+	add			bl, cl
 	jnc			label1
+	sub			cl, bl
+	shld		eax, ecx, cl
 	mov			dword ptr [edi], eax
 	add			edi, 4
-	sub			cl, ch
-	xor			eax, eax
-	shrd		eax, ebx, cl
-	add			cl, ch
-	sub			cl, 32
+	add			cl, bl
+	sub			bl, 32
 	jmp			label1
 
 label4:
-	test		cl, 1fh
+	test		bl, 1fh
 	jz			label3
+	neg			bl
+	mov			cl, bl
+	shl			eax, cl
 	mov			dword ptr [edi], eax
 	add			edi, 4
 label3:
