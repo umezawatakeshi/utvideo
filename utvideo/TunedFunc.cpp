@@ -42,6 +42,7 @@
 #include "TunedFunc.h"
 #include "Predict.h"
 #include "HuffmanCode.h"
+#include "Convert.h"
 
 const TUNEDFUNC tfnCPP = {
 	cpp_PredictMedian,
@@ -50,6 +51,7 @@ const TUNEDFUNC tfnCPP = {
 	cpp_RestoreMedian,
 	cpp_HuffmanEncode,
 	cpp_HuffmanDecode,
+	cpp_ConvertULY2ToBottomupRGB32,
 };
 
 const TUNEDFUNC tfnI686 = {
@@ -59,6 +61,7 @@ const TUNEDFUNC tfnI686 = {
 	i686_RestoreMedian_align1,
 	i686_HuffmanEncode_align1,
 	i686_HuffmanDecode_align1,
+	cpp_ConvertULY2ToBottomupRGB32,
 };
 
 const TUNEDFUNC tfnSSE2 = {
@@ -68,6 +71,7 @@ const TUNEDFUNC tfnSSE2 = {
 	i686_RestoreMedian_align1,
 	i686_HuffmanEncode_align1,
 	i686_HuffmanDecode_align1,
+	sse2_ConvertULY2ToBottomupRGB32,
 };
 
 const TUNEDFUNC tfnSSE3 = {
@@ -77,6 +81,7 @@ const TUNEDFUNC tfnSSE3 = {
 	i686_RestoreMedian_align1,
 	i686_HuffmanEncode_align1,
 	i686_HuffmanDecode_align1,
+	sse2_ConvertULY2ToBottomupRGB32,
 };
 
 const TUNEDFUNC tfnSSSE3 = {
@@ -86,6 +91,7 @@ const TUNEDFUNC tfnSSSE3 = {
 	i686_RestoreMedian_align1,
 	i686_HuffmanEncode_align1,
 	i686_HuffmanDecode_align1,
+	sse2_ConvertULY2ToBottomupRGB32,
 };
 
 TUNEDFUNC tfn;

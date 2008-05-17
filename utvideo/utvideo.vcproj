@@ -183,6 +183,32 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Convert.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Convert_asm.asm"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Convert_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Convert_asm.asm"
+						Outputs="$(IntDir)\Convert_asm.obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Convert_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Convert_asm.asm"
+						Outputs="$(IntDir)\Convert_asm.obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\Decoder.cpp"
 				>
 			</File>
@@ -316,6 +342,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\Convert.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Decoder.h"
 				>

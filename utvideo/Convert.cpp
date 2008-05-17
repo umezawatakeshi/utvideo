@@ -38,22 +38,34 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)B
  */
 
-#pragma once
+#include "StdAfx.h"
+#include "utvideo.h"
+#include "Convert.h"
 
-struct HUFFMAN_ENCODE_TABLE;
-struct HUFFMAN_DECODE_TABLE;
-
-struct TUNEDFUNC
+void cpp_ConvertULY2ToBottomupRGB32(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride)
 {
-	void (*pfnPredictMedian_align16)(BYTE *, const BYTE *, const BYTE *, DWORD);
-	void (*pfnPredictMedianAndCount_align16)(BYTE *, const BYTE *, const BYTE *, DWORD, DWORD *);
-	void (*pfnPredictMedianAndCount_align1)(BYTE *, const BYTE *, const BYTE *, DWORD, DWORD *);
-	void (*pfnRestoreMedian_align1)(BYTE *, const BYTE *, const BYTE *, DWORD);
-	DWORD (*pfnHuffmanEncode_align1)(BYTE *, const BYTE *, const BYTE *, const HUFFMAN_ENCODE_TABLE *);
-	void (*pfnHuffmanDecode_align1)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
-	void (*pfnConvertULY2ToBottomupRGB32)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);
-};
+	const BYTE *y = pYBegin;
+	const BYTE *u = pUBegin;
+	const BYTE *v = pVBegin;
 
-extern TUNEDFUNC tfn;
-
-void InitializeTunedFunc(void);
+	for (BYTE *pStrideBegin = pDstEnd - dwStride; pStrideBegin >= pDstBegin; pStrideBegin -= dwStride)
+	{
+		BYTE *pStrideEnd = pStrideBegin + dwStride;
+		for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 8)
+		{
+			*(p+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+			*(p+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+			*(p+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+			*(p+3) = 0;
+			y++;
+			if (p+4 < pStrideEnd)
+			{
+				*(p+5) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+4) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+6) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+7) = 0;
+			}
+			y++; u++; v++;
+		}
+	}
+}

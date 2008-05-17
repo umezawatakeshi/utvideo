@@ -40,20 +40,9 @@
 
 #pragma once
 
-struct HUFFMAN_ENCODE_TABLE;
-struct HUFFMAN_DECODE_TABLE;
+#include "TunedFunc.h"
 
-struct TUNEDFUNC
-{
-	void (*pfnPredictMedian_align16)(BYTE *, const BYTE *, const BYTE *, DWORD);
-	void (*pfnPredictMedianAndCount_align16)(BYTE *, const BYTE *, const BYTE *, DWORD, DWORD *);
-	void (*pfnPredictMedianAndCount_align1)(BYTE *, const BYTE *, const BYTE *, DWORD, DWORD *);
-	void (*pfnRestoreMedian_align1)(BYTE *, const BYTE *, const BYTE *, DWORD);
-	DWORD (*pfnHuffmanEncode_align1)(BYTE *, const BYTE *, const BYTE *, const HUFFMAN_ENCODE_TABLE *);
-	void (*pfnHuffmanDecode_align1)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
-	void (*pfnConvertULY2ToBottomupRGB32)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);
-};
+#define ConvertULY2ToBottomupRGB32 tfn.pfnConvertULY2ToBottomupRGB32
 
-extern TUNEDFUNC tfn;
-
-void InitializeTunedFunc(void);
+void cpp_ConvertULY2ToBottomupRGB32(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);
+extern "C" void sse2_ConvertULY2ToBottomupRGB32(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);

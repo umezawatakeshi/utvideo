@@ -42,6 +42,7 @@
 #include "utvideo.h"
 #include "ULY2Decoder.h"
 #include "Predict.h"
+#include "Convert.h"
 
 const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[8] = {
 	{ FCC('YUY2'), 16, TRUE }, { FCC('YUYV'), 16, TRUE }, { FCC('YUNV'), 16, TRUE },
@@ -147,29 +148,7 @@ void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)
 		switch (m_icd->lpbiOutput->biBitCount)
 		{
 		case 32:
-			for (BYTE *pStrideBegin = pDstEnd - m_dwFrameStride; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwFrameStride)
-			{
-				BYTE *pStrideEnd = pStrideBegin + m_icd->lpbiOutput->biWidth * 4;
-				for (p = pStrideBegin; p < pStrideEnd; p += 8)
-				{
-//R = 1.164(Y-16)                 + 1.596(Cr-128)
-//G = 1.164(Y-16) - 0.391(Cb-128) - 0.813(Cr-128)
-//B = 1.164(Y-16) + 2.018(Cb-128)
-					*(p+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-					*(p+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-					*(p+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-					*(p+3) = 0;
-					y++;
-					if (p+4 < pStrideEnd)
-					{
-						*(p+5) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-						*(p+4) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-						*(p+6) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-						*(p+7) = 0;
-					}
-					y++; u++; v++;
-				}
-			}
+			ConvertULY2ToBottomupRGB32(pDstBegin, pDstEnd, y, u, v, m_dwFrameStride);
 			break;
 		}
 		break;
