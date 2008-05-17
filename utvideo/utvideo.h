@@ -48,7 +48,7 @@
 	(((DWORD)(fcc) & 0xff000000) >> 24))
 #endif
 
-#define UTVIDEO_ENCODER_VERSION 0x03020000 /* 3.2.0 */
+#define UTVIDEO_ENCODER_VERSION 0x03030000 /* 3.3.0 */
 
 extern HINSTANCE hModule;
 
