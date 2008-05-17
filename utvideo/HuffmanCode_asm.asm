@@ -106,7 +106,7 @@ label3:
 _i686_HuffmanEncode_align1	endp
 
 
-; void i686_HuffmanEncode_align1(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
+; void i686_HuffmanDecode_align1(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
 public	_i686_HuffmanDecode_align1
 _i686_HuffmanDecode_align1	proc
 
