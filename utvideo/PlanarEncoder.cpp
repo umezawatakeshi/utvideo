@@ -285,7 +285,7 @@ DWORD CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 
 DWORD CPlanarEncoder::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
-	return pbihIn->biSizeImage + 2048; // +2048 ÇÕÇ«ÇÒÇ‘ÇËä®íËÅB
+	return ROUNDUP(pbihIn->biWidth, 4) * ROUNDUP(abs(pbihIn->biHeight), 2) * GetOutputBitCount() / 8 + 4096; // +4096 ÇÕÇ«ÇÒÇ‘ÇËä®íËÅB
 }
 
 DWORD CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
