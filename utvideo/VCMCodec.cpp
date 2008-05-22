@@ -46,12 +46,6 @@
 #include "ULRGEncoder.h"
 #include "ULRGDecoder.h"
 
-#define FCC4PRINTF(fcc) \
-	(BYTE)(fcc), \
-	(BYTE)(fcc >> 8), \
-	(BYTE)(fcc >> 16), \
-	(BYTE)(fcc >> 24)
-
 const CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
 	{ -1,          "",       CDummyEncoder::CreateInstance, CDummyDecoder::CreateInstance },
 	{ FCC('ULY2'), "YUV422", CULY2Encoder::CreateInstance,  CULY2Decoder::CreateInstance  },

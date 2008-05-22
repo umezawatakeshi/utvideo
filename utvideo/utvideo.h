@@ -48,6 +48,12 @@
 	(((DWORD)(fcc) & 0xff000000) >> 24))
 #endif
 
+#define FCC4PRINTF(fcc) \
+	(BYTE)(fcc), \
+	(BYTE)(fcc >> 8), \
+	(BYTE)(fcc >> 16), \
+	(BYTE)(fcc >> 24)
+
 #define UTVIDEO_ENCODER_VERSION 0x03030000 /* 3.3.0 */
 
 extern HINSTANCE hModule;
