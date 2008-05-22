@@ -71,6 +71,8 @@ int CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 	case WM_INITDIALOG:
 		SetWindowLong(hwnd, DWL_USER, lParam);
 		pThis = (CPlanarEncoder *)lParam;
+		wsprintf(buf, "Ut Video Codec %s (%c%c%c%c) VCM ‚ÌÝ’è", pThis->GetColorFormatName(), FCC4PRINTF(pThis->GetOutputFCC()));
+		SetWindowText(hwnd, buf);
 		wsprintf(buf, "%d", (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
 		SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
 		return TRUE;

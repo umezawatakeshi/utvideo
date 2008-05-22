@@ -58,6 +58,7 @@ public:
 
 protected:
 	virtual DWORD GetOutputFCC(void) { return FCC('ULY2'); }
+	virtual const char *GetColorFormatName(void) { return "YUV422"; }
 	virtual WORD GetOutputBitCount(void) { return 16; }
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; };
 	virtual int GetNumSupportedInputFormats(void) { return _countof(m_infmts); };

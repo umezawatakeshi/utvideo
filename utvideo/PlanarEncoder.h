@@ -94,6 +94,7 @@ public:
 
 protected:
 	virtual DWORD GetOutputFCC(void) = 0;
+	virtual const char *GetColorFormatName(void) = 0;
 	virtual WORD GetOutputBitCount(void) = 0;
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) = 0;
 	virtual int GetNumSupportedInputFormats(void) = 0;
