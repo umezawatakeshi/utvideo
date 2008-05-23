@@ -168,6 +168,6 @@ label3:
 	pop			ebx
 	ret
 
-_sse2_ConvertULY2ToBottomUpRGB32	endp
+_sse2_ConvertULY2ToBottomupRGB32	endp
 
 end
