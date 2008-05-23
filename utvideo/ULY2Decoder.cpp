@@ -49,7 +49,7 @@ const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[8] = {
 	{ FCC('UYVY'), 16, TRUE }, { FCC('UYNV'), 16, TRUE },
 	{ FCC('YVYU'), 16, TRUE },
 	{ FCC('VYUY'), 16, TRUE },
-	{ BI_RGB, 32, TRUE },
+	{ BI_RGB, 32, FALSE },
 };
 
 CULY2Decoder::CULY2Decoder(void)
