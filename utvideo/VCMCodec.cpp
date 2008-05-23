@@ -129,7 +129,13 @@ DWORD CVCMCodec::QueryAbout(void)
 
 DWORD CVCMCodec::About(HWND hwnd)
 {
-	MessageBox(hwnd, "Ut Video Codec Suite\nCopyright (C) 2008  UMEZAWA Takeshi", "Ut Video Codec Suite", MB_OK);
+	char buf[256];
+
+	wsprintf(buf, "Ut Video Codec Suite, Version %d.%d.%d\nCopyright (C) 2008  UMEZAWA Takeshi",
+		(BYTE)(UTVIDEO_ENCODER_VERSION >> 24),
+		(BYTE)(UTVIDEO_ENCODER_VERSION >> 16),
+		(BYTE)(UTVIDEO_ENCODER_VERSION >> 8));
+	MessageBox(hwnd, buf, "Ut Video Codec Suite", MB_OK);
 	return ICERR_OK;
 }
 
