@@ -42,13 +42,15 @@
 #include "utvideo.h"
 #include "ULY2Encoder.h"
 #include "Predict.h"
+#include "Convert.h"
 #include "resource.h"
 
-const CPlanarEncoder::INPUTFORMAT CULY2Encoder::m_infmts[7] = {
+const CPlanarEncoder::INPUTFORMAT CULY2Encoder::m_infmts[8] = {
 	{ FCC('YUY2'), 16, TRUE }, { FCC('YUYV'), 16, TRUE }, { FCC('YUNV'), 16, TRUE },
 	{ FCC('UYVY'), 16, TRUE }, { FCC('UYNV'), 16, TRUE },
 	{ FCC('YVYU'), 16, TRUE },
 	{ FCC('VYUY'), 16, TRUE },
+	{ BI_RGB, 24, FALSE },
 };
 
 CULY2Encoder::CULY2Encoder(void)
@@ -78,16 +80,28 @@ void CULY2Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn)
 
 void CULY2Encoder::ConvertToPlanar(DWORD nBandIndex)
 {
-	DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwPlaneStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
+	DWORD dwPlaneStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwFrameStrideBegin, dwFrameStrideEnd;
 	BYTE *y, *u, *v;
 	const BYTE *pSrcBegin, *pSrcEnd, *p;
 
-	pSrcBegin = ((BYTE *)m_icc->lpInput) + dwStrideBegin * m_dwFrameStride;
-	pSrcEnd   = ((BYTE *)m_icc->lpInput) + dwStrideEnd   * m_dwFrameStride;
-	y = m_pCurFrame->GetPlane(0) + dwStrideBegin * m_dwPlaneStride[0];
-	u = m_pCurFrame->GetPlane(1) + dwStrideBegin * m_dwPlaneStride[1];
-	v = m_pCurFrame->GetPlane(2) + dwStrideBegin * m_dwPlaneStride[2];
+	if (!m_bBottomUpFrame)
+	{
+		dwFrameStrideBegin = dwPlaneStrideBegin;
+		dwFrameStrideEnd   = dwPlaneStrideEnd;
+	}
+	else
+	{
+		dwFrameStrideBegin = m_dwNumStrides - dwPlaneStrideEnd;
+		dwFrameStrideEnd   = m_dwNumStrides - dwPlaneStrideBegin;
+	}
+
+	pSrcBegin = ((BYTE *)m_icc->lpInput) + dwFrameStrideBegin * m_dwFrameStride;
+	pSrcEnd   = ((BYTE *)m_icc->lpInput) + dwFrameStrideEnd   * m_dwFrameStride;
+	y = m_pCurFrame->GetPlane(0) + dwPlaneStrideBegin * m_dwPlaneStride[0];
+	u = m_pCurFrame->GetPlane(1) + dwPlaneStrideBegin * m_dwPlaneStride[1];
+	v = m_pCurFrame->GetPlane(2) + dwPlaneStrideBegin * m_dwPlaneStride[2];
 
 	switch (m_icc->lpbiInput->biCompression)
 	{
@@ -128,6 +142,14 @@ void CULY2Encoder::ConvertToPlanar(DWORD nBandIndex)
 			*y++ = *(p+1);
 			*u++ = *(p+2);
 			*y++ = *(p+3);
+		}
+		break;
+	case BI_RGB:
+		switch (m_icc->lpbiInput->biBitCount)
+		{
+		case 24:
+			ConvertBottomupRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwFrameStride);
+			break;
 		}
 		break;
 	}
