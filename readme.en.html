@@ -1,11 +1,11 @@
 <html>
 <!-- $Id$ -->
 <head>
-<title>Ut Video Codec Suite 3.3.1 readme (English)</title>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+<title>Ut Video Codec Suite 3.4.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 3.3.1 readme (English)</h1>
+<h1>Ut Video Codec Suite 3.4.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008  UMEZAWA Takeshi</p>
@@ -44,6 +44,15 @@ It can currently encode YUV422 and RGB sources.</p>
 <li>Usually worse compression ratio than Lagarith, but rarely better.</li>
 </ul>
 <h2 id="history">Version history</h2>
+<h3>Version 3.4.0</h3>
+<dl>
+<dt>New features</dt><dd><ul>
+<li>ULY2: Add support for RGB24 input when encoding. (but low speed)</li>
+</ul></dd>
+<dt>Bug fixes</dt><dd><ul>
+<li>ULY2: Output vertically flipped frames on some environment when decoding to RGB32, because of ignorance of sign of biHeight.</li>
+</ul></dd>
+</dl>
 <h3>Version 3.3.1</h3>
 <dl>
 <dt>Bug fixes</dt><dd><ul>
@@ -68,7 +77,7 @@ It can currently encode YUV422 and RGB sources.</p>
 <h3>Version 3.2.0</h3>
 <dl>
 <dt>New features</dt><dd><ul>
-<li>ULY2: Add support for RGB32 output when decoding. (but low performance)</li>
+<li>ULY2: Add support for RGB32 output when decoding. (but low speed)</li>
 </ul></dd>
 <dt>Bug fixes</dt><dd><ul>
 <li>ULRG: fixed frame dividing method. <strong>Due to this fix, ULRG lost compatibility if frame divide count is not 1.</strong></li>
