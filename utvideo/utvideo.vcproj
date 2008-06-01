@@ -194,7 +194,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Convert_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Convert_asm.asm"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Convert_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Convert_asm.asm&#x0D;&#x0A;"
 						Outputs="$(IntDir)\Convert_asm.obj"
 					/>
 				</FileConfiguration>
@@ -203,7 +203,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Convert_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Convert_asm.asm"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Convert_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Convert_asm.asm&#x0D;&#x0A;"
 						Outputs="$(IntDir)\Convert_asm.obj"
 					/>
 				</FileConfiguration>
