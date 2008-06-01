@@ -99,7 +99,7 @@ const TUNEDFUNC tfnSSSE3 = {
 	sse2_ConvertULY2ToBottomupRGB32,
 };
 
-TUNEDFUNC tfn;
+TUNEDFUNC tfn = tfnCPP;
 
 void InitializeTunedFunc(void)
 {
