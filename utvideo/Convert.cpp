@@ -100,15 +100,17 @@ void cpp_ConvertULY2ToBottomupRGB32(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *
 	}
 }
 
-void cpp_ConvertBottomupRGB24ToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+void cpp_ConvertBottomupRGB24ToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD dwDataStride)
 {
 	BYTE *y = pYBegin;
 	BYTE *u = pUBegin;
 	BYTE *v = pVBegin;
 
+	_ASSERT(dwStride == ROUNDUP(dwDataStride, 4));
+
 	for (const BYTE *pStrideBegin = pSrcEnd - dwStride; pStrideBegin >= pSrcBegin; pStrideBegin -= dwStride)
 	{
-		const BYTE *pStrideEnd = pStrideBegin + dwStride;
+		const BYTE *pStrideEnd = pStrideBegin + dwDataStride;
 		for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += 6)
 		{
 			const BYTE *q;
