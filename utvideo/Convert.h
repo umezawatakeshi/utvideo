@@ -42,11 +42,12 @@
 
 #include "TunedFunc.h"
 
-#define ConvertULY2ToBottomupRGB24 cpp_ConvertULY2ToBottomupRGB24
+#define ConvertULY2ToBottomupRGB24 tfn.pfnConvertULY2ToBottomupRGB24
 #define ConvertULY2ToBottomupRGB32 tfn.pfnConvertULY2ToBottomupRGB32
 #define ConvertBottomupRGB24ToULY2 cpp_ConvertBottomupRGB24ToULY2
 
 void cpp_ConvertULY2ToBottomupRGB24(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);
+extern "C" void sse2_ConvertULY2ToBottomupRGB24(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);
 
 void cpp_ConvertULY2ToBottomupRGB32(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);
 extern "C" void sse2_ConvertULY2ToBottomupRGB32(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);

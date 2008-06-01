@@ -61,16 +61,18 @@ uv2r	dq	03313000033130000h
 uv2b	dq	00000408D0000408Dh
 		dq	00000408D0000408Dh
 
-; sse2_ConvertULY2ToBottomupRGB32(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);
-public	_sse2_ConvertULY2ToBottomupRGB32
-_sse2_ConvertULY2ToBottomupRGB32	proc
+CONVERT_ULY2_TO_BOTTOMUP_RGB	macro	procname, rgb32
+
+; procname(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);
+public	&procname
+&procname	proc
 
 	push		ebx
 	push		esi
 	push		edi
 	push		ebp
 
-	mov			eax, dword ptr [esp + 16 + 4 +  8]	; pYBegin
+	mov			ebp, dword ptr [esp + 16 + 4 +  8]	; pYBegin
 	mov			ebx, dword ptr [esp + 16 + 4 + 12]	; pUBegin
 	mov			ecx, dword ptr [esp + 16 + 4 + 16]	; pVBegin
 	mov			edx, dword ptr [esp + 16 + 4 + 20]	; dwStride
@@ -85,7 +87,7 @@ label0:
 label1:
 	pxor		xmm3, xmm3				; xmm3 = 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 
-	movd		xmm0, dword ptr [eax]	; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 Y3 Y2 Y1 Y0
+	movd		xmm0, dword ptr [ebp]	; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 Y3 Y2 Y1 Y0
 	punpcklbw	xmm0, xmm3				; xmm0 = 00 00 00 00 00 00 00 00 00 Y3 00 Y2 00 Y1 00 Y0
 	psubw		xmm0, oword ptr [yoff]	; xmm0 = 00 00 00 00 00 00 00 00 ---Y3 ---Y2 ---Y1 ---Y0 (de-offset)
 	punpcklwd	xmm0, xmm3				; xmm0 = 00 00 ---Y3 00 00 ---Y2 00 00 ---Y1 00 00 ---Y0 (de-offset)
@@ -125,8 +127,9 @@ label1:
 	packuswb	xmm1, xmm1				; xmm2 = XX XX XX XX XX XX XX XX 00 R3 00 R2 00 R1 00 R0
 	punpcklwd	xmm2, xmm1				; xmm2 = 00 R3 G3 B3 00 R2 G2 B2 00 R1 G1 B1 00 R0 G0 B0
 
+if &rgb32
 	add			edi, 16
-	add			eax, 4
+	add			ebp, 4
 	add			ebx, 2
 	add			ecx, 2
 	cmp			edi, esi
@@ -137,7 +140,7 @@ label1:
 
 label2:
 	sub			edi, 16
-	sub			eax, 4
+	sub			ebp, 4
 	sub			ebx, 2
 	sub			ecx, 2
 	test		edx, 8
@@ -145,7 +148,7 @@ label2:
 	movq		qword ptr [edi], xmm2
 	psrldq		xmm2, 8
 	add			edi, 8
-	add			eax, 2
+	add			ebp, 2
 	add			ebx, 1
 	add			ecx, 1
 label4:
@@ -153,9 +156,49 @@ label4:
 	jz			label3
 	movd		dword ptr [edi], xmm2
 	add			edi, 4
-	add			eax, 2
+	add			ebp, 2
 	add			ebx, 1
 	add			ecx, 1
+else
+	movd		eax, xmm2
+	psrldq		xmm2, 4
+	mov			word ptr [edi], ax
+	shr			eax, 16
+	mov			byte ptr [edi+2], al
+	add			edi, 3
+	add			ebp, 2
+	add			ebx, 1
+	add			ecx, 1
+	cmp			edi, esi
+	je			label3
+	movd		eax, xmm2
+	psrldq		xmm2, 4
+	mov			word ptr [edi], ax
+	shr			eax, 16
+	mov			byte ptr [edi+2], al
+	add			edi, 3
+	cmp			edi, esi
+	je			label3
+	movd		eax, xmm2
+	psrldq		xmm2, 4
+	mov			word ptr [edi], ax
+	shr			eax, 16
+	mov			byte ptr [edi+2], al
+	add			edi, 3
+	add			ebp, 2
+	add			ebx, 1
+	add			ecx, 1
+	cmp			edi, esi
+	je			label3
+	movd		eax, xmm2
+	psrldq		xmm2, 4
+	mov			word ptr [edi], ax
+	shr			eax, 16
+	mov			byte ptr [edi+2], al
+	add			edi, 3
+	cmp			edi, esi
+	jne			label1
+endif
 
 label3:
 	sub			esi, edx
@@ -168,6 +211,11 @@ label3:
 	pop			ebx
 	ret
 
-_sse2_ConvertULY2ToBottomupRGB32	endp
+&procname	endp
+
+	endm
+
+CONVERT_ULY2_TO_BOTTOMUP_RGB	_sse2_ConvertULY2ToBottomupRGB24, 0
+CONVERT_ULY2_TO_BOTTOMUP_RGB	_sse2_ConvertULY2ToBottomupRGB32, 1
 
 end
