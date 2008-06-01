@@ -44,12 +44,13 @@
 #include "Predict.h"
 #include "Convert.h"
 
-const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[8] = {
+const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[9] = {
 	{ FCC('YUY2'), 16, TRUE }, { FCC('YUYV'), 16, TRUE }, { FCC('YUNV'), 16, TRUE },
 	{ FCC('UYVY'), 16, TRUE }, { FCC('UYNV'), 16, TRUE },
 	{ FCC('YVYU'), 16, TRUE },
 	{ FCC('VYUY'), 16, TRUE },
 	{ BI_RGB, 32, FALSE },
+	{ BI_RGB, 24, FALSE },
 };
 
 CULY2Decoder::CULY2Decoder(void)
@@ -147,6 +148,9 @@ void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)
 	case BI_RGB:
 		switch (m_icd->lpbiOutput->biBitCount)
 		{
+		case 24:
+			ConvertULY2ToBottomupRGB24(pDstBegin, pDstEnd, y, u, v, m_dwFrameStride);
+			break;
 		case 32:
 			ConvertULY2ToBottomupRGB32(pDstBegin, pDstEnd, y, u, v, m_dwFrameStride);
 			break;

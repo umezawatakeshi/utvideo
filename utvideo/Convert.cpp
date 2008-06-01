@@ -42,6 +42,32 @@
 #include "utvideo.h"
 #include "Convert.h"
 
+void cpp_ConvertULY2ToBottomupRGB24(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride)
+{
+	const BYTE *y = pYBegin;
+	const BYTE *u = pUBegin;
+	const BYTE *v = pVBegin;
+
+	for (BYTE *pStrideBegin = pDstEnd - dwStride; pStrideBegin >= pDstBegin; pStrideBegin -= dwStride)
+	{
+		BYTE *pStrideEnd = pStrideBegin + dwStride;
+		for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 6)
+		{
+			*(p+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+			*(p+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+			*(p+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+			y++;
+			if (p+3 < pStrideEnd)
+			{
+				*(p+4) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+3) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+5) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+			}
+			y++; u++; v++;
+		}
+	}
+}
+
 void cpp_ConvertULY2ToBottomupRGB32(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride)
 {
 	const BYTE *y = pYBegin;

@@ -49,7 +49,7 @@ class CULY2Decoder :
 	public CPlanarDecoder
 {
 private:
-	static const OUTPUTFORMAT m_outfmts[8];
+	static const OUTPUTFORMAT m_outfmts[9];
 
 public:
 	CULY2Decoder(void);
