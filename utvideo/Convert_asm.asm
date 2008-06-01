@@ -63,7 +63,7 @@ uv2b	dq	00000408D0000408Dh
 
 CONVERT_ULY2_TO_BOTTOMUP_RGB	macro	procname, rgb32
 
-; procname(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride);
+; procname(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride, DWORD dwDataStride);
 public	&procname
 &procname	proc
 
@@ -77,11 +77,13 @@ public	&procname
 	mov			ecx, dword ptr [esp + 16 + 4 + 16]	; pVBegin
 	mov			edx, dword ptr [esp + 16 + 4 + 20]	; dwStride
 	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pDstEnd	; esi なのに dst のポインタを保持するのは気持ちが悪いが。
+	sub			esi, edx
+	add			esi, dword ptr [esp + 16 + 4 + 24]	; dwDataStride
 
 	align	64
 label0:
 	mov			edi, esi
-	sub			edi, edx
+	sub			edi, dword ptr [esp + 16 + 4 + 24]	; dwDataStride
 
 	; align	64	; さすがに入れすぎな気がするのでコメントアウト。
 label1:
@@ -170,7 +172,7 @@ else
 	add			ebx, 1
 	add			ecx, 1
 	cmp			edi, esi
-	je			label3
+	jae			label3
 	movd		eax, xmm2
 	psrldq		xmm2, 4
 	mov			word ptr [edi], ax
@@ -178,7 +180,7 @@ else
 	mov			byte ptr [edi+2], al
 	add			edi, 3
 	cmp			edi, esi
-	je			label3
+	jae			label3
 	movd		eax, xmm2
 	psrldq		xmm2, 4
 	mov			word ptr [edi], ax
@@ -189,15 +191,14 @@ else
 	add			ebx, 1
 	add			ecx, 1
 	cmp			edi, esi
-	je			label3
+	jae			label3
 	movd		eax, xmm2
-	psrldq		xmm2, 4
 	mov			word ptr [edi], ax
 	shr			eax, 16
 	mov			byte ptr [edi+2], al
 	add			edi, 3
 	cmp			edi, esi
-	jne			label1
+	jb			label1
 endif
 
 label3:
