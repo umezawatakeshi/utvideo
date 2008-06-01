@@ -126,17 +126,20 @@ label1:
 	punpcklwd	xmm2, xmm1				; xmm2 = 00 R3 G3 B3 00 R2 G2 B2 00 R1 G1 B1 00 R0 G0 B0
 
 	add			edi, 16
-	cmp			edi, esi
-	ja			label2
 	add			eax, 4
 	add			ebx, 2
 	add			ecx, 2
+	cmp			edi, esi
+	ja			label2
 	movdqu		oword ptr [edi-16], xmm2
 	jne			label1
 	jmp			label3
 
 label2:
 	sub			edi, 16
+	sub			eax, 4
+	sub			ebx, 2
+	sub			ecx, 2
 	test		edx, 8
 	jz			label4
 	movq		qword ptr [edi], xmm2
