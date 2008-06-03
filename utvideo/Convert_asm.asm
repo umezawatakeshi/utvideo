@@ -219,4 +219,118 @@ label3:
 CONVERT_ULY2_TO_BOTTOMUP_RGB	_sse2_ConvertULY2ToBottomupRGB24, 0
 CONVERT_ULY2_TO_BOTTOMUP_RGB	_sse2_ConvertULY2ToBottomupRGB32, 1
 
+
+
+
+; Y  =  0.29891 R + 0.58661 G + 0.11448 B
+; Cb = -0.16874 R - 0.33126 G + 0.50000 B
+; Cr =  0.50000 R - 0.41869 G - 0.08131 B
+
+; Y  =  0.257 R + 0.504 G + 0.098 B + 16
+; Cb = -0.148 R - 0.291 G + 0.439 B + 128
+; Cr =  0.439 R - 0.368 G - 0.071 B + 128
+
+	align	64
+;			 fedcba9876543210
+;b2yuv	dq	0064b00000000064bh
+;		dq	0fdb7fdb70e0e0e0eh
+;g2yuv	dq	0203e00000000203eh
+;		dq	0f3fbf3fbf6b0f6b0h
+;r2yuv	dq	0106e00000000106eh
+;		dq	00e0e0e0efb42fb42h
+b2yuv	dq	00646000000000646h
+		dq	0fdbafdba0e0c0e0ch
+g2yuv	dq	02042000000002042h
+		dq	0f439f439f6b0f6b0h
+r2yuv	dq	01073000000001073h
+		dq	00e0c0e0cfb44fb44h
+yuvoff	dq	00004200000042000h
+		dq	00020200000202000h
+
+; sse2_ConvertBottomupRGB24ToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD dwDataStride);
+public	_sse2_ConvertBottomupRGB24ToULY2
+_sse2_ConvertBottomupRGB24ToULY2	proc
+
+	push		ebx
+	push		esi
+	push		edi
+	push		ebp
+
+	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pYBegin
+	mov			ebx, dword ptr [esp + 16 + 4 +  4]	; pUBegin
+	mov			ecx, dword ptr [esp + 16 + 4 +  8]	; pVBegin
+	mov			ebp, dword ptr [esp + 16 + 4 + 16]	; pSrcEnd
+	sub			ebp, dword ptr [esp + 16 + 4 + 20]	; dwStride
+	add			ebp, dword ptr [esp + 16 + 4 + 24]	; dwDataStride
+
+	align	64
+label0:
+	mov			esi, ebp
+	sub			esi, dword ptr [esp + 16 + 4 + 24]	; dwDataStride
+
+	;align	64
+label1:
+	movzx		eax, byte ptr [esi+2]
+	shl			eax, 16
+	movzx		edx, word ptr [esi]
+	or			eax, edx
+	movd		xmm0, eax							; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 00 R0 G0 B0
+
+	mov			edx, esi							; ñàâÒÇ±Ç±Çé¿çsÇ∑ÇÈÇÃÇÕîné≠ÇÁÇµÇ¢ÇÃÇ≈óvâ¸ó«
+	add			edx, 3
+	cmp			edx, ebp
+	setb		dl
+	movzx		edx, dl
+	lea			edx, [edx+edx*2]
+
+	movzx		eax, byte ptr [esi+edx+2]
+	shl			eax, 16
+	movzx		edx, word ptr [esi+edx]
+	or			eax, edx
+	movd		xmm1, eax							; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 00 R1 G1 B1
+
+	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 00 00 00 00 00 00 00 R1 R0 G1 G0 B1 B0
+	pxor		xmm1, xmm1
+	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 00 00 R1 00 R0 00 G1 00 G0 00 B1 00 B0
+
+	pshufd		xmm1, xmm0, 055h					; xmm1 = 00 G1 00 G0 00 G1 00 G0 00 G1 00 G0 00 G1 00 G0
+	pshufd		xmm2, xmm0, 0aah					; xmm2 = 00 R1 00 R0 00 R1 00 R0 00 R1 00 R0 00 R1 00 R0
+	pshufd		xmm0, xmm0, 000h					; xmm0 = 00 B1 00 B0 00 B1 00 B0 00 B1 00 B0 00 B1 00 B0
+
+	pmaddwd		xmm0, oword ptr [b2yuv]				; xmm0 = ----B2V---- ----B2U---- ----B2Y1--- ----B2Y0---
+	pmaddwd		xmm1, oword ptr [g2yuv]				; xmm1 = ----G2V---- ----G2U---- ----G2Y1--- ----G2Y0---
+	pmaddwd		xmm2, oword ptr [r2yuv]				; xmm2 = ----R2V---- ----R2U---- ----R2Y1--- ----R2Y0---
+
+	paddd		xmm0, oword ptr [yuvoff]
+	paddd		xmm2, xmm1
+	paddd		xmm0, xmm2							; xmm0 = -----V----- -----U----- -----Y1---- -----Y0----
+
+	psrld		xmm0, 14							; xmm0 = ---------V0 ---------U0 ---------Y1 ---------Y0
+	packssdw	xmm0, xmm0							; xmm0 = XX XX XX XX XX XX XX XX ---V0 ---U0 ---Y1 ---Y0
+	packuswb	xmm0, xmm0							; xmm0 = XX XX XX XX XX XX XX XX XX XX XX XX V0 U0 Y1 Y0
+	movd		eax, xmm0
+	mov			word ptr [edi], ax
+	shr			eax, 16
+	mov			byte ptr [ebx], al
+	mov			byte ptr [ecx], ah
+
+	add			edi, 2
+	add			ebx, 1
+	add			ecx, 1
+	add			esi, 6
+	cmp			esi, ebp
+	jb			label1
+
+	sub			ebp, dword ptr [esp + 16 + 4 + 20]	; dwStride
+	cmp			ebp, dword ptr [esp + 16 + 4 + 12]	; pSrcEnd
+	ja			label0
+
+	pop			ebp
+	pop			edi
+	pop			esi
+	pop			ebx
+	ret
+
+_sse2_ConvertBottomupRGB24ToULY2	endp
+
 end
