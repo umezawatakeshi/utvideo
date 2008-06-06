@@ -606,4 +606,66 @@ label2:
 _i686_RestoreMedian_align1	endp
 
 
+; p{min,max}ub ÇÕ SSE1 Ç≈í«â¡Ç≥ÇÍÇΩ MMX ñΩóﬂÅiÇ¢ÇÌÇ‰ÇÈ MMX2 ñΩóﬂÅjÇ≈Ç†ÇÈÅB
+; void sse1mmx_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+_sse1mmx_RestoreMedian_align1	proc
+
+	push		ebx
+	push		esi
+	push		edi
+	push		ebp
+
+	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pSrcBegin
+	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDst
+	mov			eax, esi
+	mov			ebp, dword ptr [esp + 16 + 4 + 12]	; dwStride
+	add			eax, ebp
+	neg			ebp
+
+	mov			edx, 80h
+
+	align		64
+label1:
+	add			dl, byte ptr [esi]
+	mov			byte ptr [edi], dl
+	inc 		esi
+	inc			edi
+	cmp			esi, eax
+	jb			label1
+
+	pxor		mm4, mm4
+	pxor		mm2, mm2
+
+	align		64
+label2:
+	movq		mm6, mm2
+	movq		mm7, mm2
+	psubb		mm6, mm4
+	movd		mm4, dword ptr [edi+ebp]	; mm4 = above
+	paddb		mm6, mm4	; mm6 = grad
+
+	pminub		mm2, mm6
+	pmaxub		mm6, mm7
+	pmaxub		mm2, mm4
+	pminub		mm2, mm6	; mm2 = median
+
+	paddb		mm2, qword ptr [esi]
+	movd		eax, mm2
+	mov			byte ptr [edi], al
+
+	inc			esi
+	inc			edi
+	cmp			esi, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+	jb			label2
+
+	pop			ebp
+	pop			edi
+	pop			esi
+	pop			ebx
+	emms
+	ret
+
+_sse1mmx_RestoreMedian_align1	endp
+
+
 end
