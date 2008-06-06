@@ -642,14 +642,14 @@ label2:
 	movq		mm7, mm2
 	psubb		mm6, mm4
 	movd		mm4, dword ptr [edi+ebp]	; mm4 = above
-	paddb		mm6, mm4	; mm6 = grad
+	paddb		mm6, mm4					; mm6 = grad
 
 	pminub		mm2, mm6
 	pmaxub		mm6, mm7
 	pmaxub		mm2, mm4
-	pminub		mm2, mm6	; mm2 = median
+	pminub		mm2, mm6					; mm2 = median
 
-	paddb		mm2, qword ptr [esi]
+	paddb		mm2, qword ptr [esi]		; アライメントがずれていても xmm レジスタの場合と違って一般保護例外にはならない
 	movd		eax, mm2
 	mov			byte ptr [edi], al
 
