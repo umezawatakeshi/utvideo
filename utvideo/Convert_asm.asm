@@ -276,6 +276,7 @@ label1:
 	psrld		xmm1, 8								; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 00 R1 G1 B1
 
 	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 00 00 00 00 00 00 XX R1 R0 G1 G0 B1 B0
+label3:
 	pxor		xmm1, xmm1
 	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 XX 00 R1 00 R0 00 G1 00 G0 00 B1 00 B0
 
@@ -311,33 +312,7 @@ label1:
 	movd		xmm0, dword ptr [esi-3]				; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0
 
 	punpcklbw	xmm0, xmm0							; xmm0 = 00 00 00 00 00 00 00 00 XX XX R0 R0 G0 G0 B0 B0
-	pxor		xmm1, xmm1
-	punpcklbw	xmm0, xmm1							; xmm0 = 00 XX 00 XX 00 R0 00 R0 00 G0 00 G0 00 B0 00 B0
-
-	pshufd		xmm1, xmm0, 055h					; xmm1 = 00 G0 00 G0 00 G0 00 G0 00 G0 00 G0 00 G0 00 G0
-	pshufd		xmm2, xmm0, 0aah					; xmm2 = 00 R0 00 R0 00 R0 00 R0 00 R0 00 R0 00 R0 00 R0
-	pshufd		xmm0, xmm0, 000h					; xmm0 = 00 B0 00 B0 00 B0 00 B0 00 B0 00 B0 00 B0 00 B0
-
-	pmaddwd		xmm0, oword ptr [b2yuv]				; xmm0 = ----B2V---- ----B2U---- ----B2Y1--- ----B2Y0---
-	pmaddwd		xmm1, oword ptr [g2yuv]				; xmm1 = ----G2V---- ----G2U---- ----G2Y1--- ----G2Y0---
-	pmaddwd		xmm2, oword ptr [r2yuv]				; xmm2 = ----R2V---- ----R2U---- ----R2Y1--- ----R2Y0---
-
-	paddd		xmm0, oword ptr [yuvoff]
-	paddd		xmm2, xmm1
-	paddd		xmm0, xmm2							; xmm0 = -----V----- -----U----- -----Y1---- -----Y0----
-
-	psrld		xmm0, 14							; xmm0 = ---------V0 ---------U0 ---------Y1 ---------Y0
-	packssdw	xmm0, xmm0							; xmm0 = XX XX XX XX XX XX XX XX ---V0 ---U0 ---Y1 ---Y0
-	packuswb	xmm0, xmm0							; xmm0 = XX XX XX XX XX XX XX XX XX XX XX XX V0 U0 Y1 Y0
-	movd		eax, xmm0
-	mov			word ptr [edi], ax
-	shr			eax, 16
-	mov			byte ptr [ebx], al
-	mov			byte ptr [ecx], ah
-
-	add			edi, 2
-	add			ebx, 1
-	add			ecx, 1
+	jmp			label3
 
 label2:
 	sub			ebp, dword ptr [esp + 16 + 4 + 20]	; dwStride
