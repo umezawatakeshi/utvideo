@@ -221,6 +221,7 @@ void CPlanarDecoder::DecodeProc(DWORD nBandIndex)
 		{
 		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
 			m_pCurFrame = m_pDecodedFrame;
+			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
 			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex]);
 			m_pCurFrame = m_pRestoredFrame;
