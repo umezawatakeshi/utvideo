@@ -121,14 +121,14 @@ _i686_HuffmanDecode_align1	proc
 	mov			edx, dword ptr [esi+4]
 	mov			ch, -32
 
-	cmp			byte ptr [ebx + 32+4*32+4*1024], 0	; pDecodeTable->nCodeLength[0]
+	cmp			byte ptr [ebx + 32+4*32+1], 0	; pDecodeTable->SymbolAndCodeLength[0].nCodeLength
 	jne			label1
 
 	; msmset(pDstBegin, pDecodeTable->dwSymbol[0], pDstEnd-pDstBegin);
 	mov			eax, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
 	sub			eax, edi
 	push		eax
-	mov			eax, dword ptr [ebx + 32+4*32]		; pDecodeTable->dwSymbol[0]
+	mov			eax, dword ptr [ebx + 32+4*32]		; pDecodeTable->SymbolAndCodeLength[0].bySymbol
 	push		eax
 	push		edi
 	call		_memset
@@ -149,10 +149,10 @@ label1:
 	shr			eax, cl
 	mov			ebp, dword ptr [ebx + 32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
 	add			ebp, eax
-	mov			eax, dword ptr [ebx + 32+4*32 +ebp*4]		; pDecodeTable->dwSymbol[ebp]
+	mov			eax, dword ptr [ebx + 32+4*32 + ebp*4]		; pDecodeTable->SymbolAndCodeLength[ebp]
 	mov			byte ptr [edi], al
 	inc			edi
-	add			ch, byte ptr [ebx + 32+4*32+4*1024 + ebp]	; pDecodeTable->nCodeLength[ebp]
+	add			ch, ah
 	jnc			label1
 	sub			ch, 32
 	add			esi, 4

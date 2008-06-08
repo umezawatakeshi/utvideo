@@ -50,8 +50,12 @@ struct HUFFMAN_DECODE_TABLE
 {
 	BYTE nCodeShift[32];
 	DWORD dwSymbolBase[32];
-	DWORD dwSymbol[1024];
-	BYTE nCodeLength[1024];
+	struct
+	{
+		BYTE bySymbol;
+		BYTE nCodeLength;
+		WORD padding;
+	} SymbolAndCodeLength[1024];
 };
 
 void GenerateHuffmanCodeLengthTable(BYTE *pCodeLengthTable, const DWORD *pCountTable);

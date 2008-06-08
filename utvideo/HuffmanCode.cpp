@@ -188,7 +188,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 	if (cls[0].codelen == 0)
 	{
 		memset(pDecodeTable, 0, sizeof(HUFFMAN_DECODE_TABLE));
-		pDecodeTable->dwSymbol[0] = cls[0].symbol;
+		pDecodeTable->SymbolAndCodeLength[0].bySymbol = cls[0].symbol;
 		return;
 	}
 
@@ -218,8 +218,8 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 		}
 		for (int k = 0; k < (1 << (32 - pDecodeTable->nCodeShift[bsrval] - cls[i].codelen)); k++)
 		{
-			pDecodeTable->dwSymbol[nextfillidx] = cls[i].symbol;
-			pDecodeTable->nCodeLength[nextfillidx] = cls[i].codelen;
+			pDecodeTable->SymbolAndCodeLength[nextfillidx].bySymbol    = cls[i].symbol;
+			pDecodeTable->SymbolAndCodeLength[nextfillidx].nCodeLength = cls[i].codelen;
 			nextfillidx++;
 		}
 		curcode += 0x80000000 >> (cls[i].codelen - 1);
@@ -268,9 +268,9 @@ void cpp_HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, co
 	BYTE *p;
 	DWORD code;
 
-	if (pDecodeTable->nCodeLength[0] == 0)
+	if (pDecodeTable->SymbolAndCodeLength[0].nCodeLength == 0)
 	{
-		memset(pDstBegin, pDecodeTable->dwSymbol[0], pDstEnd-pDstBegin);
+		memset(pDstBegin, pDecodeTable->SymbolAndCodeLength[0].bySymbol, pDstEnd-pDstBegin);
 		return;
 	}
 
@@ -286,9 +286,9 @@ void cpp_HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, co
 		int bsrval = bsr(code);
 		int codeshift = pDecodeTable->nCodeShift[bsrval];
 		code >>= codeshift;
-		DWORD symbol = pDecodeTable->dwSymbol[pDecodeTable->dwSymbolBase[bsrval] + code];
+		BYTE symbol = pDecodeTable->SymbolAndCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code].bySymbol;
 		*p = symbol;
-		int codelen = pDecodeTable->nCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code];
+		int codelen = pDecodeTable->SymbolAndCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code].nCodeLength;
 		nBits += codelen;
 		if (nBits >= 32)
 		{
