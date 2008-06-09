@@ -2,10 +2,10 @@
 <!-- $Id$ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
-<title>Ut Video Codec Suite 3.7.0 readme (English)</title>
+<title>Ut Video Codec Suite 3.8.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 3.7.0 readme (English)</h1>
+<h1>Ut Video Codec Suite 3.8.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008  UMEZAWA Takeshi</p>
@@ -44,6 +44,12 @@ It can currently encode YUV422 and RGB sources.</p>
 <li>Usually worse compression ratio than Lagarith, but rarely better.</li>
 </ul>
 <h2 id="history">Version history</h2>
+<h3>Version 3.8.0</h3>
+<dl>
+<dt>New features</dt><dd><ul>
+<li>common: Add "Predict left" intra-frame prediction method. According to my measurement, compared to existing implementation ("Predict median"), approximately same encoding speed, 10% lower compresstion ratio (10% larger file size) and 50% faster decoding speed (30%+ shorter decoding time).</li>
+</ul></dd>
+</dl>
 <h3>Version 3.7.0</h3>
 <dl>
 <dt>Performance Improvements</dt><dd><ul>
