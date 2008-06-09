@@ -188,7 +188,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 	if (cls[0].codelen == 0)
 	{
 		memset(pDecodeTable, 0, sizeof(HUFFMAN_DECODE_TABLE));
-		pDecodeTable->SymbolAndCodeLength[0].bySymbol = cls[0].symbol;
+		pDecodeTable->SymbolAndCodeLength[0].bySymbol = (BYTE)cls[0].symbol;
 		return;
 	}
 
@@ -218,7 +218,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 		}
 		for (int k = 0; k < (1 << (32 - pDecodeTable->nCodeShift[bsrval] - cls[i].codelen)); k++)
 		{
-			pDecodeTable->SymbolAndCodeLength[nextfillidx].bySymbol    = cls[i].symbol;
+			pDecodeTable->SymbolAndCodeLength[nextfillidx].bySymbol    = (BYTE)cls[i].symbol;
 			pDecodeTable->SymbolAndCodeLength[nextfillidx].nCodeLength = cls[i].codelen;
 			nextfillidx++;
 		}
