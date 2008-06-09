@@ -45,7 +45,7 @@
 #include "Convert.h"
 #include "resource.h"
 
-const CPlanarEncoder::INPUTFORMAT CULY2Encoder::m_infmts[8] = {
+const CPlanarEncoder::INPUTFORMAT CULY2Encoder::m_infmts[] = {
 	{ FCC('YUY2'), 16, TRUE }, { FCC('YUYV'), 16, TRUE }, { FCC('YUNV'), 16, TRUE },
 	{ FCC('UYVY'), 16, TRUE }, { FCC('UYNV'), 16, TRUE },
 	{ FCC('YVYU'), 16, TRUE },
@@ -59,6 +59,11 @@ CULY2Encoder::CULY2Encoder(void)
 
 CULY2Encoder::~CULY2Encoder(void)
 {
+}
+
+int CULY2Encoder::GetNumSupportedInputFormats(void)
+{
+	return _countof(m_infmts);
 }
 
 CEncoder *CULY2Encoder::CreateInstance(void)

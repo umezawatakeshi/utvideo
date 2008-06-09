@@ -43,7 +43,7 @@
 #include "ULRGDecoder.h"
 #include "Predict.h"
 
-const CPlanarDecoder::OUTPUTFORMAT CULRGDecoder::m_outfmts[2] = {
+const CPlanarDecoder::OUTPUTFORMAT CULRGDecoder::m_outfmts[] = {
 	{ BI_RGB, 24, FALSE },
 	{ BI_RGB, 32, FALSE },
 };
@@ -54,6 +54,11 @@ CULRGDecoder::CULRGDecoder(void)
 
 CULRGDecoder::~CULRGDecoder(void)
 {
+}
+
+int CULRGDecoder::GetNumSupportedOutputFormats(void)
+{
+	return _countof(m_outfmts);
 }
 
 CDecoder *CULRGDecoder::CreateInstance(void)

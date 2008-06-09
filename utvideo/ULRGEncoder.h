@@ -49,7 +49,7 @@ class CULRGEncoder :
 	public CPlanarEncoder
 {
 private:
-	static const INPUTFORMAT m_infmts[2];
+	static const INPUTFORMAT m_infmts[];
 
 public:
 	CULRGEncoder(void);
@@ -61,7 +61,7 @@ protected:
 	virtual const char *GetColorFormatName(void) { return "RGB"; }
 	virtual WORD GetOutputBitCount(void) { return 24; }
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; };
-	virtual int GetNumSupportedInputFormats(void) { return _countof(m_infmts); };
+	virtual int GetNumSupportedInputFormats(void);
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn);
 	virtual void ConvertToPlanar(DWORD nBandIndex);
 };

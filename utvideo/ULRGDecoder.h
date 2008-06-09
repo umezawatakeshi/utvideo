@@ -49,7 +49,7 @@ class CULRGDecoder :
 	public CPlanarDecoder
 {
 private:
-	static const OUTPUTFORMAT m_outfmts[2];
+	static const OUTPUTFORMAT m_outfmts[];
 
 public:
 	CULRGDecoder(void);
@@ -60,7 +60,7 @@ protected:
 	virtual DWORD GetInputFCC(void) { return FCC('ULRG'); }
 	virtual WORD GetInputBitCount(void) { return 24; }
 	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) { return m_outfmts; };
-	virtual int GetNumSupportedOutputFormats(void) { return _countof(m_outfmts); };
+	virtual int GetNumSupportedOutputFormats(void);
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut);
 	virtual void ConvertFromPlanar(DWORD nBandIndex);
 };

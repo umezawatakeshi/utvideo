@@ -44,7 +44,7 @@
 #include "Predict.h"
 #include "resource.h"
 
-const CPlanarEncoder::INPUTFORMAT CULRGEncoder::m_infmts[2] = {
+const CPlanarEncoder::INPUTFORMAT CULRGEncoder::m_infmts[] = {
 	{ BI_RGB, 24, FALSE },
 	{ BI_RGB, 32, FALSE },
 };
@@ -55,6 +55,11 @@ CULRGEncoder::CULRGEncoder(void)
 
 CULRGEncoder::~CULRGEncoder(void)
 {
+}
+
+int CULRGEncoder::GetNumSupportedInputFormats(void)
+{
+	return _countof(m_infmts);
 }
 
 CEncoder *CULRGEncoder::CreateInstance(void)

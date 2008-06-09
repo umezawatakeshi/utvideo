@@ -49,7 +49,7 @@ class CULY2Encoder :
 	public CPlanarEncoder
 {
 private:
-	static const INPUTFORMAT m_infmts[8];
+	static const INPUTFORMAT m_infmts[];
 
 public:
 	CULY2Encoder(void);
@@ -61,7 +61,7 @@ protected:
 	virtual const char *GetColorFormatName(void) { return "YUV422"; }
 	virtual WORD GetOutputBitCount(void) { return 16; }
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; };
-	virtual int GetNumSupportedInputFormats(void) { return _countof(m_infmts); };
+	virtual int GetNumSupportedInputFormats(void);
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn);
 	virtual void ConvertToPlanar(DWORD nBandIndex);
 };

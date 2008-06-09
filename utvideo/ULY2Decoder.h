@@ -49,7 +49,7 @@ class CULY2Decoder :
 	public CPlanarDecoder
 {
 private:
-	static const OUTPUTFORMAT m_outfmts[9];
+	static const OUTPUTFORMAT m_outfmts[];
 
 public:
 	CULY2Decoder(void);
@@ -60,7 +60,7 @@ protected:
 	virtual DWORD GetInputFCC(void) { return FCC('ULY2'); }
 	virtual WORD GetInputBitCount(void) { return 16; }
 	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) { return m_outfmts; };
-	virtual int GetNumSupportedOutputFormats(void) { return _countof(m_outfmts); };
+	virtual int GetNumSupportedOutputFormats(void);
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut);
 	virtual void ConvertFromPlanar(DWORD nBandIndex);
 };

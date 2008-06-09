@@ -44,7 +44,7 @@
 #include "Predict.h"
 #include "Convert.h"
 
-const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[9] = {
+const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[] = {
 	{ FCC('YUY2'), 16, TRUE }, { FCC('YUYV'), 16, TRUE }, { FCC('YUNV'), 16, TRUE },
 	{ FCC('UYVY'), 16, TRUE }, { FCC('UYNV'), 16, TRUE },
 	{ FCC('YVYU'), 16, TRUE },
@@ -59,6 +59,11 @@ CULY2Decoder::CULY2Decoder(void)
 
 CULY2Decoder::~CULY2Decoder(void)
 {
+}
+
+int CULY2Decoder::GetNumSupportedOutputFormats(void)
+{
+	return _countof(m_outfmts);
 }
 
 CDecoder *CULY2Decoder::CreateInstance(void)
