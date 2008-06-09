@@ -47,7 +47,7 @@
 CPlanarEncoder::CPlanarEncoder(void)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
-	m_ec.dwFlags0 = CThreadManager::GetNumProcessors() - 1;
+	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 }
 
 CPlanarEncoder::~CPlanarEncoder(void)
@@ -75,6 +75,18 @@ int CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		SetWindowText(hwnd, buf);
 		wsprintf(buf, "%d", (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
 		SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
+		switch (pThis->m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
+		{
+		default:
+			_ASSERT(false);
+			/* FALLTHROUGH */
+		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO, BST_CHECKED);
+			break;
+		case EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
+			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_MEDIAN_RADIO, BST_CHECKED);
+			break;
+		}
 		return TRUE;
 	case WM_COMMAND:
 		switch(LOWORD(wParam))
@@ -87,7 +99,12 @@ int CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 				MessageBox(hwnd, "1 <= DIVIDE_COUNT <= 256", "ERR", MB_ICONERROR);
 				return TRUE;
 			}
-			pThis->m_ec.dwFlags0 = (n - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
+			memset(&pThis->m_ec, 0, sizeof(ENCODERCONF));
+			pThis->m_ec.dwFlags0 |= (n - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
+			if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO))
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
+			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_MEDIAN_RADIO))
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 			/* FALLTHROUGH */
 		case IDCANCEL:
 			EndDialog(hwnd, 0);
@@ -114,6 +131,8 @@ DWORD CPlanarEncoder::SetState(const void *pState, DWORD dwSize)
 
 	memcpy(&m_ec, pState, min(sizeof(ENCODERCONF), dwSize));
 	m_ec.dwFlags0 &= ~EC_FLAGS0_RESERVED;
+	if ((m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK) == EC_FLAGS0_INTRAFRAME_PREDICT_RESERVED)
+		m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 
 	return min(sizeof(ENCODERCONF), dwSize);
 }
@@ -134,7 +153,18 @@ DWORD CPlanarEncoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		m_ptm->SubmitJob(new CPredictJob(this, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
-	fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
+
+	switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
+	{
+	case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+		fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_LEFT;
+		break;
+	case EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
+		fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
+		break;
+	default:
+		_ASSERT(false);
+	}
 
 	p = (BYTE *)icc->lpOutput;
 
@@ -319,7 +349,17 @@ void CPlanarEncoder::PredictProc(DWORD nBandIndex)
 		for (int i = 0; i < 256; i++)
 			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
 
-		PredictMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+		switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
+		{
+		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+			PredictLeftAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			break;
+		case EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
+			PredictMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			break;
+		default:
+			_ASSERT(false);
+		}
 	}
 }
 

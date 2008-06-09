@@ -261,21 +261,26 @@ DWORD cpp_HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrc
 	return ((BYTE *)pDst) - pDstBegin;
 }
 
-void cpp_HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
+static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum)
 {
 	int nBits;
 	DWORD *pSrc;
 	BYTE *p;
 	DWORD code;
+	BYTE prevsym;
 
 	if (pDecodeTable->SymbolAndCodeLength[0].nCodeLength == 0)
 	{
-		memset(pDstBegin, pDecodeTable->SymbolAndCodeLength[0].bySymbol, pDstEnd-pDstBegin);
+		if (bAccum)
+			memset(pDstBegin, pDecodeTable->SymbolAndCodeLength[0].bySymbol + 0x80, pDstEnd-pDstBegin);
+		else
+			memset(pDstBegin, pDecodeTable->SymbolAndCodeLength[0].bySymbol, pDstEnd-pDstBegin);
 		return;
 	}
 
 	nBits = 0;
 	pSrc = (DWORD *)pSrcBegin;
+	prevsym = 0x80;
 
 	for (p = pDstBegin; p < pDstEnd; p++)
 	{
@@ -287,7 +292,14 @@ void cpp_HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, co
 		int codeshift = pDecodeTable->nCodeShift[bsrval];
 		code >>= codeshift;
 		BYTE symbol = pDecodeTable->SymbolAndCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code].bySymbol;
-		*p = symbol;
+		if (bAccum)
+		{
+			prevsym += symbol;
+			*p = prevsym;
+		}
+		else
+			*p = symbol;
+
 		int codelen = pDecodeTable->SymbolAndCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code].nCodeLength;
 		nBits += codelen;
 		if (nBits >= 32)
@@ -296,4 +308,14 @@ void cpp_HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, co
 			pSrc++;
 		}
 	}
+}
+
+void cpp_HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
+{
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, false);
+}
+
+void cpp_HuffmanDecodeAndAccum(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
+{
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true);
 }

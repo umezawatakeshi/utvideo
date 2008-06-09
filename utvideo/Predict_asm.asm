@@ -48,6 +48,120 @@ _TEXT_ASM	SEGMENT	page public flat 'CODE'
 ; 似た関数が増えてきた…マクロ技で統合せねば…
 
 
+
+; void sse2_PredictLeftAndCount_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable)
+public	_sse2_PredictLeftAndCount_align1
+_sse2_PredictLeftAndCount_align1	proc
+
+	push		ebx
+	push		esi
+	push		edi
+	push		ebp
+
+	mov			eax, 80h
+	movd		xmm1, eax
+
+	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pSrcBegin
+	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDst
+	mov			eax, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+	sub			eax, esi
+	and			eax, 0fffffff0h
+	add			eax, esi
+
+	mov			ebx, dword ptr [esp + 16 + 4 + 12]	; pCountTable
+
+	align		64
+label1:
+	movdqu		xmm0, oword ptr [esi]
+	movdqa		xmm2, xmm0
+	pslldq		xmm2, 1
+	por			xmm2, xmm1
+	movdqa		xmm1, xmm0
+	psrldq		xmm1, 15
+
+	psubb		xmm0, xmm2
+	movdqu		oword ptr [edi], xmm0
+
+	pextrw		ecx, xmm0, 0
+	movzx		ebp, cl
+	inc			dword ptr [ebx+ebp*4]
+	movzx		ebp, ch
+	inc			dword ptr [ebx+ebp*4]
+	pextrw		ecx, xmm0, 1
+	movzx		ebp, cl
+	inc			dword ptr [ebx+ebp*4]
+	movzx		ebp, ch
+	inc			dword ptr [ebx+ebp*4]
+	pextrw		ecx, xmm0, 2
+	movzx		ebp, cl
+	inc			dword ptr [ebx+ebp*4]
+	movzx		ebp, ch
+	inc			dword ptr [ebx+ebp*4]
+	pextrw		ecx, xmm0, 3
+	movzx		ebp, cl
+	inc			dword ptr [ebx+ebp*4]
+	movzx		ebp, ch
+	inc			dword ptr [ebx+ebp*4]
+	pextrw		ecx, xmm0, 4
+	movzx		ebp, cl
+	inc			dword ptr [ebx+ebp*4]
+	movzx		ebp, ch
+	inc			dword ptr [ebx+ebp*4]
+	pextrw		ecx, xmm0, 5
+	movzx		ebp, cl
+	inc			dword ptr [ebx+ebp*4]
+	movzx		ebp, ch
+	inc			dword ptr [ebx+ebp*4]
+	pextrw		ecx, xmm0, 6
+	movzx		ebp, cl
+	inc			dword ptr [ebx+ebp*4]
+	movzx		ebp, ch
+	inc			dword ptr [ebx+ebp*4]
+	pextrw		ecx, xmm0, 7
+	movzx		ebp, cl
+	inc			dword ptr [ebx+ebp*4]
+	movzx		ebp, ch
+	inc			dword ptr [ebx+ebp*4]
+
+	add			esi, 16
+	add			edi, 16
+	cmp			esi, eax
+	jb			label1
+
+	; 最初のラインの16バイトに満たない部分を処理する。
+	; 若干のはみ出し読み込みが発生する。
+	mov			eax, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+	cmp			esi, eax
+	jae			label4
+
+	movdqu		xmm0, oword ptr [esi]
+	movdqa		xmm2, xmm0
+	pslldq		xmm2, 1
+	por			xmm2, xmm1
+	psubb		xmm0, xmm2
+
+label3:
+	movd		ecx, xmm0
+	mov			byte ptr [edi], cl
+	movzx		ebp, cl
+	inc			dword ptr [ebx+ebp*4]
+	psrldq		xmm0, 1
+	inc			esi
+	inc			edi
+	cmp			esi, eax
+	jb			label3
+
+label4:
+	pop			ebp
+	pop			edi
+	pop			esi
+	pop			ebx
+	ret
+
+_sse2_PredictLeftAndCount_align1	endp
+
+
+
 ; void sse2_PredictMedian_align16(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
 public	_sse2_PredictMedian_align16
 _sse2_PredictMedian_align16	proc

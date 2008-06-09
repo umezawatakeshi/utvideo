@@ -132,6 +132,25 @@ void cpp_PredictMedianAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pS
 	}
 }
 
+void cpp_PredictLeftAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable)
+{
+	const BYTE *p = pSrcBegin;
+	BYTE *q = pDst;
+
+	// 最初のラインの最初のピクセルは 0x80 を予測しておく。
+	*q = *p - 0x80;
+	pCountTable[*q]++;
+	p++;
+	q++;
+
+	// 残りのピクセルが predict left の本番
+	for (; p < pSrcEnd; p++, q++)
+	{
+		*q = *p - *(p-1);
+		pCountTable[*q]++;
+	}
+}
+
 void cpp_RestoreMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
 {
 	const BYTE *p = pSrcBegin;
