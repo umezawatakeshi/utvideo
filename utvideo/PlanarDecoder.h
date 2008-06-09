@@ -53,16 +53,16 @@ protected:
 	DWORD m_dwDivideCount;
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
-	DWORD m_dwPlaneSize[3];
-	DWORD m_dwPlaneStride[3];
+	DWORD m_dwPlaneSize[4];
+	DWORD m_dwPlaneStride[4];
 
 	CThreadManager *m_ptm;
 	CFrameBuffer *m_pCurFrame;
 	CFrameBuffer *m_pRestoredFrame;
 	CFrameBuffer *m_pDecodedFrame;
 	FRAMEINFO m_fi;
-	HUFFMAN_DECODE_TABLE m_hdt[3];
-	const BYTE *m_pCodeLengthTable[3];
+	HUFFMAN_DECODE_TABLE m_hdt[4];
+	const BYTE *m_pCodeLengthTable[4];
 	const ICDECOMPRESS *m_icd;
 
 public:
@@ -89,6 +89,7 @@ protected:
 	virtual WORD GetInputBitCount(void) = 0;
 	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) = 0;
 	virtual int GetNumSupportedOutputFormats(void) = 0;
+	virtual int GetNumPlanes(void) = 0;
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn) = 0;
 	virtual void ConvertFromPlanar(DWORD nBandIndex) = 0;
 

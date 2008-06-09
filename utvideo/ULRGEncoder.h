@@ -62,6 +62,7 @@ protected:
 	virtual WORD GetOutputBitCount(void) { return 24; }
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; };
 	virtual int GetNumSupportedInputFormats(void);
+	virtual int GetNumPlanes(void) { return 3; }
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn);
 	virtual void ConvertToPlanar(DWORD nBandIndex);
 };

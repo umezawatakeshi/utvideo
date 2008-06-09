@@ -54,8 +54,8 @@ protected:
 	DWORD m_dwDivideCount;
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
-	DWORD m_dwPlaneSize[3];
-	DWORD m_dwPlaneStride[3];
+	DWORD m_dwPlaneSize[4];
+	DWORD m_dwPlaneStride[4];
 
 	CThreadManager *m_ptm;
 	const ICCOMPRESS *m_icc;
@@ -63,10 +63,10 @@ protected:
 	CFrameBuffer *m_pMedianPredicted;
 	struct COUNTS
 	{
-		DWORD dwCount[4][256]; // 3 Ç≈ÇÕÇ»Ç≠ 4 Ç»ÇÃÇÕÉAÉâÉCÉÅÉìÉgÇÃìsçá
+		DWORD dwCount[4][256];
 	} *m_counts;
-	BYTE *m_pCodeLengthTable[3];
-	HUFFMAN_ENCODE_TABLE m_het[3];
+	BYTE *m_pCodeLengthTable[4];
+	HUFFMAN_ENCODE_TABLE m_het[4];
 
 public:
 	struct INPUTFORMAT
@@ -98,6 +98,7 @@ protected:
 	virtual WORD GetOutputBitCount(void) = 0;
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) = 0;
 	virtual int GetNumSupportedInputFormats(void) = 0;
+	virtual int GetNumPlanes(void) = 0;
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn) = 0;
 	virtual void ConvertToPlanar(DWORD nBandIndex) = 0;
 

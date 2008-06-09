@@ -62,7 +62,7 @@ DWORD CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	memcpy(&m_fi, ((BYTE *)icd->lpInput) + pbieIn->bih.biSizeImage - pbieIn->dwFrameInfoSize, pbieIn->dwFrameInfoSize);
 
 	p = (BYTE *)icd->lpInput;
-	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		m_pCodeLengthTable[nPlaneIndex] = p;
 		GenerateHuffmanDecodeTable(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
@@ -206,7 +206,7 @@ void CPlanarDecoder::DecodeProc(DWORD nBandIndex)
 	DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
 	DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
 
-	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
 		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];

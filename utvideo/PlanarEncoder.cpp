@@ -168,7 +168,7 @@ DWORD CPlanarEncoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
 
 	p = (BYTE *)icc->lpOutput;
 
-	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		DWORD dwCurrentOffset;
 		for (int i = 0; i < 256; i++)
@@ -341,7 +341,7 @@ void CPlanarEncoder::PredictProc(DWORD nBandIndex)
 
 	ConvertToPlanar(nBandIndex);
 
-	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
 		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];
@@ -367,7 +367,7 @@ void CPlanarEncoder::EncodeProc(DWORD nBandIndex)
 {
 	DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
 	DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
-	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
 		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];
