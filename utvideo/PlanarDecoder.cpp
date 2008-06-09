@@ -127,13 +127,12 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	CalcPlaneSizes(pbihOut);
 
 	m_pRestoredFrame = new CFrameBuffer();
-	m_pRestoredFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	m_pRestoredFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	m_pRestoredFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
+	for (int i = 0; i < GetNumPlanes(); i++)
+		m_pRestoredFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
+
 	m_pDecodedFrame = new CFrameBuffer();
-	m_pDecodedFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	m_pDecodedFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	m_pDecodedFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
+	for (int i = 0; i < GetNumPlanes(); i++)
+		m_pDecodedFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
 
 	m_ptm = new CThreadManager();
 

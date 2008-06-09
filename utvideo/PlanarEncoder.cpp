@@ -254,14 +254,12 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	CalcPlaneSizes(pbihIn);
 
 	m_pCurFrame = new CFrameBuffer();
-	m_pCurFrame->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	m_pCurFrame->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	m_pCurFrame->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
+	for (int i = 0; i < GetNumPlanes(); i++)
+		m_pCurFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
 
 	m_pMedianPredicted = new CFrameBuffer();
-	m_pMedianPredicted->AddPlane(m_dwPlaneSize[0], m_dwPlaneStride[0]);
-	m_pMedianPredicted->AddPlane(m_dwPlaneSize[1], m_dwPlaneStride[1]);
-	m_pMedianPredicted->AddPlane(m_dwPlaneSize[2], m_dwPlaneStride[2]);
+	for (int i = 0; i < GetNumPlanes(); i++)
+		m_pMedianPredicted->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
 
 	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
