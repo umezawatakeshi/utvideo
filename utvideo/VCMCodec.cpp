@@ -45,11 +45,14 @@
 #include "ULY2Decoder.h"
 #include "ULRGEncoder.h"
 #include "ULRGDecoder.h"
+#include "ULRAEncoder.h"
+#include "ULRADecoder.h"
 
 const CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
 	{ -1,          "",       CDummyEncoder::CreateInstance, CDummyDecoder::CreateInstance },
 	{ FCC('ULY2'), "YUV422", CULY2Encoder::CreateInstance,  CULY2Decoder::CreateInstance  },
 	{ FCC('ULRG'), "RGB",    CULRGEncoder::CreateInstance,  CULRGDecoder::CreateInstance  },
+	{ FCC('ULRA'), "RGBA",   CULRAEncoder::CreateInstance,  CULRADecoder::CreateInstance  },
 };
 
 void CVCMCodec::ICInstallAll(void)

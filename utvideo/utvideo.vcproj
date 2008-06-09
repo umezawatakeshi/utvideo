@@ -309,6 +309,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ULRADecoder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ULRAEncoder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ULRGDecoder.cpp"
 				>
 			</File>
@@ -388,6 +396,14 @@
 			</File>
 			<File
 				RelativePath=".\TunedFunc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ULRADecoder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ULRAEncoder.h"
 				>
 			</File>
 			<File
