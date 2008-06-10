@@ -54,7 +54,7 @@
 	(BYTE)(fcc >> 16), \
 	(BYTE)(fcc >> 24)
 
-#define UTVIDEO_ENCODER_VERSION 0x03080000 /* 3.8.0 */
+#define UTVIDEO_ENCODER_VERSION 0x04000000 /* 4.0.0 */
 
 extern HINSTANCE hModule;
 
