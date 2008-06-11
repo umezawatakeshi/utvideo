@@ -106,9 +106,11 @@ label3:
 _i686_HuffmanEncode_align1	endp
 
 
-; void i686_HuffmanDecode_align1(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
-public	_i686_HuffmanDecode_align1
-_i686_HuffmanDecode_align1	proc
+HUFFMAN_DECODE	macro	procname, accum
+
+; void procname(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
+public	&procname
+&procname	proc
 
 	push		ebx
 	push		esi
@@ -120,70 +122,9 @@ _i686_HuffmanDecode_align1	proc
 	mov			ebx, dword ptr [esp + 16 + 4 + 12]	; pDecodeTable
 	mov			edx, dword ptr [esi+4]
 	mov			ch, -32
-
-	cmp			byte ptr [ebx + 32+4*32+1], 0	; pDecodeTable->SymbolAndCodeLength[0].nCodeLength
-	jne			label1
-
-	; msmset(pDstBegin, pDecodeTable->dwSymbol[0], pDstEnd-pDstBegin);
-	mov			eax, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
-	sub			eax, edi
-	push		eax
-	mov			eax, dword ptr [ebx + 32+4*32]		; pDecodeTable->SymbolAndCodeLength[0].bySymbol
-	push		eax
-	push		edi
-	call		_memset
-	add			esp, 4*3
-
-	jmp			label2
-
-	align		64
-label1:
-	cmp			edi, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
-	jae			label2
-	mov			eax, dword ptr [esi]
-	mov			cl, ch
-	shld		eax, edx, cl
-	or			eax, 1
-	bsr			ebp, eax
-	mov			cl, byte ptr [ebx + ebp]					; pDecodeTable->nCodeShift[ebp]
-	shr			eax, cl
-	mov			ebp, dword ptr [ebx + 32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
-	add			ebp, eax
-	mov			eax, dword ptr [ebx + 32+4*32 + ebp*4]		; pDecodeTable->SymbolAndCodeLength[ebp]
-	mov			byte ptr [edi], al
-	inc			edi
-	add			ch, ah
-	jnc			label1
-	sub			ch, 32
-	add			esi, 4
-	mov			edx, dword ptr [esi+4]
-	jmp			label1
-
-label2:
-	pop			ebp
-	pop			edi
-	pop			esi
-	pop			ebx
-	ret
-
-_i686_HuffmanDecode_align1	endp
-
-
-; void i686_HuffmanDecodeAndAccum_align1(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
-public	_i686_HuffmanDecodeAndAccum_align1
-_i686_HuffmanDecodeAndAccum_align1	proc
-
-	push		ebx
-	push		esi
-	push		edi
-	push		ebp
-
-	mov			esi, dword ptr [esp + 16 + 4 +  8]	; pSrcBegin
-	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDstBegin
-	mov			ebx, dword ptr [esp + 16 + 4 + 12]	; pDecodeTable
-	mov			edx, dword ptr [esi+4]
-	mov			ch, -32
+if &accum
 	mov			byte ptr [esp - 4], 80h
+endif
 
 	cmp			byte ptr [ebx + 32+4*32+1], 0	; pDecodeTable->SymbolAndCodeLength[0].nCodeLength
 	jne			label1
@@ -193,8 +134,10 @@ _i686_HuffmanDecodeAndAccum_align1	proc
 	sub			eax, edi
 	push		eax
 	mov			eax, dword ptr [ebx + 32+4*32]		; pDecodeTable->SymbolAndCodeLength[0].bySymbol
+if &accum
 	add			eax, 80h
 	movzx		eax, al
+endif
 	push		eax
 	push		edi
 	call		_memset
@@ -216,8 +159,10 @@ label1:
 	mov			ebp, dword ptr [ebx + 32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
 	add			ebp, eax
 	mov			eax, dword ptr [ebx + 32+4*32 + ebp*4]		; pDecodeTable->SymbolAndCodeLength[ebp]
+if &accum
 	add			al, byte ptr [esp - 4]
 	mov			byte ptr [esp - 4], al
+endif
 	mov			byte ptr [edi], al
 	inc			edi
 	add			ch, ah
@@ -234,7 +179,12 @@ label2:
 	pop			ebx
 	ret
 
-_i686_HuffmanDecodeAndAccum_align1	endp
+&procname	endp
+
+		endm
+
+HUFFMAN_DECODE	_i686_HuffmanDecode_align1, 0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccum_align1, 1
 
 
 end
