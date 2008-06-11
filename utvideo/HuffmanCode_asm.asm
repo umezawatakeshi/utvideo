@@ -183,9 +183,10 @@ _i686_HuffmanDecodeAndAccum_align1	proc
 	mov			ebx, dword ptr [esp + 16 + 4 + 12]	; pDecodeTable
 	mov			edx, dword ptr [esi+4]
 	mov			ch, -32
+	mov			byte ptr [esp - 4], 80h
 
 	cmp			byte ptr [ebx + 32+4*32+1], 0	; pDecodeTable->SymbolAndCodeLength[0].nCodeLength
-	jne			label0
+	jne			label1
 
 	; msmset(pDstBegin, pDecodeTable->dwSymbol[0], pDstEnd-pDstBegin);
 	mov			eax, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
@@ -201,22 +202,6 @@ _i686_HuffmanDecodeAndAccum_align1	proc
 
 	jmp			label2
 
-label0:
-	mov			eax, dword ptr [esi]
-	mov			cl, ch
-	shld		eax, edx, cl
-	or			eax, 1
-	bsr			ebp, eax
-	mov			cl, byte ptr [ebx + ebp]					; pDecodeTable->nCodeShift[ebp]
-	shr			eax, cl
-	mov			ebp, dword ptr [ebx + 32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
-	add			ebp, eax
-	mov			eax, dword ptr [ebx + 32+4*32 + ebp*4]		; pDecodeTable->SymbolAndCodeLength[ebp]
-	add			al, 80h
-	mov			byte ptr [edi], al
-	inc			edi
-	add			ch, ah
-
 	align		64
 label1:
 	cmp			edi, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
@@ -231,7 +216,8 @@ label1:
 	mov			ebp, dword ptr [ebx + 32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
 	add			ebp, eax
 	mov			eax, dword ptr [ebx + 32+4*32 + ebp*4]		; pDecodeTable->SymbolAndCodeLength[ebp]
-	add			al, byte ptr [edi-1]
+	add			al, byte ptr [esp - 4]
+	mov			byte ptr [esp - 4], al
 	mov			byte ptr [edi], al
 	inc			edi
 	add			ch, ah
