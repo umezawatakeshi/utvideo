@@ -695,7 +695,7 @@ label2:
 	mov			eax, edx
 	cmp			dl, cl
 	cmovae		edx, ecx	; dl = min(dl,cl)
-	cmovb		eax, ecx	; al = max(dl,cl) ; ebx の上位 16bit は保護する必要があるので、ここは cmovb ebx, ecx ではいけない。また、cmov は 8bit オペランドをサポートしないので、そもそも cmovb bl, cl とは書けない。
+	cmovb		eax, ecx	; al = max(dl,cl)
 
 	cmp			dl, bl
 	cmovb		edx, ebx	; dl = max(dl,bl)
