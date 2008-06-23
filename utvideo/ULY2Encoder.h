@@ -60,6 +60,7 @@ protected:
 	virtual DWORD GetOutputFCC(void) { return FCC('ULY2'); }
 	virtual const char *GetColorFormatName(void) { return "YUV422"; }
 	virtual WORD GetOutputBitCount(void) { return 16; }
+	virtual WORD GetMaxBitCount(void) { return 24; }
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; };
 	virtual int GetNumSupportedInputFormats(void);
 	virtual int GetNumPlanes(void) { return 3; }

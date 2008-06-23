@@ -60,6 +60,7 @@ protected:
 	virtual DWORD GetOutputFCC(void) { return FCC('ULRG'); }
 	virtual const char *GetColorFormatName(void) { return "RGB"; }
 	virtual WORD GetOutputBitCount(void) { return 24; }
+	virtual WORD GetMaxBitCount(void) { return 24; }
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; };
 	virtual int GetNumSupportedInputFormats(void);
 	virtual int GetNumPlanes(void) { return 3; }

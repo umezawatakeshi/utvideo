@@ -60,6 +60,7 @@ protected:
 	virtual DWORD GetOutputFCC(void) { return FCC('ULRA'); }
 	virtual const char *GetColorFormatName(void) { return "RGBA"; }
 	virtual WORD GetOutputBitCount(void) { return 32; }
+	virtual WORD GetMaxBitCount(void) { return 32; }
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; };
 	virtual int GetNumSupportedInputFormats(void);
 	virtual int GetNumPlanes(void) { return 4; }

@@ -298,7 +298,7 @@ DWORD CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 	pbieOut->bih.biWidth         = pbihIn->biWidth;
 	pbieOut->bih.biHeight        = abs(pbihIn->biHeight);
 	pbieOut->bih.biPlanes        = 1;
-	pbieOut->bih.biBitCount      = pbihIn->biBitCount;
+	pbieOut->bih.biBitCount      = min(pbihIn->biBitCount, GetMaxBitCount());
 	pbieOut->bih.biCompression   = GetOutputFCC();
 	pbieOut->bih.biSizeImage     = pbihIn->biSizeImage;
 	//pbieOut->bih.biXPelsPerMeter
