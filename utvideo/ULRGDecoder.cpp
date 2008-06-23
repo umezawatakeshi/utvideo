@@ -131,7 +131,7 @@ void CULRGDecoder::ConvertFromPlanar(DWORD nBandIndex)
 					*(p+1) = *g;
 					*(p+0) = *b + *g - 0x80;
 					*(p+2) = *r + *g - 0x80;
-					*(p+3) = 0;
+					*(p+3) = 0xff;
 					g++; b++; r++;
 				}
 			}
