@@ -175,6 +175,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 	int base;
 	DWORD curcode;
 	int nextfillidx;
+	int lastfillidx;
 	int prevbsrval;
 
 	for (int i = 0; i < 256; i++)
@@ -216,11 +217,11 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 			pDecodeTable->nCodeShift[j] = 32 - cls[i].codelen;
 			pDecodeTable->dwSymbolBase[j] = base;
 		}
-		for (int k = 0; k < (1 << (32 - pDecodeTable->nCodeShift[bsrval] - cls[i].codelen)); k++)
+		lastfillidx = nextfillidx + (1 << (32 - pDecodeTable->nCodeShift[bsrval] - cls[i].codelen));
+		for (; nextfillidx < lastfillidx; nextfillidx++)
 		{
 			pDecodeTable->SymbolAndCodeLength[nextfillidx].bySymbol    = (BYTE)cls[i].symbol;
 			pDecodeTable->SymbolAndCodeLength[nextfillidx].nCodeLength = cls[i].codelen;
-			nextfillidx++;
 		}
 		curcode += 0x80000000 >> (cls[i].codelen - 1);
 		prevbsrval = bsrval;
