@@ -114,16 +114,14 @@ void GenerateHuffmanCodeLengthTable(BYTE *pCodeLengthTable, const DWORD *pCountT
 
 struct CODE_LENGTH_SORT
 {
-	DWORD symbol;
+	BYTE symbol;
 	BYTE codelen;
 };
 
-inline bool codelengthsort_lt(struct CODE_LENGTH_SORT &a, struct CODE_LENGTH_SORT &b)
+inline void sort_codelength(struct CODE_LENGTH_SORT *p)
 {
-	if (a.codelen != b.codelen)
-		return a.codelen < b.codelen;
-	else
-		return a.symbol < b.symbol;
+	_ASSERT(sizeof(CODE_LENGTH_SORT) == sizeof(WORD));
+	sort((WORD *)p, (WORD *)p+256);
 }
 
 void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *pCodeLengthTable)
@@ -137,7 +135,7 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *
 		cls[i].codelen = pCodeLengthTable[i];
 	}
 
-	sort(cls, cls+256, codelengthsort_lt);
+	sort_codelength(cls);
 
 	if (cls[0].codelen == 0)
 	{
@@ -184,12 +182,12 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 		cls[i].codelen = pCodeLengthTable[i];
 	}
 
-	sort(cls, cls+256, codelengthsort_lt);
+	sort_codelength(cls);
 
 	if (cls[0].codelen == 0)
 	{
 		memset(pDecodeTable, 0, sizeof(HUFFMAN_DECODE_TABLE));
-		pDecodeTable->SymbolAndCodeLength[0].bySymbol = (BYTE)cls[0].symbol;
+		pDecodeTable->SymbolAndCodeLength[0].bySymbol = cls[0].symbol;
 		return;
 	}
 
@@ -220,7 +218,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 		lastfillidx = nextfillidx + (1 << (32 - pDecodeTable->nCodeShift[bsrval] - cls[i].codelen));
 		for (; nextfillidx < lastfillidx; nextfillidx++)
 		{
-			pDecodeTable->SymbolAndCodeLength[nextfillidx].bySymbol    = (BYTE)cls[i].symbol;
+			pDecodeTable->SymbolAndCodeLength[nextfillidx].bySymbol    = cls[i].symbol;
 			pDecodeTable->SymbolAndCodeLength[nextfillidx].nCodeLength = cls[i].codelen;
 		}
 		curcode += 0x80000000 >> (cls[i].codelen - 1);
