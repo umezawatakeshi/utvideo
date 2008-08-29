@@ -226,10 +226,25 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 	}
 }
 
+inline void EncodeSymbol(BYTE bySymbol, const HUFFMAN_ENCODE_TABLE *pEncodeTable, DWORD *&pDst, DWORD &dwTmpEncoded, int &nBits)
+{
+	int nCurBits = pEncodeTable->dwTableMux[bySymbol] & 0xff;
+	DWORD dwCurEncoded = pEncodeTable->dwTableMux[bySymbol] & 0xffffff00;
+
+	dwTmpEncoded |= dwCurEncoded >> nBits;
+	nBits += nCurBits;
+	if (nBits >= 32)
+	{
+		*pDst++ = dwTmpEncoded;
+		nBits -= 32;
+		dwTmpEncoded = dwCurEncoded << (nCurBits - nBits);
+	}
+}
+
 DWORD cpp_HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable)
 {
 	int nBits;
-	DWORD dwEncoded;
+	DWORD dwTmpEncoded;
 	DWORD *pDst;
 	const BYTE *p;
 
@@ -237,27 +252,45 @@ DWORD cpp_HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrc
 		return 0;
 
 	nBits = 0;
-	dwEncoded = 0;
+	dwTmpEncoded = 0;
 	pDst = (DWORD *)pDstBegin;
 
 	for (p = pSrcBegin; p < pSrcEnd; p++)
-	{
-		int nCurBits = pEncodeTable->dwTableMux[*p] & 0xff;
-		DWORD dwCurEncoded = pEncodeTable->dwTableMux[*p] & 0xffffff00;
+		EncodeSymbol(*p, pEncodeTable, pDst, dwTmpEncoded, nBits);
 
-		dwEncoded |= dwCurEncoded >> nBits;
-		nBits += nCurBits;
-		if (nBits >= 32)
-		{
-			*pDst++ = dwEncoded;
-			nBits -= 32;
-			dwEncoded = dwCurEncoded << (nCurBits - nBits);
-		}
-	}
 	if (nBits != 0)
-		*pDst++ = dwEncoded;
+		*pDst++ = dwTmpEncoded;
 
 	return ((BYTE *)pDst) - pDstBegin;
+}
+
+inline void DecodeSymbol(DWORD *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, BYTE &byPrevSymbol, BYTE *pDst)
+{
+	DWORD code;
+
+	if (nBits == 0)
+		code = (*pSrc) | 0x00000001;
+	else
+		code = ((*pSrc) << nBits) | ((*(pSrc+1)) >> (32 - nBits)) | 0x00000001;
+	int bsrval = bsr(code);
+	int codeshift = pDecodeTable->nCodeShift[bsrval];
+	code >>= codeshift;
+	BYTE symbol = pDecodeTable->SymbolAndCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code].bySymbol;
+	if (bAccum)
+	{
+		byPrevSymbol += symbol;
+		*pDst = byPrevSymbol;
+	}
+	else
+		*pDst = symbol;
+
+	int codelen = pDecodeTable->SymbolAndCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code].nCodeLength;
+	nBits += codelen;
+	if (nBits >= 32)
+	{
+		nBits -= 32;
+		pSrc++;
+	}
 }
 
 static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum)
@@ -265,7 +298,6 @@ static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE 
 	int nBits;
 	DWORD *pSrc;
 	BYTE *p;
-	DWORD code;
 	BYTE prevsym;
 
 	if (pDecodeTable->SymbolAndCodeLength[0].nCodeLength == 0)
@@ -282,31 +314,7 @@ static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE 
 	prevsym = 0x80;
 
 	for (p = pDstBegin; p < pDstEnd; p++)
-	{
-		if (nBits == 0)
-			code = (*pSrc) | 0x00000001;
-		else
-			code = ((*pSrc) << nBits) | ((*(pSrc+1)) >> (32 - nBits)) | 0x00000001;
-		int bsrval = bsr(code);
-		int codeshift = pDecodeTable->nCodeShift[bsrval];
-		code >>= codeshift;
-		BYTE symbol = pDecodeTable->SymbolAndCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code].bySymbol;
-		if (bAccum)
-		{
-			prevsym += symbol;
-			*p = prevsym;
-		}
-		else
-			*p = symbol;
-
-		int codelen = pDecodeTable->SymbolAndCodeLength[pDecodeTable->dwSymbolBase[bsrval] + code].nCodeLength;
-		nBits += codelen;
-		if (nBits >= 32)
-		{
-			nBits -= 32;
-			pSrc++;
-		}
-	}
+		DecodeSymbol(pSrc, nBits, pDecodeTable, bAccum, prevsym, p);
 }
 
 void cpp_HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
