@@ -187,7 +187,10 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 	if (cls[0].codelen == 0)
 	{
 		memset(pDecodeTable, 0, sizeof(HUFFMAN_DECODE_TABLE));
-		pDecodeTable->SymbolAndCodeLength[0].bySymbol = cls[0].symbol;
+		for (int i = 0; i < _countof(pDecodeTable->nCodeShift); i++)
+			pDecodeTable->nCodeShift[i] = 31;
+		for (int i = 0; i < _countof(pDecodeTable->SymbolAndCodeLength); i++)
+			pDecodeTable->SymbolAndCodeLength[i].bySymbol = cls[0].symbol;
 		return;
 	}
 
