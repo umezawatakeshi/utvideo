@@ -61,6 +61,7 @@ struct HUFFMAN_DECODE_TABLE
 void GenerateHuffmanCodeLengthTable(BYTE *pCodeLengthTable, const DWORD *pCountTable);
 void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *pCodeLengthTable);
 void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *pCodeLengthTable);
+
 //DWORD HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
 #define HuffmanEncode tfn.pfnHuffmanEncode_align1
 //void HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
@@ -85,6 +86,15 @@ DWORD cpp_HuffmanEncodeFirstRawWithDiffUYUV(BYTE *pDstBegin, const BYTE *pSrcBeg
 DWORD cpp_HuffmanEncodeFirstRawWithDiffYVYU(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
 DWORD cpp_HuffmanEncodeFirstRawWithDiffVYUY(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
 
+#define HuffmanEncodeFirstRawYUY2 cpp_HuffmanEncodeFirstRawYUY2
+#define HuffmanEncodeFirstRawUYVY cpp_HuffmanEncodeFirstRawUYVY
+#define HuffmanEncodeFirstRawYVYU cpp_HuffmanEncodeFirstRawYVYU
+#define HuffmanEncodeFirstRawVYUY cpp_HuffmanEncodeFirstRawVYUY
+#define HuffmanEncodeFirstRawWithDiffYUY2 cpp_HuffmanEncodeFirstRawWithDiffYUY2
+#define HuffmanEncodeFirstRawWithDiffUYVY cpp_HuffmanEncodeFirstRawWithDiffUYVY
+#define HuffmanEncodeFirstRawWithDiffYVYU cpp_HuffmanEncodeFirstRawWithDiffYVYU
+#define HuffmanEncodeFirstRawWithDiffVYUY cpp_HuffmanEncodeFirstRawWithDiffVYUY
+
 void cpp_HuffmanDecodeFirstRawYUY2(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
 void cpp_HuffmanDecodeFirstRawUYVY(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
 void cpp_HuffmanDecodeFirstRawYVYU(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
@@ -93,3 +103,12 @@ void cpp_HuffmanDecodeFirstRawWithAccumYUY2(BYTE *pDstBegin, BYTE *pDstEnd, cons
 void cpp_HuffmanDecodeFirstRawWithAccumUYVY(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
 void cpp_HuffmanDecodeFirstRawWithAccumYVYU(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
 void cpp_HuffmanDecodeFirstRawWithAccumVYUY(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
+
+#define HuffmanDecodeFirstRawYUY2 cpp_HuffmanDecodeFirstRawYUY2
+#define HuffmanDecodeFirstRawUYVY cpp_HuffmanDecodeFirstRawUYVY
+#define HuffmanDecodeFirstRawYVYU cpp_HuffmanDecodeFirstRawYVYU
+#define HuffmanDecodeFirstRawVYUY cpp_HuffmanDecodeFirstRawVYUY
+#define HuffmanDecodeFirstRawWithAccumYUY2 cpp_HuffmanDecodeFirstRawWithAccumYUY2
+#define HuffmanDecodeFirstRawWithAccumUYVY cpp_HuffmanDecodeFirstRawWithAccumUYVY
+#define HuffmanDecodeFirstRawWithAccumYVYU cpp_HuffmanDecodeFirstRawWithAccumYVYU
+#define HuffmanDecodeFirstRawWithAccumVYUY cpp_HuffmanDecodeFirstRawWithAccumVYUY
