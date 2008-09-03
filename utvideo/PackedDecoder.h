@@ -52,24 +52,29 @@ protected:
 	DWORD m_dwNumStrides;
 	DWORD m_dwDivideCount;
 	DWORD m_dwFrameSize;
-	DWORD m_dwFrameStride;
-	DWORD m_dwPlaneSize[4];
-	DWORD m_dwPlaneStride[4];
+	DWORD m_dwStrideSize;
+	//DWORD m_dwPlaneSize[4];
+	//DWORD m_dwPlaneStride[4];
 
 	CThreadManager *m_ptm;
-	CFrameBuffer *m_pCurFrame;
-	CFrameBuffer *m_pRestoredFrame;
-	CFrameBuffer *m_pDecodedFrame;
+	//CFrameBuffer *m_pCurFrame;
+	//CFrameBuffer *m_pRestoredFrame;
+	//CFrameBuffer *m_pDecodedFrame;
 	FRAMEINFO m_fi;
 	HUFFMAN_DECODE_TABLE m_hdt[4];
-	const BYTE *m_pCodeLengthTable[4];
+	//const BYTE *m_pCodeLengthTable[4];
 	const ICDECOMPRESS *m_icd;
+	const BYTE *m_pEncodedDataBase;
+	const DWORD *m_pdwTailOffsetTable;
+	void (*m_pfnHuffmanDecodeFirstRawWithAccum)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
 
 public:
 	struct OUTPUTFORMAT
 	{
 		DWORD fcc;
 		WORD nBitCount;
+		WORD nEffectiveBitCount;
+		BOOL bPositiveHeightAllowed;
 		BOOL bNegativeHeightAllowed;
 	};
 
@@ -84,31 +89,33 @@ public:
 	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	virtual DWORD DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
+
+	const OUTPUTFORMAT *LookupOutputFormat(const BITMAPINFOHEADER *pbihOut);
+
 protected:
 	virtual DWORD GetInputFCC(void) = 0;
 	virtual WORD GetInputBitCount(void) = 0;
 	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) = 0;
 	virtual int GetNumSupportedOutputFormats(void) = 0;
-	virtual int GetNumPlanes(void) = 0;
-	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn) = 0;
-	virtual void ConvertFromPlanar(DWORD nBandIndex) = 0;
+	virtual int GetNumChannels(void) = 0;
+	virtual void SetDecompressionProperty(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 
 private:
-	void DecodeProc(DWORD nBandIndex);
+	void DecodeProc(DWORD nStripIndex);
 	class CDecodeJob : public CThreadJob
 	{
 	private:
-		DWORD m_nBandIndex;
+		DWORD m_nStripIndex;
 		CPackedDecoder *m_pDecoder;
 	public:
-		CDecodeJob(CPackedDecoder *pDecoder, DWORD nBandIndex)
+		CDecodeJob(CPackedDecoder *pDecoder, DWORD nStripIndex)
 		{
-			m_nBandIndex = nBandIndex;
+			m_nStripIndex = nStripIndex;
 			m_pDecoder = pDecoder;
 		}
 		void JobProc(CThreadManager *)
 		{
-			m_pDecoder->DecodeProc(m_nBandIndex);
+			m_pDecoder->DecodeProc(m_nStripIndex);
 		}
 	};
 };

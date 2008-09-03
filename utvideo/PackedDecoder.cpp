@@ -62,16 +62,17 @@ DWORD CPackedDecoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 	memcpy(&m_fi, ((BYTE *)icd->lpInput) + pbieIn->bih.biSizeImage - pbieIn->dwFrameInfoSize, pbieIn->dwFrameInfoSize);
 
 	p = (BYTE *)icd->lpInput;
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	for (int i = 0; i < 3; i++)
 	{
-		m_pCodeLengthTable[nPlaneIndex] = p;
-		GenerateHuffmanDecodeTable(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
-		p += 256 + sizeof(DWORD) * m_dwDivideCount;
-		p += ((const DWORD *)p)[-1];
+		GenerateHuffmanDecodeTable(&m_hdt[i], p);
+		p += 256;
 	}
+	m_pdwTailOffsetTable = (const DWORD *)p;
+	p += sizeof(DWORD) * m_dwDivideCount;
+	m_pEncodedDataBase = p;
 
-	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-		m_ptm->SubmitJob(new CDecodeJob(this, nBandIndex), nBandIndex);
+	for (DWORD nStripIndex = 0; nStripIndex < m_dwDivideCount; nStripIndex++)
+		m_ptm->SubmitJob(new CDecodeJob(this, nStripIndex), nStripIndex);
 	m_ptm->WaitForJobCompletion();
 
 	icd->lpbiOutput->biSizeImage = m_dwFrameSize;
@@ -101,10 +102,10 @@ DWORD CPackedDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 		switch (pbihOut->biBitCount)
 		{
 		case 24:
-			m_dwFrameStride = ROUNDUP(pbihOut->biWidth * 3, 4);
+			m_dwStrideSize = ROUNDUP(pbihOut->biWidth * 3, 4);
 			break;
 		case 32:
-			m_dwFrameStride = pbihOut->biWidth * 4;
+			m_dwStrideSize = pbihOut->biWidth * 4;
 			break;
 		}
 		if (pbihIn->biHeight > 0)
@@ -117,33 +118,22 @@ DWORD CPackedDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	case FCC('UYNV'):
 	case FCC('YVYU'):
 	case FCC('VYUY'):
-		m_dwFrameStride = ROUNDUP(pbihOut->biWidth, 2) * 2;
+		m_dwStrideSize = ROUNDUP(pbihOut->biWidth, 2) * 2;
 		break;
 	default:
 		return ICERR_BADFORMAT;
 	}
-	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
-
-	CalcPlaneSizes(pbihOut);
-
-	m_pRestoredFrame = new CFrameBuffer();
-	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pRestoredFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
-
-	m_pDecodedFrame = new CFrameBuffer();
-	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pDecodedFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
+	m_dwFrameSize = m_dwStrideSize * m_dwNumStrides;
 
 	m_ptm = new CThreadManager();
+
+	SetDecompressionProperty(pbihIn, pbihOut);
 
 	return ICERR_OK;
 }
 
 DWORD CPackedDecoder::DecompressEnd(void)
 {
-	delete m_pRestoredFrame;
-	delete m_pDecodedFrame;
-
 	delete m_ptm;
 
 	return ICERR_OK;
@@ -175,8 +165,6 @@ DWORD CPackedDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITM
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
 
-	const OUTPUTFORMAT *pfmts;
-
 	if (pbihIn->biCompression != GetInputFCC())
 		return ICERR_BADFORMAT;
 
@@ -190,48 +178,47 @@ DWORD CPackedDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITM
 	if (pbihOut == NULL)
 		return ICERR_OK;
 
-	pfmts = GetSupportedOutputFormats();
-	for (int i = 0; i < GetNumSupportedOutputFormats(); i++)
-	{
-		if (pbihOut->biCompression == pfmts[i].fcc && pbihOut->biBitCount == pfmts[i].nBitCount && (pfmts[i].bNegativeHeightAllowed || pbihOut->biHeight > 0) && abs(pbihOut->biHeight) == pbihIn->biHeight && pbihOut->biWidth == pbihIn->biWidth)
-			return ICERR_OK;
-	}
+	if (LookupOutputFormat(pbihOut) != NULL && abs(pbihOut->biHeight) == pbihIn->biHeight && pbihOut->biWidth == pbihIn->biWidth)
+		return ICERR_OK;
+	else
+		return ICERR_BADFORMAT;
 
 	return ICERR_BADFORMAT;
 }
 
-void CPackedDecoder::DecodeProc(DWORD nBandIndex)
+const CPackedDecoder::OUTPUTFORMAT *CPackedDecoder::LookupOutputFormat(const BITMAPINFOHEADER *pbihOut)
 {
-	DWORD dwStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
+	const OUTPUTFORMAT *pfmts;
 
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	pfmts = GetSupportedOutputFormats();
+	for (int i = 0; i < GetNumSupportedOutputFormats(); i++)
 	{
-		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
-		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];
-		DWORD dwDstOffset;
-		if (nBandIndex == 0)
-			dwDstOffset = 0;
-		else
-			dwDstOffset = ((const DWORD *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
-
-		if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) == FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
-			HuffmanDecodeAndAccum(m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, &m_hdt[nPlaneIndex]);
-		else
-			HuffmanDecode(m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, &m_hdt[nPlaneIndex]);
-
-		switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+		if (pbihOut->biCompression == pfmts[i].fcc && pbihOut->biBitCount == pfmts[i].nBitCount)
 		{
-		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
-		case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-			m_pCurFrame = m_pDecodedFrame;
-			break;
-		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex]);
-			m_pCurFrame = m_pRestoredFrame;
-			break;
+			if (pbihOut->biHeight > 0 && pfmts[i].bPositiveHeightAllowed)
+				return &pfmts[i];
+			if (pbihOut->biHeight < 0 && pfmts[i].bNegativeHeightAllowed)
+				return &pfmts[i];
 		}
 	}
 
-	ConvertFromPlanar(nBandIndex);
+	return NULL;
+}
+
+void CPackedDecoder::DecodeProc(DWORD nStripIndex)
+{
+	DWORD dwNumStrideBegin = m_dwNumStrides *  nStripIndex      / m_dwDivideCount;
+	DWORD dwNumStrideEnd   = m_dwNumStrides * (nStripIndex + 1) / m_dwDivideCount;
+	DWORD dwSrcOffset;
+
+	if (nStripIndex == 0)
+		dwSrcOffset = 0;
+	else
+		dwSrcOffset = m_pdwTailOffsetTable[nStripIndex - 1];
+
+	m_pfnHuffmanDecodeFirstRawWithAccum(
+		((BYTE *)m_icd->lpOutput) + m_dwStrideSize * dwNumStrideBegin,
+		((BYTE *)m_icd->lpOutput) + m_dwStrideSize * dwNumStrideEnd,
+		m_pEncodedDataBase + dwSrcOffset,
+		m_hdt);
 }

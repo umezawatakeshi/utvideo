@@ -57,11 +57,11 @@ public:
 	static CDecoder *CreateInstance(void);
 
 protected:
-	virtual DWORD GetInputFCC(void) { return FCC('ULY2'); }
+	virtual DWORD GetInputFCC(void) { return FCC('UAY2'); }
 	virtual WORD GetInputBitCount(void) { return 16; }
 	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) { return m_outfmts; };
 	virtual int GetNumSupportedOutputFormats(void);
-	virtual int GetNumPlanes(void) { return 3; }
-	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut);
-	virtual void ConvertFromPlanar(DWORD nBandIndex);
+	virtual int GetNumChannels(void) { return 3; }
+	virtual void SetDecompressionProperty(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+
 };

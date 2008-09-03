@@ -45,12 +45,10 @@
 #include "Convert.h"
 
 const CPackedDecoder::OUTPUTFORMAT CUAY2Decoder::m_outfmts[] = {
-	{ FCC('YUY2'), 16, TRUE }, { FCC('YUYV'), 16, TRUE }, { FCC('YUNV'), 16, TRUE },
-	{ FCC('UYVY'), 16, TRUE }, { FCC('UYNV'), 16, TRUE },
-	{ FCC('YVYU'), 16, TRUE },
-	{ FCC('VYUY'), 16, TRUE },
-	{ BI_RGB, 32, FALSE },
-	{ BI_RGB, 24, FALSE },
+	{ FCC('YUY2'), 16, 16, TRUE, TRUE }, { FCC('YUYV'), 16, 16, TRUE, TRUE }, { FCC('YUNV'), 16, 16, TRUE, TRUE },
+	{ FCC('UYVY'), 16, 16, TRUE, TRUE }, { FCC('UYNV'), 16, 16, TRUE, TRUE },
+	{ FCC('YVYU'), 16, 16, TRUE, TRUE },
+	{ FCC('VYUY'), 16, 16, TRUE, TRUE },
 };
 
 CUAY2Decoder::CUAY2Decoder(void)
@@ -71,95 +69,29 @@ CDecoder *CUAY2Decoder::CreateInstance(void)
 	return new CUAY2Decoder();
 }
 
-void CUAY2Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut)
+void CUAY2Decoder::SetDecompressionProperty(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
-	m_dwPlaneStride[0] = ROUNDUP(pbihOut->biWidth, 2);
-	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * m_dwNumStrides;
+	m_dwStrideSize = pbihIn->biWidth*2;
+	m_dwNumStrides = abs(pbihIn->biHeight);
 
-	m_dwPlaneStride[1] = ROUNDUP(pbihOut->biWidth, 2) / 2;
-	m_dwPlaneSize[1]   = m_dwPlaneStride[1] * m_dwNumStrides;
-
-	m_dwPlaneStride[2] = m_dwPlaneStride[1];
-	m_dwPlaneSize[2]   = m_dwPlaneSize[1];
-}
-
-void CUAY2Decoder::ConvertFromPlanar(DWORD nBandIndex)
-{
-	DWORD dwPlaneStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwPlaneStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
-	DWORD dwFrameStrideBegin, dwFrameStrideEnd;
-
-	const BYTE *y, *u, *v;
-	BYTE *pDstBegin, *pDstEnd, *p;
-
-	if (!m_bBottomUpFrame)
-	{
-		dwFrameStrideBegin = dwPlaneStrideBegin;
-		dwFrameStrideEnd   = dwPlaneStrideEnd;
-	}
-	else
-	{
-		dwFrameStrideBegin = m_dwNumStrides - dwPlaneStrideEnd;
-		dwFrameStrideEnd   = m_dwNumStrides - dwPlaneStrideBegin;
-	}
-
-	pDstBegin = ((BYTE *)m_icd->lpOutput) + dwFrameStrideBegin * m_dwFrameStride;
-	pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwFrameStrideEnd   * m_dwFrameStride;
-	y = m_pCurFrame->GetPlane(0) + dwPlaneStrideBegin * m_dwPlaneStride[0];
-	u = m_pCurFrame->GetPlane(1) + dwPlaneStrideBegin * m_dwPlaneStride[1];
-	v = m_pCurFrame->GetPlane(2) + dwPlaneStrideBegin * m_dwPlaneStride[2];
-
-	switch (m_icd->lpbiOutput->biCompression)
+	switch(pbihOut->biCompression)
 	{
 	case FCC('YUY2'):
 	case FCC('YUYV'):
 	case FCC('YUNV'):
-		for (p = pDstBegin; p < pDstEnd; p += 4)
-		{
-			*p     = *y++;
-			*(p+1) = *u++;
-			*(p+2) = *y++;
-			*(p+3) = *v++;
-		}
+		m_pfnHuffmanDecodeFirstRawWithAccum = HuffmanDecodeFirstRawWithAccumYUY2;
 		break;
 	case FCC('UYVY'):
 	case FCC('UYNV'):
-		for (p = pDstBegin; p < pDstEnd; p += 4)
-		{
-			*p     = *u++;
-			*(p+1) = *y++;
-			*(p+2) = *v++;
-			*(p+3) = *y++;
-		}
+		m_pfnHuffmanDecodeFirstRawWithAccum = HuffmanDecodeFirstRawWithAccumUYVY;
 		break;
 	case FCC('YVYU'):
-		for (p = pDstBegin; p < pDstEnd; p += 4)
-		{
-			*p     = *y++;
-			*(p+1) = *v++;
-			*(p+2) = *y++;
-			*(p+3) = *u++;
-		}
+		m_pfnHuffmanDecodeFirstRawWithAccum = HuffmanDecodeFirstRawWithAccumYVYU;
 		break;
 	case FCC('VYUY'):
-		for (p = pDstBegin; p < pDstEnd; p += 4)
-		{
-			*p     = *v++;
-			*(p+1) = *y++;
-			*(p+2) = *u++;
-			*(p+3) = *y++;
-		}
+		m_pfnHuffmanDecodeFirstRawWithAccum = HuffmanDecodeFirstRawWithAccumVYUY;
 		break;
-	case BI_RGB:
-		switch (m_icd->lpbiOutput->biBitCount)
-		{
-		case 24:
-			ConvertULY2ToBottomupRGB24(pDstBegin, pDstEnd, y, u, v, m_dwFrameStride, m_icd->lpbiOutput->biWidth * 3);
-			break;
-		case 32:
-			ConvertULY2ToBottomupRGB32(pDstBegin, pDstEnd, y, u, v, m_dwFrameStride, m_dwFrameStride);
-			break;
-		}
-		break;
+	default:
+		_ASSERT(false);
 	}
 }
