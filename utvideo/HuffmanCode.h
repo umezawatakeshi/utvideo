@@ -86,11 +86,14 @@ DWORD cpp_HuffmanEncodeFirstRawWithDiffUYVY(BYTE *pDstBegin, const BYTE *pSrcBeg
 DWORD cpp_HuffmanEncodeFirstRawWithDiffYVYU(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
 DWORD cpp_HuffmanEncodeFirstRawWithDiffVYUY(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
 
+extern "C" DWORD i686_HuffmanEncodeFirstRawWithDiffYUY2(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
+
 #define HuffmanEncodeFirstRawYUY2 cpp_HuffmanEncodeFirstRawYUY2
 #define HuffmanEncodeFirstRawUYVY cpp_HuffmanEncodeFirstRawUYVY
 #define HuffmanEncodeFirstRawYVYU cpp_HuffmanEncodeFirstRawYVYU
 #define HuffmanEncodeFirstRawVYUY cpp_HuffmanEncodeFirstRawVYUY
-#define HuffmanEncodeFirstRawWithDiffYUY2 cpp_HuffmanEncodeFirstRawWithDiffYUY2
+//#define HuffmanEncodeFirstRawWithDiffYUY2 cpp_HuffmanEncodeFirstRawWithDiffYUY2
+#define HuffmanEncodeFirstRawWithDiffYUY2 i686_HuffmanEncodeFirstRawWithDiffYUY2
 #define HuffmanEncodeFirstRawWithDiffUYVY cpp_HuffmanEncodeFirstRawWithDiffUYVY
 #define HuffmanEncodeFirstRawWithDiffYVYU cpp_HuffmanEncodeFirstRawWithDiffYVYU
 #define HuffmanEncodeFirstRawWithDiffVYUY cpp_HuffmanEncodeFirstRawWithDiffVYUY
