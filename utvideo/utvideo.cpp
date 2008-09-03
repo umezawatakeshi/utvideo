@@ -42,6 +42,7 @@
 #include "utvideo.h"
 #include "VCMCodec.h"
 #include "TunedFunc.h"
+#include "HuffmanTable.h"
 
 #ifdef _MANAGED
 #pragma managed(push, off)
@@ -55,6 +56,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 	{
 		::hModule = hModule;
 		InitializeTunedFunc();
+		InitializeStaticHuffmanTable();
 	}
 
 	return TRUE;
