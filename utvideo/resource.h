@@ -4,6 +4,8 @@
 //
 #define IDD_DIALOG1                     101
 #define IDD_CONFIG_DIALOG               101
+#define IDD_CONFIG_DIALOG2              102
+#define IDD_CONFIG_DIALOG3              103
 #define IDC_DIVIDE_COUNT_EDIT           1001
 #define IDC_CHECK1                      1002
 #define IDC_INTRAFRAME_PREDICT_MEDIAN_RADIO 1003

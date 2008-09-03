@@ -48,8 +48,7 @@
 CPackedEncoder::CPackedEncoder(void)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
-	//m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_QUICKMODE;
-	m_ec.dwFlags0 = EC_FLAGS0_QUICKMODE;
+	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_QUICKMODE;
 }
 
 CPackedEncoder::~CPackedEncoder(void)
@@ -58,7 +57,48 @@ CPackedEncoder::~CPackedEncoder(void)
 
 DWORD CPackedEncoder::Configure(HWND hwnd)
 {
+	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_CONFIG_DIALOG2), hwnd, DialogProc, (LPARAM)this);
 	return ICERR_OK;
+}
+
+int CALLBACK CPackedEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	CPackedEncoder *pThis = (CPackedEncoder *)GetWindowLong(hwnd, DWL_USER);
+	char buf[256];
+	int	n;
+
+	switch(uMsg)
+	{
+	case WM_INITDIALOG:
+		SetWindowLong(hwnd, DWL_USER, lParam);
+		pThis = (CPackedEncoder *)lParam;
+		wsprintf(buf, "Ut Video Codec %s (%c%c%c%c) VCM ‚ÌÝ’è", pThis->GetColorFormatName(), FCC4PRINTF(pThis->GetOutputFCC()));
+		SetWindowText(hwnd, buf);
+		wsprintf(buf, "%d", (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
+		SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
+		return TRUE;
+	case WM_COMMAND:
+		switch(LOWORD(wParam))
+		{
+		case IDOK:
+			GetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf, sizeof(buf));
+			n = atoi(buf);
+			if (n < 1 || n > 256)
+			{
+				MessageBox(hwnd, "1 <= DIVIDE_COUNT <= 256", "ERR", MB_ICONERROR);
+				return TRUE;
+			}
+			memset(&pThis->m_ec, 0, sizeof(ENCODERCONF));
+			pThis->m_ec.dwFlags0 |= (n - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
+			/* FALLTHROUGH */
+		case IDCANCEL:
+			EndDialog(hwnd, 0);
+			return TRUE;
+		}
+		break;
+	}
+
+	return FALSE;
 }
 
 DWORD CPackedEncoder::GetState(void *pState, DWORD dwSize)
