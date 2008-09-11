@@ -47,15 +47,12 @@
 #include "ULRGDecoder.h"
 #include "ULRAEncoder.h"
 #include "ULRADecoder.h"
-#include "UAY2Encoder.h"
-#include "UAY2Decoder.h"
 
 const CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
 	{ -1,          "",       CDummyEncoder::CreateInstance, CDummyDecoder::CreateInstance },
 	{ FCC('ULY2'), "YUV422", CULY2Encoder::CreateInstance,  CULY2Decoder::CreateInstance  },
 	{ FCC('ULRG'), "RGB",    CULRGEncoder::CreateInstance,  CULRGDecoder::CreateInstance  },
 	{ FCC('ULRA'), "RGBA",   CULRAEncoder::CreateInstance,  CULRADecoder::CreateInstance  },
-	{ FCC('UAY2'), "YUV422 next", CUAY2Encoder::CreateInstance,  CUAY2Decoder::CreateInstance  },
 };
 
 void CVCMCodec::ICInstallAll(void)

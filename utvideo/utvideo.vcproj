@@ -247,18 +247,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\HuffmanTable.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PackedDecoder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PackedEncoder.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\PlanarDecoder.cpp"
 				>
 			</File>
@@ -318,14 +306,6 @@
 			</File>
 			<File
 				RelativePath=".\TunedFunc.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UAY2Decoder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\UAY2Encoder.cpp"
 				>
 			</File>
 			<File
@@ -391,18 +371,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\HuffmanTable.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PackedDecoder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PackedEncoder.h"
-				>
-			</File>
-			<File
 				RelativePath=".\PlanarDecoder.h"
 				>
 			</File>
@@ -428,14 +396,6 @@
 			</File>
 			<File
 				RelativePath=".\TunedFunc.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UAY2Decoder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\UAY2Encoder.h"
 				>
 			</File>
 			<File
