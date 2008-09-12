@@ -47,7 +47,7 @@
 CPlanarEncoder::CPlanarEncoder(void)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
-	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
+	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
 }
 
 CPlanarEncoder::~CPlanarEncoder(void)
