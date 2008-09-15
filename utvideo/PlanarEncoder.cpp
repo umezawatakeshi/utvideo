@@ -224,32 +224,40 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	m_bBottomUpFrame = FALSE;
 	switch (pbihIn->biCompression)
 	{
-	case BI_RGB:
-		switch (pbihIn->biBitCount)
-		{
-		case 24:
-			m_dwFrameStride = ROUNDUP(pbihIn->biWidth * 3, 4);
-			break;
-		case 32:
-			m_dwFrameStride = pbihIn->biWidth * 4;
-			break;
-		}
-		if (pbihIn->biHeight > 0)
-			m_bBottomUpFrame = TRUE;
-		break;
-	case FCC('YUY2'):
-	case FCC('YUYV'):
-	case FCC('YUNV'):
-	case FCC('UYVY'):
-	case FCC('UYNV'):
-	case FCC('YVYU'):
-	case FCC('VYUY'):
-		m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
+	case FCC('YV12'):
+		//m_dwFrameSize = (pbihIn->biWidth * pbihIn->biHeight * 12) / 8; // XXX •‚â‚‚³‚ªŠï”‚Ìê‡‚Íl—¶‚µ‚Ä‚¢‚È‚¢
+		m_dwFrameSize = (pbihIn->biWidth * pbihIn->biHeight * 3) / 2; // XXX •‚â‚‚³‚ªŠï”‚Ìê‡‚Íl—¶‚µ‚Ä‚¢‚È‚¢
 		break;
 	default:
-		return ICERR_BADFORMAT;
+		switch (pbihIn->biCompression)
+		{
+		case BI_RGB:
+			switch (pbihIn->biBitCount)
+			{
+			case 24:
+				m_dwFrameStride = ROUNDUP(pbihIn->biWidth * 3, 4);
+				break;
+			case 32:
+				m_dwFrameStride = pbihIn->biWidth * 4;
+				break;
+			}
+			if (pbihIn->biHeight > 0)
+				m_bBottomUpFrame = TRUE;
+			break;
+		case FCC('YUY2'):
+		case FCC('YUYV'):
+		case FCC('YUNV'):
+		case FCC('UYVY'):
+		case FCC('UYNV'):
+		case FCC('YVYU'):
+		case FCC('VYUY'):
+			m_dwFrameStride = ROUNDUP(pbihIn->biWidth, 2) * 2;
+			break;
+		default:
+			return ICERR_BADFORMAT;
+		}
+		m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
 	}
-	m_dwFrameSize = m_dwFrameStride * m_dwNumStrides;
 
 	CalcPlaneSizes(pbihIn);
 
