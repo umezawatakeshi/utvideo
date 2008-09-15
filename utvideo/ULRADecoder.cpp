@@ -44,7 +44,7 @@
 #include "Predict.h"
 
 const CPlanarDecoder::OUTPUTFORMAT CULRADecoder::m_outfmts[] = {
-	{ BI_RGB, 32, FALSE },
+	{ BI_RGB, 32 },
 };
 
 CULRADecoder::CULRADecoder(void)

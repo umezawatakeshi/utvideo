@@ -73,7 +73,6 @@ public:
 	{
 		DWORD fcc;
 		WORD nBitCount;
-		BOOL bNegativeHeightAllowed;
 	};
 
 public:

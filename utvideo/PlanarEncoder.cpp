@@ -216,7 +216,7 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	if (dwRet != ICERR_OK)
 		return dwRet;
 
-	m_dwNumStrides = abs(pbihIn->biHeight);
+	m_dwNumStrides = pbihIn->biHeight;
 	m_dwDivideCount = ((pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
@@ -298,13 +298,13 @@ DWORD CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 
 	memset(pbihOut, 0, sizeof(BITMAPINFOEXT));
 
-	dwDivideCount = min(ROUNDUP(abs(pbihIn->biHeight), 2) / 2, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
+	dwDivideCount = min(ROUNDUP(pbihIn->biHeight, 2) / 2, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
 
 	_ASSERT(dwDivideCount >= 1 && dwDivideCount <= 256);
 
 	pbieOut->bih.biSize          = sizeof(BITMAPINFOEXT);
 	pbieOut->bih.biWidth         = pbihIn->biWidth;
-	pbieOut->bih.biHeight        = abs(pbihIn->biHeight);
+	pbieOut->bih.biHeight        = pbihIn->biHeight;
 	pbieOut->bih.biPlanes        = 1;
 	pbieOut->bih.biBitCount      = min(pbihIn->biBitCount, GetMaxBitCount());
 	pbieOut->bih.biCompression   = GetOutputFCC();
@@ -323,7 +323,7 @@ DWORD CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 
 DWORD CPlanarEncoder::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
-	return ROUNDUP(pbihIn->biWidth, 4) * ROUNDUP(abs(pbihIn->biHeight), 2) * GetOutputBitCount() / 8 + 4096; // +4096 ÇÕÇ«ÇÒÇ‘ÇËä®íËÅB
+	return ROUNDUP(pbihIn->biWidth, 4) * ROUNDUP(pbihIn->biHeight, 2) * GetOutputBitCount() / 8 + 4096; // +4096 ÇÕÇ«ÇÒÇ‘ÇËä®íËÅB
 }
 
 DWORD CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
@@ -333,7 +333,7 @@ DWORD CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	pfmts = GetSupportedInputFormats();
 	for (int i = 0; i < GetNumSupportedInputFormats(); i++)
 	{
-		if (pbihIn->biCompression == pfmts[i].fcc && pbihIn->biBitCount == pfmts[i].nBitCount && (pfmts[i].bNegativeHeightAllowed || pbihIn->biHeight > 0))
+		if (pbihIn->biCompression == pfmts[i].fcc && pbihIn->biBitCount == pfmts[i].nBitCount && pbihIn->biHeight > 0)
 			return ICERR_OK;
 	}
 

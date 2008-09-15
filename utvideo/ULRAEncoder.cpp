@@ -45,7 +45,7 @@
 #include "resource.h"
 
 const CPlanarEncoder::INPUTFORMAT CULRAEncoder::m_infmts[] = {
-	{ BI_RGB, 32, FALSE },
+	{ BI_RGB, 32 },
 };
 
 CULRAEncoder::CULRAEncoder(void)

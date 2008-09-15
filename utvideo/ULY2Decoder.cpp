@@ -45,12 +45,12 @@
 #include "Convert.h"
 
 const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[] = {
-	{ FCC('YUY2'), 16, TRUE }, { FCC('YUYV'), 16, TRUE }, { FCC('YUNV'), 16, TRUE },
-	{ FCC('UYVY'), 16, TRUE }, { FCC('UYNV'), 16, TRUE },
-	{ FCC('YVYU'), 16, TRUE },
-	{ FCC('VYUY'), 16, TRUE },
-	{ BI_RGB, 32, FALSE },
-	{ BI_RGB, 24, FALSE },
+	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
+	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
+	{ FCC('YVYU'), 16 },
+	{ FCC('VYUY'), 16 },
+	{ BI_RGB, 32 },
+	{ BI_RGB, 24 },
 };
 
 CULY2Decoder::CULY2Decoder(void)

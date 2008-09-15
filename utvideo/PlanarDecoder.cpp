@@ -201,7 +201,7 @@ DWORD CPlanarDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITM
 	pfmts = GetSupportedOutputFormats();
 	for (int i = 0; i < GetNumSupportedOutputFormats(); i++)
 	{
-		if (pbihOut->biCompression == pfmts[i].fcc && pbihOut->biBitCount == pfmts[i].nBitCount && (pfmts[i].bNegativeHeightAllowed || pbihOut->biHeight > 0) && abs(pbihOut->biHeight) == pbihIn->biHeight && pbihOut->biWidth == pbihIn->biWidth)
+		if (pbihOut->biCompression == pfmts[i].fcc && pbihOut->biBitCount == pfmts[i].nBitCount && pbihOut->biHeight > 0 && pbihOut->biHeight == pbihIn->biHeight && pbihOut->biWidth == pbihIn->biWidth)
 			return ICERR_OK;
 	}
 
