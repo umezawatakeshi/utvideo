@@ -74,10 +74,10 @@ CDecoder *CULY2Decoder::CreateInstance(void)
 void CULY2Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut)
 {
 	m_dwPlaneStride[0] = ROUNDUP(pbihOut->biWidth, 2);
-	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * m_dwNumStrides;
+	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * m_dwNumMacroStrides;
 
 	m_dwPlaneStride[1] = ROUNDUP(pbihOut->biWidth, 2) / 2;
-	m_dwPlaneSize[1]   = m_dwPlaneStride[1] * m_dwNumStrides;
+	m_dwPlaneSize[1]   = m_dwPlaneStride[1] * m_dwNumMacroStrides;
 
 	m_dwPlaneStride[2] = m_dwPlaneStride[1];
 	m_dwPlaneSize[2]   = m_dwPlaneSize[1];
@@ -85,8 +85,8 @@ void CULY2Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut)
 
 void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)
 {
-	DWORD dwPlaneStrideBegin = m_dwNumStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwPlaneStrideEnd   = m_dwNumStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwPlaneStrideBegin = m_dwNumMacroStrides *  nBandIndex      / m_dwDivideCount;
+	DWORD dwPlaneStrideEnd   = m_dwNumMacroStrides * (nBandIndex + 1) / m_dwDivideCount;
 	DWORD dwFrameStrideBegin, dwFrameStrideEnd;
 
 	const BYTE *y, *u, *v;
@@ -99,8 +99,8 @@ void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)
 	}
 	else
 	{
-		dwFrameStrideBegin = m_dwNumStrides - dwPlaneStrideEnd;
-		dwFrameStrideEnd   = m_dwNumStrides - dwPlaneStrideBegin;
+		dwFrameStrideBegin = m_dwNumMacroStrides - dwPlaneStrideEnd;
+		dwFrameStrideEnd   = m_dwNumMacroStrides - dwPlaneStrideBegin;
 	}
 
 	pDstBegin = ((BYTE *)m_icd->lpOutput) + dwFrameStrideBegin * m_dwFrameStride;

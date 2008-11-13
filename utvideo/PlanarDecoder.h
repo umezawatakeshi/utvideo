@@ -49,7 +49,7 @@ class CPlanarDecoder :
 {
 protected:
 	BOOL m_bBottomUpFrame;
-	DWORD m_dwNumStrides;
+	DWORD m_dwNumMacroStrides;
 	DWORD m_dwDivideCount;
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
