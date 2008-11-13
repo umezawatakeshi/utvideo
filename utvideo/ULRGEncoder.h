@@ -66,4 +66,6 @@ protected:
 	virtual int GetNumPlanes(void) { return 3; }
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn);
 	virtual void ConvertToPlanar(DWORD nBandIndex);
+	virtual int GetMacroPixelWidth(void) { return 1; }
+	virtual int GetMacroPixelHeight(void) { return 1; }
 };

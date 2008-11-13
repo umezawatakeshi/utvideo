@@ -101,6 +101,8 @@ protected:
 	virtual int GetNumPlanes(void) = 0;
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn) = 0;
 	virtual void ConvertToPlanar(DWORD nBandIndex) = 0;
+	virtual int GetMacroPixelWidth(void) = 0;
+	virtual int GetMacroPixelHeight(void) = 0;
 
 private:
 	void PredictProc(DWORD nBandIndex);
