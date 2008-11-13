@@ -188,8 +188,12 @@ DWORD CPlanarDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITM
 	if (pbihIn->biCompression != GetInputFCC())
 		return ICERR_BADFORMAT;
 
+	if (pbihIn->biWidth % GetMacroPixelWidth() != 0 || pbihIn->biHeight % GetMacroPixelHeight() != 0)
+		return ICERR_BADFORMAT;
+
 	if (pbihIn->biSize > sizeof(BITMAPINFOEXT))
 		return ICERR_BADFORMAT;
+
 	if (pbieIn->dwFrameInfoSize > sizeof(FRAMEINFO))
 		return ICERR_BADFORMAT;
 	if (pbieIn->dwFlags0 & BIE_FLAGS0_RESERVED)

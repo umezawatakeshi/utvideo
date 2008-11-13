@@ -330,6 +330,9 @@ DWORD CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 {
 	const INPUTFORMAT *pfmts;
 
+	if (pbihIn->biWidth % GetMacroPixelWidth() != 0 || pbihIn->biHeight % GetMacroPixelHeight() != 0)
+		return ICERR_BADFORMAT;
+
 	pfmts = GetSupportedInputFormats();
 	for (int i = 0; i < GetNumSupportedInputFormats(); i++)
 	{
