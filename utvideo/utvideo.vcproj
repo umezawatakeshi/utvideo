@@ -325,6 +325,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ULY0Decoder.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ULY0Encoder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\ULY2Decoder.cpp"
 				>
 			</File>
@@ -412,6 +420,14 @@
 			</File>
 			<File
 				RelativePath=".\ULRGEncoder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ULY0Decoder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ULY0Encoder.h"
 				>
 			</File>
 			<File
