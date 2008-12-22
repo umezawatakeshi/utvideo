@@ -144,7 +144,7 @@ DWORD CULY0Decoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 		default:
 			return ICERR_BADFORMAT;
 		}
-		m_dwFrameSize = m_dwFrameStride * m_dwNumMacroStrides;
+		m_dwFrameSize = m_dwFrameStride * m_dwNumMacroStrides * 2;
 	}
 
 	CalcPlaneSizes(pbihOut);
