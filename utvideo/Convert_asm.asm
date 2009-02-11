@@ -247,9 +247,11 @@ r2yuv	dq	01073000000001073h
 yuvoff	dq	00004200000042000h
 		dq	00020200000202000h
 
-; sse2_ConvertBottomupRGB24ToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD dwDataStride);
-public	_sse2_ConvertBottomupRGB24ToULY2
-_sse2_ConvertBottomupRGB24ToULY2	proc
+CONVERT_BOTTOMUP_RGB_TO_ULY2	macro	procname, rgb32
+
+; procname(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD dwDataStride);
+public	&procname
+&procname	proc
 
 	push		ebx
 	push		esi
@@ -267,13 +269,22 @@ _sse2_ConvertBottomupRGB24ToULY2	proc
 label0:
 	mov			esi, ebp
 	sub			esi, dword ptr [esp + 16 + 4 + 24]	; dwDataStride
+if &rgb32
+	add			esi, 4
+else
 	add			esi, 3
+endif
 
 	;align	64
 label1:
+if &rgb32
+	movd		xmm0, dword ptr [esi-4]				; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0
+	movd		xmm1, dword ptr [esi]				; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R1 G1 B1
+else
 	movd		xmm0, dword ptr [esi-3]				; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0
 	movd		xmm1, dword ptr [esi-1]				; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 R1 G1 B1 XX
 	psrld		xmm1, 8								; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 00 R1 G1 B1
+endif
 
 	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 00 00 00 00 00 00 XX R1 R0 G1 G0 B1 B0
 label3:
@@ -304,12 +315,20 @@ label3:
 	add			edi, 2
 	add			ebx, 1
 	add			ecx, 1
+if &rgb32
+	add			esi, 8
+else
 	add			esi, 6
+endif
 	cmp			esi, ebp
 	jb			label1
 	ja			label2
 
+if &rgb32
+	movd		xmm0, dword ptr [esi-4]				; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0
+else
 	movd		xmm0, dword ptr [esi-3]				; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0
+endif
 
 	punpcklbw	xmm0, xmm0							; xmm0 = 00 00 00 00 00 00 00 00 XX XX R0 R0 G0 G0 B0 B0
 	jmp			label3
@@ -325,6 +344,11 @@ label2:
 	pop			ebx
 	ret
 
-_sse2_ConvertBottomupRGB24ToULY2	endp
+&procname	endp
+
+	endm
+
+CONVERT_BOTTOMUP_RGB_TO_ULY2	_sse2_ConvertBottomupRGB24ToULY2, 0
+CONVERT_BOTTOMUP_RGB_TO_ULY2	_sse2_ConvertBottomupRGB32ToULY2, 1
 
 end
