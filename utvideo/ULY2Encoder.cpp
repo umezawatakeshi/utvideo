@@ -50,6 +50,7 @@ const CPlanarEncoder::INPUTFORMAT CULY2Encoder::m_infmts[] = {
 	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
 	{ FCC('YVYU'), 16 },
 	{ FCC('VYUY'), 16 },
+	{ BI_RGB, 32 },
 	{ BI_RGB, 24 },
 };
 
@@ -154,6 +155,9 @@ void CULY2Encoder::ConvertToPlanar(DWORD nBandIndex)
 		{
 		case 24:
 			ConvertBottomupRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwFrameStride, m_icc->lpbiOutput->biWidth * 3);
+			break;
+		case 32:
+			ConvertBottomupRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwFrameStride, m_dwFrameStride);
 			break;
 		}
 		break;

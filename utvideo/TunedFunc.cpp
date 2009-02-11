@@ -56,6 +56,7 @@ const TUNEDFUNC tfnCPP = {
 	cpp_ConvertULY2ToBottomupRGB24,
 	cpp_ConvertULY2ToBottomupRGB32,
 	cpp_ConvertBottomupRGB24ToULY2,
+	cpp_ConvertBottomupRGB32ToULY2,
 };
 
 const TUNEDFUNC tfnI686 = {
@@ -70,6 +71,7 @@ const TUNEDFUNC tfnI686 = {
 	cpp_ConvertULY2ToBottomupRGB24,
 	cpp_ConvertULY2ToBottomupRGB32,
 	cpp_ConvertBottomupRGB24ToULY2,
+	cpp_ConvertBottomupRGB32ToULY2,
 };
 
 const TUNEDFUNC tfnSSE2 = {
@@ -84,6 +86,7 @@ const TUNEDFUNC tfnSSE2 = {
 	sse2_ConvertULY2ToBottomupRGB24,
 	sse2_ConvertULY2ToBottomupRGB32,
 	sse2_ConvertBottomupRGB24ToULY2,
+	cpp_ConvertBottomupRGB32ToULY2,
 };
 
 const TUNEDFUNC tfnSSE3 = {
@@ -98,6 +101,7 @@ const TUNEDFUNC tfnSSE3 = {
 	sse2_ConvertULY2ToBottomupRGB24,
 	sse2_ConvertULY2ToBottomupRGB32,
 	sse2_ConvertBottomupRGB24ToULY2,
+	cpp_ConvertBottomupRGB32ToULY2,
 };
 
 const TUNEDFUNC tfnSSSE3 = {
@@ -112,6 +116,7 @@ const TUNEDFUNC tfnSSSE3 = {
 	sse2_ConvertULY2ToBottomupRGB24,
 	sse2_ConvertULY2ToBottomupRGB32,
 	sse2_ConvertBottomupRGB24ToULY2,
+	cpp_ConvertBottomupRGB32ToULY2,
 };
 
 TUNEDFUNC tfn = tfnCPP;

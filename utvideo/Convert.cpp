@@ -126,3 +126,30 @@ void cpp_ConvertBottomupRGB24ToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin,
 		}
 	}
 }
+
+void cpp_ConvertBottomupRGB32ToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD dwDataStride)
+{
+	BYTE *y = pYBegin;
+	BYTE *u = pUBegin;
+	BYTE *v = pVBegin;
+
+	_ASSERT(dwStride == ROUNDUP(dwDataStride, 4));
+
+	for (const BYTE *pStrideBegin = pSrcEnd - dwStride; pStrideBegin >= pSrcBegin; pStrideBegin -= dwStride)
+	{
+		const BYTE *pStrideEnd = pStrideBegin + dwDataStride;
+		for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += 8)
+		{
+			const BYTE *q;
+			if (p+4 < pStrideEnd)
+				q = p+4;
+			else
+				q = p;
+			*(y+0) = min(max(int((*(p+0))*0.098 + (*(p+1))*0.504 + (*(p+2))*0.257 + 16.5), 16), 235);
+			*(y+1) = min(max(int((*(q+0))*0.098 + (*(q+1))*0.504 + (*(q+2))*0.257 + 16.5), 16), 235);
+			*u     = min(max(int(((*(p+0)+*(q+0))*0.439 + (*(p+1)+*(q+1))*-0.291 + (*(p+2)+*(q+2))*-0.148)/2 + 128.5), 16), 240);
+			*v     = min(max(int(((*(p+0)+*(q+0))*-0.071 + (*(p+1)+*(q+1))*-0.368 + (*(p+2)+*(q+2))*0.439)/2 + 128.5), 16), 240);
+			y+=2; u++; v++;
+		}
+	}
+}
