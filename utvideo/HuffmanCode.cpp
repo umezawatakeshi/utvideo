@@ -143,6 +143,8 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *
 		return;
 	}
 
+	memset(pEncodeTable, 0xff, sizeof(HUFFMAN_ENCODE_TABLE));
+
 	curcode = 0;
 	for (int i = 255; i >= 0; i--)
 	{
