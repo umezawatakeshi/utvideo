@@ -44,19 +44,6 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 <dt>CPU</dt><dd>SSE2 をサポートする i686 以降の CPU<br>（Intel だと Pentium 4 以降）</dd>
 </dl>
 <p>また、<a href="http://www.microsoft.com/downloads/details.aspx?displaylang=ja&FamilyID=200b2fd9-ae1a-4a14-984d-389c36f85647">Microsoft Visual C++ 2005 SP1 再頒布可能パッケージ (x86)</a> が必要です。<strong>再頒布可能パッケージがインストールされていない場合、Ut Video Codec Suite のインストールは失敗します。</strong></p>
-<h2 id="implementation_goal">実装の目標</h2>
-<ul>
-<li>Core 2 Duo 程度の CPU でリアルタイム HD キャプチャ</li>
-<li>Huffyuv を超える圧縮率</li>
-<li>可能なら Lagarith に迫る圧縮率</li>
-</ul>
-<h3>目標の達成度合い</h3>
-<ul>
-<li>マルチスレッド化およびアセンブラ化のおかげで、リアルタイム HD キャプチャが可能になりました。</li>
-<li>プログレッシブ映像の場合は、普通は Huffyuv (Predict median) より圧縮率は高くなります。</li>
-<li>インターレース映像の場合は、高さが 288 ピクセルを超える場合は Huffyuv の方が圧縮率が高い場合があります。</li>
-<li>Lagarith の圧縮率には基本的に届きませんが、ソースによっては稀に超えます。</li>
-</ul>
 <h2 id="history">改版履歴</h2>
 <h3>バージョン 5.2.2</h3>
 <dl>
