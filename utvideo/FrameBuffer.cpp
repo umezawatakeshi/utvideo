@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
  * Ut Video Codec Suite
- * Copyright (C) 2008  UMEZAWA Takeshi
+ * Copyright (C) 2008-2009  UMEZAWA Takeshi
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
  * 
  * 
  * Ut Video Codec Suite
- * Copyright (C) 2008  梅澤 威志
+ * Copyright (C) 2008-2009  梅澤 威志
  * 
  * このプログラムはフリーソフトウェアです。あなたはこれを、フリーソフ
  * トウェア財団によって発行された GNU 一般公衆利用許諾契約書(バージョ
