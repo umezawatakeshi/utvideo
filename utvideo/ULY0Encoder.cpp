@@ -46,6 +46,7 @@
 
 const CULY0Encoder::INPUTFORMAT CULY0Encoder::m_infmts[] = {
 	{ FCC('YV12'), 12 },
+	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
 	{ BI_RGB, 32 },
 	{ BI_RGB, 24 },
 };
@@ -419,6 +420,44 @@ void CULY0Encoder::ConvertToPlanar(DWORD nBandIndex)
 			memcpy(y, pSrcYBegin, (dwMacroStrideEnd - dwMacroStrideBegin) * m_icc->lpbiInput->biWidth * 2);
 			memcpy(u, pSrcUBegin, (dwMacroStrideEnd - dwMacroStrideBegin) * m_icc->lpbiInput->biWidth / 2);
 			memcpy(v, pSrcVBegin, (dwMacroStrideEnd - dwMacroStrideBegin) * m_icc->lpbiInput->biWidth / 2);
+		}
+		break;
+	case FCC('YUY2'):
+	case FCC('YUYV'):
+	case FCC('YUNV'):
+		{
+			BYTE *y, *u, *v;
+			const BYTE *pSrcBegin, *pSrcEnd;
+			DWORD dwSrcStride;
+			DWORD dwYStride;
+
+			dwSrcStride = m_icc->lpbiInput->biWidth * 2;
+			dwYStride = m_icc->lpbiInput->biWidth;
+
+			y = m_pCurFrame->GetPlane(0) + dwMacroStrideBegin * m_icc->lpbiInput->biWidth * 2;
+			u = m_pCurFrame->GetPlane(1) + dwMacroStrideBegin * m_icc->lpbiInput->biWidth / 2;
+			v = m_pCurFrame->GetPlane(2) + dwMacroStrideBegin * m_icc->lpbiInput->biWidth / 2;
+
+			pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumMacroStrides - dwMacroStrideEnd  ) * dwSrcStride * 2;
+			pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumMacroStrides - dwMacroStrideBegin) * dwSrcStride * 2;
+
+			for (const BYTE *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += dwSrcStride * 2)
+			{
+				const BYTE *pStrideEnd = pStrideBegin + dwSrcStride;
+				for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
+				{
+					const BYTE *q = p + dwSrcStride;
+					*(y+0) = *p;
+					*(y+1) = *(p+2);
+					*(y+dwYStride+0) = *q;
+					*(y+dwYStride+1) = *(q+2);
+					*u = (*(p+1) + *(q+1)) / 2;
+					*v = (*(p+3) + *(q+3)) / 2;
+
+					y+=2; u++; v++;
+				}
+				y += dwYStride;
+			}
 		}
 		break;
 	case BI_RGB:
