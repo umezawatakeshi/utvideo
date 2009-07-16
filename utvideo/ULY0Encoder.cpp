@@ -438,8 +438,8 @@ void CULY0Encoder::ConvertToPlanar(DWORD nBandIndex)
 			u = m_pCurFrame->GetPlane(1) + dwMacroStrideBegin * m_icc->lpbiInput->biWidth / 2;
 			v = m_pCurFrame->GetPlane(2) + dwMacroStrideBegin * m_icc->lpbiInput->biWidth / 2;
 
-			pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumMacroStrides - dwMacroStrideEnd  ) * dwSrcStride * 2;
-			pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumMacroStrides - dwMacroStrideBegin) * dwSrcStride * 2;
+			pSrcBegin = ((BYTE *)m_icc->lpInput) + dwMacroStrideBegin * dwSrcStride * 2;
+			pSrcEnd   = ((BYTE *)m_icc->lpInput) + dwMacroStrideEnd   * dwSrcStride * 2;
 
 			for (const BYTE *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += dwSrcStride * 2)
 			{

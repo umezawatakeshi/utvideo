@@ -325,8 +325,8 @@ void CULY0Decoder::ConvertFromPlanar(DWORD nBandIndex)
 			u = m_pCurFrame->GetPlane(1) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
 			v = m_pCurFrame->GetPlane(2) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
 
-			pDstBegin = ((BYTE *)m_icd->lpOutput) + (m_dwNumMacroStrides - dwMacroStrideEnd  ) * dwDstStride * 2;
-			pDstEnd   = ((BYTE *)m_icd->lpOutput) + (m_dwNumMacroStrides - dwMacroStrideBegin) * dwDstStride * 2;
+			pDstBegin = ((BYTE *)m_icd->lpOutput) + dwMacroStrideBegin * dwDstStride * 2;
+			pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwMacroStrideEnd   * dwDstStride * 2;
 
 			for (BYTE *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += dwDstStride * 2)
 			{
