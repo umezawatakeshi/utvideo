@@ -285,11 +285,14 @@ void CULY0Decoder::ConvertFromPlanar(DWORD nBandIndex)
 	DWORD dwMacroStrideBegin = m_dwNumMacroStrides *  nBandIndex      / m_dwDivideCount;
 	DWORD dwMacroStrideEnd   = m_dwNumMacroStrides * (nBandIndex + 1) / m_dwDivideCount;
 
+	const BYTE *pSrcYBegin = m_pCurFrame->GetPlane(0) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth * 2;
+	const BYTE *pSrcUBegin = m_pCurFrame->GetPlane(1) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
+	const BYTE *pSrcVBegin = m_pCurFrame->GetPlane(2) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
+
 	switch (m_icd->lpbiOutput->biCompression)
 	{
 	case FCC('YV12'):
 		{
-			const BYTE *y, *u, *v;
 			BYTE *pDstYBegin, *pDstVBegin, *pDstUBegin;
 
 			pDstYBegin = ((BYTE *)m_icd->lpOutput);
@@ -300,147 +303,139 @@ void CULY0Decoder::ConvertFromPlanar(DWORD nBandIndex)
 			pDstVBegin += dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
 			pDstUBegin += dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
 
-			y = m_pCurFrame->GetPlane(0) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth * 2;
-			u = m_pCurFrame->GetPlane(1) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
-			v = m_pCurFrame->GetPlane(2) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
-
-			memcpy(pDstYBegin, y, (dwMacroStrideEnd - dwMacroStrideBegin) * m_icd->lpbiOutput->biWidth * 2);
-			memcpy(pDstUBegin, u, (dwMacroStrideEnd - dwMacroStrideBegin) * m_icd->lpbiOutput->biWidth / 2);
-			memcpy(pDstVBegin, v, (dwMacroStrideEnd - dwMacroStrideBegin) * m_icd->lpbiOutput->biWidth / 2);
+			memcpy(pDstYBegin, pSrcYBegin, (dwMacroStrideEnd - dwMacroStrideBegin) * m_icd->lpbiOutput->biWidth * 2);
+			memcpy(pDstUBegin, pSrcUBegin, (dwMacroStrideEnd - dwMacroStrideBegin) * m_icd->lpbiOutput->biWidth / 2);
+			memcpy(pDstVBegin, pSrcVBegin, (dwMacroStrideEnd - dwMacroStrideBegin) * m_icd->lpbiOutput->biWidth / 2);
 		}
 		break;
-	case FCC('YUY2'):
-	case FCC('YUYV'):
-	case FCC('YUNV'):
+	default:
 		{
 			const BYTE *y, *u, *v;
 			BYTE *pDstBegin, *pDstEnd;
-			DWORD dwDstStride;
-			DWORD dwYStride;
 
-			dwDstStride = m_icd->lpbiOutput->biWidth * 2;
-			dwYStride = m_icd->lpbiOutput->biWidth;
+			y = pSrcYBegin;
+			u = pSrcUBegin;
+			v = pSrcVBegin;
 
-			y = m_pCurFrame->GetPlane(0) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth * 2;
-			u = m_pCurFrame->GetPlane(1) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
-			v = m_pCurFrame->GetPlane(2) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
-
-			pDstBegin = ((BYTE *)m_icd->lpOutput) + dwMacroStrideBegin * dwDstStride * 2;
-			pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwMacroStrideEnd   * dwDstStride * 2;
-
-			for (BYTE *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += dwDstStride * 2)
+			switch (m_icd->lpbiOutput->biCompression)
 			{
-				BYTE *pStrideEnd = pStrideBegin + dwDstStride;
-				for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
+			case FCC('YUY2'):
+			case FCC('YUYV'):
+			case FCC('YUNV'):
 				{
-					BYTE *q = p + dwDstStride;
-					*p = *(y+0);
-					*(p+2) = *(y+1);
-					*q = *(y+dwYStride+0);
-					*(q+2) = *(y+dwYStride+1);
-					*(p+1) = *u;
-					*(q+1) = *u;
-					*(p+3) = *v;
-					*(q+3) = *v;
+					DWORD dwDstStride;
+					DWORD dwYStride;
 
-					y+=2; u++; v++;
-				}
-				y += dwYStride;
-			}
-		}
-		break;
-	case BI_RGB:
-		switch (m_icd->lpbiOutput->biBitCount)
-		{
-		case 24:
-			{
-				const BYTE *y, *u, *v;
-				BYTE *pDstBegin, *pDstEnd;
-				DWORD dwDstStride;
-				DWORD dwYStride;
-				DWORD dwDataStride;
+					dwDstStride = m_icd->lpbiOutput->biWidth * 2;
+					dwYStride = m_icd->lpbiOutput->biWidth;
 
-				dwDataStride = m_icd->lpbiOutput->biWidth * 3;
-				dwDstStride = ROUNDUP(dwDataStride, 4);
-				dwYStride = m_icd->lpbiOutput->biWidth;
+					pDstBegin = ((BYTE *)m_icd->lpOutput) + dwMacroStrideBegin * dwDstStride * 2;
+					pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwMacroStrideEnd   * dwDstStride * 2;
 
-				y = m_pCurFrame->GetPlane(0) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth * 2;
-				u = m_pCurFrame->GetPlane(1) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
-				v = m_pCurFrame->GetPlane(2) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
-
-				pDstBegin = ((BYTE *)m_icd->lpOutput) + (m_dwNumMacroStrides - dwMacroStrideEnd  ) * dwDstStride * 2;
-				pDstEnd   = ((BYTE *)m_icd->lpOutput) + (m_dwNumMacroStrides - dwMacroStrideBegin) * dwDstStride * 2;
-
-				for (BYTE *pStrideBegin = pDstEnd - dwDstStride * 2; pStrideBegin >= pDstBegin; pStrideBegin -= dwDstStride * 2)
-				{
-					BYTE *pStrideEnd = pStrideBegin + dwDataStride;
-					for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 6)
+					for (BYTE *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += dwDstStride * 2)
 					{
-						BYTE *q = p + dwDstStride;
-						*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-						*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-						*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-						*(p+1) = min(max(int((*(y+dwYStride)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-						*(p+0) = min(max(int((*(y+dwYStride)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-						*(p+2) = min(max(int((*(y+dwYStride)-16)*1.164                  + (*v-128)*1.596), 0), 255);
-						y++;
-						*(q+4) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-						*(q+3) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-						*(q+5) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-						*(p+4) = min(max(int((*(y+dwYStride)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-						*(p+3) = min(max(int((*(y+dwYStride)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-						*(p+5) = min(max(int((*(y+dwYStride)-16)*1.164                  + (*v-128)*1.596), 0), 255);
-						y++; u++; v++;
+						BYTE *pStrideEnd = pStrideBegin + dwDstStride;
+						for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
+						{
+							BYTE *q = p + dwDstStride;
+							*p = *(y+0);
+							*(p+2) = *(y+1);
+							*q = *(y+dwYStride+0);
+							*(q+2) = *(y+dwYStride+1);
+							*(p+1) = *u;
+							*(q+1) = *u;
+							*(p+3) = *v;
+							*(q+3) = *v;
+
+							y+=2; u++; v++;
+						}
+						y += dwYStride;
 					}
-					y += dwYStride;
 				}
-			}
-			break;
-		case 32:
-			{
-				const BYTE *y, *u, *v;
-				BYTE *pDstBegin, *pDstEnd;
-				DWORD dwDstStride;
-				DWORD dwYStride;
-				DWORD dwDataStride;
-
-				dwDataStride = m_icd->lpbiOutput->biWidth * 4;
-				dwDstStride = ROUNDUP(dwDataStride, 4);
-				dwYStride = m_icd->lpbiOutput->biWidth;
-
-				y = m_pCurFrame->GetPlane(0) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth * 2;
-				u = m_pCurFrame->GetPlane(1) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
-				v = m_pCurFrame->GetPlane(2) + dwMacroStrideBegin * m_icd->lpbiOutput->biWidth / 2;
-
-				pDstBegin = ((BYTE *)m_icd->lpOutput) + (m_dwNumMacroStrides - dwMacroStrideEnd  ) * dwDstStride * 2;
-				pDstEnd   = ((BYTE *)m_icd->lpOutput) + (m_dwNumMacroStrides - dwMacroStrideBegin) * dwDstStride * 2;
-
-				for (BYTE *pStrideBegin = pDstEnd - dwDstStride * 2; pStrideBegin >= pDstBegin; pStrideBegin -= dwDstStride * 2)
+				break;
+			case BI_RGB:
+				switch (m_icd->lpbiOutput->biBitCount)
 				{
-					BYTE *pStrideEnd = pStrideBegin + dwDataStride;
-					for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 8)
+				case 24:
 					{
-						BYTE *q = p + dwDstStride;
-						*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-						*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-						*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-						*(q+3) = 0xff;
-						*(p+1) = min(max(int((*(y+dwYStride)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-						*(p+0) = min(max(int((*(y+dwYStride)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-						*(p+2) = min(max(int((*(y+dwYStride)-16)*1.164                  + (*v-128)*1.596), 0), 255);
-						*(p+3) = 0xff;
-						y++;
-						*(q+5) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-						*(q+4) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-						*(q+6) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-						*(q+7) = 0xff;
-						*(p+5) = min(max(int((*(y+dwYStride)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-						*(p+4) = min(max(int((*(y+dwYStride)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-						*(p+6) = min(max(int((*(y+dwYStride)-16)*1.164                  + (*v-128)*1.596), 0), 255);
-						*(p+7) = 0xff;
-						y++; u++; v++;
+						DWORD dwDstStride;
+						DWORD dwYStride;
+						DWORD dwDataStride;
+
+						dwDataStride = m_icd->lpbiOutput->biWidth * 3;
+						dwDstStride = ROUNDUP(dwDataStride, 4);
+						dwYStride = m_icd->lpbiOutput->biWidth;
+
+						pDstBegin = ((BYTE *)m_icd->lpOutput) + (m_dwNumMacroStrides - dwMacroStrideEnd  ) * dwDstStride * 2;
+						pDstEnd   = ((BYTE *)m_icd->lpOutput) + (m_dwNumMacroStrides - dwMacroStrideBegin) * dwDstStride * 2;
+
+						for (BYTE *pStrideBegin = pDstEnd - dwDstStride * 2; pStrideBegin >= pDstBegin; pStrideBegin -= dwDstStride * 2)
+						{
+							BYTE *pStrideEnd = pStrideBegin + dwDataStride;
+							for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 6)
+							{
+								BYTE *q = p + dwDstStride;
+								*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+								*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+								*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+								*(p+1) = min(max(int((*(y+dwYStride)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+								*(p+0) = min(max(int((*(y+dwYStride)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+								*(p+2) = min(max(int((*(y+dwYStride)-16)*1.164                  + (*v-128)*1.596), 0), 255);
+								y++;
+								*(q+4) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+								*(q+3) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+								*(q+5) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+								*(p+4) = min(max(int((*(y+dwYStride)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+								*(p+3) = min(max(int((*(y+dwYStride)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+								*(p+5) = min(max(int((*(y+dwYStride)-16)*1.164                  + (*v-128)*1.596), 0), 255);
+								y++; u++; v++;
+							}
+							y += dwYStride;
+						}
 					}
-					y += dwYStride;
+					break;
+				case 32:
+					{
+						DWORD dwDstStride;
+						DWORD dwYStride;
+						DWORD dwDataStride;
+
+						dwDataStride = m_icd->lpbiOutput->biWidth * 4;
+						dwDstStride = ROUNDUP(dwDataStride, 4);
+						dwYStride = m_icd->lpbiOutput->biWidth;
+
+						pDstBegin = ((BYTE *)m_icd->lpOutput) + (m_dwNumMacroStrides - dwMacroStrideEnd  ) * dwDstStride * 2;
+						pDstEnd   = ((BYTE *)m_icd->lpOutput) + (m_dwNumMacroStrides - dwMacroStrideBegin) * dwDstStride * 2;
+
+						for (BYTE *pStrideBegin = pDstEnd - dwDstStride * 2; pStrideBegin >= pDstBegin; pStrideBegin -= dwDstStride * 2)
+						{
+							BYTE *pStrideEnd = pStrideBegin + dwDataStride;
+							for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 8)
+							{
+								BYTE *q = p + dwDstStride;
+								*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+								*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+								*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+								*(q+3) = 0xff;
+								*(p+1) = min(max(int((*(y+dwYStride)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+								*(p+0) = min(max(int((*(y+dwYStride)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+								*(p+2) = min(max(int((*(y+dwYStride)-16)*1.164                  + (*v-128)*1.596), 0), 255);
+								*(p+3) = 0xff;
+								y++;
+								*(q+5) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+								*(q+4) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+								*(q+6) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+								*(q+7) = 0xff;
+								*(p+5) = min(max(int((*(y+dwYStride)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+								*(p+4) = min(max(int((*(y+dwYStride)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+								*(p+6) = min(max(int((*(y+dwYStride)-16)*1.164                  + (*v-128)*1.596), 0), 255);
+								*(p+7) = 0xff;
+								y++; u++; v++;
+							}
+							y += dwYStride;
+						}
+					}
+					break;
 				}
 			}
 			break;
