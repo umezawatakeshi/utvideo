@@ -319,6 +319,10 @@ void CULY0Decoder::ConvertFromPlanar(DWORD nBandIndex)
 
 			switch (m_icd->lpbiOutput->biCompression)
 			{
+			case FCC('YVYU'):
+				swap(pSrcUBegin, pSrcVBegin);
+				swap(u, v);
+				/* FALLTHROUGH */
 			case FCC('YUY2'):
 			case FCC('YUYV'):
 			case FCC('YUNV'):
@@ -346,6 +350,43 @@ void CULY0Decoder::ConvertFromPlanar(DWORD nBandIndex)
 							*(q+1) = *u;
 							*(p+3) = *v;
 							*(q+3) = *v;
+
+							y+=2; u++; v++;
+						}
+						y += dwYStride;
+					}
+				}
+				break;
+			case FCC('VYUY'):
+				swap(pSrcUBegin, pSrcVBegin);
+				swap(u, v);
+				/* FALLTHROUGH */
+			case FCC('UYVY'):
+			case FCC('UYNV'):
+				{
+					DWORD dwDstStride;
+					DWORD dwYStride;
+
+					dwDstStride = m_icd->lpbiOutput->biWidth * 2;
+					dwYStride = m_icd->lpbiOutput->biWidth;
+
+					pDstBegin = ((BYTE *)m_icd->lpOutput) + dwMacroStrideBegin * dwDstStride * 2;
+					pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwMacroStrideEnd   * dwDstStride * 2;
+
+					for (BYTE *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += dwDstStride * 2)
+					{
+						BYTE *pStrideEnd = pStrideBegin + dwDstStride;
+						for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
+						{
+							BYTE *q = p + dwDstStride;
+							*(p+1) = *(y+0);
+							*(p+3) = *(y+1);
+							*(q+1) = *(y+dwYStride+0);
+							*(q+3) = *(y+dwYStride+1);
+							*(p+0) = *u;
+							*(q+0) = *u;
+							*(p+2) = *v;
+							*(q+2) = *v;
 
 							y+=2; u++; v++;
 						}
