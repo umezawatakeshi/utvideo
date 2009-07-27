@@ -65,19 +65,17 @@ CDecoder *CULRADecoder::CreateInstance(void)
 	return new CULRADecoder();
 }
 
-void CULRADecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut)
+void CULRADecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
-	m_dwPlaneStride[0] = pbihOut->biWidth;
-	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * m_dwNumMacroStrides;
+	m_dwPlaneSize[0]   = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[1]   = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[2]   = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[3]   = pbih->biWidth * pbih->biHeight;
 
-	m_dwPlaneStride[1] = m_dwPlaneStride[0];
-	m_dwPlaneSize[1]   = m_dwPlaneSize[0];
-
-	m_dwPlaneStride[2] = m_dwPlaneStride[0];
-	m_dwPlaneSize[2]   = m_dwPlaneSize[0];
-
-	m_dwPlaneStride[3] = m_dwPlaneStride[0];
-	m_dwPlaneSize[3]   = m_dwPlaneSize[0];
+	m_dwPlaneStride[0] = pbih->biWidth;
+	m_dwPlaneStride[1] = pbih->biWidth;
+	m_dwPlaneStride[2] = pbih->biWidth;
+	m_dwPlaneStride[3] = pbih->biWidth;
 }
 
 void CULRADecoder::ConvertFromPlanar(DWORD nBandIndex)

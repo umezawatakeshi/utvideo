@@ -71,16 +71,15 @@ CDecoder *CULY2Decoder::CreateInstance(void)
 	return new CULY2Decoder();
 }
 
-void CULY2Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut)
+void CULY2Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
-	m_dwPlaneStride[0] = ROUNDUP(pbihOut->biWidth, 2);
-	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * m_dwNumMacroStrides;
+	m_dwPlaneSize[0]   = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[1]   = pbih->biWidth * pbih->biHeight / 2;
+	m_dwPlaneSize[2]   = pbih->biWidth * pbih->biHeight / 2;
 
-	m_dwPlaneStride[1] = ROUNDUP(pbihOut->biWidth, 2) / 2;
-	m_dwPlaneSize[1]   = m_dwPlaneStride[1] * m_dwNumMacroStrides;
-
-	m_dwPlaneStride[2] = m_dwPlaneStride[1];
-	m_dwPlaneSize[2]   = m_dwPlaneSize[1];
+	m_dwPlaneStride[0] = pbih->biWidth;
+	m_dwPlaneStride[1] = pbih->biWidth / 2;
+	m_dwPlaneStride[2] = pbih->biWidth / 2;
 }
 
 void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)

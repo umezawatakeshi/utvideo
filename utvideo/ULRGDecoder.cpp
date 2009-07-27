@@ -66,16 +66,15 @@ CDecoder *CULRGDecoder::CreateInstance(void)
 	return new CULRGDecoder();
 }
 
-void CULRGDecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut)
+void CULRGDecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
-	m_dwPlaneStride[0] = pbihOut->biWidth;
-	m_dwPlaneSize[0]   = m_dwPlaneStride[0] * m_dwNumMacroStrides;
+	m_dwPlaneSize[0]   = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[1]   = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[2]   = pbih->biWidth * pbih->biHeight;
 
-	m_dwPlaneStride[1] = m_dwPlaneStride[0];
-	m_dwPlaneSize[1]   = m_dwPlaneSize[0];
-
-	m_dwPlaneStride[2] = m_dwPlaneStride[0];
-	m_dwPlaneSize[2]   = m_dwPlaneSize[0];
+	m_dwPlaneStride[0] = pbih->biWidth;
+	m_dwPlaneStride[1] = pbih->biWidth;
+	m_dwPlaneStride[2] = pbih->biWidth;
 }
 
 void CULRGDecoder::ConvertFromPlanar(DWORD nBandIndex)
