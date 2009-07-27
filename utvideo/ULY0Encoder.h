@@ -53,7 +53,7 @@ protected:
 	DWORD m_dwNumMacroStrides;
 	DWORD m_dwDivideCount;
 	DWORD m_dwPlaneSize[4];
-	DWORD m_dwPlaneStride[4];
+	DWORD m_dwPlaneWidth[4];
 	DWORD m_dwPlaneMacroStride[4];
 
 	CThreadManager *m_ptm;

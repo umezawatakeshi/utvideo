@@ -136,11 +136,11 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 
 	m_pRestoredFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pRestoredFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
+		m_pRestoredFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
 
 	m_pDecodedFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pDecodedFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
+		m_pDecodedFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
 
 	m_ptm = new CThreadManager();
 
@@ -219,8 +219,8 @@ void CPlanarDecoder::DecodeProc(DWORD nBandIndex)
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStride[nPlaneIndex];
-		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStride[nPlaneIndex];
+		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneWidth[nPlaneIndex];
+		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneWidth[nPlaneIndex];
 		DWORD dwDstOffset;
 		if (nBandIndex == 0)
 			dwDstOffset = 0;
@@ -239,7 +239,7 @@ void CPlanarDecoder::DecodeProc(DWORD nBandIndex)
 			m_pCurFrame = m_pDecodedFrame;
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex]);
+			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneWidth[nPlaneIndex]);
 			m_pCurFrame = m_pRestoredFrame;
 			break;
 		}

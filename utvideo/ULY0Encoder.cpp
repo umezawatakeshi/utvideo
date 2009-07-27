@@ -246,11 +246,11 @@ DWORD CULY0Encoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 
 	m_pCurFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pCurFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
+		m_pCurFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
 
 	m_pMedianPredicted = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pMedianPredicted->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
+		m_pMedianPredicted->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
 
 	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 
@@ -347,7 +347,7 @@ void CULY0Encoder::PredictProc(DWORD nBandIndex)
 			PredictLeftAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		case EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			PredictMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			PredictMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneWidth[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		default:
 			_ASSERT(false);
@@ -387,13 +387,13 @@ void CULY0Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlaneSize[1]        = pbih->biWidth * pbih->biHeight / 4;
 	m_dwPlaneSize[2]        = pbih->biWidth * pbih->biHeight / 4;
 
-	m_dwPlaneStride[0]      = pbih->biWidth;
-	m_dwPlaneMacroStride[0] = m_dwPlaneStride[0] * 2;
+	m_dwPlaneWidth[0]       = pbih->biWidth;
+	m_dwPlaneMacroStride[0] = m_dwPlaneWidth[0] * 2;
 
-	m_dwPlaneStride[1]      = pbih->biWidth / 2;
-	m_dwPlaneMacroStride[1] = m_dwPlaneStride[1];
+	m_dwPlaneWidth[1]       = pbih->biWidth / 2;
+	m_dwPlaneMacroStride[1] = m_dwPlaneWidth[1];
 
-	m_dwPlaneStride[2]      = m_dwPlaneStride[1];
+	m_dwPlaneWidth[2]       = m_dwPlaneWidth[1];
 	m_dwPlaneMacroStride[2] = m_dwPlaneMacroStride[1];
 }
 

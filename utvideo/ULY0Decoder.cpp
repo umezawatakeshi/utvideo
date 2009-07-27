@@ -153,11 +153,11 @@ DWORD CULY0Decoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	m_pRestoredFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pRestoredFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
+		m_pRestoredFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
 
 	m_pDecodedFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pDecodedFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneStride[i]);
+		m_pDecodedFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
 
 	m_ptm = new CThreadManager();
 
@@ -256,7 +256,7 @@ void CULY0Decoder::DecodeProc(DWORD nBandIndex)
 			m_pCurFrame = m_pDecodedFrame;
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStride[nPlaneIndex]);
+			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneWidth[nPlaneIndex]);
 			m_pCurFrame = m_pRestoredFrame;
 			break;
 		}
@@ -271,13 +271,13 @@ void CULY0Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlaneSize[1]        = pbih->biWidth * pbih->biHeight / 4;
 	m_dwPlaneSize[2]        = pbih->biWidth * pbih->biHeight / 4;
 
-	m_dwPlaneStride[0]      = pbih->biWidth;
-	m_dwPlaneMacroStride[0] = m_dwPlaneStride[0] * 2;
+	m_dwPlaneWidth[0]       = pbih->biWidth;
+	m_dwPlaneMacroStride[0] = m_dwPlaneWidth[0] * 2;
 
-	m_dwPlaneStride[1]      = pbih->biWidth / 2;
-	m_dwPlaneMacroStride[1] = m_dwPlaneStride[1];
+	m_dwPlaneWidth[1]       = pbih->biWidth / 2;
+	m_dwPlaneMacroStride[1] = m_dwPlaneWidth[1];
 
-	m_dwPlaneStride[2]      = m_dwPlaneStride[1];
+	m_dwPlaneWidth[2]       = m_dwPlaneWidth[1];
 	m_dwPlaneMacroStride[2] = m_dwPlaneMacroStride[1];
 }
 

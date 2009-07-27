@@ -54,7 +54,7 @@ protected:
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
 	DWORD m_dwPlaneSize[4];
-	DWORD m_dwPlaneStride[4];
+	DWORD m_dwPlaneWidth[4];
 	DWORD m_dwPlaneMacroStride[4];
 
 	CThreadManager *m_ptm;

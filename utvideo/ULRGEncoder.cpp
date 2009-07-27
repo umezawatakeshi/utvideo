@@ -73,9 +73,9 @@ void CULRGEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlaneSize[1]   = pbih->biWidth * pbih->biHeight;
 	m_dwPlaneSize[2]   = pbih->biWidth * pbih->biHeight;
 
-	m_dwPlaneStride[0] = pbih->biWidth;
-	m_dwPlaneStride[1] = pbih->biWidth;
-	m_dwPlaneStride[2] = pbih->biWidth;
+	m_dwPlaneWidth[0]  = pbih->biWidth;
+	m_dwPlaneWidth[1]  = pbih->biWidth;
+	m_dwPlaneWidth[2]  = pbih->biWidth;
 }
 
 void CULRGEncoder::ConvertToPlanar(DWORD nBandIndex)
@@ -100,9 +100,9 @@ void CULRGEncoder::ConvertToPlanar(DWORD nBandIndex)
 
 	pSrcBegin = ((BYTE *)m_icc->lpInput) + dwFrameStrideBegin * m_dwFrameStride;
 	pSrcEnd   = ((BYTE *)m_icc->lpInput) + dwFrameStrideEnd   * m_dwFrameStride;
-	g = m_pCurFrame->GetPlane(0) + dwPlaneStrideBegin * m_dwPlaneStride[0];
-	b = m_pCurFrame->GetPlane(1) + dwPlaneStrideBegin * m_dwPlaneStride[1];
-	r = m_pCurFrame->GetPlane(2) + dwPlaneStrideBegin * m_dwPlaneStride[2];
+	g = m_pCurFrame->GetPlane(0) + dwPlaneStrideBegin * m_dwPlaneWidth[0];
+	b = m_pCurFrame->GetPlane(1) + dwPlaneStrideBegin * m_dwPlaneWidth[1];
+	r = m_pCurFrame->GetPlane(2) + dwPlaneStrideBegin * m_dwPlaneWidth[2];
 
 	switch (m_icc->lpbiInput->biCompression)
 	{
