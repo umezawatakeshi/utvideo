@@ -49,7 +49,7 @@ class CULY0Decoder :
 {
 protected:
 	BOOL m_bBottomUpFrame;
-	DWORD m_dwNumMacroStrides;
+	DWORD m_dwNumStripes;
 	DWORD m_dwDivideCount;
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;

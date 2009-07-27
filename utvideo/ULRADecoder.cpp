@@ -80,8 +80,8 @@ void CULRADecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 
 void CULRADecoder::ConvertFromPlanar(DWORD nBandIndex)
 {
-	DWORD dwPlaneStrideBegin = m_dwNumMacroStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwPlaneStrideEnd   = m_dwNumMacroStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwPlaneStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
+	DWORD dwPlaneStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 	DWORD dwFrameStrideBegin, dwFrameStrideEnd;
 
 	const BYTE *g, *b, *r, *a;
@@ -94,8 +94,8 @@ void CULRADecoder::ConvertFromPlanar(DWORD nBandIndex)
 	}
 	else
 	{
-		dwFrameStrideBegin = m_dwNumMacroStrides - dwPlaneStrideEnd;
-		dwFrameStrideEnd   = m_dwNumMacroStrides - dwPlaneStrideBegin;
+		dwFrameStrideBegin = m_dwNumStripes - dwPlaneStrideEnd;
+		dwFrameStrideEnd   = m_dwNumStripes - dwPlaneStrideBegin;
 	}
 
 	pDstBegin = ((BYTE *)m_icd->lpOutput) + dwFrameStrideBegin * m_dwFrameStride;

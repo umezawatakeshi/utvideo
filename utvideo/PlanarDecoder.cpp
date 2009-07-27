@@ -88,7 +88,7 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	if (dwRet != ICERR_OK)
 		return dwRet;
 
-	m_dwNumMacroStrides = pbihIn->biHeight;
+	m_dwNumStripes = pbihIn->biHeight;
 	m_dwDivideCount = ((pbieIn->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
@@ -129,7 +129,7 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 		default:
 			return ICERR_BADFORMAT;
 		}
-		m_dwFrameSize = m_dwFrameStride * m_dwNumMacroStrides;
+		m_dwFrameSize = m_dwFrameStride * m_dwNumStripes;
 	}
 
 	CalcPlaneSizes(pbihOut);
@@ -220,8 +220,8 @@ DWORD CPlanarDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITM
 
 void CPlanarDecoder::DecodeProc(DWORD nBandIndex)
 {
-	DWORD dwStrideBegin = m_dwNumMacroStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwStrideEnd   = m_dwNumMacroStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
+	DWORD dwStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{

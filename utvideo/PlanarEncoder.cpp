@@ -219,7 +219,7 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	if (dwRet != ICERR_OK)
 		return dwRet;
 
-	m_dwNumMacroStrides = pbihIn->biHeight;
+	m_dwNumStripes = pbihIn->biHeight;
 	m_dwDivideCount = ((pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
@@ -259,7 +259,7 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 		default:
 			return ICERR_BADFORMAT;
 		}
-		m_dwFrameSize = m_dwFrameStride * m_dwNumMacroStrides;
+		m_dwFrameSize = m_dwFrameStride * m_dwNumStripes;
 	}
 
 	CalcPlaneSizes(pbihIn);
@@ -354,8 +354,8 @@ DWORD CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 void CPlanarEncoder::PredictProc(DWORD nBandIndex)
 {
-	DWORD dwStrideBegin = m_dwNumMacroStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwStrideEnd   = m_dwNumMacroStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
+	DWORD dwStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 
 	ConvertToPlanar(nBandIndex);
 
@@ -383,8 +383,8 @@ void CPlanarEncoder::PredictProc(DWORD nBandIndex)
 
 void CPlanarEncoder::EncodeProc(DWORD nBandIndex)
 {
-	DWORD dwStrideBegin = m_dwNumMacroStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwStrideEnd   = m_dwNumMacroStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
+	DWORD dwStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneWidth[nPlaneIndex];

@@ -236,7 +236,7 @@ DWORD CULY0Encoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 	if (dwRet != ICERR_OK)
 		return dwRet;
 
-	m_dwNumMacroStrides = pbihIn->biHeight / 2;
+	m_dwNumStripes = pbihIn->biHeight / 2;
 	m_dwDivideCount = ((pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
@@ -328,8 +328,8 @@ DWORD CULY0Encoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 
 void CULY0Encoder::PredictProc(DWORD nBandIndex)
 {
-	DWORD dwMacroStrideBegin = m_dwNumMacroStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwMacroStrideEnd   = m_dwNumMacroStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwMacroStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
+	DWORD dwMacroStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 
 	ConvertToPlanar(nBandIndex);
 
@@ -357,8 +357,8 @@ void CULY0Encoder::PredictProc(DWORD nBandIndex)
 
 void CULY0Encoder::EncodeProc(DWORD nBandIndex)
 {
-	DWORD dwStrideBegin = m_dwNumMacroStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwStrideEnd   = m_dwNumMacroStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
+	DWORD dwStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneMacroStride[nPlaneIndex];
@@ -399,8 +399,8 @@ void CULY0Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 
 void CULY0Encoder::ConvertToPlanar(DWORD nBandIndex)
 {
-	DWORD dwMacroStrideBegin = m_dwNumMacroStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwMacroStrideEnd   = m_dwNumMacroStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwMacroStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
+	DWORD dwMacroStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 
 	BYTE *pDstYBegin = m_pCurFrame->GetPlane(0) + dwMacroStrideBegin * m_icc->lpbiInput->biWidth * 2;
 	BYTE *pDstUBegin = m_pCurFrame->GetPlane(1) + dwMacroStrideBegin * m_icc->lpbiInput->biWidth / 2;
@@ -510,8 +510,8 @@ void CULY0Encoder::ConvertToPlanar(DWORD nBandIndex)
 						DWORD dwSrcStride = ROUNDUP(dwDataStride, 4);
 						DWORD dwYStride = m_icc->lpbiInput->biWidth;
 
-						pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumMacroStrides - dwMacroStrideEnd  ) * dwSrcStride * 2;
-						pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumMacroStrides - dwMacroStrideBegin) * dwSrcStride * 2;
+						pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - dwMacroStrideEnd  ) * dwSrcStride * 2;
+						pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - dwMacroStrideBegin) * dwSrcStride * 2;
 
 						for (const BYTE *pStrideBegin = pSrcEnd - dwSrcStride * 2; pStrideBegin >= pSrcBegin; pStrideBegin -= dwSrcStride * 2)
 						{
@@ -537,8 +537,8 @@ void CULY0Encoder::ConvertToPlanar(DWORD nBandIndex)
 						DWORD dwSrcStride = ROUNDUP(dwDataStride, 4);
 						DWORD dwYStride = m_icc->lpbiInput->biWidth;
 
-						pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumMacroStrides - dwMacroStrideEnd  ) * dwSrcStride * 2;
-						pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumMacroStrides - dwMacroStrideBegin) * dwSrcStride * 2;
+						pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - dwMacroStrideEnd  ) * dwSrcStride * 2;
+						pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - dwMacroStrideBegin) * dwSrcStride * 2;
 
 						for (const BYTE *pStrideBegin = pSrcEnd - dwSrcStride * 2; pStrideBegin >= pSrcBegin; pStrideBegin -= dwSrcStride * 2)
 						{

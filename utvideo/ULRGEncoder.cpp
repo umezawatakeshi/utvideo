@@ -80,8 +80,8 @@ void CULRGEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 
 void CULRGEncoder::ConvertToPlanar(DWORD nBandIndex)
 {
-	DWORD dwPlaneStrideBegin = m_dwNumMacroStrides *  nBandIndex      / m_dwDivideCount;
-	DWORD dwPlaneStrideEnd   = m_dwNumMacroStrides * (nBandIndex + 1) / m_dwDivideCount;
+	DWORD dwPlaneStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
+	DWORD dwPlaneStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 	DWORD dwFrameStrideBegin, dwFrameStrideEnd;
 
 	BYTE *g, *b, *r;
@@ -94,8 +94,8 @@ void CULRGEncoder::ConvertToPlanar(DWORD nBandIndex)
 	}
 	else
 	{
-		dwFrameStrideBegin = m_dwNumMacroStrides - dwPlaneStrideEnd;
-		dwFrameStrideEnd   = m_dwNumMacroStrides - dwPlaneStrideBegin;
+		dwFrameStrideBegin = m_dwNumStripes - dwPlaneStrideEnd;
+		dwFrameStrideEnd   = m_dwNumStripes - dwPlaneStrideBegin;
 	}
 
 	pSrcBegin = ((BYTE *)m_icc->lpInput) + dwFrameStrideBegin * m_dwFrameStride;
