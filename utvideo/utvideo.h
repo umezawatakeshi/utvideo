@@ -74,7 +74,9 @@ struct BITMAPINFOEXT
 #define BIE_FLAGS0_COMPRESS_NONE                0x00000000
 #define BIE_FLAGS0_COMPRESS_HUFFMAN_CODE        0x00000001
 
-#define BIE_FLAGS0_RESERVED                     0x00fffffe
+#define BIE_FLAGS0_ASSUME_INTERLACE             0x00000800
+
+#define BIE_FLAGS0_RESERVED                     0x00fff7fe
 
 
 struct FRAMEINFO
@@ -103,7 +105,9 @@ struct ENCODERCONF
 #define EC_FLAGS0_INTRAFRAME_PREDICT_LEFT       0x00000100
 #define EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN     0x00000300
 
-#define EC_FLAGS0_RESERVED                      0xfffffc00
+#define EC_FLAGS0_ASSUME_INTERLACE              0x00000800
+
+#define EC_FLAGS0_RESERVED                      0xfffff400
 
 
 inline DWORD ROUNDUP(DWORD a, DWORD b)
