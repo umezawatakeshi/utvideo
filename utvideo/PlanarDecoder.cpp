@@ -134,6 +134,9 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 
 	CalcPlaneSizes(pbihOut);
 
+	for (int i = 0; i < _countof(m_dwPlaneWidth); i++)
+		m_dwPlanePredictStride[i] = m_dwPlaneWidth[i] * GetMacroPixelHeight() * ((pbieIn->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE) ? 2 : 1);
+
 	m_pRestoredFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pRestoredFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
@@ -194,6 +197,9 @@ DWORD CPlanarDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITM
 	if (pbihIn->biSize > sizeof(BITMAPINFOEXT))
 		return ICERR_BADFORMAT;
 
+	if (pbieIn->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE && pbihIn->biHeight % (GetMacroPixelHeight() * 2) != 0)
+		return ICERR_BADFORMAT;
+
 	if (pbieIn->dwFrameInfoSize > sizeof(FRAMEINFO))
 		return ICERR_BADFORMAT;
 	if (pbieIn->dwFlags0 & BIE_FLAGS0_RESERVED)
@@ -239,7 +245,7 @@ void CPlanarDecoder::DecodeProc(DWORD nBandIndex)
 			m_pCurFrame = m_pDecodedFrame;
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneWidth[nPlaneIndex]);
+			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlanePredictStride[nPlaneIndex]);
 			m_pCurFrame = m_pRestoredFrame;
 			break;
 		}

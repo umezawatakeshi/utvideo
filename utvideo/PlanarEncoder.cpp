@@ -264,6 +264,9 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	CalcPlaneSizes(pbihIn);
 
+	for (int i = 0; i < _countof(m_dwPlaneWidth); i++)
+		m_dwPlanePredictStride[i] = m_dwPlaneWidth[i] * GetMacroPixelHeight() * ((m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE) ? 2 : 1);
+
 	m_pCurFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
@@ -319,7 +322,7 @@ DWORD CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 	pbieOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
 	pbieOut->fccOriginalFormat = pbihIn->biCompression;
 	pbieOut->dwFrameInfoSize   = sizeof(FRAMEINFO);
-	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | ((dwDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT);
+	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | ((dwDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT) | (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE ? BIE_FLAGS0_ASSUME_INTERLACE : 0);
 
 	return ICERR_OK;
 }
@@ -334,6 +337,9 @@ DWORD CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	const INPUTFORMAT *pfmts;
 
 	if (pbihIn->biWidth % GetMacroPixelWidth() != 0 || pbihIn->biHeight % GetMacroPixelHeight() != 0)
+		return ICERR_BADFORMAT;
+
+	if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE && pbihIn->biHeight % (GetMacroPixelHeight() * 2) != 0)
 		return ICERR_BADFORMAT;
 
 	pfmts = GetSupportedInputFormats();
@@ -367,7 +373,7 @@ void CPlanarEncoder::PredictProc(DWORD nBandIndex)
 			PredictLeftAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		case EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			PredictMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneWidth[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			PredictMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		default:
 			_ASSERT(false);
