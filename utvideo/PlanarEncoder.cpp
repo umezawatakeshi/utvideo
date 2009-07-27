@@ -87,6 +87,7 @@ int CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_MEDIAN_RADIO, BST_CHECKED);
 			break;
 		}
+		CheckDlgButton(hwnd, IDC_ASSUME_INTERLACE_CHECK, pThis->m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE);
 		return TRUE;
 	case WM_COMMAND:
 		switch(LOWORD(wParam))
@@ -105,6 +106,8 @@ int CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
 			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_MEDIAN_RADIO))
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
+			if (IsDlgButtonChecked(hwnd, IDC_ASSUME_INTERLACE_CHECK))
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_ASSUME_INTERLACE;
 			/* FALLTHROUGH */
 		case IDCANCEL:
 			EndDialog(hwnd, 0);
