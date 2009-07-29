@@ -221,6 +221,7 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	m_dwNumStripes = pbihIn->biHeight;
 	m_dwDivideCount = ((pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
+	m_bInterlace = pbieOut->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE;
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 
@@ -265,7 +266,7 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	CalcPlaneSizes(pbihIn);
 
 	for (int i = 0; i < _countof(m_dwPlaneWidth); i++)
-		m_dwPlanePredictStride[i] = m_dwPlaneWidth[i] * GetMacroPixelHeight() * ((m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE) ? 2 : 1);
+		m_dwPlanePredictStride[i] = m_dwPlaneWidth[i] * GetMacroPixelHeight() * (m_bInterlace ? 2 : 1);
 
 	m_pCurFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)

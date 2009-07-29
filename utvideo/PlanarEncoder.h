@@ -52,6 +52,7 @@ protected:
 	BOOL m_bBottomUpFrame;
 	DWORD m_dwNumStripes;
 	DWORD m_dwDivideCount;
+	BOOL m_bInterlace;
 	DWORD m_dwFrameSize;
 	DWORD m_dwFrameStride;
 	DWORD m_dwPlaneSize[4];
