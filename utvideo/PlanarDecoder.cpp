@@ -138,6 +138,23 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	for (int i = 0; i < _countof(m_dwPlaneWidth); i++)
 		m_dwPlanePredictStride[i] = m_dwPlaneWidth[i] * GetMacroPixelHeight() * (m_bInterlace ? 2 : 1);
 
+	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+	{
+		m_dwPlaneStripeBegin[nBandIndex] = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
+		m_dwPlaneStripeEnd[nBandIndex]   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
+
+		if (!m_bBottomUpFrame)
+		{
+			m_dwRawStripeBegin[nBandIndex] = m_dwPlaneStripeBegin[nBandIndex];
+			m_dwRawStripeEnd[nBandIndex]   = m_dwPlaneStripeEnd[nBandIndex];
+		}
+		else
+		{
+			m_dwRawStripeBegin[nBandIndex] = m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex];
+			m_dwRawStripeEnd[nBandIndex]   = m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex];
+		}
+	}
+
 	m_pRestoredFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pRestoredFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
