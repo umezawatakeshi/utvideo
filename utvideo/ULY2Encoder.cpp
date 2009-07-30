@@ -102,8 +102,8 @@ void CULY2Encoder::ConvertToPlanar(DWORD nBandIndex)
 		dwFrameStrideEnd   = m_dwNumStripes - dwPlaneStrideBegin;
 	}
 
-	pSrcBegin = ((BYTE *)m_icc->lpInput) + dwFrameStrideBegin * m_dwFrameStride;
-	pSrcEnd   = ((BYTE *)m_icc->lpInput) + dwFrameStrideEnd   * m_dwFrameStride;
+	pSrcBegin = ((BYTE *)m_icc->lpInput) + dwFrameStrideBegin * m_dwRawWidth;
+	pSrcEnd   = ((BYTE *)m_icc->lpInput) + dwFrameStrideEnd   * m_dwRawWidth;
 	y = m_pCurFrame->GetPlane(0) + dwPlaneStrideBegin * m_dwPlaneWidth[0];
 	u = m_pCurFrame->GetPlane(1) + dwPlaneStrideBegin * m_dwPlaneWidth[1];
 	v = m_pCurFrame->GetPlane(2) + dwPlaneStrideBegin * m_dwPlaneWidth[2];
@@ -153,10 +153,10 @@ void CULY2Encoder::ConvertToPlanar(DWORD nBandIndex)
 		switch (m_icc->lpbiInput->biBitCount)
 		{
 		case 24:
-			ConvertBottomupRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwFrameStride, m_icc->lpbiOutput->biWidth * 3);
+			ConvertBottomupRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawWidth, m_icc->lpbiOutput->biWidth * 3);
 			break;
 		case 32:
-			ConvertBottomupRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwFrameStride, m_dwFrameStride);
+			ConvertBottomupRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawWidth, m_dwRawWidth);
 			break;
 		}
 		break;

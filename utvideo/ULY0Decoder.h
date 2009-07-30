@@ -51,8 +51,8 @@ protected:
 	BOOL m_bBottomUpFrame;
 	DWORD m_dwNumStripes;
 	DWORD m_dwDivideCount;
-	DWORD m_dwFrameSize;
-	DWORD m_dwFrameStride;
+	DWORD m_dwRawSize;
+	DWORD m_dwRawWidth;
 	DWORD m_dwPlaneSize[4];
 	DWORD m_dwPlaneWidth[4];
 	DWORD m_dwPlaneMacroStride[4];

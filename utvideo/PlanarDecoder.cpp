@@ -74,7 +74,7 @@ DWORD CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
 		m_ptm->SubmitJob(new CDecodeJob(this, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
-	icd->lpbiOutput->biSizeImage = m_dwFrameSize;
+	icd->lpbiOutput->biSizeImage = m_dwRawSize;
 
 	return ICERR_OK;
 }
@@ -99,8 +99,8 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	switch (pbihOut->biCompression)
 	{
 	case FCC('YV12'):
-		//m_dwFrameSize = (pbihOut->biWidth * pbihOut->biHeight * 12) / 8; // XXX 幅や高さが奇数の場合は考慮していない
-		m_dwFrameSize = (pbihOut->biWidth * pbihOut->biHeight * 3) / 2; // XXX 幅や高さが奇数の場合は考慮していない
+		//m_dwRawSize = (pbihOut->biWidth * pbihOut->biHeight * 12) / 8; // XXX 幅や高さが奇数の場合は考慮していない
+		m_dwRawSize = (pbihOut->biWidth * pbihOut->biHeight * 3) / 2; // XXX 幅や高さが奇数の場合は考慮していない
 		break;
 	default:
 		switch (pbihOut->biCompression)
@@ -109,10 +109,10 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 			switch (pbihOut->biBitCount)
 			{
 			case 24:
-				m_dwFrameStride = ROUNDUP(pbihOut->biWidth * 3, 4);
+				m_dwRawWidth = ROUNDUP(pbihOut->biWidth * 3, 4);
 				break;
 			case 32:
-				m_dwFrameStride = pbihOut->biWidth * 4;
+				m_dwRawWidth = pbihOut->biWidth * 4;
 				break;
 			}
 			if (pbihIn->biHeight > 0)
@@ -125,12 +125,16 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 		case FCC('UYNV'):
 		case FCC('YVYU'):
 		case FCC('VYUY'):
-			m_dwFrameStride = ROUNDUP(pbihOut->biWidth, 2) * 2;
+			m_dwRawWidth = ROUNDUP(pbihOut->biWidth, 2) * 2;
 			break;
 		default:
 			return ICERR_BADFORMAT;
 		}
-		m_dwFrameSize = m_dwFrameStride * m_dwNumStripes;
+		m_dwRawSize = m_dwRawWidth * pbihIn->biHeight;
+		if (m_bInterlace)
+			m_dwRawStripeSize = m_dwRawWidth * 2;
+		else
+			m_dwRawStripeSize = m_dwRawWidth;
 	}
 
 	CalcPlaneSizes(pbihOut);

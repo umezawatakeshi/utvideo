@@ -98,8 +98,8 @@ void CULRADecoder::ConvertFromPlanar(DWORD nBandIndex)
 		dwFrameStrideEnd   = m_dwNumStripes - dwPlaneStrideBegin;
 	}
 
-	pDstBegin = ((BYTE *)m_icd->lpOutput) + dwFrameStrideBegin * m_dwFrameStride;
-	pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwFrameStrideEnd   * m_dwFrameStride;
+	pDstBegin = ((BYTE *)m_icd->lpOutput) + dwFrameStrideBegin * m_dwRawWidth;
+	pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwFrameStrideEnd   * m_dwRawWidth;
 	g = m_pCurFrame->GetPlane(0) + dwPlaneStrideBegin * m_dwPlaneWidth[0];
 	b = m_pCurFrame->GetPlane(1) + dwPlaneStrideBegin * m_dwPlaneWidth[1];
 	r = m_pCurFrame->GetPlane(2) + dwPlaneStrideBegin * m_dwPlaneWidth[2];
@@ -111,7 +111,7 @@ void CULRADecoder::ConvertFromPlanar(DWORD nBandIndex)
 		switch (m_icd->lpbiOutput->biBitCount)
 		{
 		case 32:
-			for (pStrideBegin = pDstEnd - m_dwFrameStride; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwFrameStride)
+			for (pStrideBegin = pDstEnd - m_dwRawWidth; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwRawWidth)
 			{
 				BYTE *pStrideEnd = pStrideBegin + m_icd->lpbiOutput->biWidth * 4;
 				for (p = pStrideBegin; p < pStrideEnd; p += 4)

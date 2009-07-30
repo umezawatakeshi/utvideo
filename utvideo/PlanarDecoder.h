@@ -52,8 +52,8 @@ protected:
 	DWORD m_dwNumStripes;
 	DWORD m_dwDivideCount;
 	BOOL m_bInterlace;
-	DWORD m_dwFrameSize;
-	DWORD m_dwFrameStride;
+	DWORD m_dwRawSize;
+	DWORD m_dwRawWidth;
 	DWORD m_dwPlaneSize[4];
 	DWORD m_dwPlaneWidth[4];
 	DWORD m_dwPlaneStripeSize[4];
@@ -61,6 +61,7 @@ protected:
 	DWORD m_dwPlaneStripeEnd[256];
 	DWORD m_dwRawStripeBegin[256];
 	DWORD m_dwRawStripeEnd[256];
+	DWORD m_dwRawStripeSize;
 
 	CThreadManager *m_ptm;
 	CFrameBuffer *m_pCurFrame;
