@@ -88,9 +88,9 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	if (dwRet != ICERR_OK)
 		return dwRet;
 
-	m_dwNumStripes = pbihIn->biHeight;
 	m_dwDivideCount = ((pbieIn->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 	m_bInterlace = pbieIn->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE;
+	m_dwNumStripes = pbihIn->biHeight / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 	_RPT1(_CRT_WARN, "divide count = %d\n", m_dwDivideCount);
@@ -242,14 +242,13 @@ DWORD CPlanarDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITM
 
 void CPlanarDecoder::DecodeProc(DWORD nBandIndex)
 {
-	DWORD dwStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
-	DWORD dwStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
-
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneWidth[nPlaneIndex];
-		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneWidth[nPlaneIndex];
+		DWORD dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
+		DWORD dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
+
 		DWORD dwDstOffset;
+
 		if (nBandIndex == 0)
 			dwDstOffset = 0;
 		else

@@ -219,9 +219,9 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	if (dwRet != ICERR_OK)
 		return dwRet;
 
-	m_dwNumStripes = pbihIn->biHeight;
 	m_dwDivideCount = ((pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 	m_bInterlace = pbieOut->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE;
+	m_dwNumStripes = pbihIn->biHeight / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 
@@ -376,15 +376,12 @@ DWORD CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 void CPlanarEncoder::PredictProc(DWORD nBandIndex)
 {
-	DWORD dwStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
-	DWORD dwStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
-
 	ConvertToPlanar(nBandIndex);
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneWidth[nPlaneIndex];
-		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneWidth[nPlaneIndex];
+		DWORD dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
+		DWORD dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
 
 		for (int i = 0; i < 256; i++)
 			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
@@ -405,17 +402,17 @@ void CPlanarEncoder::PredictProc(DWORD nBandIndex)
 
 void CPlanarEncoder::EncodeProc(DWORD nBandIndex)
 {
-	DWORD dwStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
-	DWORD dwStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneWidth[nPlaneIndex];
-		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneWidth[nPlaneIndex];
+		DWORD dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
+		DWORD dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
+
 		DWORD dwDstOffset;
 #ifdef _DEBUG
 		DWORD dwDstEnd;
 		DWORD dwEncodedSize;
 #endif
+
 		if (nBandIndex == 0)
 			dwDstOffset = 0;
 		else

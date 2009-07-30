@@ -81,30 +81,15 @@ void CULRAEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 
 void CULRAEncoder::ConvertToPlanar(DWORD nBandIndex)
 {
-	DWORD dwPlaneStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
-	DWORD dwPlaneStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
-	DWORD dwFrameStrideBegin, dwFrameStrideEnd;
-
 	BYTE *g, *b, *r, *a;
 	const BYTE *pSrcBegin, *pSrcEnd, *pStrideBegin, *p;
 
-	if (!m_bBottomUpFrame)
-	{
-		dwFrameStrideBegin = dwPlaneStrideBegin;
-		dwFrameStrideEnd   = dwPlaneStrideEnd;
-	}
-	else
-	{
-		dwFrameStrideBegin = m_dwNumStripes - dwPlaneStrideEnd;
-		dwFrameStrideEnd   = m_dwNumStripes - dwPlaneStrideBegin;
-	}
-
-	pSrcBegin = ((BYTE *)m_icc->lpInput) + dwFrameStrideBegin * m_dwRawWidth;
-	pSrcEnd   = ((BYTE *)m_icc->lpInput) + dwFrameStrideEnd   * m_dwRawWidth;
-	g = m_pCurFrame->GetPlane(0) + dwPlaneStrideBegin * m_dwPlaneWidth[0];
-	b = m_pCurFrame->GetPlane(1) + dwPlaneStrideBegin * m_dwPlaneWidth[1];
-	r = m_pCurFrame->GetPlane(2) + dwPlaneStrideBegin * m_dwPlaneWidth[2];
-	a = m_pCurFrame->GetPlane(3) + dwPlaneStrideBegin * m_dwPlaneWidth[3];
+	pSrcBegin = ((BYTE *)m_icc->lpInput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	pSrcEnd   = ((BYTE *)m_icc->lpInput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
+	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
+	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
+	a = m_pCurFrame->GetPlane(3) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[3];
 
 	switch (m_icc->lpbiInput->biCompression)
 	{

@@ -84,29 +84,14 @@ void CULY2Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 
 void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)
 {
-	DWORD dwPlaneStrideBegin = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
-	DWORD dwPlaneStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
-	DWORD dwFrameStrideBegin, dwFrameStrideEnd;
-
 	const BYTE *y, *u, *v;
 	BYTE *pDstBegin, *pDstEnd, *p;
 
-	if (!m_bBottomUpFrame)
-	{
-		dwFrameStrideBegin = dwPlaneStrideBegin;
-		dwFrameStrideEnd   = dwPlaneStrideEnd;
-	}
-	else
-	{
-		dwFrameStrideBegin = m_dwNumStripes - dwPlaneStrideEnd;
-		dwFrameStrideEnd   = m_dwNumStripes - dwPlaneStrideBegin;
-	}
-
-	pDstBegin = ((BYTE *)m_icd->lpOutput) + dwFrameStrideBegin * m_dwRawWidth;
-	pDstEnd   = ((BYTE *)m_icd->lpOutput) + dwFrameStrideEnd   * m_dwRawWidth;
-	y = m_pCurFrame->GetPlane(0) + dwPlaneStrideBegin * m_dwPlaneWidth[0];
-	u = m_pCurFrame->GetPlane(1) + dwPlaneStrideBegin * m_dwPlaneWidth[1];
-	v = m_pCurFrame->GetPlane(2) + dwPlaneStrideBegin * m_dwPlaneWidth[2];
+	pDstBegin = ((BYTE *)m_icd->lpOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	pDstEnd   = ((BYTE *)m_icd->lpOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	y = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
+	u = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
+	v = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
 
 	switch (m_icd->lpbiOutput->biCompression)
 	{
