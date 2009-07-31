@@ -46,6 +46,9 @@
 const CULY0Decoder::OUTPUTFORMAT CULY0Decoder::m_outfmts[] = {
 	{ FCC('YV12'), 12 },
 	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
+	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
+	{ FCC('YVYU'), 16 },
+	{ FCC('VYUY'), 16 },
 	{ BI_RGB, 32 },
 	{ BI_RGB, 24 },
 };
