@@ -69,13 +69,17 @@ CEncoder *CULRGEncoder::CreateInstance(void)
 
 void CULRGEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
-	m_dwPlaneSize[0]   = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[1]   = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[2]   = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[0]       = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[1]       = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[2]       = pbih->biWidth * pbih->biHeight;
 
-	m_dwPlaneWidth[0]  = pbih->biWidth;
-	m_dwPlaneWidth[1]  = pbih->biWidth;
-	m_dwPlaneWidth[2]  = pbih->biWidth;
+	m_dwPlaneWidth[0]      = pbih->biWidth;
+	m_dwPlaneWidth[1]      = pbih->biWidth;
+	m_dwPlaneWidth[2]      = pbih->biWidth;
+
+	m_dwPlaneStripeSize[0] = pbih->biWidth;
+	m_dwPlaneStripeSize[1] = pbih->biWidth;
+	m_dwPlaneStripeSize[2] = pbih->biWidth;
 }
 
 void CULRGEncoder::ConvertToPlanar(DWORD nBandIndex)

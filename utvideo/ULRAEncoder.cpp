@@ -68,15 +68,20 @@ CEncoder *CULRAEncoder::CreateInstance(void)
 
 void CULRAEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
-	m_dwPlaneSize[0]   = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[1]   = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[2]   = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[3]   = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[0]       = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[1]       = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[2]       = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[3]       = pbih->biWidth * pbih->biHeight;
 
-	m_dwPlaneWidth[0]  = pbih->biWidth;
-	m_dwPlaneWidth[1]  = pbih->biWidth;
-	m_dwPlaneWidth[2]  = pbih->biWidth;
-	m_dwPlaneWidth[3]  = pbih->biWidth;
+	m_dwPlaneWidth[0]      = pbih->biWidth;
+	m_dwPlaneWidth[1]      = pbih->biWidth;
+	m_dwPlaneWidth[2]      = pbih->biWidth;
+	m_dwPlaneWidth[3]      = pbih->biWidth;
+
+	m_dwPlaneStripeSize[0] = pbih->biWidth;
+	m_dwPlaneStripeSize[1] = pbih->biWidth;
+	m_dwPlaneStripeSize[2] = pbih->biWidth;
+	m_dwPlaneStripeSize[3] = pbih->biWidth;
 }
 
 void CULRAEncoder::ConvertToPlanar(DWORD nBandIndex)

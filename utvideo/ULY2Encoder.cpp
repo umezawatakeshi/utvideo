@@ -74,13 +74,17 @@ CEncoder *CULY2Encoder::CreateInstance(void)
 
 void CULY2Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
-	m_dwPlaneSize[0]   = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[1]   = pbih->biWidth * pbih->biHeight / 2;
-	m_dwPlaneSize[2]   = pbih->biWidth * pbih->biHeight / 2;
+	m_dwPlaneSize[0]       = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[1]       = pbih->biWidth * pbih->biHeight / 2;
+	m_dwPlaneSize[2]       = pbih->biWidth * pbih->biHeight / 2;
 
-	m_dwPlaneWidth[0]  = pbih->biWidth;
-	m_dwPlaneWidth[1]  = pbih->biWidth / 2;
-	m_dwPlaneWidth[2]  = pbih->biWidth / 2;
+	m_dwPlaneWidth[0]      = pbih->biWidth;
+	m_dwPlaneWidth[1]      = pbih->biWidth / 2;
+	m_dwPlaneWidth[2]      = pbih->biWidth / 2;
+
+	m_dwPlaneStripeSize[0] = pbih->biWidth;
+	m_dwPlaneStripeSize[1] = pbih->biWidth / 2;
+	m_dwPlaneStripeSize[2] = pbih->biWidth / 2;
 }
 
 void CULY2Encoder::ConvertToPlanar(DWORD nBandIndex)

@@ -269,8 +269,11 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	CalcPlaneSizes(pbihIn);
 
-	for (int i = 0; i < _countof(m_dwPlaneWidth); i++)
-		m_dwPlaneStripeSize[i] = m_dwPlaneWidth[i] * GetMacroPixelHeight() * (m_bInterlace ? 2 : 1);
+	if (m_bInterlace)
+	{
+		for (int i = 0; i < _countof(m_dwPlaneWidth); i++)
+			m_dwPlaneStripeSize[i] *= 2;
+	}
 
 	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 	{
