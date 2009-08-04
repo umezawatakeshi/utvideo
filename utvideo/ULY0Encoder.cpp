@@ -335,8 +335,8 @@ void CULY0Encoder::PredictProc(DWORD nBandIndex)
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwPlaneBegin = dwMacroStrideBegin * m_dwPlaneMacroStride[nPlaneIndex];
-		DWORD dwPlaneEnd   = dwMacroStrideEnd   * m_dwPlaneMacroStride[nPlaneIndex];
+		DWORD dwPlaneBegin = dwMacroStrideBegin * m_dwPlaneStripeSize[nPlaneIndex];
+		DWORD dwPlaneEnd   = dwMacroStrideEnd   * m_dwPlaneStripeSize[nPlaneIndex];
 
 		for (int i = 0; i < 256; i++)
 			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
@@ -361,8 +361,8 @@ void CULY0Encoder::EncodeProc(DWORD nBandIndex)
 	DWORD dwStrideEnd   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneMacroStride[nPlaneIndex];
-		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneMacroStride[nPlaneIndex];
+		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStripeSize[nPlaneIndex];
+		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStripeSize[nPlaneIndex];
 		DWORD dwDstOffset;
 #ifdef _DEBUG
 		DWORD dwDstEnd;
@@ -388,13 +388,13 @@ void CULY0Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlaneSize[2]        = pbih->biWidth * pbih->biHeight / 4;
 
 	m_dwPlaneWidth[0]       = pbih->biWidth;
-	m_dwPlaneMacroStride[0] = m_dwPlaneWidth[0] * 2;
+	m_dwPlaneStripeSize[0] = m_dwPlaneWidth[0] * 2;
 
 	m_dwPlaneWidth[1]       = pbih->biWidth / 2;
-	m_dwPlaneMacroStride[1] = m_dwPlaneWidth[1];
+	m_dwPlaneStripeSize[1] = m_dwPlaneWidth[1];
 
 	m_dwPlaneWidth[2]       = m_dwPlaneWidth[1];
-	m_dwPlaneMacroStride[2] = m_dwPlaneMacroStride[1];
+	m_dwPlaneStripeSize[2] = m_dwPlaneStripeSize[1];
 }
 
 void CULY0Encoder::ConvertToPlanar(DWORD nBandIndex)

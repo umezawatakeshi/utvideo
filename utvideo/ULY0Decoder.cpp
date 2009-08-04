@@ -239,8 +239,8 @@ void CULY0Decoder::DecodeProc(DWORD nBandIndex)
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneMacroStride[nPlaneIndex];
-		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneMacroStride[nPlaneIndex];
+		DWORD dwPlaneBegin = dwStrideBegin * m_dwPlaneStripeSize[nPlaneIndex];
+		DWORD dwPlaneEnd   = dwStrideEnd   * m_dwPlaneStripeSize[nPlaneIndex];
 		DWORD dwDstOffset;
 		if (nBandIndex == 0)
 			dwDstOffset = 0;
@@ -275,13 +275,13 @@ void CULY0Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlaneSize[2]        = pbih->biWidth * pbih->biHeight / 4;
 
 	m_dwPlaneWidth[0]       = pbih->biWidth;
-	m_dwPlaneMacroStride[0] = m_dwPlaneWidth[0] * 2;
+	m_dwPlaneStripeSize[0] = m_dwPlaneWidth[0] * 2;
 
 	m_dwPlaneWidth[1]       = pbih->biWidth / 2;
-	m_dwPlaneMacroStride[1] = m_dwPlaneWidth[1];
+	m_dwPlaneStripeSize[1] = m_dwPlaneWidth[1];
 
 	m_dwPlaneWidth[2]       = m_dwPlaneWidth[1];
-	m_dwPlaneMacroStride[2] = m_dwPlaneMacroStride[1];
+	m_dwPlaneStripeSize[2] = m_dwPlaneStripeSize[1];
 }
 
 void CULY0Decoder::ConvertFromPlanar(DWORD nBandIndex)

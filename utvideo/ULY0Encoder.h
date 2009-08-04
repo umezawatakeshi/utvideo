@@ -54,7 +54,7 @@ protected:
 	DWORD m_dwDivideCount;
 	DWORD m_dwPlaneSize[4];
 	DWORD m_dwPlaneWidth[4];
-	DWORD m_dwPlaneMacroStride[4];
+	DWORD m_dwPlaneStripeSize[4];
 
 	CThreadManager *m_ptm;
 	const ICCOMPRESS *m_icc;
