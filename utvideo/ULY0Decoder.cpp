@@ -92,9 +92,9 @@ void CULY0Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 
 void CULY0Decoder::ConvertFromPlanar(DWORD nBandIndex)
 {
-	const BYTE *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_icd->lpbiOutput->biWidth * 2;
-	const BYTE *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_icd->lpbiOutput->biWidth / 2;
-	const BYTE *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_icd->lpbiOutput->biWidth / 2;
+	const BYTE *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
+	const BYTE *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
+	const BYTE *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
 
 	switch (m_icd->lpbiOutput->biCompression)
 	{
@@ -106,13 +106,13 @@ void CULY0Decoder::ConvertFromPlanar(DWORD nBandIndex)
 			pDstVBegin = pDstYBegin + m_icd->lpbiOutput->biWidth * m_icd->lpbiOutput->biHeight;
 			pDstUBegin = pDstVBegin + m_icd->lpbiOutput->biWidth * m_icd->lpbiOutput->biHeight / 4;
 
-			pDstYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_icd->lpbiOutput->biWidth * 2;
-			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_icd->lpbiOutput->biWidth / 2;
-			pDstUBegin += m_dwPlaneStripeBegin[nBandIndex] * m_icd->lpbiOutput->biWidth / 2;
+			pDstYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
+			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
+			pDstUBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
 
-			memcpy(pDstYBegin, pSrcYBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_icd->lpbiOutput->biWidth * 2);
-			memcpy(pDstUBegin, pSrcUBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_icd->lpbiOutput->biWidth / 2);
-			memcpy(pDstVBegin, pSrcVBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_icd->lpbiOutput->biWidth / 2);
+			memcpy(pDstYBegin, pSrcYBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[0]);
+			memcpy(pDstUBegin, pSrcUBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[1]);
+			memcpy(pDstVBegin, pSrcVBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[2]);
 		}
 		break;
 	default:
