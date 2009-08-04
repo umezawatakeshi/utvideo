@@ -73,17 +73,21 @@ CDecoder *CULY2Decoder::CreateInstance(void)
 
 void CULY2Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
-	m_dwPlaneSize[0]       = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[1]       = pbih->biWidth * pbih->biHeight / 2;
-	m_dwPlaneSize[2]       = pbih->biWidth * pbih->biHeight / 2;
+	m_dwPlaneSize[0]          = pbih->biWidth * pbih->biHeight;
+	m_dwPlaneSize[1]          = pbih->biWidth * pbih->biHeight / 2;
+	m_dwPlaneSize[2]          = pbih->biWidth * pbih->biHeight / 2;
 
-	m_dwPlaneWidth[0]      = pbih->biWidth;
-	m_dwPlaneWidth[1]      = pbih->biWidth / 2;
-	m_dwPlaneWidth[2]      = pbih->biWidth / 2;
+	m_dwPlaneWidth[0]         = pbih->biWidth;
+	m_dwPlaneWidth[1]         = pbih->biWidth / 2;
+	m_dwPlaneWidth[2]         = pbih->biWidth / 2;
 
-	m_dwPlaneStripeSize[0] = pbih->biWidth;
-	m_dwPlaneStripeSize[1] = pbih->biWidth / 2;
-	m_dwPlaneStripeSize[2] = pbih->biWidth / 2;
+	m_dwPlaneStripeSize[0]    = pbih->biWidth;
+	m_dwPlaneStripeSize[1]    = pbih->biWidth / 2;
+	m_dwPlaneStripeSize[2]    = pbih->biWidth / 2;
+
+	m_dwPlanePredictStride[0] = pbih->biWidth;
+	m_dwPlanePredictStride[1] = pbih->biWidth / 2;
+	m_dwPlanePredictStride[2] = pbih->biWidth / 2;
 }
 
 void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)

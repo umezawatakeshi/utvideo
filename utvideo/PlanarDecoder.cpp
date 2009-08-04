@@ -142,7 +142,10 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	if (m_bInterlace)
 	{
 		for (int i = 0; i < _countof(m_dwPlaneWidth); i++)
-			m_dwPlaneStripeSize[i] *= 2;
+		{
+			m_dwPlaneStripeSize[i]    *= 2;
+			m_dwPlanePredictStride[i] *= 2;
+		}
 	}
 
 	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
@@ -269,7 +272,7 @@ void CPlanarDecoder::DecodeProc(DWORD nBandIndex)
 			m_pCurFrame = m_pDecodedFrame;
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlaneStripeSize[nPlaneIndex]);
+			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlanePredictStride[nPlaneIndex]);
 			m_pCurFrame = m_pRestoredFrame;
 			break;
 		}

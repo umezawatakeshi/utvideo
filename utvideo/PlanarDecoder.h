@@ -57,6 +57,7 @@ protected:
 	DWORD m_dwPlaneSize[4];
 	DWORD m_dwPlaneWidth[4];
 	DWORD m_dwPlaneStripeSize[4];
+	DWORD m_dwPlanePredictStride[4];
 	DWORD m_dwPlaneStripeBegin[256];
 	DWORD m_dwPlaneStripeEnd[256];
 	DWORD m_dwRawStripeBegin[256];
