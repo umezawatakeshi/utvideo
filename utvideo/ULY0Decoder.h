@@ -40,39 +40,14 @@
 
 #pragma once
 #include "Decoder.h"
+#include "PlanarDecoder.h"
 #include "FrameBuffer.h"
 #include "Thread.h"
 #include "HuffmanCode.h"
 
 class CULY0Decoder :
-	public CDecoder
+	public CPlanarDecoder
 {
-protected:
-	BOOL m_bBottomUpFrame;
-	DWORD m_dwNumStripes;
-	DWORD m_dwDivideCount;
-	DWORD m_dwRawSize;
-	DWORD m_dwRawWidth;
-	DWORD m_dwPlaneSize[4];
-	DWORD m_dwPlaneWidth[4];
-	DWORD m_dwPlaneStripeSize[4];
-
-	CThreadManager *m_ptm;
-	CFrameBuffer *m_pCurFrame;
-	CFrameBuffer *m_pRestoredFrame;
-	CFrameBuffer *m_pDecodedFrame;
-	FRAMEINFO m_fi;
-	HUFFMAN_DECODE_TABLE m_hdt[4];
-	const BYTE *m_pCodeLengthTable[4];
-	const ICDECOMPRESS *m_icd;
-
-public:
-	struct OUTPUTFORMAT
-	{
-		DWORD fcc;
-		WORD nBitCount;
-	};
-
 private:
 	static const OUTPUTFORMAT m_outfmts[];
 
@@ -80,13 +55,6 @@ public:
 	CULY0Decoder(void);
 	virtual ~CULY0Decoder(void);
 	static CDecoder *CreateInstance(void);
-
-public:
-	virtual DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize);
-	virtual DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual DWORD DecompressEnd(void);
-	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	virtual DWORD DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
 protected:
 	virtual DWORD GetInputFCC(void) { return FCC('ULY0'); }
@@ -98,23 +66,4 @@ protected:
 	virtual void ConvertFromPlanar(DWORD nBandIndex);
 	virtual int GetMacroPixelWidth(void) { return 2; }
 	virtual int GetMacroPixelHeight(void) { return 2; }
-
-private:
-	void DecodeProc(DWORD nBandIndex);
-	class CDecodeJob : public CThreadJob
-	{
-	private:
-		DWORD m_nBandIndex;
-		CULY0Decoder *m_pDecoder;
-	public:
-		CDecodeJob(CULY0Decoder *pDecoder, DWORD nBandIndex)
-		{
-			m_nBandIndex = nBandIndex;
-			m_pDecoder = pDecoder;
-		}
-		void JobProc(CThreadManager *)
-		{
-			m_pDecoder->DecodeProc(m_nBandIndex);
-		}
-	};
 };

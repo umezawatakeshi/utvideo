@@ -40,40 +40,14 @@
 
 #pragma once
 #include "Encoder.h"
+#include "PlanarEncoder.h"
 #include "FrameBuffer.h"
 #include "HuffmanCode.h"
 #include "Thread.h"
 
 class CULY0Encoder :
-	public CEncoder
+	public CPlanarEncoder
 {
-protected:
-	ENCODERCONF m_ec;
-	BOOL m_bBottomUpFrame;
-	DWORD m_dwNumStripes;
-	DWORD m_dwDivideCount;
-	DWORD m_dwPlaneSize[4];
-	DWORD m_dwPlaneWidth[4];
-	DWORD m_dwPlaneStripeSize[4];
-
-	CThreadManager *m_ptm;
-	const ICCOMPRESS *m_icc;
-	CFrameBuffer *m_pCurFrame;
-	CFrameBuffer *m_pMedianPredicted;
-	struct COUNTS
-	{
-		DWORD dwCount[4][256];
-	} *m_counts;
-	BYTE *m_pCodeLengthTable[4];
-	HUFFMAN_ENCODE_TABLE m_het[4];
-
-public:
-	struct INPUTFORMAT
-	{
-		DWORD fcc;
-		WORD nBitCount;
-	};
-
 private:
 	static const INPUTFORMAT m_infmts[];
 
@@ -81,18 +55,6 @@ public:
 	CULY0Encoder(void);
 	virtual ~CULY0Encoder(void);
 	static CEncoder *CreateInstance(void);
-
-public:
-	virtual DWORD Configure(HWND hwnd);
-	static int CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	virtual DWORD GetState(void *pState, DWORD dwSize);
-	virtual DWORD SetState(const void *pState, DWORD dwSize);
-	virtual DWORD Compress(const ICCOMPRESS *icc, DWORD dwSize);
-	virtual DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressEnd(void);
-	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
 protected:
 	virtual DWORD GetOutputFCC(void) { return FCC('ULY0'); }
@@ -106,41 +68,4 @@ protected:
 	virtual void ConvertToPlanar(DWORD nBandIndex);
 	virtual int GetMacroPixelWidth(void) { return 2; }
 	virtual int GetMacroPixelHeight(void) { return 2; }
-
-private:
-	void PredictProc(DWORD nBandIndex);
-	class CPredictJob : public CThreadJob
-	{
-	private:
-		DWORD m_nBandIndex;
-		CULY0Encoder *m_pEncoder;
-	public:
-		CPredictJob(CULY0Encoder *pEncoder, DWORD nBandIndex)
-		{
-			m_nBandIndex = nBandIndex;
-			m_pEncoder = pEncoder;
-		}
-		void JobProc(CThreadManager *)
-		{
-			m_pEncoder->PredictProc(m_nBandIndex);
-		}
-	};
-
-	void EncodeProc(DWORD nBandIndex);
-	class CEncodeJob : public CThreadJob
-	{
-	private:
-		DWORD m_nBandIndex;
-		CULY0Encoder *m_pEncoder;
-	public:
-		CEncodeJob(CULY0Encoder *pEncoder, DWORD nBandIndex)
-		{
-			m_nBandIndex = nBandIndex;
-			m_pEncoder = pEncoder;
-		}
-		void JobProc(CThreadManager *)
-		{
-			m_pEncoder->EncodeProc(m_nBandIndex);
-		}
-	};
 };
