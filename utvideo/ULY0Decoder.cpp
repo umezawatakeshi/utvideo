@@ -275,13 +275,12 @@ void CULY0Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlaneSize[2]        = pbih->biWidth * pbih->biHeight / 4;
 
 	m_dwPlaneWidth[0]       = pbih->biWidth;
-	m_dwPlaneStripeSize[0] = m_dwPlaneWidth[0] * 2;
-
 	m_dwPlaneWidth[1]       = pbih->biWidth / 2;
-	m_dwPlaneStripeSize[1] = m_dwPlaneWidth[1];
+	m_dwPlaneWidth[2]       = pbih->biWidth / 2;
 
-	m_dwPlaneWidth[2]       = m_dwPlaneWidth[1];
-	m_dwPlaneStripeSize[2] = m_dwPlaneStripeSize[1];
+	m_dwPlaneStripeSize[0] = pbih->biWidth * 2;
+	m_dwPlaneStripeSize[1] = pbih->biWidth / 2;
+	m_dwPlaneStripeSize[2] = pbih->biWidth / 2;
 }
 
 void CULY0Decoder::ConvertFromPlanar(DWORD nBandIndex)
