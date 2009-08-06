@@ -132,9 +132,9 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 		}
 		m_dwRawSize = m_dwRawWidth * pbihIn->biHeight;
 		if (m_bInterlace)
-			m_dwRawStripeSize = m_dwRawWidth * 2;
+			m_dwRawStripeSize = m_dwRawWidth * GetMacroPixelHeight() * 2;
 		else
-			m_dwRawStripeSize = m_dwRawWidth;
+			m_dwRawStripeSize = m_dwRawWidth * GetMacroPixelHeight();
 	}
 
 	CalcPlaneSizes(pbihOut);
