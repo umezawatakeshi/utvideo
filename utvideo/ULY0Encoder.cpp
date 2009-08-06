@@ -93,6 +93,68 @@ void CULY0Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlanePredictStride[2] = pbih->biWidth / 2;
 }
 
+void CULY0Encoder::ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD bypp)
+{
+	BYTE *y = pDstYBegin;
+	BYTE *u = pDstUBegin;
+	BYTE *v = pDstVBegin;
+
+	DWORD dwDataStride = m_icc->lpbiInput->biWidth * bypp;
+	DWORD dwSrcStride = ROUNDUP(dwDataStride, 4);
+	DWORD dwYStride = m_icc->lpbiInput->biWidth;
+
+	const BYTE *pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * dwSrcStride * 2;
+	const BYTE *pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * dwSrcStride * 2;
+
+	for (const BYTE *pStrideBegin = pSrcEnd - dwSrcStride * 2; pStrideBegin >= pSrcBegin; pStrideBegin -= dwSrcStride * 2)
+	{
+		const BYTE *pStrideEnd = pStrideBegin + dwDataStride;
+		for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += bypp * 2)
+		{
+			const BYTE *q = p + dwSrcStride;
+			*(y+0)           = min(max(int((*(q     +0))*0.098 + (*(q     +1))*0.504 + (*(q     +2))*0.257 + 16.5), 16), 235);
+			*(y+1)           = min(max(int((*(q+bypp+0))*0.098 + (*(q+bypp+1))*0.504 + (*(q+bypp+2))*0.257 + 16.5), 16), 235);
+			*(y+dwYStride+0) = min(max(int((*(p     +0))*0.098 + (*(p     +1))*0.504 + (*(p     +2))*0.257 + 16.5), 16), 235);
+			*(y+dwYStride+1) = min(max(int((*(p+bypp+0))*0.098 + (*(p+bypp+1))*0.504 + (*(p+bypp+2))*0.257 + 16.5), 16), 235);
+			*u               = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*0.439 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.291 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*-0.148)/4 + 128.5), 16), 240);
+			*v               = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*-0.071 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.368 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*0.439)/4 + 128.5), 16), 240);
+			y+=2; u++; v++;
+		}
+		y += dwYStride;
+	}
+}
+
+void CULY0Encoder::ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD nYOffset)
+{
+	BYTE *y = pDstYBegin;
+	BYTE *u = pDstUBegin;
+	BYTE *v = pDstVBegin;
+
+	DWORD dwSrcStride = m_icc->lpbiInput->biWidth * 2;
+	DWORD dwYStride = m_icc->lpbiInput->biWidth;
+
+	const BYTE *pSrcBegin = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeBegin[nBandIndex] * dwSrcStride * 2;
+	const BYTE *pSrcEnd   = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeEnd[nBandIndex]   * dwSrcStride * 2;
+
+	for (const BYTE *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += dwSrcStride * 2)
+	{
+		const BYTE *pStrideEnd = pStrideBegin + dwSrcStride;
+		for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
+		{
+			const BYTE *q = p + dwSrcStride;
+			*(y+0) = *(p+0+nYOffset);
+			*(y+1) = *(p+2+nYOffset);
+			*(y+dwYStride+0) = *(q+0+nYOffset);
+			*(y+dwYStride+1) = *(q+2+nYOffset);
+			*u = (*(p+1-nYOffset) + *(q+1-nYOffset)) / 2;
+			*v = (*(p+3-nYOffset) + *(q+3-nYOffset)) / 2;
+
+			y+=2; u++; v++;
+		}
+		y += dwYStride;
+	}
+}
+
 void CULY0Encoder::ConvertToPlanar(DWORD nBandIndex)
 {
 	BYTE *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
@@ -118,141 +180,31 @@ void CULY0Encoder::ConvertToPlanar(DWORD nBandIndex)
 			memcpy(pDstVBegin, pSrcVBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[2]);
 		}
 		break;
-	default:
+	case FCC('YUY2'):
+	case FCC('YUYV'):
+	case FCC('YUNV'):
+		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 0);
+		break;
+	case FCC('UYVY'):
+	case FCC('UYNV'):
+		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 1);
+		break;
+	case FCC('YVYU'):
+		ConvertYUV422ToULY0(pDstYBegin, pDstVBegin, pDstUBegin, nBandIndex, 0);
+		break;
+	case FCC('VYUY'):
+		ConvertYUV422ToULY0(pDstYBegin, pDstVBegin, pDstUBegin, nBandIndex, 1);
+		break;
+	case BI_RGB:
+		switch (m_icc->lpbiInput->biBitCount)
 		{
-			BYTE *y, *u, *v;
-			const BYTE *pSrcBegin, *pSrcEnd;
-
-			y = pDstYBegin;
-			u = pDstUBegin;
-			v = pDstVBegin;
-
-			switch (m_icc->lpbiInput->biCompression)
-			{
-			case FCC('YVYU'):
-				swap(pDstUBegin, pDstVBegin);
-				swap(u, v);
-				/* FALLTHROUGH */
-			case FCC('YUY2'):
-			case FCC('YUYV'):
-			case FCC('YUNV'):
-				{
-					DWORD dwSrcStride = m_icc->lpbiInput->biWidth * 2;
-					DWORD dwYStride = m_icc->lpbiInput->biWidth;
-
-					pSrcBegin = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeBegin[nBandIndex] * dwSrcStride * 2;
-					pSrcEnd   = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeEnd[nBandIndex]   * dwSrcStride * 2;
-
-					for (const BYTE *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += dwSrcStride * 2)
-					{
-						const BYTE *pStrideEnd = pStrideBegin + dwSrcStride;
-						for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
-						{
-							const BYTE *q = p + dwSrcStride;
-							*(y+0) = *p;
-							*(y+1) = *(p+2);
-							*(y+dwYStride+0) = *q;
-							*(y+dwYStride+1) = *(q+2);
-							*u = (*(p+1) + *(q+1)) / 2;
-							*v = (*(p+3) + *(q+3)) / 2;
-
-							y+=2; u++; v++;
-						}
-						y += dwYStride;
-					}
-				}
-				break;
-			case FCC('VYUY'):
-				swap(pDstUBegin, pDstVBegin);
-				swap(u, v);
-				/* FALLTHROUGH */
-			case FCC('UYVY'):
-			case FCC('UYNV'):
-				{
-					DWORD dwSrcStride = m_icc->lpbiInput->biWidth * 2;
-					DWORD dwYStride = m_icc->lpbiInput->biWidth;
-
-					pSrcBegin = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeBegin[nBandIndex] * dwSrcStride * 2;
-					pSrcEnd   = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeEnd[nBandIndex]   * dwSrcStride * 2;
-
-					for (const BYTE *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += dwSrcStride * 2)
-					{
-						const BYTE *pStrideEnd = pStrideBegin + dwSrcStride;
-						for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
-						{
-							const BYTE *q = p + dwSrcStride;
-							*(y+0) = *(p+1);
-							*(y+1) = *(p+3);
-							*(y+dwYStride+0) = *(q+1);
-							*(y+dwYStride+1) = *(q+3);
-							*u = (*(p+0) + *(q+0)) / 2;
-							*v = (*(p+2) + *(q+2)) / 2;
-
-							y+=2; u++; v++;
-						}
-						y += dwYStride;
-					}
-				}
-				break;
-			case BI_RGB:
-				switch (m_icc->lpbiInput->biBitCount)
-				{
-				case 24:
-					{
-						DWORD dwDataStride = m_icc->lpbiInput->biWidth * 3;
-						DWORD dwSrcStride = ROUNDUP(dwDataStride, 4);
-						DWORD dwYStride = m_icc->lpbiInput->biWidth;
-
-						pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * dwSrcStride * 2;
-						pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * dwSrcStride * 2;
-
-						for (const BYTE *pStrideBegin = pSrcEnd - dwSrcStride * 2; pStrideBegin >= pSrcBegin; pStrideBegin -= dwSrcStride * 2)
-						{
-							const BYTE *pStrideEnd = pStrideBegin + dwDataStride;
-							for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += 6)
-							{
-								const BYTE *q = p + dwSrcStride;
-								*(y+0)           = min(max(int((*(q+0))*0.098 + (*(q+1))*0.504 + (*(q+2))*0.257 + 16.5), 16), 235);
-								*(y+1)           = min(max(int((*(q+3))*0.098 + (*(q+4))*0.504 + (*(q+5))*0.257 + 16.5), 16), 235);
-								*(y+dwYStride+0) = min(max(int((*(p+0))*0.098 + (*(p+1))*0.504 + (*(p+2))*0.257 + 16.5), 16), 235);
-								*(y+dwYStride+1) = min(max(int((*(p+3))*0.098 + (*(p+4))*0.504 + (*(p+5))*0.257 + 16.5), 16), 235);
-								*u               = min(max(int(((*(p+0)+*(p+3)+*(q+0)+*(q+3))*0.439 + (*(p+1)+*(p+4)+*(q+1)+*(q+4))*-0.291 + (*(p+2)+*(p+5)+*(q+2)+*(q+5))*-0.148)/4 + 128.5), 16), 240);
-								*v               = min(max(int(((*(p+0)+*(p+3)+*(q+0)+*(q+3))*-0.071 + (*(p+1)+*(p+4)+*(q+1)+*(q+4))*-0.368 + (*(p+2)+*(p+5)+*(q+2)+*(q+5))*0.439)/4 + 128.5), 16), 240);
-								y+=2; u++; v++;
-							}
-							y += dwYStride;
-						}
-					}
-					break;
-				case 32:
-					{
-						DWORD dwDataStride = m_icc->lpbiInput->biWidth * 4;
-						DWORD dwSrcStride = ROUNDUP(dwDataStride, 4);
-						DWORD dwYStride = m_icc->lpbiInput->biWidth;
-
-						pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * dwSrcStride * 2;
-						pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * dwSrcStride * 2;
-
-						for (const BYTE *pStrideBegin = pSrcEnd - dwSrcStride * 2; pStrideBegin >= pSrcBegin; pStrideBegin -= dwSrcStride * 2)
-						{
-							const BYTE *pStrideEnd = pStrideBegin + dwDataStride;
-							for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += 8)
-							{
-								const BYTE *q = p + dwSrcStride;
-								*(y+0)           = min(max(int((*(q+0))*0.098 + (*(q+1))*0.504 + (*(q+2))*0.257 + 16.5), 16), 235);
-								*(y+1)           = min(max(int((*(q+4))*0.098 + (*(q+5))*0.504 + (*(q+6))*0.257 + 16.5), 16), 235);
-								*(y+dwYStride+0) = min(max(int((*(p+0))*0.098 + (*(p+1))*0.504 + (*(p+2))*0.257 + 16.5), 16), 235);
-								*(y+dwYStride+1) = min(max(int((*(p+4))*0.098 + (*(p+5))*0.504 + (*(p+6))*0.257 + 16.5), 16), 235);
-								*u               = min(max(int(((*(p+0)+*(p+4)+*(q+0)+*(q+4))*0.439 + (*(p+1)+*(p+5)+*(q+1)+*(q+5))*-0.291 + (*(p+2)+*(p+6)+*(q+2)+*(q+6))*-0.148)/4 + 128.5), 16), 240);
-								*v               = min(max(int(((*(p+0)+*(p+4)+*(q+0)+*(q+4))*-0.071 + (*(p+1)+*(p+5)+*(q+1)+*(q+5))*-0.368 + (*(p+2)+*(p+6)+*(q+2)+*(q+6))*0.439)/4 + 128.5), 16), 240);
-								y+=2; u++; v++;
-							}
-							y += dwYStride;
-						}
-					}
-					break;
-				}
-			}
+		case 24:
+			ConvertBottomupRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 3);
+			break;
+		case 32:
+			ConvertBottomupRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 4);
+			break;
 		}
+		break;
 	}
 }

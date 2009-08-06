@@ -56,6 +56,10 @@ public:
 	virtual ~CULY0Decoder(void);
 	static CDecoder *CreateInstance(void);
 
+private:
+	void ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD bypp);
+	void ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD nYOffset);
+
 protected:
 	virtual DWORD GetInputFCC(void) { return FCC('ULY0'); }
 	virtual WORD GetInputBitCount(void) { return 12; }

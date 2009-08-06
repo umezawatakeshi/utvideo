@@ -56,6 +56,10 @@ public:
 	virtual ~CULY0Encoder(void);
 	static CEncoder *CreateInstance(void);
 
+private:
+	void ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD bypp);
+	void ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD nYOffset);
+
 protected:
 	virtual DWORD GetOutputFCC(void) { return FCC('ULY0'); }
 	virtual const char *GetColorFormatName(void) { return "YUV420"; }
