@@ -100,7 +100,7 @@ void CULY0Encoder::ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, 
 	BYTE *v = pDstVBegin;
 
 	DWORD dwDataStride = m_icc->lpbiInput->biWidth * bypp;
-	DWORD dwSrcStride = ROUNDUP(dwDataStride, 4); // = m_dwRawStripeSize
+	DWORD dwSrcStride = ROUNDUP(dwDataStride, 4);
 	DWORD dwYStride = m_icc->lpbiInput->biWidth; // = m_dwPlaneWidth[0]
 
 	const BYTE *pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
@@ -130,7 +130,7 @@ void CULY0Encoder::ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE 
 	BYTE *u = pDstUBegin;
 	BYTE *v = pDstVBegin;
 
-	DWORD dwSrcStride = m_icc->lpbiInput->biWidth * 2; // = m_dwRawStripeSize
+	DWORD dwSrcStride = m_icc->lpbiInput->biWidth * 2;
 	DWORD dwYStride = m_icc->lpbiInput->biWidth; // = m_dwPlaneWidth[0]
 
 	const BYTE *pSrcBegin = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
