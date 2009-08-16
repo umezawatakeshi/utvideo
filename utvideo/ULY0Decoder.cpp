@@ -97,11 +97,11 @@ void CULY0Decoder::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *
 	const BYTE *v = pSrcVBegin;
 
 	DWORD dwDataStride = m_icd->lpbiOutput->biWidth * bypp;
-	DWORD dwDstStride = ROUNDUP(dwDataStride, 4);
-	DWORD dwYStride = m_icd->lpbiOutput->biWidth;
+	DWORD dwDstStride = ROUNDUP(dwDataStride, 4); // = m_dwRawStripeSize
+	DWORD dwYStride = m_icd->lpbiOutput->biWidth; // = m_dwPlaneWidth[0]
 
-	BYTE *pDstBegin = ((BYTE *)m_icd->lpOutput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * dwDstStride * 2;
-	BYTE *pDstEnd   = ((BYTE *)m_icd->lpOutput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * dwDstStride * 2;
+	BYTE *pDstBegin = ((BYTE *)m_icd->lpOutput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
+	BYTE *pDstEnd   = ((BYTE *)m_icd->lpOutput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
 
 	for (BYTE *pStrideBegin = pDstEnd - dwDstStride * 2; pStrideBegin >= pDstBegin; pStrideBegin -= dwDstStride * 2)
 	{
@@ -134,11 +134,11 @@ void CULY0Decoder::ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcU
 	const BYTE *u = pSrcUBegin;
 	const BYTE *v = pSrcVBegin;
 
-	DWORD dwDstStride = m_icd->lpbiOutput->biWidth * 2;
-	DWORD dwYStride = m_icd->lpbiOutput->biWidth;
+	DWORD dwDstStride = m_icd->lpbiOutput->biWidth * 2; // = m_dwRawStripeSize
+	DWORD dwYStride = m_icd->lpbiOutput->biWidth; // = m_dwPlaneWidth[0]
 
-	BYTE *pDstBegin = ((BYTE *)m_icd->lpOutput) + m_dwPlaneStripeBegin[nBandIndex] * dwDstStride * 2;
-	BYTE *pDstEnd   = ((BYTE *)m_icd->lpOutput) + m_dwPlaneStripeEnd[nBandIndex]   * dwDstStride * 2;
+	BYTE *pDstBegin = ((BYTE *)m_icd->lpOutput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	BYTE *pDstEnd   = ((BYTE *)m_icd->lpOutput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 
 	for (BYTE *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += dwDstStride * 2)
 	{
