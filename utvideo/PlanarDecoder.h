@@ -53,7 +53,8 @@ protected:
 	DWORD m_dwDivideCount;
 	BOOL m_bInterlace;
 	DWORD m_dwRawSize;
-	DWORD m_dwRawWidth;
+	DWORD m_dwRawGrossWidth;
+	DWORD m_dwRawNetWidth;
 	DWORD m_dwPlaneSize[4];
 	DWORD m_dwPlaneWidth[4];
 	DWORD m_dwPlaneStripeSize[4];

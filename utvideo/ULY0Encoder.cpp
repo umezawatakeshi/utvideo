@@ -106,7 +106,7 @@ void CULY0Encoder::ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, 
 	const BYTE *pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
 	const BYTE *pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
 
-	for (const BYTE *pStrideBegin = pSrcEnd - dwSrcStride * 2; pStrideBegin >= pSrcBegin; pStrideBegin -= dwSrcStride * 2)
+	for (const BYTE *pStrideBegin = pSrcEnd - dwSrcStride * 2; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwRawStripeSize)
 	{
 		const BYTE *pStrideEnd = pStrideBegin + dwDataStride;
 		for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += bypp * 2)
@@ -130,28 +130,25 @@ void CULY0Encoder::ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE 
 	BYTE *u = pDstUBegin;
 	BYTE *v = pDstVBegin;
 
-	DWORD dwSrcStride = m_icc->lpbiInput->biWidth * 2;
-	DWORD dwYStride = m_icc->lpbiInput->biWidth; // = m_dwPlaneWidth[0]
-
 	const BYTE *pSrcBegin = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
 	const BYTE *pSrcEnd   = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 
-	for (const BYTE *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += dwSrcStride * 2)
+	for (const BYTE *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += m_dwRawStripeSize)
 	{
-		const BYTE *pStrideEnd = pStrideBegin + dwSrcStride;
+		const BYTE *pStrideEnd = pStrideBegin + m_dwRawStripeSize / 2;
 		for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
 		{
-			const BYTE *q = p + dwSrcStride;
+			const BYTE *q = p + m_dwRawStripeSize / 2;
 			*(y+0) = *(p+0+nYOffset);
 			*(y+1) = *(p+2+nYOffset);
-			*(y+dwYStride+0) = *(q+0+nYOffset);
-			*(y+dwYStride+1) = *(q+2+nYOffset);
+			*(y+m_dwPlanePredictStride[0]+0) = *(q+0+nYOffset);
+			*(y+m_dwPlanePredictStride[0]+1) = *(q+2+nYOffset);
 			*u = (*(p+1-nYOffset) + *(q+1-nYOffset)) / 2;
 			*v = (*(p+3-nYOffset) + *(q+3-nYOffset)) / 2;
 
 			y+=2; u++; v++;
 		}
-		y += dwYStride;
+		y += m_dwPlanePredictStride[0];
 	}
 }
 

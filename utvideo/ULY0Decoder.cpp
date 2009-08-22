@@ -49,8 +49,8 @@ const CULY0Decoder::OUTPUTFORMAT CULY0Decoder::m_outfmts[] = {
 	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
 	{ FCC('YVYU'), 16 },
 	{ FCC('VYUY'), 16 },
-	{ BI_RGB, 32 },
-	{ BI_RGB, 24 },
+//	{ BI_RGB, 32 },
+//	{ BI_RGB, 24 },
 };
 
 CULY0Decoder::CULY0Decoder(void)
@@ -103,7 +103,7 @@ void CULY0Decoder::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *
 	BYTE *pDstBegin = ((BYTE *)m_icd->lpOutput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
 	BYTE *pDstEnd   = ((BYTE *)m_icd->lpOutput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
 
-	for (BYTE *pStrideBegin = pDstEnd - dwDstStride * 2; pStrideBegin >= pDstBegin; pStrideBegin -= dwDstStride * 2)
+	for (BYTE *pStrideBegin = pDstEnd - dwDstStride * 2; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwRawStripeSize)
 	{
 		BYTE *pStrideEnd = pStrideBegin + dwDataStride;
 		for (BYTE *p = pStrideBegin; p < pStrideEnd; p += bypp * 2)
@@ -134,22 +134,19 @@ void CULY0Decoder::ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcU
 	const BYTE *u = pSrcUBegin;
 	const BYTE *v = pSrcVBegin;
 
-	DWORD dwDstStride = m_icd->lpbiOutput->biWidth * 2;
-	DWORD dwYStride = m_icd->lpbiOutput->biWidth; // = m_dwPlaneWidth[0]
-
 	BYTE *pDstBegin = ((BYTE *)m_icd->lpOutput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
 	BYTE *pDstEnd   = ((BYTE *)m_icd->lpOutput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 
-	for (BYTE *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += dwDstStride * 2)
+	for (BYTE *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawStripeSize)
 	{
-		BYTE *pStrideEnd = pStrideBegin + dwDstStride;
+		BYTE *pStrideEnd = pStrideBegin + m_dwRawStripeSize / 2;
 		for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
 		{
-			BYTE *q = p + dwDstStride;
+			BYTE *q = p + m_dwRawStripeSize / 2;
 			*(p+0+nYOffset) = *(y+0);
 			*(p+2+nYOffset) = *(y+1);
-			*(q+0+nYOffset) = *(y+dwYStride+0);
-			*(q+2+nYOffset) = *(y+dwYStride+1);
+			*(q+0+nYOffset) = *(y+m_dwPlanePredictStride[0]+0);
+			*(q+2+nYOffset) = *(y+m_dwPlanePredictStride[0]+1);
 			*(p+1-nYOffset) = *u;
 			*(q+1-nYOffset) = *u;
 			*(p+3-nYOffset) = *v;
@@ -157,7 +154,7 @@ void CULY0Decoder::ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcU
 
 			y+=2; u++; v++;
 		}
-		y += dwYStride;
+		y += m_dwPlanePredictStride[0];
 	}
 }
 

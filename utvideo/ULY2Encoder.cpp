@@ -147,10 +147,10 @@ void CULY2Encoder::ConvertToPlanar(DWORD nBandIndex)
 		switch (m_icc->lpbiInput->biBitCount)
 		{
 		case 24:
-			ConvertBottomupRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawWidth, m_icc->lpbiOutput->biWidth * 3);
+			ConvertBottomupRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_icc->lpbiOutput->biWidth * 3);
 			break;
 		case 32:
-			ConvertBottomupRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawWidth, m_dwRawWidth);
+			ConvertBottomupRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawGrossWidth);
 			break;
 		}
 		break;

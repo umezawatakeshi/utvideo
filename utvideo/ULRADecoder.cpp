@@ -106,7 +106,7 @@ void CULRADecoder::ConvertFromPlanar(DWORD nBandIndex)
 		switch (m_icd->lpbiOutput->biBitCount)
 		{
 		case 32:
-			for (pStrideBegin = pDstEnd - m_dwRawWidth; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwRawWidth)
+			for (pStrideBegin = pDstEnd - m_dwRawGrossWidth; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwRawGrossWidth)
 			{
 				BYTE *pStrideEnd = pStrideBegin + m_icd->lpbiOutput->biWidth * 4;
 				for (p = pStrideBegin; p < pStrideEnd; p += 4)

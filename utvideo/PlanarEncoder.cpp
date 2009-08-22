@@ -239,10 +239,12 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 			switch (pbihIn->biBitCount)
 			{
 			case 24:
-				m_dwRawWidth = ROUNDUP(pbihIn->biWidth * 3, 4);
+				m_dwRawNetWidth = pbihIn->biWidth * 3;
+				m_dwRawGrossWidth = ROUNDUP(m_dwRawNetWidth, 4);
 				break;
 			case 32:
-				m_dwRawWidth = pbihIn->biWidth * 4;
+				m_dwRawNetWidth = pbihIn->biWidth * 4;
+				m_dwRawGrossWidth = m_dwRawNetWidth;
 				break;
 			}
 			if (pbihIn->biHeight > 0)
@@ -255,16 +257,17 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 		case FCC('UYNV'):
 		case FCC('YVYU'):
 		case FCC('VYUY'):
-			m_dwRawWidth = ROUNDUP(pbihIn->biWidth, 2) * 2;
+			m_dwRawNetWidth = ROUNDUP(pbihIn->biWidth, 2) * 2;
+			m_dwRawGrossWidth = m_dwRawNetWidth;
 			break;
 		default:
 			return ICERR_BADFORMAT;
 		}
-		m_dwRawSize = m_dwRawWidth * pbihIn->biHeight;
+		m_dwRawSize = m_dwRawGrossWidth * pbihIn->biHeight;
 		if (m_bInterlace)
-			m_dwRawStripeSize = m_dwRawWidth * GetMacroPixelHeight() * 2;
+			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight() * 2;
 		else
-			m_dwRawStripeSize = m_dwRawWidth * GetMacroPixelHeight();
+			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight();
 	}
 
 	CalcPlaneSizes(pbihIn);

@@ -103,7 +103,7 @@ void CULRGEncoder::ConvertToPlanar(DWORD nBandIndex)
 		switch (m_icc->lpbiInput->biBitCount)
 		{
 		case 24:
-			for (pStrideBegin = pSrcEnd - m_dwRawWidth; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwRawWidth)
+			for (pStrideBegin = pSrcEnd - m_dwRawGrossWidth; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwRawGrossWidth)
 			{
 				const BYTE *pStrideEnd = pStrideBegin + m_icc->lpbiInput->biWidth * 3;
 				for (p = pStrideBegin; p < pStrideEnd; p += 3)
@@ -115,7 +115,7 @@ void CULRGEncoder::ConvertToPlanar(DWORD nBandIndex)
 			}
 			break;
 		case 32:
-			for (pStrideBegin = pSrcEnd - m_dwRawWidth; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwRawWidth)
+			for (pStrideBegin = pSrcEnd - m_dwRawGrossWidth; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwRawGrossWidth)
 			{
 				const BYTE *pStrideEnd = pStrideBegin + m_icc->lpbiInput->biWidth * 4;
 				for (p = pStrideBegin; p < pStrideEnd; p += 4)
