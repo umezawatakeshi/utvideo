@@ -49,8 +49,8 @@ const CULY0Decoder::OUTPUTFORMAT CULY0Decoder::m_outfmts[] = {
 	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
 	{ FCC('YVYU'), 16 },
 	{ FCC('VYUY'), 16 },
-//	{ BI_RGB, 32 },
-//	{ BI_RGB, 24 },
+	{ BI_RGB, 32 },
+	{ BI_RGB, 24 },
 };
 
 CULY0Decoder::CULY0Decoder(void)
@@ -96,35 +96,35 @@ void CULY0Decoder::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *
 	const BYTE *u = pSrcUBegin;
 	const BYTE *v = pSrcVBegin;
 
-	DWORD dwDataStride = m_icd->lpbiOutput->biWidth * bypp;
-	DWORD dwDstStride = ROUNDUP(dwDataStride, 4);
-	DWORD dwYStride = m_icd->lpbiOutput->biWidth; // = m_dwPlaneWidth[0]
+	DWORD dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
 
 	BYTE *pDstBegin = ((BYTE *)m_icd->lpOutput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
 	BYTE *pDstEnd   = ((BYTE *)m_icd->lpOutput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
 
-	for (BYTE *pStrideBegin = pDstEnd - dwDstStride * 2; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwRawStripeSize)
-	{
-		BYTE *pStrideEnd = pStrideBegin + dwDataStride;
-		for (BYTE *p = pStrideBegin; p < pStrideEnd; p += bypp * 2)
+	for (BYTE *pStripeBegin = pDstEnd; pStripeBegin > pDstBegin; pStripeBegin -= m_dwRawStripeSize) {
+		for (BYTE *pStrideBegin = pStripeBegin - m_dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= m_dwRawGrossWidth)
 		{
-			BYTE *q = p + dwDstStride;
-			*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-			*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-			*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-			*(p+1) = min(max(int((*(y+dwYStride)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-			*(p+0) = min(max(int((*(y+dwYStride)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-			*(p+2) = min(max(int((*(y+dwYStride)-16)*1.164                  + (*v-128)*1.596), 0), 255);
-			y++;
-			*(q+bypp+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-			*(q+bypp+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-			*(q+bypp+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-			*(p+bypp+1) = min(max(int((*(y+dwYStride)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-			*(p+bypp+0) = min(max(int((*(y+dwYStride)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-			*(p+bypp+2) = min(max(int((*(y+dwYStride)-16)*1.164                  + (*v-128)*1.596), 0), 255);
-			y++; u++; v++;
+			BYTE *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			for (BYTE *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
+			{
+				BYTE *p = q - dwRawPredictStride;
+				*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				y++;
+				*(q+bypp+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(q+bypp+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(q+bypp+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+bypp+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+bypp+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+bypp+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				y++; u++; v++;
+			}
 		}
-		y += dwYStride;
+		y += m_dwPlanePredictStride[0];
 	}
 }
 
