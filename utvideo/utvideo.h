@@ -133,3 +133,8 @@ inline bool IS_ALIGNED(const void *p, DWORD a)
 {
 	return IS_ALIGNED((DWORD)p, a);
 }
+
+inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
+{
+	return EnableWindow(GetDlgItem(hwndParent, nID), bEnable);
+}
