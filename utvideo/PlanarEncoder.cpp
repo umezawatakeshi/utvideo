@@ -88,20 +88,33 @@ int CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			break;
 		}
 		CheckDlgButton(hwnd, IDC_ASSUME_INTERLACE_CHECK, pThis->m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE);
+		if (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS)
+		{
+			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS, BST_CHECKED);
+			EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, FALSE);
+		}
 		return TRUE;
 	case WM_COMMAND:
 		switch(LOWORD(wParam))
 		{
 		case IDOK:
-			GetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf, sizeof(buf));
-			n = atoi(buf);
-			if (n < 1 || n > 256)
-			{
-				MessageBox(hwnd, "1 <= DIVIDE_COUNT <= 256", "ERR", MB_ICONERROR);
-				return TRUE;
-			}
 			memset(&pThis->m_ec, 0, sizeof(ENCODERCONF));
-			pThis->m_ec.dwFlags0 |= (n - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
+			if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS))
+			{
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS;
+				pThis->m_ec.dwFlags0 |= (CThreadManager::GetNumProcessors() - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
+			}
+			else
+			{
+				GetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf, sizeof(buf));
+				n = atoi(buf);
+				if (n < 1 || n > 256)
+				{
+					MessageBox(hwnd, "1 <= DIVIDE_COUNT <= 256", "ERR", MB_ICONERROR);
+					return TRUE;
+				}
+				pThis->m_ec.dwFlags0 |= (n - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
+			}
 			if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO))
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
 			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_MEDIAN_RADIO))
@@ -112,6 +125,17 @@ int CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		case IDCANCEL:
 			EndDialog(hwnd, 0);
 			return TRUE;
+		case IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS:
+			if (HIWORD(wParam) == BN_CLICKED)
+			{
+				EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, !IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS));
+				if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS))
+				{
+					wsprintf(buf, "%d", CThreadManager::GetNumProcessors());
+					SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
+				}
+			}
+			break;
 		}
 		break;
 	}
@@ -136,7 +160,11 @@ DWORD CPlanarEncoder::SetState(const void *pState, DWORD dwSize)
 	m_ec.dwFlags0 &= ~EC_FLAGS0_RESERVED;
 	if ((m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK) == EC_FLAGS0_INTRAFRAME_PREDICT_RESERVED)
 		m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
-
+	if (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS)
+	{
+		m_ec.dwFlags0 &= ~EC_FLAGS0_DIVIDE_COUNT_MASK;
+		m_ec.dwFlags0 |= (CThreadManager::GetNumProcessors() - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
+	}
 	return min(sizeof(ENCODERCONF), dwSize);
 }
 
