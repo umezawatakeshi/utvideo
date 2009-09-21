@@ -116,7 +116,7 @@ inline DWORD ROUNDUP(DWORD a, DWORD b)
 	return ((a + b - 1) / b) * b;
 }
 
-inline bool IS_ALIGNED(DWORD v, DWORD a)
+inline bool IS_ALIGNED(DWORD_PTR v, DWORD_PTR a)
 {
 	_ASSERT(
 		a == 2 ||
@@ -130,9 +130,9 @@ inline bool IS_ALIGNED(DWORD v, DWORD a)
 	return (v & (a - 1)) == 0;
 }
 
-inline bool IS_ALIGNED(const void *p, DWORD a)
+inline bool IS_ALIGNED(const void *p, DWORD_PTR a)
 {
-	return IS_ALIGNED((DWORD)p, a);
+	return IS_ALIGNED((DWORD_PTR)p, a);
 }
 
 inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
