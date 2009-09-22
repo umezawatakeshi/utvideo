@@ -111,7 +111,7 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 			return pCodec->About((HWND)lParam1);
 
 	case ICM_GETINFO:
-		return pCodec->GetInfo((ICINFO *)lParam1, (DWORD)lParam2);
+		return pCodec->GetInfo((ICINFO *)lParam1, lParam2);
 
 	/* Encoder Messages */
 	case ICM_CONFIGURE:
@@ -130,7 +130,7 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 		return pCodec->SetState((void *)lParam1, lParam2);
 
 	case ICM_COMPRESS:
-		return pCodec->Compress((ICCOMPRESS *)lParam1, (DWORD)lParam2);
+		return pCodec->Compress((ICCOMPRESS *)lParam1, lParam2);
 
 	case ICM_COMPRESS_BEGIN:
 		return pCodec->CompressBegin((BITMAPINFOHEADER *)lParam1, (BITMAPINFOHEADER *)lParam2);
@@ -149,7 +149,7 @@ LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lPar
 
 	/* Decoder Messages */
 	case ICM_DECOMPRESS:
-		return pCodec->Decompress((ICDECOMPRESS *)lParam1, (DWORD)lParam2);
+		return pCodec->Decompress((ICDECOMPRESS *)lParam1, lParam2);
 
 	case ICM_DECOMPRESS_BEGIN:
 		return pCodec->DecompressBegin((BITMAPINFOHEADER *)lParam1, (BITMAPINFOHEADER *)lParam2);
