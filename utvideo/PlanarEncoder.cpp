@@ -62,14 +62,17 @@ DWORD CPlanarEncoder::Configure(HWND hwnd)
 
 int CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	CPlanarEncoder *pThis = (CPlanarEncoder *)GetWindowLong(hwnd, DWL_USER);
+	// 一旦 LONG_PTR にキャストするのは、/Wp64 環境下で誤って 警告C4312 が発生するため。
+	CPlanarEncoder *pThis = (CPlanarEncoder *)(LONG_PTR)GetWindowLongPtr(hwnd, DWLP_USER);
 	char buf[256];
 	int	n;
 
 	switch(uMsg)
 	{
 	case WM_INITDIALOG:
-		SetWindowLong(hwnd, DWL_USER, lParam);
+		// 一旦 __int3264 にキャストするのは、/Wp64 環境下で誤って 警告C4244 が発生するため。
+		// LONG_PTR にキャストするのではダメらしい。
+		SetWindowLongPtr(hwnd, DWLP_USER, (__int3264)lParam);
 		pThis = (CPlanarEncoder *)lParam;
 		wsprintf(buf, "Ut Video Codec %s (%c%c%c%c) VCM の設定", pThis->GetColorFormatName(), FCC4PRINTF(pThis->GetOutputFCC()));
 		SetWindowText(hwnd, buf);
