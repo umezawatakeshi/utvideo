@@ -47,7 +47,7 @@ public:
 	virtual ~CDecoder(void);
 
 public:
-	virtual DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize) = 0;
+	virtual DWORD Decompress(const ICDECOMPRESS *icd, SIZE_T cb) = 0;
 	virtual DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 	virtual DWORD DecompressEnd(void) = 0;
 	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
@@ -63,7 +63,7 @@ public:
 	static CDecoder *CreateInstance(void);
 
 public:
-	virtual DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize);
+	virtual DWORD Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
 	virtual DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual DWORD DecompressEnd(void);
 	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);

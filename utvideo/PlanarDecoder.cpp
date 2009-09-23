@@ -51,7 +51,7 @@ CPlanarDecoder::~CPlanarDecoder(void)
 {
 }
 
-DWORD CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
+DWORD CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)icd->lpbiInput;
 	const BYTE *p;

@@ -75,21 +75,21 @@ public:
 
 	DWORD QueryAbout(void);
 	DWORD About(HWND hwnd);
-	DWORD GetInfo(ICINFO *icinfo, DWORD dwSize);
+	DWORD GetInfo(ICINFO *icinfo, SIZE_T cb);
 
 	DWORD QueryConfigure(void);
 	DWORD Configure(HWND hwnd);
 	DWORD GetStateSize(void);
-	DWORD GetState(void *pState, DWORD dwSize);
-	DWORD SetState(const void *pState, DWORD dwSize);
-	DWORD Compress(const ICCOMPRESS *icc, DWORD dwSize);
+	DWORD GetState(void *pState, SIZE_T cb);
+	DWORD SetState(const void *pState, SIZE_T cb);
+	DWORD Compress(const ICCOMPRESS *icc, SIZE_T cb);
 	DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	DWORD CompressEnd(void);
 	DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
-	DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize);
+	DWORD Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
 	DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	DWORD DecompressEnd(void);
 	DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);

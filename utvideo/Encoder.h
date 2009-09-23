@@ -48,9 +48,9 @@ public:
 
 public:
 	virtual DWORD Configure(HWND hwnd) = 0;
-	virtual DWORD GetState(void *pState, DWORD dwSize) = 0;
-	virtual DWORD SetState(const void *pState, DWORD dwSize) = 0;
-	virtual DWORD Compress(const ICCOMPRESS *icc, DWORD dwSize) = 0;
+	virtual DWORD GetState(void *pState, SIZE_T cb) = 0;
+	virtual DWORD SetState(const void *pState, SIZE_T cb) = 0;
+	virtual DWORD Compress(const ICCOMPRESS *icc, SIZE_T cb) = 0;
 	virtual DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 	virtual DWORD CompressEnd(void) = 0;
 	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
@@ -68,9 +68,9 @@ public:
 
 public:
 	virtual DWORD Configure(HWND hwnd);
-	virtual DWORD GetState(void *pState, DWORD dwSize);
-	virtual DWORD SetState(const void *pState, DWORD dwSize);
-	virtual DWORD Compress(const ICCOMPRESS *icc, DWORD dwSize);
+	virtual DWORD GetState(void *pState, SIZE_T cb);
+	virtual DWORD SetState(const void *pState, SIZE_T cb);
+	virtual DWORD Compress(const ICCOMPRESS *icc, SIZE_T cb);
 	virtual DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual DWORD CompressEnd(void);
 	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);

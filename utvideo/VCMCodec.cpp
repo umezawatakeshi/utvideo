@@ -145,12 +145,12 @@ DWORD CVCMCodec::About(HWND hwnd)
 	return ICERR_OK;
 }
 
-DWORD CVCMCodec::GetInfo(ICINFO *icinfo, DWORD dwSize)
+DWORD CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
 {
 	if (icinfo == NULL)
 		return sizeof(ICINFO);
 
-	if (dwSize < sizeof(ICINFO))
+	if (cb < sizeof(ICINFO))
 		return 0;
 
 	icinfo->dwSize       = sizeof(ICINFO);
@@ -180,21 +180,21 @@ DWORD CVCMCodec::GetStateSize(void)
 	return sizeof(ENCODERCONF);
 }
 
-DWORD CVCMCodec::GetState(void *pState, DWORD dwSize)
+DWORD CVCMCodec::GetState(void *pState, SIZE_T cb)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::GetState()\n");
-	return m_pEncoder->GetState(pState, dwSize);
+	return m_pEncoder->GetState(pState, cb);
 }
 
-DWORD CVCMCodec::SetState(const void *pState, DWORD dwSize)
+DWORD CVCMCodec::SetState(const void *pState, SIZE_T cb)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::SetState()\n");
-	return m_pEncoder->SetState(pState, dwSize);
+	return m_pEncoder->SetState(pState, cb);
 }
 
-DWORD CVCMCodec::Compress(const ICCOMPRESS *icc, DWORD dwSize)
+DWORD CVCMCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 {
-	return m_pEncoder->Compress(icc, dwSize);
+	return m_pEncoder->Compress(icc, cb);
 }
 
 DWORD CVCMCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
@@ -227,9 +227,9 @@ DWORD CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOH
 	return m_pEncoder->CompressQuery(pbihIn, pbihOut);
 }
 
-DWORD CVCMCodec::Decompress(const ICDECOMPRESS *icd, DWORD dwSize)
+DWORD CVCMCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
-	return m_pDecoder->Decompress(icd, dwSize);
+	return m_pDecoder->Decompress(icd, cb);
 }
 
 DWORD CVCMCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)

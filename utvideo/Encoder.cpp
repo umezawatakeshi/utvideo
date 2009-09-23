@@ -67,17 +67,17 @@ DWORD CDummyEncoder::Configure(HWND hwnd)
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::GetState(void *pState, DWORD dwSize)
+DWORD CDummyEncoder::GetState(void *pState, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::SetState(const void *pState, DWORD dwSize)
+DWORD CDummyEncoder::SetState(const void *pState, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
+DWORD CDummyEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }

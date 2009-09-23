@@ -86,7 +86,7 @@ public:
 	virtual ~CPlanarDecoder(void);
 
 public:
-	virtual DWORD Decompress(const ICDECOMPRESS *icd, DWORD dwSize);
+	virtual DWORD Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
 	virtual DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual DWORD DecompressEnd(void);
 	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);

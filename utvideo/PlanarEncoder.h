@@ -91,9 +91,9 @@ public:
 public:
 	virtual DWORD Configure(HWND hwnd);
 	static int CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	virtual DWORD GetState(void *pState, DWORD dwSize);
-	virtual DWORD SetState(const void *pState, DWORD dwSize);
-	virtual DWORD Compress(const ICCOMPRESS *icc, DWORD dwSize);
+	virtual DWORD GetState(void *pState, SIZE_T cb);
+	virtual DWORD SetState(const void *pState, SIZE_T cb);
+	virtual DWORD Compress(const ICCOMPRESS *icc, SIZE_T cb);
 	virtual DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual DWORD CompressEnd(void);
 	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);

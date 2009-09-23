@@ -146,20 +146,20 @@ int CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 	return FALSE;
 }
 
-DWORD CPlanarEncoder::GetState(void *pState, DWORD dwSize)
+DWORD CPlanarEncoder::GetState(void *pState, SIZE_T cb)
 {
-	if (dwSize < sizeof(ENCODERCONF))
+	if (cb < sizeof(ENCODERCONF))
 		return ICERR_BADSIZE;
 
 	memcpy(pState, &m_ec, sizeof(ENCODERCONF));
 	return ICERR_OK;
 }
 
-DWORD CPlanarEncoder::SetState(const void *pState, DWORD dwSize)
+DWORD CPlanarEncoder::SetState(const void *pState, SIZE_T cb)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 
-	memcpy(&m_ec, pState, min(sizeof(ENCODERCONF), dwSize));
+	memcpy(&m_ec, pState, min(sizeof(ENCODERCONF), cb));
 	m_ec.dwFlags0 &= ~EC_FLAGS0_RESERVED;
 	if ((m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK) == EC_FLAGS0_INTRAFRAME_PREDICT_RESERVED)
 		m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
@@ -168,10 +168,10 @@ DWORD CPlanarEncoder::SetState(const void *pState, DWORD dwSize)
 		m_ec.dwFlags0 &= ~EC_FLAGS0_DIVIDE_COUNT_MASK;
 		m_ec.dwFlags0 |= (CThreadManager::GetNumProcessors() - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
 	}
-	return min(sizeof(ENCODERCONF), dwSize);
+	return min(sizeof(ENCODERCONF), cb);
 }
 
-DWORD CPlanarEncoder::Compress(const ICCOMPRESS *icc, DWORD dwSize)
+DWORD CPlanarEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 {
 	FRAMEINFO fi;
 	BYTE *p;
