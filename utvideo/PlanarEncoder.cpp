@@ -60,7 +60,7 @@ DWORD CPlanarEncoder::Configure(HWND hwnd)
 	return ICERR_OK;
 }
 
-int CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	// 一旦 LONG_PTR にキャストするのは、/Wp64 環境下で誤って 警告C4312 が発生するため。
 	CPlanarEncoder *pThis = (CPlanarEncoder *)(LONG_PTR)GetWindowLongPtr(hwnd, DWLP_USER);
