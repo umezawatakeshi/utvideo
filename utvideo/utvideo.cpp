@@ -82,7 +82,7 @@ void CALLBACK ICRemoveByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, in
 	CVCMCodec::ICRemoveAll();
 }
 
-LRESULT CALLBACK DriverProc(DWORD dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lParam1, LPARAM lParam2)
+LRESULT CALLBACK DriverProc(DWORD_PTR dwDriverId, HDRVR hdrvr,UINT uMsg, LPARAM lParam1, LPARAM lParam2)
 {
 	CVCMCodec *pCodec = (CVCMCodec *)dwDriverId;
 
