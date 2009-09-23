@@ -59,6 +59,12 @@ const TUNEDFUNC tfnCPP = {
 	cpp_ConvertBottomupRGB32ToULY2,
 };
 
+#ifdef _WIN64
+
+// nothing
+
+#else
+
 const TUNEDFUNC tfnI686 = {
 	cpp_PredictMedian,
 	cpp_PredictMedianAndCount,
@@ -119,7 +125,18 @@ const TUNEDFUNC tfnSSSE3 = {
 	sse2_ConvertBottomupRGB32ToULY2,
 };
 
+#endif
+
 TUNEDFUNC tfn = tfnCPP;
+
+#ifdef _WIN64
+
+void InitializeTunedFunc(void)
+{
+	// nothing to do
+}
+
+#else
 
 void InitializeTunedFunc(void)
 {
@@ -172,3 +189,5 @@ void InitializeTunedFunc(void)
 		tfn = tfnI686;
 	}
 }
+
+#endif
