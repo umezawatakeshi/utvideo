@@ -43,15 +43,15 @@
 
 int CThreadManager::GetNumProcessors(void)
 {
-	DWORD dwProcessAffinityMask;
-	DWORD dwSystemAffinityMask;
+	DWORD_PTR dwpProcessAffinityMask;
+	DWORD_PTR dwpSystemAffinityMask;
 	int nNumProcessors;
 
-	GetProcessAffinityMask(GetCurrentProcess(), &dwProcessAffinityMask, &dwSystemAffinityMask);
+	GetProcessAffinityMask(GetCurrentProcess(), &dwpProcessAffinityMask, &dwpSystemAffinityMask);
 	nNumProcessors = 0;
-	for (DWORD dwAffinityMask = 1; dwAffinityMask != 0; dwAffinityMask <<= 1)
+	for (DWORD_PTR dwpAffinityMask = 1; dwpAffinityMask != 0; dwpAffinityMask <<= 1)
 	{
-		if (dwProcessAffinityMask & dwAffinityMask)
+		if (dwpProcessAffinityMask & dwpAffinityMask)
 			nNumProcessors++;
 	}
 
@@ -60,8 +60,8 @@ int CThreadManager::GetNumProcessors(void)
 
 CThreadManager::CThreadManager(void)
 {
-	DWORD dwProcessAffinityMask;
-	DWORD dwSystemAffinityMask;
+	DWORD_PTR dwpProcessAffinityMask;
+	DWORD_PTR dwpSystemAffinityMask;
 
 	_RPT1(_CRT_WARN, "enter CThreadManager::CThreadManager() this=%p\n", this);
 	m_nNumThreads = 0;
@@ -72,13 +72,13 @@ CThreadManager::CThreadManager(void)
 		m_hThreadSemaphore[i] = NULL;
 	}
 
-	GetProcessAffinityMask(GetCurrentProcess(), &dwProcessAffinityMask, &dwSystemAffinityMask);
-	for (DWORD dwThreadAffinityMask = 1; dwThreadAffinityMask != 0; dwThreadAffinityMask <<= 1)
+	GetProcessAffinityMask(GetCurrentProcess(), &dwpProcessAffinityMask, &dwpSystemAffinityMask);
+	for (DWORD_PTR dwpThreadAffinityMask = 1; dwpThreadAffinityMask != 0; dwpThreadAffinityMask <<= 1)
 	{
-		if (dwProcessAffinityMask & dwThreadAffinityMask)
+		if (dwpProcessAffinityMask & dwpThreadAffinityMask)
 		{
 			m_hThread[m_nNumThreads] = CreateThread(NULL, 0, StaticThreadProc, this, CREATE_SUSPENDED, &m_dwThreadId[m_nNumThreads]);
-			SetThreadAffinityMask(m_hThread[m_nNumThreads], dwThreadAffinityMask);
+			SetThreadAffinityMask(m_hThread[m_nNumThreads], dwpThreadAffinityMask);
 			m_hThreadSemaphore[m_nNumThreads] = CreateSemaphore(NULL, 0, 0x7fffffff, NULL);
 			m_nNumThreads++;
 		}
