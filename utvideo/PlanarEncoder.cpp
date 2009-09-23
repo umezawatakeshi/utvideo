@@ -235,7 +235,15 @@ DWORD CPlanarEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 		m_ptm->SubmitJob(new CEncodeJob(this, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
-	icc->lpbiOutput->biSizeImage = p - ((BYTE *)icc->lpOutput);
+	// 念のため、サイズ値が変数に収まるかどうかのチェック。
+	// 2GB を超えることなどまずあり得ないとは思うが…
+	SIZE_T cbSizeImage = p - ((BYTE *)icc->lpOutput);
+	if (cbSizeImage > 0x7fffffff) // BITMAPINFOHEADER::biSizeImage は DWORD なので最大値は 2^32-1 であるが、ここでは 2^31-1 で制限しておく。
+	{
+		return ICERR_MEMORY; // 返すエラーはこれでいいのだろうか？
+	}
+
+	icc->lpbiOutput->biSizeImage = (DWORD)cbSizeImage;
 	*icc->lpdwFlags = AVIIF_KEYFRAME;
 
 	return ICERR_OK;
