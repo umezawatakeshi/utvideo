@@ -389,7 +389,7 @@ DWORD CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 	//pbieOut->bih.biYPelsPerMeter
 	//pbieOut->bih.biClrUsed
 	//pbieOut->bih.biClrImportant
-	pbieOut->dwEncoderVersion  = UTVIDEO_ENCODER_VERSION;
+	pbieOut->dwEncoderVersionAndImplementation  = UTVIDEO_ENCODER_VERSION_AND_IMPLEMENTATION;
 	pbieOut->fccOriginalFormat = pbihIn->biCompression;
 	pbieOut->dwFrameInfoSize   = sizeof(FRAMEINFO);
 	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | ((dwDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT) | (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE ? BIE_FLAGS0_ASSUME_INTERLACE : 0);

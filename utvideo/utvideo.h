@@ -54,14 +54,38 @@
 	(BYTE)(fcc >> 16), \
 	(BYTE)(fcc >> 24)
 
-#define UTVIDEO_ENCODER_VERSION 0x06010000 /* 6.1.0 */
+#define UTVIDEO_ENCODER_VERSION_MASK                      0xffffff00
+#define UTVIDEO_ENCODER_VERSION                           0x06010000 /* 6.1.0 */
+
+#define UTVIDEO_ENCODER_IMPLEMENTATION_MASK               0x000000ff
+#define UTVIDEO_ENCODER_IMPLEMENTATION_ORIGINAL_WIN32_X86 0x00000000
+#define UTVIDEO_ENCODER_IMPLEMENTATION_ORIGINAL_WIN64_X64 0x00000001
+#define UTVIDEO_ENCODER_IMPLEMENTATION_NOT_REGISTERED     0x000000ff
+
+#ifdef _WIN64
+ #ifdef _M_X64
+  #define UTVIDEO_ENCODER_IMPLEMENTATION UTVIDEO_ENCODER_IMPLEMENTATION_ORIGINAL_WIN64_X64
+ #else
+  #error This platform is not supported.
+ #endif
+#else
+#ifdef _WIN32
+ #ifdef _M_IX86
+  #define UTVIDEO_ENCODER_IMPLEMENTATION UTVIDEO_ENCODER_IMPLEMENTATION_ORIGINAL_WIN32_X86
+ #else
+  #error This platform is not supported.
+ #endif
+#endif
+#endif
+
+#define UTVIDEO_ENCODER_VERSION_AND_IMPLEMENTATION (UTVIDEO_ENCODER_VERSION | UTVIDEO_ENCODER_IMPLEMENTATION)
 
 extern HINSTANCE hModule;
 
 struct BITMAPINFOEXT
 {
 	BITMAPINFOHEADER bih;
-	DWORD dwEncoderVersion;
+	DWORD dwEncoderVersionAndImplementation;
 	DWORD fccOriginalFormat;
 	DWORD dwFrameInfoSize;
 	DWORD dwFlags0;
