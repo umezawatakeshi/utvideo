@@ -65,6 +65,10 @@
 #ifdef _WIN64
  #ifdef _M_X64
   #define UTVIDEO_ENCODER_IMPLEMENTATION UTVIDEO_ENCODER_IMPLEMENTATION_ORIGINAL_WIN64_X64
+  #define UTVIDEO_ENCODER_IMPLEMENTATION_STR "x64"
+  #ifndef _WIN64_X64
+   #define _WIN64_X64
+  #endif
  #else
   #error This platform is not supported.
  #endif
@@ -72,6 +76,10 @@
 #ifdef _WIN32
  #ifdef _M_IX86
   #define UTVIDEO_ENCODER_IMPLEMENTATION UTVIDEO_ENCODER_IMPLEMENTATION_ORIGINAL_WIN32_X86
+  #define UTVIDEO_ENCODER_IMPLEMENTATION_STR "x86"
+  #ifndef _WIN32_X86
+   #define _WIN32_X86
+  #endif
  #else
   #error This platform is not supported.
  #endif
