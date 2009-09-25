@@ -66,6 +66,7 @@
 #pragma warning(disable:4819)
 #include <vfw.h>
 #pragma warning(pop)
+#include <msi.h>
 
 #include <queue>
 #include <algorithm>
