@@ -81,12 +81,12 @@ LRESULT CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 
 LRESULT CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
-	DWORD dwRet;
+	LRESULT ret;
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
 
-	dwRet = DecompressQuery(pbihIn, pbihOut);
-	if (dwRet != ICERR_OK)
-		return dwRet;
+	ret = DecompressQuery(pbihIn, pbihOut);
+	if (ret != ICERR_OK)
+		return ret;
 
 	m_dwDivideCount = ((pbieIn->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 	m_bInterlace = pbieIn->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE;

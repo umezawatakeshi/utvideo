@@ -254,12 +254,12 @@ LRESULT CPlanarEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 
 LRESULT CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
-	DWORD dwRet;
+	LRESULT ret;
 	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
 
-	dwRet = CompressQuery(pbihIn, pbihOut);
-	if (dwRet != ICERR_OK)
-		return dwRet;
+	ret = CompressQuery(pbihIn, pbihOut);
+	if (ret != ICERR_OK)
+		return ret;
 
 	m_dwDivideCount = ((pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 	m_bInterlace = pbieOut->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE;
