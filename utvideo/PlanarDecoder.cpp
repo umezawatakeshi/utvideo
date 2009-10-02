@@ -51,7 +51,7 @@ CPlanarDecoder::~CPlanarDecoder(void)
 {
 }
 
-DWORD CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
+LRESULT CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)icd->lpbiInput;
 	const BYTE *p;
@@ -79,7 +79,7 @@ DWORD CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 	return ICERR_OK;
 }
 
-DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	DWORD dwRet;
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
@@ -181,7 +181,7 @@ DWORD CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	return ICERR_OK;
 }
 
-DWORD CPlanarDecoder::DecompressEnd(void)
+LRESULT CPlanarDecoder::DecompressEnd(void)
 {
 	delete m_pRestoredFrame;
 	delete m_pDecodedFrame;
@@ -191,7 +191,7 @@ DWORD CPlanarDecoder::DecompressEnd(void)
 	return ICERR_OK;
 }
 
-DWORD CPlanarDecoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CPlanarDecoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	if (pbihOut == NULL)
 		return sizeof(BITMAPINFOHEADER);
@@ -213,7 +213,7 @@ DWORD CPlanarDecoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAP
 	return ICERR_OK;
 }
 
-DWORD CPlanarDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CPlanarDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
 

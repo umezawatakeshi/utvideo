@@ -62,47 +62,47 @@ CEncoder *CDummyEncoder::CreateInstance(void)
 	return new CDummyEncoder();
 }
 
-DWORD CDummyEncoder::Configure(HWND hwnd)
+LRESULT CDummyEncoder::Configure(HWND hwnd)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::GetState(void *pState, SIZE_T cb)
+LRESULT CDummyEncoder::GetState(void *pState, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::SetState(const void *pState, SIZE_T cb)
+LRESULT CDummyEncoder::SetState(const void *pState, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
+LRESULT CDummyEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::CompressEnd(void)
+LRESULT CDummyEncoder::CompressEnd(void)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyEncoder::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }

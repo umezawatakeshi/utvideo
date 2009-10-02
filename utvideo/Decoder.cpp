@@ -62,27 +62,27 @@ CDecoder *CDummyDecoder::CreateInstance(void)
 	return new CDummyDecoder();
 }
 
-DWORD CDummyDecoder::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
+LRESULT CDummyDecoder::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyDecoder::DecompressEnd(void)
+LRESULT CDummyDecoder::DecompressEnd(void)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyDecoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyDecoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-DWORD CDummyDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }

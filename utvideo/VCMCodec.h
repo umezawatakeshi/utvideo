@@ -73,25 +73,25 @@ public:
 public:
 	static CVCMCodec *Open(ICOPEN *icopen);
 
-	DWORD QueryAbout(void);
-	DWORD About(HWND hwnd);
-	DWORD GetInfo(ICINFO *icinfo, SIZE_T cb);
+	LRESULT QueryAbout(void);
+	LRESULT About(HWND hwnd);
+	LRESULT GetInfo(ICINFO *icinfo, SIZE_T cb);
 
-	DWORD QueryConfigure(void);
-	DWORD Configure(HWND hwnd);
-	DWORD GetStateSize(void);
-	DWORD GetState(void *pState, SIZE_T cb);
-	DWORD SetState(const void *pState, SIZE_T cb);
-	DWORD Compress(const ICCOMPRESS *icc, SIZE_T cb);
-	DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	DWORD CompressEnd(void);
-	DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	LRESULT QueryConfigure(void);
+	LRESULT Configure(HWND hwnd);
+	LRESULT GetStateSize(void);
+	LRESULT GetState(void *pState, SIZE_T cb);
+	LRESULT SetState(const void *pState, SIZE_T cb);
+	LRESULT Compress(const ICCOMPRESS *icc, SIZE_T cb);
+	LRESULT CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	LRESULT CompressEnd(void);
+	LRESULT CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	LRESULT CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	LRESULT CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
-	DWORD Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
-	DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	DWORD DecompressEnd(void);
-	DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	DWORD DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	LRESULT Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
+	LRESULT DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	LRESULT DecompressEnd(void);
+	LRESULT DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	LRESULT DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 };

@@ -89,16 +89,16 @@ public:
 	virtual ~CPlanarEncoder(void);
 
 public:
-	virtual DWORD Configure(HWND hwnd);
+	virtual LRESULT Configure(HWND hwnd);
 	static INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	virtual DWORD GetState(void *pState, SIZE_T cb);
-	virtual DWORD SetState(const void *pState, SIZE_T cb);
-	virtual DWORD Compress(const ICCOMPRESS *icc, SIZE_T cb);
-	virtual DWORD CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressEnd(void);
-	virtual DWORD CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual DWORD CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual LRESULT GetState(void *pState, SIZE_T cb);
+	virtual LRESULT SetState(const void *pState, SIZE_T cb);
+	virtual LRESULT Compress(const ICCOMPRESS *icc, SIZE_T cb);
+	virtual LRESULT CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual LRESULT CompressEnd(void);
+	virtual LRESULT CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual LRESULT CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual LRESULT CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
 protected:
 	virtual DWORD GetOutputFCC(void) = 0;

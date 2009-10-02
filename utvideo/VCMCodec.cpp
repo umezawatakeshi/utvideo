@@ -128,12 +128,12 @@ CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)
 	return new CVCMCodec(fccHandler);
 }
 
-DWORD CVCMCodec::QueryAbout(void)
+LRESULT CVCMCodec::QueryAbout(void)
 {
 	return ICERR_OK;
 }
 
-DWORD CVCMCodec::About(HWND hwnd)
+LRESULT CVCMCodec::About(HWND hwnd)
 {
 	char buf[256];
 
@@ -146,7 +146,7 @@ DWORD CVCMCodec::About(HWND hwnd)
 	return ICERR_OK;
 }
 
-DWORD CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
+LRESULT CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
 {
 	if (icinfo == NULL)
 		return sizeof(ICINFO);
@@ -169,92 +169,92 @@ DWORD CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
 	return sizeof(ICINFO);
 }
 
-DWORD CVCMCodec::QueryConfigure(void)
+LRESULT CVCMCodec::QueryConfigure(void)
 {
 	return ICERR_OK;
 }
 
-DWORD CVCMCodec::Configure(HWND hwnd)
+LRESULT CVCMCodec::Configure(HWND hwnd)
 {
 	return m_pEncoder->Configure(hwnd);
 }
 
-DWORD CVCMCodec::GetStateSize(void)
+LRESULT CVCMCodec::GetStateSize(void)
 {
 	return sizeof(ENCODERCONF);
 }
 
-DWORD CVCMCodec::GetState(void *pState, SIZE_T cb)
+LRESULT CVCMCodec::GetState(void *pState, SIZE_T cb)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::GetState()\n");
 	return m_pEncoder->GetState(pState, cb);
 }
 
-DWORD CVCMCodec::SetState(const void *pState, SIZE_T cb)
+LRESULT CVCMCodec::SetState(const void *pState, SIZE_T cb)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::SetState()\n");
 	return m_pEncoder->SetState(pState, cb);
 }
 
-DWORD CVCMCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
+LRESULT CVCMCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 {
 	return m_pEncoder->Compress(icc, cb);
 }
 
-DWORD CVCMCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CVCMCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::CompressBegin()\n");
 	return m_pEncoder->CompressBegin(pbihIn, pbihOut);
 }
 
-DWORD CVCMCodec::CompressEnd(void)
+LRESULT CVCMCodec::CompressEnd(void)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::CompressEnd()\n");
 	return m_pEncoder->CompressEnd();
 }
 
-DWORD CVCMCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CVCMCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::CompressGetFormat()\n");
 	return m_pEncoder->CompressGetFormat(pbihIn, pbihOut);
 }
 
-DWORD CVCMCodec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CVCMCodec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::CompressGetSize()\n");
 	return m_pEncoder->CompressGetSize(pbihIn, pbihOut);
 }
 
-DWORD CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::CompressQuery()\n");
 	return m_pEncoder->CompressQuery(pbihIn, pbihOut);
 }
 
-DWORD CVCMCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
+LRESULT CVCMCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
 	return m_pDecoder->Decompress(icd, cb);
 }
 
-DWORD CVCMCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CVCMCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::DecompressBegin()\n");
 	return m_pDecoder->DecompressBegin(pbihIn, pbihOut);
 }
 
-DWORD CVCMCodec::DecompressEnd(void)
+LRESULT CVCMCodec::DecompressEnd(void)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::DecompressEnd()\n");
 	return m_pDecoder->DecompressEnd();
 }
 
-DWORD CVCMCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CVCMCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::DecompressGetFormat()\n");
 	return m_pDecoder->DecompressGetFormat(pbihIn, pbihOut);
 }
 
-DWORD CVCMCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CVCMCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	_RPT0(_CRT_WARN, "CVCMCodec::DecompressQuery()\n");
 	return m_pDecoder->DecompressQuery(pbihIn, pbihOut);

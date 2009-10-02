@@ -54,7 +54,7 @@ CPlanarEncoder::~CPlanarEncoder(void)
 {
 }
 
-DWORD CPlanarEncoder::Configure(HWND hwnd)
+LRESULT CPlanarEncoder::Configure(HWND hwnd)
 {
 	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_CONFIG_DIALOG), hwnd, DialogProc, (LPARAM)this);
 	return ICERR_OK;
@@ -149,7 +149,7 @@ INT_PTR CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	return FALSE;
 }
 
-DWORD CPlanarEncoder::GetState(void *pState, SIZE_T cb)
+LRESULT CPlanarEncoder::GetState(void *pState, SIZE_T cb)
 {
 	if (cb < sizeof(ENCODERCONF))
 		return ICERR_BADSIZE;
@@ -158,7 +158,7 @@ DWORD CPlanarEncoder::GetState(void *pState, SIZE_T cb)
 	return ICERR_OK;
 }
 
-DWORD CPlanarEncoder::SetState(const void *pState, SIZE_T cb)
+LRESULT CPlanarEncoder::SetState(const void *pState, SIZE_T cb)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 
@@ -174,7 +174,7 @@ DWORD CPlanarEncoder::SetState(const void *pState, SIZE_T cb)
 	return min(sizeof(ENCODERCONF), cb);
 }
 
-DWORD CPlanarEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
+LRESULT CPlanarEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 {
 	FRAMEINFO fi;
 	BYTE *p;
@@ -252,7 +252,7 @@ DWORD CPlanarEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 	return ICERR_OK;
 }
 
-DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	DWORD dwRet;
 	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
@@ -355,7 +355,7 @@ DWORD CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	return ICERR_OK;
 }
 
-DWORD CPlanarEncoder::CompressEnd(void)
+LRESULT CPlanarEncoder::CompressEnd(void)
 {
 	delete m_pCurFrame;
 	delete m_pMedianPredicted;
@@ -367,7 +367,7 @@ DWORD CPlanarEncoder::CompressEnd(void)
 	return ICERR_OK;
 }
 
-DWORD CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
 	DWORD dwDivideCount;
@@ -400,12 +400,12 @@ DWORD CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 	return ICERR_OK;
 }
 
-DWORD CPlanarEncoder::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CPlanarEncoder::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ROUNDUP(pbihIn->biWidth, 4) * ROUNDUP(pbihIn->biHeight, 2) * GetOutputBitCount() / 8 + 4096; // +4096 ÇÕÇ«ÇÒÇ‘ÇËä®íËÅB
 }
 
-DWORD CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	const INPUTFORMAT *pfmts;
 

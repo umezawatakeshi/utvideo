@@ -86,11 +86,11 @@ public:
 	virtual ~CPlanarDecoder(void);
 
 public:
-	virtual DWORD Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
-	virtual DWORD DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual DWORD DecompressEnd(void);
-	virtual DWORD DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	virtual DWORD DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual LRESULT Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
+	virtual LRESULT DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual LRESULT DecompressEnd(void);
+	virtual LRESULT DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual LRESULT DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
 protected:
 	virtual DWORD GetInputFCC(void) = 0;
