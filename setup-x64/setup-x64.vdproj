@@ -73,6 +73,17 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                }
+            }
         }
         "Release"
         {
@@ -299,7 +310,7 @@
             }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_57FB51DF1CF6408A83E9242C1FD158FE"
             {
-            "DefaultLocation" = "8:[ProgramFiles64Folder][Manufacturer]\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFiles64Folder]\\utvideo"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -336,7 +347,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite (x64)"
         "ProductCode" = "8:{C118E43D-FBB8-45DA-8CF7-0F422B9E6935}"
-        "PackageCode" = "8:{DA3C7269-DB53-4AE0-99ED-E920AC42C905}"
+        "PackageCode" = "8:{06962EE5-9E32-485F-997B-330CCE5BB606}"
         "UpgradeCode" = "8:{D9406D67-866D-4C5A-B188-D02E4CEF555B}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
