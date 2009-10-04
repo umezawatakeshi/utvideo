@@ -64,6 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/export:_ICInstallSelf@4=?ICInstallSelf@@YGHK@Z /export:_ICRemoveSelf@4=?ICRemoveSelf@@YGHK@Z"
 				AdditionalDependencies="vfw32.lib winmm.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile="utvideo.def"
@@ -144,6 +145,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/export:_ICInstallSelf@4=?ICInstallSelf@@YAHK@Z /export:_ICRemoveSelf@4=?ICRemoveSelf@@YAHK@Z"
 				AdditionalDependencies="vfw32.lib winmm.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile="utvideo.def"
@@ -221,6 +223,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/export:_ICInstallSelf@4=?ICInstallSelf@@YGHK@Z /export:_ICRemoveSelf@4=?ICRemoveSelf@@YGHK@Z"
 				AdditionalDependencies="vfw32.lib winmm.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile="utvideo.def"
@@ -301,6 +304,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalOptions="/export:_ICInstallSelf@4=?ICInstallSelf@@YAHK@Z /export:_ICRemoveSelf@4=?ICRemoveSelf@@YAHK@Z"
 				AdditionalDependencies="vfw32.lib winmm.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile="utvideo.def"

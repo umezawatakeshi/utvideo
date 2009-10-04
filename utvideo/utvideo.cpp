@@ -60,13 +60,13 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 	return TRUE;
 }
 
-int APIENTRY ICInstallSelf(MSIHANDLE hmsi)
+__declspec(dllexport) int APIENTRY ICInstallSelf(MSIHANDLE hmsi)
 {
 	CVCMCodec::ICInstallAll();
 	return 0;
 }
 
-int APIENTRY ICRemoveSelf(MSIHANDLE hmsi)
+__declspec(dllexport) int APIENTRY ICRemoveSelf(MSIHANDLE hmsi)
 {
 	CVCMCodec::ICRemoveAll();
 	return 0;

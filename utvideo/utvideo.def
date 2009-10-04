@@ -2,7 +2,7 @@ LIBRARY	"utvideo"
 
 EXPORTS
 	DriverProc
-	ICInstallSelf
+;	ICInstallSelf		; use linker /export option instead
 	ICInstallByRundll
-	ICRemoveSelf
+;	ICRemoveSelf		; ditto
 	ICRemoveByRundll
