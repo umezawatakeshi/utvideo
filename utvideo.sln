@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utvideo", "utvideo\utvideo.
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "setup", "setup\setup.vdproj", "{41E8B592-994C-4FC8-9560-D99E0B73EE39}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "setup-x64", "setup-x64\setup-x64.vdproj", "{4232327C-2369-413F-A8BA-70A2818C6B0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -23,10 +25,12 @@ Global
 		{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}.Release|x64.Build.0 = Release|x64
 		{41E8B592-994C-4FC8-9560-D99E0B73EE39}.Debug|Win32.ActiveCfg = Debug
 		{41E8B592-994C-4FC8-9560-D99E0B73EE39}.Debug|x64.ActiveCfg = Debug
-		{41E8B592-994C-4FC8-9560-D99E0B73EE39}.Debug|x64.Build.0 = Debug
 		{41E8B592-994C-4FC8-9560-D99E0B73EE39}.Release|Win32.ActiveCfg = Release
 		{41E8B592-994C-4FC8-9560-D99E0B73EE39}.Release|x64.ActiveCfg = Release
-		{41E8B592-994C-4FC8-9560-D99E0B73EE39}.Release|x64.Build.0 = Release
+		{4232327C-2369-413F-A8BA-70A2818C6B0C}.Debug|Win32.ActiveCfg = Debug
+		{4232327C-2369-413F-A8BA-70A2818C6B0C}.Debug|x64.ActiveCfg = Debug
+		{4232327C-2369-413F-A8BA-70A2818C6B0C}.Release|Win32.ActiveCfg = Release
+		{4232327C-2369-413F-A8BA-70A2818C6B0C}.Release|x64.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
