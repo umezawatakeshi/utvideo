@@ -15,7 +15,25 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_1A9FDF65D06986CAA457460A7505BB64"
+        "OwnerKey" = "8:_C4F1C75E50764A5DA99FFDBBBB0785E6"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_1A9FDF65D06986CAA457460A7505BB64"
+        "OwnerKey" = "8:_6CAAE03A2C6344E29F76FD32872BB44A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3FF0B905FABD4AA59151EDC4309952A8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6CAAE03A2C6344E29F76FD32872BB44A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -33,6 +51,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_C4F1C75E50764A5DA99FFDBBBB0785E6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_C58263587B8145D9A5E1FBA7AAADD70E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -41,18 +65,6 @@
         {
         "MsmKey" = "8:_C9BC2C2A2D2B47D5938CC3B5A42DE5F6"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_ECA43D056AFB4F1FABE1881A7BF11F90"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_F82A213EDE8D7DB07F07286D23F6BDDD"
-        "OwnerKey" = "8:_ECA43D056AFB4F1FABE1881A7BF11F90"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -117,31 +129,31 @@
     {
         "CustomAction"
         {
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_39D66CF4D14940FA9DF2B400D8C2EC1B"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_098F68AACF914882B978FFC02C3ABF28"
             {
-            "Name" = "8:ICRemoveSelf"
+            "Name" = "8:utvideo (Release x64) の プライマリ出力"
             "Condition" = "8:"
-            "Object" = "8:_ECA43D056AFB4F1FABE1881A7BF11F90"
-            "FileType" = "3:1"
-            "InstallAction" = "3:4"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:ICRemoveSelf"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_445B42C9_6698_4027_BFBF_04A1478941BF"
-            "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:"
-            }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_FA4A4DBB59E1460994DC60B450CC05FA"
-            {
-            "Name" = "8:ICInstallSelf"
-            "Condition" = "8:"
-            "Object" = "8:_ECA43D056AFB4F1FABE1881A7BF11F90"
+            "Object" = "8:_C4F1C75E50764A5DA99FFDBBBB0785E6"
             "FileType" = "3:1"
             "InstallAction" = "3:1"
             "Arguments" = "8:"
             "EntryPoint" = "8:ICInstallSelf"
             "Sequence" = "3:1"
-            "Identifier" = "8:_3AEB811D_E838_4468_943E_11302F823AC8"
+            "Identifier" = "8:_449BF1D6_5C5F_49BB_B0C5_5DBA97756533"
+            "InstallerClass" = "11:FALSE"
+            "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_91903A1B19504AD19580B665EE0F0D59"
+            {
+            "Name" = "8:utvideo (Release x64) の プライマリ出力"
+            "Condition" = "8:"
+            "Object" = "8:_C4F1C75E50764A5DA99FFDBBBB0785E6"
+            "FileType" = "3:1"
+            "InstallAction" = "3:4"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:ICRemoveSelf"
+            "Sequence" = "3:1"
+            "Identifier" = "8:_F2848611_0DA0_4749_B5D5_3B185A754E8F"
             "InstallerClass" = "11:FALSE"
             "CustomActionData" = "8:"
             }
@@ -160,6 +172,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1A9FDF65D06986CAA457460A7505BB64"
+            {
+            "SourcePath" = "8:MSVFW32.dll"
+            "TargetName" = "8:MSVFW32.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_83BF4A5DE5FD48078CCCD27AB6A6DCDF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3FF0B905FABD4AA59151EDC4309952A8"
             {
             "SourcePath" = "8:..\\readme.en.html"
@@ -260,26 +292,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F82A213EDE8D7DB07F07286D23F6BDDD"
-            {
-            "SourcePath" = "8:MSVFW32.dll"
-            "TargetName" = "8:MSVFW32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_57FB51DF1CF6408A83E9242C1FD158FE"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
         }
         "FileType"
         {
@@ -308,6 +320,17 @@
                     }
                 }
             }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_57F768BCC2BE446194CEF0279754572C"
+            {
+            "Name" = "8:#1914"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:SystemFolder"
+                "Folders"
+                {
+                }
+            }
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_57FB51DF1CF6408A83E9242C1FD158FE"
             {
             "DefaultLocation" = "8:[ProgramFiles64Folder]\\utvideo"
@@ -316,6 +339,17 @@
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Property" = "8:TARGETDIR"
+                "Folders"
+                {
+                }
+            }
+            "{1525181F-901A-416C-8A58-119130FE478E}:_83BF4A5DE5FD48078CCCD27AB6A6DCDF"
+            {
+            "Name" = "8:#1936"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:System64Folder"
                 "Folders"
                 {
                 }
@@ -1029,12 +1063,40 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_ECA43D056AFB4F1FABE1881A7BF11F90"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_6CAAE03A2C6344E29F76FD32872BB44A"
+            {
+            "SourcePath" = "8:..\\release\\utvideo.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_57F768BCC2BE446194CEF0279754572C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:Release|Win32"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_C4F1C75E50764A5DA99FFDBBBB0785E6"
             {
             "SourcePath" = "8:..\\x64\\release\\utvideo.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
-            "Folder" = "8:_57FB51DF1CF6408A83E9242C1FD158FE"
+            "Folder" = "8:_83BF4A5DE5FD48078CCCD27AB6A6DCDF"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
