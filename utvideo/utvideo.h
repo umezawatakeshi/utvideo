@@ -55,7 +55,7 @@
 	(BYTE)(fcc >> 24)
 
 #define UTVIDEO_ENCODER_VERSION_MASK                      0xffffff00
-#define UTVIDEO_ENCODER_VERSION                           0x06010000 /* 6.1.0 */
+#define UTVIDEO_ENCODER_VERSION                           0x07000000 /* 7.0.0 */
 
 #define UTVIDEO_ENCODER_IMPLEMENTATION_MASK               0x000000ff
 #define UTVIDEO_ENCODER_IMPLEMENTATION_ORIGINAL_WIN32_X86 0x00000000
