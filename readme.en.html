@@ -2,10 +2,10 @@
 <!-- $Id$ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
-<title>Ut Video Codec Suite 6.1.0 readme (English)</title>
+<title>Ut Video Codec Suite 7.0.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 6.1.0 readme (English)</h1>
+<h1>Ut Video Codec Suite 7.0.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008-2009  UMEZAWA Takeshi</p>
@@ -23,12 +23,26 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <h2 id="overview">Overview</h2>
 <p>Ut Video Codec Suite is a lossless video codec for Windows, which is implemented as a VCM codec (also called "VfW codec").</p>
 <h2 id="environment">Environment</h2>
-<h3>Minimum requirement</h3>
+<h3>Minimum requirement (x86)</h3>
 <dl>
 <dt>OS</dt><dd>Windows XP or later</dd>
 <dt>CPU</dt><dd>i686-compatible CPU with SSE2 support<br>(e.g. Pentium 4 or later)</dd>
 </dl>
+<h3>Minimum requirement (x64)</h3>
+<dl>
+<dt>OS</dt><dd>Windows Vista (x64) or later</dd>
+<dt>CPU</dt><dd>CPU with AMD64 or Intel 64 (formerly EM64T) support</dd>
+</dl>
 <h2 id="history">Version history</h2>
+<h3>Version 7.0.0</h3>
+<dl>
+<dt>New features</dt><dd><ul>
+<li>Add x64 version. Both x64 version DLL and x86 version DLL are included in x64 version installer.</li>
+</ul></dd>
+<dt>Others</dt><dd><ul>
+<li>DLL is now installed under System32/SysWOW64 directory instead of Program Files directory.</li>
+</ul></dd>
+</dl>
 <h3>Version 6.1.0</h3>
 <dl>
 <dt>New features</dt><dd><ul>
@@ -44,7 +58,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <h3>Version 6.0.1</h3>
 <dl>
 <dt>Others</dt><dd><ul>
-<li>DLL is now statically-linked rather than dynamically-linked.</li>
+<li>DLL is now statically-linked instead of dynamically-linked.</li>
 </ul></dd>
 </dl>
 <h3>Version 6.0.0</h3>
