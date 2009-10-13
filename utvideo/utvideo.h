@@ -57,6 +57,12 @@
 #define UTVIDEO_ENCODER_VERSION_MASK                      0xffffff00
 #define UTVIDEO_ENCODER_VERSION                           0x07000000 /* 7.0.0 */
 
+/*
+ * NOTE:
+ *  If you want to implement original version of encoder,
+ *  you should register "implementation ID".
+ *  Otherwise, you must use 0xff as ID.
+ */
 #define UTVIDEO_ENCODER_IMPLEMENTATION_MASK               0x000000ff
 #define UTVIDEO_ENCODER_IMPLEMENTATION_ORIGINAL_WIN32_X86 0x00000000
 #define UTVIDEO_ENCODER_IMPLEMENTATION_ORIGINAL_WIN64_X64 0x00000001
