@@ -151,21 +151,14 @@ struct ENCODERCONF
 
 inline DWORD ROUNDUP(DWORD a, DWORD b)
 {
+	_ASSERT(b > 0 && (b & (b - 1)) == 0); // b ‚Í 2 ‚Ì—İæ‚Å‚ ‚éB
 	return ((a + b - 1) / b) * b;
 }
 
 inline bool IS_ALIGNED(DWORD_PTR v, DWORD_PTR a)
 {
-	_ASSERT(
-		a == 2 ||
-		a == 4 ||
-		a == 8 ||
-		a == 16 ||
-		a == 32 ||
-		a == 64 ||
-		a == 128 ||
-		a == 256);
-	return (v & (a - 1)) == 0;
+	_ASSERT(a > 0 && (a & (a - 1)) == 0); // a ‚Í 2 ‚Ì—İæ‚Å‚ ‚éB
+	return (v & (a - 1)) == 0; // v ‚Í a ‚Ì”{”‚Å‚ ‚éB
 }
 
 inline bool IS_ALIGNED(const void *p, DWORD_PTR a)
