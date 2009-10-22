@@ -138,10 +138,10 @@ LRESULT CVCMCodec::About(HWND hwnd)
 	char buf[256];
 
 	wsprintf(buf, "Ut Video Codec Suite, Version %d.%d.%d (%s) \nCopyright (C) 2008-2009  UMEZAWA Takeshi",
-		(BYTE)(UTVIDEO_ENCODER_VERSION >> 24),
-		(BYTE)(UTVIDEO_ENCODER_VERSION >> 16),
-		(BYTE)(UTVIDEO_ENCODER_VERSION >> 8),
-		UTVIDEO_ENCODER_IMPLEMENTATION_STR);
+		(BYTE)(UTVIDEO_VERSION >> 24),
+		(BYTE)(UTVIDEO_VERSION >> 16),
+		(BYTE)(UTVIDEO_VERSION >> 8),
+		UTVIDEO_IMPLEMENTATION_STR);
 	MessageBox(hwnd, buf, "Ut Video Codec Suite", MB_OK);
 	return ICERR_OK;
 }
@@ -158,13 +158,13 @@ LRESULT CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
 	icinfo->fccType      = ICTYPE_VIDEO;
 	icinfo->fccHandler   = m_fccHandler;
 	icinfo->dwFlags      = 0;
-	icinfo->dwVersion    = UTVIDEO_ENCODER_VERSION_AND_IMPLEMENTATION;
+	icinfo->dwVersion    = UTVIDEO_VERSION_AND_IMPLEMENTATION;
 	icinfo->dwVersionICM = ICVERSION;
 	wsprintfW(icinfo->szName, L"Ut Video (%C%C%C%C)", FCC4PRINTF(m_fccHandler));
 	wsprintfW(icinfo->szDescription, L"Ut Video Codec %S (%C%C%C%C) VCM (%S)",
 		m_pszColorFormatName,
 		FCC4PRINTF(m_fccHandler),
-		UTVIDEO_ENCODER_IMPLEMENTATION_STR);
+		UTVIDEO_IMPLEMENTATION_STR);
 
 	return sizeof(ICINFO);
 }

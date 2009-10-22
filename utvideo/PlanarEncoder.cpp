@@ -77,7 +77,7 @@ INT_PTR CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 		wsprintf(buf, "Ut Video Codec %s (%c%c%c%c) VCM (%s) ‚ÌÝ’è",
 			pThis->GetColorFormatName(),
 			FCC4PRINTF(pThis->GetOutputFCC()),
-			UTVIDEO_ENCODER_IMPLEMENTATION_STR);
+			UTVIDEO_IMPLEMENTATION_STR);
 		SetWindowText(hwnd, buf);
 		wsprintf(buf, "%d", (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
 		SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
@@ -392,7 +392,7 @@ LRESULT CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAP
 	//pbieOut->bih.biYPelsPerMeter
 	//pbieOut->bih.biClrUsed
 	//pbieOut->bih.biClrImportant
-	pbieOut->dwEncoderVersionAndImplementation  = UTVIDEO_ENCODER_VERSION_AND_IMPLEMENTATION;
+	pbieOut->dwEncoderVersionAndImplementation  = UTVIDEO_VERSION_AND_IMPLEMENTATION;
 	pbieOut->fccOriginalFormat = pbihIn->biCompression;
 	pbieOut->dwFrameInfoSize   = sizeof(FRAMEINFO);
 	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | ((dwDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT) | (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE ? BIE_FLAGS0_ASSUME_INTERLACE : 0);
