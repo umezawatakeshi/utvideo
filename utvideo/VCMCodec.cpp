@@ -141,10 +141,8 @@ LRESULT CVCMCodec::About(HWND hwnd)
 {
 	char buf[256];
 
-	wsprintf(buf, "Ut Video Codec Suite, Version %d.%d.%d (%s) \nCopyright (C) 2008-2009  UMEZAWA Takeshi",
-		(BYTE)(UTVIDEO_VERSION >> 24),
-		(BYTE)(UTVIDEO_VERSION >> 16),
-		(BYTE)(UTVIDEO_VERSION >> 8),
+	wsprintf(buf, "Ut Video Codec Suite, Version %s (%s) \nCopyright (C) 2008-2009  UMEZAWA Takeshi",
+		UTVIDEO_VERSION_STR,
 		UTVIDEO_IMPLEMENTATION_STR);
 	MessageBox(hwnd, buf, "Ut Video Codec Suite", MB_OK);
 	return ICERR_OK;
