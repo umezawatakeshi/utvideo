@@ -74,7 +74,7 @@ INT_PTR CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 		// LONG_PTR にキャストするのではダメらしい。
 		SetWindowLongPtr(hwnd, DWLP_USER, (__int3264)lParam);
 		pThis = (CPlanarEncoder *)lParam;
-		wsprintf(buf, "Ut Video Codec %s (%c%c%c%c) VCM (%s) の設定",
+		wsprintf(buf, "Ut Video Codec %s (%c%c%c%c) %s の設定",
 			pThis->GetColorFormatName(),
 			FCC4PRINTF(pThis->GetOutputFCC()),
 			UTVIDEO_IMPLEMENTATION_STR);
