@@ -86,8 +86,10 @@ LRESULT CALLBACK DriverProc(DWORD_PTR dwDriverId, HDRVR hdrvr, UINT uMsg, LPARAM
 {
 	CVCMCodec *pCodec = (CVCMCodec *)dwDriverId;
 
+#ifdef _DEBUG
 	if (uMsg != ICM_COMPRESS && uMsg != ICM_DECOMPRESS)
 		_RPT5(_CRT_WARN, "DriverProc() dwDriverId=%08X hdrvr=%08X uMsg=%08X lParam1=%08X lParam2=%08X\n", dwDriverId, hdrvr, uMsg, lParam1, lParam2);
+#endif
 
 	switch (uMsg)
 	{
