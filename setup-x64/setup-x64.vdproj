@@ -407,7 +407,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Ut Video Codec Suite (x64)"
+        "ProductName" = "8:Ut Video Codec Suite x64"
         "ProductCode" = "8:{1CED48A5-41D2-401A-A3A6-D8CF8342C2E5}"
         "PackageCode" = "8:{820807F0-91F8-447E-985A-5F08F1965113}"
         "UpgradeCode" = "8:{D9406D67-866D-4C5A-B188-D02E4CEF555B}"
@@ -419,7 +419,7 @@
         "Manufacturer" = "8:UMEZAWA Takeshi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://umezawa.dyndns.info/"
-        "Title" = "8:Ut Video Codec Suite Installer (x64)"
+        "Title" = "8:Ut Video Codec Suite x64 Installer"
         "Subject" = "8:"
         "ARPCONTACT" = "8:UMEZAWA Takeshi"
         "Keywords" = "8:"
