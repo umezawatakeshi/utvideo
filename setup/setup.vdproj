@@ -345,6 +345,13 @@
         }
         "LaunchCondition"
         {
+            "{836E08B8-0285-4809-BA42-01DB6754A45D}:_797C8DB5B67E4C4ABFC6B3B03ACD47F9"
+            {
+            "Name" = "8:Deny x64-Windows"
+            "Condition" = "8:NOT (Msix64 > 0)"
+            "Message" = "8:x86 installer does not support x64-Windows environment. Use x64 installer."
+            "InstallUrl" = "8:"
+            }
         }
         "Locator"
         {
@@ -358,7 +365,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite x86"
         "ProductCode" = "8:{9CAB2330-F2E2-454C-9374-F78DF92C30F4}"
-        "PackageCode" = "8:{C1698F0A-DA54-4E85-A12C-75F36D86C6ED}"
+        "PackageCode" = "8:{2E9855CD-84AC-4D1F-AC73-F1145FFE5EAA}"
         "UpgradeCode" = "8:{BD16A4A2-9AB5-4C0C-A763-DB7F9EAA4B1E}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
