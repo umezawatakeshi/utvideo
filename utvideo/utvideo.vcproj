@@ -95,7 +95,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd $(OutDir)&#x0D;&#x0A;rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\SysWOW64\rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -176,7 +176,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd $(OutDir)&#x0D;&#x0A;rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\system32\rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -256,7 +256,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd $(OutDir)&#x0D;&#x0A;rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\SysWOW64\rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -337,7 +337,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd $(OutDir)&#x0D;&#x0A;rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\system32\rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
