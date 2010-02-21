@@ -23,26 +23,26 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 	return TRUE;
 }
 
-__declspec(dllexport) int APIENTRY ICInstallSelf(MSIHANDLE hmsi)
+__declspec(dllexport) int APIENTRY InstallCodec(MSIHANDLE hmsi)
 {
-	CVCMCodec::ICInstallAll();
-	return 0;
+	return CVCMCodec::InstallCodec();
 }
 
-__declspec(dllexport) int APIENTRY ICRemoveSelf(MSIHANDLE hmsi)
+__declspec(dllexport) int APIENTRY UninstallCodec(MSIHANDLE hmsi)
 {
-	CVCMCodec::ICRemoveAll();
-	return 0;
+	return CVCMCodec::UninstallCodec();
 }
 
-void CALLBACK ICInstallByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
+void CALLBACK InstallCodecByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
 {
-	CVCMCodec::ICInstallAll();
+	if (CVCMCodec::InstallCodec() != 0)
+		MessageBox(hwnd, "Installation Failed", "Ut Video Codec Suite", MB_OK | MB_ICONERROR);
 }
 
-void CALLBACK ICRemoveByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
+void CALLBACK UninstallCodecByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
 {
-	CVCMCodec::ICRemoveAll();
+	if (CVCMCodec::UninstallCodec() != 0)
+		MessageBox(hwnd, "Uninstallation Failed", "Ut Video Codec Suite", MB_OK | MB_ICONERROR);
 }
 
 LRESULT CALLBACK DriverProc(DWORD_PTR dwDriverId, HDRVR hdrvr, UINT uMsg, LPARAM lParam1, LPARAM lParam2)

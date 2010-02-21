@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/export:_ICInstallSelf@4=?ICInstallSelf@@YGHK@Z /export:_ICRemoveSelf@4=?ICRemoveSelf@@YGHK@Z"
+				AdditionalOptions="/export:_InstallCodec@4=?InstallCodec@@YGHK@Z /export:_UninstallCodec@4=?UninstallCodec@@YGHK@Z"
 				AdditionalDependencies="vfw32.lib winmm.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile="utvideo.def"
@@ -95,7 +95,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\SysWOW64\rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\SysWOW64\rundll32 $(TargetFileName),InstallCodecByRundll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -145,7 +145,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/export:_ICInstallSelf@4=?ICInstallSelf@@YAHK@Z /export:_ICRemoveSelf@4=?ICRemoveSelf@@YAHK@Z"
+				AdditionalOptions="/export:_InstallCodec@4=?InstallCodec@@YAHK@Z /export:_UninstallCodec@4=?UninstallCodec@@YAHK@Z"
 				AdditionalDependencies="vfw32.lib winmm.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile="utvideo.def"
@@ -176,7 +176,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\system32\rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\system32\rundll32 $(TargetFileName),InstallCodecByRundll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -223,7 +223,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/export:_ICInstallSelf@4=?ICInstallSelf@@YGHK@Z /export:_ICRemoveSelf@4=?ICRemoveSelf@@YGHK@Z"
+				AdditionalOptions="/export:_InstallCodec@4=?InstallCodec@@YGHK@Z /export:_UninstallCodec@4=?UninstallCodec@@YGHK@Z"
 				AdditionalDependencies="vfw32.lib winmm.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile="utvideo.def"
@@ -256,7 +256,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\SysWOW64\rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\SysWOW64\rundll32 $(TargetFileName),InstallCodecByRundll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -304,7 +304,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="/export:_ICInstallSelf@4=?ICInstallSelf@@YAHK@Z /export:_ICRemoveSelf@4=?ICRemoveSelf@@YAHK@Z"
+				AdditionalOptions="/export:_InstallCodec@4=?InstallCodec@@YAHK@Z /export:_UninstallCodec@4=?UninstallCodec@@YAHK@Z"
 				AdditionalDependencies="vfw32.lib winmm.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile="utvideo.def"
@@ -337,7 +337,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\system32\rundll32 $(TargetFileName),ICInstallByRundll&#x0D;&#x0A;"
+				CommandLine="cd $(OutDir)&#x0D;&#x0A;C:\WINDOWS\system32\rundll32 $(TargetFileName),InstallCodecByRundll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

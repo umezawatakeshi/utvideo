@@ -2,7 +2,7 @@ LIBRARY	"utvideo"
 
 EXPORTS
 	DriverProc
-;	ICInstallSelf		; use linker /export option instead
-	ICInstallByRundll
-;	ICRemoveSelf		; ditto
-	ICRemoveByRundll
+;	InstallCodec			; use linker /export option instead
+	InstallCodecByRundll
+;	UninstallCodec			; ditto
+	UninstallCodecByRundll

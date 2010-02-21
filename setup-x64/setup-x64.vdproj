@@ -15,18 +15,6 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_3DB05F0FEC472B71B48EAFDFEF6B910A"
-        "OwnerKey" = "8:_6CAAE03A2C6344E29F76FD32872BB44A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_3DB05F0FEC472B71B48EAFDFEF6B910A"
-        "OwnerKey" = "8:_C4F1C75E50764A5DA99FFDBBBB0785E6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_3FF0B905FABD4AA59151EDC4309952A8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -137,7 +125,7 @@
             "FileType" = "3:1"
             "InstallAction" = "3:1"
             "Arguments" = "8:"
-            "EntryPoint" = "8:ICInstallSelf"
+            "EntryPoint" = "8:InstallCodec"
             "Sequence" = "3:1"
             "Identifier" = "8:_BE876884_9B5C_4911_921F_352ADA9AE3BA"
             "InstallerClass" = "11:FALSE"
@@ -151,7 +139,7 @@
             "FileType" = "3:1"
             "InstallAction" = "3:4"
             "Arguments" = "8:"
-            "EntryPoint" = "8:ICRemoveSelf"
+            "EntryPoint" = "8:UninstallCodec"
             "Sequence" = "3:1"
             "Identifier" = "8:_F2848611_0DA0_4749_B5D5_3B185A754E8F"
             "InstallerClass" = "11:FALSE"
@@ -165,7 +153,7 @@
             "FileType" = "3:1"
             "InstallAction" = "3:4"
             "Arguments" = "8:"
-            "EntryPoint" = "8:ICRemoveSelf"
+            "EntryPoint" = "8:UninstallCodec"
             "Sequence" = "3:2"
             "Identifier" = "8:_39E1B6A1_F33C_4435_9AE2_1AD483A2F722"
             "InstallerClass" = "11:FALSE"
@@ -179,7 +167,7 @@
             "FileType" = "3:1"
             "InstallAction" = "3:1"
             "Arguments" = "8:"
-            "EntryPoint" = "8:ICInstallSelf"
+            "EntryPoint" = "8:InstallCodec"
             "Sequence" = "3:2"
             "Identifier" = "8:_449BF1D6_5C5F_49BB_B0C5_5DBA97756533"
             "InstallerClass" = "11:FALSE"
@@ -200,26 +188,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3DB05F0FEC472B71B48EAFDFEF6B910A"
-            {
-            "SourcePath" = "8:MSVFW32.dll"
-            "TargetName" = "8:MSVFW32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_83BF4A5DE5FD48078CCCD27AB6A6DCDF"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3FF0B905FABD4AA59151EDC4309952A8"
             {
             "SourcePath" = "8:..\\readme.en.html"

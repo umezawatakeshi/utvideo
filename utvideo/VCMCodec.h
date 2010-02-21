@@ -19,8 +19,8 @@ private:
 	static const CODECLIST m_codeclist[];
 
 public:
-	static void ICInstallAll(void);
-	static void ICRemoveAll(void);
+	static int InstallCodec(void);
+	static int UninstallCodec(void);
 
 private:
 	DWORD m_fccHandler;

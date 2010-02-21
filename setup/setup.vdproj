@@ -39,12 +39,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_ADE7F8E494761370B72FCF557FD38C8A"
-        "OwnerKey" = "8:_DE5F826C877346A4B6CCD0AB24C7F040"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_B75FAC1C6559494FA2B2FC9F3AED7F5B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -125,7 +119,7 @@
             "FileType" = "3:1"
             "InstallAction" = "3:1"
             "Arguments" = "8:"
-            "EntryPoint" = "8:ICInstallSelf"
+            "EntryPoint" = "8:InstallCodec"
             "Sequence" = "3:1"
             "Identifier" = "8:_26FFA8ED_6862_4624_B1B3_DBB3B9948540"
             "InstallerClass" = "11:FALSE"
@@ -139,7 +133,7 @@
             "FileType" = "3:1"
             "InstallAction" = "3:4"
             "Arguments" = "8:"
-            "EntryPoint" = "8:ICRemoveSelf"
+            "EntryPoint" = "8:UninstallCodec"
             "Sequence" = "3:1"
             "Identifier" = "8:_6C63F206_2316_491B_9DEC_CDEB8D0DAB2D"
             "InstallerClass" = "11:FALSE"
@@ -238,26 +232,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ADE7F8E494761370B72FCF557FD38C8A"
-            {
-            "SourcePath" = "8:MSVFW32.dll"
-            "TargetName" = "8:MSVFW32.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_97983D00EA0D4FB5828C0B6653E2B02D"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B75FAC1C6559494FA2B2FC9F3AED7F5B"
