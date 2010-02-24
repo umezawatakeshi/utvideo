@@ -18,10 +18,6 @@ private:
 
 	static const CODECLIST m_codeclist[];
 
-public:
-	static int InstallCodec(void);
-	static int UninstallCodec(void);
-
 private:
 	DWORD m_fccHandler;
 	const char *m_pszColorFormatName;

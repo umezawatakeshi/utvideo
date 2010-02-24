@@ -21,60 +21,6 @@ const CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
 	{ FCC('ULRA'), "RGBA",   CULRAEncoder::CreateInstance,  CULRADecoder::CreateInstance  },
 };
 
-int CVCMCodec::InstallCodec(void)
-{
-	char szLongFilename[MAX_PATH];
-	char szShortFilename[MAX_PATH];
-	HKEY hkDrivers32;
-
-	/*
-	 * 何故か長いファイル名ではダメ（登録はできるがロードに失敗する）で、
-	 * 8.3 形式のファイル名で登録しなければならない。
-	 */
-	GetModuleFileName(hModule, szLongFilename, sizeof(szLongFilename));
-	GetShortPathName(szLongFilename, szShortFilename, sizeof(szShortFilename));
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows NT\\CurrentVersion\\Drivers32", 0, KEY_ALL_ACCESS, &hkDrivers32) != 0)
-		return -1;
-	for (int i = 1; i < _countof(m_codeclist); i++)
-	{
-		char szValueName[10];
-
-		wsprintf(szValueName, "VIDC.%c%c%c%c", FCC4PRINTF(m_codeclist[i].fcc));
-		if (RegSetValueEx(hkDrivers32, szValueName, 0, REG_SZ, (BYTE *)szShortFilename, (DWORD)strlen(szShortFilename) + 1) != 0)
-		{
-			RegCloseKey(hkDrivers32);
-			return -1;
-		}
-
-		//ICInstall(ICTYPE_VIDEO, m_codeclist[i].fcc, (LPARAM)szShortFilename, NULL, ICINSTALL_DRIVER);
-	}
-	RegCloseKey(hkDrivers32);
-	return 0;
-}
-
-int CVCMCodec::UninstallCodec(void)
-{
-	HKEY hkDrivers32;
-
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Microsoft\\Windows NT\\CurrentVersion\\Drivers32", 0, KEY_ALL_ACCESS, &hkDrivers32) != 0)
-		return -1;
-	for (int i = 1; i < _countof(m_codeclist); i++)
-	{
-		char szValueName[10];
-
-		wsprintf(szValueName, "VIDC.%c%c%c%c", FCC4PRINTF(m_codeclist[i].fcc));
-		if (RegDeleteValue(hkDrivers32, szValueName))
-		{
-			RegCloseKey(hkDrivers32);
-			return -1;
-		}
-
-		//ICRemove(ICTYPE_VIDEO, m_codeclist[i].fcc, 0);
-	}
-	RegCloseKey(hkDrivers32);
-	return 0;
-}
-
 CVCMCodec::CVCMCodec(DWORD fccHandler)
 {
 	int idx;

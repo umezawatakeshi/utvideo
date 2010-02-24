@@ -2,7 +2,3 @@ LIBRARY	"utvideo"
 
 EXPORTS
 	DriverProc
-;	InstallCodec			; use linker /export option instead
-	InstallCodecByRundll
-;	UninstallCodec			; ditto
-	UninstallCodecByRundll

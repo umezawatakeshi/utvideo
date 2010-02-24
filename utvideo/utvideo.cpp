@@ -23,28 +23,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 	return TRUE;
 }
 
-__declspec(dllexport) int APIENTRY InstallCodec(MSIHANDLE hmsi)
-{
-	return CVCMCodec::InstallCodec();
-}
-
-__declspec(dllexport) int APIENTRY UninstallCodec(MSIHANDLE hmsi)
-{
-	return CVCMCodec::UninstallCodec();
-}
-
-void CALLBACK InstallCodecByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
-{
-	if (CVCMCodec::InstallCodec() != 0)
-		MessageBox(hwnd, "Installation Failed", "Ut Video Codec Suite", MB_OK | MB_ICONERROR);
-}
-
-void CALLBACK UninstallCodecByRundll(HWND hwnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
-{
-	if (CVCMCodec::UninstallCodec() != 0)
-		MessageBox(hwnd, "Uninstallation Failed", "Ut Video Codec Suite", MB_OK | MB_ICONERROR);
-}
-
 LRESULT CALLBACK DriverProc(DWORD_PTR dwDriverId, HDRVR hdrvr, UINT uMsg, LPARAM lParam1, LPARAM lParam2)
 {
 	CVCMCodec *pCodec = (CVCMCodec *)dwDriverId;

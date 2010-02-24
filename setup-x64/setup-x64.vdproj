@@ -117,62 +117,6 @@
     {
         "CustomAction"
         {
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_04228CAFD0BC4282AE4AABB5480D2871"
-            {
-            "Name" = "8:utvideo (Release Win32) の プライマリ出力"
-            "Condition" = "8:"
-            "Object" = "8:_6CAAE03A2C6344E29F76FD32872BB44A"
-            "FileType" = "3:1"
-            "InstallAction" = "3:1"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:InstallCodec"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_BE876884_9B5C_4911_921F_352ADA9AE3BA"
-            "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:"
-            }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_04AE32A2310B48628E02F56994DDD1F6"
-            {
-            "Name" = "8:utvideo (Release x64) の プライマリ出力"
-            "Condition" = "8:"
-            "Object" = "8:_C4F1C75E50764A5DA99FFDBBBB0785E6"
-            "FileType" = "3:1"
-            "InstallAction" = "3:4"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:UninstallCodec"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_F2848611_0DA0_4749_B5D5_3B185A754E8F"
-            "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:"
-            }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_6AA816A354164B09AECE7749E09317BA"
-            {
-            "Name" = "8:utvideo (Release Win32) の プライマリ出力"
-            "Condition" = "8:"
-            "Object" = "8:_6CAAE03A2C6344E29F76FD32872BB44A"
-            "FileType" = "3:1"
-            "InstallAction" = "3:4"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:UninstallCodec"
-            "Sequence" = "3:2"
-            "Identifier" = "8:_39E1B6A1_F33C_4435_9AE2_1AD483A2F722"
-            "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:"
-            }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_F0205BB413844FCD83E0C23C4757BC5F"
-            {
-            "Name" = "8:utvideo (Release x64) の プライマリ出力"
-            "Condition" = "8:"
-            "Object" = "8:_C4F1C75E50764A5DA99FFDBBBB0785E6"
-            "FileType" = "3:1"
-            "InstallAction" = "3:1"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:InstallCodec"
-            "Sequence" = "3:2"
-            "Identifier" = "8:_449BF1D6_5C5F_49BB_B0C5_5DBA97756533"
-            "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:"
-            }
         }
         "DefaultFeature"
         {
@@ -377,7 +321,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite x64"
         "ProductCode" = "8:{0A59F5DE-0633-4713-948E-37D30EDAA570}"
-        "PackageCode" = "8:{E63928D9-0153-47EE-B38E-EF5D8118A039}"
+        "PackageCode" = "8:{8396C3DC-B0BC-4D82-B41E-1FE24F17BE69}"
         "UpgradeCode" = "8:{D9406D67-866D-4C5A-B188-D02E4CEF555B}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -417,15 +361,191 @@
                     "Transitive" = "11:FALSE"
                         "Keys"
                         {
-                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_480629DF2AA64C3AB370F30FB0459470"
+                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_7C822E8CCB934A6A80FC9FB41440B174"
                             {
-                            "Name" = "8:[Manufacturer]"
+                            "Name" = "8:Wow6432Node"
                             "Condition" = "8:"
                             "AlwaysCreate" = "11:FALSE"
                             "DeleteAtUninstall" = "11:FALSE"
                             "Transitive" = "11:FALSE"
                                 "Keys"
                                 {
+                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_C9ABCD1994F24D70AE53EC9C597B54F0"
+                                    {
+                                    "Name" = "8:Microsoft"
+                                    "Condition" = "8:"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "DeleteAtUninstall" = "11:FALSE"
+                                    "Transitive" = "11:FALSE"
+                                        "Keys"
+                                        {
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_CEA5C8A3C69A49FB871DFBE16A28EFF1"
+                                            {
+                                            "Name" = "8:Windows NT"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "DeleteAtUninstall" = "11:FALSE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_42901EAE119744A8839E45D6937DD2EC"
+                                                    {
+                                                    "Name" = "8:CurrentVersion"
+                                                    "Condition" = "8:"
+                                                    "AlwaysCreate" = "11:FALSE"
+                                                    "DeleteAtUninstall" = "11:FALSE"
+                                                    "Transitive" = "11:FALSE"
+                                                        "Keys"
+                                                        {
+                                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_068C318B76D34C8E85B23C5DE21A832F"
+                                                            {
+                                                            "Name" = "8:Drivers32"
+                                                            "Condition" = "8:"
+                                                            "AlwaysCreate" = "11:FALSE"
+                                                            "DeleteAtUninstall" = "11:FALSE"
+                                                            "Transitive" = "11:FALSE"
+                                                                "Keys"
+                                                                {
+                                                                }
+                                                                "Values"
+                                                                {
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_190169DDD96642CB882D92C1FF8D9E11"
+                                                                    {
+                                                                    "Name" = "8:VIDC.ULRG"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:1"
+                                                                    "Value" = "8:utvideo.dll"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_57FCD25B57254C2FAE584464B47607B7"
+                                                                    {
+                                                                    "Name" = "8:VIDC.ULRA"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:1"
+                                                                    "Value" = "8:utvideo.dll"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_A1B8FD520CD64B9A89D123045A8CE678"
+                                                                    {
+                                                                    "Name" = "8:VIDC.ULY2"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:1"
+                                                                    "Value" = "8:utvideo.dll"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_D5154E8FFB3342ECB62CB46FC387EF43"
+                                                                    {
+                                                                    "Name" = "8:VIDC.ULY0"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:1"
+                                                                    "Value" = "8:utvideo.dll"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        "Values"
+                                                        {
+                                                        }
+                                                    }
+                                                }
+                                                "Values"
+                                                {
+                                                }
+                                            }
+                                        }
+                                        "Values"
+                                        {
+                                        }
+                                    }
+                                }
+                                "Values"
+                                {
+                                }
+                            }
+                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_8F3D48353D854EA583409D7F4A62368C"
+                            {
+                            "Name" = "8:Microsoft"
+                            "Condition" = "8:"
+                            "AlwaysCreate" = "11:FALSE"
+                            "DeleteAtUninstall" = "11:FALSE"
+                            "Transitive" = "11:FALSE"
+                                "Keys"
+                                {
+                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_9F985E8B96AA4A629BC207A5CB4D55FF"
+                                    {
+                                    "Name" = "8:Windows NT"
+                                    "Condition" = "8:"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "DeleteAtUninstall" = "11:FALSE"
+                                    "Transitive" = "11:FALSE"
+                                        "Keys"
+                                        {
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_527107D8DC8F415184FC527ADF0FEE47"
+                                            {
+                                            "Name" = "8:CurrentVersion"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "DeleteAtUninstall" = "11:FALSE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_2919B76003544F3E94F22C1F54E114E1"
+                                                    {
+                                                    "Name" = "8:Drivers32"
+                                                    "Condition" = "8:"
+                                                    "AlwaysCreate" = "11:FALSE"
+                                                    "DeleteAtUninstall" = "11:FALSE"
+                                                    "Transitive" = "11:FALSE"
+                                                        "Keys"
+                                                        {
+                                                        }
+                                                        "Values"
+                                                        {
+                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_0D877A241EA44723A9374B6928934A4B"
+                                                            {
+                                                            "Name" = "8:VIDC.ULRG"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "ValueTypes" = "3:1"
+                                                            "Value" = "8:utvideo.dll"
+                                                            }
+                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_4F0EED11E5F643CC9DA6AFA1403DBEDF"
+                                                            {
+                                                            "Name" = "8:VIDC.ULY0"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "ValueTypes" = "3:1"
+                                                            "Value" = "8:utvideo.dll"
+                                                            }
+                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_54036193713A4A86805139B329CF8E55"
+                                                            {
+                                                            "Name" = "8:VIDC.ULY2"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "ValueTypes" = "3:1"
+                                                            "Value" = "8:utvideo.dll"
+                                                            }
+                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_70B457719773486E86BAE4347F5ED14C"
+                                                            {
+                                                            "Name" = "8:VIDC.ULRA"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "ValueTypes" = "3:1"
+                                                            "Value" = "8:utvideo.dll"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                "Values"
+                                                {
+                                                }
+                                            }
+                                        }
+                                        "Values"
+                                        {
+                                        }
+                                    }
                                 }
                                 "Values"
                                 {
@@ -442,34 +562,6 @@
             {
                 "Keys"
                 {
-                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_F24217F77C79485D92A031164F480D33"
-                    {
-                    "Name" = "8:Software"
-                    "Condition" = "8:"
-                    "AlwaysCreate" = "11:FALSE"
-                    "DeleteAtUninstall" = "11:FALSE"
-                    "Transitive" = "11:FALSE"
-                        "Keys"
-                        {
-                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_FDBF46B3B5AF4E9DA67ECA5090169132"
-                            {
-                            "Name" = "8:[Manufacturer]"
-                            "Condition" = "8:"
-                            "AlwaysCreate" = "11:FALSE"
-                            "DeleteAtUninstall" = "11:FALSE"
-                            "Transitive" = "11:FALSE"
-                                "Keys"
-                                {
-                                }
-                                "Values"
-                                {
-                                }
-                            }
-                        }
-                        "Values"
-                        {
-                        }
-                    }
                 }
             }
             "HKCR"
