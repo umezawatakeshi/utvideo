@@ -1,0 +1,13 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Drivers32]
+"VIDC.ULRA"="utvideo.dll"
+"VIDC.ULRG"="utvideo.dll"
+"VIDC.ULY0"="utvideo.dll"
+"VIDC.ULY2"="utvideo.dll"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Drivers32]
+"VIDC.ULRA"="utvideo.dll"
+"VIDC.ULRG"="utvideo.dll"
+"VIDC.ULY0"="utvideo.dll"
+"VIDC.ULY2"="utvideo.dll"

@@ -27,6 +27,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_707B29E7888F4AE0A3CEE3D7AC0CE0F8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_77361C4AEFD64A5287A1863D384FBC11"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -150,6 +156,26 @@
             {
             "SourcePath" = "8:..\\gplv2.txt"
             "TargetName" = "8:gplv2.txt"
+            "Tag" = "8:"
+            "Folder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_707B29E7888F4AE0A3CEE3D7AC0CE0F8"
+            {
+            "SourcePath" = "8:utvideo-x86.reg"
+            "TargetName" = "8:utvideo-x86.reg"
             "Tag" = "8:"
             "Folder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
             "Condition" = "8:"
