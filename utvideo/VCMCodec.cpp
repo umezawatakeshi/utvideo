@@ -4,14 +4,10 @@
 #include "StdAfx.h"
 #include "utvideo.h"
 #include "VCMCodec.h"
-#include "ULY2Encoder.h"
-#include "ULY2Decoder.h"
-#include "ULY0Encoder.h"
-#include "ULY0Decoder.h"
-#include "ULRGEncoder.h"
-#include "ULRGDecoder.h"
-#include "ULRAEncoder.h"
-#include "ULRADecoder.h"
+#include "ULY2Codec.h"
+#include "ULY0Codec.h"
+#include "ULRGCodec.h"
+#include "ULRACodec.h"
 
 const CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
 	{ -1,          "",       CDummyEncoder::CreateInstance, CDummyDecoder::CreateInstance },

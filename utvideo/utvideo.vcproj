@@ -346,6 +346,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Codec.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Convert.cpp"
 				>
 			</File>
@@ -390,14 +394,6 @@
 						Outputs="$(IntDir)\Convert_asm.obj"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Decoder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Encoder.cpp"
-				>
 			</File>
 			<File
 				RelativePath=".\FrameBuffer.cpp"
@@ -448,14 +444,6 @@
 						Outputs="$(IntDir)\HuffmanCode_asm.obj"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\PlanarDecoder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PlanarEncoder.cpp"
-				>
 			</File>
 			<File
 				RelativePath=".\Predict.cpp"
@@ -548,35 +536,23 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ULRADecoder.cpp"
+				RelativePath=".\UL00Codec.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ULRAEncoder.cpp"
+				RelativePath=".\ULRACodec.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ULRGDecoder.cpp"
+				RelativePath=".\ULRGCodec.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ULRGEncoder.cpp"
+				RelativePath=".\ULY0Codec.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ULY0Decoder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ULY0Encoder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ULY2Decoder.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\ULY2Encoder.cpp"
+				RelativePath=".\ULY2Codec.cpp"
 				>
 			</File>
 			<File
@@ -598,15 +574,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\Codec.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Convert.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Decoder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Encoder.h"
 				>
 			</File>
 			<File
@@ -615,14 +587,6 @@
 			</File>
 			<File
 				RelativePath=".\HuffmanCode.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PlanarDecoder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PlanarEncoder.h"
 				>
 			</File>
 			<File
@@ -646,35 +610,23 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ULRADecoder.h"
+				RelativePath=".\UL00Codec.h"
 				>
 			</File>
 			<File
-				RelativePath=".\ULRAEncoder.h"
+				RelativePath=".\ULRACodec.h"
 				>
 			</File>
 			<File
-				RelativePath=".\ULRGDecoder.h"
+				RelativePath=".\ULRGCodec.h"
 				>
 			</File>
 			<File
-				RelativePath=".\ULRGEncoder.h"
+				RelativePath=".\ULY0Codec.h"
 				>
 			</File>
 			<File
-				RelativePath=".\ULY0Decoder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ULY0Encoder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ULY2Decoder.h"
-				>
-			</File>
-			<File
-				RelativePath=".\ULY2Encoder.h"
+				RelativePath=".\ULY2Codec.h"
 				>
 			</File>
 			<File

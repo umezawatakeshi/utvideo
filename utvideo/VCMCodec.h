@@ -2,8 +2,7 @@
 /* $Id$ */
 
 #pragma once
-#include "Encoder.h"
-#include "Decoder.h"
+#include "Codec.h"
 
 class CVCMCodec
 {
