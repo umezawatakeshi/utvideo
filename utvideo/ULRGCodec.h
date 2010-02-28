@@ -21,10 +21,10 @@ public:
 	static CCodec *CreateInstance(void);
 
 protected:
-	virtual DWORD GetOutputFCC(void) { return FCC('ULRG'); }
+	virtual DWORD GetFCC(void) { return FCC('ULRG'); }
 	virtual const char *GetColorFormatName(void) { return "RGB"; }
-	virtual WORD GetOutputBitCount(void) { return 24; }
-	virtual WORD GetMaxBitCount(void) { return 24; }
+	virtual WORD GetRealBitCount(void) { return 24; }
+	virtual WORD GetFalseBitCount(void) { return 24; }
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; };
 	virtual int GetNumSupportedInputFormats(void);
 	virtual int GetNumPlanes(void) { return 3; }
@@ -33,8 +33,6 @@ protected:
 	virtual int GetMacroPixelWidth(void) { return 1; }
 	virtual int GetMacroPixelHeight(void) { return 1; }
 
-	virtual DWORD GetInputFCC(void) { return FCC('ULRG'); }
-	virtual WORD GetInputBitCount(void) { return 24; }
 	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) { return m_outfmts; };
 	virtual int GetNumSupportedOutputFormats(void);
 	virtual void ConvertFromPlanar(DWORD nBandIndex);

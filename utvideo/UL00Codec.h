@@ -80,10 +80,10 @@ public:
 	virtual LRESULT DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
 protected:
-	virtual DWORD GetOutputFCC(void) = 0;
+	virtual DWORD GetFCC(void) = 0;
 	virtual const char *GetColorFormatName(void) = 0;
-	virtual WORD GetOutputBitCount(void) = 0;
-	virtual WORD GetMaxBitCount(void) = 0;
+	virtual WORD GetRealBitCount(void) = 0;
+	virtual WORD GetFalseBitCount(void) = 0;
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) = 0;
 	virtual int GetNumSupportedInputFormats(void) = 0;
 	virtual int GetNumPlanes(void) = 0;
@@ -92,8 +92,6 @@ protected:
 	virtual int GetMacroPixelWidth(void) = 0;
 	virtual int GetMacroPixelHeight(void) = 0;
 
-	virtual DWORD GetInputFCC(void) = 0;
-	virtual WORD GetInputBitCount(void) = 0;
 	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) = 0;
 	virtual int GetNumSupportedOutputFormats(void) = 0;
 	virtual void ConvertFromPlanar(DWORD nBandIndex) = 0;

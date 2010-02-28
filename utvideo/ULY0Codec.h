@@ -27,10 +27,10 @@ private:
 	void ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD nYOffset);
 
 protected:
-	virtual DWORD GetOutputFCC(void) { return FCC('ULY0'); }
+	virtual DWORD GetFCC(void) { return FCC('ULY0'); }
 	virtual const char *GetColorFormatName(void) { return "YUV420"; }
-	virtual WORD GetOutputBitCount(void) { return 12; }
-	virtual WORD GetMaxBitCount(void) { return 24; }
+	virtual WORD GetRealBitCount(void) { return 12; }
+	virtual WORD GetFalseBitCount(void) { return 24; }
 	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; }
 	virtual int GetNumSupportedInputFormats(void);
 	virtual int GetNumPlanes(void) { return 3; }
@@ -39,8 +39,6 @@ protected:
 	virtual int GetMacroPixelWidth(void) { return 2; }
 	virtual int GetMacroPixelHeight(void) { return 2; }
 
-	virtual DWORD GetInputFCC(void) { return FCC('ULY0'); }
-	virtual WORD GetInputBitCount(void) { return 12; }
 	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) { return m_outfmts; }
 	virtual int GetNumSupportedOutputFormats(void);
 	virtual void ConvertFromPlanar(DWORD nBandIndex);

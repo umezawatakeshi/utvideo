@@ -39,7 +39,7 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		pThis = (CUL00Codec *)lParam;
 		wsprintf(buf, "Ut Video Codec %s (%c%c%c%c) %s",
 			pThis->GetColorFormatName(),
-			FCC4PRINTF(pThis->GetOutputFCC()),
+			FCC4PRINTF(pThis->GetFCC()),
 			UTVIDEO_IMPLEMENTATION_STR);
 		SetWindowText(hwnd, buf);
 		wsprintf(buf, "%d", (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
@@ -348,8 +348,8 @@ LRESULT CUL00Codec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFO
 	pbieOut->bih.biWidth         = pbihIn->biWidth;
 	pbieOut->bih.biHeight        = pbihIn->biHeight;
 	pbieOut->bih.biPlanes        = 1;
-	pbieOut->bih.biBitCount      = min(pbihIn->biBitCount, GetMaxBitCount());
-	pbieOut->bih.biCompression   = GetOutputFCC();
+	pbieOut->bih.biBitCount      = min(pbihIn->biBitCount, GetFalseBitCount());
+	pbieOut->bih.biCompression   = GetFCC();
 	pbieOut->bih.biSizeImage     = pbihIn->biSizeImage;
 	//pbieOut->bih.biXPelsPerMeter
 	//pbieOut->bih.biYPelsPerMeter
@@ -365,7 +365,7 @@ LRESULT CUL00Codec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFO
 
 LRESULT CUL00Codec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
-	return ROUNDUP(pbihIn->biWidth, 4) * ROUNDUP(pbihIn->biHeight, 2) * GetOutputBitCount() / 8 + 4096; // +4096 ‚Í‚Ç‚ñ‚Ô‚èŠ¨’èB
+	return ROUNDUP(pbihIn->biWidth, 4) * ROUNDUP(pbihIn->biHeight, 2) * GetRealBitCount() / 8 + 4096; // +4096 ‚Í‚Ç‚ñ‚Ô‚èŠ¨’èB
 }
 
 LRESULT CUL00Codec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
@@ -608,7 +608,7 @@ LRESULT CUL00Codec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	const OUTPUTFORMAT *pfmts;
 
-	if (pbihIn->biCompression != GetInputFCC())
+	if (pbihIn->biCompression != GetFCC())
 		return ICERR_BADFORMAT;
 
 	if (pbihIn->biWidth % GetMacroPixelWidth() != 0 || pbihIn->biHeight % GetMacroPixelHeight() != 0)
