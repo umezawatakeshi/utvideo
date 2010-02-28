@@ -7,8 +7,8 @@
 #include "Thread.h"
 #include "HuffmanCode.h"
 
-class CPlanarEncoder :
-	public CEncoder
+class CUL00Codec :
+	public CCodec
 {
 protected:
 	ENCODERCONF m_ec;
@@ -37,8 +37,14 @@ protected:
 	{
 		DWORD dwCount[4][256];
 	} *m_counts;
-	BYTE *m_pCodeLengthTable[4];
+	/* const */ BYTE *m_pCodeLengthTable[4];
 	HUFFMAN_ENCODE_TABLE m_het[4];
+
+	CFrameBuffer *m_pRestoredFrame;
+	CFrameBuffer *m_pDecodedFrame;
+	FRAMEINFO m_fi;
+	HUFFMAN_DECODE_TABLE m_hdt[4];
+	const ICDECOMPRESS *m_icd;
 
 public:
 	struct INPUTFORMAT
@@ -46,10 +52,15 @@ public:
 		DWORD fcc;
 		WORD nBitCount;
 	};
+	struct OUTPUTFORMAT
+	{
+		DWORD fcc;
+		WORD nBitCount;
+	};
 
 public:
-	CPlanarEncoder(void);
-	virtual ~CPlanarEncoder(void);
+	CUL00Codec(void);
+	virtual ~CUL00Codec(void);
 
 public:
 	virtual LRESULT Configure(HWND hwnd);
@@ -62,6 +73,11 @@ public:
 	virtual LRESULT CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	virtual LRESULT CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual LRESULT CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual LRESULT Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
+	virtual LRESULT DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
+	virtual LRESULT DecompressEnd(void);
+	virtual LRESULT DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
+	virtual LRESULT DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
 protected:
 	virtual DWORD GetOutputFCC(void) = 0;
@@ -76,15 +92,21 @@ protected:
 	virtual int GetMacroPixelWidth(void) = 0;
 	virtual int GetMacroPixelHeight(void) = 0;
 
+	virtual DWORD GetInputFCC(void) = 0;
+	virtual WORD GetInputBitCount(void) = 0;
+	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) = 0;
+	virtual int GetNumSupportedOutputFormats(void) = 0;
+	virtual void ConvertFromPlanar(DWORD nBandIndex) = 0;
+
 private:
 	void PredictProc(DWORD nBandIndex);
 	class CPredictJob : public CThreadJob
 	{
 	private:
 		DWORD m_nBandIndex;
-		CPlanarEncoder *m_pEncoder;
+		CUL00Codec *m_pEncoder;
 	public:
-		CPredictJob(CPlanarEncoder *pEncoder, DWORD nBandIndex)
+		CPredictJob(CUL00Codec *pEncoder, DWORD nBandIndex)
 		{
 			m_nBandIndex = nBandIndex;
 			m_pEncoder = pEncoder;
@@ -100,9 +122,9 @@ private:
 	{
 	private:
 		DWORD m_nBandIndex;
-		CPlanarEncoder *m_pEncoder;
+		CUL00Codec *m_pEncoder;
 	public:
-		CEncodeJob(CPlanarEncoder *pEncoder, DWORD nBandIndex)
+		CEncodeJob(CUL00Codec *pEncoder, DWORD nBandIndex)
 		{
 			m_nBandIndex = nBandIndex;
 			m_pEncoder = pEncoder;
@@ -112,76 +134,15 @@ private:
 			m_pEncoder->EncodeProc(m_nBandIndex);
 		}
 	};
-};
 
-class CPlanarDecoder :
-	public CDecoder
-{
-protected:
-	BOOL m_bBottomUpFrame;
-	DWORD m_dwNumStripes;
-	DWORD m_dwDivideCount;
-	BOOL m_bInterlace;
-	DWORD m_dwRawSize;
-	DWORD m_dwRawGrossWidth;
-	DWORD m_dwRawNetWidth;
-	DWORD m_dwPlaneSize[4];
-	DWORD m_dwPlaneWidth[4];
-	DWORD m_dwPlaneStripeSize[4];
-	DWORD m_dwPlanePredictStride[4];
-	DWORD m_dwPlaneStripeBegin[256];
-	DWORD m_dwPlaneStripeEnd[256];
-	DWORD m_dwRawStripeBegin[256];
-	DWORD m_dwRawStripeEnd[256];
-	DWORD m_dwRawStripeSize;
-
-	CThreadManager *m_ptm;
-	CFrameBuffer *m_pCurFrame;
-	CFrameBuffer *m_pRestoredFrame;
-	CFrameBuffer *m_pDecodedFrame;
-	FRAMEINFO m_fi;
-	HUFFMAN_DECODE_TABLE m_hdt[4];
-	const BYTE *m_pCodeLengthTable[4];
-	const ICDECOMPRESS *m_icd;
-
-public:
-	struct OUTPUTFORMAT
-	{
-		DWORD fcc;
-		WORD nBitCount;
-	};
-
-public:
-	CPlanarDecoder(void);
-	virtual ~CPlanarDecoder(void);
-
-public:
-	virtual LRESULT Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
-	virtual LRESULT DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual LRESULT DecompressEnd(void);
-	virtual LRESULT DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
-	virtual LRESULT DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-
-protected:
-	virtual DWORD GetInputFCC(void) = 0;
-	virtual WORD GetInputBitCount(void) = 0;
-	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) = 0;
-	virtual int GetNumSupportedOutputFormats(void) = 0;
-	virtual int GetNumPlanes(void) = 0;
-	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn) = 0;
-	virtual void ConvertFromPlanar(DWORD nBandIndex) = 0;
-	virtual int GetMacroPixelWidth(void) = 0;
-	virtual int GetMacroPixelHeight(void) = 0;
-
-private:
 	void DecodeProc(DWORD nBandIndex);
 	class CDecodeJob : public CThreadJob
 	{
 	private:
 		DWORD m_nBandIndex;
-		CPlanarDecoder *m_pDecoder;
+		CUL00Codec *m_pDecoder;
 	public:
-		CDecodeJob(CPlanarDecoder *pDecoder, DWORD nBandIndex)
+		CDecodeJob(CUL00Codec *pDecoder, DWORD nBandIndex)
 		{
 			m_nBandIndex = nBandIndex;
 			m_pDecoder = pDecoder;

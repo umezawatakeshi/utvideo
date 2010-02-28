@@ -11,8 +11,7 @@ private:
 	{
 		DWORD fcc;
 		const char *pszColorFormatName;
-		CEncoder *(*pfnCreateEncoder)(void);
-		CDecoder *(*pfnCreateDecoder)(void);
+		CCodec *(*pfnCreateCodec)(void);
 	};
 
 	static const CODECLIST m_codeclist[];
@@ -20,8 +19,7 @@ private:
 private:
 	DWORD m_fccHandler;
 	const char *m_pszColorFormatName;
-	CEncoder *m_pEncoder;
-	CDecoder *m_pDecoder;
+	CCodec *m_pCodec;
 
 private:
 	CVCMCodec(DWORD fccHandler);

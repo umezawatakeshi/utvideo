@@ -4,114 +4,93 @@
 #include "StdAfx.h"
 #include "Codec.h"
 
-CEncoder::CEncoder(void)
+CCodec::CCodec(void)
 {
 }
 
-CEncoder::~CEncoder(void)
+CCodec::~CCodec(void)
 {
 }
 
-CDecoder::CDecoder(void)
+CDummyCodec::CDummyCodec(void)
 {
 }
 
-CDecoder::~CDecoder(void)
+CDummyCodec::~CDummyCodec(void)
 {
 }
 
-CDummyEncoder::CDummyEncoder(void)
+CCodec *CDummyCodec::CreateInstance(void)
 {
+	return new CDummyCodec();
 }
 
-CDummyEncoder::~CDummyEncoder(void)
-{
-}
-
-CEncoder *CDummyEncoder::CreateInstance(void)
-{
-	return new CDummyEncoder();
-}
-
-LRESULT CDummyEncoder::Configure(HWND hwnd)
+LRESULT CDummyCodec::Configure(HWND hwnd)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyEncoder::GetState(void *pState, SIZE_T cb)
+LRESULT CDummyCodec::GetState(void *pState, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyEncoder::SetState(const void *pState, SIZE_T cb)
+LRESULT CDummyCodec::SetState(const void *pState, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
+LRESULT CDummyCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyEncoder::CompressEnd(void)
+LRESULT CDummyCodec::CompressEnd(void)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyEncoder::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyCodec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-CDummyDecoder::CDummyDecoder(void)
-{
-}
-
-CDummyDecoder::~CDummyDecoder(void)
-{
-}
-
-CDecoder *CDummyDecoder::CreateInstance(void)
-{
-	return new CDummyDecoder();
-}
-
-LRESULT CDummyDecoder::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
+LRESULT CDummyCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyDecoder::DecompressEnd(void)
+LRESULT CDummyCodec::DecompressEnd(void)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyDecoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
 }

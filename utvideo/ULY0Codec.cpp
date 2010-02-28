@@ -6,7 +6,7 @@
 #include "ULY0Codec.h"
 #include "Predict.h"
 
-const CULY0Encoder::INPUTFORMAT CULY0Encoder::m_infmts[] = {
+const CULY0Codec::INPUTFORMAT CULY0Codec::m_infmts[] = {
 	{ FCC('YV12'), 12 },
 	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
 	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
@@ -16,27 +16,27 @@ const CULY0Encoder::INPUTFORMAT CULY0Encoder::m_infmts[] = {
 	{ BI_RGB, 24 },
 };
 
-CULY0Encoder::CULY0Encoder(void)
+CULY0Codec::CULY0Codec(void)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
 }
 
-CULY0Encoder::~CULY0Encoder(void)
+CULY0Codec::~CULY0Codec(void)
 {
 }
 
-int CULY0Encoder::GetNumSupportedInputFormats(void)
+int CULY0Codec::GetNumSupportedInputFormats(void)
 {
 	return _countof(m_infmts);
 }
 
-CEncoder *CULY0Encoder::CreateInstance(void)
+CCodec *CULY0Codec::CreateInstance(void)
 {
-	return new CULY0Encoder();
+	return new CULY0Codec();
 }
 
-void CULY0Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
+void CULY0Codec::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
 	m_dwPlaneSize[0]          = pbih->biWidth * pbih->biHeight;
 	m_dwPlaneSize[1]          = pbih->biWidth * pbih->biHeight / 4;
@@ -55,7 +55,7 @@ void CULY0Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlanePredictStride[2] = pbih->biWidth / 2;
 }
 
-void CULY0Encoder::ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD bypp)
+void CULY0Codec::ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD bypp)
 {
 	BYTE *y = pDstYBegin;
 	BYTE *u = pDstUBegin;
@@ -86,7 +86,7 @@ void CULY0Encoder::ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, 
 	}
 }
 
-void CULY0Encoder::ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD nYOffset)
+void CULY0Codec::ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD nYOffset)
 {
 	BYTE *y = pDstYBegin;
 	BYTE *u = pDstUBegin;
@@ -114,7 +114,7 @@ void CULY0Encoder::ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE 
 	}
 }
 
-void CULY0Encoder::ConvertToPlanar(DWORD nBandIndex)
+void CULY0Codec::ConvertToPlanar(DWORD nBandIndex)
 {
 	BYTE *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 	BYTE *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
@@ -168,7 +168,7 @@ void CULY0Encoder::ConvertToPlanar(DWORD nBandIndex)
 	}
 }
 
-const CULY0Decoder::OUTPUTFORMAT CULY0Decoder::m_outfmts[] = {
+const CULY0Codec::OUTPUTFORMAT CULY0Codec::m_outfmts[] = {
 	{ FCC('YV12'), 12 },
 	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
 	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
@@ -178,44 +178,12 @@ const CULY0Decoder::OUTPUTFORMAT CULY0Decoder::m_outfmts[] = {
 	{ BI_RGB, 24 },
 };
 
-CULY0Decoder::CULY0Decoder(void)
-{
-}
-
-CULY0Decoder::~CULY0Decoder(void)
-{
-}
-
-int CULY0Decoder::GetNumSupportedOutputFormats(void)
+int CULY0Codec::GetNumSupportedOutputFormats(void)
 {
 	return _countof(m_outfmts);
 }
 
-CDecoder *CULY0Decoder::CreateInstance(void)
-{
-	return new CULY0Decoder();
-}
-
-void CULY0Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
-{
-	m_dwPlaneSize[0]          = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[1]          = pbih->biWidth * pbih->biHeight / 4;
-	m_dwPlaneSize[2]          = pbih->biWidth * pbih->biHeight / 4;
-
-	m_dwPlaneWidth[0]         = pbih->biWidth;
-	m_dwPlaneWidth[1]         = pbih->biWidth / 2;
-	m_dwPlaneWidth[2]         = pbih->biWidth / 2;
-
-	m_dwPlaneStripeSize[0]    = pbih->biWidth * 2;
-	m_dwPlaneStripeSize[1]    = pbih->biWidth / 2;
-	m_dwPlaneStripeSize[2]    = pbih->biWidth / 2;
-
-	m_dwPlanePredictStride[0] = pbih->biWidth;
-	m_dwPlanePredictStride[1] = pbih->biWidth / 2;
-	m_dwPlanePredictStride[2] = pbih->biWidth / 2;
-}
-
-void CULY0Decoder::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD bypp)
+void CULY0Codec::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD bypp)
 {
 	const BYTE *y = pSrcYBegin;
 	const BYTE *u = pSrcUBegin;
@@ -253,7 +221,7 @@ void CULY0Decoder::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *
 	}
 }
 
-void CULY0Decoder::ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD nYOffset)
+void CULY0Codec::ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD nYOffset)
 {
 	const BYTE *y = pSrcYBegin;
 	const BYTE *u = pSrcUBegin;
@@ -283,7 +251,7 @@ void CULY0Decoder::ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcU
 	}
 }
 
-void CULY0Decoder::ConvertFromPlanar(DWORD nBandIndex)
+void CULY0Codec::ConvertFromPlanar(DWORD nBandIndex)
 {
 	const BYTE *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 	const BYTE *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];

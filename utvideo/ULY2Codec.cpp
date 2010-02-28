@@ -7,7 +7,7 @@
 #include "Predict.h"
 #include "Convert.h"
 
-const CPlanarEncoder::INPUTFORMAT CULY2Encoder::m_infmts[] = {
+const CUL00Codec::INPUTFORMAT CULY2Codec::m_infmts[] = {
 	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
 	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
 	{ FCC('YVYU'), 16 },
@@ -16,25 +16,25 @@ const CPlanarEncoder::INPUTFORMAT CULY2Encoder::m_infmts[] = {
 	{ BI_RGB, 24 },
 };
 
-CULY2Encoder::CULY2Encoder(void)
+CULY2Codec::CULY2Codec(void)
 {
 }
 
-CULY2Encoder::~CULY2Encoder(void)
+CULY2Codec::~CULY2Codec(void)
 {
 }
 
-int CULY2Encoder::GetNumSupportedInputFormats(void)
+int CULY2Codec::GetNumSupportedInputFormats(void)
 {
 	return _countof(m_infmts);
 }
 
-CEncoder *CULY2Encoder::CreateInstance(void)
+CCodec *CULY2Codec::CreateInstance(void)
 {
-	return new CULY2Encoder();
+	return new CULY2Codec();
 }
 
-void CULY2Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
+void CULY2Codec::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
 	m_dwPlaneSize[0]          = pbih->biWidth * pbih->biHeight;
 	m_dwPlaneSize[1]          = pbih->biWidth * pbih->biHeight / 2;
@@ -53,7 +53,7 @@ void CULY2Encoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlanePredictStride[2] = pbih->biWidth / 2;
 }
 
-void CULY2Encoder::ConvertToPlanar(DWORD nBandIndex)
+void CULY2Codec::ConvertToPlanar(DWORD nBandIndex)
 {
 	BYTE *y, *u, *v;
 	const BYTE *pSrcBegin, *pSrcEnd, *p;
@@ -119,7 +119,7 @@ void CULY2Encoder::ConvertToPlanar(DWORD nBandIndex)
 	}
 }
 
-const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[] = {
+const CUL00Codec::OUTPUTFORMAT CULY2Codec::m_outfmts[] = {
 	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
 	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
 	{ FCC('YVYU'), 16 },
@@ -128,44 +128,12 @@ const CPlanarDecoder::OUTPUTFORMAT CULY2Decoder::m_outfmts[] = {
 	{ BI_RGB, 24 },
 };
 
-CULY2Decoder::CULY2Decoder(void)
-{
-}
-
-CULY2Decoder::~CULY2Decoder(void)
-{
-}
-
-int CULY2Decoder::GetNumSupportedOutputFormats(void)
+int CULY2Codec::GetNumSupportedOutputFormats(void)
 {
 	return _countof(m_outfmts);
 }
 
-CDecoder *CULY2Decoder::CreateInstance(void)
-{
-	return new CULY2Decoder();
-}
-
-void CULY2Decoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
-{
-	m_dwPlaneSize[0]          = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[1]          = pbih->biWidth * pbih->biHeight / 2;
-	m_dwPlaneSize[2]          = pbih->biWidth * pbih->biHeight / 2;
-
-	m_dwPlaneWidth[0]         = pbih->biWidth;
-	m_dwPlaneWidth[1]         = pbih->biWidth / 2;
-	m_dwPlaneWidth[2]         = pbih->biWidth / 2;
-
-	m_dwPlaneStripeSize[0]    = pbih->biWidth;
-	m_dwPlaneStripeSize[1]    = pbih->biWidth / 2;
-	m_dwPlaneStripeSize[2]    = pbih->biWidth / 2;
-
-	m_dwPlanePredictStride[0] = pbih->biWidth;
-	m_dwPlanePredictStride[1] = pbih->biWidth / 2;
-	m_dwPlanePredictStride[2] = pbih->biWidth / 2;
-}
-
-void CULY2Decoder::ConvertFromPlanar(DWORD nBandIndex)
+void CULY2Codec::ConvertFromPlanar(DWORD nBandIndex)
 {
 	const BYTE *y, *u, *v;
 	BYTE *pDstBegin, *pDstEnd, *p;

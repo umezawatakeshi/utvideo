@@ -8,16 +8,17 @@
 #include "Thread.h"
 #include "HuffmanCode.h"
 
-class CULRAEncoder :
-	public CPlanarEncoder
+class CULRACodec :
+	public CUL00Codec
 {
 private:
 	static const INPUTFORMAT m_infmts[];
+	static const OUTPUTFORMAT m_outfmts[];
 
 public:
-	CULRAEncoder(void);
-	virtual ~CULRAEncoder(void);
-	static CEncoder *CreateInstance(void);
+	CULRACodec(void);
+	virtual ~CULRACodec(void);
+	static CCodec *CreateInstance(void);
 
 protected:
 	virtual DWORD GetOutputFCC(void) { return FCC('ULRA'); }
@@ -31,27 +32,10 @@ protected:
 	virtual void ConvertToPlanar(DWORD nBandIndex);
 	virtual int GetMacroPixelWidth(void) { return 1; }
 	virtual int GetMacroPixelHeight(void) { return 1; }
-};
 
-class CULRADecoder :
-	public CPlanarDecoder
-{
-private:
-	static const OUTPUTFORMAT m_outfmts[];
-
-public:
-	CULRADecoder(void);
-	virtual ~CULRADecoder(void);
-	static CDecoder *CreateInstance(void);
-
-protected:
 	virtual DWORD GetInputFCC(void) { return FCC('ULRA'); }
 	virtual WORD GetInputBitCount(void) { return 32; }
 	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) { return m_outfmts; };
 	virtual int GetNumSupportedOutputFormats(void);
-	virtual int GetNumPlanes(void) { return 4; }
-	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihOut);
 	virtual void ConvertFromPlanar(DWORD nBandIndex);
-	virtual int GetMacroPixelWidth(void) { return 1; }
-	virtual int GetMacroPixelHeight(void) { return 1; }
 };

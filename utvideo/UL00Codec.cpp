@@ -7,26 +7,26 @@
 #include "Predict.h"
 #include "resource.h"
 
-CPlanarEncoder::CPlanarEncoder(void)
+CUL00Codec::CUL00Codec(void)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
 }
 
-CPlanarEncoder::~CPlanarEncoder(void)
+CUL00Codec::~CUL00Codec(void)
 {
 }
 
-LRESULT CPlanarEncoder::Configure(HWND hwnd)
+LRESULT CUL00Codec::Configure(HWND hwnd)
 {
 	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_CONFIG_DIALOG), hwnd, DialogProc, (LPARAM)this);
 	return ICERR_OK;
 }
 
-INT_PTR CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	// 一旦 LONG_PTR にキャストするのは、/Wp64 環境下で誤って 警告C4312 が発生するため。
-	CPlanarEncoder *pThis = (CPlanarEncoder *)(LONG_PTR)GetWindowLongPtr(hwnd, DWLP_USER);
+	CUL00Codec *pThis = (CUL00Codec *)(LONG_PTR)GetWindowLongPtr(hwnd, DWLP_USER);
 	char buf[256];
 	int	n;
 
@@ -36,7 +36,7 @@ INT_PTR CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 		// 一旦 __int3264 にキャストするのは、/Wp64 環境下で誤って 警告C4244 が発生するため。
 		// LONG_PTR にキャストするのではダメらしい。
 		SetWindowLongPtr(hwnd, DWLP_USER, (__int3264)lParam);
-		pThis = (CPlanarEncoder *)lParam;
+		pThis = (CUL00Codec *)lParam;
 		wsprintf(buf, "Ut Video Codec %s (%c%c%c%c) %s",
 			pThis->GetColorFormatName(),
 			FCC4PRINTF(pThis->GetOutputFCC()),
@@ -112,7 +112,7 @@ INT_PTR CALLBACK CPlanarEncoder::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam,
 	return FALSE;
 }
 
-LRESULT CPlanarEncoder::GetState(void *pState, SIZE_T cb)
+LRESULT CUL00Codec::GetState(void *pState, SIZE_T cb)
 {
 	if (cb < sizeof(ENCODERCONF))
 		return ICERR_BADSIZE;
@@ -121,7 +121,7 @@ LRESULT CPlanarEncoder::GetState(void *pState, SIZE_T cb)
 	return ICERR_OK;
 }
 
-LRESULT CPlanarEncoder::SetState(const void *pState, SIZE_T cb)
+LRESULT CUL00Codec::SetState(const void *pState, SIZE_T cb)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 
@@ -137,7 +137,7 @@ LRESULT CPlanarEncoder::SetState(const void *pState, SIZE_T cb)
 	return min(sizeof(ENCODERCONF), cb);
 }
 
-LRESULT CPlanarEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
+LRESULT CUL00Codec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 {
 	FRAMEINFO fi;
 	BYTE *p;
@@ -215,7 +215,7 @@ LRESULT CPlanarEncoder::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 	return ICERR_OK;
 }
 
-LRESULT CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CUL00Codec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	LRESULT ret;
 	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
@@ -318,7 +318,7 @@ LRESULT CPlanarEncoder::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITM
 	return ICERR_OK;
 }
 
-LRESULT CPlanarEncoder::CompressEnd(void)
+LRESULT CUL00Codec::CompressEnd(void)
 {
 	delete m_pCurFrame;
 	delete m_pMedianPredicted;
@@ -330,7 +330,7 @@ LRESULT CPlanarEncoder::CompressEnd(void)
 	return ICERR_OK;
 }
 
-LRESULT CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CUL00Codec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
 	DWORD dwDivideCount;
@@ -363,12 +363,12 @@ LRESULT CPlanarEncoder::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAP
 	return ICERR_OK;
 }
 
-LRESULT CPlanarEncoder::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CUL00Codec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ROUNDUP(pbihIn->biWidth, 4) * ROUNDUP(pbihIn->biHeight, 2) * GetOutputBitCount() / 8 + 4096; // +4096 はどんぶり勘定。
 }
 
-LRESULT CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CUL00Codec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	const INPUTFORMAT *pfmts;
 
@@ -388,7 +388,7 @@ LRESULT CPlanarEncoder::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITM
 	return ICERR_BADFORMAT;
 }
 
-void CPlanarEncoder::PredictProc(DWORD nBandIndex)
+void CUL00Codec::PredictProc(DWORD nBandIndex)
 {
 	ConvertToPlanar(nBandIndex);
 
@@ -414,7 +414,7 @@ void CPlanarEncoder::PredictProc(DWORD nBandIndex)
 	}
 }
 
-void CPlanarEncoder::EncodeProc(DWORD nBandIndex)
+void CUL00Codec::EncodeProc(DWORD nBandIndex)
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
@@ -440,18 +440,10 @@ void CPlanarEncoder::EncodeProc(DWORD nBandIndex)
 	}
 }
 
-CPlanarDecoder::CPlanarDecoder(void)
-{
-}
-
-CPlanarDecoder::~CPlanarDecoder(void)
-{
-}
-
-LRESULT CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
+LRESULT CUL00Codec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)icd->lpbiInput;
-	const BYTE *p;
+	/* const */ BYTE *p;
 
 	m_icd = icd;
 
@@ -476,7 +468,7 @@ LRESULT CPlanarDecoder::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 	return ICERR_OK;
 }
 
-LRESULT CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CUL00Codec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	LRESULT ret;
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
@@ -578,7 +570,7 @@ LRESULT CPlanarDecoder::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BI
 	return ICERR_OK;
 }
 
-LRESULT CPlanarDecoder::DecompressEnd(void)
+LRESULT CUL00Codec::DecompressEnd(void)
 {
 	delete m_pRestoredFrame;
 	delete m_pDecodedFrame;
@@ -588,7 +580,7 @@ LRESULT CPlanarDecoder::DecompressEnd(void)
 	return ICERR_OK;
 }
 
-LRESULT CPlanarDecoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CUL00Codec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
 	if (pbihOut == NULL)
 		return sizeof(BITMAPINFOHEADER);
@@ -610,7 +602,7 @@ LRESULT CPlanarDecoder::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITM
 	return ICERR_OK;
 }
 
-LRESULT CPlanarDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CUL00Codec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
 
@@ -646,7 +638,7 @@ LRESULT CPlanarDecoder::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BI
 	return ICERR_BADFORMAT;
 }
 
-void CPlanarDecoder::DecodeProc(DWORD nBandIndex)
+void CUL00Codec::DecodeProc(DWORD nBandIndex)
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{

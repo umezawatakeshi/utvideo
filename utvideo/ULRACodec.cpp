@@ -6,29 +6,29 @@
 #include "ULRACodec.h"
 #include "Predict.h"
 
-const CPlanarEncoder::INPUTFORMAT CULRAEncoder::m_infmts[] = {
+const CUL00Codec::INPUTFORMAT CULRACodec::m_infmts[] = {
 	{ BI_RGB, 32 },
 };
 
-CULRAEncoder::CULRAEncoder(void)
+CULRACodec::CULRACodec(void)
 {
 }
 
-CULRAEncoder::~CULRAEncoder(void)
+CULRACodec::~CULRACodec(void)
 {
 }
 
-int CULRAEncoder::GetNumSupportedInputFormats(void)
+int CULRACodec::GetNumSupportedInputFormats(void)
 {
 	return _countof(m_infmts);
 }
 
-CEncoder *CULRAEncoder::CreateInstance(void)
+CCodec *CULRACodec::CreateInstance(void)
 {
-	return new CULRAEncoder();
+	return new CULRACodec();
 }
 
-void CULRAEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
+void CULRACodec::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
 	m_dwPlaneSize[0]          = pbih->biWidth * pbih->biHeight;
 	m_dwPlaneSize[1]          = pbih->biWidth * pbih->biHeight;
@@ -51,7 +51,7 @@ void CULRAEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlanePredictStride[3] = pbih->biWidth;
 }
 
-void CULRAEncoder::ConvertToPlanar(DWORD nBandIndex)
+void CULRACodec::ConvertToPlanar(DWORD nBandIndex)
 {
 	BYTE *g, *b, *r, *a;
 	const BYTE *pSrcBegin, *pSrcEnd, *pStrideBegin, *p;
@@ -86,52 +86,16 @@ void CULRAEncoder::ConvertToPlanar(DWORD nBandIndex)
 	}
 }
 
-const CPlanarDecoder::OUTPUTFORMAT CULRADecoder::m_outfmts[] = {
+const CUL00Codec::OUTPUTFORMAT CULRACodec::m_outfmts[] = {
 	{ BI_RGB, 32 },
 };
 
-CULRADecoder::CULRADecoder(void)
-{
-}
-
-CULRADecoder::~CULRADecoder(void)
-{
-}
-
-int CULRADecoder::GetNumSupportedOutputFormats(void)
+int CULRACodec::GetNumSupportedOutputFormats(void)
 {
 	return _countof(m_outfmts);
 }
 
-CDecoder *CULRADecoder::CreateInstance(void)
-{
-	return new CULRADecoder();
-}
-
-void CULRADecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
-{
-	m_dwPlaneSize[0]          = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[1]          = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[2]          = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[3]          = pbih->biWidth * pbih->biHeight;
-
-	m_dwPlaneWidth[0]         = pbih->biWidth;
-	m_dwPlaneWidth[1]         = pbih->biWidth;
-	m_dwPlaneWidth[2]         = pbih->biWidth;
-	m_dwPlaneWidth[3]         = pbih->biWidth;
-
-	m_dwPlaneStripeSize[0]    = pbih->biWidth;
-	m_dwPlaneStripeSize[1]    = pbih->biWidth;
-	m_dwPlaneStripeSize[2]    = pbih->biWidth;
-	m_dwPlaneStripeSize[3]    = pbih->biWidth;
-
-	m_dwPlanePredictStride[0] = pbih->biWidth;
-	m_dwPlanePredictStride[1] = pbih->biWidth;
-	m_dwPlanePredictStride[2] = pbih->biWidth;
-	m_dwPlanePredictStride[3] = pbih->biWidth;
-}
-
-void CULRADecoder::ConvertFromPlanar(DWORD nBandIndex)
+void CULRACodec::ConvertFromPlanar(DWORD nBandIndex)
 {
 	const BYTE *g, *b, *r, *a;
 	BYTE *pDstBegin, *pDstEnd, *pStrideBegin, *p;

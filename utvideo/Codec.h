@@ -3,11 +3,11 @@
 
 #pragma once
 
-class CEncoder
+class CCodec
 {
 public:
-	CEncoder(void);
-	virtual ~CEncoder(void);
+	CCodec(void);
+	virtual ~CCodec(void);
 
 public:
 	virtual LRESULT Configure(HWND hwnd) = 0;
@@ -19,15 +19,6 @@ public:
 	virtual LRESULT CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) = 0;
 	virtual LRESULT CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 	virtual LRESULT CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
-};
-
-class CDecoder
-{
-public:
-	CDecoder(void);
-	virtual ~CDecoder(void);
-
-public:
 	virtual LRESULT Decompress(const ICDECOMPRESS *icd, SIZE_T cb) = 0;
 	virtual LRESULT DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 	virtual LRESULT DecompressEnd(void) = 0;
@@ -35,13 +26,13 @@ public:
 	virtual LRESULT DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) = 0;
 };
 
-class CDummyEncoder :
-	public CEncoder
+class CDummyCodec :
+	public CCodec
 {
 public:
-	CDummyEncoder(void);
-	~CDummyEncoder(void);
-	static CEncoder *CreateInstance(void);
+	CDummyCodec(void);
+	~CDummyCodec(void);
+	static CCodec *CreateInstance(void);
 
 public:
 	virtual LRESULT Configure(HWND hwnd);
@@ -53,17 +44,6 @@ public:
 	virtual LRESULT CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	virtual LRESULT CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual LRESULT CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-};
-
-class CDummyDecoder :
-	public CDecoder
-{
-public:
-	CDummyDecoder(void);
-	~CDummyDecoder(void);
-	static CDecoder *CreateInstance(void);
-
-public:
 	virtual LRESULT Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
 	virtual LRESULT DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual LRESULT DecompressEnd(void);

@@ -6,30 +6,30 @@
 #include "ULRGCodec.h"
 #include "Predict.h"
 
-const CPlanarEncoder::INPUTFORMAT CULRGEncoder::m_infmts[] = {
+const CUL00Codec::INPUTFORMAT CULRGCodec::m_infmts[] = {
 	{ BI_RGB, 24 },
 	{ BI_RGB, 32 },
 };
 
-CULRGEncoder::CULRGEncoder(void)
+CULRGCodec::CULRGCodec(void)
 {
 }
 
-CULRGEncoder::~CULRGEncoder(void)
+CULRGCodec::~CULRGCodec(void)
 {
 }
 
-int CULRGEncoder::GetNumSupportedInputFormats(void)
+int CULRGCodec::GetNumSupportedInputFormats(void)
 {
 	return _countof(m_infmts);
 }
 
-CEncoder *CULRGEncoder::CreateInstance(void)
+CCodec *CULRGCodec::CreateInstance(void)
 {
-	return new CULRGEncoder();
+	return new CULRGCodec();
 }
 
-void CULRGEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
+void CULRGCodec::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 {
 	m_dwPlaneSize[0]          = pbih->biWidth * pbih->biHeight;
 	m_dwPlaneSize[1]          = pbih->biWidth * pbih->biHeight;
@@ -48,7 +48,7 @@ void CULRGEncoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
 	m_dwPlanePredictStride[2] = pbih->biWidth;
 }
 
-void CULRGEncoder::ConvertToPlanar(DWORD nBandIndex)
+void CULRGCodec::ConvertToPlanar(DWORD nBandIndex)
 {
 	BYTE *g, *b, *r;
 	const BYTE *pSrcBegin, *pSrcEnd, *pStrideBegin, *p;
@@ -93,49 +93,17 @@ void CULRGEncoder::ConvertToPlanar(DWORD nBandIndex)
 	}
 }
 
-const CPlanarDecoder::OUTPUTFORMAT CULRGDecoder::m_outfmts[] = {
+const CUL00Codec::OUTPUTFORMAT CULRGCodec::m_outfmts[] = {
 	{ BI_RGB, 24 },
 	{ BI_RGB, 32 },
 };
 
-CULRGDecoder::CULRGDecoder(void)
-{
-}
-
-CULRGDecoder::~CULRGDecoder(void)
-{
-}
-
-int CULRGDecoder::GetNumSupportedOutputFormats(void)
+int CULRGCodec::GetNumSupportedOutputFormats(void)
 {
 	return _countof(m_outfmts);
 }
 
-CDecoder *CULRGDecoder::CreateInstance(void)
-{
-	return new CULRGDecoder();
-}
-
-void CULRGDecoder::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
-{
-	m_dwPlaneSize[0]          = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[1]          = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[2]          = pbih->biWidth * pbih->biHeight;
-
-	m_dwPlaneWidth[0]         = pbih->biWidth;
-	m_dwPlaneWidth[1]         = pbih->biWidth;
-	m_dwPlaneWidth[2]         = pbih->biWidth;
-
-	m_dwPlaneStripeSize[0]    = pbih->biWidth;
-	m_dwPlaneStripeSize[1]    = pbih->biWidth;
-	m_dwPlaneStripeSize[2]    = pbih->biWidth;
-
-	m_dwPlanePredictStride[0] = pbih->biWidth;
-	m_dwPlanePredictStride[1] = pbih->biWidth;
-	m_dwPlanePredictStride[2] = pbih->biWidth;
-}
-
-void CULRGDecoder::ConvertFromPlanar(DWORD nBandIndex)
+void CULRGCodec::ConvertFromPlanar(DWORD nBandIndex)
 {
 	const BYTE *g, *b, *r;
 	BYTE *pDstBegin, *pDstEnd, *pStrideBegin, *p;
