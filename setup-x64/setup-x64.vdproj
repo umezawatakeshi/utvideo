@@ -15,19 +15,13 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_3DB05F0FEC472B71B48EAFDFEF6B910A"
-        "OwnerKey" = "8:_6CAAE03A2C6344E29F76FD32872BB44A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_3DB05F0FEC472B71B48EAFDFEF6B910A"
-        "OwnerKey" = "8:_C4F1C75E50764A5DA99FFDBBBB0785E6"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_3FF0B905FABD4AA59151EDC4309952A8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5D01A8F2B1C2433D910477C231784457"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -150,12 +144,12 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3DB05F0FEC472B71B48EAFDFEF6B910A"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3FF0B905FABD4AA59151EDC4309952A8"
             {
-            "SourcePath" = "8:MSVFW32.dll"
-            "TargetName" = "8:MSVFW32.dll"
+            "SourcePath" = "8:..\\readme.en.html"
+            "TargetName" = "8:readme.en.html"
             "Tag" = "8:"
-            "Folder" = "8:_57F768BCC2BE446194CEF0279754572C"
+            "Folder" = "8:_57FB51DF1CF6408A83E9242C1FD158FE"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -166,14 +160,14 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3FF0B905FABD4AA59151EDC4309952A8"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5D01A8F2B1C2433D910477C231784457"
             {
-            "SourcePath" = "8:..\\readme.en.html"
-            "TargetName" = "8:readme.en.html"
+            "SourcePath" = "8:information.rtf"
+            "TargetName" = "8:information.rtf"
             "Tag" = "8:"
             "Folder" = "8:_57FB51DF1CF6408A83E9242C1FD158FE"
             "Condition" = "8:"
@@ -378,14 +372,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite x64"
-        "ProductCode" = "8:{C4AFF698-2168-455D-B033-A37B1B5768BB}"
-        "PackageCode" = "8:{5D13C8EB-ACD3-43A3-A704-6BF838630DF0}"
+        "ProductCode" = "8:{25FDB365-88A1-4E3A-BA1A-E1D10A369AD7}"
+        "PackageCode" = "8:{366A0FF3-B197-4E98-B09B-E8066494B587}"
         "UpgradeCode" = "8:{D9406D67-866D-4C5A-B188-D02E4CEF555B}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:7.00.0400"
+        "ProductVersion" = "8:7.00.0406"
         "Manufacturer" = "8:UMEZAWA Takeshi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://umezawa.dyndns.info/"
@@ -776,9 +770,56 @@
             "Attributes" = "3:3"
                 "Dialogs"
                 {
-                    "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_ADC0CFB693D54F48BCD8005BBADA528E"
+                    "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_7C7BA57171CB4A078C4904B07B76C78D"
                     {
                     "Sequence" = "3:100"
+                    "DisplayName" = "8:注意事項"
+                    "UseDynamicProperties" = "11:TRUE"
+                    "IsDependency" = "11:FALSE"
+                    "SourcePath" = "8:<VsdDialogDir>\\VsdReadmeDlg.wid"
+                        "Properties"
+                        {
+                            "BannerBitmap"
+                            {
+                            "Name" = "8:BannerBitmap"
+                            "DisplayName" = "8:#1001"
+                            "Description" = "8:#1101"
+                            "Type" = "3:8"
+                            "ContextData" = "8:Bitmap"
+                            "Attributes" = "3:4"
+                            "Setting" = "3:1"
+                            "UsePlugInResources" = "11:TRUE"
+                            }
+                            "ReadmeText"
+                            {
+                            "Name" = "8:ReadmeText"
+                            "DisplayName" = "8:#1010"
+                            "Description" = "8:#1110"
+                            "Type" = "3:6"
+                            "ContextData" = "8:"
+                            "Attributes" = "3:0"
+                            "Setting" = "3:2"
+                            "Value" = "8:_5D01A8F2B1C2433D910477C231784457"
+                            "UsePlugInResources" = "11:TRUE"
+                            }
+                            "Sunken"
+                            {
+                            "Name" = "8:Sunken"
+                            "DisplayName" = "8:#1007"
+                            "Description" = "8:#1107"
+                            "Type" = "3:5"
+                            "ContextData" = "8:4;True=4;False=0"
+                            "Attributes" = "3:0"
+                            "Setting" = "3:0"
+                            "Value" = "3:4"
+                            "DefaultValue" = "3:4"
+                            "UsePlugInResources" = "11:TRUE"
+                            }
+                        }
+                    }
+                    "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_ADC0CFB693D54F48BCD8005BBADA528E"
+                    {
+                    "Sequence" = "3:110"
                     "DisplayName" = "8:完了"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
@@ -1129,9 +1170,56 @@
             "Attributes" = "3:3"
                 "Dialogs"
                 {
-                    "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_BD8F6BF51233426C8175B771722D0050"
+                    "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_916A33105C824968ACC5BD5B40796016"
                     {
                     "Sequence" = "3:100"
+                    "DisplayName" = "8:注意事項"
+                    "UseDynamicProperties" = "11:TRUE"
+                    "IsDependency" = "11:FALSE"
+                    "SourcePath" = "8:<VsdDialogDir>\\VsdAdminReadmeDlg.wid"
+                        "Properties"
+                        {
+                            "BannerBitmap"
+                            {
+                            "Name" = "8:BannerBitmap"
+                            "DisplayName" = "8:#1001"
+                            "Description" = "8:#1101"
+                            "Type" = "3:8"
+                            "ContextData" = "8:Bitmap"
+                            "Attributes" = "3:4"
+                            "Setting" = "3:1"
+                            "UsePlugInResources" = "11:TRUE"
+                            }
+                            "ReadmeText"
+                            {
+                            "Name" = "8:ReadmeText"
+                            "DisplayName" = "8:#1010"
+                            "Description" = "8:#1110"
+                            "Type" = "3:6"
+                            "ContextData" = "8:"
+                            "Attributes" = "3:0"
+                            "Setting" = "3:2"
+                            "Value" = "8:_5D01A8F2B1C2433D910477C231784457"
+                            "UsePlugInResources" = "11:TRUE"
+                            }
+                            "Sunken"
+                            {
+                            "Name" = "8:Sunken"
+                            "DisplayName" = "8:#1007"
+                            "Description" = "8:#1107"
+                            "Type" = "3:5"
+                            "ContextData" = "8:4;True=4;False=0"
+                            "Attributes" = "3:0"
+                            "Setting" = "3:0"
+                            "Value" = "3:4"
+                            "DefaultValue" = "3:4"
+                            "UsePlugInResources" = "11:TRUE"
+                            }
+                        }
+                    }
+                    "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_BD8F6BF51233426C8175B771722D0050"
+                    {
+                    "Sequence" = "3:110"
                     "DisplayName" = "8:完了"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
