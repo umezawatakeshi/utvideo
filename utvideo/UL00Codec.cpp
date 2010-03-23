@@ -112,6 +112,11 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 	return FALSE;
 }
 
+LRESULT CUL00Codec::GetStateSize(void)
+{
+	return sizeof(ENCODERCONF);
+}
+
 LRESULT CUL00Codec::GetState(void *pState, SIZE_T cb)
 {
 	if (cb < sizeof(ENCODERCONF))

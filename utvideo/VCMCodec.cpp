@@ -120,7 +120,8 @@ LRESULT CVCMCodec::Configure(HWND hwnd)
 
 LRESULT CVCMCodec::GetStateSize(void)
 {
-	return sizeof(ENCODERCONF);
+	DEBUG_ENTER_LEAVE("CVCMCodec::GetStateSize() this=%p", this);
+	return m_pCodec->GetStateSize();
 }
 
 LRESULT CVCMCodec::GetState(void *pState, SIZE_T cb)

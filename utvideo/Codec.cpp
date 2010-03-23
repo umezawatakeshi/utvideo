@@ -30,6 +30,11 @@ LRESULT CDummyCodec::Configure(HWND hwnd)
 	return ICERR_UNSUPPORTED;
 }
 
+LRESULT CDummyCodec::GetStateSize(void)
+{
+	return ICERR_UNSUPPORTED;
+}
+
 LRESULT CDummyCodec::GetState(void *pState, SIZE_T cb)
 {
 	return ICERR_UNSUPPORTED;

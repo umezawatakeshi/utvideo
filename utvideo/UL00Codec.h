@@ -65,6 +65,7 @@ public:
 public:
 	virtual LRESULT Configure(HWND hwnd);
 	static INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT GetStateSize(void);
 	virtual LRESULT GetState(void *pState, SIZE_T cb);
 	virtual LRESULT SetState(const void *pState, SIZE_T cb);
 	virtual LRESULT Compress(const ICCOMPRESS *icc, SIZE_T cb);

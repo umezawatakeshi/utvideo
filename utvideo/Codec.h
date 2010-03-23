@@ -11,6 +11,7 @@ public:
 
 public:
 	virtual LRESULT Configure(HWND hwnd) = 0;
+	virtual LRESULT GetStateSize(void) = 0;
 	virtual LRESULT GetState(void *pState, SIZE_T cb) = 0;
 	virtual LRESULT SetState(const void *pState, SIZE_T cb) = 0;
 	virtual LRESULT Compress(const ICCOMPRESS *icc, SIZE_T cb) = 0;
@@ -36,6 +37,7 @@ public:
 
 public:
 	virtual LRESULT Configure(HWND hwnd);
+	virtual LRESULT GetStateSize(void);
 	virtual LRESULT GetState(void *pState, SIZE_T cb);
 	virtual LRESULT SetState(const void *pState, SIZE_T cb);
 	virtual LRESULT Compress(const ICCOMPRESS *icc, SIZE_T cb);
