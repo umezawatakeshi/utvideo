@@ -15,6 +15,18 @@
     {
         "Entry"
         {
+        "MsmKey" = "8:_3DB05F0FEC472B71B48EAFDFEF6B910A"
+        "OwnerKey" = "8:_6CAAE03A2C6344E29F76FD32872BB44A"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_3DB05F0FEC472B71B48EAFDFEF6B910A"
+        "OwnerKey" = "8:_C4F1C75E50764A5DA99FFDBBBB0785E6"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3FF0B905FABD4AA59151EDC4309952A8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -138,6 +150,26 @@
         }
         "File"
         {
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3DB05F0FEC472B71B48EAFDFEF6B910A"
+            {
+            "SourcePath" = "8:MSVFW32.dll"
+            "TargetName" = "8:MSVFW32.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_57F768BCC2BE446194CEF0279754572C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3FF0B905FABD4AA59151EDC4309952A8"
             {
             "SourcePath" = "8:..\\readme.en.html"
