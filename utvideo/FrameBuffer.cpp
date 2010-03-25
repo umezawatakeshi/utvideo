@@ -47,7 +47,7 @@ void CFrameBuffer::AddPlane(DWORD dwSize, DWORD dwMarginSize)
 	 * プレーンごとに開始アドレスを少しずつずらし、キャッシュのスラッシングを回避する。
 	 * 256 はマジックナンバーであるが、
 	 *   - キャッシュラインサイズ（最近の多くのプロセッサでは 64 バイト）の整数倍
-	 *   - キャッシュサイズ / 連想度 より十分小さい
+	 *   - キャッシュサイズより十分小さい
 	 * を満たす必要がある。
 	 */
 	m_pBufferAddr[m_nPlanes] = pAllocatedAddr + dwPrecedingMarginSize + m_nPlanes * 256;
