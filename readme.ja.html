@@ -48,6 +48,21 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 <dt>OS</dt><dd>Windows Vista (x64) 以降</dd>
 <dt>CPU</dt><dd>AMD64 あるいは Intel 64（旧称 EM64T）をサポートする CPU</dd>
 </dl>
+<h2 id="fourcc">FourCC 一覧</h2>
+<table border>
+<tr><th>FourCC</th><th>内部保持形式</th><th>対応フォーマット</th></tr>
+<tr><td>ULRA</td><td>RGBA フルレンジ 4:4:4:4 8bit</td><td><strong>RGBA<sup>*</sup></strong></td></tr>
+<tr><td>ULRG</td><td>RGB フルレンジ 4:4:4 8bit</td><td><strong>RGB24<sup>*</sup><br />RGB32</strong></td></tr>
+<tr><td>ULY2</td><td>YCbCr リミテッド 4:2:2 8bit</td><td><strong>YUY2<sup>*</sup> (YUYV YUNV) UYVY (UYNV) YVYU VYUY</strong><br>RGB24<br>RGB32</td></tr>
+<tr><td>ULY0</td><td>YCbCr リミテッド 4:2:0 8bit</td><td><strong>YV12<sup>*</sup></strong><br>YUY2 (YUYV YUNV) UYVY (UYNV) YVYU VYUY<br>RGB24<br>RGB32</td></tr>
+</table>
+<ul>
+<li>現状では、対応入力フォーマットと対応出力フォーマットは同じなので、上の表では分けないで書いてあります。</li>
+<li>RGB 系のフォーマットはすべてフルレンジ（8bit なら R,G,B=0-255）として扱います。YUV 系のフォーマットはすべてリミテッド（8bit なら Y=16-235, U,V=16-240）として扱います。</li>
+<li><strong>太字</strong>はネイティブな（=色空間の変換が発生しない）フォーマットです。可能な限りこのフォーマットで入出力することが推奨されます。</li>
+<li><sup>*</sup> 印は出力時に優先されるフォーマットです。フォーマットを指定せずにデコードするとこのフォーマットで出力されます。</li>
+<li>カッコ内は、その前に書いてあるものと FourCC が異なるだけで中身が同じフォーマットです。例えば、YUY2 と YUYV と YUNV は中身が同じフォーマットです。</li>
+</ul>
 <h2 id="donations">寄付について</h2>
 <p>Ut Video Codec Suite はフリーソフトウェアです。開発を支援するための寄付は常に歓迎しております。詳細は作者のblogの<a href="http://umezawa.dyndns.info/wordpress/?page_id=1565">「寄付について」ページ</a>をご覧ください。</p>
 <h2 id="history">改版履歴</h2>

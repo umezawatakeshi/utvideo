@@ -33,6 +33,21 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <dt>OS</dt><dd>Windows Vista (x64) or later</dd>
 <dt>CPU</dt><dd>CPU with AMD64 or Intel 64 (formerly EM64T) support</dd>
 </dl>
+<h2 id="fourcc">List of FourCC</h2>
+<table border>
+<tr><th>FourCC</th><th>Internal format</th><th>Supported input/output format</th></tr>
+<tr><td>ULRA</td><td>RGBA full-range 4:4:4:4 8bit</td><td><strong>RGBA<sup>*</sup></strong></td></tr>
+<tr><td>ULRG</td><td>RGB full-range 4:4:4 8bit</td><td><strong>RGB24<sup>*</sup><br />RGB32</strong></td></tr>
+<tr><td>ULY2</td><td>YCbCr limited 4:2:2 8bit</td><td><strong>YUY2<sup>*</sup> (YUYV YUNV) UYVY (UYNV) YVYU VYUY</strong><br>RGB24<br>RGB32</td></tr>
+<tr><td>ULY0</td><td>YCbCr limited 4:2:0 8bit</td><td><strong>YV12<sup>*</sup></strong><br>YUY2 (YUYV YUNV) UYVY (UYNV) YVYU VYUY<br>RGB24<br>RGB32</td></tr>
+</table>
+<ul>
+<li>Currentry supported input formats and supported output formats are same.</li>
+<li>RGB formats are assumed full-range (R,G,B=0-255 for 8bit). YUV formats are assumed limited (Y=16-235, U,V=16-240 for 8bit).</li>
+<li><strong>Bold</strong> are &quot;native&quot; (no colorspace conversion occurs) formats. It is recommended to input/output with that formats.</li>
+<li><sup>*</sup> marks are the output formats with top priority. When decode without specifing output format, these format is used.</li>
+<li>Formats written in brackets are equivalent format with preceding format. For example, YUY2, YUYV and YUNV are equivalent.</li>
+</ul>
 <h2 id="donations">About Donations</h2>
 <p>Ut Video Codec Suite is a free software. Donations to support development are always welcome. For more information, visit <a href="http://umezawa.dyndns.info/wordpress/?page_id=1577">&quot;About Donations&quot; page</a>.</p>
 <h2 id="history">Version history</h2>
