@@ -18,8 +18,8 @@
 	(BYTE)(fcc >> 24)
 
 #define UTVIDEO_VERSION_MASK                      0xffffff00
-#define UTVIDEO_VERSION                           0x07000400
-#define UTVIDEO_VERSION_STR                       "7.0.4"
+#define UTVIDEO_VERSION                           0x07010000
+#define UTVIDEO_VERSION_STR                       "7.1.0"
 
 /*
  * NOTE:
