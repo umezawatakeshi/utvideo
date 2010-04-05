@@ -467,7 +467,7 @@
                                                                     "Condition" = "8:"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:utvideo.dll"
+                                                                    "Value" = "8:[SystemFolder]utvideo.dll"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_57FCD25B57254C2FAE584464B47607B7"
                                                                     {
@@ -475,7 +475,7 @@
                                                                     "Condition" = "8:"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:utvideo.dll"
+                                                                    "Value" = "8:[SystemFolder]utvideo.dll"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_A1B8FD520CD64B9A89D123045A8CE678"
                                                                     {
@@ -483,7 +483,7 @@
                                                                     "Condition" = "8:"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:utvideo.dll"
+                                                                    "Value" = "8:[SystemFolder]utvideo.dll"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_D5154E8FFB3342ECB62CB46FC387EF43"
                                                                     {
@@ -491,7 +491,7 @@
                                                                     "Condition" = "8:"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:utvideo.dll"
+                                                                    "Value" = "8:[SystemFolder]utvideo.dll"
                                                                     }
                                                                 }
                                                             }
@@ -560,7 +560,7 @@
                                                             "Condition" = "8:"
                                                             "Transitive" = "11:FALSE"
                                                             "ValueTypes" = "3:1"
-                                                            "Value" = "8:utvideo.dll"
+                                                            "Value" = "8:[System64Folder]utvideo.dll"
                                                             }
                                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_4F0EED11E5F643CC9DA6AFA1403DBEDF"
                                                             {
@@ -568,7 +568,7 @@
                                                             "Condition" = "8:"
                                                             "Transitive" = "11:FALSE"
                                                             "ValueTypes" = "3:1"
-                                                            "Value" = "8:utvideo.dll"
+                                                            "Value" = "8:[System64Folder]utvideo.dll"
                                                             }
                                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_54036193713A4A86805139B329CF8E55"
                                                             {
@@ -576,7 +576,7 @@
                                                             "Condition" = "8:"
                                                             "Transitive" = "11:FALSE"
                                                             "ValueTypes" = "3:1"
-                                                            "Value" = "8:utvideo.dll"
+                                                            "Value" = "8:[System64Folder]utvideo.dll"
                                                             }
                                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_70B457719773486E86BAE4347F5ED14C"
                                                             {
@@ -584,7 +584,7 @@
                                                             "Condition" = "8:"
                                                             "Transitive" = "11:FALSE"
                                                             "ValueTypes" = "3:1"
-                                                            "Value" = "8:utvideo.dll"
+                                                            "Value" = "8:[System64Folder]utvideo.dll"
                                                             }
                                                         }
                                                     }
