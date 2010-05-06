@@ -1,0 +1,21 @@
+/* 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ */
+/* $Id$ */
+
+// utv_dmo.idl : utv_dmo の IDL ソース
+//
+
+// このファイルは、タイプ ライブラリ (utv_dmo.tlb) およびマーシャリング コードを
+// 作成するために MIDL ツールによって処理されます。
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(C4D7F8E8-2F15-4641-A671-9DFCD0E9CB8C),
+	version(1.0),
+	helpstring("UtVideoDMO 1.0 type library")
+]
+library UtVideoDMO
+{
+	importlib("stdole2.tlb");
+};
