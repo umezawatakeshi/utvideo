@@ -25,6 +25,26 @@ CCodec *CDummyCodec::CreateInstance(void)
 	return new CDummyCodec();
 }
 
+void CDummyCodec::GetShortFriendlyName(char *pszName, size_t cchName)
+{
+	pszName[0] = '\0';
+}
+
+void CDummyCodec::GetShortFriendlyName(wchar_t *pszName, size_t cchName)
+{
+	pszName[0] = L'\0';
+}
+
+void CDummyCodec::GetLongFriendlyName(char *pszName, size_t cchName)
+{
+	pszName[0] = '\0';
+}
+
+void CDummyCodec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
+{
+	pszName[0] = L'\0';
+}
+
 LRESULT CDummyCodec::Configure(HWND hwnd)
 {
 	return ICERR_UNSUPPORTED;

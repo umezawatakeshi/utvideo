@@ -10,6 +10,11 @@ public:
 	virtual ~CCodec(void);
 
 public:
+	virtual void GetShortFriendlyName(char *pszName, size_t cchName) = 0;
+	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName) = 0;
+	virtual void GetLongFriendlyName(char *pszName, size_t cchName) = 0;
+	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName) = 0;
+
 	virtual LRESULT Configure(HWND hwnd) = 0;
 	virtual LRESULT GetStateSize(void) = 0;
 	virtual LRESULT GetState(void *pState, SIZE_T cb) = 0;
@@ -36,6 +41,11 @@ public:
 	static CCodec *CreateInstance(void);
 
 public:
+	virtual void GetShortFriendlyName(char *pszName, size_t cchName);
+	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName);
+	virtual void GetLongFriendlyName(char *pszName, size_t cchName);
+	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName);
+
 	virtual LRESULT Configure(HWND hwnd);
 	virtual LRESULT GetStateSize(void);
 	virtual LRESULT GetState(void *pState, SIZE_T cb);

@@ -116,6 +116,11 @@ public:
 	virtual ~CUL00Codec(void);
 
 public:
+	virtual void GetShortFriendlyName(char *pszName, size_t cchName);
+	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName);
+	virtual void GetLongFriendlyName(char *pszName, size_t cchName);
+	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName);
+
 	virtual LRESULT Configure(HWND hwnd);
 	static INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	virtual LRESULT GetStateSize(void);

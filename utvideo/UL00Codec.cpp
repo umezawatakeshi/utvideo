@@ -17,6 +17,53 @@ CUL00Codec::~CUL00Codec(void)
 {
 }
 
+void CUL00Codec::GetShortFriendlyName(char *pszName, size_t cchName)
+{
+	char buf[16];
+	DWORD fcc = GetFCC();
+
+	sprintf(buf, "Ut Video (%c%c%c%c)", FCC4PRINTF(fcc));
+	strncpy(pszName, buf, cchName);
+	pszName[cchName - 1] = '\0';
+}
+
+void CUL00Codec::GetShortFriendlyName(wchar_t *pszName, size_t cchName)
+{
+	char buf[16];
+	char *p;
+
+	// 名前には us-ascii な文字しか入らないので、数値代入してしまう。
+	GetShortFriendlyName(buf, min(cchName, _countof(buf)));
+	p = buf;
+	while ((*(pszName++) = *(p++)) != '\0')
+		/* NOTHING */;
+}
+
+void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
+{
+	char buf[128];
+	DWORD fcc = GetFCC();
+
+	sprintf(buf, "Ut Video Codec %s (%c%c%c%c) %s",
+		GetColorFormatName(),
+		FCC4PRINTF(fcc),
+		UTVIDEO_IMPLEMENTATION_STR);
+	strncpy(pszName, buf, cchName);
+	pszName[cchName - 1] = '\0';
+}
+
+void CUL00Codec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
+{
+	char buf[128];
+	char *p;
+
+	// 名前には us-ascii な文字しか入らないので、数値代入してしまう。
+	GetLongFriendlyName(buf, min(cchName, _countof(buf)));
+	p = buf;
+	while ((*(pszName++) = *(p++)) != '\0')
+		/* NOTHING */;
+}
+
 LRESULT CUL00Codec::Configure(HWND hwnd)
 {
 	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_CONFIG_DIALOG), hwnd, DialogProc, (LPARAM)this);
