@@ -18,6 +18,7 @@ class CCodec
 public:
 	CCodec(void);
 	virtual ~CCodec(void);
+	static CCodec *CreateInstance(DWORD fcc);
 
 public:
 	virtual void GetShortFriendlyName(char *pszName, size_t cchName) = 0;

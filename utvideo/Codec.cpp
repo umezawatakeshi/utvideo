@@ -2,7 +2,12 @@
 /* $Id$ */
 
 #include "StdAfx.h"
+#include "utvideo.h"
 #include "Codec.h"
+#include "ULRACodec.h"
+#include "ULRGCodec.h"
+#include "ULY0Codec.h"
+#include "ULY2Codec.h"
 
 CCodec::CCodec(void)
 {
@@ -10,6 +15,39 @@ CCodec::CCodec(void)
 
 CCodec::~CCodec(void)
 {
+}
+
+struct CODECLIST
+{
+	DWORD fcc;
+	CCodec *(*pfnCreateInstace)(void);
+};
+
+static const struct CODECLIST codeclist[] = {
+	{ -1,          CDummyCodec::CreateInstance },
+	{ FCC('ULRA'), CULRACodec::CreateInstance  },
+	{ FCC('ULRG'), CULRGCodec::CreateInstance  },
+	{ FCC('ULY0'), CULY0Codec::CreateInstance  },
+	{ FCC('ULY2'), CULY2Codec::CreateInstance  },
+};
+
+CCodec *CCodec::CreateInstance(DWORD fcc)
+{
+	int idx;
+
+	DEBUG_ENTER_LEAVE("CCodec::CreateInstance(DWORD) fcc=%08X (%c%c%c%c)", fcc, FCC4PRINTF(fcc));
+
+	for (idx = 0; idx < _countof(codeclist); idx++)
+	{
+		if (codeclist[idx].fcc == fcc)
+			break;
+	}
+	if (idx == _countof(codeclist))
+		idx = 0;
+
+	_RPT2(_CRT_WARN, "infcc=%08X foundfcc=%08X\n", fcc, codeclist[idx].fcc);
+
+	return codeclist[idx].pfnCreateInstace();
 }
 
 CDummyCodec::CDummyCodec(void)

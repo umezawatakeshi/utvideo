@@ -7,16 +7,6 @@
 class CVCMCodec
 {
 private:
-	struct CODECLIST
-	{
-		DWORD fcc;
-		const char *pszColorFormatName;
-		CCodec *(*pfnCreateCodec)(void);
-	};
-
-	static const CODECLIST m_codeclist[];
-
-private:
 	CCodec *m_pCodec;
 
 private:

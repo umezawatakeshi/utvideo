@@ -4,34 +4,13 @@
 #include "StdAfx.h"
 #include "utvideo.h"
 #include "VCMCodec.h"
-#include "ULY2Codec.h"
-#include "ULY0Codec.h"
-#include "ULRGCodec.h"
-#include "ULRACodec.h"
-
-const CVCMCodec::CODECLIST CVCMCodec::m_codeclist[] = {
-	{ -1,          "",       CDummyCodec::CreateInstance },
-	{ FCC('ULY2'), "YUV422", CULY2Codec::CreateInstance  },
-	{ FCC('ULY0'), "YUV420", CULY0Codec::CreateInstance  },
-	{ FCC('ULRG'), "RGB",    CULRGCodec::CreateInstance  },
-	{ FCC('ULRA'), "RGBA",   CULRACodec::CreateInstance  },
-};
 
 CVCMCodec::CVCMCodec(DWORD fccHandler)
 {
-	int idx;
-
 	DEBUG_ENTER_LEAVE("CVCMCodec::CVCMCodec(DWORD) this=%p fccHandler=%08X (%c%c%c%c)", this, fccHandler, FCC4PRINTF(fccHandler));
 
-	for (idx = 0; idx < _countof(m_codeclist); idx++)
-	{
-		if (m_codeclist[idx].fcc == fccHandler)
-			break;
-	}
-	if (idx == _countof(m_codeclist))
-		idx = 0;
+	m_pCodec = CCodec::CreateInstance(fccHandler);
 
-	m_pCodec = m_codeclist[idx].pfnCreateCodec();
 	_RPT2(_CRT_WARN, "infcc=%08X foundfcc=%08X\n", fccHandler, m_pCodec->GetFCC());
 }
 
