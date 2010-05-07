@@ -22,6 +22,8 @@
 #endif
 
 #define WIN32_LEAN_AND_MEAN		// Windows ヘッダーから使用されていない部分を除外します。
+#define _CRT_SECURE_NO_WARNINGS
+
 // Windows ヘッダー ファイル:
 #include <windows.h>
 // mmreg.h に「現在のコードページで表示できない文字」が含まれていて警告が出るので、それを抑制する。
