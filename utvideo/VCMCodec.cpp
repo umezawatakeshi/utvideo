@@ -31,10 +31,8 @@ CVCMCodec::CVCMCodec(DWORD fccHandler)
 	if (idx == _countof(m_codeclist))
 		idx = 0;
 
-	m_fccHandler         = m_codeclist[idx].fcc;
-	m_pszColorFormatName = m_codeclist[idx].pszColorFormatName;
-	m_pCodec             = m_codeclist[idx].pfnCreateCodec();
-	_RPT2(_CRT_WARN, "infcc=%08X foundfcc=%08X\n", fccHandler, m_fccHandler);
+	m_pCodec = m_codeclist[idx].pfnCreateCodec();
+	_RPT2(_CRT_WARN, "infcc=%08X foundfcc=%08X\n", fccHandler, m_pCodec->GetFCC());
 }
 
 CVCMCodec::~CVCMCodec(void)
@@ -94,15 +92,12 @@ LRESULT CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
 
 	icinfo->dwSize       = sizeof(ICINFO);
 	icinfo->fccType      = ICTYPE_VIDEO;
-	icinfo->fccHandler   = m_fccHandler;
+	icinfo->fccHandler   = m_pCodec->GetFCC();
 	icinfo->dwFlags      = 0;
 	icinfo->dwVersion    = UTVIDEO_VERSION_AND_IMPLEMENTATION;
 	icinfo->dwVersionICM = ICVERSION;
-	wsprintfW(icinfo->szName, L"Ut Video (%C%C%C%C)", FCC4PRINTF(m_fccHandler));
-	wsprintfW(icinfo->szDescription, L"Ut Video Codec %S (%C%C%C%C) %S",
-		m_pszColorFormatName,
-		FCC4PRINTF(m_fccHandler),
-		UTVIDEO_IMPLEMENTATION_STR);
+	m_pCodec->GetShortFriendlyName(icinfo->szName, _countof(icinfo->szName));
+	m_pCodec->GetLongFriendlyName(icinfo->szDescription, _countof(icinfo->szDescription));
 
 	return sizeof(ICINFO);
 }

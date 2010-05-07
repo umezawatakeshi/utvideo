@@ -84,10 +84,7 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		// LONG_PTR にキャストするのではダメらしい。
 		SetWindowLongPtr(hwnd, DWLP_USER, (__int3264)lParam);
 		pThis = (CUL00Codec *)lParam;
-		wsprintf(buf, "Ut Video Codec %s (%c%c%c%c) %s",
-			pThis->GetColorFormatName(),
-			FCC4PRINTF(pThis->GetFCC()),
-			UTVIDEO_IMPLEMENTATION_STR);
+		pThis->GetLongFriendlyName(buf, _countof(buf));
 		SetWindowText(hwnd, buf);
 		wsprintf(buf, "%d", (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
 		SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);

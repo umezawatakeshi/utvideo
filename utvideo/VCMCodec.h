@@ -17,8 +17,6 @@ private:
 	static const CODECLIST m_codeclist[];
 
 private:
-	DWORD m_fccHandler;
-	const char *m_pszColorFormatName;
 	CCodec *m_pCodec;
 
 private:
