@@ -33,6 +33,8 @@
 #pragma warning(pop)
 #include <msi.h>
 
+#include <uuids.h> // for MEDIATYPE_* and MEDIASUBTYPE_*
+
 #include <queue>
 #include <algorithm>
 using namespace std;

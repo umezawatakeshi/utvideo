@@ -64,7 +64,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vfw32.lib winmm.lib"
+				AdditionalDependencies="vfw32.lib winmm.lib amstrmid.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile="utvideo.def"
 				GenerateDebugInformation="true"
@@ -144,7 +144,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vfw32.lib winmm.lib"
+				AdditionalDependencies="vfw32.lib winmm.lib amstrmid.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile="utvideo.def"
 				GenerateDebugInformation="true"
@@ -221,7 +221,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vfw32.lib winmm.lib"
+				AdditionalDependencies="vfw32.lib winmm.lib amstrmid.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile="utvideo.def"
 				GenerateDebugInformation="true"
@@ -301,7 +301,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="vfw32.lib winmm.lib"
+				AdditionalDependencies="vfw32.lib winmm.lib amstrmid.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile="utvideo.def"
 				GenerateDebugInformation="true"
@@ -446,6 +446,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\MediaSubType.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Predict.cpp"
 				>
 			</File>
@@ -587,6 +591,10 @@
 			</File>
 			<File
 				RelativePath=".\HuffmanCode.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MediaSubType.h"
 				>
 			</File>
 			<File
