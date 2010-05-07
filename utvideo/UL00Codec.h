@@ -100,18 +100,6 @@ protected:
 	const ICDECOMPRESS *m_icd;
 
 public:
-	struct INPUTFORMAT
-	{
-		DWORD fcc;
-		WORD nBitCount;
-	};
-	struct OUTPUTFORMAT
-	{
-		DWORD fcc;
-		WORD nBitCount;
-	};
-
-public:
 	CUL00Codec(void);
 	virtual ~CUL00Codec(void);
 
@@ -120,6 +108,10 @@ public:
 	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName);
+	virtual DWORD GetFCC(void) = 0;
+	virtual const FORMATINFO *GetEncoderInputFormat(void) = 0;
+	virtual const FORMATINFO *GetDecoderOutputFormat(void) = 0;
+	virtual const FORMATINFO *GetCompressedFormat(void) = 0;
 
 	virtual LRESULT Configure(HWND hwnd);
 	static INT_PTR CALLBACK DialogProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -139,20 +131,15 @@ public:
 	virtual LRESULT DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
 protected:
-	virtual DWORD GetFCC(void) = 0;
 	virtual const char *GetColorFormatName(void) = 0;
 	virtual WORD GetRealBitCount(void) = 0;
 	virtual WORD GetFalseBitCount(void) = 0;
-	virtual const INPUTFORMAT *GetSupportedInputFormats(void) = 0;
-	virtual int GetNumSupportedInputFormats(void) = 0;
 	virtual int GetNumPlanes(void) = 0;
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn) = 0;
 	virtual void ConvertToPlanar(DWORD nBandIndex) = 0;
 	virtual int GetMacroPixelWidth(void) = 0;
 	virtual int GetMacroPixelHeight(void) = 0;
 
-	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) = 0;
-	virtual int GetNumSupportedOutputFormats(void) = 0;
 	virtual void ConvertFromPlanar(DWORD nBandIndex) = 0;
 
 private:

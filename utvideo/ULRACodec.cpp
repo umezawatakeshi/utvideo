@@ -5,9 +5,21 @@
 #include "utvideo.h"
 #include "ULRACodec.h"
 #include "Predict.h"
+#include "MediaSubType.h"
 
-const CUL00Codec::INPUTFORMAT CULRACodec::m_infmts[] = {
-	{ BI_RGB, 32 },
+const FORMATINFO CULRACodec::m_fiEncoderInput[] = {
+	{ BI_RGB, 32, MEDIASUBTYPE_ARGB32 },
+	FORMATINFO_END,
+};
+
+const FORMATINFO CULRACodec::m_fiDecoderOutput[] = {
+	{ BI_RGB, 32, MEDIASUBTYPE_ARGB32 },
+	FORMATINFO_END,
+};
+
+const FORMATINFO CULRACodec::m_fiCompressed[] = {
+	{ FCC('ULRA'), 32, MEDIASUBTYPE_ULRA },
+	FORMATINFO_END,
 };
 
 CULRACodec::CULRACodec(void)
@@ -16,11 +28,6 @@ CULRACodec::CULRACodec(void)
 
 CULRACodec::~CULRACodec(void)
 {
-}
-
-int CULRACodec::GetNumSupportedInputFormats(void)
-{
-	return _countof(m_infmts);
 }
 
 CCodec *CULRACodec::CreateInstance(void)
@@ -84,15 +91,6 @@ void CULRACodec::ConvertToPlanar(DWORD nBandIndex)
 		}
 		break;
 	}
-}
-
-const CUL00Codec::OUTPUTFORMAT CULRACodec::m_outfmts[] = {
-	{ BI_RGB, 32 },
-};
-
-int CULRACodec::GetNumSupportedOutputFormats(void)
-{
-	return _countof(m_outfmts);
 }
 
 void CULRACodec::ConvertFromPlanar(DWORD nBandIndex)

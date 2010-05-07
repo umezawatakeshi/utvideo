@@ -5,15 +5,33 @@
 #include "utvideo.h"
 #include "ULY0Codec.h"
 #include "Predict.h"
+#include "MediaSubType.h"
 
-const CULY0Codec::INPUTFORMAT CULY0Codec::m_infmts[] = {
-	{ FCC('YV12'), 12 },
-	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
-	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
-	{ FCC('YVYU'), 16 },
-	{ FCC('VYUY'), 16 },
-	{ BI_RGB, 32 },
-	{ BI_RGB, 24 },
+const FORMATINFO CULY0Codec::m_fiEncoderInput[] = {
+	{ FCC('YV12'), 12, MEDIASUBTYPE_YV12 },
+	{ FCC('YUY2'), 16, MEDIASUBTYPE_YUY2 },	{ FCC('YUYV'), 16, MEDIASUBTYPE_YUYV }, { FCC('YUNV'), 16, MEDIASUBTYPE_YUNV },
+	{ FCC('UYVY'), 16, MEDIASUBTYPE_UYVY }, { FCC('UYNV'), 16, MEDIASUBTYPE_UYNV },
+	{ FCC('YVYU'), 16, MEDIASUBTYPE_YVYU },
+	{ FCC('VYUY'), 16, MEDIASUBTYPE_VYUY },
+	{ BI_RGB, 24, MEDIASUBTYPE_RGB24 },
+	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
+	FORMATINFO_END,
+};
+
+const FORMATINFO CULY0Codec::m_fiDecoderOutput[] = {
+	{ FCC('YV12'), 12, MEDIASUBTYPE_YV12 },
+	{ FCC('YUY2'), 16, MEDIASUBTYPE_YUY2 },	{ FCC('YUYV'), 16, MEDIASUBTYPE_YUYV }, { FCC('YUNV'), 16, MEDIASUBTYPE_YUNV },
+	{ FCC('UYVY'), 16, MEDIASUBTYPE_UYVY }, { FCC('UYNV'), 16, MEDIASUBTYPE_UYNV },
+	{ FCC('YVYU'), 16, MEDIASUBTYPE_YVYU },
+	{ FCC('VYUY'), 16, MEDIASUBTYPE_VYUY },
+	{ BI_RGB, 24, MEDIASUBTYPE_RGB24 },
+	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
+	FORMATINFO_END,
+};
+
+const FORMATINFO CULY0Codec::m_fiCompressed[] = {
+	{ FCC('ULY0'), 24, MEDIASUBTYPE_ULY0 },
+	FORMATINFO_END,
 };
 
 CULY0Codec::CULY0Codec(void)
@@ -24,11 +42,6 @@ CULY0Codec::CULY0Codec(void)
 
 CULY0Codec::~CULY0Codec(void)
 {
-}
-
-int CULY0Codec::GetNumSupportedInputFormats(void)
-{
-	return _countof(m_infmts);
 }
 
 CCodec *CULY0Codec::CreateInstance(void)
@@ -166,21 +179,6 @@ void CULY0Codec::ConvertToPlanar(DWORD nBandIndex)
 		}
 		break;
 	}
-}
-
-const CULY0Codec::OUTPUTFORMAT CULY0Codec::m_outfmts[] = {
-	{ FCC('YV12'), 12 },
-	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
-	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
-	{ FCC('YVYU'), 16 },
-	{ FCC('VYUY'), 16 },
-	{ BI_RGB, 32 },
-	{ BI_RGB, 24 },
-};
-
-int CULY0Codec::GetNumSupportedOutputFormats(void)
-{
-	return _countof(m_outfmts);
 }
 
 void CULY0Codec::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD bypp)

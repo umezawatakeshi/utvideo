@@ -50,6 +50,21 @@ DWORD CDummyCodec::GetFCC(void)
 	return DWORD(-1);
 }
 
+const FORMATINFO *CDummyCodec::GetEncoderInputFormat(void)
+{
+	return NULL;
+}
+
+const FORMATINFO *CDummyCodec::GetDecoderOutputFormat(void)
+{
+	return NULL;
+}
+
+const FORMATINFO *CDummyCodec::GetCompressedFormat(void)
+{
+	return NULL;
+}
+
 LRESULT CDummyCodec::Configure(HWND hwnd)
 {
 	return ICERR_UNSUPPORTED;

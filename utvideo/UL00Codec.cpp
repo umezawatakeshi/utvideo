@@ -419,18 +419,15 @@ LRESULT CUL00Codec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 LRESULT CUL00Codec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
-	const INPUTFORMAT *pfmts;
-
 	if (pbihIn->biWidth % GetMacroPixelWidth() != 0 || pbihIn->biHeight % GetMacroPixelHeight() != 0)
 		return ICERR_BADFORMAT;
 
 	if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE && pbihIn->biHeight % (GetMacroPixelHeight() * 2) != 0)
 		return ICERR_BADFORMAT;
 
-	pfmts = GetSupportedInputFormats();
-	for (int i = 0; i < GetNumSupportedInputFormats(); i++)
+	for (const FORMATINFO *pfi = GetEncoderInputFormat(); !IS_FORMATINFO_END(pfi); pfi++)
 	{
-		if (pbihIn->biCompression == pfmts[i].fcc && pbihIn->biBitCount == pfmts[i].nBitCount && pbihIn->biHeight > 0)
+		if (pbihIn->biCompression == pfi->fcc && pbihIn->biBitCount == pfi->nBitCount && pbihIn->biHeight > 0)
 			return ICERR_OK;
 	}
 
@@ -640,8 +637,8 @@ LRESULT CUL00Codec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 	pbihOut->biWidth         = pbihIn->biWidth;
 	pbihOut->biHeight        = pbihIn->biHeight;
 	pbihOut->biPlanes        = 1;
-	pbihOut->biBitCount      = GetSupportedOutputFormats()[0].nBitCount;
-	pbihOut->biCompression   = GetSupportedOutputFormats()[0].fcc;
+	pbihOut->biBitCount      = GetDecoderOutputFormat()->nBitCount;
+	pbihOut->biCompression   = GetDecoderOutputFormat()->fcc;
 	pbihOut->biSizeImage     = pbihIn->biSizeImage;
 	//pbihOut->biXPelsPerMeter
 	//pbihOut->biYPelsPerMeter
@@ -654,8 +651,6 @@ LRESULT CUL00Codec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 LRESULT CUL00Codec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
-
-	const OUTPUTFORMAT *pfmts;
 
 	if (pbihIn->biCompression != GetFCC())
 		return ICERR_BADFORMAT;
@@ -677,10 +672,9 @@ LRESULT CUL00Codec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	if (pbihOut == NULL)
 		return ICERR_OK;
 
-	pfmts = GetSupportedOutputFormats();
-	for (int i = 0; i < GetNumSupportedOutputFormats(); i++)
+	for (const FORMATINFO *pfi = GetDecoderOutputFormat(); !IS_FORMATINFO_END(pfi); pfi++)
 	{
-		if (pbihOut->biCompression == pfmts[i].fcc && pbihOut->biBitCount == pfmts[i].nBitCount && pbihOut->biHeight > 0 && pbihOut->biHeight == pbihIn->biHeight && pbihOut->biWidth == pbihIn->biWidth)
+		if (pbihOut->biCompression == pfi->fcc && pbihOut->biBitCount == pfi->nBitCount && pbihOut->biHeight > 0 && pbihOut->biHeight == pbihIn->biHeight && pbihOut->biWidth == pbihIn->biWidth)
 			return ICERR_OK;
 	}
 

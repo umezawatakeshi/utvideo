@@ -3,6 +3,16 @@
 
 #pragma once
 
+struct FORMATINFO
+{
+	DWORD fcc;
+	WORD nBitCount;
+	REFGUID guidMediaSubType;
+};
+
+#define FORMATINFO_END { DWORD(-1), 0, GUID_NULL }
+#define IS_FORMATINFO_END(pfi) ((pfi)->fcc == DWORD(-1))
+
 class CCodec
 {
 public:
@@ -15,6 +25,9 @@ public:
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName) = 0;
 	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName) = 0;
 	virtual DWORD GetFCC(void) = 0;
+	virtual const FORMATINFO *GetEncoderInputFormat(void) = 0;
+	virtual const FORMATINFO *GetDecoderOutputFormat(void) = 0;
+	virtual const FORMATINFO *GetCompressedFormat(void) = 0;
 
 	virtual LRESULT Configure(HWND hwnd) = 0;
 	virtual LRESULT GetStateSize(void) = 0;
@@ -47,6 +60,9 @@ public:
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName);
 	virtual DWORD GetFCC(void);
+	virtual const FORMATINFO *GetEncoderInputFormat(void);
+	virtual const FORMATINFO *GetDecoderOutputFormat(void);
+	virtual const FORMATINFO *GetCompressedFormat(void);
 
 	virtual LRESULT Configure(HWND hwnd);
 	virtual LRESULT GetStateSize(void);

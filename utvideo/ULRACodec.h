@@ -12,28 +12,30 @@ class CULRACodec :
 	public CUL00Codec
 {
 private:
-	static const INPUTFORMAT m_infmts[];
-	static const OUTPUTFORMAT m_outfmts[];
+	static const FORMATINFO m_fiEncoderInput[];
+	static const FORMATINFO m_fiDecoderOutput[];
+	static const FORMATINFO m_fiCompressed[];
 
 public:
 	CULRACodec(void);
 	virtual ~CULRACodec(void);
 	static CCodec *CreateInstance(void);
 
-protected:
+public:
 	virtual DWORD GetFCC(void) { return FCC('ULRA'); }
+	virtual const FORMATINFO *GetEncoderInputFormat(void) { return m_fiEncoderInput; }
+	virtual const FORMATINFO *GetDecoderOutputFormat(void) { return m_fiDecoderOutput; }
+	virtual const FORMATINFO *GetCompressedFormat(void) { return m_fiCompressed; }
+
+protected:
 	virtual const char *GetColorFormatName(void) { return "RGBA"; }
 	virtual WORD GetRealBitCount(void) { return 32; }
 	virtual WORD GetFalseBitCount(void) { return 32; }
-	virtual const INPUTFORMAT *GetSupportedInputFormats(void) { return m_infmts; };
-	virtual int GetNumSupportedInputFormats(void);
 	virtual int GetNumPlanes(void) { return 4; }
 	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn);
 	virtual void ConvertToPlanar(DWORD nBandIndex);
 	virtual int GetMacroPixelWidth(void) { return 1; }
 	virtual int GetMacroPixelHeight(void) { return 1; }
 
-	virtual const OUTPUTFORMAT *GetSupportedOutputFormats(void) { return m_outfmts; };
-	virtual int GetNumSupportedOutputFormats(void);
 	virtual void ConvertFromPlanar(DWORD nBandIndex);
 };

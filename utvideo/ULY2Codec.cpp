@@ -6,14 +6,31 @@
 #include "ULY2Codec.h"
 #include "Predict.h"
 #include "Convert.h"
+#include "MediaSubType.h"
 
-const CUL00Codec::INPUTFORMAT CULY2Codec::m_infmts[] = {
-	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
-	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
-	{ FCC('YVYU'), 16 },
-	{ FCC('VYUY'), 16 },
-	{ BI_RGB, 32 },
-	{ BI_RGB, 24 },
+const FORMATINFO CULY2Codec::m_fiEncoderInput[] = {
+	{ FCC('YUY2'), 16, MEDIASUBTYPE_YUY2 },	{ FCC('YUYV'), 16, MEDIASUBTYPE_YUYV }, { FCC('YUNV'), 16, MEDIASUBTYPE_YUNV },
+	{ FCC('UYVY'), 16, MEDIASUBTYPE_UYVY }, { FCC('UYNV'), 16, MEDIASUBTYPE_UYNV },
+	{ FCC('YVYU'), 16, MEDIASUBTYPE_YVYU },
+	{ FCC('VYUY'), 16, MEDIASUBTYPE_VYUY },
+	{ BI_RGB, 24, MEDIASUBTYPE_RGB24 },
+	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
+	FORMATINFO_END,
+};
+
+const FORMATINFO CULY2Codec::m_fiDecoderOutput[] = {
+	{ FCC('YUY2'), 16, MEDIASUBTYPE_YUY2 },	{ FCC('YUYV'), 16, MEDIASUBTYPE_YUYV }, { FCC('YUNV'), 16, MEDIASUBTYPE_YUNV },
+	{ FCC('UYVY'), 16, MEDIASUBTYPE_UYVY }, { FCC('UYNV'), 16, MEDIASUBTYPE_UYNV },
+	{ FCC('YVYU'), 16, MEDIASUBTYPE_YVYU },
+	{ FCC('VYUY'), 16, MEDIASUBTYPE_VYUY },
+	{ BI_RGB, 24, MEDIASUBTYPE_RGB24 },
+	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
+	FORMATINFO_END,
+};
+
+const FORMATINFO CULY2Codec::m_fiCompressed[] = {
+	{ FCC('ULY2'), 24, MEDIASUBTYPE_ULY2 },
+	FORMATINFO_END,
 };
 
 CULY2Codec::CULY2Codec(void)
@@ -22,11 +39,6 @@ CULY2Codec::CULY2Codec(void)
 
 CULY2Codec::~CULY2Codec(void)
 {
-}
-
-int CULY2Codec::GetNumSupportedInputFormats(void)
-{
-	return _countof(m_infmts);
 }
 
 CCodec *CULY2Codec::CreateInstance(void)
@@ -117,20 +129,6 @@ void CULY2Codec::ConvertToPlanar(DWORD nBandIndex)
 		}
 		break;
 	}
-}
-
-const CUL00Codec::OUTPUTFORMAT CULY2Codec::m_outfmts[] = {
-	{ FCC('YUY2'), 16 }, { FCC('YUYV'), 16 }, { FCC('YUNV'), 16 },
-	{ FCC('UYVY'), 16 }, { FCC('UYNV'), 16 },
-	{ FCC('YVYU'), 16 },
-	{ FCC('VYUY'), 16 },
-	{ BI_RGB, 32 },
-	{ BI_RGB, 24 },
-};
-
-int CULY2Codec::GetNumSupportedOutputFormats(void)
-{
-	return _countof(m_outfmts);
 }
 
 void CULY2Codec::ConvertFromPlanar(DWORD nBandIndex)

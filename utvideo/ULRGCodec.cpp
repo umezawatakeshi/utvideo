@@ -5,10 +5,23 @@
 #include "utvideo.h"
 #include "ULRGCodec.h"
 #include "Predict.h"
+#include "MediaSubType.h"
 
-const CUL00Codec::INPUTFORMAT CULRGCodec::m_infmts[] = {
-	{ BI_RGB, 24 },
-	{ BI_RGB, 32 },
+const FORMATINFO CULRGCodec::m_fiEncoderInput[] = {
+	{ BI_RGB, 24, MEDIASUBTYPE_RGB24 },
+	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
+	FORMATINFO_END,
+};
+
+const FORMATINFO CULRGCodec::m_fiDecoderOutput[] = {
+	{ BI_RGB, 24, MEDIASUBTYPE_RGB24 },
+	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
+	FORMATINFO_END,
+};
+
+const FORMATINFO CULRGCodec::m_fiCompressed[] = {
+	{ FCC('ULRG'), 24, MEDIASUBTYPE_ULRG },
+	FORMATINFO_END,
 };
 
 CULRGCodec::CULRGCodec(void)
@@ -17,11 +30,6 @@ CULRGCodec::CULRGCodec(void)
 
 CULRGCodec::~CULRGCodec(void)
 {
-}
-
-int CULRGCodec::GetNumSupportedInputFormats(void)
-{
-	return _countof(m_infmts);
 }
 
 CCodec *CULRGCodec::CreateInstance(void)
@@ -91,16 +99,6 @@ void CULRGCodec::ConvertToPlanar(DWORD nBandIndex)
 		}
 		break;
 	}
-}
-
-const CUL00Codec::OUTPUTFORMAT CULRGCodec::m_outfmts[] = {
-	{ BI_RGB, 24 },
-	{ BI_RGB, 32 },
-};
-
-int CULRGCodec::GetNumSupportedOutputFormats(void)
-{
-	return _countof(m_outfmts);
 }
 
 void CULRGCodec::ConvertFromPlanar(DWORD nBandIndex)
