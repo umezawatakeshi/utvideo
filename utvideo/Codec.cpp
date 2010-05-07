@@ -45,6 +45,11 @@ void CDummyCodec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
 	pszName[0] = L'\0';
 }
 
+DWORD CDummyCodec::GetFCC(void)
+{
+	return DWORD(-1);
+}
+
 LRESULT CDummyCodec::Configure(HWND hwnd)
 {
 	return ICERR_UNSUPPORTED;

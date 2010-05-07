@@ -14,6 +14,7 @@ public:
 	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName) = 0;
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName) = 0;
 	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName) = 0;
+	virtual DWORD GetFCC(void) = 0;
 
 	virtual LRESULT Configure(HWND hwnd) = 0;
 	virtual LRESULT GetStateSize(void) = 0;
@@ -45,6 +46,7 @@ public:
 	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName);
+	virtual DWORD GetFCC(void);
 
 	virtual LRESULT Configure(HWND hwnd);
 	virtual LRESULT GetStateSize(void);
