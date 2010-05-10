@@ -18,7 +18,7 @@ class CCodec
 public:
 	CCodec(void);
 	virtual ~CCodec(void);
-	static CCodec *CreateInstance(DWORD fcc, const char *pszInterfaceName);
+	__declspec(dllexport) static CCodec *CreateInstance(DWORD fcc, const char *pszInterfaceName);
 
 public:
 	virtual void GetShortFriendlyName(char *pszName, size_t cchName) = 0;

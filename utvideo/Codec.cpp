@@ -31,7 +31,7 @@ static const struct CODECLIST codeclist[] = {
 	{ FCC('ULY2'), CULY2Codec::CreateInstance  },
 };
 
-CCodec *CCodec::CreateInstance(DWORD fcc, const char *pszInterfaceName)
+__declspec(dllexport) CCodec *CCodec::CreateInstance(DWORD fcc, const char *pszInterfaceName)
 {
 	int idx;
 
