@@ -17,9 +17,9 @@ private:
 	static const FORMATINFO m_fiCompressed[];
 
 public:
-	CULRACodec(void);
+	CULRACodec(const char *pszInterfaceName);
 	virtual ~CULRACodec(void);
-	static CCodec *CreateInstance(void);
+	static CCodec *CreateInstance(const char *pszInterfaceName);
 
 public:
 	virtual DWORD GetFCC(void) { return FCC('ULRA'); }

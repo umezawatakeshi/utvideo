@@ -22,7 +22,7 @@ const FORMATINFO CULRACodec::m_fiCompressed[] = {
 	FORMATINFO_END,
 };
 
-CULRACodec::CULRACodec(void)
+CULRACodec::CULRACodec(const char *pszInterfaceName) : CUL00Codec(pszInterfaceName)
 {
 }
 
@@ -30,9 +30,9 @@ CULRACodec::~CULRACodec(void)
 {
 }
 
-CCodec *CULRACodec::CreateInstance(void)
+CCodec *CULRACodec::CreateInstance(const char *pszInterfaceName)
 {
-	return new CULRACodec();
+	return new CULRACodec(pszInterfaceName);
 }
 
 void CULRACodec::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)

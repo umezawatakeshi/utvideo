@@ -18,7 +18,7 @@ class CCodec
 public:
 	CCodec(void);
 	virtual ~CCodec(void);
-	static CCodec *CreateInstance(DWORD fcc);
+	static CCodec *CreateInstance(DWORD fcc, const char *pszInterfaceName);
 
 public:
 	virtual void GetShortFriendlyName(char *pszName, size_t cchName) = 0;
@@ -53,7 +53,7 @@ class CDummyCodec :
 public:
 	CDummyCodec(void);
 	~CDummyCodec(void);
-	static CCodec *CreateInstance(void);
+	static CCodec *CreateInstance(const char *pszInterfaceName);
 
 public:
 	virtual void GetShortFriendlyName(char *pszName, size_t cchName);

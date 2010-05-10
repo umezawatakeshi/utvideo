@@ -64,6 +64,8 @@ class CUL00Codec :
 	public CCodec
 {
 protected:
+	const char *m_pszInterfaceName;
+
 	ENCODERCONF m_ec;
 	BOOL m_bBottomUpFrame;
 	DWORD m_dwNumStripes;
@@ -100,7 +102,7 @@ protected:
 	const ICDECOMPRESS *m_icd;
 
 public:
-	CUL00Codec(void);
+	CUL00Codec(const char *pszInterfaceName);
 	virtual ~CUL00Codec(void);
 
 public:

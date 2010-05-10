@@ -24,7 +24,7 @@ const FORMATINFO CULRGCodec::m_fiCompressed[] = {
 	FORMATINFO_END,
 };
 
-CULRGCodec::CULRGCodec(void)
+CULRGCodec::CULRGCodec(const char *pszInterfaceName) : CUL00Codec(pszInterfaceName)
 {
 }
 
@@ -32,9 +32,9 @@ CULRGCodec::~CULRGCodec(void)
 {
 }
 
-CCodec *CULRGCodec::CreateInstance(void)
+CCodec *CULRGCodec::CreateInstance(const char *pszInterfaceName)
 {
-	return new CULRGCodec();
+	return new CULRGCodec(pszInterfaceName);
 }
 
 void CULRGCodec::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)

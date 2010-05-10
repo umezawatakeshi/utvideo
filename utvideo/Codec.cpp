@@ -20,7 +20,7 @@ CCodec::~CCodec(void)
 struct CODECLIST
 {
 	DWORD fcc;
-	CCodec *(*pfnCreateInstace)(void);
+	CCodec *(*pfnCreateInstace)(const char *pszInterfaceName);
 };
 
 static const struct CODECLIST codeclist[] = {
@@ -31,7 +31,7 @@ static const struct CODECLIST codeclist[] = {
 	{ FCC('ULY2'), CULY2Codec::CreateInstance  },
 };
 
-CCodec *CCodec::CreateInstance(DWORD fcc)
+CCodec *CCodec::CreateInstance(DWORD fcc, const char *pszInterfaceName)
 {
 	int idx;
 
@@ -47,7 +47,7 @@ CCodec *CCodec::CreateInstance(DWORD fcc)
 
 	_RPT2(_CRT_WARN, "infcc=%08X foundfcc=%08X\n", fcc, codeclist[idx].fcc);
 
-	return codeclist[idx].pfnCreateInstace();
+	return codeclist[idx].pfnCreateInstace(pszInterfaceName);
 }
 
 CDummyCodec::CDummyCodec(void)
@@ -58,7 +58,7 @@ CDummyCodec::~CDummyCodec(void)
 {
 }
 
-CCodec *CDummyCodec::CreateInstance(void)
+CCodec *CDummyCodec::CreateInstance(const char *pszInterfaceName)
 {
 	return new CDummyCodec();
 }

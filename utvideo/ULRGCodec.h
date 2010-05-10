@@ -17,9 +17,9 @@ private:
 	static const FORMATINFO m_fiCompressed[];
 
 public:
-	CULRGCodec(void);
+	CULRGCodec(const char *pszInterfaceName);
 	virtual ~CULRGCodec(void);
-	static CCodec *CreateInstance(void);
+	static CCodec *CreateInstance(const char *pszInterfaceName);
 
 public:
 	virtual DWORD GetFCC(void) { return FCC('ULRG'); }

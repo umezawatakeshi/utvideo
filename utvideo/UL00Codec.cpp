@@ -7,10 +7,11 @@
 #include "Predict.h"
 #include "resource.h"
 
-CUL00Codec::CUL00Codec(void)
+CUL00Codec::CUL00Codec(const char *pszInterfaceName)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
+	m_pszInterfaceName = pszInterfaceName;
 }
 
 CUL00Codec::~CUL00Codec(void)
@@ -44,9 +45,10 @@ void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 	char buf[128];
 	DWORD fcc = GetFCC();
 
-	sprintf(buf, "Ut Video Codec %s (%c%c%c%c) %s",
+	sprintf(buf, "Ut Video Codec %s (%c%c%c%c) %s %s",
 		GetColorFormatName(),
 		FCC4PRINTF(fcc),
+		m_pszInterfaceName,
 		UTVIDEO_IMPLEMENTATION_STR);
 	strncpy(pszName, buf, cchName);
 	pszName[cchName - 1] = '\0';

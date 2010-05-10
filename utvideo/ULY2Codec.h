@@ -17,9 +17,9 @@ private:
 	static const FORMATINFO m_fiCompressed[];
 
 public:
-	CULY2Codec(void);
+	CULY2Codec(const char *pszInterfaceName);
 	virtual ~CULY2Codec(void);
-	static CCodec *CreateInstance(void);
+	static CCodec *CreateInstance(const char *pszInterfaceName);
 
 public:
 	virtual DWORD GetFCC(void) { return FCC('ULY2'); }

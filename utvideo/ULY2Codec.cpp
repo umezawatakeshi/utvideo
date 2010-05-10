@@ -33,7 +33,7 @@ const FORMATINFO CULY2Codec::m_fiCompressed[] = {
 	FORMATINFO_END,
 };
 
-CULY2Codec::CULY2Codec(void)
+CULY2Codec::CULY2Codec(const char *pszInterfaceName) : CUL00Codec(pszInterfaceName)
 {
 }
 
@@ -41,9 +41,9 @@ CULY2Codec::~CULY2Codec(void)
 {
 }
 
-CCodec *CULY2Codec::CreateInstance(void)
+CCodec *CULY2Codec::CreateInstance(const char *pszInterfaceName)
 {
-	return new CULY2Codec();
+	return new CULY2Codec(pszInterfaceName);
 }
 
 void CULY2Codec::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
