@@ -36,8 +36,6 @@ const FORMATINFO CULY0Codec::m_fiCompressed[] = {
 
 CULY0Codec::CULY0Codec(const char *pszInterfaceName) : CUL00Codec(pszInterfaceName)
 {
-	memset(&m_ec, 0, sizeof(ENCODERCONF));
-	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
 }
 
 CULY0Codec::~CULY0Codec(void)
