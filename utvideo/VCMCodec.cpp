@@ -9,7 +9,7 @@ CVCMCodec::CVCMCodec(DWORD fccHandler)
 {
 	DEBUG_ENTER_LEAVE("CVCMCodec::CVCMCodec(DWORD) this=%p fccHandler=%08X (%c%c%c%c)", this, fccHandler, FCC4PRINTF(fccHandler));
 
-	m_pCodec = CCodec::CreateInstance(fccHandler);
+	m_pCodec = CCodec::CreateInstance(fccHandler, "VCM");
 
 	_RPT2(_CRT_WARN, "infcc=%08X foundfcc=%08X\n", fccHandler, m_pCodec->GetFCC());
 }
