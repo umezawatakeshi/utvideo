@@ -84,12 +84,20 @@ HRESULT WINAPI CDMOEncoder::UpdateRegistry(DWORD fcc, REFCLSID clsid, BOOL bRegi
 
 HRESULT CDMOEncoder::InternalGetInputStreamInfo(DWORD dwInputStreamIndex, DWORD *pdwFlags)
 {
-	return E_NOTIMPL;
+	*pdwFlags = DMO_INPUT_STREAMF_WHOLE_SAMPLES |
+	            DMO_INPUT_STREAMF_SINGLE_SAMPLE_PER_BUFFER |
+	            DMO_INPUT_STREAMF_FIXED_SAMPLE_SIZE |
+	            DMO_INPUT_STREAMF_HOLDS_BUFFERS;
+
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalGetOutputStreamInfo(DWORD dwOutputStreamIndex, DWORD *pdwFlags)
 {
-	return E_NOTIMPL;
+	*pdwFlags = DMO_OUTPUT_STREAMF_WHOLE_SAMPLES |
+	            DMO_OUTPUT_STREAMF_SINGLE_SAMPLE_PER_BUFFER;
+
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalCheckInputType(DWORD dwInputStreamIndex, const DMO_MEDIA_TYPE *pmt)
