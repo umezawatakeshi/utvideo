@@ -66,6 +66,11 @@ void CUL00Codec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
 		/* NOTHING */;
 }
 
+BOOL CUL00Codec::IsTemporalCompressionSupported(void)
+{
+	return FALSE;
+}
+
 LRESULT CUL00Codec::Configure(HWND hwnd)
 {
 	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_CONFIG_DIALOG), hwnd, DialogProc, (LPARAM)this);

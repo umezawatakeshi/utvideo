@@ -26,6 +26,7 @@ public:
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName) = 0;
 	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName) = 0;
 	virtual DWORD GetFCC(void) = 0;
+	virtual BOOL IsTemporalCompressionSupported(void) = 0;
 	virtual const FORMATINFO *GetEncoderInputFormat(void) = 0;
 	virtual const FORMATINFO *GetDecoderOutputFormat(void) = 0;
 	virtual const FORMATINFO *GetCompressedFormat(void) = 0;
@@ -61,6 +62,7 @@ public:
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName);
 	virtual DWORD GetFCC(void);
+	virtual BOOL IsTemporalCompressionSupported(void);
 	virtual const FORMATINFO *GetEncoderInputFormat(void);
 	virtual const FORMATINFO *GetDecoderOutputFormat(void);
 	virtual const FORMATINFO *GetCompressedFormat(void);
