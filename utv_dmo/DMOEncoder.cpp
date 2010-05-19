@@ -104,75 +104,152 @@ HRESULT CDMOEncoder::InternalGetOutputStreamInfo(DWORD dwOutputStreamIndex, DWOR
 
 HRESULT CDMOEncoder::InternalCheckInputType(DWORD dwInputStreamIndex, const DMO_MEDIA_TYPE *pmt)
 {
-	return E_NOTIMPL;
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalCheckInputType()\n");
+
+	const FORMATINFO *pfi;
+	const VIDEOINFOHEADER *pvih;
+
+	if (!IsEqualGUID(pmt->majortype, MEDIATYPE_Video))
+		return DMO_E_INVALIDTYPE;
+	if (!pmt->bFixedSizeSamples)
+		return DMO_E_INVALIDTYPE;
+	if (pmt->bTemporalCompression)
+		return DMO_E_INVALIDTYPE;
+	if (!IsEqualGUID(pmt->formattype, FORMAT_VideoInfo))
+		return DMO_E_INVALIDTYPE;
+
+	pvih = (const VIDEOINFOHEADER *)pmt->pbFormat;
+
+	for (pfi = m_pCodec->GetEncoderInputFormat(); !IS_FORMATINFO_END(pfi); pfi++)
+	{
+		if (IsEqualGUID(pfi->guidMediaSubType, pmt->subtype))
+		{
+			if (m_pCodec->CompressQuery(&pvih->bmiHeader, NULL) == 0)
+				return S_OK;
+		}
+	}
+
+	return DMO_E_INVALIDTYPE;
 }
 
 HRESULT CDMOEncoder::InternalCheckOutputType(DWORD dwOutputStreamIndex, const DMO_MEDIA_TYPE *pmt)
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalCheckOutputType()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalGetInputType(DWORD dwInputStreamIndex, DWORD dwTypeIndex, DMO_MEDIA_TYPE *pmt)
 {
-	return E_NOTIMPL;
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalGetInputType()\n");
+
+	const FORMATINFO *pfi = m_pCodec->GetEncoderInputFormat();
+
+	while (dwTypeIndex > 0 && !IS_FORMATINFO_END(pfi))
+	{
+		pfi++;
+		dwTypeIndex--;
+	}
+
+	if (IS_FORMATINFO_END(pfi))
+		return DMO_E_NO_MORE_ITEMS;
+
+	if (pmt != NULL)
+	{
+		memset(pmt, 0, sizeof(DMO_MEDIA_TYPE));
+		pmt->majortype            = MEDIATYPE_Video;
+		pmt->subtype              = pfi->guidMediaSubType;
+		pmt->bFixedSizeSamples    = TRUE;
+		pmt->bTemporalCompression = FALSE;
+	}
+
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalGetOutputType(DWORD dwOutputStreamIndex, DWORD dwTypeIndex, DMO_MEDIA_TYPE *pmt)
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalGetOutputType()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalGetInputSizeInfo(DWORD dwInputStreamIndex, DWORD *pcbSize, DWORD *pcbMaxLookahead, DWORD *pcbAlignment)
 {
-	return E_NOTIMPL;
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalGetInputSizeInfo()\n");
+
+	*pcbSize = 0;
+	*pcbMaxLookahead = 0;
+	*pcbAlignment = 4;
+
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalGetOutputSizeInfo(DWORD dwOutputStreamIndex, DWORD *pcbSize, DWORD *pcbAlignment)
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalGetOutputSizeInfo()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalGetInputMaxLatency(DWORD dwInputStreamIndex, REFERENCE_TIME *prtMaxLatency)
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalGetInputMaxLatency()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalSetInputMaxLatency(DWORD dwInputStreamIndex, REFERENCE_TIME rtMaxLatency)
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalSetInputMaxLatency()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalFlush()
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalFlush()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalDiscontinuity(DWORD dwInputStreamIndex)
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalDiscontinuity()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalAllocateStreamingResources()
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalAllocateStreamingResources()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalFreeStreamingResources()
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalFreeStreamingResources()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalProcessInput(DWORD dwInputStreamIndex, IMediaBuffer *pBuffer, DWORD dwFlags, REFERENCE_TIME rtTimestamp, REFERENCE_TIME rtTimelength)
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalProcessInput()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, DMO_OUTPUT_DATA_BUFFER *pOutputBuffers, DWORD *pdwStatus)
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalProcessOutput()\n");
+
 	return E_NOTIMPL;
 }
 
 HRESULT CDMOEncoder::InternalAcceptingInput(DWORD dwInputStreamIndex)
 {
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalAcceptingInput()\n");
+
 	return E_NOTIMPL;
 }
