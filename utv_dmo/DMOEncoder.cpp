@@ -16,10 +16,12 @@
 
 CDMOEncoder::CDMOEncoder(DWORD fcc)
 {
+	m_pCodec = CCodec::CreateInstance(fcc, "DMO");
 }
 
 CDMOEncoder::~CDMOEncoder()
 {
+	delete m_pCodec;
 }
 
 static void FormatInfoToPartialMediaType(const FORMATINFO *pfi, DWORD *pcTypes, DMO_PARTIAL_MEDIATYPE **ppTypes)

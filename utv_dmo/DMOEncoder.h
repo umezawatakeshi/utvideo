@@ -25,6 +25,9 @@ class ATL_NO_VTABLE CDMOEncoder :
 	public CComObjectRootEx<CComMultiThreadModel>,
 	public IMediaObjectImpl<CDMOEncoder, 1, 1>
 {
+private:
+	CCodec *m_pCodec;
+
 public:
 	CDMOEncoder(DWORD fcc);
 	virtual ~CDMOEncoder();
