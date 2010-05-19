@@ -38,6 +38,7 @@
 #include <atlbase.h>
 #include <atlcom.h>
 
+#include <dshow.h>
 #include <uuids.h> // for MEDIATYPE_* and MEDIASUBTYPE_*
 
 #define FIX_LOCK_NAME
