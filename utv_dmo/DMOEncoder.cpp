@@ -136,7 +136,30 @@ HRESULT CDMOEncoder::InternalCheckOutputType(DWORD dwOutputStreamIndex, const DM
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalCheckOutputType()\n");
 
-	return E_NOTIMPL;
+	const FORMATINFO *pfi;
+	const DMO_MEDIA_TYPE *pmtIn;
+	const VIDEOINFOHEADER *pvih;
+	const VIDEOINFOHEADER *pvihIn;
+
+	if (!InputTypeSet(0))
+		return DMO_E_INVALIDTYPE;
+	pmtIn = InputType(0);
+	pvihIn = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
+
+	if (!IsEqualGUID(pmt->majortype, MEDIATYPE_Video))
+		return DMO_E_INVALIDTYPE;
+	if (!IsEqualGUID(pmt->formattype, FORMAT_VideoInfo))
+		return DMO_E_INVALIDTYPE;
+
+	pvih = (const VIDEOINFOHEADER *)pmt->pbFormat;
+
+	pfi = m_pCodec->GetCompressedFormat();
+	if (!IsEqualGUID(pfi->guidMediaSubType, pmt->subtype))
+		return DMO_E_INVALIDTYPE;
+	if (m_pCodec->CompressQuery(&pvihIn->bmiHeader, &pvih->bmiHeader) != 0)
+		return DMO_E_INVALIDTYPE;
+
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalGetInputType(DWORD dwInputStreamIndex, DWORD dwTypeIndex, DMO_MEDIA_TYPE *pmt)
@@ -170,7 +193,33 @@ HRESULT CDMOEncoder::InternalGetOutputType(DWORD dwOutputStreamIndex, DWORD dwTy
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalGetOutputType()\n");
 
-	return E_NOTIMPL;
+	const FORMATINFO *pfi = m_pCodec->GetCompressedFormat();
+
+	if (dwTypeIndex != 0)
+		return DMO_E_NO_MORE_ITEMS;
+
+	memset(pmt, 0, sizeof(DMO_MEDIA_TYPE));
+	pmt->majortype            = MEDIATYPE_Video;
+	pmt->subtype              = pfi->guidMediaSubType;
+	pmt->bFixedSizeSamples    = FALSE;
+	pmt->bTemporalCompression = m_pCodec->IsTemporalCompressionSupported();
+
+	if (InputTypeSet(0))
+	{
+		const DMO_MEDIA_TYPE *pmtIn = InputType(0);
+		const VIDEOINFOHEADER *pvihIn = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
+		VIDEOINFOHEADER *pvih;
+		DWORD biSize;
+
+		biSize = m_pCodec->CompressGetFormat(&pvihIn->bmiHeader, NULL);
+		MoInitMediaType(pmt, sizeof(DMO_MEDIA_TYPE) - sizeof(BITMAPINFOHEADER) + biSize);
+		pvih = (VIDEOINFOHEADER *)pmt->pbFormat;
+		memcpy(pvih, pvihIn, sizeof(VIDEOINFOHEADER) - sizeof(BITMAPINFOHEADER));
+		m_pCodec->CompressGetFormat(&pvihIn->bmiHeader, &pvih->bmiHeader);
+		pmt->formattype = FORMAT_VideoInfo;
+	}
+
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalGetInputSizeInfo(DWORD dwInputStreamIndex, DWORD *pcbSize, DWORD *pcbMaxLookahead, DWORD *pcbAlignment)
@@ -188,7 +237,10 @@ HRESULT CDMOEncoder::InternalGetOutputSizeInfo(DWORD dwOutputStreamIndex, DWORD 
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalGetOutputSizeInfo()\n");
 
-	return E_NOTIMPL;
+	*pcbSize = 0;
+	*pcbAlignment = 4;
+
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalGetInputMaxLatency(DWORD dwInputStreamIndex, REFERENCE_TIME *prtMaxLatency)
