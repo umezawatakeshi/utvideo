@@ -94,7 +94,7 @@ public:
 	typedef CSpecializedDMOEncoder<fcc, &CLSID_##fccname##DMOEncoder> C##fccname##DMOEncoder; \
 	OBJECT_ENTRY_AUTO(CLSID_##fccname##DMOEncoder, C##fccname##DMOEncoder)
 
-//DMOENCODER_ENTRY_AUTO(FCC('ULRA'), ULRA);
+DMOENCODER_ENTRY_AUTO(FCC('ULRA'), ULRA);
 DMOENCODER_ENTRY_AUTO(FCC('ULRG'), ULRG);
 DMOENCODER_ENTRY_AUTO(FCC('ULY0'), ULY0);
 DMOENCODER_ENTRY_AUTO(FCC('ULY2'), ULY2);
