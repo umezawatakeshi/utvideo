@@ -212,7 +212,7 @@ HRESULT CDMOEncoder::InternalGetOutputType(DWORD dwOutputStreamIndex, DWORD dwTy
 		DWORD biSize;
 
 		biSize = m_pCodec->CompressGetFormat(&pvihIn->bmiHeader, NULL);
-		MoInitMediaType(pmt, sizeof(DMO_MEDIA_TYPE) - sizeof(BITMAPINFOHEADER) + biSize);
+		MoInitMediaType(pmt, sizeof(VIDEOINFOHEADER) - sizeof(BITMAPINFOHEADER) + biSize);
 		pvih = (VIDEOINFOHEADER *)pmt->pbFormat;
 		memcpy(pvih, pvihIn, sizeof(VIDEOINFOHEADER) - sizeof(BITMAPINFOHEADER));
 		m_pCodec->CompressGetFormat(&pvihIn->bmiHeader, &pvih->bmiHeader);
@@ -237,7 +237,12 @@ HRESULT CDMOEncoder::InternalGetOutputSizeInfo(DWORD dwOutputStreamIndex, DWORD 
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalGetOutputSizeInfo()\n");
 
-	*pcbSize = 0;
+	const DMO_MEDIA_TYPE *pmtIn  = InputType(0);
+	const DMO_MEDIA_TYPE *pmtOut = OutputType(0);
+	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
+	const VIDEOINFOHEADER *pvihOut = (const VIDEOINFOHEADER *)pmtOut->pbFormat;
+
+	*pcbSize = m_pCodec->CompressGetSize(&pvihIn->bmiHeader, &pvihOut->bmiHeader);
 	*pcbAlignment = 4;
 
 	return S_OK;
@@ -303,5 +308,8 @@ HRESULT CDMOEncoder::InternalAcceptingInput(DWORD dwInputStreamIndex)
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalAcceptingInput()\n");
 
-	return E_NOTIMPL;
+	if (m_pInputBuffer == NULL)
+		return S_OK;
+	else
+		return S_FALSE;
 }
