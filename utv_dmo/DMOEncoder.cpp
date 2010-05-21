@@ -17,10 +17,15 @@
 CDMOEncoder::CDMOEncoder(DWORD fcc)
 {
 	m_pCodec = CCodec::CreateInstance(fcc, "DMO");
+	m_pInputBuffer = NULL;
 }
 
 CDMOEncoder::~CDMOEncoder()
 {
+	FreeStreamingResources();
+
+	if (m_pInputBuffer != NULL)
+		m_pInputBuffer->Release();
 	delete m_pCodec;
 }
 
@@ -266,42 +271,115 @@ HRESULT CDMOEncoder::InternalFlush()
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalFlush()\n");
 
-	return E_NOTIMPL;
+	if (m_pInputBuffer != NULL)
+	{
+		m_pInputBuffer->Release();
+		m_pInputBuffer = NULL;
+	}
+
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalDiscontinuity(DWORD dwInputStreamIndex)
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalDiscontinuity()\n");
 
-	return E_NOTIMPL;
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalAllocateStreamingResources()
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalAllocateStreamingResources()\n");
 
-	return E_NOTIMPL;
+	const DMO_MEDIA_TYPE *pmtIn  = InputType(0);
+	const DMO_MEDIA_TYPE *pmtOut = OutputType(0);
+	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
+	const VIDEOINFOHEADER *pvihOut = (const VIDEOINFOHEADER *)pmtOut->pbFormat;
+
+	if (m_pCodec->CompressBegin(&pvihIn->bmiHeader, &pvihOut->bmiHeader) == 0)
+		return S_OK;
+	else
+		return E_FAIL;
 }
 
 HRESULT CDMOEncoder::InternalFreeStreamingResources()
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalFreeStreamingResources()\n");
 
-	return E_NOTIMPL;
+	m_pCodec->CompressEnd();
+
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalProcessInput(DWORD dwInputStreamIndex, IMediaBuffer *pBuffer, DWORD dwFlags, REFERENCE_TIME rtTimestamp, REFERENCE_TIME rtTimelength)
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalProcessInput()\n");
 
-	return E_NOTIMPL;
+	m_pInputBuffer = pBuffer;
+	m_pInputBuffer->AddRef();
+	m_bInputKeyFrame = dwFlags & DMO_INPUT_DATA_BUFFERF_SYNCPOINT;
+	m_bInputTimestampValid = dwFlags & DMO_INPUT_DATA_BUFFERF_TIME;
+	m_bInputTimelengthValid = dwFlags & DMO_INPUT_DATA_BUFFERF_TIMELENGTH;
+	m_rtInputTimestamp = rtTimestamp;
+	m_rtInputTimelength = rtTimelength;
+
+	return S_OK;
 }
 
 HRESULT CDMOEncoder::InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, DMO_OUTPUT_DATA_BUFFER *pOutputBuffers, DWORD *pdwStatus)
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalProcessOutput()\n");
 
-	return E_NOTIMPL;
+	const DMO_MEDIA_TYPE *pmtIn  = InputType(0);
+	const DMO_MEDIA_TYPE *pmtOut = OutputType(0);
+	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
+	const VIDEOINFOHEADER *pvihOut = (const VIDEOINFOHEADER *)pmtOut->pbFormat;
+	ICCOMPRESS icc;
+	DWORD ckid;
+	DWORD dwAviFlags;
+
+	if (m_pInputBuffer == NULL)
+		return S_FALSE;
+
+	memset(&icc, 0, sizeof(icc));
+	icc.dwFlags = m_bInputKeyFrame ? ICCOMPRESS_KEYFRAME : 0;
+	icc.lpbiOutput = (BITMAPINFOHEADER *)malloc(pvihOut->bmiHeader.biSize);
+	memcpy(icc.lpbiOutput, &pvihOut->bmiHeader, pvihOut->bmiHeader.biSize);
+	pOutputBuffers->pBuffer->GetBufferAndLength((BYTE **)&icc.lpOutput, NULL);
+	icc.lpbiInput = (BITMAPINFOHEADER *)malloc(pvihIn->bmiHeader.biSize);
+	memcpy(icc.lpbiInput, &pvihIn->bmiHeader, pvihIn->bmiHeader.biSize);
+	m_pInputBuffer->GetBufferAndLength((BYTE **)&icc.lpInput, NULL);
+	icc.lpckid = &ckid;
+	icc.lpdwFlags = &dwAviFlags;
+	icc.lFrameNum = 0; // XXX
+	icc.dwFrameSize = 0;
+	icc.dwQuality = 0;
+
+	m_pCodec->Compress(&icc, sizeof(icc));
+
+	pOutputBuffers->dwStatus = 0;
+	if (dwAviFlags & AVIIF_KEYFRAME)
+		pOutputBuffers->dwStatus |= DMO_OUTPUT_DATA_BUFFERF_SYNCPOINT;
+	if (m_bInputTimestampValid)
+	{
+		pOutputBuffers->dwStatus |= DMO_OUTPUT_DATA_BUFFERF_TIME;
+		pOutputBuffers->rtTimestamp = m_rtInputTimestamp;
+	}
+	if (m_bInputTimelengthValid)
+	{
+		pOutputBuffers->dwStatus |= DMO_OUTPUT_DATA_BUFFERF_TIMELENGTH;
+		pOutputBuffers->rtTimelength = m_rtInputTimelength;
+	}
+	pOutputBuffers->pBuffer->SetLength(icc.lpbiOutput->biSizeImage);
+	_RPT1(_CRT_WARN, "Size = %d\n", icc.lpbiOutput->biSizeImage);
+
+	free(icc.lpbiOutput);
+	free(icc.lpbiInput);
+
+	m_pInputBuffer->Release();
+	m_pInputBuffer = NULL;
+
+	return S_OK;	
 }
 
 HRESULT CDMOEncoder::InternalAcceptingInput(DWORD dwInputStreamIndex)

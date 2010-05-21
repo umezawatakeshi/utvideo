@@ -27,6 +27,12 @@ class ATL_NO_VTABLE CDMOEncoder :
 {
 private:
 	CCodec *m_pCodec;
+	IMediaBuffer *m_pInputBuffer;
+	BOOL m_bInputKeyFrame;
+	BOOL m_bInputTimestampValid;
+	BOOL m_bInputTimelengthValid;
+	REFERENCE_TIME m_rtInputTimestamp;
+	REFERENCE_TIME m_rtInputTimelength;
 
 public:
 	CDMOEncoder(DWORD fcc);
