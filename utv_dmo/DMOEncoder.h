@@ -19,7 +19,7 @@
 
 
 // CDMOEncoder
-// 02EB5C68-6991-460D-840B-C1C6497457EF
+// <FCC>-E991-460D-840B-C1C6497457EF
 
 class ATL_NO_VTABLE CDMOEncoder :
 	public CComObjectRootEx<CComMultiThreadModel>,
