@@ -14,7 +14,8 @@
 
 // CDMOEncoder
 
-CDMOEncoder::CDMOEncoder(DWORD fcc)
+CDMOEncoder::CDMOEncoder(DWORD fcc, REFCLSID clsid) :
+	m_fcc(fcc), m_clsid(clsid)
 {
 	m_pCodec = CCodec::CreateInstance(fcc, "DMO");
 	m_pInputBuffer = NULL;
@@ -88,6 +89,9 @@ HRESULT WINAPI CDMOEncoder::UpdateRegistry(DWORD fcc, REFCLSID clsid, BOOL bRegi
 		return DMOUnregister(clsid, DMOCATEGORY_VIDEO_ENCODER);
 	}
 }
+
+
+// IMediaObjectImpl
 
 HRESULT CDMOEncoder::InternalGetInputStreamInfo(DWORD dwInputStreamIndex, DWORD *pdwFlags)
 {
@@ -390,4 +394,70 @@ HRESULT CDMOEncoder::InternalAcceptingInput(DWORD dwInputStreamIndex)
 		return S_OK;
 	else
 		return S_FALSE;
+}
+
+
+// IPersist
+
+HRESULT STDMETHODCALLTYPE CDMOEncoder::GetClassID(CLSID *pClassID)
+{
+	*pClassID = m_clsid;
+
+	return S_OK;
+}
+
+
+// IPersistStream
+
+HRESULT STDMETHODCALLTYPE CDMOEncoder::IsDirty(void)
+{
+	return S_OK; /* XXX í‚É dirty */
+}
+
+HRESULT STDMETHODCALLTYPE CDMOEncoder::Load(IStream *pStm)
+{
+	ULONG cbState;
+	ULONG cbRead;
+	void *pState;
+	HRESULT hr;
+
+	cbState = m_pCodec->GetStateSize();
+	pState = malloc(cbState);
+	hr = pStm->Read(pState, cbState, &cbRead);
+	if (FAILED(hr))
+	{
+		free(pState);
+		return hr;
+	}
+	m_pCodec->SetState(pState, cbRead);
+	free(pState);
+
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE CDMOEncoder::Save(IStream *pStm, BOOL fClearDirty)
+{
+	ULONG cbState;
+	ULONG cbWritten;
+	void *pState;
+	HRESULT hr;
+
+	cbState = m_pCodec->GetStateSize();
+	pState = malloc(cbState);
+	m_pCodec->GetState(pState, cbState);
+	hr = pStm->Write(pState, cbState, &cbWritten);
+	free(pState);
+	if (FAILED(hr))
+		return hr;
+	if (cbWritten != cbState)
+		return STG_E_MEDIUMFULL;
+
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE CDMOEncoder::GetSizeMax(ULARGE_INTEGER *pcbSize)
+{
+	pcbSize->QuadPart = m_pCodec->GetStateSize();
+
+	return S_OK;
 }

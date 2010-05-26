@@ -23,9 +23,12 @@
 
 class ATL_NO_VTABLE CDMOEncoder :
 	public CComObjectRootEx<CComMultiThreadModel>,
-	public IMediaObjectImpl<CDMOEncoder, 1, 1>
+	public IMediaObjectImpl<CDMOEncoder, 1, 1>,
+	public IPersistStream
 {
 private:
+	const DWORD m_fcc;
+	const CLSID m_clsid;
 	CCodec *m_pCodec;
 	IMediaBuffer *m_pInputBuffer;
 	BOOL m_bInputKeyFrame;
@@ -35,13 +38,15 @@ private:
 	REFERENCE_TIME m_rtInputTimelength;
 
 public:
-	CDMOEncoder(DWORD fcc);
+	CDMOEncoder(DWORD fcc, REFCLSID clsid);
 	virtual ~CDMOEncoder();
 
 	static HRESULT WINAPI UpdateRegistry(DWORD fcc, REFCLSID clsid, BOOL bRegister);
 
 	BEGIN_COM_MAP(CDMOEncoder)
 		COM_INTERFACE_ENTRY(IMediaObject)
+		COM_INTERFACE_ENTRY(IPersist)
+		COM_INTERFACE_ENTRY(IPersistStream)
 	END_COM_MAP()
 
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -56,6 +61,7 @@ public:
 	}
 
 public:
+	// IMediaObjectImpl
 	HRESULT InternalGetInputStreamInfo(DWORD dwInputStreamIndex, DWORD *pdwFlags);
 	HRESULT InternalGetOutputStreamInfo(DWORD dwOutputStreamIndex, DWORD *pdwFlags);
 	HRESULT InternalCheckInputType(DWORD dwInputStreamIndex, const DMO_MEDIA_TYPE *pmt);
@@ -73,6 +79,15 @@ public:
 	HRESULT InternalProcessInput(DWORD dwInputStreamIndex, IMediaBuffer *pBuffer, DWORD dwFlags, REFERENCE_TIME rtTimestamp, REFERENCE_TIME rtTimelength);
 	HRESULT InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, DMO_OUTPUT_DATA_BUFFER *pOutputBuffers, DWORD *pdwStatus);
 	HRESULT InternalAcceptingInput(DWORD dwInputStreamIndex);
+
+	// IPersist
+	virtual HRESULT STDMETHODCALLTYPE GetClassID(CLSID *pClassID);
+
+	// IPersistStream
+	virtual HRESULT STDMETHODCALLTYPE IsDirty(void);
+	virtual HRESULT STDMETHODCALLTYPE Load(IStream *pStm);
+	virtual HRESULT STDMETHODCALLTYPE Save(IStream *pStm, BOOL fClearDirty);
+	virtual HRESULT STDMETHODCALLTYPE GetSizeMax(ULARGE_INTEGER *pcbSize);
 };
 
 
@@ -82,7 +97,7 @@ class ATL_NO_VTABLE CSpecializedDMOEncoder :
 	public CComCoClass<CSpecializedDMOEncoder<fcc, pclsid>, pclsid>
 {
 public:
-	CSpecializedDMOEncoder() : CDMOEncoder(fcc) {}
+	CSpecializedDMOEncoder() : CDMOEncoder(fcc, *pclsid) {}
 
 	static HRESULT WINAPI UpdateRegistry(BOOL bRegister)
 	{
