@@ -467,3 +467,49 @@ HRESULT STDMETHODCALLTYPE CDMOEncoder::GetSizeMax(ULARGE_INTEGER *pcbSize)
 
 	return S_OK;
 }
+
+
+// IAMVfwCompressDialogs
+
+HRESULT STDMETHODCALLTYPE CDMOEncoder::ShowDialog(int iDialog, HWND hwnd)
+{
+	LockIt lck(this);
+
+	switch (iDialog)
+	{
+	case VfwCompressDialog_Config:
+		m_pCodec->Configure(hwnd);
+		return S_OK;
+	case VfwCompressDialog_About:
+		m_pCodec->About(hwnd);
+		return S_OK;
+	case VfwCompressDialog_QueryConfig:
+	case VfwCompressDialog_QueryAbout:
+		return S_OK;
+	default:
+		return E_INVALIDARG;
+	}
+}
+
+HRESULT STDMETHODCALLTYPE CDMOEncoder::GetState(LPVOID pState, int *pcbState)
+{
+	LockIt lck(this);
+
+	*pcbState = m_pCodec->GetState(pState, *pcbState);
+
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE CDMOEncoder::SetState(LPVOID pState, int cbState)
+{
+	LockIt lck(this);
+
+	m_pCodec->SetState(pState, cbState);
+
+	return S_OK;
+}
+
+HRESULT STDMETHODCALLTYPE CDMOEncoder::SendDriverMessage(int uMsg, long dw1, long dw2)
+{
+	return E_NOTIMPL;
+}

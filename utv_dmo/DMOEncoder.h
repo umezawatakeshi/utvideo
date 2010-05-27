@@ -24,7 +24,8 @@
 class ATL_NO_VTABLE CDMOEncoder :
 	public CComObjectRootEx<CComMultiThreadModel>,
 	public IMediaObjectImpl<CDMOEncoder, 1, 1>,
-	public IPersistStream
+	public IPersistStream,
+	public IAMVfwCompressDialogs
 {
 private:
 	const DWORD m_fcc;
@@ -47,6 +48,7 @@ public:
 		COM_INTERFACE_ENTRY(IMediaObject)
 		COM_INTERFACE_ENTRY(IPersist)
 		COM_INTERFACE_ENTRY(IPersistStream)
+		COM_INTERFACE_ENTRY(IAMVfwCompressDialogs)
 	END_COM_MAP()
 
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -88,6 +90,12 @@ public:
 	virtual HRESULT STDMETHODCALLTYPE Load(IStream *pStm);
 	virtual HRESULT STDMETHODCALLTYPE Save(IStream *pStm, BOOL fClearDirty);
 	virtual HRESULT STDMETHODCALLTYPE GetSizeMax(ULARGE_INTEGER *pcbSize);
+
+	// IAMVfwCompressDialogs
+	virtual HRESULT STDMETHODCALLTYPE ShowDialog(int iDialog, HWND hwnd);
+	virtual HRESULT STDMETHODCALLTYPE GetState(LPVOID pState, int *pcbState);
+	virtual HRESULT STDMETHODCALLTYPE SetState(LPVOID pState, int cbState);
+	virtual HRESULT STDMETHODCALLTYPE SendDriverMessage(int uMsg, long dw1, long dw2);
 };
 
 
