@@ -31,6 +31,7 @@ public:
 	virtual const FORMATINFO *GetDecoderOutputFormat(void) = 0;
 	virtual const FORMATINFO *GetCompressedFormat(void) = 0;
 
+	virtual LRESULT About(HWND hwnd);
 	virtual LRESULT Configure(HWND hwnd) = 0;
 	virtual LRESULT GetStateSize(void) = 0;
 	virtual LRESULT GetState(void *pState, SIZE_T cb) = 0;

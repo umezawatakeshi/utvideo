@@ -52,13 +52,7 @@ LRESULT CVCMCodec::QueryAbout(void)
 
 LRESULT CVCMCodec::About(HWND hwnd)
 {
-	char buf[256];
-
-	wsprintf(buf, "Ut Video Codec Suite, Version %s %s \nCopyright (C) 2008-2010  UMEZAWA Takeshi",
-		UTVIDEO_VERSION_STR,
-		UTVIDEO_IMPLEMENTATION_STR);
-	MessageBox(hwnd, buf, "Ut Video Codec Suite", MB_OK);
-	return ICERR_OK;
+	return m_pCodec->About(hwnd);
 }
 
 LRESULT CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
