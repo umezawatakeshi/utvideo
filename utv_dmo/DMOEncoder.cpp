@@ -421,6 +421,8 @@ HRESULT STDMETHODCALLTYPE CDMOEncoder::Load(IStream *pStm)
 	void *pState;
 	HRESULT hr;
 
+	LockIt lck(this);
+
 	cbState = m_pCodec->GetStateSize();
 	pState = malloc(cbState);
 	hr = pStm->Read(pState, cbState, &cbRead);
@@ -442,6 +444,8 @@ HRESULT STDMETHODCALLTYPE CDMOEncoder::Save(IStream *pStm, BOOL fClearDirty)
 	void *pState;
 	HRESULT hr;
 
+	LockIt lck(this);
+
 	cbState = m_pCodec->GetStateSize();
 	pState = malloc(cbState);
 	m_pCodec->GetState(pState, cbState);
@@ -457,6 +461,8 @@ HRESULT STDMETHODCALLTYPE CDMOEncoder::Save(IStream *pStm, BOOL fClearDirty)
 
 HRESULT STDMETHODCALLTYPE CDMOEncoder::GetSizeMax(ULARGE_INTEGER *pcbSize)
 {
+	LockIt lck(this);
+
 	pcbSize->QuadPart = m_pCodec->GetStateSize();
 
 	return S_OK;
