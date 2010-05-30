@@ -21,9 +21,11 @@ LRESULT CCodec::About(HWND hwnd)
 {
 	char buf[256];
 
-	wsprintf(buf, "Ut Video Codec Suite, Version %s %s \nCopyright (C) 2008-2010  UMEZAWA Takeshi",
-		UTVIDEO_VERSION_STR,
-		UTVIDEO_IMPLEMENTATION_STR);
+	wsprintf(buf,
+		"Ut Video Codec Suite, version %s\n"
+		"Copyright (C) 2008-2010  UMEZAWA Takeshi\n\n"
+		"Licensed under GNU General Public License version 2 or later.",
+		UTVIDEO_VERSION_STR);
 	MessageBox(hwnd, buf, "Ut Video Codec Suite", MB_OK);
 
 	return ICERR_OK;
