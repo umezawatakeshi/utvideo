@@ -21,6 +21,24 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_509B8BC36261446984442DADB90E4C0C"
+        "OwnerKey" = "8:_5B781877468E4E71822E44E82568B697"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_509B8BC36261446984442DADB90E4C0C"
+        "OwnerKey" = "8:_8048B460AD4B4B188D5F1857E5306725"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5B781877468E4E71822E44E82568B697"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5D01A8F2B1C2433D910477C231784457"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -35,6 +53,24 @@
         {
         "MsmKey" = "8:_7522E47756584FAA88FA7BFA2BAD7632"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8048B460AD4B4B188D5F1857E5306725"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AA484BB99B6FFB2868FF861D3F0D9C61"
+        "OwnerKey" = "8:_5B781877468E4E71822E44E82568B697"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AA484BB99B6FFB2868FF861D3F0D9C61"
+        "OwnerKey" = "8:_8048B460AD4B4B188D5F1857E5306725"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -164,6 +200,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_509B8BC36261446984442DADB90E4C0C"
+            {
+            "SourcePath" = "8:msdmo.dll"
+            "TargetName" = "8:msdmo.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_57FB51DF1CF6408A83E9242C1FD158FE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:4"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5D01A8F2B1C2433D910477C231784457"
             {
             "SourcePath" = "8:information.rtf"
@@ -202,6 +258,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AA484BB99B6FFB2868FF861D3F0D9C61"
+            {
+            "SourcePath" = "8:utvideo.dll"
+            "TargetName" = "8:utvideo.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_57FB51DF1CF6408A83E9242C1FD158FE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B6BBC5F0571F4A5F902A4E3B4C5C0FAD"
@@ -373,7 +449,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite x64"
         "ProductCode" = "8:{ACF814BB-03B7-4974-9A74-5F8C528788A8}"
-        "PackageCode" = "8:{E156CA5B-C929-423E-91B3-0F314E123355}"
+        "PackageCode" = "8:{678A790C-E76E-4D25-94A6-B3A12013D7C3}"
         "UpgradeCode" = "8:{D9406D67-866D-4C5A-B188-D02E4CEF555B}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -1297,6 +1373,34 @@
         }
         "ProjectOutput"
         {
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_5B781877468E4E71822E44E82568B697"
+            {
+            "SourcePath" = "8:..\\x64\\release\\utv_dmo.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_83BF4A5DE5FD48078CCCD27AB6A6DCDF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:4"
+            "OutputConfiguration" = "8:Release|x64"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{9F47709C-CC4E-4286-BF62-C60482CC878F}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_6CAAE03A2C6344E29F76FD32872BB44A"
             {
             "SourcePath" = "8:..\\release\\utvideo.dll"
@@ -1320,6 +1424,34 @@
             "OutputConfiguration" = "8:Release|Win32"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_8048B460AD4B4B188D5F1857E5306725"
+            {
+            "SourcePath" = "8:..\\release\\utv_dmo.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_57F768BCC2BE446194CEF0279754572C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:4"
+            "OutputConfiguration" = "8:Release|Win32"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{9F47709C-CC4E-4286-BF62-C60482CC878F}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
