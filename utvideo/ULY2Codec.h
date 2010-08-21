@@ -22,7 +22,6 @@ public:
 	static CCodec *CreateInstance(const char *pszInterfaceName);
 
 public:
-	virtual DWORD GetFCC(void) { return FCC('ULY2'); }
 	virtual const FORMATINFO *GetEncoderInputFormat(void) { return m_fiEncoderInput; }
 	virtual const FORMATINFO *GetDecoderOutputFormat(void) { return m_fiDecoderOutput; }
 	virtual const FORMATINFO *GetCompressedFormat(void) { return m_fiCompressed; }

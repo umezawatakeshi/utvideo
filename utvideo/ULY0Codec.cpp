@@ -34,7 +34,7 @@ const FORMATINFO CULY0Codec::m_fiCompressed[] = {
 	FORMATINFO_END,
 };
 
-CULY0Codec::CULY0Codec(const char *pszInterfaceName) : CUL00Codec(pszInterfaceName)
+CULY0Codec::CULY0Codec(const char *pszInterfaceName) : CUL00Codec(FCC('ULY0'), pszInterfaceName)
 {
 }
 

@@ -24,7 +24,7 @@ const FORMATINFO CULRACodec::m_fiCompressed[] = {
 	FORMATINFO_END,
 };
 
-CULRACodec::CULRACodec(const char *pszInterfaceName) : CUL00Codec(pszInterfaceName)
+CULRACodec::CULRACodec(const char *pszInterfaceName) : CUL00Codec(FCC('ULRA'), pszInterfaceName)
 {
 }
 

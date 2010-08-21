@@ -7,11 +7,10 @@
 #include "Predict.h"
 #include "resource.h"
 
-CUL00Codec::CUL00Codec(const char *pszInterfaceName)
+CUL00Codec::CUL00Codec(DWORD fcc, const char *pszInterfaceName) : m_fcc(fcc), m_pszInterfaceName(pszInterfaceName)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
-	m_pszInterfaceName = pszInterfaceName;
 }
 
 CUL00Codec::~CUL00Codec(void)
@@ -21,9 +20,8 @@ CUL00Codec::~CUL00Codec(void)
 void CUL00Codec::GetShortFriendlyName(char *pszName, size_t cchName)
 {
 	char buf[16];
-	DWORD fcc = GetFCC();
 
-	sprintf(buf, "Ut Video (%c%c%c%c)", FCC4PRINTF(fcc));
+	sprintf(buf, "Ut Video (%c%c%c%c)", FCC4PRINTF(m_fcc));
 	strncpy(pszName, buf, cchName);
 	pszName[cchName - 1] = '\0';
 }
@@ -43,11 +41,10 @@ void CUL00Codec::GetShortFriendlyName(wchar_t *pszName, size_t cchName)
 void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 {
 	char buf[128];
-	DWORD fcc = GetFCC();
 
 	sprintf(buf, "Ut Video Codec %s (%c%c%c%c) %s %s",
 		GetColorFormatName(),
-		FCC4PRINTF(fcc),
+		FCC4PRINTF(m_fcc),
 		m_pszInterfaceName,
 		UTVIDEO_IMPLEMENTATION_STR);
 	strncpy(pszName, buf, cchName);
@@ -64,6 +61,11 @@ void CUL00Codec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
 	p = buf;
 	while ((*(pszName++) = *(p++)) != '\0')
 		/* NOTHING */;
+}
+
+DWORD CUL00Codec::GetFCC(void)
+{
+	return m_fcc;
 }
 
 BOOL CUL00Codec::IsTemporalCompressionSupported(void)
@@ -405,7 +407,7 @@ LRESULT CUL00Codec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFO
 	pbieOut->bih.biHeight        = pbihIn->biHeight;
 	pbieOut->bih.biPlanes        = 1;
 	pbieOut->bih.biBitCount      = min(pbihIn->biBitCount, GetFalseBitCount());
-	pbieOut->bih.biCompression   = GetFCC();
+	pbieOut->bih.biCompression   = m_fcc;
 	pbieOut->bih.biSizeImage     = pbihIn->biSizeImage;
 	//pbieOut->bih.biXPelsPerMeter
 	//pbieOut->bih.biYPelsPerMeter
@@ -659,7 +661,7 @@ LRESULT CUL00Codec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
 
-	if (pbihIn->biCompression != GetFCC())
+	if (pbihIn->biCompression != m_fcc)
 		return ICERR_BADFORMAT;
 
 	if (pbihIn->biWidth % GetMacroPixelWidth() != 0 || pbihIn->biHeight % GetMacroPixelHeight() != 0)

@@ -64,7 +64,8 @@ class CUL00Codec :
 	public CCodec
 {
 protected:
-	const char *m_pszInterfaceName;
+	DWORD const m_fcc;
+	const char *const m_pszInterfaceName;
 
 	ENCODERCONF m_ec;
 	BOOL m_bBottomUpFrame;
@@ -102,7 +103,7 @@ protected:
 	const ICDECOMPRESS *m_icd;
 
 public:
-	CUL00Codec(const char *pszInterfaceName);
+	CUL00Codec(DWORD fcc, const char *pszInterfaceName);
 	virtual ~CUL00Codec(void);
 
 public:
@@ -110,7 +111,7 @@ public:
 	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName);
-	virtual DWORD GetFCC(void) = 0;
+	virtual DWORD GetFCC(void);
 	virtual BOOL IsTemporalCompressionSupported(void);
 	virtual const FORMATINFO *GetEncoderInputFormat(void) = 0;
 	virtual const FORMATINFO *GetDecoderOutputFormat(void) = 0;
