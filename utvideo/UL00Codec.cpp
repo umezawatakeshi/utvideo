@@ -11,6 +11,8 @@ CUL00Codec::CUL00Codec(DWORD fcc, const char *pszInterfaceName) : m_fcc(fcc), m_
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
+
+	LoadConfig();
 }
 
 CUL00Codec::~CUL00Codec(void)
@@ -71,6 +73,67 @@ DWORD CUL00Codec::GetFCC(void)
 BOOL CUL00Codec::IsTemporalCompressionSupported(void)
 {
 	return FALSE;
+}
+
+LRESULT CUL00Codec::LoadConfig(void)
+{
+	HKEY hkUtVideo;
+	DWORD dwSaveConfig;
+	DWORD cb;
+	DWORD dwType;
+	ENCODERCONF ec;
+	char buf[16];
+
+	if (RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Ut Video Codec Suite", 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hkUtVideo, NULL) != ERROR_SUCCESS)
+		return -1;
+
+	cb = sizeof(DWORD);
+	if (RegQueryValueEx(hkUtVideo, "SaveConfig", NULL, &dwType, (BYTE *)&dwSaveConfig, &cb) != ERROR_SUCCESS)
+		goto notloaded;
+	if (!dwSaveConfig)
+		goto notloaded;
+
+	wsprintf(buf, "Config%c%c%c%c", FCC4PRINTF(m_fcc));
+	cb = sizeof(ENCODERCONF);
+	if (RegQueryValueEx(hkUtVideo, buf, NULL, &dwType, (BYTE *)&ec, &cb) != ERROR_SUCCESS)
+		goto notloaded;
+	SetState(&ec, cb);
+
+	RegCloseKey(hkUtVideo);
+	return 0;
+
+notloaded:
+	RegCloseKey(hkUtVideo);
+	return -1;
+}
+
+LRESULT CUL00Codec::SaveConfig(void)
+{
+	HKEY hkUtVideo;
+	DWORD dwSaveConfig;
+	DWORD cb;
+	DWORD dwType;
+	char buf[16];
+
+	if (RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Ut Video Codec Suite", 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hkUtVideo, NULL) != ERROR_SUCCESS)
+		return -1;
+
+	cb = sizeof(DWORD);
+	if (RegQueryValueEx(hkUtVideo, "SaveConfig", NULL, &dwType, (BYTE *)&dwSaveConfig, &cb) != ERROR_SUCCESS)
+		goto notsaved;
+	if (!dwSaveConfig)
+		goto notsaved;
+
+	wsprintf(buf, "Config%c%c%c%c", FCC4PRINTF(m_fcc));
+	if (RegSetValueEx(hkUtVideo, buf, 0, REG_BINARY, (const BYTE *)&m_ec, sizeof(ENCODERCONF)) != ERROR_SUCCESS)
+		goto notsaved;
+
+	RegCloseKey(hkUtVideo);
+	return 0;
+
+notsaved:
+	RegCloseKey(hkUtVideo);
+	return -1;
 }
 
 LRESULT CUL00Codec::Configure(HWND hwnd)
@@ -143,6 +206,7 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
 			if (IsDlgButtonChecked(hwnd, IDC_ASSUME_INTERLACE_CHECK))
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_ASSUME_INTERLACE;
+			pThis->SaveConfig();
 			/* FALLTHROUGH */
 		case IDCANCEL:
 			EndDialog(hwnd, 0);

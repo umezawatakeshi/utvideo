@@ -135,6 +135,8 @@ public:
 	virtual LRESULT DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 
 protected:
+	LRESULT LoadConfig(void);
+	LRESULT SaveConfig(void);
 	virtual const char *GetColorFormatName(void) = 0;
 	virtual WORD GetRealBitCount(void) = 0;
 	virtual WORD GetFalseBitCount(void) = 0;
