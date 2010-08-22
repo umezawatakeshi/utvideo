@@ -75,6 +75,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_DD5D27B7EE494AD6A0FE84F3B8E6DD42"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_DE5F826C877346A4B6CCD0AB24C7F040"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -414,7 +420,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite x86"
         "ProductCode" = "8:{D636771E-EBF6-42F1-A6B8-3B7B27B0DE51}"
-        "PackageCode" = "8:{483C15FD-5B98-443D-8A7F-C68EC6967F35}"
+        "PackageCode" = "8:{C6B39168-2C43-4EE1-87A5-EA5BED841263}"
         "UpgradeCode" = "8:{BD16A4A2-9AB5-4C0C-A763-DB7F9EAA4B1E}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -602,6 +608,20 @@
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
             "Target" = "8:_77361C4AEFD64A5287A1863D384FBC11"
+            "Folder" = "8:_31C7B3BCDC0B4CE5B3D14E73D404DB1B"
+            "WorkingFolder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
+            "Icon" = "8:"
+            "Feature" = "8:"
+            }
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_6BE0D218EB0844049E3DF12DFA3FE01E"
+            {
+            "Name" = "8:Global Configuration"
+            "Arguments" = "8:"
+            "Description" = "8:"
+            "ShowCmd" = "3:1"
+            "IconIndex" = "3:0"
+            "Transitive" = "11:FALSE"
+            "Target" = "8:_DD5D27B7EE494AD6A0FE84F3B8E6DD42"
             "Folder" = "8:_31C7B3BCDC0B4CE5B3D14E73D404DB1B"
             "WorkingFolder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
             "Icon" = "8:"
@@ -1259,6 +1279,34 @@
             "OutputConfiguration" = "8:Release|Win32"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{9F47709C-CC4E-4286-BF62-C60482CC878F}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_DD5D27B7EE494AD6A0FE84F3B8E6DD42"
+            {
+            "SourcePath" = "8:..\\release\\utv_cfg.exe"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:Release|Win32"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{FE411A31-5F19-4BC8-8206-880E7DCF00EB}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
