@@ -97,7 +97,7 @@ LRESULT CUL00Codec::LoadConfig(void)
 	cb = sizeof(ENCODERCONF);
 	if (RegQueryValueEx(hkUtVideo, buf, NULL, &dwType, (BYTE *)&ec, &cb) != ERROR_SUCCESS)
 		goto notloaded;
-	SetState(&ec, cb);
+	InternalSetState(&ec, cb);
 
 	RegCloseKey(hkUtVideo);
 	return 0;
@@ -244,6 +244,31 @@ LRESULT CUL00Codec::GetState(void *pState, SIZE_T cb)
 }
 
 LRESULT CUL00Codec::SetState(const void *pState, SIZE_T cb)
+{
+	HKEY hkUtVideo;
+	DWORD dwIgnoreSetConfig;
+	DWORD cbRegData;
+	DWORD dwType;
+
+	if (RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Ut Video Codec Suite", 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hkUtVideo, NULL) != ERROR_SUCCESS)
+		goto doset_noclose;
+
+	cbRegData = sizeof(DWORD);
+	if (RegQueryValueEx(hkUtVideo, "IgnoreSetConfig", NULL, &dwType, (BYTE *)&dwIgnoreSetConfig, &cbRegData) != ERROR_SUCCESS)
+		goto doset;
+	if (!dwIgnoreSetConfig)
+		goto doset;
+
+	RegCloseKey(hkUtVideo);
+	return min(sizeof(ENCODERCONF), cb);
+
+doset:
+	RegCloseKey(hkUtVideo);
+doset_noclose:
+	return InternalSetState(pState, cb);
+}
+
+LRESULT CUL00Codec::InternalSetState(const void *pState, SIZE_T cb)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 
