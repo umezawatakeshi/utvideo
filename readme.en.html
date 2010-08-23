@@ -2,10 +2,10 @@
 <!-- $Id$ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
-<title>Ut Video Codec Suite 8.0.0 readme (English)</title>
+<title>Ut Video Codec Suite 8.1.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 8.0.0 readme (English)</h1>
+<h1>Ut Video Codec Suite 8.1.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008-2010  UMEZAWA Takeshi</p>
@@ -36,14 +36,14 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <h2 id="fourcc">List of FourCC</h2>
 <table border>
 <tr><th>FourCC</th><th>Internal format</th><th>Supported input/output format (in order of priority)</th></tr>
-<tr><td>ULRA</td><td>RGBA full-range 4:4:4:4 8bit</td><td><strong>RGBA</strong></td></tr>
-<tr><td>ULRG</td><td>RGB full-range 4:4:4 8bit</td><td><strong>RGB24<br />RGB32</strong></td></tr>
-<tr><td>ULY2</td><td>YCbCr limited 4:2:2 8bit</td><td><strong>YUY2 (YUYV YUNV) UYVY (UYNV) YVYU VYUY</strong><br>RGB24<br>RGB32</td></tr>
-<tr><td>ULY0</td><td>YCbCr limited 4:2:0 8bit</td><td><strong>YV12</strong><br>YUY2 (YUYV YUNV) UYVY (UYNV) YVYU VYUY<br>RGB24<br>RGB32</td></tr>
+<tr><td>ULRA</td><td>RGBA 4:4:4:4 8bit full-range</td><td><strong>RGBA</strong></td></tr>
+<tr><td>ULRG</td><td>RGB 4:4:4 8bit full-range</td><td><strong>RGB24<br />RGB32</strong></td></tr>
+<tr><td>ULY2</td><td>YCbCr 4:2:2 8bit limited</td><td><strong>YUY2 (YUYV YUNV) UYVY (UYNV) YVYU VYUY</strong><br>RGB24<br>RGB32</td></tr>
+<tr><td>ULY0</td><td>YCbCr 4:2:0 8bit limited</td><td><strong>YV12</strong><br>YUY2 (YUYV YUNV) UYVY (UYNV) YVYU VYUY<br>RGB24<br>RGB32</td></tr>
 </table>
 <ul>
 <li>Currentry supported input formats and supported output formats are same.</li>
-<li>RGB formats are assumed full-range (R,G,B=0-255 for 8bit). YUV formats are assumed limited (Y=16-235, U,V=16-240 for 8bit).</li>
+<li>In &quot;8-bit full-range&quot; of RGB formats, R,G,B=0-255. In &quot;8-bit limited&quot; of YUV formats, Y=16-235 and U,V=16-240.</li>
 <li><strong>Bold</strong> are &quot;native&quot; (no colorspace conversion occurs) formats. It is recommended to input/output with that formats.</li>
 <li>Formats written in brackets are equivalent format with preceding format. For example, YUY2, YUYV and YUNV are equivalent.</li>
 </ul>
@@ -53,10 +53,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <dl>
 <dt>OS</dt><dd>Windows 7 Ultimate x64 (ja)</dd>
 <dt>CPU</dt><dd>Intel Core 2 Quad Q6600</dd>
-<dt>RAM</dt><dd>DDR2-800 8GB</dd>
+<dt>RAM</dt><dd>DDR2-800 6GB</dd>
 <dt>Development Tools</dt><dd>Visual Studio 2005 SP1 + Windows SDK for Windows Server 2008 and .NET Framework 3.5 (Windows SDK 6.1)</dd>
 </dl>
 <h2 id="history">Version history</h2>
+<h3>Version 8.1.0</h3>
+<dl>
+<dt>New features</dt><dd><ul>
+<li>Encoder is now able to save configuration globally by encoder itself.</li>
+<li>Encoder is now able to ignore setting of cofiguration from codec client (e.g. editing software).</li>
+</ul></dd>
+</dl>
 <h3>Version 8.0.0</h3>
 <dl>
 <dt>New features</dt><dd><ul>
