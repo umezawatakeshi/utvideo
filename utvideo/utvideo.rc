@@ -70,6 +70,18 @@ BEGIN
     PUSHBUTTON      "キャンセル",IDCANCEL,129,24,50,14
 END
 
+IDD_GLOBAL_CONFIG_DIALOG DIALOGEX 0, 0, 221, 93
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Ut Video Codec Suite のグローバル設定"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,164,7,50,14
+    PUSHBUTTON      "キャンセル",IDCANCEL,164,24,50,14
+    CONTROL         "コーデック側で設定をグローバルに保持する",IDC_SAVE_CONFIG_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,148,10
+    CONTROL         "コーデッククライアントからの設定を無視する",IDC_IGNORE_SET_CONFIG_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,148,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -85,6 +97,14 @@ BEGIN
         RIGHTMARGIN, 179
         TOPMARGIN, 7
         BOTTOMMARGIN, 83
+    END
+
+    IDD_GLOBAL_CONFIG_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 214
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 86
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -126,6 +146,19 @@ BEGIN
     PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
 END
 
+IDD_GLOBAL_CONFIG_DIALOG DIALOGEX 0, 0, 230, 93
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Ut Video Codec Suite Global Configutation"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,173,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,173,24,50,14
+    CONTROL         "Save configuration globally by codec itself",IDC_SAVE_CONFIG_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,150,10
+    CONTROL         "Ignore setting configuration from codec client",IDC_IGNORE_SET_CONFIG_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,161,10
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -141,6 +174,14 @@ BEGIN
         RIGHTMARGIN, 179
         TOPMARGIN, 7
         BOTTOMMARGIN, 83
+    END
+
+    IDD_GLOBAL_CONFIG_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 223
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 86
     END
 END
 #endif    // APSTUDIO_INVOKED

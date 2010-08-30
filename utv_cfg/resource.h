@@ -4,10 +4,7 @@
 //
 #define IDD_UTV_CFG_DIALOG              102
 #define IDR_MAINFRAME                   128
-#define IDD_GLOBAL_CONFIG_DIALOG        129
-#define IDC_SAVE_CONFIG_CHECK           1001
 #define IDC_CHECK2                      1002
-#define IDC_IGNORE_SET_CONFIG_CHECK     1002
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

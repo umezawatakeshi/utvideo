@@ -400,6 +400,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\GlobalConfig.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\HuffmanCode.cpp"
 				>
 			</File>
@@ -587,6 +591,10 @@
 			</File>
 			<File
 				RelativePath=".\FrameBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GlobalConfig.h"
 				>
 			</File>
 			<File
