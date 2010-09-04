@@ -90,14 +90,14 @@ if &accum
 	mov			byte ptr [esp - 4], 80h
 endif
 
-	cmp			byte ptr [ebx + 32+4*32+1], 0	; pDecodeTable->SymbolAndCodeLength[0].nCodeLength
+	cmp			byte ptr [ebx + 8192+32+4*32+1], 0	; pDecodeTable->SymbolAndCodeLength[0].nCodeLength
 	jne			label1
 
 	; msmset(pDstBegin, pDecodeTable->dwSymbol[0], pDstEnd-pDstBegin);
 	mov			eax, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
 	sub			eax, edi
 	push		eax
-	mov			eax, dword ptr [ebx + 32+4*32]		; pDecodeTable->SymbolAndCodeLength[0].bySymbol
+	mov			eax, dword ptr [ebx + 8192+32+4*32]		; pDecodeTable->SymbolAndCodeLength[0].bySymbol
 if &accum
 	add			eax, 80h
 	movzx		eax, al
@@ -115,14 +115,24 @@ label1:
 	jae			label2
 	mov			eax, dword ptr [esi]
 	mov			cl, ch
+
+	shld		eax, edx, cl
+	shr			eax, 20
+	movzx		eax, word ptr [ebx + eax*2]
+	cmp			ah, 255
+	jne			label0
+
+	mov			eax, dword ptr [esi]
 	shld		eax, edx, cl
 	or			eax, 1
 	bsr			ebp, eax
-	mov			cl, byte ptr [ebx + ebp]					; pDecodeTable->nCodeShift[ebp]
+	mov			cl, byte ptr [ebx + 8192 + ebp]					; pDecodeTable->nCodeShift[ebp]
 	shr			eax, cl
-	mov			ebp, dword ptr [ebx + 32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
+	mov			ebp, dword ptr [ebx + 8192+32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
 	add			ebp, eax
-	mov			eax, dword ptr [ebx + 32+4*32 + ebp*4]		; pDecodeTable->SymbolAndCodeLength[ebp]
+	mov			eax, dword ptr [ebx + 8192+32+4*32 + ebp*4]		; pDecodeTable->SymbolAndCodeLength[ebp]
+
+label0:
 if &accum
 	add			al, byte ptr [esp - 4]
 	mov			byte ptr [esp - 4], al

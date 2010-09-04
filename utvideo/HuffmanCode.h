@@ -9,8 +9,15 @@ struct HUFFMAN_ENCODE_TABLE
 	DWORD dwTableMux[256];
 };
 
+#define HUFFMAN_DECODE_TABLELOOKUP_BITS 12
+
 struct HUFFMAN_DECODE_TABLE
 {
+	struct
+	{
+		BYTE bySymbol;
+		BYTE nCodeLength;
+	} LookupSymbolAndCodeLength[1<<HUFFMAN_DECODE_TABLELOOKUP_BITS];
 	BYTE nCodeShift[32];
 	DWORD dwSymbolBase[32];
 	struct
