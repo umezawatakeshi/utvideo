@@ -91,7 +91,7 @@ if &accum
 endif
 
 	cmp			byte ptr [ebx + 8192+32+4*32+1], 0	; pDecodeTable->SymbolAndCodeLength[0].nCodeLength
-	jne			label1
+	jne			label3
 
 	; msmset(pDstBegin, pDecodeTable->dwSymbol[0], pDstEnd-pDstBegin);
 	mov			eax, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
@@ -110,10 +110,12 @@ endif
 	jmp			label2
 
 	align		64
+label3:
+	mov			ebp, dword ptr [esi]
 label1:
 	cmp			edi, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
 	jae			label2
-	mov			eax, dword ptr [esi]
+	mov			eax, ebp
 	mov			cl, ch
 
 	shld		eax, edx, cl
@@ -131,6 +133,7 @@ label1:
 	mov			ebp, dword ptr [ebx + 8192+32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
 	add			ebp, eax
 	mov			eax, dword ptr [ebx + 8192+32+4*32 + ebp*2]		; pDecodeTable->SymbolAndCodeLength[ebp]
+	mov			ebp, dword ptr [esi]
 
 label0:
 if &accum
@@ -143,6 +146,7 @@ endif
 	jnc			label1
 	sub			ch, 32
 	add			esi, 4
+	mov			ebp, edx
 	mov			edx, dword ptr [esi+4]
 	jmp			label1
 
