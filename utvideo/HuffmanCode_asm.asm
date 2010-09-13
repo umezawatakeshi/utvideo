@@ -130,7 +130,7 @@ label1:
 	shr			eax, cl
 	mov			ebp, dword ptr [ebx + 8192+32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
 	add			ebp, eax
-	mov			eax, dword ptr [ebx + 8192+32+4*32 + ebp*4]		; pDecodeTable->SymbolAndCodeLength[ebp]
+	mov			eax, dword ptr [ebx + 8192+32+4*32 + ebp*2]		; pDecodeTable->SymbolAndCodeLength[ebp]
 
 label0:
 if &accum

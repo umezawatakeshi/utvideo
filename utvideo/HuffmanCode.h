@@ -24,7 +24,6 @@ struct HUFFMAN_DECODE_TABLE
 	{
 		BYTE bySymbol;
 		BYTE nCodeLength;
-		WORD padding;
 	} SymbolAndCodeLength[1024];
 };
 
