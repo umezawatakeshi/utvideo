@@ -12,9 +12,9 @@ extrn	_memset:PROC
 
 _TEXT_ASM	SEGMENT	page public flat 'CODE'
 
-; void i686_HuffmanEncode_align1(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable)
-public	_i686_HuffmanEncode_align1
-_i686_HuffmanEncode_align1	proc
+; void i686_HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable)
+public	_i686_HuffmanEncode
+_i686_HuffmanEncode	proc
 
 	push		ebx
 	push		esi
@@ -67,7 +67,7 @@ label3:
 	pop			ebx
 	ret
 
-_i686_HuffmanEncode_align1	endp
+_i686_HuffmanEncode	endp
 
 
 HUFFMAN_DECODE	macro	procname, accum
@@ -161,8 +161,8 @@ label2:
 
 		endm
 
-HUFFMAN_DECODE	_i686_HuffmanDecode_align1, 0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccum_align1, 1
+HUFFMAN_DECODE	_i686_HuffmanDecode, 0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccum, 1
 
 
 end
