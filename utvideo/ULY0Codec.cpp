@@ -203,6 +203,11 @@ void CULY0Codec::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *pS
 				*(p+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
 				*(p+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
 				*(p+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				if (bypp == 4)
+				{
+					*(q+3) = 255;
+					*(p+3) = 255;
+				}
 				y++;
 				*(q+bypp+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
 				*(q+bypp+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
@@ -210,6 +215,11 @@ void CULY0Codec::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *pS
 				*(p+bypp+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
 				*(p+bypp+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
 				*(p+bypp+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				if (bypp == 4)
+				{
+					*(q+bypp+3) = 255;
+					*(p+bypp+3) = 255;
+				}
 				y++; u++; v++;
 			}
 		}

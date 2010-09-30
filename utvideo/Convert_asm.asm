@@ -82,16 +82,23 @@ label1:
 	paddd		xmm1, xmm0				; xmm1 = -G3-------- -G2-------- -G1-------- -G0--------
 	psrad		xmm1, 14				; xmm1 = ---------G3 ---------G2 ---------G1 ---------G0
 
-	pxor		xmm0, xmm0
+	pxor		xmm0, xmm0				; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 	packssdw	xmm1, xmm3				; xmm1 = ---R3 ---R2 ---R1 ---R0 ---G3 ---G2 ---G1 ---G0
 	packssdw	xmm2, xmm0				; xmm2 = 00 00 00 00 00 00 00 00 ---B3 ---B2 ---B1 ---B0
 	pmaxsw		xmm1, xmm0				; 計算過程でマイナスになることがあるので、
 	pmaxsw		xmm2, xmm0				; ここの pmaxsw xmmN, xmm0 は必要。
 	punpcklwd	xmm2, xmm1				; xmm2 = ---G3 ---B3 ---G2 ---B2 ---G1 ---B1 ---G0 ---B0
 	punpckhwd	xmm1, xmm0				; xmm1 = 00 00 ---R3 00 00 ---R2 00 00 ---R1 00 00 ---R0
+if &rgb32
+	pcmpeqb		xmm0, xmm0				; xmm0 = ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+	pslld		xmm0, 24				; xmm0 = ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 00 00 00
+endif
 	packuswb	xmm2, xmm2				; xmm2 = XX XX XX XX XX XX XX XX G3 B3 G2 B2 G1 B1 G0 B0
 	packuswb	xmm1, xmm1				; xmm2 = XX XX XX XX XX XX XX XX 00 R3 00 R2 00 R1 00 R0
 	punpcklwd	xmm2, xmm1				; xmm2 = 00 R3 G3 B3 00 R2 G2 B2 00 R1 G1 B1 00 R0 G0 B0
+if &rgb32
+	por			xmm2, xmm0				; xmm2 = ff R3 G3 B3 ff R2 G2 B2 ff R1 G1 B1 ff R0 G0 B0
+endif
 
 if &rgb32
 	add			edi, 16
