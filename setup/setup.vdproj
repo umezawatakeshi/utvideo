@@ -57,6 +57,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7F6A80F930A9763D9D283AE4956FD4D8"
+        "OwnerKey" = "8:_DD5D27B7EE494AD6A0FE84F3B8E6DD42"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_8C3447F14F014BBBB83BB1282D1EFA61"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -419,14 +425,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite x86"
-        "ProductCode" = "8:{AB02272E-A0A2-4565-8D2C-2D5DAEA1542C}"
-        "PackageCode" = "8:{E38A4941-7C23-4E40-9BDD-337CA1B1142F}"
+        "ProductCode" = "8:{8C2813C5-2D76-4B13-B153-16C982448E30}"
+        "PackageCode" = "8:{90195EA6-489D-4364-AB7B-EE6F0E5D8A7B}"
         "UpgradeCode" = "8:{BD16A4A2-9AB5-4C0C-A763-DB7F9EAA4B1E}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:8.2.0"
+        "ProductVersion" = "8:8.2.1"
         "Manufacturer" = "8:UMEZAWA Takeshi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://umezawa.dyndns.info/"
