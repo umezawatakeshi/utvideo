@@ -37,4 +37,5 @@ protected:
 	virtual int GetMacroPixelHeight(void) { return 1; }
 
 	virtual void ConvertFromPlanar(DWORD nBandIndex);
+	virtual BOOL DecodeDirect(DWORD nBandIndex);
 };

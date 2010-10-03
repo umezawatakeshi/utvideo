@@ -196,3 +196,41 @@ void CULY2Codec::ConvertFromPlanar(DWORD nBandIndex)
 		break;
 	}
 }
+
+BOOL CULY2Codec::DecodeDirect(DWORD nBandIndex)
+{
+	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
+		return FALSE;
+
+	BYTE *pDstBegin = ((BYTE *)m_icd->lpOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	BYTE *pDstEnd   = ((BYTE *)m_icd->lpOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+
+	switch (m_icd->lpbiOutput->biCompression)
+	{
+	case FCC('YUY2'):
+	case FCC('YUYV'):
+	case FCC('YUNV'):
+		HuffmanDecodeAndAccumStep2(pDstBegin+0, pDstEnd+0  m_pDecodeCode[0][nBandIndex], &m_hdt[0]);
+		HuffmanDecodeAndAccumStep4(pDstBegin+1, pDstEnd+1, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
+		HuffmanDecodeAndAccumStep4(pDstBegin+3, pDstEnd+3, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
+		return TRUE;
+	case FCC('UYVY'):
+	case FCC('UYNV'):
+		HuffmanDecodeAndAccumStep2(pDstBegin+1, pDstEnd+1  m_pDecodeCode[0][nBandIndex], &m_hdt[0]);
+		HuffmanDecodeAndAccumStep4(pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
+		HuffmanDecodeAndAccumStep4(pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
+		return TRUE;
+	case FCC('YVYU'):
+		HuffmanDecodeAndAccumStep2(pDstBegin+0, pDstEnd+0  m_pDecodeCode[0][nBandIndex], &m_hdt[0]);
+		HuffmanDecodeAndAccumStep4(pDstBegin+3, pDstEnd+3, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
+		HuffmanDecodeAndAccumStep4(pDstBegin+1, pDstEnd+1, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
+		return TRUE;
+	case FCC('VYUY'):
+		HuffmanDecodeAndAccumStep2(pDstBegin+1, pDstEnd+1  m_pDecodeCode[0][nBandIndex], &m_hdt[0]);
+		HuffmanDecodeAndAccumStep4(pDstBegin+2, pDstEnd+2, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
+		HuffmanDecodeAndAccumStep4(pDstBegin+0, pDstEnd+0, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
+		return TRUE;
+	default:
+		return FALSE;
+	}
+}
