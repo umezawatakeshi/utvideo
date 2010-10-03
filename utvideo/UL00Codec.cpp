@@ -781,6 +781,9 @@ LRESULT CUL00Codec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 void CUL00Codec::DecodeProc(DWORD nBandIndex)
 {
+	if (DecodeDirect(nBandIndex))
+		return;
+
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		DWORD dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
@@ -812,4 +815,9 @@ void CUL00Codec::DecodeProc(DWORD nBandIndex)
 	}
 
 	ConvertFromPlanar(nBandIndex);
+}
+
+BOOL CUL00Codec::DecodeDirect(DWORD nBandIndex)
+{
+	return FALSE;
 }

@@ -148,6 +148,7 @@ protected:
 	virtual int GetMacroPixelHeight(void) = 0;
 
 	virtual void ConvertFromPlanar(DWORD nBandIndex) = 0;
+	virtual BOOL DecodeDirect(DWORD nBandIndex);
 
 private:
 	void PredictProc(DWORD nBandIndex);
