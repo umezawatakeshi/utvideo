@@ -70,7 +70,7 @@ label3:
 _i686_HuffmanEncode	endp
 
 
-HUFFMAN_DECODE	macro	procname, accum
+HUFFMAN_DECODE	macro	procname, accum, step
 
 ; void procname(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
 public	&procname
@@ -141,7 +141,11 @@ if &accum
 	mov			byte ptr [esp - 4], al
 endif
 	mov			byte ptr [edi], al
+if &step eq 1
 	inc			edi
+else
+	add			edi, &step
+endif
 	add			ch, ah
 	jnc			label1
 	sub			ch, 32
@@ -161,8 +165,10 @@ label2:
 
 		endm
 
-HUFFMAN_DECODE	_i686_HuffmanDecode, 0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccum, 1
+HUFFMAN_DECODE	_i686_HuffmanDecode, 0, 1
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccum, 1, 1
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep2, 1, 2
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4, 1, 4
 
 
 end

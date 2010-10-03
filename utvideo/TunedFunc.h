@@ -16,6 +16,8 @@ struct TUNEDFUNC
 	size_t (*pfnHuffmanEncode)(BYTE *, const BYTE *, const BYTE *, const HUFFMAN_ENCODE_TABLE *);
 	void (*pfnHuffmanDecode)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
 	void (*pfnHuffmanDecodeAndAccum)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
+	void (*pfnHuffmanDecodeAndAccumStep2)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
+	void (*pfnHuffmanDecodeAndAccumStep4)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
 	void (*pfnConvertULY2ToBottomupRGB24)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride, DWORD dwDataStride);
 	void (*pfnConvertULY2ToBottomupRGB32)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride, DWORD dwDataStride);
 	void (*pfnConvertBottomupRGB24ToULY2)(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD dwDataStride);
