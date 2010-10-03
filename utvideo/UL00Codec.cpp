@@ -601,6 +601,17 @@ LRESULT CUL00Codec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 		GenerateHuffmanDecodeTable(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 		p += 256 + sizeof(DWORD) * m_dwDivideCount;
 		p += ((const DWORD *)p)[-1];
+		for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+		{
+			DWORD dwCodeOffset;
+
+			if (nBandIndex == 0)
+				dwCodeOffset = 0;
+			else
+				dwCodeOffset = ((const DWORD *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
+
+			m_pDecodeCode[nPlaneIndex][nBandIndex] = m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwCodeOffset;
+		}
 	}
 
 	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
@@ -789,17 +800,10 @@ void CUL00Codec::DecodeProc(DWORD nBandIndex)
 		DWORD dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
 		DWORD dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
 
-		DWORD dwDstOffset;
-
-		if (nBandIndex == 0)
-			dwDstOffset = 0;
-		else
-			dwDstOffset = ((const DWORD *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
-
 		if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) == FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
-			HuffmanDecodeAndAccum(m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, &m_hdt[nPlaneIndex]);
+			HuffmanDecodeAndAccum(m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
 		else
-			HuffmanDecode(m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, &m_hdt[nPlaneIndex]);
+			HuffmanDecode(m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
 
 		switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{

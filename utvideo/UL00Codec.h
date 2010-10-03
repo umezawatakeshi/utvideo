@@ -101,6 +101,7 @@ protected:
 	FRAMEINFO m_fi;
 	HUFFMAN_DECODE_TABLE m_hdt[4];
 	const ICDECOMPRESS *m_icd;
+	const BYTE *m_pDecodeCode[4][256];
 
 public:
 	CUL00Codec(DWORD fcc, const char *pszInterfaceName);
