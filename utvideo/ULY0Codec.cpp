@@ -310,3 +310,36 @@ void CULY0Codec::ConvertFromPlanar(DWORD nBandIndex)
 		break;
 	}
 }
+
+BOOL CULY0Codec::DecodeDirect(DWORD nBandIndex)
+{
+	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
+		return FALSE;
+
+	switch (m_icd->lpbiOutput->biCompression)
+	{
+	case FCC('YV12'):
+		{
+			BYTE *pDstYBegin, *pDstVBegin, *pDstUBegin;
+
+			pDstYBegin = ((BYTE *)m_icd->lpOutput);
+			pDstVBegin = pDstYBegin + m_icd->lpbiOutput->biWidth * m_icd->lpbiOutput->biHeight;
+			pDstUBegin = pDstVBegin + m_icd->lpbiOutput->biWidth * m_icd->lpbiOutput->biHeight / 4;
+
+			BYTE *pDstYEnd = pDstYBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[0];
+			BYTE *pDstUEnd = pDstUBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[1];
+			BYTE *pDstVEnd = pDstVBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[2];
+
+			pDstYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
+			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
+			pDstUBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
+
+			HuffmanDecodeAndAccum(pDstYBegin, pDstYEnd, m_pDecodeCode[0][nBandIndex], &m_hdt[0]);
+			HuffmanDecodeAndAccum(pDstUBegin, pDstUEnd, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
+			HuffmanDecodeAndAccum(pDstVBegin, pDstVEnd, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
+		}
+		return TRUE;
+	default:
+		return FALSE;
+	}
+}
