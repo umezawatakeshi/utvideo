@@ -284,11 +284,11 @@ inline void DecodeSymbol(DWORD *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *p
 
 	if (bAccum)
 	{
-		byPrevSymbol += symbol;
-		*pDst = byPrevSymbol;
+		symbol += byPrevSymbol;
+		byPrevSymbol = symbol;
 	}
-	else
-		*pDst = symbol;
+
+	*pDst = symbol;
 	nBits += codelen;
 
 	if (nBits >= 32)
