@@ -10,8 +10,8 @@
 	(BYTE)(fcc >> 24)
 
 #define UTVIDEO_VERSION_MASK                      0xffffff00
-#define UTVIDEO_VERSION                           0x08020100
-#define UTVIDEO_VERSION_STR                       "8.2.1"
+#define UTVIDEO_VERSION                           0x08030000
+#define UTVIDEO_VERSION_STR                       "8.3.0"
 
 /*
  * NOTE:
