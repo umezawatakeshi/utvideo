@@ -155,7 +155,15 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 		for (int i = 0; i < _countof(pDecodeTable->nCodeShift); i++)
 			pDecodeTable->nCodeShift[i] = 31;
 		for (int i = 0; i < _countof(pDecodeTable->SymbolAndCodeLength); i++)
-			pDecodeTable->SymbolAndCodeLength[i].bySymbol = cls[0].symbol;
+		{
+			pDecodeTable->SymbolAndCodeLength[i].nCodeLength = 0;
+			pDecodeTable->SymbolAndCodeLength[i].bySymbol    = cls[0].symbol;
+		}
+		for (int i = 0; i < _countof(pDecodeTable->LookupSymbolAndCodeLength); i++)
+		{
+			pDecodeTable->LookupSymbolAndCodeLength[i].nCodeLength = 0;
+			pDecodeTable->LookupSymbolAndCodeLength[i].bySymbol    = cls[0].symbol;
+		}
 		return;
 	}
 
@@ -304,15 +312,6 @@ static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE 
 	DWORD *pSrc;
 	BYTE *p;
 	BYTE prevsym;
-
-	if (pDecodeTable->SymbolAndCodeLength[0].nCodeLength == 0)
-	{
-		if (bAccum)
-			memset(pDstBegin, pDecodeTable->SymbolAndCodeLength[0].bySymbol + 0x80, pDstEnd-pDstBegin);
-		else
-			memset(pDstBegin, pDecodeTable->SymbolAndCodeLength[0].bySymbol, pDstEnd-pDstBegin);
-		return;
-	}
 
 	nBits = 0;
 	pSrc = (DWORD *)pSrcBegin;

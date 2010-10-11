@@ -89,29 +89,9 @@ public	&procname
 if &accum
 	mov			byte ptr [esp - 4], 80h
 endif
-
-	cmp			byte ptr [ebx + 8192+32+4*32+1], 0	; pDecodeTable->SymbolAndCodeLength[0].nCodeLength
-	jne			label3
-
-	; msmset(pDstBegin, pDecodeTable->dwSymbol[0], pDstEnd-pDstBegin);
-	mov			eax, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
-	sub			eax, edi
-	push		eax
-	mov			eax, dword ptr [ebx + 8192+32+4*32]		; pDecodeTable->SymbolAndCodeLength[0].bySymbol
-if &accum
-	add			eax, 80h
-	movzx		eax, al
-endif
-	push		eax
-	push		edi
-	call		_memset
-	add			esp, 4*3
-
-	jmp			label2
+	mov			ebp, dword ptr [esi]
 
 	align		64
-label3:
-	mov			ebp, dword ptr [esi]
 label1:
 	cmp			edi, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
 	jae			label2
