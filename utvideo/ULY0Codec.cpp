@@ -11,8 +11,6 @@ const FORMATINFO CULY0Codec::m_fiEncoderInput[] = {
 	{ FCC('YV12'), 12, MEDIASUBTYPE_YV12 },
 	{ FCC('YUY2'), 16, MEDIASUBTYPE_YUY2 },	{ FCC('YUYV'), 16, MEDIASUBTYPE_YUYV }, { FCC('YUNV'), 16, MEDIASUBTYPE_YUNV },
 	{ FCC('UYVY'), 16, MEDIASUBTYPE_UYVY }, { FCC('UYNV'), 16, MEDIASUBTYPE_UYNV },
-	{ FCC('YVYU'), 16, MEDIASUBTYPE_YVYU },
-	{ FCC('VYUY'), 16, MEDIASUBTYPE_VYUY },
 	{ BI_RGB, 24, MEDIASUBTYPE_RGB24 },
 	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
 	FORMATINFO_END,
@@ -22,8 +20,6 @@ const FORMATINFO CULY0Codec::m_fiDecoderOutput[] = {
 	{ FCC('YV12'), 12, MEDIASUBTYPE_YV12 },
 	{ FCC('YUY2'), 16, MEDIASUBTYPE_YUY2 },	{ FCC('YUYV'), 16, MEDIASUBTYPE_YUYV }, { FCC('YUNV'), 16, MEDIASUBTYPE_YUNV },
 	{ FCC('UYVY'), 16, MEDIASUBTYPE_UYVY }, { FCC('UYNV'), 16, MEDIASUBTYPE_UYNV },
-	{ FCC('YVYU'), 16, MEDIASUBTYPE_YVYU },
-	{ FCC('VYUY'), 16, MEDIASUBTYPE_VYUY },
 	{ BI_RGB, 24, MEDIASUBTYPE_RGB24 },
 	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
 	FORMATINFO_END,
@@ -159,12 +155,6 @@ void CULY0Codec::ConvertToPlanar(DWORD nBandIndex)
 	case FCC('UYNV'):
 		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 1);
 		break;
-	case FCC('YVYU'):
-		ConvertYUV422ToULY0(pDstYBegin, pDstVBegin, pDstUBegin, nBandIndex, 0);
-		break;
-	case FCC('VYUY'):
-		ConvertYUV422ToULY0(pDstYBegin, pDstVBegin, pDstUBegin, nBandIndex, 1);
-		break;
 	case BI_RGB:
 		switch (m_icc->lpbiInput->biBitCount)
 		{
@@ -290,12 +280,6 @@ void CULY0Codec::ConvertFromPlanar(DWORD nBandIndex)
 	case FCC('UYVY'):
 	case FCC('UYNV'):
 		ConvertULY0ToYUV422(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 1);
-		break;
-	case FCC('YVYU'):
-		ConvertULY0ToYUV422(pSrcYBegin, pSrcVBegin, pSrcUBegin, nBandIndex, 0);
-		break;
-	case FCC('VYUY'):
-		ConvertULY0ToYUV422(pSrcYBegin, pSrcVBegin, pSrcUBegin, nBandIndex, 1);
 		break;
 	case BI_RGB:
 		switch (m_icd->lpbiOutput->biBitCount)

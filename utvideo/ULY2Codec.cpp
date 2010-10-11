@@ -11,8 +11,6 @@
 const FORMATINFO CULY2Codec::m_fiEncoderInput[] = {
 	{ FCC('YUY2'), 16, MEDIASUBTYPE_YUY2 },	{ FCC('YUYV'), 16, MEDIASUBTYPE_YUYV }, { FCC('YUNV'), 16, MEDIASUBTYPE_YUNV },
 	{ FCC('UYVY'), 16, MEDIASUBTYPE_UYVY }, { FCC('UYNV'), 16, MEDIASUBTYPE_UYNV },
-	{ FCC('YVYU'), 16, MEDIASUBTYPE_YVYU },
-	{ FCC('VYUY'), 16, MEDIASUBTYPE_VYUY },
 	{ BI_RGB, 24, MEDIASUBTYPE_RGB24 },
 	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
 	FORMATINFO_END,
@@ -21,8 +19,6 @@ const FORMATINFO CULY2Codec::m_fiEncoderInput[] = {
 const FORMATINFO CULY2Codec::m_fiDecoderOutput[] = {
 	{ FCC('YUY2'), 16, MEDIASUBTYPE_YUY2 },	{ FCC('YUYV'), 16, MEDIASUBTYPE_YUYV }, { FCC('YUNV'), 16, MEDIASUBTYPE_YUNV },
 	{ FCC('UYVY'), 16, MEDIASUBTYPE_UYVY }, { FCC('UYNV'), 16, MEDIASUBTYPE_UYNV },
-	{ FCC('YVYU'), 16, MEDIASUBTYPE_YVYU },
-	{ FCC('VYUY'), 16, MEDIASUBTYPE_VYUY },
 	{ BI_RGB, 24, MEDIASUBTYPE_RGB24 },
 	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
 	FORMATINFO_END,
@@ -99,24 +95,6 @@ void CULY2Codec::ConvertToPlanar(DWORD nBandIndex)
 			*y++ = *(p+3);
 		}
 		break;
-	case FCC('YVYU'):
-		for (p = pSrcBegin; p < pSrcEnd; p += 4)
-		{
-			*y++ = *p;
-			*v++ = *(p+1);
-			*y++ = *(p+2);
-			*u++ = *(p+3);
-		}
-		break;
-	case FCC('VYUY'):
-		for (p = pSrcBegin; p < pSrcEnd; p += 4)
-		{
-			*v++ = *p;
-			*y++ = *(p+1);
-			*u++ = *(p+2);
-			*y++ = *(p+3);
-		}
-		break;
 	case BI_RGB:
 		switch (m_icc->lpbiInput->biBitCount)
 		{
@@ -165,24 +143,6 @@ void CULY2Codec::ConvertFromPlanar(DWORD nBandIndex)
 			*(p+3) = *y++;
 		}
 		break;
-	case FCC('YVYU'):
-		for (p = pDstBegin; p < pDstEnd; p += 4)
-		{
-			*p     = *y++;
-			*(p+1) = *v++;
-			*(p+2) = *y++;
-			*(p+3) = *u++;
-		}
-		break;
-	case FCC('VYUY'):
-		for (p = pDstBegin; p < pDstEnd; p += 4)
-		{
-			*p     = *v++;
-			*(p+1) = *y++;
-			*(p+2) = *u++;
-			*(p+3) = *y++;
-		}
-		break;
 	case BI_RGB:
 		switch (m_icd->lpbiOutput->biBitCount)
 		{
@@ -219,16 +179,6 @@ BOOL CULY2Codec::DecodeDirect(DWORD nBandIndex)
 		HuffmanDecodeAndAccumStep2(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0]);
 		HuffmanDecodeAndAccumStep4(pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
 		HuffmanDecodeAndAccumStep4(pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
-		return TRUE;
-	case FCC('YVYU'):
-		HuffmanDecodeAndAccumStep2(pDstBegin+0, pDstEnd+0, m_pDecodeCode[0][nBandIndex], &m_hdt[0]);
-		HuffmanDecodeAndAccumStep4(pDstBegin+3, pDstEnd+3, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
-		HuffmanDecodeAndAccumStep4(pDstBegin+1, pDstEnd+1, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
-		return TRUE;
-	case FCC('VYUY'):
-		HuffmanDecodeAndAccumStep2(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0]);
-		HuffmanDecodeAndAccumStep4(pDstBegin+2, pDstEnd+2, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
-		HuffmanDecodeAndAccumStep4(pDstBegin+0, pDstEnd+0, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
 		return TRUE;
 	default:
 		return FALSE;

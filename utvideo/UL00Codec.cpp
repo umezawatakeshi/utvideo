@@ -407,8 +407,6 @@ LRESULT CUL00Codec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 		case FCC('YUNV'):
 		case FCC('UYVY'):
 		case FCC('UYNV'):
-		case FCC('YVYU'):
-		case FCC('VYUY'):
 			m_dwRawNetWidth = ROUNDUP(pbihIn->biWidth, 2) * 2;
 			m_dwRawGrossWidth = m_dwRawNetWidth;
 			break;
@@ -669,8 +667,6 @@ LRESULT CUL00Codec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 		case FCC('YUNV'):
 		case FCC('UYVY'):
 		case FCC('UYNV'):
-		case FCC('YVYU'):
-		case FCC('VYUY'):
 			m_dwRawNetWidth = ROUNDUP(pbihOut->biWidth, 2) * 2;
 			m_dwRawGrossWidth = m_dwRawNetWidth;
 			break;
