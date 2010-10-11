@@ -72,8 +72,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <h3>Version 8.3.0</h3>
 <dl>
 <dt>Performance Improvements</dt><dd><ul>
-<li>ULY2: Speed up decoding. About 12% if Core 2.</li>
-<li>ULY0: Speed up decoding. About 5% if Core 2.</li>
+<li>ULY2: Speed up decoding &quot;Predict left&quot; video to YUY2 and UYVY. About 12% if Core 2.</li>
+<li>ULY0: Speed up decoding &quot;Predict left&quot; video to YV12. About 5% if Core 2.</li>
+</ul></dd>
+<dt>Others</dt><dd><ul>
+<li>ULY2: Delete support for encoding-from and decoding-to YVYU and VYUY.</li>
+<li>ULY0: Delete support for encoding-from and decoding-to YVYU and VYUY.</li>
 </ul></dd>
 </dl>
 <h3>Version 8.2.1</h3>

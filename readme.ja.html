@@ -87,8 +87,12 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 <h3>バージョン 8.3.0</h3>
 <dl>
 <dt>性能向上</dt><dd><ul>
-<li>ULY2: デコードを高速化した。Core 2 で 12% ほど。</li>
-<li>ULY0: デコードを高速化した。Core 2 で 5% ほど。</li>
+<li>ULY2: デコード速度優先でエンコードされたものの YUY2 や UYVY へのデコードを高速化した。Core 2 で 12% ほど。</li>
+<li>ULY0: デコード速度優先でエンコードされたものの YV12 へのデコードを高速化した。Core 2 で 5% ほど。</li>
+</ul></dd>
+<dt>その他</dt><dd><ul>
+<li>ULY2: YVYU と VYUY での入出力のサポートを廃止した。</li>
+<li>ULY0: YVYU と VYUY での入出力のサポートを廃止した。</li>
 </ul></dd>
 </dl>
 <h3>バージョン 8.2.1</h3>
