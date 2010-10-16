@@ -323,7 +323,7 @@ BOOL CULY0Codec::DecodeDirect(DWORD nBandIndex)
 			HuffmanDecodeAndAccum(pDstVBegin, pDstVEnd, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
 		}
 		return TRUE;
-	default:
-		return FALSE;
 	}
+
+	return FALSE;
 }

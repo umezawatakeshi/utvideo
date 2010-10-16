@@ -180,7 +180,7 @@ BOOL CULY2Codec::DecodeDirect(DWORD nBandIndex)
 		HuffmanDecodeAndAccumStep4(pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
 		HuffmanDecodeAndAccumStep4(pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
 		return TRUE;
-	default:
-		return FALSE;
 	}
+
+	return FALSE;
 }

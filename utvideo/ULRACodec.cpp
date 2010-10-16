@@ -152,7 +152,7 @@ BOOL CULRACodec::DecodeDirect(DWORD nBandIndex)
 			return TRUE;
 		}
 		return FALSE;
-	default:
-		return FALSE;
 	}
+
+	return FALSE;
 }
