@@ -145,10 +145,10 @@ BOOL CULRACodec::DecodeDirect(DWORD nBandIndex)
 		switch (m_icd->lpbiOutput->biBitCount)
 		{
 		case 32:
-			cpp_HuffmanDecodeAndAccumStep4ForBottomupRGB32Green(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
-			cpp_HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue (pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
-			cpp_HuffmanDecodeAndAccumStep4ForBottomupRGB32Red  (pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
-			cpp_HuffmanDecodeAndAccumStep4ForBottomupRGB32Green(pDstBegin+3, pDstEnd+3, m_pDecodeCode[3][nBandIndex], &m_hdt[3], m_dwRawNetWidth, m_dwRawGrossWidth);
+			HuffmanDecodeAndAccumStep4ForBottomupRGB32Green(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
+			HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue (pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
+			HuffmanDecodeAndAccumStep4ForBottomupRGB32Red  (pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
+			HuffmanDecodeAndAccumStep4ForBottomupRGB32Green(pDstBegin+3, pDstEnd+3, m_pDecodeCode[3][nBandIndex], &m_hdt[3], m_dwRawNetWidth, m_dwRawGrossWidth);
 			return TRUE;
 		}
 		return FALSE;

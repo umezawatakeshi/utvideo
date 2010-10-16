@@ -36,6 +36,9 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 #define HuffmanDecodeAndAccum tfn.pfnHuffmanDecodeAndAccum
 #define HuffmanDecodeAndAccumStep2 tfn.pfnHuffmanDecodeAndAccumStep2
 #define HuffmanDecodeAndAccumStep4 tfn.pfnHuffmanDecodeAndAccumStep4
+#define HuffmanDecodeAndAccumStep4ForBottomupRGB32Green tfn.pfnHuffmanDecodeAndAccumStep4ForBottomupRGB32Green
+#define HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue tfn.pfnHuffmanDecodeAndAccumStep4ForBottomupRGB32Blue
+#define HuffmanDecodeAndAccumStep4ForBottomupRGB32Red tfn.pfnHuffmanDecodeAndAccumStep4ForBottomupRGB32Red
 
 size_t cpp_HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
 extern "C" size_t i686_HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);

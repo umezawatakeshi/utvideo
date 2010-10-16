@@ -70,9 +70,10 @@ label3:
 _i686_HuffmanEncode	endp
 
 
-HUFFMAN_DECODE	macro	procname, accum, step
+HUFFMAN_DECODE	macro	procname, accum, step, multiscan, bottomup, corrpos
 
 ; void procname(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
+; void procname(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
 public	&procname
 &procname	proc
 
@@ -82,18 +83,39 @@ public	&procname
 	push		ebp
 
 	mov			esi, dword ptr [esp + 16 + 4 +  8]	; pSrcBegin
-	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDstBegin
 	mov			ebx, dword ptr [esp + 16 + 4 + 12]	; pDecodeTable
 	mov			edx, dword ptr [esi+4]
+if &multiscan
+ if &bottomup
+	mov			edi, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
+	sub			edi, dword ptr [esp + 16 + 4 + 20]	; dwGrossWidth
+	mov			eax, edi
+	add			eax, dword ptr [esp + 16 + 4 + 16]	; dwNetWidth
+	mov			dword ptr [esp - 8], eax
+	mov			eax, dword ptr [esp + 16 + 4 + 20]	; dwGrossWidth
+	add			eax, dword ptr [esp + 16 + 4 + 16]	; dwNetWidth
+	mov			dword ptr [esp - 12], eax
+ else
+	NOTIMPL
+ endif
+else
+	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDstBegin
+	mov			eax, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
+	mov			dword ptr [esp - 8], eax
+endif
 	mov			ch, -32
 if &accum
+ if &corrpos ne 0
+	mov			byte ptr [esp - 4], 00h
+ else
 	mov			byte ptr [esp - 4], 80h
+ endif
 endif
 	mov			ebp, dword ptr [esi]
 
 	align		64
 label1:
-	cmp			edi, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
+	cmp			edi, dword ptr [esp - 8]	; pDstEnd
 	jae			label2
 	mov			eax, ebp
 	mov			cl, ch
@@ -120,6 +142,9 @@ if &accum
 	add			al, byte ptr [esp - 4]
 	mov			byte ptr [esp - 4], al
 endif
+if &corrpos ne 0
+	add			al, byte ptr [edi + &corrpos]
+endif
 	mov			byte ptr [edi], al
 if &step eq 1
 	inc			edi
@@ -135,6 +160,21 @@ endif
 	jmp			label1
 
 label2:
+if &multiscan
+ if &bottomup
+	mov			eax, dword ptr [esp - 8]
+	sub			eax, dword ptr [esp + 16 + 4 + 20]
+	cmp			eax, dword ptr [esp + 16 + 4 +  0]
+	jbe			label3
+	mov			dword ptr [esp - 8], eax
+
+	sub			edi, dword ptr [esp -12]
+ else
+	NOTIMPL
+ endif
+	jmp			label1
+label3:
+endif
 	pop			ebp
 	pop			edi
 	pop			esi
@@ -145,10 +185,13 @@ label2:
 
 		endm
 
-HUFFMAN_DECODE	_i686_HuffmanDecode, 0, 1
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccum, 1, 1
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep2, 1, 2
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4, 1, 4
+HUFFMAN_DECODE	_i686_HuffmanDecode, 0, 1, 0, 0, 0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccum, 1, 1, 0, 0, 0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep2, 1, 2, 0, 0, 0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4, 1, 4, 0, 0, 0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Green, 1, 4, 1, 1, 0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue, 1, 4, 1, 1, 1
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Red, 1, 4, 1, 1, -1
 
 
 end
