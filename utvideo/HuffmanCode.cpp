@@ -263,7 +263,7 @@ size_t cpp_HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSr
 	return ((BYTE *)pDst) - pDstBegin;
 }
 
-inline void DecodeSymbol(DWORD *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, BYTE &byPrevSymbol, BYTE *pDst, int nCorrPos)
+inline void DecodeSymbol(DWORD *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, BYTE &byPrevSymbol, BYTE *pDst, int nCorrPos, bool bDummyAlpha)
 {
 	DWORD code;
 	BYTE symbol;
@@ -300,6 +300,8 @@ inline void DecodeSymbol(DWORD *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *p
 		symbol += *(pDst + nCorrPos) + 0x80;
 
 	*pDst = symbol;
+	if (bDummyAlpha)
+		*(pDst+1) = 0xff;
 	nBits += codelen;
 
 	if (nBits >= 32)
@@ -309,7 +311,7 @@ inline void DecodeSymbol(DWORD *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *p
 	}
 }
 
-static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, int nStep, bool bBottomup, DWORD dwNetWidth, DWORD dwGrossWidth, int nCorrPos)
+static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, int nStep, bool bBottomup, DWORD dwNetWidth, DWORD dwGrossWidth, int nCorrPos, bool bDummyAlpha)
 {
 	int nBits;
 	DWORD *pSrc;
@@ -327,7 +329,7 @@ static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE 
 		{
 			BYTE *pStripeEnd = pStripeBegin + dwNetWidth;
 			for (p = pStripeBegin; p < pStripeEnd; p += nStep)
-				DecodeSymbol(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos);
+				DecodeSymbol(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos, bDummyAlpha);
 		}
 	}
 	else
@@ -336,42 +338,62 @@ static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE 
 		{
 			BYTE *pStripeEnd = pStripeBegin + dwNetWidth;
 			for (p = pStripeBegin; p < pStripeEnd; p += nStep)
-				DecodeSymbol(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos);
+				DecodeSymbol(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos, bDummyAlpha);
 		}
 	}
 }
 
 void cpp_HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, false, 1, false, pDstEnd - pDstBegin, pDstEnd - pDstBegin, 0);
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, false, 1, false, pDstEnd - pDstBegin, pDstEnd - pDstBegin, 0, false);
 }
 
 void cpp_HuffmanDecodeAndAccum(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 1, false, pDstEnd - pDstBegin, pDstEnd - pDstBegin, 0);
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 1, false, pDstEnd - pDstBegin, pDstEnd - pDstBegin, 0, false);
 }
 
 void cpp_HuffmanDecodeAndAccumStep2(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 2, false, pDstEnd - pDstBegin, pDstEnd - pDstBegin, 0);
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 2, false, pDstEnd - pDstBegin, pDstEnd - pDstBegin, 0, false);
 }
 
 void cpp_HuffmanDecodeAndAccumStep4(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, false, pDstEnd - pDstBegin, pDstEnd - pDstBegin, 0);
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, false, pDstEnd - pDstBegin, pDstEnd - pDstBegin, 0, false);
 }
 
 void cpp_HuffmanDecodeAndAccumStep4ForBottomupRGB32Green(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, true, dwNetWidth, dwGrossWidth, 0);
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, true, dwNetWidth, dwGrossWidth, 0, false);
 }
 
 void cpp_HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, true, dwNetWidth, dwGrossWidth, +1);
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, true, dwNetWidth, dwGrossWidth, +1, false);
 }
 
 void cpp_HuffmanDecodeAndAccumStep4ForBottomupRGB32Red(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, true, dwNetWidth, dwGrossWidth, -1);
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, true, dwNetWidth, dwGrossWidth, -1, false);
+}
+
+void cpp_HuffmanDecodeAndAccumStep4ForBottomupRGB32RedAndDummyAlpha(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
+{
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, true, dwNetWidth, dwGrossWidth, -1, true);
+}
+
+void cpp_HuffmanDecodeAndAccumStep3ForBottomupRGB24Green(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
+{
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, true, dwNetWidth, dwGrossWidth, 0, false);
+}
+
+void cpp_HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
+{
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, true, dwNetWidth, dwGrossWidth, +1, false);
+}
+
+void cpp_HuffmanDecodeAndAccumStep3ForBottomupRGB24Red(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
+{
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, true, dwNetWidth, dwGrossWidth, -1, false);
 }

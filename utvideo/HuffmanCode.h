@@ -39,6 +39,10 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const BYTE *
 #define HuffmanDecodeAndAccumStep4ForBottomupRGB32Green tfn.pfnHuffmanDecodeAndAccumStep4ForBottomupRGB32Green
 #define HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue tfn.pfnHuffmanDecodeAndAccumStep4ForBottomupRGB32Blue
 #define HuffmanDecodeAndAccumStep4ForBottomupRGB32Red tfn.pfnHuffmanDecodeAndAccumStep4ForBottomupRGB32Red
+#define HuffmanDecodeAndAccumStep4ForBottomupRGB32RedAndDummyAlpha tfn.pfnHuffmanDecodeAndAccumStep4ForBottomupRGB32RedAndDummyAlpha
+#define HuffmanDecodeAndAccumStep3ForBottomupRGB24Green tfn.pfnHuffmanDecodeAndAccumStep3ForBottomupRGB24Green
+#define HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue tfn.pfnHuffmanDecodeAndAccumStep3ForBottomupRGB24Blue
+#define HuffmanDecodeAndAccumStep3ForBottomupRGB24Red tfn.pfnHuffmanDecodeAndAccumStep3ForBottomupRGB24Red
 
 size_t cpp_HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
 extern "C" size_t i686_HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
@@ -63,3 +67,15 @@ extern "C" void i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue(BYTE *pDstBe
 
 void cpp_HuffmanDecodeAndAccumStep4ForBottomupRGB32Red(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
 extern "C" void i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Red(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
+
+void cpp_HuffmanDecodeAndAccumStep4ForBottomupRGB32RedAndDummyAlpha(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
+extern "C" void i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32RedAndDummyAlpha(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
+
+void cpp_HuffmanDecodeAndAccumStep3ForBottomupRGB24Green(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
+extern "C" void i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Green(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
+
+void cpp_HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
+extern "C" void i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
+
+void cpp_HuffmanDecodeAndAccumStep3ForBottomupRGB24Red(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
+extern "C" void i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Red(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
