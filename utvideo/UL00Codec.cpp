@@ -362,44 +362,40 @@ LRESULT CUL00Codec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 	return ICERR_OK;
 }
 
-LRESULT CUL00Codec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+LRESULT CUL00Codec::CalcFrameMetric(const BITMAPINFOHEADER *pbihRaw, const BITMAPINFOEXT *pbieCompressed)
 {
-	LRESULT ret;
-	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
-
-	ret = CompressQuery(pbihIn, pbihOut);
-	if (ret != ICERR_OK)
-		return ret;
-
-	m_dwDivideCount = ((pbieOut->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
-	m_bInterlace = pbieOut->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE;
-	m_dwNumStripes = pbihIn->biHeight / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
+	m_dwDivideCount = ((pbieCompressed->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
+	m_bInterlace = pbieCompressed->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE;
+	m_dwNumStripes = pbihRaw->biHeight / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
 
 	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
 
 	m_bBottomUpFrame = FALSE;
-	switch (pbihIn->biCompression)
+	switch (pbihRaw->biCompression)
 	{
 	case FCC('YV12'):
-		//m_dwRawSize = (pbihIn->biWidth * pbihIn->biHeight * 12) / 8; // XXX 幅や高さが奇数の場合は考慮していない
-		m_dwRawSize = (pbihIn->biWidth * pbihIn->biHeight * 3) / 2; // XXX 幅や高さが奇数の場合は考慮していない
+		//m_dwRawSize = (pbihRaw->biWidth * pbihRaw->biHeight * 12) / 8; // XXX 幅や高さが奇数の場合は考慮していない
+		m_dwRawSize = (pbihRaw->biWidth * pbihRaw->biHeight * 3) / 2; // XXX 幅や高さが奇数の場合は考慮していない
 		break;
 	default:
-		switch (pbihIn->biCompression)
+		switch (pbihRaw->biCompression)
 		{
 		case BI_RGB:
-			switch (pbihIn->biBitCount)
+			switch (pbihRaw->biBitCount)
 			{
 			case 24:
-				m_dwRawNetWidth = pbihIn->biWidth * 3;
+				m_dwRawNetWidth = pbihRaw->biWidth * 3;
 				m_dwRawGrossWidth = ROUNDUP(m_dwRawNetWidth, 4);
 				break;
 			case 32:
-				m_dwRawNetWidth = pbihIn->biWidth * 4;
+				m_dwRawNetWidth = pbihRaw->biWidth * 4;
 				m_dwRawGrossWidth = m_dwRawNetWidth;
 				break;
+			default:
+				_ASSERT(FALSE);
+				return ICERR_BADFORMAT;
 			}
-			if (pbihIn->biHeight > 0)
+			if (pbihRaw->biHeight > 0)
 				m_bBottomUpFrame = TRUE;
 			break;
 		case FCC('YUY2'):
@@ -407,20 +403,21 @@ LRESULT CUL00Codec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 		case FCC('YUNV'):
 		case FCC('UYVY'):
 		case FCC('UYNV'):
-			m_dwRawNetWidth = ROUNDUP(pbihIn->biWidth, 2) * 2;
+			m_dwRawNetWidth = ROUNDUP(pbihRaw->biWidth, 2) * 2;
 			m_dwRawGrossWidth = m_dwRawNetWidth;
 			break;
 		default:
+			_ASSERT(FALSE);
 			return ICERR_BADFORMAT;
 		}
-		m_dwRawSize = m_dwRawGrossWidth * pbihIn->biHeight;
+		m_dwRawSize = m_dwRawGrossWidth * pbihRaw->biHeight;
 		if (m_bInterlace)
 			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight() * 2;
 		else
 			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight();
 	}
 
-	CalcPlaneSizes(pbihIn);
+	CalcPlaneSizes(pbihRaw);
 
 	if (m_bInterlace)
 	{
@@ -447,6 +444,22 @@ LRESULT CUL00Codec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 			m_dwRawStripeEnd[nBandIndex]   = m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex];
 		}
 	}
+
+	return ICERR_OK;
+}
+
+LRESULT CUL00Codec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+{
+	LRESULT ret;
+	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
+
+	ret = CompressQuery(pbihIn, pbihOut);
+	if (ret != ICERR_OK)
+		return ret;
+
+	ret = CalcFrameMetric(pbihIn, pbieOut);
+	if (ret != ICERR_OK)
+		return ret;
 
 	m_pCurFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
@@ -630,83 +643,9 @@ LRESULT CUL00Codec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 	if (ret != ICERR_OK)
 		return ret;
 
-	m_dwDivideCount = ((pbieIn->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
-	m_bInterlace = pbieIn->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE;
-	m_dwNumStripes = pbihIn->biHeight / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
-
-	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
-	_RPT1(_CRT_WARN, "divide count = %d\n", m_dwDivideCount);
-
-	m_bBottomUpFrame = FALSE;
-	switch (pbihOut->biCompression)
-	{
-	case FCC('YV12'):
-		//m_dwRawSize = (pbihOut->biWidth * pbihOut->biHeight * 12) / 8; // XXX 幅や高さが奇数の場合は考慮していない
-		m_dwRawSize = (pbihOut->biWidth * pbihOut->biHeight * 3) / 2; // XXX 幅や高さが奇数の場合は考慮していない
-		break;
-	default:
-		switch (pbihOut->biCompression)
-		{
-		case BI_RGB:
-			switch (pbihOut->biBitCount)
-			{
-			case 24:
-				m_dwRawNetWidth = pbihOut->biWidth * 3;
-				m_dwRawGrossWidth = ROUNDUP(m_dwRawNetWidth, 4);
-				break;
-			case 32:
-				m_dwRawNetWidth = pbihOut->biWidth * 4;
-				m_dwRawGrossWidth = m_dwRawNetWidth;
-				break;
-			}
-			if (pbihOut->biHeight > 0)
-				m_bBottomUpFrame = TRUE;
-			break;
-		case FCC('YUY2'):
-		case FCC('YUYV'):
-		case FCC('YUNV'):
-		case FCC('UYVY'):
-		case FCC('UYNV'):
-			m_dwRawNetWidth = ROUNDUP(pbihOut->biWidth, 2) * 2;
-			m_dwRawGrossWidth = m_dwRawNetWidth;
-			break;
-		default:
-			return ICERR_BADFORMAT;
-		}
-		m_dwRawSize = m_dwRawGrossWidth * pbihOut->biHeight;
-		if (m_bInterlace)
-			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight() * 2;
-		else
-			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight();
-	}
-
-	CalcPlaneSizes(pbihOut);
-
-	if (m_bInterlace)
-	{
-		for (int i = 0; i < _countof(m_dwPlaneWidth); i++)
-		{
-			m_dwPlaneStripeSize[i]    *= 2;
-			m_dwPlanePredictStride[i] *= 2;
-		}
-	}
-
-	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-	{
-		m_dwPlaneStripeBegin[nBandIndex] = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
-		m_dwPlaneStripeEnd[nBandIndex]   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
-
-		if (!m_bBottomUpFrame)
-		{
-			m_dwRawStripeBegin[nBandIndex] = m_dwPlaneStripeBegin[nBandIndex];
-			m_dwRawStripeEnd[nBandIndex]   = m_dwPlaneStripeEnd[nBandIndex];
-		}
-		else
-		{
-			m_dwRawStripeBegin[nBandIndex] = m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex];
-			m_dwRawStripeEnd[nBandIndex]   = m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex];
-		}
-	}
+	ret = CalcFrameMetric(pbihOut, pbieIn);
+	if (ret != ICERR_OK)
+		return ret;
 
 	m_pRestoredFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)

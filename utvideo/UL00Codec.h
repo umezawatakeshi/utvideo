@@ -139,6 +139,7 @@ protected:
 	LRESULT LoadConfig(void);
 	LRESULT SaveConfig(void);
 	LRESULT InternalSetState(const void *pState, SIZE_T cb);
+	LRESULT CalcFrameMetric(const BITMAPINFOHEADER *pbihRaw, const BITMAPINFOEXT *pbieCompressed);
 	virtual const char *GetColorFormatName(void) = 0;
 	virtual WORD GetRealBitCount(void) = 0;
 	virtual WORD GetFalseBitCount(void) = 0;
