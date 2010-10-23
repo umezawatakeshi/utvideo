@@ -150,31 +150,17 @@ void InitializeTunedFunc(void)
 {
 	DWORD	cpuid_1_ecx = 0;
 	DWORD	cpuid_1_edx = 0;
+	int info[4];
 
-	__asm
+	__cpuid(info, 0);
+	if (info[0] >= 1)
 	{
-		push	eax
-		push	ebx
-		push	ecx
-		push	edx
+		__cpuid(info, 1);
+		cpuid_1_ecx = info[2];
+		cpuid_1_edx = info[3];
+	}
 
-		xor		eax, eax
-		cpuid
-		cmp		eax, 1
-		jb		no_feature
-		mov		eax, 1
-		cpuid
-		mov		cpuid_1_ecx, ecx
-		mov		cpuid_1_edx, edx
-
-	no_feature:
-		pop		edx
-		pop		ecx
-		pop		ebx
-		pop		eax
-	};
-
-	_RPT2(_CRT_WARN, "CPUID.EAX=1 ECX=%08X EDX=%08X\n", cpuid_1_ecx, cpuid_1_edx);
+	_RPT2(_CRT_WARN, "CPUID.1 ECX=%08X EDX=%08X\n", cpuid_1_ecx, cpuid_1_edx);
 
 	if (cpuid_1_ecx & (1 << 9))
 	{
