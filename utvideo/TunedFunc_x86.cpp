@@ -2,6 +2,7 @@
 /* $Id$ */
 
 #include "StdAfx.h"
+#include "utvideo.h"
 #include "TunedFunc.h"
 #include "Predict.h"
 #include "HuffmanCode.h"
