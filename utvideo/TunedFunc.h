@@ -8,16 +8,16 @@ struct HUFFMAN_DECODE_TABLE;
 
 struct TUNEDFUNC
 {
-	void (*pfnPredictMedian_align16)(BYTE *, const BYTE *, const BYTE *, DWORD);
-	void (*pfnPredictMedianAndCount_align16)(BYTE *, const BYTE *, const BYTE *, DWORD, DWORD *);
-	void (*pfnPredictMedianAndCount_align1)(BYTE *, const BYTE *, const BYTE *, DWORD, DWORD *);
-	void (*pfnPredictLeftAndCount_align1)(BYTE *, const BYTE *, const BYTE *, DWORD *);
-	void (*pfnRestoreMedian_align1)(BYTE *, const BYTE *, const BYTE *, DWORD);
-	size_t (*pfnHuffmanEncode)(BYTE *, const BYTE *, const BYTE *, const HUFFMAN_ENCODE_TABLE *);
-	void (*pfnHuffmanDecode)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
-	void (*pfnHuffmanDecodeAndAccum)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
-	void (*pfnHuffmanDecodeAndAccumStep2)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
-	void (*pfnHuffmanDecodeAndAccumStep4)(BYTE *, BYTE *, const BYTE *, const HUFFMAN_DECODE_TABLE *);
+	void (*pfnPredictMedian_align16)(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride);
+	void (*pfnPredictMedianAndCount_align16)(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable);
+	void (*pfnPredictMedianAndCount_align1)(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable);
+	void (*pfnPredictLeftAndCount_align1)(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable);
+	void (*pfnRestoreMedian_align1)(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride);
+	size_t (*pfnHuffmanEncode)(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
+	void (*pfnHuffmanDecode)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
+	void (*pfnHuffmanDecodeAndAccum)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
+	void (*pfnHuffmanDecodeAndAccumStep2)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
+	void (*pfnHuffmanDecodeAndAccumStep4)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
 	void (*pfnHuffmanDecodeAndAccumStep4ForBottomupRGB32Green)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
 	void (*pfnHuffmanDecodeAndAccumStep4ForBottomupRGB32Blue)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
 	void (*pfnHuffmanDecodeAndAccumStep4ForBottomupRGB32Red)(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth);
