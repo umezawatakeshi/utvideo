@@ -361,7 +361,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -371,7 +371,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -380,7 +380,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -390,7 +390,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -408,6 +408,48 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HuffmanCode_asm_x64.asm"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
 				RelativePath=".\HuffmanCode_asm_x86.asm"
 				>
 				<FileConfiguration
@@ -415,7 +457,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -425,7 +467,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -434,7 +476,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -444,7 +486,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -465,7 +507,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -475,7 +517,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -484,7 +526,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -494,7 +536,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
