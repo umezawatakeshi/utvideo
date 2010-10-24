@@ -311,7 +311,7 @@ inline void DecodeSymbol(DWORD *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *p
 	}
 }
 
-static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, int nStep, bool bBottomup, DWORD dwNetWidth, DWORD dwGrossWidth, int nCorrPos, bool bDummyAlpha)
+static void cpp_HuffmanDecode_common(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, int nStep, bool bBottomup, size_t dwNetWidth, size_t dwGrossWidth, int nCorrPos, bool bDummyAlpha)
 {
 	int nBits;
 	DWORD *pSrc;
