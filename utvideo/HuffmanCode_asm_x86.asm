@@ -7,8 +7,6 @@
 
 .model	flat
 
-extrn	_memset:PROC
-
 
 _TEXT_ASM	SEGMENT	page public flat 'CODE'
 
