@@ -13,9 +13,9 @@ _TEXT_ASM	SEGMENT	page public flat 'CODE'
 
 
 
-; void sse2_PredictLeftAndCount_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable)
-public	_sse2_PredictLeftAndCount_align1
-_sse2_PredictLeftAndCount_align1	proc
+; void x86_sse2_PredictLeftAndCount_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable)
+public	_x86_sse2_PredictLeftAndCount_align1
+_x86_sse2_PredictLeftAndCount_align1	proc
 
 	push		ebx
 	push		esi
@@ -122,13 +122,13 @@ label4:
 	pop			ebx
 	ret
 
-_sse2_PredictLeftAndCount_align1	endp
+_x86_sse2_PredictLeftAndCount_align1	endp
 
 
 
-; void sse2_PredictMedian_align16(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
-public	_sse2_PredictMedian_align16
-_sse2_PredictMedian_align16	proc
+; void x86_sse2_PredictMedian_align16(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+public	_x86_sse2_PredictMedian_align16
+_x86_sse2_PredictMedian_align16	proc
 
 	push		ebx
 	push		esi
@@ -207,12 +207,12 @@ label2:
 	pop			ebx
 	ret
 
-_sse2_PredictMedian_align16	endp
+_x86_sse2_PredictMedian_align16	endp
 
 
-; void sse2_PredictMedianAndCount_align16(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
-public	_sse2_PredictMedianAndCount_align16
-_sse2_PredictMedianAndCount_align16	proc
+; void x86_sse2_PredictMedianAndCount_align16(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
+public	_x86_sse2_PredictMedianAndCount_align16
+_x86_sse2_PredictMedianAndCount_align16	proc
 
 	push		ebx
 	push		esi
@@ -374,15 +374,15 @@ label2:
 	pop			ebx
 	ret
 
-_sse2_PredictMedianAndCount_align16	endp
+_x86_sse2_PredictMedianAndCount_align16	endp
 
 
 ; prediction は前後にマージンを持つ CFrameBuffer 上で行うので、計算結果が変わらない限り、はみ出し読み込みは許容される。
 ; 一方、マルチスレッド動作した時に問題が発生するので、はみ出し書き込みは許容されない。
 
-; void sse2_PredictMedianAndCount_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
-public	_sse2_PredictMedianAndCount_align1
-_sse2_PredictMedianAndCount_align1	proc
+; void x86_sse2_PredictMedianAndCount_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
+public	_x86_sse2_PredictMedianAndCount_align1
+_x86_sse2_PredictMedianAndCount_align1	proc
 
 	push		ebx
 	push		esi
@@ -617,11 +617,11 @@ label6:
 	pop			ebx
 	ret
 
-_sse2_PredictMedianAndCount_align1	endp
+_x86_sse2_PredictMedianAndCount_align1	endp
 
 
-; void i686_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
-_i686_RestoreMedian_align1	proc
+; void x86_i686_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+_x86_i686_RestoreMedian_align1	proc
 
 	push		ebx
 	push		esi
@@ -681,12 +681,12 @@ label2:
 	pop			ebx
 	ret
 
-_i686_RestoreMedian_align1	endp
+_x86_i686_RestoreMedian_align1	endp
 
 
 ; p{min,max}ub は SSE1 で追加された MMX 命令（いわゆる MMX2 命令）である。
-; void sse1mmx_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
-_sse1mmx_RestoreMedian_align1	proc
+; void x86_sse1mmx_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+_x86_sse1mmx_RestoreMedian_align1	proc
 
 	push		ebx
 	push		esi
@@ -743,7 +743,7 @@ label2:
 	emms
 	ret
 
-_sse1mmx_RestoreMedian_align1	endp
+_x86_sse1mmx_RestoreMedian_align1	endp
 
 
 end
