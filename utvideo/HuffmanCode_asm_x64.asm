@@ -58,7 +58,7 @@ label4:
 	mov			dword ptr [rdi], eax
 	add			rdi, 4
 label3:
-	mov			rax, rdi			; ï‘ÇËílÇÕ eax Ç…ÅB
+	mov			rax, rdi
 	sub			rax, qword ptr [rsp + 64 + 8 +  0]	; pDstBegin
 
 	pop			r15

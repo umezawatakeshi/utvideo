@@ -56,7 +56,7 @@ label4:
 	mov			dword ptr [edi], eax
 	add			edi, 4
 label3:
-	mov			eax, edi			; ï‘ÇËílÇÕ eax Ç…ÅB
+	mov			eax, edi
 	sub			eax, dword ptr [esp + 16 + 4 +  0]	; pDstBegin
 
 	pop			ebp
