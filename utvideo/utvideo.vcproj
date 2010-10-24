@@ -354,15 +354,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Convert_asm.asm"
+				RelativePath=".\Convert_asm_x86.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Convert_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Convert_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\Convert_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -371,8 +371,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Convert_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Convert_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\Convert_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -380,8 +380,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Convert_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Convert_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\Convert_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -390,8 +390,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Convert_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Convert_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\Convert_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 			</File>
@@ -408,15 +408,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\HuffmanCode_asm.asm"
+				RelativePath=".\HuffmanCode_asm_x86.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\HuffmanCode_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta HuffmanCode_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\HuffmanCode_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -425,8 +425,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\HuffmanCode_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta HuffmanCode_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\HuffmanCode_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -434,8 +434,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\HuffmanCode_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta HuffmanCode_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\HuffmanCode_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -444,8 +444,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\HuffmanCode_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta HuffmanCode_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\HuffmanCode_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 			</File>
@@ -458,15 +458,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Predict_asm.asm"
+				RelativePath=".\Predict_asm_x86.asm"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Predict_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Predict_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\Predict_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -475,8 +475,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Predict_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Predict_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\Predict_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -484,8 +484,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Predict_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Predict_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\Predict_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -494,8 +494,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\Predict_asm.obj&quot; /W3 /Zi /errorReport:prompt  /Ta Predict_asm.asm&#x0D;&#x0A;"
-						Outputs="$(IntDir)\Predict_asm.obj"
+						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
 			</File>
