@@ -55,53 +55,9 @@ const TUNEDFUNC tfnSSE2 = {
 	sse2_ConvertBottomupRGB32ToULY2,
 };
 
-const TUNEDFUNC tfnSSE3 = {
-	sse2_PredictMedian_align16,
-	sse2_PredictMedianAndCount_align16,
-	sse2_PredictMedianAndCount_align1,
-	sse2_PredictLeftAndCount_align1,
-	sse1mmx_RestoreMedian_align1,
-	i686_HuffmanEncode,
-	i686_HuffmanDecode,
-	i686_HuffmanDecodeAndAccum,
-	i686_HuffmanDecodeAndAccumStep2,
-	i686_HuffmanDecodeAndAccumStep4,
-	i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Green,
-	i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue,
-	i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Red,
-	i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32RedAndDummyAlpha,
-	i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Green,
-	i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue,
-	i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Red,
-	sse2_ConvertULY2ToBottomupRGB24,
-	sse2_ConvertULY2ToBottomupRGB32,
-	sse2_ConvertBottomupRGB24ToULY2,
-	sse2_ConvertBottomupRGB32ToULY2,
-};
+const TUNEDFUNC &tfnSSE3 = tfnSSE2;
 
-const TUNEDFUNC tfnSSSE3 = {
-	sse2_PredictMedian_align16,
-	sse2_PredictMedianAndCount_align16,
-	sse2_PredictMedianAndCount_align1,
-	sse2_PredictLeftAndCount_align1,
-	sse1mmx_RestoreMedian_align1,
-	i686_HuffmanEncode,
-	i686_HuffmanDecode,
-	i686_HuffmanDecodeAndAccum,
-	i686_HuffmanDecodeAndAccumStep2,
-	i686_HuffmanDecodeAndAccumStep4,
-	i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Green,
-	i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue,
-	i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Red,
-	i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32RedAndDummyAlpha,
-	i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Green,
-	i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue,
-	i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Red,
-	sse2_ConvertULY2ToBottomupRGB24,
-	sse2_ConvertULY2ToBottomupRGB32,
-	sse2_ConvertBottomupRGB24ToULY2,
-	sse2_ConvertBottomupRGB32ToULY2,
-};
+const TUNEDFUNC &tfnSSSE3 = tfnSSE2;
 
 void InitializeTunedFunc(void)
 {

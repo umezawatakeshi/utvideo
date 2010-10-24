@@ -31,6 +31,10 @@ const TUNEDFUNC tfnSSE2 = {
 	cpp_ConvertBottomupRGB32ToULY2,
 };
 
+const TUNEDFUNC &tfnSSE3 = tfnSSE2;
+
+const TUNEDFUNC &tfnSSSE3 = tfnSSE2;
+
 void InitializeTunedFunc(void)
 {
 	DWORD	cpuid_1_ecx = 0;
@@ -47,7 +51,7 @@ void InitializeTunedFunc(void)
 
 	_RPT2(_CRT_WARN, "CPUID.1 ECX=%08X EDX=%08X\n", cpuid_1_ecx, cpuid_1_edx);
 
-/*	if (cpuid_1_ecx & (1 << 9))
+	if (cpuid_1_ecx & (1 << 9))
 	{
 		_RPT0(_CRT_WARN, "supports SSSE3\n");
 		tfn = tfnSSSE3;
@@ -57,7 +61,7 @@ void InitializeTunedFunc(void)
 		_RPT0(_CRT_WARN, "supports SSE3\n");
 		tfn = tfnSSE3;
 	}
-	else*/
+	else
 	{
 		// AMD64 / Intel 64 ‚Í SSE2 ‚ª•K{B
 		_RPT0(_CRT_WARN, "supports SSE2\n");
