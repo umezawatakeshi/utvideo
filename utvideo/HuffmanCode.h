@@ -74,4 +74,6 @@ extern "C" void x86_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Red(BYTE *pDs
 
 #ifdef _WIN64_X64
 extern "C" size_t x64_i686_HuffmanEncode(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
+extern "C" void x64_i686_HuffmanDecode(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
+extern "C" void x64_i686_HuffmanDecodeAndAccum(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable);
 #endif
