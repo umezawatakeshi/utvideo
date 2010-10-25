@@ -165,11 +165,11 @@ endif
 ;else
 	mov			byte ptr [rdi], al
 ;endif
-;if &step eq 1
+if &step eq 1
 	inc			rdi
-;else
-;	add			edi, &step
-;endif
+else
+	add			rdi, &step
+endif
 ;if &dummyalpha
 ;	test		ch, 80h
 ;	jnz			label1
@@ -216,8 +216,8 @@ label2:
 
 HUFFMAN_DECODE	x64_i686_HuffmanDecode, 0, 1, 0, 0, 0, 0
 HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccum, 1, 1, 0, 0, 0, 0
-;HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep2, 1, 2, 0, 0, 0, 0
-;HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4, 1, 4, 0, 0, 0, 0
+HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep2, 1, 2, 0, 0, 0, 0
+HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4, 1, 4, 0, 0, 0, 0
 ;HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Green, 1, 4, 1, 1, 0, 0
 ;HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue, 1, 4, 1, 1, 1, 0
 ;HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Red, 1, 4, 1, 1, -1, 0
