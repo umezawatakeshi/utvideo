@@ -136,9 +136,6 @@ label1:
 	mov			ebp, dword ptr [esi]
 
 label0:
-if &dummyalpha
-	add			ch, ah
-endif
 if &accum
 	add			al, byte ptr [esp - 4]
 	mov			byte ptr [esp - 4], al
@@ -146,25 +143,17 @@ endif
 if &corrpos ne 0
 	add			al, byte ptr [edi + &corrpos]
 endif
-if &dummyalpha
-	movzx		ax, al
-	or			ax, 0ff00h
-	mov			word ptr [edi], ax
-else
 	mov			byte ptr [edi], al
+if &dummyalpha
+	mov			byte ptr [edi+1], 0ffh
 endif
 if &step eq 1
 	inc			edi
 else
 	add			edi, &step
 endif
-if &dummyalpha
-	test		ch, 80h
-	jnz			label1
-else
 	add			ch, ah
 	jnc			label1
-endif
 	sub			ch, 32
 	add			esi, 4
 	mov			ebp, edx

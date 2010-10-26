@@ -146,9 +146,6 @@ label1:
 	mov			eax, dword ptr [rbx + 8192+32+4*32 + r10*2]		; pDecodeTable->SymbolAndCodeLength[r10]
 
 label0:
-if &dummyalpha
-	add			ch, ah
-endif
 if &accum
 	add			al, r11b
 	mov			r11b, al
@@ -156,25 +153,17 @@ endif
 if &corrpos ne 0
 	add			al, byte ptr [rdi + &corrpos]
 endif
-if &dummyalpha
-	movzx		ax, al
-	or			ax, 0ff00h
-	mov			word ptr [rdi], ax
-else
 	mov			byte ptr [rdi], al
+if &dummyalpha
+	mov			byte ptr [rdi+1], 0ffh
 endif
 if &step eq 1
 	inc			rdi
 else
 	add			rdi, &step
 endif
-if &dummyalpha
-	test		ch, 80h
-	jnz			label1
-else
 	add			ch, ah
 	jnc			label1
-endif
 	sub			ch, 32
 	add			rsi, 4
 	mov			r9d, edx
