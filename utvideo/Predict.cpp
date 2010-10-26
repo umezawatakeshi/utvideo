@@ -11,7 +11,7 @@ inline BYTE median(BYTE a, BYTE b, BYTE c)
 	return max(min(max(a,b),c),min(a,b));
 }
 
-void PredictMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+void PredictMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride)
 {
 	if (IS_ALIGNED(pDst, 16) && IS_ALIGNED(pSrcBegin, 16) && IS_ALIGNED(dwStride, 16))
 		tfn.pfnPredictMedian_align16(pDst, pSrcBegin, pSrcEnd, dwStride);
@@ -19,7 +19,7 @@ void PredictMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD
 		cpp_PredictMedian(pDst, pSrcBegin, pSrcEnd, dwStride);
 }
 
-void PredictMedianAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
+void PredictMedianAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride, DWORD *pCountTable)
 {
 	if (IS_ALIGNED(pDst, 16) && IS_ALIGNED(pSrcBegin, 16) && IS_ALIGNED(dwStride, 16))
 		tfn.pfnPredictMedianAndCount_align16(pDst, pSrcBegin, pSrcEnd, dwStride, pCountTable);
@@ -27,7 +27,7 @@ void PredictMedianAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEn
 		tfn.pfnPredictMedianAndCount_align1(pDst, pSrcBegin, pSrcEnd, dwStride, pCountTable);
 }
 
-void cpp_PredictMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+void cpp_PredictMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride)
 {
 	const BYTE *p = pSrcBegin;
 	BYTE *q = pDst;
@@ -58,7 +58,7 @@ void cpp_PredictMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, D
 	}
 }
 
-void cpp_PredictMedianAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
+void cpp_PredictMedianAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride, DWORD *pCountTable)
 {
 	const BYTE *p = pSrcBegin;
 	BYTE *q = pDst;
@@ -114,7 +114,7 @@ void cpp_PredictLeftAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrc
 	}
 }
 
-void cpp_RestoreMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+void cpp_RestoreMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride)
 {
 	const BYTE *p = pSrcBegin;
 	BYTE *q = pDst;
