@@ -101,7 +101,7 @@ else
 	mov			eax, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
 	mov			dword ptr [esp - 8], eax
 endif
-	mov			ch, -32
+	mov			cl, -32
 if &accum
  if &corrpos ne 0
 	mov			byte ptr [esp - 4], 00h
@@ -116,7 +116,6 @@ label1:
 	cmp			edi, dword ptr [esp - 8]	; pDstEnd
 	jae			label2
 	mov			eax, ebp
-	mov			cl, ch
 
 	shld		eax, edx, cl
 	shr			eax, 20
@@ -126,10 +125,12 @@ label1:
 
 	mov			eax, dword ptr [esi]
 	shld		eax, edx, cl
+	mov			ch, cl
 	or			eax, 1
 	bsr			ebp, eax
 	mov			cl, byte ptr [ebx + 8192 + ebp]					; pDecodeTable->nCodeShift[ebp]
 	shr			eax, cl
+	mov			cl, ch
 	mov			ebp, dword ptr [ebx + 8192+32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
 	add			ebp, eax
 	mov			eax, dword ptr [ebx + 8192+32+4*32 + ebp*2]		; pDecodeTable->SymbolAndCodeLength[ebp]
@@ -152,9 +153,9 @@ if &step eq 1
 else
 	add			edi, &step
 endif
-	add			ch, ah
+	add			cl, ah
 	jnc			label1
-	sub			ch, 32
+	sub			cl, 32
 	add			esi, 4
 	mov			ebp, edx
 	mov			edx, dword ptr [esi+4]
