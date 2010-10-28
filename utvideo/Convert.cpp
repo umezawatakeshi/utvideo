@@ -29,7 +29,7 @@ static void cpp_ConvertULY2ToBottomupRGB(BYTE *pDstBegin, BYTE *pDstEnd, const B
 			*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
 			*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
 			if (bypp == 4)
-				*(p+3) = 0xff;
+				*(q+3) = 0xff;
 			y++; u++; v++;
 		}
 	}
