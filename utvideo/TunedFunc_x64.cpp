@@ -9,7 +9,6 @@
 #include "Convert.h"
 
 const TUNEDFUNC tfnSSE2 = {
-	cpp_PredictMedian,
 	x64_sse2_PredictMedianAndCount_align16,
 	x64_sse2_PredictMedianAndCount_align1,
 	x64_sse2_PredictLeftAndCount_align1,

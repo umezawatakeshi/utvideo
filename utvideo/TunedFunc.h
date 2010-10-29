@@ -8,7 +8,6 @@ struct HUFFMAN_DECODE_TABLE;
 
 struct TUNEDFUNC
 {
-	void (*pfnPredictMedian_align16)(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride);
 	void (*pfnPredictMedianAndCount_align16)(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride, DWORD *pCountTable);
 	void (*pfnPredictMedianAndCount_align1)(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride, DWORD *pCountTable);
 	void (*pfnPredictLeftAndCount_align1)(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable);

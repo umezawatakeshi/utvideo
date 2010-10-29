@@ -8,7 +8,6 @@
 #include "Convert.h"
 
 const TUNEDFUNC tfnCPP = {
-	cpp_PredictMedian,
 	cpp_PredictMedianAndCount,
 	cpp_PredictMedianAndCount,
 	cpp_PredictLeftAndCount,

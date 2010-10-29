@@ -9,7 +9,6 @@
 #include "Convert.h"
 
 const TUNEDFUNC tfnI686 = {
-	cpp_PredictMedian,
 	cpp_PredictMedianAndCount,
 	cpp_PredictMedianAndCount,
 	cpp_PredictLeftAndCount,
@@ -33,7 +32,6 @@ const TUNEDFUNC tfnI686 = {
 };
 
 const TUNEDFUNC tfnSSE2 = {
-	x86_sse2_PredictMedian_align16,
 	x86_sse2_PredictMedianAndCount_align16,
 	x86_sse2_PredictMedianAndCount_align1,
 	x86_sse2_PredictLeftAndCount_align1,
