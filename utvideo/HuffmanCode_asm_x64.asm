@@ -8,10 +8,11 @@ _TEXT_ASM	SEGMENT	page 'CODE'
 public	x64_i686_HuffmanEncode
 x64_i686_HuffmanEncode	proc
 
-	mov			[rsp +  8], rcx
-	mov			[rsp + 16], rdx
-	mov			[rsp + 24], r8
-	mov			[rsp + 32], r9
+	sub			rsp, 8
+	mov			[rsp + 16 +  0], rcx
+	mov			[rsp + 16 +  8], rdx
+	mov			[rsp + 16 + 16], r8
+	mov			[rsp + 16 + 24], r9
 	push		rbx
 	push		rbp
 	push		rsi
@@ -21,10 +22,10 @@ x64_i686_HuffmanEncode	proc
 	push		r14
 	push		r15
 
-	mov			rsi, qword ptr [rsp + 64 + 8 +  8]	; pSrcBegin
-	mov			rdi, qword ptr [rsp + 64 + 8 +  0]	; pDstBegin
-	mov			r8,  qword ptr [rsp + 64 + 8 + 16]	; pSrcEnd
-	mov			rdx, qword ptr [rsp + 64 + 8 + 24]	; pEncodeTable
+	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
+	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDstBegin
+	mov			r8,  qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
+	mov			rdx, qword ptr [rsp + 64 + 16 + 24]	; pEncodeTable
 	cmp			qword ptr [rdx], 0
 	je			label3
 
@@ -59,7 +60,7 @@ label4:
 	add			rdi, 4
 label3:
 	mov			rax, rdi
-	sub			rax, qword ptr [rsp + 64 + 8 +  0]	; pDstBegin
+	sub			rax, qword ptr [rsp + 64 + 16 +  0]	; pDstBegin
 
 	pop			r15
 	pop			r14
@@ -69,6 +70,7 @@ label3:
 	pop			rsi
 	pop			rbp
 	pop			rbx
+	add			rsp, 8
 	ret
 
 x64_i686_HuffmanEncode	endp
@@ -81,10 +83,11 @@ HUFFMAN_DECODE	macro	procname, accum, step, multiscan, bottomup, corrpos, dummya
 public	&procname
 &procname	proc
 
-	mov			[rsp +  8], rcx
-	mov			[rsp + 16], rdx
-	mov			[rsp + 24], r8
-	mov			[rsp + 32], r9
+	sub			rsp, 8
+	mov			[rsp + 16 +  0], rcx
+	mov			[rsp + 16 +  8], rdx
+	mov			[rsp + 16 + 16], r8
+	mov			[rsp + 16 + 24], r9
 	push		rbx
 	push		rbp
 	push		rsi
@@ -94,23 +97,23 @@ public	&procname
 	push		r14
 	push		r15
 
-	mov			rsi, qword ptr [rsp + 64 + 8 + 16]	; pSrcBegin
-	mov			rbx, qword ptr [rsp + 64 + 8 + 24]	; pDecodeTable
+	mov			rsi, qword ptr [rsp + 64 + 16 + 16]	; pSrcBegin
+	mov			rbx, qword ptr [rsp + 64 + 16 + 24]	; pDecodeTable
 	mov			edx, dword ptr [rsi+4]
 if &multiscan
  if &bottomup
-	mov			rdi, qword ptr [rsp + 64 + 8 +  8]	; pDstEnd
-	sub			rdi, qword ptr [rsp + 64 + 8 + 40]	; dwGrossWidth
+	mov			rdi, qword ptr [rsp + 64 + 16 +  8]	; pDstEnd
+	sub			rdi, qword ptr [rsp + 64 + 16 + 40]	; dwGrossWidth
 	mov			r8, rdi
-	add			r8, qword ptr [rsp + 64 + 8 + 32]	; dwNetWidth
-	mov			r12, qword ptr [rsp + 64 + 8 + 40]	; dwGrossWidth
-	add			r12, qword ptr [rsp + 64 + 8 + 32]	; dwNetWidth
+	add			r8, qword ptr [rsp + 64 + 16 + 32]	; dwNetWidth
+	mov			r12, qword ptr [rsp + 64 + 16 + 40]	; dwGrossWidth
+	add			r12, qword ptr [rsp + 64 + 16 + 32]	; dwNetWidth
  else
 	NOTIMPL
  endif
 else
-	mov			rdi, qword ptr [rsp + 64 + 8 +  0]	; pDstBegin
-	mov			r8,  qword ptr [rsp + 64 + 8 +  8]	; pDstEnd
+	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDstBegin
+	mov			r8,  qword ptr [rsp + 64 + 16 +  8]	; pDstEnd
 endif
 	mov			cl, -32
 if &accum
@@ -174,8 +177,8 @@ endif
 label2:
 if &multiscan
  if &bottomup
-	sub			r8, qword ptr [rsp + 64 + 8 + 40]
-	cmp			r8, qword ptr [rsp + 64 + 8 +  0]
+	sub			r8, qword ptr [rsp + 64 + 16 + 40]
+	cmp			r8, qword ptr [rsp + 64 + 16 +  0]
 	jbe			label3
 
 	sub			rdi, r12
@@ -194,6 +197,7 @@ endif
 	pop			rsi
 	pop			rbp
 	pop			rbx
+	add			rsp, 8
 	ret
 
 &procname	endp

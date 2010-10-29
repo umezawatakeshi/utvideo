@@ -8,10 +8,11 @@ _TEXT_ASM	SEGMENT	page 'CODE'
 public	x64_sse2_PredictLeftAndCount_align1
 x64_sse2_PredictLeftAndCount_align1	proc
 
-	mov			[rsp +  8], rcx
-	mov			[rsp + 16], rdx
-	mov			[rsp + 24], r8
-	mov			[rsp + 32], r9
+	sub			rsp, 8
+	mov			[rsp + 16 +  0], rcx
+	mov			[rsp + 16 +  8], rdx
+	mov			[rsp + 16 + 16], r8
+	mov			[rsp + 16 + 24], r9
 	push		rbx
 	push		rbp
 	push		rsi
@@ -34,14 +35,14 @@ x64_sse2_PredictLeftAndCount_align1	proc
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			rsi, qword ptr [rsp + 64 + 8 +  8]	; pSrcBegin
-	mov			rdi, qword ptr [rsp + 64 + 8 +  0]	; pDst
-	mov			rax, qword ptr [rsp + 64 + 8 + 16]	; pSrcEnd
+	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
+	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDst
+	mov			rax, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
 	sub			rax, rsi
 	and			rax, 0fffffffffffffff0h
 	add			rax, rsi
 
-	mov			rbx, qword ptr [rsp + 64 + 8 + 24]	; pCountTable
+	mov			rbx, qword ptr [rsp + 64 + 16 + 24]	; pCountTable
 
 	align		64
 label1:
@@ -103,7 +104,7 @@ label1:
 
 	; 最初のラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			rax, qword ptr [rsp + 64 + 8 + 16]	; pSrcEnd
+	mov			rax, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
 	cmp			rsi, rax
 	jae			label4
 
@@ -144,6 +145,7 @@ label4:
 	pop			rsi
 	pop			rbp
 	pop			rbx
+	add			rsp, 8
 	ret
 
 x64_sse2_PredictLeftAndCount_align1	endp
@@ -153,10 +155,11 @@ x64_sse2_PredictLeftAndCount_align1	endp
 public	x64_sse2_PredictMedianAndCount_align16
 x64_sse2_PredictMedianAndCount_align16	proc
 
-	mov			[rsp +  8], rcx
-	mov			[rsp + 16], rdx
-	mov			[rsp + 24], r8
-	mov			[rsp + 32], r9
+	sub			rsp, 8
+	mov			[rsp + 16 +  0], rcx
+	mov			[rsp + 16 +  8], rdx
+	mov			[rsp + 16 + 16], r8
+	mov			[rsp + 16 + 24], r9
 	push		rbx
 	push		rbp
 	push		rsi
@@ -179,13 +182,13 @@ x64_sse2_PredictMedianAndCount_align16	proc
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			rsi, qword ptr [rsp + 64 + 8 +  8]	; pSrcBegin
-	mov			rdi, qword ptr [rsp + 64 + 8 +  0]	; pDst
+	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
+	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDst
 	mov			rax, rsi
-	mov			rdx, qword ptr [rsp + 64 + 8 + 24]	; dwStride
+	mov			rdx, qword ptr [rsp + 64 + 16 + 24]	; dwStride
 	add			rax, rdx
 	neg			rdx
-	mov			rbx, qword ptr [rsp + 64 + 8 + 32]	; pCountTable
+	mov			rbx, qword ptr [rsp + 64 + 16 + 32]	; pCountTable
 
 	align		64
 label1:
@@ -245,7 +248,7 @@ label1:
 	cmp			rsi, rax
 	jb			label1
 
-	mov			rax, qword ptr [rsp + 64 + 8 + 16]	; pSrcEnd
+	mov			rax, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
 
 	pxor		xmm1, xmm1
 	pxor		xmm5, xmm5
@@ -343,6 +346,7 @@ label2:
 	pop			rsi
 	pop			rbp
 	pop			rbx
+	add			rsp, 8
 	ret
 
 x64_sse2_PredictMedianAndCount_align16	endp
@@ -352,10 +356,11 @@ x64_sse2_PredictMedianAndCount_align16	endp
 public	x64_sse2_PredictMedianAndCount_align1
 x64_sse2_PredictMedianAndCount_align1	proc
 
-	mov			[rsp +  8], rcx
-	mov			[rsp + 16], rdx
-	mov			[rsp + 24], r8
-	mov			[rsp + 32], r9
+	sub			rsp, 8
+	mov			[rsp + 16 +  0], rcx
+	mov			[rsp + 16 +  8], rdx
+	mov			[rsp + 16 + 16], r8
+	mov			[rsp + 16 + 24], r9
 	push		rbx
 	push		rbp
 	push		rsi
@@ -378,13 +383,13 @@ x64_sse2_PredictMedianAndCount_align1	proc
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			rsi, qword ptr [rsp + 64 + 8 +  8]	; pSrcBegin
-	mov			rdi, qword ptr [rsp + 64 + 8 +  0]	; pDst
+	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
+	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDst
 	mov			rax, rsi
-	mov			rdx, qword ptr [rsp + 64 + 8 + 24]	; dwStride
+	mov			rdx, qword ptr [rsp + 64 + 16 + 24]	; dwStride
 	and			rdx, 0fffffffffffffff0h
 	add			rax, rdx
-	mov			rbx, qword ptr [rsp + 64 + 8 + 32]	; pCountTable
+	mov			rbx, qword ptr [rsp + 64 + 16 + 32]	; pCountTable
 
 	; 最初のラインを16バイトずつ処理する。
 	align		64
@@ -447,8 +452,8 @@ label1:
 
 	; 最初のラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			rax, qword ptr [rsp + 64 + 8 +  8]	; pSrcBegin
-	add			rax, qword ptr [rsp + 64 + 8 + 24]	; dwStride
+	mov			rax, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
+	add			rax, qword ptr [rsp + 64 + 16 + 24]	; dwStride
 	cmp			rsi, rax
 	jae			label4
 
@@ -471,9 +476,9 @@ label3:
 
 	; 残りのラインを16バイトずつ処理する。
 label4:
-	mov			rdx, qword ptr [rsp + 64 + 8 + 24]	; dwStride
+	mov			rdx, qword ptr [rsp + 64 + 16 + 24]	; dwStride
 	neg			rdx
-	mov			rax, qword ptr [rsp + 64 + 8 + 16]	; pSrcEnd
+	mov			rax, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
 	sub			rax, rsi
 	and			rax, 0fffffffffffffff0h
 	add			rax, rsi
@@ -558,7 +563,7 @@ label2:
 
 	; 残りのラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			rax, qword ptr [rsp + 64 + 8 + 16]	; pSrcEnd
+	mov			rax, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
 	cmp			rsi, rax
 	jae			label6
 
@@ -616,6 +621,7 @@ label6:
 	pop			rsi
 	pop			rbp
 	pop			rbx
+	add			rsp, 8
 	ret
 
 x64_sse2_PredictMedianAndCount_align1	endp
@@ -625,10 +631,11 @@ x64_sse2_PredictMedianAndCount_align1	endp
 ; void x64_sse1mmx_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
 x64_sse1mmx_RestoreMedian_align1	proc
 
-	mov			[rsp +  8], rcx
-	mov			[rsp + 16], rdx
-	mov			[rsp + 24], r8
-	mov			[rsp + 32], r9
+	sub			rsp, 8
+	mov			[rsp + 16 +  0], rcx
+	mov			[rsp + 16 +  8], rdx
+	mov			[rsp + 16 + 16], r8
+	mov			[rsp + 16 + 24], r9
 	push		rbx
 	push		rbp
 	push		rsi
@@ -638,10 +645,10 @@ x64_sse1mmx_RestoreMedian_align1	proc
 	push		r14
 	push		r15
 
-	mov			rsi, qword ptr [rsp + 64 + 8 +  8]	; pSrcBegin
-	mov			rdi, qword ptr [rsp + 64 + 8 +  0]	; pDst
+	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
+	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDst
 	mov			rax, rsi
-	mov			rbp, qword ptr [rsp + 64 + 8 + 24]	; dwStride
+	mov			rbp, qword ptr [rsp + 64 + 16 + 24]	; dwStride
 	add			rax, rbp
 	neg			rbp
 
@@ -678,7 +685,7 @@ label2:
 
 	inc			rsi
 	inc			rdi
-	cmp			rsi, qword ptr [rsp + 64 + 8 + 16]	; pSrcEnd
+	cmp			rsi, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
 	jb			label2
 
 	pop			r15
@@ -689,6 +696,7 @@ label2:
 	pop			rsi
 	pop			rbp
 	pop			rbx
+	add			rsp, 8
 	emms
 	ret
 
