@@ -25,10 +25,10 @@ const TUNEDFUNC tfnSSE2 = {
 	x64_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Green,
 	x64_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue,
 	x64_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Red,
-	cpp_ConvertULY2ToBottomupRGB24,
-	cpp_ConvertULY2ToBottomupRGB32,
-	cpp_ConvertBottomupRGB24ToULY2,
-	cpp_ConvertBottomupRGB32ToULY2,
+	x64_sse2_ConvertULY2ToBottomupRGB24,
+	x64_sse2_ConvertULY2ToBottomupRGB32,
+	x64_sse2_ConvertBottomupRGB24ToULY2,
+	x64_sse2_ConvertBottomupRGB32ToULY2,
 };
 
 const TUNEDFUNC &tfnSSE3 = tfnSSE2;

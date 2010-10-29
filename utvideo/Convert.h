@@ -21,3 +21,10 @@ extern "C" void x86_sse2_ConvertULY2ToBottomupRGB32(BYTE *pDstBegin, BYTE *pDstE
 extern "C" void x86_sse2_ConvertBottomupRGB24ToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride, size_t dwDataStride);
 extern "C" void x86_sse2_ConvertBottomupRGB32ToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride, size_t dwDataStride);
 #endif
+
+#ifdef _WIN64_X64
+extern "C" void x64_sse2_ConvertULY2ToBottomupRGB24(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, size_t dwStride, size_t dwDataStride);
+extern "C" void x64_sse2_ConvertULY2ToBottomupRGB32(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, size_t dwStride, size_t dwDataStride);
+extern "C" void x64_sse2_ConvertBottomupRGB24ToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride, size_t dwDataStride);
+extern "C" void x64_sse2_ConvertBottomupRGB32ToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride, size_t dwDataStride);
+#endif
