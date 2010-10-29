@@ -20,6 +20,16 @@ x64_sse2_PredictLeftAndCount_align1	proc
 	push		r13
 	push		r14
 	push		r15
+	movdqa		[rsp -  16], xmm6
+	movdqa		[rsp -  32], xmm7
+	movdqa		[rsp -  48], xmm8
+	movdqa		[rsp -  64], xmm9
+	movdqa		[rsp -  80], xmm10
+	movdqa		[rsp -  96], xmm11
+	movdqa		[rsp - 112], xmm12
+	movdqa		[rsp - 128], xmm13
+	movdqa		[rsp - 144], xmm14
+	movdqa		[rsp - 160], xmm15
 
 	mov			eax, 80h
 	movd		xmm1, eax
@@ -116,6 +126,16 @@ label3:
 
 label4:
 
+	movdqa		xmm15, [rsp - 160]
+	movdqa		xmm14, [rsp - 144]
+	movdqa		xmm13, [rsp - 128]
+	movdqa		xmm12, [rsp - 112]
+	movdqa		xmm11, [rsp -  96]
+	movdqa		xmm10, [rsp -  80]
+	movdqa		xmm9,  [rsp -  64]
+	movdqa		xmm8,  [rsp -  48]
+	movdqa		xmm7,  [rsp -  32]
+	movdqa		xmm6,  [rsp -  16]
 	pop			r15
 	pop			r14
 	pop			r13
@@ -145,6 +165,16 @@ x64_sse2_PredictMedianAndCount_align16	proc
 	push		r13
 	push		r14
 	push		r15
+	movdqa		[rsp -  16], xmm6
+	movdqa		[rsp -  32], xmm7
+	movdqa		[rsp -  48], xmm8
+	movdqa		[rsp -  64], xmm9
+	movdqa		[rsp -  80], xmm10
+	movdqa		[rsp -  96], xmm11
+	movdqa		[rsp - 112], xmm12
+	movdqa		[rsp - 128], xmm13
+	movdqa		[rsp - 144], xmm14
+	movdqa		[rsp - 160], xmm15
 
 	mov			eax, 80h
 	movd		xmm1, eax
@@ -295,6 +325,16 @@ label2:
 	cmp			rsi, rax
 	jb			label2
 
+	movdqa		xmm15, [rsp - 160]
+	movdqa		xmm14, [rsp - 144]
+	movdqa		xmm13, [rsp - 128]
+	movdqa		xmm12, [rsp - 112]
+	movdqa		xmm11, [rsp -  96]
+	movdqa		xmm10, [rsp -  80]
+	movdqa		xmm9,  [rsp -  64]
+	movdqa		xmm8,  [rsp -  48]
+	movdqa		xmm7,  [rsp -  32]
+	movdqa		xmm6,  [rsp -  16]
 	pop			r15
 	pop			r14
 	pop			r13
@@ -324,6 +364,16 @@ x64_sse2_PredictMedianAndCount_align1	proc
 	push		r13
 	push		r14
 	push		r15
+	movdqa		[rsp -  16], xmm6
+	movdqa		[rsp -  32], xmm7
+	movdqa		[rsp -  48], xmm8
+	movdqa		[rsp -  64], xmm9
+	movdqa		[rsp -  80], xmm10
+	movdqa		[rsp -  96], xmm11
+	movdqa		[rsp - 112], xmm12
+	movdqa		[rsp - 128], xmm13
+	movdqa		[rsp - 144], xmm14
+	movdqa		[rsp - 160], xmm15
 
 	mov			eax, 80h
 	movd		xmm1, eax
@@ -548,6 +598,16 @@ label5:
 
 label6:
 
+	movdqa		xmm15, [rsp - 160]
+	movdqa		xmm14, [rsp - 144]
+	movdqa		xmm13, [rsp - 128]
+	movdqa		xmm12, [rsp - 112]
+	movdqa		xmm11, [rsp -  96]
+	movdqa		xmm10, [rsp -  80]
+	movdqa		xmm9,  [rsp -  64]
+	movdqa		xmm8,  [rsp -  48]
+	movdqa		xmm7,  [rsp -  32]
+	movdqa		xmm6,  [rsp -  16]
 	pop			r15
 	pop			r14
 	pop			r13
