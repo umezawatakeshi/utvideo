@@ -10,10 +10,10 @@
 
 const TUNEDFUNC tfnSSE2 = {
 	cpp_PredictMedian,
-	cpp_PredictMedianAndCount,
-	cpp_PredictMedianAndCount,
-	cpp_PredictLeftAndCount,
-	cpp_RestoreMedian,
+	x64_sse2_PredictMedianAndCount_align16,
+	x64_sse2_PredictMedianAndCount_align1,
+	x64_sse2_PredictLeftAndCount_align1,
+	x64_sse1mmx_RestoreMedian_align1,
 	x64_i686_HuffmanEncode,
 	x64_i686_HuffmanDecode,
 	x64_i686_HuffmanDecodeAndAccum,
