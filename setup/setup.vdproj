@@ -21,6 +21,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_0A8C87A54662EF32AB28B26A4719B978"
+        "OwnerKey" = "8:_103BD1760A3549A395B57D42C68EC8EC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0A8C87A54662EF32AB28B26A4719B978"
+        "OwnerKey" = "8:_DD5D27B7EE494AD6A0FE84F3B8E6DD42"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_103BD1760A3549A395B57D42C68EC8EC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -28,6 +40,12 @@
         "Entry"
         {
         "MsmKey" = "8:_1F878E1DA1B34589B3F68E6439C694A7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2132544A283941869AE6B62DC751FB89"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -51,18 +69,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_7F6A80F930A9763D9D283AE4956FD4D8"
-        "OwnerKey" = "8:_103BD1760A3549A395B57D42C68EC8EC"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7F6A80F930A9763D9D283AE4956FD4D8"
-        "OwnerKey" = "8:_DD5D27B7EE494AD6A0FE84F3B8E6DD42"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_8C3447F14F014BBBB83BB1282D1EFA61"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -71,6 +77,18 @@
         {
         "MsmKey" = "8:_B75FAC1C6559494FA2B2FC9F3AED7F5B"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C345F608470B41419FB32947A343C35E"
+        "OwnerKey" = "8:_2132544A283941869AE6B62DC751FB89"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_C9C23E6CF5A74A3287AA115CC2B5571D"
+        "OwnerKey" = "8:_C345F608470B41419FB32947A343C35E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -188,6 +206,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0A8C87A54662EF32AB28B26A4719B978"
+            {
+            "SourcePath" = "8:utvideo.dll"
+            "TargetName" = "8:utvideo.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1F878E1DA1B34589B3F68E6439C694A7"
             {
             "SourcePath" = "8:..\\gplv2.txt"
@@ -266,26 +304,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7F6A80F930A9763D9D283AE4956FD4D8"
-            {
-            "SourcePath" = "8:utvideo.dll"
-            "TargetName" = "8:utvideo.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8C3447F14F014BBBB83BB1282D1EFA61"
@@ -511,7 +529,7 @@
                                                             "Condition" = "8:"
                                                             "Transitive" = "11:FALSE"
                                                             "ValueTypes" = "3:1"
-                                                            "Value" = "8:[SystemFolder]utvideo.dll"
+                                                            "Value" = "8:[SystemFolder]utv_vcm.dll"
                                                             }
                                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8E0E05249CEC46C89D4149E81BA8F90F"
                                                             {
@@ -519,7 +537,7 @@
                                                             "Condition" = "8:"
                                                             "Transitive" = "11:FALSE"
                                                             "ValueTypes" = "3:1"
-                                                            "Value" = "8:[SystemFolder]utvideo.dll"
+                                                            "Value" = "8:[SystemFolder]utv_vcm.dll"
                                                             }
                                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_9D447549D5D64CF08F86DD05DCC01B15"
                                                             {
@@ -527,7 +545,7 @@
                                                             "Condition" = "8:"
                                                             "Transitive" = "11:FALSE"
                                                             "ValueTypes" = "3:1"
-                                                            "Value" = "8:[SystemFolder]utvideo.dll"
+                                                            "Value" = "8:[SystemFolder]utv_vcm.dll"
                                                             }
                                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_C32FF9F3FCB2430C960E5C846AD7ABA0"
                                                             {
@@ -535,7 +553,7 @@
                                                             "Condition" = "8:"
                                                             "Transitive" = "11:FALSE"
                                                             "ValueTypes" = "3:1"
-                                                            "Value" = "8:[SystemFolder]utvideo.dll"
+                                                            "Value" = "8:[SystemFolder]utv_vcm.dll"
                                                             }
                                                         }
                                                     }
@@ -1259,6 +1277,34 @@
         }
         "MergeModule"
         {
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C345F608470B41419FB32947A343C35E"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "SourcePath" = "8:Microsoft_VC80_CRT_x86.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C9C23E6CF5A74A3287AA115CC2B5571D"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "SourcePath" = "8:policy_8_0_microsoft_vc80_crt_x86.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
         }
         "ProjectOutput"
         {
@@ -1285,6 +1331,34 @@
             "OutputConfiguration" = "8:Release|Win32"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{9F47709C-CC4E-4286-BF62-C60482CC878F}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_2132544A283941869AE6B62DC751FB89"
+            {
+            "SourcePath" = "8:..\\release\\utv_vcm.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:Release|Win32"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{680F6318-AC63-4AAF-9E77-A513204507CA}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {

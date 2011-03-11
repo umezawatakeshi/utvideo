@@ -1,4 +1,4 @@
-LIBRARY	"utvideo"
+LIBRARY	"utv_vcm"
 
 EXPORTS
 	DriverProc

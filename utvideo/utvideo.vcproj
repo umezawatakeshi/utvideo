@@ -66,7 +66,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="vfw32.lib winmm.lib amstrmid.lib"
 				LinkIncremental="2"
-				ModuleDefinitionFile="utvideo.def"
+				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -146,7 +146,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="vfw32.lib winmm.lib amstrmid.lib"
 				LinkIncremental="2"
-				ModuleDefinitionFile="utvideo.def"
+				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -223,7 +223,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="vfw32.lib winmm.lib amstrmid.lib"
 				LinkIncremental="1"
-				ModuleDefinitionFile="utvideo.def"
+				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -303,7 +303,7 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="vfw32.lib winmm.lib amstrmid.lib"
 				LinkIncremental="1"
-				ModuleDefinitionFile="utvideo.def"
+				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -550,7 +550,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -559,7 +559,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -569,7 +569,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -578,7 +578,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)"
+						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -733,14 +733,6 @@
 				RelativePath=".\utvideo.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\utvideo.def"
-				>
-			</File>
-			<File
-				RelativePath=".\VCMCodec.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="ヘッダー ファイル"
@@ -813,10 +805,6 @@
 			</File>
 			<File
 				RelativePath=".\utvideo.h"
-				>
-			</File>
-			<File
-				RelativePath=".\VCMCodec.h"
 				>
 			</File>
 		</Filter>

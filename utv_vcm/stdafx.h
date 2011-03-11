@@ -29,7 +29,23 @@
 #define WIN32_LEAN_AND_MEAN		// Windows ヘッダーから使用されていない部分を除外します。
 // Windows ヘッダー ファイル:
 #include <windows.h>
+// mmreg.h に「現在のコードページで表示できない文字」が含まれていて警告が出るので、それを抑制する。
+#pragma warning(push)
+#pragma warning(disable:4819)
+#include <vfw.h>
+#pragma warning(pop)
+#include <msi.h>
 
+#include <uuids.h> // for MEDIATYPE_* and MEDIASUBTYPE_*
 
+#include <queue>
+#include <algorithm>
+using namespace std;
 
-// TODO: プログラムに必要な追加ヘッダーをここで参照してください。
+#ifndef FCC
+#define FCC(fcc) ( \
+	(((DWORD)(fcc) & 0x000000ff) << 24) | \
+	(((DWORD)(fcc) & 0x0000ff00) <<  8) | \
+	(((DWORD)(fcc) & 0x00ff0000) >>  8) | \
+	(((DWORD)(fcc) & 0xff000000) >> 24))
+#endif

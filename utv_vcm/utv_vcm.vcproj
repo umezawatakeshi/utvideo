@@ -64,9 +64,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utvideo.lib"
+				AdditionalDependencies="vfw32.lib winmm.lib utvideo.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(OutDir)"
+				ModuleDefinitionFile="utv_vcm.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="1"
@@ -144,9 +145,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utvideo.lib"
+				AdditionalDependencies="vfw32.lib winmm.lib utvideo.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="$(OutDir)"
+				ModuleDefinitionFile="utv_vcm.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				TargetMachine="17"
@@ -221,9 +223,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utvideo.lib"
+				AdditionalDependencies="vfw32.lib winmm.lib utvideo.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(OutDir)"
+				ModuleDefinitionFile="utv_vcm.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -301,9 +304,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utvideo.lib"
+				AdditionalDependencies="vfw32.lib winmm.lib utvideo.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="$(OutDir)"
+				ModuleDefinitionFile="utv_vcm.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -346,6 +350,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\DriverProc.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -385,6 +393,14 @@
 				RelativePath=".\utv_vcm.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\utv_vcm.def"
+				>
+			</File>
+			<File
+				RelativePath=".\VCMCodec.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="ヘッダー ファイル"
@@ -393,6 +409,10 @@
 			>
 			<File
 				RelativePath=".\stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VCMCodec.h"
 				>
 			</File>
 		</Filter>
