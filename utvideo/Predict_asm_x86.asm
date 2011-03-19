@@ -1,6 +1,8 @@
 ; 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ
 ; $Id$
 
+include Common_asm_x86.inc
+
 .686
 .no87
 .xmm
@@ -17,22 +19,23 @@ _TEXT_ASM	SEGMENT	page public flat 'CODE'
 public	_x86_sse2_PredictLeftAndCount_align1
 _x86_sse2_PredictLeftAndCount_align1	proc
 
-	push		ebx
-	push		esi
-	push		edi
-	push		ebp
+	STD_PROLOG	0
+$pDstBegin   = argsoffset +  0
+$pSrcBegin   = argsoffset +  4
+$pSrcEnd     = argsoffset +  8
+$pCountTable = argsoffset + 12
 
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pSrcBegin
-	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDst
-	mov			eax, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+	mov			esi, dword ptr [esp + $pSrcBegin]
+	mov			edi, dword ptr [esp + $pDstBegin]
+	mov			eax, dword ptr [esp + $pSrcEnd]
 	sub			eax, esi
 	and			eax, 0fffffff0h
 	add			eax, esi
 
-	mov			ebx, dword ptr [esp + 16 + 4 + 12]	; pCountTable
+	mov			ebx, dword ptr [esp + $pCountTable]
 
 	align		64
 label1:
@@ -94,7 +97,7 @@ label1:
 
 	; 最初のラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			eax, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+	mov			eax, dword ptr [esp + $pSrcEnd]
 	cmp			esi, eax
 	jae			label4
 
@@ -116,10 +119,7 @@ label3:
 	jb			label3
 
 label4:
-	pop			ebp
-	pop			edi
-	pop			esi
-	pop			ebx
+	STD_EPILOG
 	ret
 
 _x86_sse2_PredictLeftAndCount_align1	endp
@@ -129,21 +129,23 @@ _x86_sse2_PredictLeftAndCount_align1	endp
 public	_x86_sse2_PredictMedianAndCount_align16
 _x86_sse2_PredictMedianAndCount_align16	proc
 
-	push		ebx
-	push		esi
-	push		edi
-	push		ebp
+	STD_PROLOG	0
+$pDstBegin   = argsoffset +  0
+$pSrcBegin   = argsoffset +  4
+$pSrcEnd     = argsoffset +  8
+$dwStride    = argsoffset + 12
+$pCountTable = argsoffset + 16
 
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pSrcBegin
-	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDst
+	mov			esi, dword ptr [esp + $pSrcBegin]
+	mov			edi, dword ptr [esp + $pDstBegin]
 	mov			eax, esi
-	mov			edx, dword ptr [esp + 16 + 4 + 12]	; dwStride
+	mov			edx, dword ptr [esp + $dwStride]
 	add			eax, edx
 	neg			edx
-	mov			ebx, dword ptr [esp + 16 + 4 + 16]	; pCountTable
+	mov			ebx, dword ptr [esp + $pCountTable]
 
 	align		64
 label1:
@@ -203,7 +205,7 @@ label1:
 	cmp			esi, eax
 	jb			label1
 
-	mov			eax, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+	mov			eax, dword ptr [esp + $pSrcEnd]
 
 	pxor		xmm1, xmm1
 	pxor		xmm5, xmm5
@@ -283,10 +285,7 @@ label2:
 	cmp			esi, eax
 	jb			label2
 
-	pop			ebp
-	pop			edi
-	pop			esi
-	pop			ebx
+	STD_EPILOG
 	ret
 
 _x86_sse2_PredictMedianAndCount_align16	endp
@@ -299,21 +298,23 @@ _x86_sse2_PredictMedianAndCount_align16	endp
 public	_x86_sse2_PredictMedianAndCount_align1
 _x86_sse2_PredictMedianAndCount_align1	proc
 
-	push		ebx
-	push		esi
-	push		edi
-	push		ebp
+	STD_PROLOG	0
+$pDstBegin   = argsoffset +  0
+$pSrcBegin   = argsoffset +  4
+$pSrcEnd     = argsoffset +  8
+$dwStride    = argsoffset + 12
+$pCountTable = argsoffset + 16
 
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pSrcBegin
-	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDst
+	mov			esi, dword ptr [esp + $pSrcBegin]
+	mov			edi, dword ptr [esp + $pDstBegin]
 	mov			eax, esi
-	mov			edx, dword ptr [esp + 16 + 4 + 12]	; dwStride
+	mov			edx, dword ptr [esp + $dwStride]
 	and			edx, 0fffffff0h
 	add			eax, edx
-	mov			ebx, dword ptr [esp + 16 + 4 + 16]	; pCountTable
+	mov			ebx, dword ptr [esp + $pCountTable]
 
 	; 最初のラインを16バイトずつ処理する。
 	align		64
@@ -376,8 +377,8 @@ label1:
 
 	; 最初のラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			eax, dword ptr [esp + 16 + 4 +  4]	; pSrcBegin
-	add			eax, dword ptr [esp + 16 + 4 + 12]	; dwStride
+	mov			eax, dword ptr [esp + $pSrcBegin]
+	add			eax, dword ptr [esp + $dwStride]
 	cmp			esi, eax
 	jae			label4
 
@@ -400,9 +401,9 @@ label3:
 
 	; 残りのラインを16バイトずつ処理する。
 label4:
-	mov			edx, dword ptr [esp + 16 + 4 + 12]	; dwStride
+	mov			edx, dword ptr [esp + $dwStride]
 	neg			edx
-	mov			eax, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+	mov			eax, dword ptr [esp + $pSrcEnd]
 	sub			eax, esi
 	and			eax, 0fffffff0h
 	add			eax, esi
@@ -487,7 +488,7 @@ label2:
 
 	; 残りのラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			eax, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+	mov			eax, dword ptr [esp + $pSrcEnd]
 	cmp			esi, eax
 	jae			label6
 
@@ -526,10 +527,7 @@ label5:
 
 
 label6:
-	pop			ebp
-	pop			edi
-	pop			esi
-	pop			ebx
+	STD_EPILOG
 	ret
 
 _x86_sse2_PredictMedianAndCount_align1	endp
@@ -538,15 +536,16 @@ _x86_sse2_PredictMedianAndCount_align1	endp
 ; void x86_i686_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
 _x86_i686_RestoreMedian_align1	proc
 
-	push		ebx
-	push		esi
-	push		edi
-	push		ebp
+	STD_PROLOG	0
+$pDstBegin   = argsoffset +  0
+$pSrcBegin   = argsoffset +  4
+$pSrcEnd     = argsoffset +  8
+$dwStride    = argsoffset + 12
 
-	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pSrcBegin
-	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDst
+	mov			esi, dword ptr [esp + $pSrcBegin]	; pSrcBegin
+	mov			edi, dword ptr [esp + $pDstBegin]	; pDst
 	mov			eax, esi
-	mov			ebp, dword ptr [esp + 16 + 4 + 12]	; dwStride
+	mov			ebp, dword ptr [esp + $dwStride]	; dwStride
 	add			eax, ebp
 	neg			ebp
 
@@ -587,13 +586,10 @@ label2:
 
 	inc			esi
 	inc			edi
-	cmp			esi, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+	cmp			esi, dword ptr [esp + $pSrcEnd]	; pSrcEnd
 	jb			label2
 
-	pop			ebp
-	pop			edi
-	pop			esi
-	pop			ebx
+	STD_EPILOG
 	ret
 
 _x86_i686_RestoreMedian_align1	endp
@@ -603,15 +599,16 @@ _x86_i686_RestoreMedian_align1	endp
 ; void x86_sse1mmx_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
 _x86_sse1mmx_RestoreMedian_align1	proc
 
-	push		ebx
-	push		esi
-	push		edi
-	push		ebp
+	STD_PROLOG	0
+$pDstBegin   = argsoffset +  0
+$pSrcBegin   = argsoffset +  4
+$pSrcEnd     = argsoffset +  8
+$dwStride    = argsoffset + 12
 
-	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pSrcBegin
-	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDst
+	mov			esi, dword ptr [esp + $pSrcBegin]	; pSrcBegin
+	mov			edi, dword ptr [esp + $pDstBegin]	; pDst
 	mov			eax, esi
-	mov			ebp, dword ptr [esp + 16 + 4 + 12]	; dwStride
+	mov			ebp, dword ptr [esp + $dwStride]	; dwStride
 	add			eax, ebp
 	neg			ebp
 
@@ -648,13 +645,10 @@ label2:
 
 	inc			esi
 	inc			edi
-	cmp			esi, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
+	cmp			esi, dword ptr [esp + $pSrcEnd]	; pSrcEnd
 	jb			label2
 
-	pop			ebp
-	pop			edi
-	pop			esi
-	pop			ebx
+	STD_EPILOG
 	emms
 	ret
 

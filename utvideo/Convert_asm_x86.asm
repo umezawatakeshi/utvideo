@@ -1,6 +1,8 @@
 ; 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ
 ; $Id$
 
+include Common_asm_x86.inc
+
 .686
 .no87
 .xmm
@@ -31,23 +33,27 @@ CONVERT_ULY2_TO_BOTTOMUP_RGB	macro	procname, rgb32
 public	&procname
 &procname	proc
 
-	push		ebx
-	push		esi
-	push		edi
-	push		ebp
+	STD_PROLOG	0
+$pDstBegin    = argsoffset +  0
+$pDstEnd      = argsoffset +  4
+$pYBegin      = argsoffset +  8
+$pUBegin      = argsoffset + 12
+$pVBegin      = argsoffset + 16
+$dwStride     = argsoffset + 20
+$dwDataStride = argsoffset + 24
 
-	mov			ebp, dword ptr [esp + 16 + 4 +  8]	; pYBegin
-	mov			ebx, dword ptr [esp + 16 + 4 + 12]	; pUBegin
-	mov			ecx, dword ptr [esp + 16 + 4 + 16]	; pVBegin
-	mov			edx, dword ptr [esp + 16 + 4 + 20]	; dwStride
-	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pDstEnd	; esi なのに dst のポインタを保持するのは気持ちが悪いが。
+	mov			ebp, dword ptr [esp + $pYBegin]
+	mov			ebx, dword ptr [esp + $pUBegin]
+	mov			ecx, dword ptr [esp + $pVBegin]
+	mov			edx, dword ptr [esp + $dwStride]
+	mov			esi, dword ptr [esp + $pDstEnd]			; esi なのに dst のポインタを保持するのは気持ちが悪いが。
 	sub			esi, edx
-	add			esi, dword ptr [esp + 16 + 4 + 24]	; dwDataStride
+	add			esi, dword ptr [esp + $dwDataStride]
 
 	align	64
 label0:
 	mov			edi, esi
-	sub			edi, dword ptr [esp + 16 + 4 + 24]	; dwDataStride
+	sub			edi, dword ptr [esp + $dwDataStride]
 
 	; align	64	; さすがに入れすぎな気がするのでコメントアウト。
 label1:
@@ -174,13 +180,10 @@ endif
 
 label3:
 	sub			esi, edx
-	cmp			esi, dword ptr [esp + 16 + 4 +  0]	; pDstBegin
+	cmp			esi, dword ptr [esp + $pDstBegin]
 	ja			label0
 
-	pop			ebp
-	pop			edi
-	pop			esi
-	pop			ebx
+	STD_EPILOG
 	ret
 
 &procname	endp
@@ -224,22 +227,26 @@ CONVERT_BOTTOMUP_RGB_TO_ULY2	macro	procname, rgb32
 public	&procname
 &procname	proc
 
-	push		ebx
-	push		esi
-	push		edi
-	push		ebp
+	STD_PROLOG	0
+$pYBegin      = argsoffset +  0
+$pUBegin      = argsoffset +  4
+$pVBegin      = argsoffset +  8
+$pSrcBegin    = argsoffset + 12
+$pSrcEnd      = argsoffset + 16
+$dwStride     = argsoffset + 20
+$dwDataStride = argsoffset + 24
 
-	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pYBegin
-	mov			ebx, dword ptr [esp + 16 + 4 +  4]	; pUBegin
-	mov			ecx, dword ptr [esp + 16 + 4 +  8]	; pVBegin
-	mov			ebp, dword ptr [esp + 16 + 4 + 16]	; pSrcEnd
-	sub			ebp, dword ptr [esp + 16 + 4 + 20]	; dwStride
-	add			ebp, dword ptr [esp + 16 + 4 + 24]	; dwDataStride
+	mov			edi, dword ptr [esp + $pYBegin]
+	mov			ebx, dword ptr [esp + $pUBegin]
+	mov			ecx, dword ptr [esp + $pVBegin]
+	mov			ebp, dword ptr [esp + $pSrcEnd]
+	sub			ebp, dword ptr [esp + $dwStride]
+	add			ebp, dword ptr [esp + $dwDataStride]
 
 	align	64
 label0:
 	mov			esi, ebp
-	sub			esi, dword ptr [esp + 16 + 4 + 24]	; dwDataStride
+	sub			esi, dword ptr [esp + $dwDataStride]
 if &rgb32
 	add			esi, 4
 else
@@ -305,14 +312,11 @@ endif
 	jmp			label3
 
 label2:
-	sub			ebp, dword ptr [esp + 16 + 4 + 20]	; dwStride
-	cmp			ebp, dword ptr [esp + 16 + 4 + 12]	; pSrcEnd
+	sub			ebp, dword ptr [esp + $dwStride]
+	cmp			ebp, dword ptr [esp + $pSrcBegin]
 	ja			label0
 
-	pop			ebp
-	pop			edi
-	pop			esi
-	pop			ebx
+	STD_EPILOG
 	ret
 
 &procname	endp
