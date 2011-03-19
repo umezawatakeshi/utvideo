@@ -7,6 +7,27 @@
 
 .model	flat
 
+STD_PROLOG	macro	_numlocal
+numlocal = &_numlocal
+argsoffset = numlocal + 4 * 4 + 4
+	push		ebx
+	push		esi
+	push		edi
+	push		ebp
+if numlocal ne 0
+	sub			esp, numlocal
+endif
+endm
+
+STD_EPILOG	macro
+if numlocal ne 0
+	add			esp, numlocal
+endif
+	pop			ebp
+	pop			edi
+	pop			esi
+	pop			ebx
+endm	
 
 _TEXT_ASM	SEGMENT	page public flat 'CODE'
 
@@ -14,15 +35,16 @@ _TEXT_ASM	SEGMENT	page public flat 'CODE'
 public	_x86_i686_HuffmanEncode
 _x86_i686_HuffmanEncode	proc
 
-	push		ebx
-	push		esi
-	push		edi
-	push		ebp
+	STD_PROLOG	0
+$pDstBegin    = argsoffset
+$pSrcBegin    = argsoffset +  4
+$pSrcEnd      = argsoffset +  8
+$pEncodeTable = argsoffset + 12
 
-	mov			esi, dword ptr [esp + 16 + 4 +  4]	; pSrcBegin
-	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDstBegin
-	mov			edx, dword ptr [esp + 16 + 4 +  8]	; pSrcEnd
-	mov			ebp, dword ptr [esp + 16 + 4 + 12]	; pEncodeTable
+	mov			esi, dword ptr [esp + $pSrcBegin]
+	mov			edi, dword ptr [esp + $pDstBegin]
+	mov			edx, dword ptr [esp + $pSrcEnd]
+	mov			ebp, dword ptr [esp + $pEncodeTable]
 	cmp			dword ptr [ebp], 0
 	je			label3
 
@@ -57,12 +79,9 @@ label4:
 	add			edi, 4
 label3:
 	mov			eax, edi
-	sub			eax, dword ptr [esp + 16 + 4 +  0]	; pDstBegin
+	sub			eax, dword ptr [esp + $pDstBegin]
 
-	pop			ebp
-	pop			edi
-	pop			esi
-	pop			ebx
+	STD_EPILOG
 	ret
 
 _x86_i686_HuffmanEncode	endp
@@ -75,10 +94,7 @@ HUFFMAN_DECODE	macro	procname, accum, step, multiscan, bottomup, corrpos, dummya
 public	&procname
 &procname	proc
 
-	push		ebx
-	push		esi
-	push		edi
-	push		ebp
+	STD_PROLOG	0
 
 	mov			esi, dword ptr [esp + 16 + 4 +  8]	; pSrcBegin
 	mov			ebx, dword ptr [esp + 16 + 4 + 12]	; pDecodeTable
@@ -177,10 +193,7 @@ if &multiscan
 	jmp			label1
 label3:
 endif
-	pop			ebp
-	pop			edi
-	pop			esi
-	pop			ebx
+	STD_EPILOG
 	ret
 
 &procname	endp
