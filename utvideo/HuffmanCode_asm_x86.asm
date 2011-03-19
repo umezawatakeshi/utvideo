@@ -89,47 +89,56 @@ _x86_i686_HuffmanEncode	endp
 
 HUFFMAN_DECODE	macro	procname, accum, step, multiscan, bottomup, corrpos, dummyalpha
 
-; void procname(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
-; void procname(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
+; void procname(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
+; void procname(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
 public	&procname
 &procname	proc
 
-	STD_PROLOG	0
+	STD_PROLOG	12
+$pDstBegin    = argsoffset
+$pDstEnd      = argsoffset +  4
+$pSrcBegin    = argsoffset +  8
+$pDecodeTable = argsoffset + 12
+$dwNetWidth   = argsoffset + 16
+$dwGrossWidth = argsoffset + 20
+$byCorrBuf    =  0
+$pLineEnd     =  4
+$dwLineOffset =  8
 
-	mov			esi, dword ptr [esp + 16 + 4 +  8]	; pSrcBegin
-	mov			ebx, dword ptr [esp + 16 + 4 + 12]	; pDecodeTable
+	mov			esi, dword ptr [esp + $pSrcBegin]
+	mov			ebx, dword ptr [esp + $pDecodeTable]
 	mov			edx, dword ptr [esi+4]
 if &multiscan
  if &bottomup
-	mov			edi, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
-	sub			edi, dword ptr [esp + 16 + 4 + 20]	; dwGrossWidth
+	mov			edi, dword ptr [esp + $pDstEnd]
+	sub			edi, dword ptr [esp + $dwGrossWidth]
 	mov			eax, edi
-	add			eax, dword ptr [esp + 16 + 4 + 16]	; dwNetWidth
-	mov			dword ptr [esp - 8], eax
-	mov			eax, dword ptr [esp + 16 + 4 + 20]	; dwGrossWidth
-	add			eax, dword ptr [esp + 16 + 4 + 16]	; dwNetWidth
-	mov			dword ptr [esp - 12], eax
+	add			eax, dword ptr [esp + $dwNetWidth]
+	mov			dword ptr [esp + $pLineEnd], eax
+	mov			eax, dword ptr [esp + $dwGrossWidth]
+	add			eax, dword ptr [esp + $dwNetWidth]
+	mov			dword ptr [esp + $dwLineOffset], eax
  else
 	NOTIMPL
  endif
 else
-	mov			edi, dword ptr [esp + 16 + 4 +  0]	; pDstBegin
-	mov			eax, dword ptr [esp + 16 + 4 +  4]	; pDstEnd
-	mov			dword ptr [esp - 8], eax
+	mov			edi, dword ptr [esp + $pDstBegin]
+	mov			eax, dword ptr [esp + $pDstEnd]
+	mov			dword ptr [esp + $pLineEnd], eax
 endif
 	mov			cl, -32
 if &accum
  if &corrpos ne 0
-	mov			byte ptr [esp - 4], 00h
+	mov			byte ptr [esp + $byCorrBuf], 00h
  else
-	mov			byte ptr [esp - 4], 80h
+	mov			byte ptr [esp + $byCorrBuf], 80h
  endif
 endif
 	mov			ebp, dword ptr [esi]
 
 	align		64
 label1:
-	cmp			edi, dword ptr [esp - 8]	; pDstEnd
+	cmp			edi, dword ptr [esp + $pLineEnd]
 	jae			label2
 	mov			eax, ebp
 
@@ -154,8 +163,8 @@ label1:
 
 label0:
 if &accum
-	add			al, byte ptr [esp - 4]
-	mov			byte ptr [esp - 4], al
+	add			al, byte ptr [esp + $byCorrBuf]
+	mov			byte ptr [esp + $byCorrBuf], al
 endif
 if &corrpos ne 0
 	add			al, byte ptr [edi + &corrpos]
@@ -180,13 +189,13 @@ endif
 label2:
 if &multiscan
  if &bottomup
-	mov			eax, dword ptr [esp - 8]
-	sub			eax, dword ptr [esp + 16 + 4 + 20]
-	cmp			eax, dword ptr [esp + 16 + 4 +  0]
+	mov			eax, dword ptr [esp + $pLineEnd]
+	sub			eax, dword ptr [esp + $dwGrossWidth]
+	cmp			eax, dword ptr [esp + $pDstBegin]
 	jbe			label3
-	mov			dword ptr [esp - 8], eax
+	mov			dword ptr [esp + $pLineEnd], eax
 
-	sub			edi, dword ptr [esp -12]
+	sub			edi, dword ptr [esp + $dwLineOffset]
  else
 	NOTIMPL
  endif
