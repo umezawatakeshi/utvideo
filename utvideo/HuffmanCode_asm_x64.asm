@@ -1,6 +1,7 @@
 ; ï∂éöÉRÅ[ÉhÇÕÇrÇiÇhÇr â¸çsÉRÅ[ÉhÇÕÇbÇqÇkÇe
 ; $Id$
 
+include Common_asm_x64.inc
 
 _TEXT_ASM	SEGMENT	page 'CODE'
 
@@ -8,24 +9,16 @@ _TEXT_ASM	SEGMENT	page 'CODE'
 public	x64_i686_HuffmanEncode
 x64_i686_HuffmanEncode	proc
 
-	sub			rsp, 8
-	mov			[rsp + 16 +  0], rcx
-	mov			[rsp + 16 +  8], rdx
-	mov			[rsp + 16 + 16], r8
-	mov			[rsp + 16 + 24], r9
-	push		rbx
-	push		rbp
-	push		rsi
-	push		rdi
-	push		r12
-	push		r13
-	push		r14
-	push		r15
+	STD_PROLOG	0
+$pDstBegin    = argsoffset +  0
+$pSrcBegin    = argsoffset +  8
+$pSrcEnd      = argsoffset + 16
+$pEncodeTable = argsoffset + 24
 
-	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
-	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDstBegin
-	mov			r8,  qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
-	mov			rdx, qword ptr [rsp + 64 + 16 + 24]	; pEncodeTable
+	mov			rsi, qword ptr [rsp + $pSrcBegin]
+	mov			rdi, qword ptr [rsp + $pDstBegin]
+	mov			r8,  qword ptr [rsp + $pSrcEnd]
+	mov			rdx, qword ptr [rsp + $pEncodeTable]
 	cmp			qword ptr [rdx], 0
 	je			label3
 
@@ -60,17 +53,9 @@ label4:
 	add			rdi, 4
 label3:
 	mov			rax, rdi
-	sub			rax, qword ptr [rsp + 64 + 16 +  0]	; pDstBegin
+	sub			rax, qword ptr [rsp + $pDstBegin]
 
-	pop			r15
-	pop			r14
-	pop			r13
-	pop			r12
-	pop			rdi
-	pop			rsi
-	pop			rbp
-	pop			rbx
-	add			rsp, 8
+	STD_EPILOG
 	ret
 
 x64_i686_HuffmanEncode	endp
@@ -78,42 +63,36 @@ x64_i686_HuffmanEncode	endp
 
 HUFFMAN_DECODE	macro	procname, accum, step, multiscan, bottomup, corrpos, dummyalpha
 
-; void procname(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
-; void procname(BYTE *pDstBegin, BYTE *pDstcEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
+; void procname(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
+; void procname(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, DWORD dwNetWidth, DWORD dwGrossWidth)
 public	&procname
 &procname	proc
 
-	sub			rsp, 8
-	mov			[rsp + 16 +  0], rcx
-	mov			[rsp + 16 +  8], rdx
-	mov			[rsp + 16 + 16], r8
-	mov			[rsp + 16 + 24], r9
-	push		rbx
-	push		rbp
-	push		rsi
-	push		rdi
-	push		r12
-	push		r13
-	push		r14
-	push		r15
+	STD_PROLOG	0
+$pDstBegin    = argsoffset +  0
+$pDstEnd      = argsoffset +  8
+$pSrcBegin    = argsoffset + 16
+$pDecodeTable = argsoffset + 24
+$dwNetWidth   = argsoffset + 32
+$dwGrossWidth = argsoffset + 40
 
-	mov			rsi, qword ptr [rsp + 64 + 16 + 16]	; pSrcBegin
-	mov			rbx, qword ptr [rsp + 64 + 16 + 24]	; pDecodeTable
+	mov			rsi, qword ptr [rsp + $pSrcBegin]
+	mov			rbx, qword ptr [rsp + $pDecodeTable]
 	mov			edx, dword ptr [rsi+4]
 if &multiscan
  if &bottomup
-	mov			rdi, qword ptr [rsp + 64 + 16 +  8]	; pDstEnd
-	sub			rdi, qword ptr [rsp + 64 + 16 + 40]	; dwGrossWidth
+	mov			rdi, qword ptr [rsp + $pDstEnd]
+	sub			rdi, qword ptr [rsp + $dwGrossWidth]
 	mov			r8, rdi
-	add			r8, qword ptr [rsp + 64 + 16 + 32]	; dwNetWidth
-	mov			r12, qword ptr [rsp + 64 + 16 + 40]	; dwGrossWidth
-	add			r12, qword ptr [rsp + 64 + 16 + 32]	; dwNetWidth
+	add			r8, qword ptr [rsp + $dwNetWidth]
+	mov			r12, qword ptr [rsp + $dwGrossWidth]
+	add			r12, qword ptr [rsp + $dwNetWidth]
  else
 	NOTIMPL
  endif
 else
-	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDstBegin
-	mov			r8,  qword ptr [rsp + 64 + 16 +  8]	; pDstEnd
+	mov			rdi, qword ptr [rsp + $pDstBegin]
+	mov			r8,  qword ptr [rsp + $pDstEnd]
 endif
 	mov			cl, -32
 if &accum
@@ -177,8 +156,8 @@ endif
 label2:
 if &multiscan
  if &bottomup
-	sub			r8, qword ptr [rsp + 64 + 16 + 40]
-	cmp			r8, qword ptr [rsp + 64 + 16 +  0]
+	sub			r8, qword ptr [rsp + $dwGrossWidth]
+	cmp			r8, qword ptr [rsp + $pDstBegin]
 	jbe			label3
 
 	sub			rdi, r12
@@ -189,15 +168,7 @@ if &multiscan
 label3:
 endif
 
-	pop			r15
-	pop			r14
-	pop			r13
-	pop			r12
-	pop			rdi
-	pop			rsi
-	pop			rbp
-	pop			rbx
-	add			rsp, 8
+	STD_EPILOG
 	ret
 
 &procname	endp

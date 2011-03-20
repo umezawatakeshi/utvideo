@@ -744,6 +744,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Common_asm_x64.inc"
+				>
+			</File>
+			<File
 				RelativePath=".\Common_asm_x86.inc"
 				>
 			</File>
