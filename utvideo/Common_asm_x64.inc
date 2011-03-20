@@ -3,7 +3,7 @@
 
 STD_PROLOG	macro	_numlocal, savexmm
 numlocal = &_numlocal
-argsoffset = 8 * 8 + 8 + 8
+argsoffset = numlocal + 8 * 8 + 8 + 8
 	sub			rsp, 8
 	mov			qword ptr [rsp + 16 +  0], rcx
 	mov			qword ptr [rsp + 16 +  8], rdx
