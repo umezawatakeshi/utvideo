@@ -1,6 +1,7 @@
 ; 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ
 ; $Id$
 
+include Common_asm_x64.inc
 
 _TEXT_ASM	SEGMENT	page 'CODE'
 
@@ -26,42 +27,27 @@ CONVERT_ULY2_TO_BOTTOMUP_RGB	macro	procname, rgb32
 public	&procname
 &procname	proc
 
-	sub			rsp, 8
-	mov			[rsp + 16 +  0], rcx
-	mov			[rsp + 16 +  8], rdx
-	mov			[rsp + 16 + 16], r8
-	mov			[rsp + 16 + 24], r9
-	push		rbx
-	push		rbp
-	push		rsi
-	push		rdi
-	push		r12
-	push		r13
-	push		r14
-	push		r15
-	movdqa		[rsp -  16], xmm6
-	movdqa		[rsp -  32], xmm7
-	movdqa		[rsp -  48], xmm8
-	movdqa		[rsp -  64], xmm9
-	movdqa		[rsp -  80], xmm10
-	movdqa		[rsp -  96], xmm11
-	movdqa		[rsp - 112], xmm12
-	movdqa		[rsp - 128], xmm13
-	movdqa		[rsp - 144], xmm14
-	movdqa		[rsp - 160], xmm15
+	STD_PROLOG	0
+$pDstBegin    = argsoffset +  0
+$pDstEnd      = argsoffset +  8
+$pYBegin      = argsoffset + 16
+$pUBegin      = argsoffset + 24
+$pVBegin      = argsoffset + 32
+$dwStride     = argsoffset + 40
+$dwDataStride = argsoffset + 48
 
-	mov			rbp, qword ptr [rsp + 64 + 16 + 16]	; pYBegin
-	mov			rbx, qword ptr [rsp + 64 + 16 + 24]	; pUBegin
-	mov			rcx, qword ptr [rsp + 64 + 16 + 32]	; pVBegin
-	mov			rdx, qword ptr [rsp + 64 + 16 + 40]	; dwStride
-	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pDstEnd	; esi なのに dst のポインタを保持するのは気持ちが悪いが。
+	mov			rbp, qword ptr [rsp + $pYBegin]
+	mov			rbx, qword ptr [rsp + $pUBegin]
+	mov			rcx, qword ptr [rsp + $pVBegin]
+	mov			rdx, qword ptr [rsp + $dwStride]
+	mov			rsi, qword ptr [rsp + $pDstEnd]			; esi なのに dst のポインタを保持するのは気持ちが悪いが。
 	sub			rsi, rdx
-	add			rsi, qword ptr [rsp + 64 + 16 + 48]	; dwDataStride
+	add			rsi, qword ptr [rsp + $dwDataStride]
 
 	align	64
 label0:
 	mov			rdi, rsi
-	sub			rdi, qword ptr [rsp + 64 + 16 + 48]	; dwDataStride
+	sub			rdi, qword ptr [rsp + $dwDataStride]
 
 	; align	64	; さすがに入れすぎな気がするのでコメントアウト。
 label1:
@@ -188,28 +174,10 @@ endif
 
 label3:
 	sub			rsi, rdx
-	cmp			rsi, qword ptr [rsp + 64 + 16 +  0]	; pDstBegin
+	cmp			rsi, qword ptr [rsp + $pDstBegin]
 	ja			label0
 
-	movdqa		xmm15, [rsp - 160]
-	movdqa		xmm14, [rsp - 144]
-	movdqa		xmm13, [rsp - 128]
-	movdqa		xmm12, [rsp - 112]
-	movdqa		xmm11, [rsp -  96]
-	movdqa		xmm10, [rsp -  80]
-	movdqa		xmm9,  [rsp -  64]
-	movdqa		xmm8,  [rsp -  48]
-	movdqa		xmm7,  [rsp -  32]
-	movdqa		xmm6,  [rsp -  16]
-	pop			r15
-	pop			r14
-	pop			r13
-	pop			r12
-	pop			rdi
-	pop			rsi
-	pop			rbp
-	pop			rbx
-	add			rsp, 8
+	STD_EPILOG
 	ret
 
 &procname	endp
@@ -253,41 +221,26 @@ CONVERT_BOTTOMUP_RGB_TO_ULY2	macro	procname, rgb32
 public	&procname
 &procname	proc
 
-	sub			rsp, 8
-	mov			[rsp + 16 +  0], rcx
-	mov			[rsp + 16 +  8], rdx
-	mov			[rsp + 16 + 16], r8
-	mov			[rsp + 16 + 24], r9
-	push		rbx
-	push		rbp
-	push		rsi
-	push		rdi
-	push		r12
-	push		r13
-	push		r14
-	push		r15
-	movdqa		[rsp -  16], xmm6
-	movdqa		[rsp -  32], xmm7
-	movdqa		[rsp -  48], xmm8
-	movdqa		[rsp -  64], xmm9
-	movdqa		[rsp -  80], xmm10
-	movdqa		[rsp -  96], xmm11
-	movdqa		[rsp - 112], xmm12
-	movdqa		[rsp - 128], xmm13
-	movdqa		[rsp - 144], xmm14
-	movdqa		[rsp - 160], xmm15
+	STD_PROLOG	0
+$pYBegin      = argsoffset +  0
+$pUBegin      = argsoffset +  8
+$pVBegin      = argsoffset + 16
+$pSrcBegin    = argsoffset + 24
+$pSrcEnd      = argsoffset + 32
+$dwStride     = argsoffset + 40
+$dwDataStride = argsoffset + 48
 
-	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pYBegin
-	mov			rbx, qword ptr [rsp + 64 + 16 +  8]	; pUBegin
-	mov			rcx, qword ptr [rsp + 64 + 16 + 16]	; pVBegin
-	mov			rbp, qword ptr [rsp + 64 + 16 + 32]	; pSrcEnd
-	sub			rbp, qword ptr [rsp + 64 + 16 + 40]	; dwStride
-	add			rbp, qword ptr [rsp + 64 + 16 + 48]	; dwDataStride
+	mov			rdi, qword ptr [rsp + $pYBegin]
+	mov			rbx, qword ptr [rsp + $pUBegin]
+	mov			rcx, qword ptr [rsp + $pVBegin]
+	mov			rbp, qword ptr [rsp + $pSrcEnd]
+	sub			rbp, qword ptr [rsp + $dwStride]
+	add			rbp, qword ptr [rsp + $dwDataStride]
 
 	align	64
 label0:
 	mov			rsi, rbp
-	sub			rsi, qword ptr [esp + 64 + 16 + 48]	; dwDataStride
+	sub			rsi, qword ptr [rsp + $dwDataStride]
 if &rgb32
 	add			rsi, 4
 else
@@ -353,29 +306,11 @@ endif
 	jmp			label3
 
 label2:
-	sub			rbp, qword ptr [rsp + 64 + 16 + 40]	; dwStride
-	cmp			rbp, qword ptr [rsp + 64 + 16 + 24]	; pSrcEnd
+	sub			rbp, qword ptr [rsp + $dwStride]
+	cmp			rbp, qword ptr [rsp + $pSrcBegin]
 	ja			label0
 
-	movdqa		xmm15, [rsp - 160]
-	movdqa		xmm14, [rsp - 144]
-	movdqa		xmm13, [rsp - 128]
-	movdqa		xmm12, [rsp - 112]
-	movdqa		xmm11, [rsp -  96]
-	movdqa		xmm10, [rsp -  80]
-	movdqa		xmm9,  [rsp -  64]
-	movdqa		xmm8,  [rsp -  48]
-	movdqa		xmm7,  [rsp -  32]
-	movdqa		xmm6,  [rsp -  16]
-	pop			r15
-	pop			r14
-	pop			r13
-	pop			r12
-	pop			rdi
-	pop			rsi
-	pop			rbp
-	pop			rbx
-	add			rsp, 8
+	STD_EPILOG
 	ret
 
 &procname	endp

@@ -1,48 +1,31 @@
 ; 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ
 ; $Id$
 
+include Common_asm_x64.inc
 
 _TEXT_ASM	SEGMENT	page 'CODE'
 
-; void x64_sse2_PredictLeftAndCount_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable)
+; void x64_sse2_PredictLeftAndCount_align1(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable)
 public	x64_sse2_PredictLeftAndCount_align1
 x64_sse2_PredictLeftAndCount_align1	proc
 
-	sub			rsp, 8
-	mov			[rsp + 16 +  0], rcx
-	mov			[rsp + 16 +  8], rdx
-	mov			[rsp + 16 + 16], r8
-	mov			[rsp + 16 + 24], r9
-	push		rbx
-	push		rbp
-	push		rsi
-	push		rdi
-	push		r12
-	push		r13
-	push		r14
-	push		r15
-	movdqa		[rsp -  16], xmm6
-	movdqa		[rsp -  32], xmm7
-	movdqa		[rsp -  48], xmm8
-	movdqa		[rsp -  64], xmm9
-	movdqa		[rsp -  80], xmm10
-	movdqa		[rsp -  96], xmm11
-	movdqa		[rsp - 112], xmm12
-	movdqa		[rsp - 128], xmm13
-	movdqa		[rsp - 144], xmm14
-	movdqa		[rsp - 160], xmm15
+	STD_PROLOG	0
+$pDstBegin   = argsoffset +  0
+$pSrcBegin   = argsoffset +  8
+$pSrcEnd     = argsoffset + 16
+$pCountTable = argsoffset + 24
 
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
-	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDst
-	mov			rax, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
+	mov			rsi, qword ptr [rsp + $pSrcBegin]
+	mov			rdi, qword ptr [rsp + $pDstBegin]
+	mov			rax, qword ptr [rsp + $pSrcEnd]
 	sub			rax, rsi
 	and			rax, 0fffffffffffffff0h
 	add			rax, rsi
 
-	mov			rbx, qword ptr [rsp + 64 + 16 + 24]	; pCountTable
+	mov			rbx, qword ptr [rsp + $pCountTable]
 
 	align		64
 label1:
@@ -104,7 +87,7 @@ label1:
 
 	; 最初のラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			rax, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
+	mov			rax, qword ptr [rsp + $pSrcEnd]
 	cmp			rsi, rax
 	jae			label4
 
@@ -127,25 +110,7 @@ label3:
 
 label4:
 
-	movdqa		xmm15, [rsp - 160]
-	movdqa		xmm14, [rsp - 144]
-	movdqa		xmm13, [rsp - 128]
-	movdqa		xmm12, [rsp - 112]
-	movdqa		xmm11, [rsp -  96]
-	movdqa		xmm10, [rsp -  80]
-	movdqa		xmm9,  [rsp -  64]
-	movdqa		xmm8,  [rsp -  48]
-	movdqa		xmm7,  [rsp -  32]
-	movdqa		xmm6,  [rsp -  16]
-	pop			r15
-	pop			r14
-	pop			r13
-	pop			r12
-	pop			rdi
-	pop			rsi
-	pop			rbp
-	pop			rbx
-	add			rsp, 8
+	STD_EPILOG
 	ret
 
 x64_sse2_PredictLeftAndCount_align1	endp
@@ -155,40 +120,23 @@ x64_sse2_PredictLeftAndCount_align1	endp
 public	x64_sse2_PredictMedianAndCount_align16
 x64_sse2_PredictMedianAndCount_align16	proc
 
-	sub			rsp, 8
-	mov			[rsp + 16 +  0], rcx
-	mov			[rsp + 16 +  8], rdx
-	mov			[rsp + 16 + 16], r8
-	mov			[rsp + 16 + 24], r9
-	push		rbx
-	push		rbp
-	push		rsi
-	push		rdi
-	push		r12
-	push		r13
-	push		r14
-	push		r15
-	movdqa		[rsp -  16], xmm6
-	movdqa		[rsp -  32], xmm7
-	movdqa		[rsp -  48], xmm8
-	movdqa		[rsp -  64], xmm9
-	movdqa		[rsp -  80], xmm10
-	movdqa		[rsp -  96], xmm11
-	movdqa		[rsp - 112], xmm12
-	movdqa		[rsp - 128], xmm13
-	movdqa		[rsp - 144], xmm14
-	movdqa		[rsp - 160], xmm15
+	STD_PROLOG	0
+$pDstBegin   = argsoffset +  0
+$pSrcBegin   = argsoffset +  8
+$pSrcEnd     = argsoffset + 16
+$dwStride    = argsoffset + 24
+$pCountTable = argsoffset + 32
 
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
-	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDst
+	mov			rsi, qword ptr [rsp + $pSrcBegin]
+	mov			rdi, qword ptr [rsp + $pDstBegin]
 	mov			rax, rsi
-	mov			rdx, qword ptr [rsp + 64 + 16 + 24]	; dwStride
+	mov			rdx, qword ptr [rsp + $dwStride]
 	add			rax, rdx
 	neg			rdx
-	mov			rbx, qword ptr [rsp + 64 + 16 + 32]	; pCountTable
+	mov			rbx, qword ptr [rsp + $pCountTable]
 
 	align		64
 label1:
@@ -248,7 +196,7 @@ label1:
 	cmp			rsi, rax
 	jb			label1
 
-	mov			rax, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
+	mov			rax, qword ptr [rsp + $pSrcEnd]
 
 	pxor		xmm1, xmm1
 	pxor		xmm5, xmm5
@@ -328,25 +276,7 @@ label2:
 	cmp			rsi, rax
 	jb			label2
 
-	movdqa		xmm15, [rsp - 160]
-	movdqa		xmm14, [rsp - 144]
-	movdqa		xmm13, [rsp - 128]
-	movdqa		xmm12, [rsp - 112]
-	movdqa		xmm11, [rsp -  96]
-	movdqa		xmm10, [rsp -  80]
-	movdqa		xmm9,  [rsp -  64]
-	movdqa		xmm8,  [rsp -  48]
-	movdqa		xmm7,  [rsp -  32]
-	movdqa		xmm6,  [rsp -  16]
-	pop			r15
-	pop			r14
-	pop			r13
-	pop			r12
-	pop			rdi
-	pop			rsi
-	pop			rbp
-	pop			rbx
-	add			rsp, 8
+	STD_EPILOG
 	ret
 
 x64_sse2_PredictMedianAndCount_align16	endp
@@ -356,40 +286,23 @@ x64_sse2_PredictMedianAndCount_align16	endp
 public	x64_sse2_PredictMedianAndCount_align1
 x64_sse2_PredictMedianAndCount_align1	proc
 
-	sub			rsp, 8
-	mov			[rsp + 16 +  0], rcx
-	mov			[rsp + 16 +  8], rdx
-	mov			[rsp + 16 + 16], r8
-	mov			[rsp + 16 + 24], r9
-	push		rbx
-	push		rbp
-	push		rsi
-	push		rdi
-	push		r12
-	push		r13
-	push		r14
-	push		r15
-	movdqa		[rsp -  16], xmm6
-	movdqa		[rsp -  32], xmm7
-	movdqa		[rsp -  48], xmm8
-	movdqa		[rsp -  64], xmm9
-	movdqa		[rsp -  80], xmm10
-	movdqa		[rsp -  96], xmm11
-	movdqa		[rsp - 112], xmm12
-	movdqa		[rsp - 128], xmm13
-	movdqa		[rsp - 144], xmm14
-	movdqa		[rsp - 160], xmm15
+	STD_PROLOG	0
+$pDstBegin   = argsoffset +  0
+$pSrcBegin   = argsoffset +  8
+$pSrcEnd     = argsoffset + 16
+$dwStride    = argsoffset + 24
+$pCountTable = argsoffset + 32
 
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
-	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDst
+	mov			rsi, qword ptr [rsp + $pSrcBegin]
+	mov			rdi, qword ptr [rsp + $pDstBegin]
 	mov			rax, rsi
-	mov			rdx, qword ptr [rsp + 64 + 16 + 24]	; dwStride
+	mov			rdx, qword ptr [rsp + $dwStride]
 	and			rdx, 0fffffffffffffff0h
 	add			rax, rdx
-	mov			rbx, qword ptr [rsp + 64 + 16 + 32]	; pCountTable
+	mov			rbx, qword ptr [rsp + $pCountTable]
 
 	; 最初のラインを16バイトずつ処理する。
 	align		64
@@ -452,8 +365,8 @@ label1:
 
 	; 最初のラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			rax, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
-	add			rax, qword ptr [rsp + 64 + 16 + 24]	; dwStride
+	mov			rax, qword ptr [rsp + $pSrcBegin]
+	add			rax, qword ptr [rsp + $dwStride]
 	cmp			rsi, rax
 	jae			label4
 
@@ -476,9 +389,9 @@ label3:
 
 	; 残りのラインを16バイトずつ処理する。
 label4:
-	mov			rdx, qword ptr [rsp + 64 + 16 + 24]	; dwStride
+	mov			rdx, qword ptr [rsp + $dwStride]
 	neg			rdx
-	mov			rax, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
+	mov			rax, qword ptr [rsp + $pSrcEnd]
 	sub			rax, rsi
 	and			rax, 0fffffffffffffff0h
 	add			rax, rsi
@@ -563,7 +476,7 @@ label2:
 
 	; 残りのラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			rax, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
+	mov			rax, qword ptr [rsp + $pSrcEnd]
 	cmp			rsi, rax
 	jae			label6
 
@@ -603,25 +516,7 @@ label5:
 
 label6:
 
-	movdqa		xmm15, [rsp - 160]
-	movdqa		xmm14, [rsp - 144]
-	movdqa		xmm13, [rsp - 128]
-	movdqa		xmm12, [rsp - 112]
-	movdqa		xmm11, [rsp -  96]
-	movdqa		xmm10, [rsp -  80]
-	movdqa		xmm9,  [rsp -  64]
-	movdqa		xmm8,  [rsp -  48]
-	movdqa		xmm7,  [rsp -  32]
-	movdqa		xmm6,  [rsp -  16]
-	pop			r15
-	pop			r14
-	pop			r13
-	pop			r12
-	pop			rdi
-	pop			rsi
-	pop			rbp
-	pop			rbx
-	add			rsp, 8
+	STD_EPILOG
 	ret
 
 x64_sse2_PredictMedianAndCount_align1	endp
@@ -631,24 +526,16 @@ x64_sse2_PredictMedianAndCount_align1	endp
 ; void x64_sse1mmx_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
 x64_sse1mmx_RestoreMedian_align1	proc
 
-	sub			rsp, 8
-	mov			[rsp + 16 +  0], rcx
-	mov			[rsp + 16 +  8], rdx
-	mov			[rsp + 16 + 16], r8
-	mov			[rsp + 16 + 24], r9
-	push		rbx
-	push		rbp
-	push		rsi
-	push		rdi
-	push		r12
-	push		r13
-	push		r14
-	push		r15
+	STD_PROLOG	0
+$pDstBegin   = argsoffset +  0
+$pSrcBegin   = argsoffset +  8
+$pSrcEnd     = argsoffset + 16
+$dwStride    = argsoffset + 24
 
-	mov			rsi, qword ptr [rsp + 64 + 16 +  8]	; pSrcBegin
-	mov			rdi, qword ptr [rsp + 64 + 16 +  0]	; pDst
+	mov			rsi, qword ptr [rsp + $pSrcBegin]
+	mov			rdi, qword ptr [rsp + $pDstBegin]
 	mov			rax, rsi
-	mov			rbp, qword ptr [rsp + 64 + 16 + 24]	; dwStride
+	mov			rbp, qword ptr [rsp + $dwStride]
 	add			rax, rbp
 	neg			rbp
 
@@ -685,18 +572,10 @@ label2:
 
 	inc			rsi
 	inc			rdi
-	cmp			rsi, qword ptr [rsp + 64 + 16 + 16]	; pSrcEnd
+	cmp			rsi, qword ptr [rsp + $pSrcEnd]
 	jb			label2
 
-	pop			r15
-	pop			r14
-	pop			r13
-	pop			r12
-	pop			rdi
-	pop			rsi
-	pop			rbp
-	pop			rbx
-	add			rsp, 8
+	STD_EPILOG
 	emms
 	ret
 
