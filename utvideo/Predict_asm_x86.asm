@@ -49,46 +49,13 @@ label1:
 	psubb		xmm0, xmm2
 	movdqu		oword ptr [edi], xmm0
 
-	pextrw		ecx, xmm0, 0
+for pos, <0, 1, 2, 3, 4, 5, 6, 7>
+	pextrw		ecx, xmm0, &pos
 	movzx		ebp, cl
 	inc			dword ptr [ebx+ebp*4]
 	movzx		ebp, ch
 	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 1
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 2
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 3
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 4
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 5
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 6
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 7
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
+endm
 
 	add			esi, 16
 	add			edi, 16
@@ -159,46 +126,13 @@ label1:
 	psubb		xmm0, xmm2
 	movdqa		oword ptr [edi], xmm0
 
-	pextrw		ecx, xmm0, 0
+for pos, <0, 1, 2, 3, 4, 5, 6, 7>
+	pextrw		ecx, xmm0, &pos
 	movzx		ebp, cl
 	inc			dword ptr [ebx+ebp*4]
 	movzx		ebp, ch
 	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 1
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 2
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 3
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 4
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 5
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 6
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 7
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
+endm
 
 	add			esi, 16
 	add			edi, 16
@@ -239,46 +173,13 @@ label2:
 	psubb		xmm0, xmm7
 	movdqa		oword ptr [edi], xmm0
 
-	pextrw		ecx, xmm0, 0
+for pos, <0, 1, 2, 3, 4, 5, 6, 7>
+	pextrw		ecx, xmm0, &pos
 	movzx		ebp, cl
 	inc			dword ptr [ebx+ebp*4]
 	movzx		ebp, ch
 	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 1
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 2
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 3
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 4
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 5
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 6
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 7
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
+endm
 
 	add			esi, 16
 	add			edi, 16
@@ -329,46 +230,13 @@ label1:
 	psubb		xmm0, xmm2
 	movdqu		oword ptr [edi], xmm0
 
-	pextrw		ecx, xmm0, 0
+for pos, <0, 1, 2, 3, 4, 5, 6, 7>
+	pextrw		ecx, xmm0, &pos
 	movzx		ebp, cl
 	inc			dword ptr [ebx+ebp*4]
 	movzx		ebp, ch
 	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 1
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 2
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 3
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 4
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 5
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 6
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 7
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
+endm
 
 	add			esi, 16
 	add			edi, 16
@@ -440,46 +308,13 @@ label2:
 	psubb		xmm0, xmm7
 	movdqu		oword ptr [edi], xmm0
 
-	pextrw		ecx, xmm0, 0
+for pos, <0, 1, 2, 3, 4, 5, 6, 7>
+	pextrw		ecx, xmm0, &pos
 	movzx		ebp, cl
 	inc			dword ptr [ebx+ebp*4]
 	movzx		ebp, ch
 	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 1
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 2
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 3
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 4
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 5
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 6
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-	pextrw		ecx, xmm0, 7
-	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
-	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
+endm
 
 	add			esi, 16
 	add			edi, 16
