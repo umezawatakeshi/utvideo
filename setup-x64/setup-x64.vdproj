@@ -21,12 +21,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_3EBCA836DA5B49548E6D9D7FF76D4D32"
-        "OwnerKey" = "8:_9DDF4CABCE6C4DB9A0F16F5380F80A5A"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_3FF0B905FABD4AA59151EDC4309952A8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -53,12 +47,6 @@
         {
         "MsmKey" = "8:_7522E47756584FAA88FA7BFA2BAD7632"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_9DDF4CABCE6C4DB9A0F16F5380F80A5A"
-        "OwnerKey" = "8:_EEB9096AC4CD470C9353B6D39DF20212"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -101,6 +89,12 @@
         {
         "MsmKey" = "8:_FF112364F0B7919883E968D54EB901E9"
         "OwnerKey" = "8:_06E8111446584DB79B314E141B053B66"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FF112364F0B7919883E968D54EB901E9"
+        "OwnerKey" = "8:_EEB9096AC4CD470C9353B6D39DF20212"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -454,14 +448,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite x64"
-        "ProductCode" = "8:{40717F5A-AB92-4A40-A64B-8239B88D3415}"
-        "PackageCode" = "8:{7BA4CA3C-73A2-44CA-9B1B-6FE3AD945CBB}"
+        "ProductCode" = "8:{4B65C737-358E-4BFB-9488-7B1AF86AED2D}"
+        "PackageCode" = "8:{138D3448-AC2A-403F-BC94-D1C8614D5260}"
         "UpgradeCode" = "8:{D9406D67-866D-4C5A-B188-D02E4CEF555B}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:8.5.0"
+        "ProductVersion" = "8:8.5.1"
         "Manufacturer" = "8:UMEZAWA Takeshi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://umezawa.dyndns.info/"
@@ -1288,34 +1282,6 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_3EBCA836DA5B49548E6D9D7FF76D4D32"
-            {
-            "UseDynamicProperties" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_8_0_microsoft_vc80_crt_x86_x64.msm"
-                "Properties"
-                {
-                }
-            "LanguageId" = "3:0"
-            "Exclude" = "11:FALSE"
-            "Folder" = "8:"
-            "Feature" = "8:"
-            "IsolateTo" = "8:"
-            }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_9DDF4CABCE6C4DB9A0F16F5380F80A5A"
-            {
-            "UseDynamicProperties" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC80_CRT_x86_x64.msm"
-                "Properties"
-                {
-                }
-            "LanguageId" = "3:0"
-            "Exclude" = "11:FALSE"
-            "Folder" = "8:"
-            "Feature" = "8:"
-            "IsolateTo" = "8:"
-            }
         }
         "ProjectOutput"
         {

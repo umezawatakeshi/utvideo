@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_0A8C87A54662EF32AB28B26A4719B978"
+        "OwnerKey" = "8:_2132544A283941869AE6B62DC751FB89"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_103BD1760A3549A395B57D42C68EC8EC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -77,18 +83,6 @@
         {
         "MsmKey" = "8:_B75FAC1C6559494FA2B2FC9F3AED7F5B"
         "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C345F608470B41419FB32947A343C35E"
-        "OwnerKey" = "8:_2132544A283941869AE6B62DC751FB89"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C9C23E6CF5A74A3287AA115CC2B5571D"
-        "OwnerKey" = "8:_C345F608470B41419FB32947A343C35E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -443,14 +437,14 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite x86"
-        "ProductCode" = "8:{150E2C59-01C2-4696-9B79-CD4E28E6003B}"
-        "PackageCode" = "8:{F41E9899-8290-43DD-AAD4-B5549A8560FB}"
+        "ProductCode" = "8:{A65BDDA6-DB6A-4EEE-9E92-8D850886C124}"
+        "PackageCode" = "8:{6A92FB4C-CCA6-4C30-A7E4-EA7877180E93}"
         "UpgradeCode" = "8:{BD16A4A2-9AB5-4C0C-A763-DB7F9EAA4B1E}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:8.5.0"
+        "ProductVersion" = "8:8.5.1"
         "Manufacturer" = "8:UMEZAWA Takeshi"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:http://umezawa.dyndns.info/"
@@ -1277,34 +1271,6 @@
         }
         "MergeModule"
         {
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C345F608470B41419FB32947A343C35E"
-            {
-            "UseDynamicProperties" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:Microsoft_VC80_CRT_x86.msm"
-                "Properties"
-                {
-                }
-            "LanguageId" = "3:0"
-            "Exclude" = "11:FALSE"
-            "Folder" = "8:"
-            "Feature" = "8:"
-            "IsolateTo" = "8:"
-            }
-            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_C9C23E6CF5A74A3287AA115CC2B5571D"
-            {
-            "UseDynamicProperties" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
-            "SourcePath" = "8:policy_8_0_microsoft_vc80_crt_x86.msm"
-                "Properties"
-                {
-                }
-            "LanguageId" = "3:0"
-            "Exclude" = "11:FALSE"
-            "Folder" = "8:"
-            "Feature" = "8:"
-            "IsolateTo" = "8:"
-            }
         }
         "ProjectOutput"
         {
