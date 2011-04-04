@@ -71,7 +71,7 @@ HRESULT WINAPI CDMOEncoder::UpdateRegistry(DWORD fcc, REFCLSID clsid, BOOL bRegi
 
 	if (bRegister)
 	{
-		CCodec *pCodec = CCodec::CreateInstance(fcc, "DMO");
+		CCodec *pCodec = CCodec::CreateInstance(fcc, "Encoder DMO");
 		DMO_PARTIAL_MEDIATYPE *pInTypes;
 		DMO_PARTIAL_MEDIATYPE *pOutTypes;
 		DWORD cInTypes, cOutTypes;
