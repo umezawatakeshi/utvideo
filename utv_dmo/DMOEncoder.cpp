@@ -17,7 +17,7 @@
 CDMOEncoder::CDMOEncoder(DWORD fcc, REFCLSID clsid) :
 	m_fcc(fcc), m_clsid(clsid)
 {
-	m_pCodec = CCodec::CreateInstance(fcc, "DMO");
+	m_pCodec = CCodec::CreateInstance(fcc, "Encoder DMO");
 	m_pInputBuffer = NULL;
 }
 
