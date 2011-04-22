@@ -162,13 +162,16 @@ HRESULT CDMOEncoder::InternalCheckOutputType(DWORD dwOutputStreamIndex, const DM
 
 	pvih = (const VIDEOINFOHEADER *)pmt->pbFormat;
 
-	pfi = m_pCodec->GetCompressedFormat();
-	if (!IsEqualGUID(pfi->guidMediaSubType, pmt->subtype))
-		return DMO_E_INVALIDTYPE;
-	if (m_pCodec->CompressQuery(&pvihIn->bmiHeader, &pvih->bmiHeader) != 0)
-		return DMO_E_INVALIDTYPE;
+	for (pfi = m_pCodec->GetCompressedFormat(); !IS_FORMATINFO_END(pfi); pfi++)
+	{
+		if (IsEqualGUID(pfi->guidMediaSubType, pmt->subtype))
+		{
+			if (m_pCodec->CompressQuery(&pvihIn->bmiHeader, &pvih->bmiHeader) == 0)
+				return S_OK;
+		}
+	}
 
-	return S_OK;
+	return DMO_E_INVALIDTYPE;
 }
 
 HRESULT CDMOEncoder::InternalGetInputType(DWORD dwInputStreamIndex, DWORD dwTypeIndex, DMO_MEDIA_TYPE *pmt)
@@ -204,7 +207,13 @@ HRESULT CDMOEncoder::InternalGetOutputType(DWORD dwOutputStreamIndex, DWORD dwTy
 
 	const FORMATINFO *pfi = m_pCodec->GetCompressedFormat();
 
-	if (dwTypeIndex != 0)
+	while (dwTypeIndex > 0 && !IS_FORMATINFO_END(pfi))
+	{
+		pfi++;
+		dwTypeIndex--;
+	}
+
+	if (IS_FORMATINFO_END(pfi))
 		return DMO_E_NO_MORE_ITEMS;
 
 	memset(pmt, 0, sizeof(DMO_MEDIA_TYPE));
