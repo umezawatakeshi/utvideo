@@ -476,6 +476,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DMOCodec.h"
+				>
+			</File>
+			<File
 				RelativePath=".\DMOEncoder.h"
 				>
 			</File>

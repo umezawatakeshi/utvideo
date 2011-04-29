@@ -11,6 +11,8 @@
 #include "Codec.h"
 #include "ClsID.h"
 
+#include "DMOCodec.h"
+
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "DCOM の完全サポートを含んでいない Windows Mobile プラットフォームのような Windows CE プラットフォームでは、単一スレッド COM オブジェクトは正しくサポートされていません。ATL が単一スレッド COM オブジェクトの作成をサポートすること、およびその単一スレッド COM オブジェクトの実装の使用を許可することを強制するには、_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA を定義してください。ご使用の rgs ファイルのスレッド モデルは 'Free' に設定されており、DCOM Windows CE 以外のプラットフォームでサポートされる唯一のスレッド モデルと設定されていました。"
@@ -22,27 +24,13 @@
 // <FCC>-E991-460D-840B-C1C6497457EF
 
 class ATL_NO_VTABLE CDMOEncoder :
-	public CComObjectRootEx<CComMultiThreadModel>,
-	public IMediaObjectImpl<CDMOEncoder, 1, 1>,
+	public CDMOCodec<CDMOEncoder>,
 	public IPersistStream,
 	public IAMVfwCompressDialogs
 {
-private:
-	const DWORD m_fcc;
-	const CLSID m_clsid;
-	CCodec *m_pCodec;
-	IMediaBuffer *m_pInputBuffer;
-	BOOL m_bInputKeyFrame;
-	BOOL m_bInputTimestampValid;
-	BOOL m_bInputTimelengthValid;
-	REFERENCE_TIME m_rtInputTimestamp;
-	REFERENCE_TIME m_rtInputTimelength;
-
 public:
-	CDMOEncoder(DWORD fcc, REFCLSID clsid);
-	virtual ~CDMOEncoder();
-
-	static HRESULT WINAPI UpdateRegistry(DWORD fcc, REFCLSID clsid, BOOL bRegister);
+	CDMOEncoder(DWORD fcc, REFCLSID clsid) : CDMOCodec(fcc, clsid) {}
+	virtual ~CDMOEncoder() {}
 
 	BEGIN_COM_MAP(CDMOEncoder)
 		COM_INTERFACE_ENTRY(IMediaObject)
@@ -51,36 +39,9 @@ public:
 		COM_INTERFACE_ENTRY(IAMVfwCompressDialogs)
 	END_COM_MAP()
 
-	DECLARE_PROTECT_FINAL_CONSTRUCT()
-
-	HRESULT FinalConstruct()
-	{
-		return S_OK;
-	}
-
-	void FinalRelease()
-	{
-	}
-
 public:
 	// IMediaObjectImpl
-	HRESULT InternalGetInputStreamInfo(DWORD dwInputStreamIndex, DWORD *pdwFlags);
-	HRESULT InternalGetOutputStreamInfo(DWORD dwOutputStreamIndex, DWORD *pdwFlags);
-	HRESULT InternalCheckInputType(DWORD dwInputStreamIndex, const DMO_MEDIA_TYPE *pmt);
-	HRESULT InternalCheckOutputType(DWORD dwOutputStreamIndex, const DMO_MEDIA_TYPE *pmt);
-	HRESULT InternalGetInputType(DWORD dwInputStreamIndex, DWORD dwTypeIndex, DMO_MEDIA_TYPE *pmt);
-	HRESULT InternalGetOutputType(DWORD dwOutputStreamIndex, DWORD dwTypeIndex, DMO_MEDIA_TYPE *pmt);
-	HRESULT InternalGetInputSizeInfo(DWORD dwInputStreamIndex, DWORD *pcbSize, DWORD *pcbMaxLookahead, DWORD *pcbAlignment);
-	HRESULT InternalGetOutputSizeInfo(DWORD dwOutputStreamIndex, DWORD *pcbSize, DWORD *pcbAlignment);
-	HRESULT InternalGetInputMaxLatency(DWORD dwInputStreamIndex, REFERENCE_TIME *prtMaxLatency);
-	HRESULT InternalSetInputMaxLatency(DWORD dwInputStreamIndex, REFERENCE_TIME rtMaxLatency);
-	HRESULT InternalFlush();
-	HRESULT InternalDiscontinuity(DWORD dwInputStreamIndex);
-	HRESULT InternalAllocateStreamingResources();
-	HRESULT InternalFreeStreamingResources();
-	HRESULT InternalProcessInput(DWORD dwInputStreamIndex, IMediaBuffer *pBuffer, DWORD dwFlags, REFERENCE_TIME rtTimestamp, REFERENCE_TIME rtTimelength);
 	HRESULT InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, DMO_OUTPUT_DATA_BUFFER *pOutputBuffers, DWORD *pdwStatus);
-	HRESULT InternalAcceptingInput(DWORD dwInputStreamIndex);
 
 	// IPersist
 	virtual HRESULT STDMETHODCALLTYPE GetClassID(CLSID *pClassID);
