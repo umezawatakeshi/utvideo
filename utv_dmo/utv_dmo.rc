@@ -93,6 +93,7 @@ END
 
 IDR_UTVIDEODMO          REGISTRY                "utv_dmo.rgs"
 IDR_DMOENCODER          REGISTRY                "DMOEncoder.rgs"
+IDR_DMODECODER          REGISTRY                "DMODecoder.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
