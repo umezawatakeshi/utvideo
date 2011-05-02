@@ -7,10 +7,11 @@ struct FORMATINFO
 {
 	DWORD fcc;
 	WORD nBitCount;
+	bool bTemporalCompression;
 	REFGUID guidMediaSubType;
 };
 
-#define FORMATINFO_END { DWORD(-1), 0, GUID_NULL }
+#define FORMATINFO_END { DWORD(-1), 0, false, GUID_NULL }
 #define IS_FORMATINFO_END(pfi) ((pfi)->fcc == DWORD(-1))
 
 class CCodec

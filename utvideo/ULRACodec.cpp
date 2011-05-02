@@ -8,19 +8,19 @@
 #include "MediaSubType.h"
 
 const FORMATINFO CULRACodec::m_fiEncoderInput[] = {
-	{ BI_RGB, 32, MEDIASUBTYPE_ARGB32 },
-	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
+	{ BI_RGB, 32, false, MEDIASUBTYPE_ARGB32 },
+	{ BI_RGB, 32, false, MEDIASUBTYPE_RGB32 },
 	FORMATINFO_END,
 };
 
 const FORMATINFO CULRACodec::m_fiDecoderOutput[] = {
-	{ BI_RGB, 32, MEDIASUBTYPE_ARGB32 },
-	{ BI_RGB, 32, MEDIASUBTYPE_RGB32 },
+	{ BI_RGB, 32, false, MEDIASUBTYPE_ARGB32 },
+	{ BI_RGB, 32, false, MEDIASUBTYPE_RGB32 },
 	FORMATINFO_END,
 };
 
 const FORMATINFO CULRACodec::m_fiCompressed[] = {
-	{ FCC('ULRA'), 32, MEDIASUBTYPE_ULRA },
+	{ FCC('ULRA'), 32, false, MEDIASUBTYPE_ULRA },
 	FORMATINFO_END,
 };
 
