@@ -692,6 +692,18 @@ LRESULT CUL00Codec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 	return ICERR_OK;
 }
 
+LRESULT CUL00Codec::DecompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+{
+	LRESULT ret;
+	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
+
+	ret = CalcFrameMetric(pbihOut, pbieIn);
+	if (ret != ICERR_OK)
+		return ret;
+
+	return m_dwRawSize;
+}
+
 LRESULT CUL00Codec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;

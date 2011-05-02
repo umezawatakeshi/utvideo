@@ -192,6 +192,11 @@ LRESULT CDummyCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPI
 	return ICERR_UNSUPPORTED;
 }
 
+LRESULT CDummyCodec::DecompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+{
+	return ICERR_UNSUPPORTED;
+}
+
 LRESULT CDummyCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	return ICERR_UNSUPPORTED;
