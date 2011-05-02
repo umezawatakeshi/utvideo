@@ -56,7 +56,7 @@ HRESULT CDMOEncoder::InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCou
 	pOutputBuffers->pBuffer->GetBufferAndLength((BYTE **)&icc.lpOutput, NULL);
 	icc.lpbiInput = (BITMAPINFOHEADER *)malloc(pvihIn->bmiHeader.biSize);
 	memcpy(icc.lpbiInput, &pvihIn->bmiHeader, pvihIn->bmiHeader.biSize);
-	m_pInputBuffer->GetBufferAndLength((BYTE **)&icc.lpInput, NULL);
+	m_pInputBuffer->GetBufferAndLength((BYTE **)&icc.lpInput, &icc.lpbiInput->biSizeImage);
 	icc.lpckid = &ckid;
 	icc.lpdwFlags = &dwAviFlags;
 	icc.lFrameNum = 0; // XXX
