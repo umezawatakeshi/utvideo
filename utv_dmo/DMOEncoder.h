@@ -40,7 +40,23 @@ public:
 	END_COM_MAP()
 
 public:
+	// CDMOCodec
+	static const GUID &DMOCATEGORY /* = DMOCATEGORY_VIDEO_ENCODER */;
+	static const UINT IDR = IDR_DMOENCODER;
+	static const bool bEncoding = true;
+
+	static const FORMATINFO *GetInputFormatInfo(CCodec *pCodec) { return pCodec->GetEncoderInputFormat(); }
+	static const FORMATINFO *GetOutputFormatInfo(CCodec *pCodec) { return pCodec->GetCompressedFormat(); }
+	static const void GetName(CCodec *pCodec, WCHAR *szCodecName, size_t cchCodecName) { pCodec->GetLongFriendlyName(szCodecName, cchCodecName); }
+
+	LRESULT GetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) { return m_pCodec->CompressGetFormat(pbihIn, pbihOut); }
+	LRESULT GetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) {return m_pCodec->CompressGetSize(pbihIn, pbihOut); }
+	LRESULT Query(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) {return m_pCodec->CompressQuery(pbihIn, pbihOut); }
+
+public:
 	// IMediaObjectImpl
+	HRESULT InternalAllocateStreamingResources();
+	HRESULT InternalFreeStreamingResources();
 	HRESULT InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, DMO_OUTPUT_DATA_BUFFER *pOutputBuffers, DWORD *pdwStatus);
 
 	// IPersist

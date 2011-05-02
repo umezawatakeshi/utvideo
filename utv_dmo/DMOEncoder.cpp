@@ -8,6 +8,32 @@
 
 // CDMOEncoder
 
+const GUID &CDMOEncoder::DMOCATEGORY = DMOCATEGORY_VIDEO_ENCODER;
+
+HRESULT CDMOEncoder::InternalAllocateStreamingResources()
+{
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalAllocateStreamingResources()\n");
+
+	const DMO_MEDIA_TYPE *pmtIn  = InputType(0);
+	const DMO_MEDIA_TYPE *pmtOut = OutputType(0);
+	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
+	const VIDEOINFOHEADER *pvihOut = (const VIDEOINFOHEADER *)pmtOut->pbFormat;
+
+	if (m_pCodec->CompressBegin(&pvihIn->bmiHeader, &pvihOut->bmiHeader) == 0)
+		return S_OK;
+	else
+		return E_FAIL;
+}
+
+HRESULT CDMOEncoder::InternalFreeStreamingResources()
+{
+	_RPT0(_CRT_WARN, "CDMOEncoder::InternalFreeStreamingResources()\n");
+
+	m_pCodec->CompressEnd();
+
+	return S_OK;
+}
+
 HRESULT CDMOEncoder::InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, DMO_OUTPUT_DATA_BUFFER *pOutputBuffers, DWORD *pdwStatus)
 {
 	_RPT0(_CRT_WARN, "CDMOEncoder::InternalProcessOutput()\n");
