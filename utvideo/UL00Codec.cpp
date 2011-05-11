@@ -70,11 +70,6 @@ DWORD CUL00Codec::GetFCC(void)
 	return m_fcc;
 }
 
-BOOL CUL00Codec::IsTemporalCompressionSupported(void)
-{
-	return FALSE;
-}
-
 LRESULT CUL00Codec::LoadConfig(void)
 {
 	HKEY hkUtVideo;

@@ -102,11 +102,6 @@ DWORD CDummyCodec::GetFCC(void)
 	return DWORD(-1);
 }
 
-BOOL CDummyCodec::IsTemporalCompressionSupported(void)
-{
-	return FALSE;
-}
-
 const FORMATINFO *CDummyCodec::GetEncoderInputFormat(void)
 {
 	return NULL;
