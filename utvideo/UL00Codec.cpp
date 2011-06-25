@@ -504,10 +504,10 @@ LRESULT CUL00Codec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFO
 	pbieOut->bih.biBitCount      = min(pbihIn->biBitCount, GetFalseBitCount());
 	pbieOut->bih.biCompression   = m_fcc;
 	pbieOut->bih.biSizeImage     = pbihIn->biSizeImage;
-	//pbieOut->bih.biXPelsPerMeter
-	//pbieOut->bih.biYPelsPerMeter
-	//pbieOut->bih.biClrUsed
-	//pbieOut->bih.biClrImportant
+	pbieOut->bih.biXPelsPerMeter = pbihIn->biXPelsPerMeter;
+	pbieOut->bih.biYPelsPerMeter = pbihIn->biYPelsPerMeter;
+	pbieOut->bih.biClrUsed       = 0;
+	pbieOut->bih.biClrImportant  = 0;
 	pbieOut->dwEncoderVersionAndImplementation  = UTVIDEO_VERSION_AND_IMPLEMENTATION;
 	pbieOut->fccOriginalFormat = pbihIn->biCompression;
 	pbieOut->dwFrameInfoSize   = sizeof(FRAMEINFO);
@@ -679,10 +679,10 @@ LRESULT CUL00Codec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 	pbihOut->biBitCount      = GetDecoderOutputFormat()->nBitCount;
 	pbihOut->biCompression   = GetDecoderOutputFormat()->fcc;
 	pbihOut->biSizeImage     = pbihIn->biSizeImage;
-	//pbihOut->biXPelsPerMeter
-	//pbihOut->biYPelsPerMeter
-	//pbihOut->biClrUsed
-	//pbihOut->biClrImportant
+	pbihOut->biXPelsPerMeter = pbihIn->biXPelsPerMeter;
+	pbihOut->biYPelsPerMeter = pbihIn->biYPelsPerMeter;
+	pbihOut->biClrUsed       = 0;
+	pbihOut->biClrImportant  = 0;
 
 	return ICERR_OK;
 }
