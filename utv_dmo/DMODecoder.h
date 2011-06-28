@@ -44,7 +44,7 @@ public:
 	static const FORMATINFO *GetOutputFormatInfo(CCodec *pCodec) { return pCodec->GetDecoderOutputFormat(); }
 	static const void GetName(CCodec *pCodec, WCHAR *szCodecName, size_t cchCodecName) { DWORD fcc = pCodec->GetFCC(); wsprintfW(szCodecName, L"%C%C%C%C DMO Decoder", FCC4PRINTF(fcc)); }
 
-	LRESULT GetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) { return m_pCodec->DecompressGetFormat(pbihIn, pbihOut); }
+	LRESULT GetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut, const FORMATINFO *pfiOut) { return m_pCodec->DecompressGetFormat(pbihIn, pbihOut, pfiOut); }
 	LRESULT GetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) {return m_pCodec->DecompressGetSize(pbihIn, pbihOut); }
 	LRESULT Query(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) {return m_pCodec->DecompressQuery(pbihIn, pbihOut); }
 

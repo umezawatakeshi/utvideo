@@ -210,6 +210,8 @@ public:
 		for (pfi = T::GetOutputFormatInfo(m_pCodec); !IS_FORMATINFO_END(pfi); pfi++)
 		{
 			if (IsEqualGUID(pfi->guidMediaSubType, pmt->subtype) &&
+				pvih->bmiHeader.biCompression == pfi->fcc &&
+				pvih->bmiHeader.biBitCount == pfi->nBitCount &&
 				((T *)this)->Query(&pvihIn->bmiHeader, &pvih->bmiHeader) == 0 &&
 				(pmt->bTemporalCompression && pfi->bTemporalCompression ||
 					!pmt->bTemporalCompression && !pfi->bTemporalCompression))
@@ -275,11 +277,11 @@ public:
 			VIDEOINFOHEADER *pvih;
 			DWORD biSize;
 
-			biSize = ((T *)this)->GetFormat(&pvihIn->bmiHeader, NULL);
+			biSize = ((T *)this)->GetFormat(&pvihIn->bmiHeader, NULL, pfi);
 			MoInitMediaType(pmt, sizeof(VIDEOINFOHEADER) - sizeof(BITMAPINFOHEADER) + biSize);
 			pvih = (VIDEOINFOHEADER *)pmt->pbFormat;
 			memcpy(pvih, pvihIn, sizeof(VIDEOINFOHEADER) - sizeof(BITMAPINFOHEADER));
-			((T *)this)->GetFormat(&pvihIn->bmiHeader, &pvih->bmiHeader);
+			((T *)this)->GetFormat(&pvihIn->bmiHeader, &pvih->bmiHeader, pfi);
 			pmt->formattype = FORMAT_VideoInfo;
 			pmt->bTemporalCompression = pfi->bTemporalCompression;
 		}

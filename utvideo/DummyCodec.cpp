@@ -123,7 +123,7 @@ LRESULT CDummyCodec::DecompressEnd(void)
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CDummyCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut, const FORMATINFO *pfiOut)
 {
 	return ICERR_UNSUPPORTED;
 }

@@ -49,7 +49,7 @@ public:
 	static const FORMATINFO *GetOutputFormatInfo(CCodec *pCodec) { return pCodec->GetCompressedFormat(); }
 	static const void GetName(CCodec *pCodec, WCHAR *szCodecName, size_t cchCodecName) { pCodec->GetLongFriendlyName(szCodecName, cchCodecName); }
 
-	LRESULT GetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut) { return m_pCodec->CompressGetFormat(pbihIn, pbihOut); }
+	LRESULT GetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut, const FORMATINFO *pfiOut) { return m_pCodec->CompressGetFormat(pbihIn, pbihOut); }
 	LRESULT GetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) {return m_pCodec->CompressGetSize(pbihIn, pbihOut); }
 	LRESULT Query(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) {return m_pCodec->CompressQuery(pbihIn, pbihOut); }
 

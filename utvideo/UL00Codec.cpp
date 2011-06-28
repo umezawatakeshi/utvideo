@@ -665,10 +665,13 @@ LRESULT CUL00Codec::DecompressEnd(void)
 	return ICERR_OK;
 }
 
-LRESULT CUL00Codec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+LRESULT CUL00Codec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut, const FORMATINFO *pfiOut)
 {
 	if (pbihOut == NULL)
 		return sizeof(BITMAPINFOHEADER);
+
+	if (pfiOut == NULL)
+		pfiOut = GetDecoderOutputFormat();
 
 	memset(pbihOut, 0, sizeof(BITMAPINFOHEADER));
 
@@ -676,8 +679,8 @@ LRESULT CUL00Codec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPIN
 	pbihOut->biWidth         = pbihIn->biWidth;
 	pbihOut->biHeight        = pbihIn->biHeight;
 	pbihOut->biPlanes        = 1;
-	pbihOut->biBitCount      = GetDecoderOutputFormat()->nBitCount;
-	pbihOut->biCompression   = GetDecoderOutputFormat()->fcc;
+	pbihOut->biBitCount      = pfiOut->nBitCount;
+	pbihOut->biCompression   = pfiOut->fcc;
 	pbihOut->biSizeImage     = pbihIn->biSizeImage;
 	pbihOut->biXPelsPerMeter = pbihIn->biXPelsPerMeter;
 	pbihOut->biYPelsPerMeter = pbihIn->biYPelsPerMeter;
