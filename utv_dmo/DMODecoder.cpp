@@ -43,8 +43,6 @@ HRESULT CDMODecoder::InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCou
 	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
 	const VIDEOINFOHEADER *pvihOut = (const VIDEOINFOHEADER *)pmtOut->pbFormat;
 	ICDECOMPRESS icd;
-	DWORD ckid;
-	DWORD dwAviFlags;
 
 	if (m_pInputBuffer == NULL)
 		return S_FALSE;
