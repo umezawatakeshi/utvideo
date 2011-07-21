@@ -90,6 +90,7 @@ public:
 			hr = DMORegister(szCodecName, clsid, T::DMOCATEGORY, 0, cInTypes, pInTypes, cOutTypes, pOutTypes);
 			delete pInTypes;
 			delete pOutTypes;
+			CCodec::DeleteInstance(pCodec);
 			return hr;
 		}
 		else
