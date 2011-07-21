@@ -18,7 +18,7 @@ CVCMCodec::~CVCMCodec(void)
 {
 	DEBUG_ENTER_LEAVE("CVCMCodec::~CVCMCodec(void) this=%p", this);
 
-	delete m_pCodec;
+	CCodec::DeleteInstance(m_pCodec);
 }
 
 CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)

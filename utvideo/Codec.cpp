@@ -64,3 +64,8 @@ __declspec(dllexport) CCodec *CCodec::CreateInstance(DWORD fcc, const char *pszI
 
 	return codeclist[idx].pfnCreateInstace(pszInterfaceName);
 }
+
+__declspec(dllexport) void CCodec::DeleteInstance(CCodec *pCodec)
+{
+	delete pCodec;
+}

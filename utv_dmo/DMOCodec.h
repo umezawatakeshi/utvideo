@@ -56,7 +56,7 @@ public:
 
 		if (m_pInputBuffer != NULL)
 			m_pInputBuffer->Release();
-		delete m_pCodec;
+		CCodec::DeleteInstance(m_pCodec);
 	}
 
 	static HRESULT WINAPI UpdateRegistry(DWORD fcc, REFCLSID clsid, BOOL bRegister)
