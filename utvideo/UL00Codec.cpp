@@ -501,7 +501,7 @@ LRESULT CUL00Codec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFO
 	pbieOut->bih.biWidth         = pbihIn->biWidth;
 	pbieOut->bih.biHeight        = pbihIn->biHeight;
 	pbieOut->bih.biPlanes        = 1;
-	pbieOut->bih.biBitCount      = min(pbihIn->biBitCount, GetFalseBitCount());
+	pbieOut->bih.biBitCount      = GetFalseBitCount();
 	pbieOut->bih.biCompression   = m_fcc;
 	pbieOut->bih.biSizeImage     = pbihIn->biSizeImage;
 	pbieOut->bih.biXPelsPerMeter = pbihIn->biXPelsPerMeter;
