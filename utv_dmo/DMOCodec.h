@@ -164,8 +164,6 @@ public:
 
 		if (!IsEqualGUID(pmt->majortype, MEDIATYPE_Video))
 			return DMO_E_INVALIDTYPE;
-		if (T::bEncoding ? !pmt->bFixedSizeSamples : pmt->bFixedSizeSamples)
-			return DMO_E_INVALIDTYPE;
 		if (!IsEqualGUID(pmt->formattype, FORMAT_VideoInfo))
 			return DMO_E_INVALIDTYPE;
 
@@ -174,9 +172,7 @@ public:
 		for (pfi = T::GetInputFormatInfo(m_pCodec); !IS_FORMATINFO_END(pfi); pfi++)
 		{
 			if (IsEqualGUID(pfi->guidMediaSubType, pmt->subtype) &&
-				((T *)this)->Query(&pvih->bmiHeader, NULL) == 0 &&
-				(pmt->bTemporalCompression && pfi->bTemporalCompression ||
-					!pmt->bTemporalCompression && !pfi->bTemporalCompression))
+				((T *)this)->Query(&pvih->bmiHeader, NULL) == 0)
 			{
 					return S_OK;
 			}
@@ -201,8 +197,6 @@ public:
 
 		if (!IsEqualGUID(pmt->majortype, MEDIATYPE_Video))
 			return DMO_E_INVALIDTYPE;
-		if (T::bEncoding ? pmt->bFixedSizeSamples : !pmt->bFixedSizeSamples)
-			return DMO_E_INVALIDTYPE;
 		if (!IsEqualGUID(pmt->formattype, FORMAT_VideoInfo))
 			return DMO_E_INVALIDTYPE;
 
@@ -213,9 +207,7 @@ public:
 			if (IsEqualGUID(pfi->guidMediaSubType, pmt->subtype) &&
 				pvih->bmiHeader.biCompression == pfi->fcc &&
 				pvih->bmiHeader.biBitCount == pfi->nBitCount &&
-				((T *)this)->Query(&pvihIn->bmiHeader, &pvih->bmiHeader) == 0 &&
-				(pmt->bTemporalCompression && pfi->bTemporalCompression ||
-					!pmt->bTemporalCompression && !pfi->bTemporalCompression))
+				((T *)this)->Query(&pvihIn->bmiHeader, &pvih->bmiHeader) == 0)
 			{
 					return S_OK;
 			}
