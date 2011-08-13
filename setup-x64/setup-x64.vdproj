@@ -87,19 +87,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_FF112364F0B7919883E968D54EB901E9"
+        "MsmKey" = "8:_FFA98DE82AAA08F22C3624141BF172B9"
         "OwnerKey" = "8:_06E8111446584DB79B314E141B053B66"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_FF112364F0B7919883E968D54EB901E9"
+        "MsmKey" = "8:_FFA98DE82AAA08F22C3624141BF172B9"
         "OwnerKey" = "8:_EEB9096AC4CD470C9353B6D39DF20212"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_FF112364F0B7919883E968D54EB901E9"
+        "MsmKey" = "8:_FFA98DE82AAA08F22C3624141BF172B9"
         "OwnerKey" = "8:_5B781877468E4E71822E44E82568B697"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -340,10 +340,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FF112364F0B7919883E968D54EB901E9"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FFA98DE82AAA08F22C3624141BF172B9"
             {
-            "SourcePath" = "8:utvideo.dll"
-            "TargetName" = "8:utvideo.dll"
+            "SourcePath" = "8:utv_core.dll"
+            "TargetName" = "8:utv_core.dll"
             "Tag" = "8:"
             "Folder" = "8:_57FB51DF1CF6408A83E9242C1FD158FE"
             "Condition" = "8:"
@@ -1343,7 +1343,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_C4F1C75E50764A5DA99FFDBBBB0785E6"
             {
-            "SourcePath" = "8:..\\x64\\release\\utvideo.dll"
+            "SourcePath" = "8:..\\x64\\release\\utv_core.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_83BF4A5DE5FD48078CCCD27AB6A6DCDF"

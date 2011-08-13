@@ -21,24 +21,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0A8C87A54662EF32AB28B26A4719B978"
-        "OwnerKey" = "8:_103BD1760A3549A395B57D42C68EC8EC"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0A8C87A54662EF32AB28B26A4719B978"
-        "OwnerKey" = "8:_DD5D27B7EE494AD6A0FE84F3B8E6DD42"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_0A8C87A54662EF32AB28B26A4719B978"
-        "OwnerKey" = "8:_2132544A283941869AE6B62DC751FB89"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_103BD1760A3549A395B57D42C68EC8EC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -83,6 +65,24 @@
         {
         "MsmKey" = "8:_B75FAC1C6559494FA2B2FC9F3AED7F5B"
         "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D28076E4E9939563D480C152BAB0D02F"
+        "OwnerKey" = "8:_103BD1760A3549A395B57D42C68EC8EC"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D28076E4E9939563D480C152BAB0D02F"
+        "OwnerKey" = "8:_DD5D27B7EE494AD6A0FE84F3B8E6DD42"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D28076E4E9939563D480C152BAB0D02F"
+        "OwnerKey" = "8:_2132544A283941869AE6B62DC751FB89"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -198,26 +198,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0A8C87A54662EF32AB28B26A4719B978"
-            {
-            "SourcePath" = "8:utvideo.dll"
-            "TargetName" = "8:utvideo.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_443DEB24D0C74DD38A8B217C891224D6"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:TRUE"
-            "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1F878E1DA1B34589B3F68E6439C694A7"
@@ -340,6 +320,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D28076E4E9939563D480C152BAB0D02F"
+            {
+            "SourcePath" = "8:utv_core.dll"
+            "TargetName" = "8:utv_core.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_97983D00EA0D4FB5828C0B6653E2B02D"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D85FD29E03552DA8ABC00C776137B266"
             {
             "SourcePath" = "8:msdmo.dll"
@@ -438,7 +438,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Ut Video Codec Suite x86"
         "ProductCode" = "8:{A2430113-EDC8-4F74-AEAD-B14A1641E87D}"
-        "PackageCode" = "8:{C6A2E3A7-D0E0-4E02-91B9-5BC7A8315EF9}"
+        "PackageCode" = "8:{45866142-8268-4F3E-946B-99F862E532EC}"
         "UpgradeCode" = "8:{BD16A4A2-9AB5-4C0C-A763-DB7F9EAA4B1E}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
@@ -1360,7 +1360,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_DE5F826C877346A4B6CCD0AB24C7F040"
             {
-            "SourcePath" = "8:..\\release\\utvideo.dll"
+            "SourcePath" = "8:..\\release\\utv_core.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_97983D00EA0D4FB5828C0B6653E2B02D"
