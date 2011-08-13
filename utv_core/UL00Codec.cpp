@@ -3,6 +3,7 @@
 
 #include "StdAfx.h"
 #include "utvideo.h"
+#include "utv_core.h"
 #include "UL00Codec.h"
 #include "Predict.h"
 #include "resource.h"

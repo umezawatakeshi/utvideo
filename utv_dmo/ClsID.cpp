@@ -4,4 +4,5 @@
 #include "stdafx.h"
 #define INITGUID
 #include "guiddef.h"
+#include "utvideo.h"
 #include "ClsID.h"

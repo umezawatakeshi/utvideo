@@ -820,6 +820,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\utv_core.h"
+				>
+			</File>
+			<File
 				RelativePath=".\utvideo.h"
 				>
 			</File>

@@ -41,11 +41,3 @@
 #include <queue>
 #include <algorithm>
 using namespace std;
-
-#ifndef FCC
-#define FCC(fcc) ( \
-	(((DWORD)(fcc) & 0x000000ff) << 24) | \
-	(((DWORD)(fcc) & 0x0000ff00) <<  8) | \
-	(((DWORD)(fcc) & 0x00ff0000) >>  8) | \
-	(((DWORD)(fcc) & 0xff000000) >> 24))
-#endif

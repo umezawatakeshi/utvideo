@@ -6,6 +6,7 @@
 #pragma once
 #include "resource.h"       // ƒƒCƒ“ ƒVƒ“ƒ{ƒ‹
 
+#include "utvideo.h"
 #include "utv_dmo.h"
 #include <vfw.h>
 #include "Codec.h"
