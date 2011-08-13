@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="utvideo"
+	Name="utv_core"
 	ProjectGUID="{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}"
 	RootNamespace="utvideo"
 	Keyword="Win32Proj"
