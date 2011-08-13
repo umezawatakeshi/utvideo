@@ -734,7 +734,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\utvideo.cpp"
+				RelativePath=".\utv_core.cpp"
 				>
 			</File>
 		</Filter>
@@ -830,7 +830,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\utvideo.rc"
+				RelativePath=".\utv_core.rc"
 				>
 			</File>
 		</Filter>
