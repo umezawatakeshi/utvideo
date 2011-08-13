@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utvideo", "utvideo\utvideo.vcproj", "{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_core", "utv_core\utvideo.vcproj", "{7922358B-FEC7-43F8-82DC-0E6A57C1FD18}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "setup", "setup\setup.vdproj", "{41E8B592-994C-4FC8-9560-D99E0B73EE39}"
 	ProjectSection(ProjectDependencies) = postProject
