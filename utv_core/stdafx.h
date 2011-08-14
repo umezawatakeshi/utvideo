@@ -45,3 +45,5 @@ extern "C" void __cpuid(int *, int);
 #include <queue>
 #include <algorithm>
 using namespace std;
+
+#include <stdint.h>

@@ -46,3 +46,5 @@
 #include <dmoimpl.h>
 
 using namespace ATL;
+
+#include <stdint.h>
