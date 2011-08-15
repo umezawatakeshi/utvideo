@@ -68,17 +68,17 @@ LRESULT CDummyCodec::GetStateSize(void)
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyCodec::GetState(void *pState, SIZE_T cb)
+LRESULT CDummyCodec::GetState(void *pState, size_t cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyCodec::SetState(const void *pState, SIZE_T cb)
+LRESULT CDummyCodec::SetState(const void *pState, size_t cb)
 {
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
+LRESULT CDummyCodec::Compress(const ICCOMPRESS *icc, size_t cb)
 {
 	return ICERR_UNSUPPORTED;
 }
@@ -108,7 +108,7 @@ LRESULT CDummyCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPI
 	return ICERR_UNSUPPORTED;
 }
 
-LRESULT CDummyCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
+LRESULT CDummyCodec::Decompress(const ICDECOMPRESS *icd, size_t cb)
 {
 	return ICERR_UNSUPPORTED;
 }

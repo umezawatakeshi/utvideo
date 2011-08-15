@@ -24,15 +24,15 @@ public:
 
 	virtual LRESULT Configure(HWND hwnd);
 	virtual LRESULT GetStateSize(void);
-	virtual LRESULT GetState(void *pState, SIZE_T cb);
-	virtual LRESULT SetState(const void *pState, SIZE_T cb);
-	virtual LRESULT Compress(const ICCOMPRESS *icc, SIZE_T cb);
+	virtual LRESULT GetState(void *pState, size_t cb);
+	virtual LRESULT SetState(const void *pState, size_t cb);
+	virtual LRESULT Compress(const ICCOMPRESS *icc, size_t cb);
 	virtual LRESULT CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual LRESULT CompressEnd(void);
 	virtual LRESULT CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut);
 	virtual LRESULT CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual LRESULT CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
-	virtual LRESULT Decompress(const ICDECOMPRESS *icd, SIZE_T cb);
+	virtual LRESULT Decompress(const ICDECOMPRESS *icd, size_t cb);
 	virtual LRESULT DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut);
 	virtual LRESULT DecompressEnd(void);
 	virtual LRESULT DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut, const FORMATINFO *pfiOut);

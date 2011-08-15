@@ -230,7 +230,7 @@ LRESULT CUL00Codec::GetStateSize(void)
 	return sizeof(ENCODERCONF);
 }
 
-LRESULT CUL00Codec::GetState(void *pState, SIZE_T cb)
+LRESULT CUL00Codec::GetState(void *pState, size_t cb)
 {
 	if (cb < sizeof(ENCODERCONF))
 		return ICERR_BADSIZE;
@@ -239,7 +239,7 @@ LRESULT CUL00Codec::GetState(void *pState, SIZE_T cb)
 	return ICERR_OK;
 }
 
-LRESULT CUL00Codec::SetState(const void *pState, SIZE_T cb)
+LRESULT CUL00Codec::SetState(const void *pState, size_t cb)
 {
 	HKEY hkUtVideo;
 	DWORD dwIgnoreSetConfig;
@@ -264,7 +264,7 @@ doset_noclose:
 	return InternalSetState(pState, cb);
 }
 
-LRESULT CUL00Codec::InternalSetState(const void *pState, SIZE_T cb)
+LRESULT CUL00Codec::InternalSetState(const void *pState, size_t cb)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 
@@ -280,7 +280,7 @@ LRESULT CUL00Codec::InternalSetState(const void *pState, SIZE_T cb)
 	return min(sizeof(ENCODERCONF), cb);
 }
 
-LRESULT CUL00Codec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
+LRESULT CUL00Codec::Compress(const ICCOMPRESS *icc, size_t cb)
 {
 	FRAMEINFO fi;
 	BYTE *p;
@@ -346,7 +346,7 @@ LRESULT CUL00Codec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 
 	// 念のため、サイズ値が変数に収まるかどうかのチェック。
 	// 2GB を超えることなどまずあり得ないとは思うが…
-	SIZE_T cbSizeImage = p - ((BYTE *)icc->lpOutput);
+	size_t cbSizeImage = p - ((BYTE *)icc->lpOutput);
 	if (cbSizeImage > 0x7fffffff) // BITMAPINFOHEADER::biSizeImage は DWORD なので最大値は 2^32-1 であるが、ここでは 2^31-1 で制限しておく。
 	{
 		return ICERR_MEMORY; // 返すエラーはこれでいいのだろうか？
@@ -591,7 +591,7 @@ void CUL00Codec::EncodeProc(DWORD nBandIndex)
 	}
 }
 
-LRESULT CUL00Codec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
+LRESULT CUL00Codec::Decompress(const ICDECOMPRESS *icd, size_t cb)
 {
 	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)icd->lpbiInput;
 	/* const */ BYTE *p;
