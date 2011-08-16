@@ -17,6 +17,13 @@
 	(BYTE)(fcc >> 16), \
 	(BYTE)(fcc >> 24)
 
+#define UNFCC(fcc) ( \
+	(((DWORD)(fcc) & 0x000000ff) << 24) | \
+	(((DWORD)(fcc) & 0x0000ff00) <<  8) | \
+	(((DWORD)(fcc) & 0x00ff0000) >>  8) | \
+	(((DWORD)(fcc) & 0xff000000) >> 24))
+
+
 #define UTVIDEO_VERSION_MASK                      0xffffff00
 #define UTVIDEO_VERSION                           0x09000300
 #define UTVIDEO_VERSION_STR                       "9.0.3"
@@ -64,7 +71,32 @@
 #define UTVIDEO_VERSION_AND_IMPLEMENTATION (UTVIDEO_VERSION | UTVIDEO_IMPLEMENTATION)
 
 
-inline DWORD ROUNDUP(DWORD a, DWORD b)
+typedef uint32_t utvf_t;
+
+#define UTVF_INVALID 0
+
+// standard RGB formats
+#define UTVF_RGB24_WIN   ((utvf_t)0x00000118)
+#define UTVF_RGB32_WIN   ((utvf_t)0x00000218)
+#define UTVF_ARGB32_WIN  ((utvf_t)0x00000120)
+#define UTVF_RGB24_QT    ((utvf_t)0x00000018)
+#define UTVF_ARGB32_QT   ((utvf_t)0x00000020)
+
+// FourCC formats
+#define UTVF_ULRA ((utvf_t)'ULRA')
+#define UTVF_ULRG ((utvf_t)'ULRG')
+#define UTVF_ULY2 ((utvf_t)'ULY2')
+#define UTVF_ULY0 ((utvf_t)'ULY0')
+
+#define UTVF_YUY2 ((utvf_t)'YUY2')
+#define UTVF_YUYV ((utvf_t)'YUYV')
+#define UTVF_YUNV ((utvf_t)'YUNV')
+#define UTVF_UYVY ((utvf_t)'UYVY')
+#define UTVF_UYNV ((utvf_t)'UYNV')
+#define UTVF_YV12 ((utvf_t)'YV12')
+
+
+inline uint32_t ROUNDUP(DWORD a, DWORD b)
 {
 	_ASSERT(b > 0 && (b & (b - 1)) == 0); // b ÇÕ 2 ÇÃó›èÊÇ≈Ç†ÇÈÅB
 	return ((a + b - 1) / b) * b;

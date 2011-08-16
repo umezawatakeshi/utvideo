@@ -442,6 +442,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Format.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\FrameBuffer.cpp"
 				>
 			</File>
@@ -761,6 +765,10 @@
 			</File>
 			<File
 				RelativePath=".\DummyCodec.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Format.h"
 				>
 			</File>
 			<File
