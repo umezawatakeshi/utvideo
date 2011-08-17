@@ -38,102 +38,101 @@ void CDummyCodec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
 	pszName[0] = L'\0';
 }
 
-DWORD CDummyCodec::GetFCC(void)
-{
-	return DWORD(-1);
-}
-
-const FORMATINFO *CDummyCodec::GetEncoderInputFormat(void)
+const utvf_t *CDummyCodec::GetEncoderInputFormat(void)
 {
 	return NULL;
 }
 
-const FORMATINFO *CDummyCodec::GetDecoderOutputFormat(void)
+const utvf_t *CDummyCodec::GetDecoderOutputFormat(void)
 {
 	return NULL;
 }
 
-const FORMATINFO *CDummyCodec::GetCompressedFormat(void)
+const utvf_t *CDummyCodec::GetCompressedFormat(void)
 {
 	return NULL;
 }
 
-LRESULT CDummyCodec::Configure(HWND hwnd)
+#ifdef _WIN32
+INT_PTR CDummyCodec::Configure(HWND hwnd)
 {
-	return ICERR_UNSUPPORTED;
+	return 0;
+}
+#endif
+
+size_t CDummyCodec::GetStateSize(void)
+{
+	return 0;
 }
 
-LRESULT CDummyCodec::GetStateSize(void)
+int CDummyCodec::GetState(void *pState, size_t cb)
 {
-	return ICERR_UNSUPPORTED;
+	return 0;
 }
 
-LRESULT CDummyCodec::GetState(void *pState, size_t cb)
+int CDummyCodec::SetState(const void *pState, size_t cb)
 {
-	return ICERR_UNSUPPORTED;
+	return 0;
 }
 
-LRESULT CDummyCodec::SetState(const void *pState, size_t cb)
+
+int CDummyCodec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
-	return ICERR_UNSUPPORTED;
+	return -1;
 }
 
-LRESULT CDummyCodec::Compress(const ICCOMPRESS *icc, size_t cb)
+size_t CDummyCodec::EncodeFrame(void *pOutput, const void *pInput)
 {
-	return ICERR_UNSUPPORTED;
+	return 0;
 }
 
-LRESULT CDummyCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+int CDummyCodec::EncodeEnd(void)
 {
-	return ICERR_UNSUPPORTED;
+	return 0;
 }
 
-LRESULT CDummyCodec::CompressEnd(void)
+size_t CDummyCodec::EncodeGetExtraDataSize(void)
 {
-	return ICERR_UNSUPPORTED;
+	return 0;
 }
 
-LRESULT CDummyCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+int CDummyCodec::EncodeGetExtraData(void *pExtraData, size_t cb)
 {
-	return ICERR_UNSUPPORTED;
+	return -1;
 }
 
-LRESULT CDummyCodec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+size_t CDummyCodec::EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
-	return ICERR_UNSUPPORTED;
+	return 0;
 }
 
-LRESULT CDummyCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+int CDummyCodec::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
-	return ICERR_UNSUPPORTED;
+	return -1;
 }
 
-LRESULT CDummyCodec::Decompress(const ICDECOMPRESS *icd, size_t cb)
+
+int CDummyCodec::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
-	return ICERR_UNSUPPORTED;
+	return -1;
 }
 
-LRESULT CDummyCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+size_t CDummyCodec::DecodeFrame(void *pOutput, const void *pInput)
 {
-	return ICERR_UNSUPPORTED;
+	return 0;
 }
 
-LRESULT CDummyCodec::DecompressEnd(void)
+int CDummyCodec::DecodeEnd(void)
 {
-	return ICERR_UNSUPPORTED;
+	return 0;
 }
 
-LRESULT CDummyCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut, const FORMATINFO *pfiOut)
+size_t CDummyCodec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
-	return ICERR_UNSUPPORTED;
+	return 0;
 }
 
-LRESULT CDummyCodec::DecompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+int CDummyCodec::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
-	return ICERR_UNSUPPORTED;
-}
-
-LRESULT CDummyCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
-{
-	return ICERR_UNSUPPORTED;
+	return -1;
 }
