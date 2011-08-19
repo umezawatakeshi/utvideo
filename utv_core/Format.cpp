@@ -14,7 +14,7 @@ inline bool is_fourcc(uint32_t x)
 
 #include "MediaSubType.h"
 
-int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, GUID *subtype, utvf_t utvf)
+__declspec(dllexport) int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, GUID *subtype, utvf_t utvf)
 {
 	DWORD dwtmp;
 	WORD wtmp;
@@ -82,7 +82,7 @@ int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, GUID *s
 	return 0;
 }
 
-int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype)
+__declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype)
 {
 	utvf_t bybi, byguid;
 
@@ -100,7 +100,7 @@ int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCo
 		return -1;
 }
 
-int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount)
+__declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount)
 {
 	DWORD dwtmp;
 
@@ -126,7 +126,7 @@ int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCo
 	return 0;
 }
 
-int WindowsFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
+__declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 {
 	GUID guidtmp;
 	utvf_t utvftmp;

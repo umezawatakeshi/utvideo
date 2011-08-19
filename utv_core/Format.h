@@ -4,10 +4,10 @@
 #pragma once
 
 #ifdef _WIN32
-int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, GUID *subtype, utvf_t utvf);
-int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype);
-int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount);
-int WindowsFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype);
+__declspec(dllexport) int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, GUID *subtype, utvf_t utvf);
+__declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype);
+__declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount);
+__declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype);
 #endif
 
 #if 0
