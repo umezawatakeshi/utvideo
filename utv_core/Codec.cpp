@@ -5,10 +5,10 @@
 #include "utvideo.h"
 #include "Codec.h"
 #include "DummyCodec.h"
-//#include "ULRACodec.h"
+#include "ULRACodec.h"
 #include "ULRGCodec.h"
-//#include "ULY0Codec.h"
-//#include "ULY2Codec.h"
+#include "ULY0Codec.h"
+#include "ULY2Codec.h"
 
 CCodec::CCodec(void)
 {
@@ -39,11 +39,11 @@ struct CODECLIST
 };
 
 static const struct CODECLIST codeclist[] = {
-	{ UTVF_INVALID,          CDummyCodec::CreateInstance },
-//	{ FCC('ULRA'), CULRACodec::CreateInstance  },
-	{ UTVF_ULRG, CULRGCodec::CreateInstance  },
-//	{ FCC('ULY0'), CULY0Codec::CreateInstance  },
-//	{ FCC('ULY2'), CULY2Codec::CreateInstance  },
+	{ UTVF_INVALID, CDummyCodec::CreateInstance },
+	{ UTVF_ULRA,    CULRACodec::CreateInstance  },
+	{ UTVF_ULRG,    CULRGCodec::CreateInstance  },
+	{ UTVF_ULY0,    CULY0Codec::CreateInstance  },
+	{ UTVF_ULY2,    CULY2Codec::CreateInstance  },
 };
 
 __declspec(dllexport) CCodec *CCodec::CreateInstance(utvf_t utvf, const char *pszInterfaceName)

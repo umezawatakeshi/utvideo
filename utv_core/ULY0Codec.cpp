@@ -7,30 +7,30 @@
 #include "Predict.h"
 #include "MediaSubType.h"
 
-const FORMATINFO CULY0Codec::m_fiEncoderInput[] = {
-	{ FCC('YV12'), 12, false, MEDIASUBTYPE_YV12 },
-	{ FCC('YUY2'), 16, false, MEDIASUBTYPE_YUY2 }, { FCC('YUYV'), 16, false, MEDIASUBTYPE_YUYV }, { FCC('YUNV'), 16, false, MEDIASUBTYPE_YUNV },
-	{ FCC('UYVY'), 16, false, MEDIASUBTYPE_UYVY }, { FCC('UYNV'), 16, false, MEDIASUBTYPE_UYNV },
-	{ BI_RGB, 24, false, MEDIASUBTYPE_RGB24 },
-	{ BI_RGB, 32, false, MEDIASUBTYPE_RGB32 },
-	FORMATINFO_END,
+const utvf_t CULY0Codec::m_utvfEncoderInput[] = {
+	UTVF_YV12,
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
+	UTVF_UYVY, UTVF_UYNV,
+	UTVF_RGB24_WIN,
+	UTVF_RGB32_WIN,
+	UTVF_INVALID,
 };
 
-const FORMATINFO CULY0Codec::m_fiDecoderOutput[] = {
-	{ FCC('YV12'), 12, false, MEDIASUBTYPE_YV12 },
-	{ FCC('YUY2'), 16, false, MEDIASUBTYPE_YUY2 }, { FCC('YUYV'), 16, false, MEDIASUBTYPE_YUYV }, { FCC('YUNV'), 16, false, MEDIASUBTYPE_YUNV },
-	{ FCC('UYVY'), 16, false, MEDIASUBTYPE_UYVY }, { FCC('UYNV'), 16, false, MEDIASUBTYPE_UYNV },
-	{ BI_RGB, 24, false, MEDIASUBTYPE_RGB24 },
-	{ BI_RGB, 32, false, MEDIASUBTYPE_RGB32 },
-	FORMATINFO_END,
+const utvf_t CULY0Codec::m_utvfDecoderOutput[] = {
+	UTVF_YV12,
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
+	UTVF_UYVY, UTVF_UYNV,
+	UTVF_RGB24_WIN,
+	UTVF_RGB32_WIN,
+	UTVF_INVALID,
 };
 
-const FORMATINFO CULY0Codec::m_fiCompressed[] = {
-	{ FCC('ULY0'), 24, false, MEDIASUBTYPE_ULY0 },
-	FORMATINFO_END,
+const utvf_t CULY0Codec::m_utvfCompressed[] = {
+	UTVF_ULY0,
+	UTVF_INVALID,
 };
 
-CULY0Codec::CULY0Codec(const char *pszInterfaceName) : CUL00Codec(FCC('ULY0'), pszInterfaceName)
+CULY0Codec::CULY0Codec(const char *pszInterfaceName) : CUL00Codec(pszInterfaceName)
 {
 }
 
@@ -43,23 +43,23 @@ CCodec *CULY0Codec::CreateInstance(const char *pszInterfaceName)
 	return new CULY0Codec(pszInterfaceName);
 }
 
-void CULY0Codec::CalcPlaneSizes(const BITMAPINFOHEADER *pbih)
+void CULY0Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 {
-	m_dwPlaneSize[0]          = pbih->biWidth * pbih->biHeight;
-	m_dwPlaneSize[1]          = pbih->biWidth * pbih->biHeight / 4;
-	m_dwPlaneSize[2]          = pbih->biWidth * pbih->biHeight / 4;
+	m_dwPlaneSize[0]          = width * height;
+	m_dwPlaneSize[1]          = width * height / 4;
+	m_dwPlaneSize[2]          = width * height / 4;
 
-	m_dwPlaneWidth[0]         = pbih->biWidth;
-	m_dwPlaneWidth[1]         = pbih->biWidth / 2;
-	m_dwPlaneWidth[2]         = pbih->biWidth / 2;
+	m_dwPlaneWidth[0]         = width;
+	m_dwPlaneWidth[1]         = width / 2;
+	m_dwPlaneWidth[2]         = width / 2;
 
-	m_dwPlaneStripeSize[0]    = pbih->biWidth * 2;
-	m_dwPlaneStripeSize[1]    = pbih->biWidth / 2;
-	m_dwPlaneStripeSize[2]    = pbih->biWidth / 2;
+	m_dwPlaneStripeSize[0]    = width * 2;
+	m_dwPlaneStripeSize[1]    = width / 2;
+	m_dwPlaneStripeSize[2]    = width / 2;
 
-	m_dwPlanePredictStride[0] = pbih->biWidth;
-	m_dwPlanePredictStride[1] = pbih->biWidth / 2;
-	m_dwPlanePredictStride[2] = pbih->biWidth / 2;
+	m_dwPlanePredictStride[0] = width;
+	m_dwPlanePredictStride[1] = width / 2;
+	m_dwPlanePredictStride[2] = width / 2;
 }
 
 void CULY0Codec::ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD bypp)
@@ -70,8 +70,8 @@ void CULY0Codec::ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BY
 
 	DWORD dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
 
-	const BYTE *pSrcBegin = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
-	const BYTE *pSrcEnd   = ((BYTE *)m_icc->lpInput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
+	const BYTE *pSrcBegin = ((BYTE *)m_pInput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
+	const BYTE *pSrcEnd   = ((BYTE *)m_pInput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
 
 	for (const BYTE *pStripeBegin = pSrcEnd; pStripeBegin > pSrcBegin; pStripeBegin -= m_dwRawStripeSize) {
 		for (const BYTE *pStrideBegin = pStripeBegin - m_dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= m_dwRawGrossWidth)
@@ -99,8 +99,8 @@ void CULY0Codec::ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *p
 	BYTE *u = pDstUBegin;
 	BYTE *v = pDstVBegin;
 
-	const BYTE *pSrcBegin = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	const BYTE *pSrcEnd   = ((BYTE *)m_icc->lpInput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	const BYTE *pSrcBegin = ((BYTE *)m_pInput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	const BYTE *pSrcEnd   = ((BYTE *)m_pInput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 
 	for (const BYTE *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += m_dwRawStripeSize)
 	{
@@ -127,15 +127,15 @@ void CULY0Codec::ConvertToPlanar(DWORD nBandIndex)
 	BYTE *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
 	BYTE *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
 
-	switch (m_icc->lpbiInput->biCompression)
+	switch (m_utvfRaw)
 	{
-	case FCC('YV12'):
+	case UTVF_YV12:
 		{
 			const BYTE *pSrcYBegin, *pSrcVBegin, *pSrcUBegin;
 
-			pSrcYBegin = ((BYTE *)m_icc->lpInput);
-			pSrcVBegin = pSrcYBegin + m_icc->lpbiInput->biWidth * m_icc->lpbiInput->biHeight;
-			pSrcUBegin = pSrcVBegin + m_icc->lpbiInput->biWidth * m_icc->lpbiInput->biHeight / 4;
+			pSrcYBegin = ((BYTE *)m_pInput);
+			pSrcVBegin = pSrcYBegin + m_nWidth * m_nHeight;
+			pSrcUBegin = pSrcVBegin + m_nWidth * m_nHeight / 4;
 
 			pSrcYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 			pSrcVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
@@ -146,25 +146,20 @@ void CULY0Codec::ConvertToPlanar(DWORD nBandIndex)
 			memcpy(pDstVBegin, pSrcVBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[2]);
 		}
 		break;
-	case FCC('YUY2'):
-	case FCC('YUYV'):
-	case FCC('YUNV'):
+	case UTVF_YUY2:
+	case UTVF_YUYV:
+	case UTVF_YUNV:
 		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 0);
 		break;
-	case FCC('UYVY'):
-	case FCC('UYNV'):
+	case UTVF_UYVY:
+	case UTVF_UYNV:
 		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 1);
 		break;
-	case BI_RGB:
-		switch (m_icc->lpbiInput->biBitCount)
-		{
-		case 24:
-			ConvertBottomupRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 3);
-			break;
-		case 32:
-			ConvertBottomupRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 4);
-			break;
-		}
+	case UTVF_RGB24_WIN:
+		ConvertBottomupRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 3);
+		break;
+	case UTVF_RGB32_WIN:
+		ConvertBottomupRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 4);
 		break;
 	}
 }
@@ -177,8 +172,8 @@ void CULY0Codec::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *pS
 
 	DWORD dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
 
-	BYTE *pDstBegin = ((BYTE *)m_icd->lpOutput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
-	BYTE *pDstEnd   = ((BYTE *)m_icd->lpOutput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
+	BYTE *pDstBegin = ((BYTE *)m_pOutput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
+	BYTE *pDstEnd   = ((BYTE *)m_pOutput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
 
 	for (BYTE *pStripeBegin = pDstEnd; pStripeBegin > pDstBegin; pStripeBegin -= m_dwRawStripeSize) {
 		for (BYTE *pStrideBegin = pStripeBegin - m_dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= m_dwRawGrossWidth)
@@ -223,8 +218,8 @@ void CULY0Codec::ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcUBe
 	const BYTE *u = pSrcUBegin;
 	const BYTE *v = pSrcVBegin;
 
-	BYTE *pDstBegin = ((BYTE *)m_icd->lpOutput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	BYTE *pDstEnd   = ((BYTE *)m_icd->lpOutput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	BYTE *pDstBegin = ((BYTE *)m_pOutput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	BYTE *pDstEnd   = ((BYTE *)m_pOutput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 
 	for (BYTE *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawStripeSize)
 	{
@@ -253,15 +248,15 @@ void CULY0Codec::ConvertFromPlanar(DWORD nBandIndex)
 	const BYTE *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
 	const BYTE *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
 
-	switch (m_icd->lpbiOutput->biCompression)
+	switch (m_utvfRaw)
 	{
-	case FCC('YV12'):
+	case UTVF_YV12:
 		{
 			BYTE *pDstYBegin, *pDstVBegin, *pDstUBegin;
 
-			pDstYBegin = ((BYTE *)m_icd->lpOutput);
-			pDstVBegin = pDstYBegin + m_icd->lpbiOutput->biWidth * m_icd->lpbiOutput->biHeight;
-			pDstUBegin = pDstVBegin + m_icd->lpbiOutput->biWidth * m_icd->lpbiOutput->biHeight / 4;
+			pDstYBegin = ((BYTE *)m_pOutput);
+			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
+			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight / 4;
 
 			pDstYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
@@ -272,25 +267,20 @@ void CULY0Codec::ConvertFromPlanar(DWORD nBandIndex)
 			memcpy(pDstVBegin, pSrcVBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[2]);
 		}
 		break;
-	case FCC('YUY2'):
-	case FCC('YUYV'):
-	case FCC('YUNV'):
+	case UTVF_YUY2:
+	case UTVF_YUYV:
+	case UTVF_YUNV:
 		ConvertULY0ToYUV422(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 0);
 		break;
-	case FCC('UYVY'):
-	case FCC('UYNV'):
+	case UTVF_UYVY:
+	case UTVF_UYNV:
 		ConvertULY0ToYUV422(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 1);
 		break;
-	case BI_RGB:
-		switch (m_icd->lpbiOutput->biBitCount)
-		{
-		case 24:
-			ConvertULY0ToBottomupRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 3);
-			break;
-		case 32:
-			ConvertULY0ToBottomupRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
-			break;
-		}
+	case UTVF_RGB24_WIN:
+		ConvertULY0ToBottomupRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 3);
+		break;
+	case UTVF_RGB32_WIN:
+		ConvertULY0ToBottomupRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
 		break;
 	}
 }
@@ -300,15 +290,15 @@ BOOL CULY0Codec::DecodeDirect(DWORD nBandIndex)
 	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
 		return FALSE;
 
-	switch (m_icd->lpbiOutput->biCompression)
+	switch (m_utvfRaw)
 	{
-	case FCC('YV12'):
+	case UTVF_YV12:
 		{
 			BYTE *pDstYBegin, *pDstVBegin, *pDstUBegin;
 
-			pDstYBegin = ((BYTE *)m_icd->lpOutput);
-			pDstVBegin = pDstYBegin + m_icd->lpbiOutput->biWidth * m_icd->lpbiOutput->biHeight;
-			pDstUBegin = pDstVBegin + m_icd->lpbiOutput->biWidth * m_icd->lpbiOutput->biHeight / 4;
+			pDstYBegin = ((BYTE *)m_pOutput);
+			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
+			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight / 4;
 
 			BYTE *pDstYEnd = pDstYBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[0];
 			BYTE *pDstUEnd = pDstUBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[1];

@@ -12,9 +12,9 @@ class CULY0Codec :
 	public CUL00Codec
 {
 private:
-	static const FORMATINFO m_fiEncoderInput[];
-	static const FORMATINFO m_fiDecoderOutput[];
-	static const FORMATINFO m_fiCompressed[];
+	static const utvf_t m_utvfEncoderInput[];
+	static const utvf_t m_utvfDecoderOutput[];
+	static const utvf_t m_utvfCompressed[];
 
 public:
 	CULY0Codec(const char *pszInterfaceName);
@@ -22,9 +22,10 @@ public:
 	static CCodec *CreateInstance(const char *pszInterfaceName);
 
 public:
-	virtual const FORMATINFO *GetEncoderInputFormat(void) { return m_fiEncoderInput; }
-	virtual const FORMATINFO *GetDecoderOutputFormat(void) { return m_fiDecoderOutput; }
-	virtual const FORMATINFO *GetCompressedFormat(void) { return m_fiCompressed; }
+	virtual const char *GetTinyName(void) { return "ULY0"; }
+	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }
+	virtual const utvf_t *GetDecoderOutputFormat(void) { return m_utvfDecoderOutput; }
+	virtual const utvf_t *GetCompressedFormat(void) { return m_utvfCompressed; }
 
 private:
 	void ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD bypp);
@@ -35,9 +36,8 @@ private:
 protected:
 	virtual const char *GetColorFormatName(void) { return "YUV420"; }
 	virtual WORD GetRealBitCount(void) { return 12; }
-	virtual WORD GetFalseBitCount(void) { return 24; }
 	virtual int GetNumPlanes(void) { return 3; }
-	virtual void CalcPlaneSizes(const BITMAPINFOHEADER *pbihIn);
+	virtual void CalcPlaneSizes(unsigned int width, unsigned int height);
 	virtual void ConvertToPlanar(DWORD nBandIndex);
 	virtual int GetMacroPixelWidth(void) { return 2; }
 	virtual int GetMacroPixelHeight(void) { return 2; }
