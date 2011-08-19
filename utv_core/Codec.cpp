@@ -5,10 +5,10 @@
 #include "utvideo.h"
 #include "Codec.h"
 #include "DummyCodec.h"
-#include "ULRACodec.h"
+//#include "ULRACodec.h"
 #include "ULRGCodec.h"
-#include "ULY0Codec.h"
-#include "ULY2Codec.h"
+//#include "ULY0Codec.h"
+//#include "ULY2Codec.h"
 
 CCodec::CCodec(void)
 {
@@ -18,7 +18,7 @@ CCodec::~CCodec(void)
 {
 }
 
-LRESULT CCodec::About(HWND hwnd)
+INT_PTR CCodec::About(HWND hwnd)
 {
 	char buf[256];
 
@@ -34,33 +34,33 @@ LRESULT CCodec::About(HWND hwnd)
 
 struct CODECLIST
 {
-	DWORD fcc;
+	utvf_t utvf;
 	CCodec *(*pfnCreateInstace)(const char *pszInterfaceName);
 };
 
 static const struct CODECLIST codeclist[] = {
-	{ -1,          CDummyCodec::CreateInstance },
-	{ FCC('ULRA'), CULRACodec::CreateInstance  },
-	{ FCC('ULRG'), CULRGCodec::CreateInstance  },
-	{ FCC('ULY0'), CULY0Codec::CreateInstance  },
-	{ FCC('ULY2'), CULY2Codec::CreateInstance  },
+	{ UTVF_INVALID,          CDummyCodec::CreateInstance },
+//	{ FCC('ULRA'), CULRACodec::CreateInstance  },
+	{ UTVF_ULRG, CULRGCodec::CreateInstance  },
+//	{ FCC('ULY0'), CULY0Codec::CreateInstance  },
+//	{ FCC('ULY2'), CULY2Codec::CreateInstance  },
 };
 
-__declspec(dllexport) CCodec *CCodec::CreateInstance(DWORD fcc, const char *pszInterfaceName)
+__declspec(dllexport) CCodec *CCodec::CreateInstance(utvf_t utvf, const char *pszInterfaceName)
 {
 	int idx;
 
-	DEBUG_ENTER_LEAVE("CCodec::CreateInstance(DWORD) fcc=%08X (%c%c%c%c)", fcc, FCC4PRINTF(fcc));
+	DEBUG_ENTER_LEAVE("CCodec::CreateInstance(DWORD) utvf=%08X", utvf);
 
 	for (idx = 0; idx < _countof(codeclist); idx++)
 	{
-		if (codeclist[idx].fcc == fcc)
+		if (codeclist[idx].utvf == utvf)
 			break;
 	}
 	if (idx == _countof(codeclist))
 		idx = 0;
 
-	_RPT2(_CRT_WARN, "infcc=%08X foundfcc=%08X\n", fcc, codeclist[idx].fcc);
+	_RPT2(_CRT_WARN, "in=%08X found=%08X\n", utvf, codeclist[idx].utvf);
 
 	return codeclist[idx].pfnCreateInstace(pszInterfaceName);
 }

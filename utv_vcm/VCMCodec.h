@@ -7,6 +7,7 @@
 class CVCMCodec
 {
 private:
+	const DWORD m_fcc;
 	CCodec *m_pCodec;
 
 private:

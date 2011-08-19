@@ -18,6 +18,11 @@ CCodec *CDummyCodec::CreateInstance(const char *pszInterfaceName)
 	return new CDummyCodec();
 }
 
+const char *CDummyCodec::GetTinyName(void)
+{
+	return "Dummy";
+}
+
 void CDummyCodec::GetShortFriendlyName(char *pszName, size_t cchName)
 {
 	pszName[0] = '\0';
@@ -81,7 +86,7 @@ int CDummyCodec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int heig
 	return -1;
 }
 
-size_t CDummyCodec::EncodeFrame(void *pOutput, const void *pInput)
+size_t CDummyCodec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput)
 {
 	return 0;
 }
@@ -96,7 +101,7 @@ size_t CDummyCodec::EncodeGetExtraDataSize(void)
 	return 0;
 }
 
-int CDummyCodec::EncodeGetExtraData(void *pExtraData, size_t cb)
+int CDummyCodec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
 	return -1;
 }
@@ -117,7 +122,7 @@ int CDummyCodec::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int hei
 	return -1;
 }
 
-size_t CDummyCodec::DecodeFrame(void *pOutput, const void *pInput)
+size_t CDummyCodec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame)
 {
 	return 0;
 }

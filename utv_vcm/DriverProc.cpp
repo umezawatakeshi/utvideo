@@ -2,6 +2,7 @@
 /* $Id$ */
 
 #include "stdafx.h"
+#include "utvideo.h"
 #include "VCMCodec.h"
 
 LRESULT CALLBACK DriverProc(DWORD_PTR dwDriverId, HDRVR hdrvr, UINT uMsg, LPARAM lParam1, LPARAM lParam2)

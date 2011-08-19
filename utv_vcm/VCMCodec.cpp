@@ -4,14 +4,20 @@
 #include "StdAfx.h"
 #include "utvideo.h"
 #include "VCMCodec.h"
+#include <Format.h>
 
-CVCMCodec::CVCMCodec(DWORD fccHandler)
+CVCMCodec::CVCMCodec(DWORD fccHandler) : m_fcc(fccHandler)
 {
-	DEBUG_ENTER_LEAVE("CVCMCodec::CVCMCodec(DWORD) this=%p fccHandler=%08X (%c%c%c%c)", this, fccHandler, FCC4PRINTF(fccHandler));
+	utvf_t utvf;
 
-	m_pCodec = CCodec::CreateInstance(fccHandler, "VCM");
+	DEBUG_ENTER_LEAVE("CVCMCodec::CVCMCodec(DWORD) this=%p fccHandler=%08X", this, fccHandler);
 
-	_RPT2(_CRT_WARN, "infcc=%08X foundfcc=%08X\n", fccHandler, m_pCodec->GetFCC());
+	if (WindowsFormatToUtVideoFormat(&utvf, fccHandler, 0) != 0)
+		utvf = UTVF_INVALID;
+
+	m_pCodec = CCodec::CreateInstance(utvf, "VCM");
+
+	_RPT2(_CRT_WARN, "in=%08X found=%s\n", fccHandler, m_pCodec->GetTinyName());
 }
 
 CVCMCodec::~CVCMCodec(void)
@@ -65,7 +71,7 @@ LRESULT CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
 
 	icinfo->dwSize       = sizeof(ICINFO);
 	icinfo->fccType      = ICTYPE_VIDEO;
-	icinfo->fccHandler   = m_pCodec->GetFCC();
+	icinfo->fccHandler   = m_fcc;
 	icinfo->dwFlags      = 0;
 	icinfo->dwVersion    = UTVIDEO_VERSION_AND_IMPLEMENTATION;
 	icinfo->dwVersionICM = ICVERSION;
@@ -83,7 +89,7 @@ LRESULT CVCMCodec::QueryConfigure(void)
 LRESULT CVCMCodec::Configure(HWND hwnd)
 {
 	DEBUG_ENTER_LEAVE("CVCMCodec::Configure() this=%p hwnd=%08X", this, hwnd);
-	return m_pCodec->Configure(hwnd);
+	return m_pCodec->Configure(hwnd) == 0 ? ICERR_OK : ICERR_UNSUPPORTED;
 }
 
 LRESULT CVCMCodec::GetStateSize(void)
@@ -95,75 +101,161 @@ LRESULT CVCMCodec::GetStateSize(void)
 LRESULT CVCMCodec::GetState(void *pState, SIZE_T cb)
 {
 	DEBUG_ENTER_LEAVE("CVCMCodec::GetState() this=%p pState=%p, cb=%z", this, pState, cb);
-	return m_pCodec->GetState(pState, cb);
+	return m_pCodec->GetState(pState, cb) == 0 ? ICERR_OK : ICERR_INTERNAL;
 }
 
 LRESULT CVCMCodec::SetState(const void *pState, SIZE_T cb)
 {
 	DEBUG_ENTER_LEAVE("CVCMCodec::SetState() this=%p pState=%p, cb=%z", this, pState, cb);
-	return m_pCodec->SetState(pState, cb);
+	return m_pCodec->SetState(pState, cb) == 0 ? ICERR_OK : ICERR_INTERNAL;
 }
 
 LRESULT CVCMCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 {
-	return m_pCodec->Compress(icc, cb);
+	bool bKeyFrame;
+	size_t cbFrame;
+
+	cbFrame = m_pCodec->EncodeFrame(icc->lpOutput, &bKeyFrame, icc->lpInput);
+	if (icc->lpckid != NULL)
+		*icc->lpckid = FCC('dcdc');
+	icc->lpbiOutput->biSizeImage = (DWORD)cbFrame;
+	*icc->lpdwFlags = bKeyFrame ? AVIIF_KEYFRAME : 0;
+	return ICERR_OK;
 }
 
 LRESULT CVCMCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	utvf_t infmt;
+
 	DEBUG_ENTER_LEAVE("CVCMCodec::CompressBegin() this=%p", this);
-	return m_pCodec->CompressBegin(pbihIn, pbihOut);
+
+	if (WindowsFormatToUtVideoFormat(&infmt, pbihIn->biCompression, pbihIn->biBitCount) != 0)
+		return ICERR_BADFORMAT;
+
+	return m_pCodec->EncodeBegin(infmt, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS) == 0 ? ICERR_OK : ICERR_INTERNAL;
 }
 
 LRESULT CVCMCodec::CompressEnd(void)
 {
 	DEBUG_ENTER_LEAVE("CVCMCodec::CompressEnd() this=%p", this);
-	return m_pCodec->CompressEnd();
+	return m_pCodec->EncodeEnd();
 }
 
 LRESULT CVCMCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
+	utvf_t infmt;
+
 	DEBUG_ENTER_LEAVE("CVCMCodec::CompressGetFormat() this=%p", this);
-	return m_pCodec->CompressGetFormat(pbihIn, pbihOut);
+
+	if (pbihOut == NULL)
+		return sizeof(BITMAPINFOHEADER) + m_pCodec->EncodeGetExtraDataSize();
+
+	memcpy(pbihOut, pbihIn, sizeof(BITMAPINFOHEADER));
+	pbihOut->biSize = (DWORD)(sizeof(BITMAPINFOHEADER) + m_pCodec->EncodeGetExtraDataSize());
+
+	if (WindowsFormatToUtVideoFormat(&infmt, pbihIn->biCompression, pbihIn->biBitCount) != 0)
+		return ICERR_BADFORMAT;
+
+	UtVideoFormatToWindowsFormat(&pbihOut->biCompression, &pbihOut->biBitCount, NULL, *m_pCodec->GetCompressedFormat());
+	return m_pCodec->EncodeGetExtraData(((BYTE *)pbihOut) + sizeof(BITMAPINFOHEADER), m_pCodec->EncodeGetExtraDataSize(), infmt, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS) == 0 ? ICERR_OK : ICERR_BADFORMAT;
 }
 
 LRESULT CVCMCodec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	utvf_t infmt;
+
 	DEBUG_ENTER_LEAVE("CVCMCodec::CompressGetSize() this=%p", this);
-	return m_pCodec->CompressGetSize(pbihIn, pbihOut);
+
+	if (WindowsFormatToUtVideoFormat(&infmt, pbihIn->biCompression, pbihIn->biBitCount) != 0)
+		return ICERR_BADFORMAT;
+
+	return (LRESULT)m_pCodec->EncodeGetOutputSize(infmt, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS);
 }
 
 LRESULT CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	utvf_t infmt;
+
 	DEBUG_ENTER_LEAVE("CVCMCodec::CompressQuery() this=%p", this);
-	return m_pCodec->CompressQuery(pbihIn, pbihOut);
+
+	if (WindowsFormatToUtVideoFormat(&infmt, pbihIn->biCompression, pbihIn->biBitCount) != 0)
+		return ICERR_BADFORMAT;
+
+	return m_pCodec->EncodeQuery(infmt, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS) == 0 ? ICERR_OK : ICERR_BADFORMAT;
 }
 
 LRESULT CVCMCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
-	return m_pCodec->Decompress(icd, cb);
+	size_t cbFrame;
+
+	cbFrame = m_pCodec->DecodeFrame(icd->lpOutput, icd->lpInput, !(icd->dwFlags & ICDECOMPRESS_NOTKEYFRAME));
+	icd->lpbiOutput->biSizeImage = (DWORD)cbFrame;
+	return ICERR_OK;
 }
 
 LRESULT CVCMCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	utvf_t utvf;
+
 	DEBUG_ENTER_LEAVE("CVCMCodec::DecompressBegin() this=%p", this);
-	return m_pCodec->DecompressBegin(pbihIn, pbihOut);
+
+	if (WindowsFormatToUtVideoFormat(&utvf, pbihOut->biCompression, pbihOut->biBitCount) != 0)
+		return ICERR_BADFORMAT;
+
+	return m_pCodec->DecodeBegin(utvf, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS, ((BYTE *)pbihIn) + sizeof(BITMAPINFOHEADER), pbihIn->biSize - sizeof(BITMAPINFOHEADER)) == 0 ? ICERR_OK : ICERR_BADFORMAT;
 }
 
 LRESULT CVCMCodec::DecompressEnd(void)
 {
 	DEBUG_ENTER_LEAVE("CVCMCodec::DecompressEnd() this=%p", this);
-	return m_pCodec->DecompressEnd();
+	return m_pCodec->DecodeEnd();
 }
 
 LRESULT CVCMCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
 {
+	const utvf_t *utvf;
+
 	DEBUG_ENTER_LEAVE("CVCMCodec::DecompressGetFormat() this=%p", this);
-	return m_pCodec->DecompressGetFormat(pbihIn, pbihOut);
+
+	if (pbihOut == NULL)
+		return sizeof(BITMAPINFOHEADER);
+
+	memcpy(pbihOut, pbihIn, sizeof(BITMAPINFOHEADER));
+	pbihOut->biSize = sizeof(BITMAPINFOHEADER);
+
+	for (utvf = m_pCodec->GetDecoderOutputFormat(); *utvf; utvf++)
+	{
+		if (UtVideoFormatToWindowsFormat(&pbihOut->biCompression, &pbihOut->biBitCount, NULL, *utvf) == 0)
+			return ICERR_OK;
+	}
+
+	return ICERR_INTERNAL;
 }
 
 LRESULT CVCMCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	utvf_t utvf;
+	const utvf_t *putvf;
+
 	DEBUG_ENTER_LEAVE("CVCMCodec::DecompressQuery() this=%p", this);
-	return m_pCodec->DecompressQuery(pbihIn, pbihOut);
+
+	WindowsFormatToUtVideoFormat(&utvf, pbihIn->biCompression, pbihIn->biBitCount);
+	if (utvf != *m_pCodec->GetCompressedFormat())
+		return ICERR_BADFORMAT;
+
+	if (pbihOut == NULL)
+		return ICERR_OK;
+
+	if (WindowsFormatToUtVideoFormat(&utvf, pbihOut->biCompression, pbihOut->biBitCount) != 0)
+		return ICERR_BADFORMAT;
+
+	for (putvf = m_pCodec->GetDecoderOutputFormat(); *putvf; putvf++)
+	{
+		if (utvf != *putvf)
+			continue;
+		if (m_pCodec->DecodeQuery(*putvf, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS, ((BYTE *)pbihIn) + sizeof(BITMAPINFOHEADER), pbihIn->biSize - sizeof(BITMAPINFOHEADER)) == 0)
+			return ICERR_OK;
+	}
+
+	return ICERR_BADFORMAT;
 }

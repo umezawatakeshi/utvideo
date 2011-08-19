@@ -8,7 +8,7 @@
 #include "Predict.h"
 #include "resource.h"
 
-CUL00Codec::CUL00Codec(DWORD fcc, const char *pszInterfaceName) : m_fcc(fcc), m_pszInterfaceName(pszInterfaceName)
+CUL00Codec::CUL00Codec(const char *pszInterfaceName) : m_pszInterfaceName(pszInterfaceName)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
@@ -24,7 +24,7 @@ void CUL00Codec::GetShortFriendlyName(char *pszName, size_t cchName)
 {
 	char buf[16];
 
-	sprintf(buf, "Ut Video (%c%c%c%c)", FCC4PRINTF(m_fcc));
+	sprintf(buf, "Ut Video (%s)", GetTinyName());
 	strncpy(pszName, buf, cchName);
 	pszName[cchName - 1] = '\0';
 }
@@ -45,9 +45,9 @@ void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 {
 	char buf[128];
 
-	sprintf(buf, "Ut Video Codec %s (%c%c%c%c) %s %s",
+	sprintf(buf, "Ut Video Codec %s (%s) %s %s",
 		GetColorFormatName(),
-		FCC4PRINTF(m_fcc),
+		GetTinyName(),
 		m_pszInterfaceName,
 		UTVIDEO_IMPLEMENTATION_STR);
 	strncpy(pszName, buf, cchName);
@@ -66,12 +66,7 @@ void CUL00Codec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
 		/* NOTHING */;
 }
 
-DWORD CUL00Codec::GetFCC(void)
-{
-	return m_fcc;
-}
-
-LRESULT CUL00Codec::LoadConfig(void)
+int CUL00Codec::LoadConfig(void)
 {
 	HKEY hkUtVideo;
 	DWORD dwSaveConfig;
@@ -89,7 +84,7 @@ LRESULT CUL00Codec::LoadConfig(void)
 	if (!dwSaveConfig)
 		goto notloaded;
 
-	wsprintf(buf, "Config%c%c%c%c", FCC4PRINTF(m_fcc));
+	wsprintf(buf, "Config%s", GetTinyName());
 	cb = sizeof(ENCODERCONF);
 	if (RegQueryValueEx(hkUtVideo, buf, NULL, &dwType, (BYTE *)&ec, &cb) != ERROR_SUCCESS)
 		goto notloaded;
@@ -103,7 +98,7 @@ notloaded:
 	return -1;
 }
 
-LRESULT CUL00Codec::SaveConfig(void)
+int CUL00Codec::SaveConfig(void)
 {
 	HKEY hkUtVideo;
 	DWORD dwSaveConfig;
@@ -120,7 +115,7 @@ LRESULT CUL00Codec::SaveConfig(void)
 	if (!dwSaveConfig)
 		goto notsaved;
 
-	wsprintf(buf, "Config%c%c%c%c", FCC4PRINTF(m_fcc));
+	wsprintf(buf, "Config%s", GetTinyName());
 	if (RegSetValueEx(hkUtVideo, buf, 0, REG_BINARY, (const BYTE *)&m_ec, sizeof(ENCODERCONF)) != ERROR_SUCCESS)
 		goto notsaved;
 
@@ -132,10 +127,10 @@ notsaved:
 	return -1;
 }
 
-LRESULT CUL00Codec::Configure(HWND hwnd)
+INT_PTR CUL00Codec::Configure(HWND hwnd)
 {
 	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_CONFIG_DIALOG), hwnd, DialogProc, (LPARAM)this);
-	return ICERR_OK;
+	return 0;
 }
 
 INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -225,21 +220,21 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 	return FALSE;
 }
 
-LRESULT CUL00Codec::GetStateSize(void)
+size_t CUL00Codec::GetStateSize(void)
 {
 	return sizeof(ENCODERCONF);
 }
 
-LRESULT CUL00Codec::GetState(void *pState, size_t cb)
+int CUL00Codec::GetState(void *pState, size_t cb)
 {
 	if (cb < sizeof(ENCODERCONF))
-		return ICERR_BADSIZE;
+		return -1;
 
 	memcpy(pState, &m_ec, sizeof(ENCODERCONF));
-	return ICERR_OK;
+	return 0;
 }
 
-LRESULT CUL00Codec::SetState(const void *pState, size_t cb)
+int CUL00Codec::SetState(const void *pState, size_t cb)
 {
 	HKEY hkUtVideo;
 	DWORD dwIgnoreSetConfig;
@@ -256,7 +251,7 @@ LRESULT CUL00Codec::SetState(const void *pState, size_t cb)
 		goto doset;
 
 	RegCloseKey(hkUtVideo);
-	return min(sizeof(ENCODERCONF), cb);
+	return 0;
 
 doset:
 	RegCloseKey(hkUtVideo);
@@ -264,7 +259,7 @@ doset_noclose:
 	return InternalSetState(pState, cb);
 }
 
-LRESULT CUL00Codec::InternalSetState(const void *pState, size_t cb)
+int CUL00Codec::InternalSetState(const void *pState, size_t cb)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 
@@ -277,19 +272,17 @@ LRESULT CUL00Codec::InternalSetState(const void *pState, size_t cb)
 		m_ec.dwFlags0 &= ~EC_FLAGS0_DIVIDE_COUNT_MASK;
 		m_ec.dwFlags0 |= (CThreadManager::GetNumProcessors() - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
 	}
-	return min(sizeof(ENCODERCONF), cb);
+	return 0;
 }
 
-LRESULT CUL00Codec::Compress(const ICCOMPRESS *icc, size_t cb)
+size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput)
 {
 	FRAMEINFO fi;
 	BYTE *p;
 	DWORD count[256];
 
-	m_icc = icc;
-
-	if (icc->lpckid != NULL)
-		*icc->lpckid = FCC('dcdc');
+	m_pInput = pInput;
+	m_pOutput = pOutput;
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
@@ -309,7 +302,7 @@ LRESULT CUL00Codec::Compress(const ICCOMPRESS *icc, size_t cb)
 		_ASSERT(false);
 	}
 
-	p = (BYTE *)icc->lpOutput;
+	p = (BYTE *)pOutput;
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
@@ -344,76 +337,58 @@ LRESULT CUL00Codec::Compress(const ICCOMPRESS *icc, size_t cb)
 		m_ptm->SubmitJob(new CEncodeJob(this, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
-	// 念のため、サイズ値が変数に収まるかどうかのチェック。
-	// 2GB を超えることなどまずあり得ないとは思うが…
-	size_t cbSizeImage = p - ((BYTE *)icc->lpOutput);
-	if (cbSizeImage > 0x7fffffff) // BITMAPINFOHEADER::biSizeImage は DWORD なので最大値は 2^32-1 であるが、ここでは 2^31-1 で制限しておく。
-	{
-		return ICERR_MEMORY; // 返すエラーはこれでいいのだろうか？
-	}
+	*pbKeyFrame = true;
 
-	icc->lpbiOutput->biSizeImage = (DWORD)cbSizeImage;
-	*icc->lpdwFlags = AVIIF_KEYFRAME;
-
-	return ICERR_OK;
+	return p - ((BYTE *)pOutput);
 }
 
-LRESULT CUL00Codec::CalcFrameMetric(const BITMAPINFOHEADER *pbihRaw, const BITMAPINFOEXT *pbieCompressed)
+int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
-	m_dwDivideCount = ((pbieCompressed->dwFlags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
-	m_bInterlace = pbieCompressed->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE;
-	m_dwNumStripes = pbihRaw->biHeight / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
+	const EXTRADATA *p = (const EXTRADATA *)pExtraData;
 
-	_ASSERT(m_dwDivideCount >= 1 && m_dwDivideCount <= 256);
+	m_dwDivideCount = ((p->flags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
+	m_bInterlace = p->flags0 & BIE_FLAGS0_ASSUME_INTERLACE;
+	m_dwNumStripes = height / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
 
 	m_bBottomUpFrame = FALSE;
-	switch (pbihRaw->biCompression)
+	switch (rawfmt)
 	{
-	case FCC('YV12'):
-		//m_dwRawSize = (pbihRaw->biWidth * pbihRaw->biHeight * 12) / 8; // XXX 幅や高さが奇数の場合は考慮していない
-		m_dwRawSize = (pbihRaw->biWidth * pbihRaw->biHeight * 3) / 2; // XXX 幅や高さが奇数の場合は考慮していない
+	case UTVF_YV12:
+		m_dwRawSize = (width * height * 3) / 2; // XXX 幅や高さが奇数の場合は考慮していない
 		break;
 	default:
-		switch (pbihRaw->biCompression)
+		switch (rawfmt)
 		{
-		case BI_RGB:
-			switch (pbihRaw->biBitCount)
-			{
-			case 24:
-				m_dwRawNetWidth = pbihRaw->biWidth * 3;
-				m_dwRawGrossWidth = ROUNDUP(m_dwRawNetWidth, 4);
-				break;
-			case 32:
-				m_dwRawNetWidth = pbihRaw->biWidth * 4;
-				m_dwRawGrossWidth = m_dwRawNetWidth;
-				break;
-			default:
-				_ASSERT(FALSE);
-				return ICERR_BADFORMAT;
-			}
-			if (pbihRaw->biHeight > 0)
-				m_bBottomUpFrame = TRUE;
+		case UTVF_RGB24_WIN:
+			m_bBottomUpFrame = true;
+			m_dwRawNetWidth = width * 3;
+			m_dwRawGrossWidth = ROUNDUP(m_dwRawNetWidth, 4);
 			break;
-		case FCC('YUY2'):
-		case FCC('YUYV'):
-		case FCC('YUNV'):
-		case FCC('UYVY'):
-		case FCC('UYNV'):
-			m_dwRawNetWidth = ROUNDUP(pbihRaw->biWidth, 2) * 2;
+		case UTVF_RGB32_WIN:
+		case UTVF_ARGB32_WIN:
+			m_bBottomUpFrame = true;
+			m_dwRawNetWidth = width * 4;
+			m_dwRawGrossWidth = m_dwRawNetWidth;
+			break;
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+			m_dwRawNetWidth = width * 2;
 			m_dwRawGrossWidth = m_dwRawNetWidth;
 			break;
 		default:
-			_ASSERT(FALSE);
-			return ICERR_BADFORMAT;
+			return -1;
 		}
-		m_dwRawSize = m_dwRawGrossWidth * pbihRaw->biHeight;
+		m_dwRawSize = m_dwRawGrossWidth * height;
 		if (m_bInterlace)
 			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight() * 2;
 		else
 			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight();
 	}
 
-	CalcPlaneSizes(pbihRaw);
+	CalcPlaneSizes(width, height);
 
 	if (m_bInterlace)
 	{
@@ -444,17 +419,22 @@ LRESULT CUL00Codec::CalcFrameMetric(const BITMAPINFOHEADER *pbihRaw, const BITMA
 	return ICERR_OK;
 }
 
-LRESULT CUL00Codec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+int CUL00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
-	LRESULT ret;
-	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
+	int ret;
+	EXTRADATA ed;
 
-	ret = CompressQuery(pbihIn, pbihOut);
-	if (ret != ICERR_OK)
+	ret = EncodeQuery(infmt, width, height, cbGrossWidth);
+	if (ret != 0)
 		return ret;
 
-	ret = CalcFrameMetric(pbihIn, pbieOut);
-	if (ret != ICERR_OK)
+	m_utvfRaw = infmt;
+	m_nWidth = width;
+	m_nHeight = height;
+
+	EncodeGetExtraData(&ed, sizeof(ed), infmt, width, height, cbGrossWidth);
+	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth, &ed, sizeof(ed));
+	if (ret != 0)
 		return ret;
 
 	m_pCurFrame = new CFrameBuffer();
@@ -472,7 +452,7 @@ LRESULT CUL00Codec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPIN
 	return ICERR_OK;
 }
 
-LRESULT CUL00Codec::CompressEnd(void)
+int CUL00Codec::EncodeEnd(void)
 {
 	delete m_pCurFrame;
 	delete m_pMedianPredicted;
@@ -481,62 +461,54 @@ LRESULT CUL00Codec::CompressEnd(void)
 
 	delete m_ptm;
 
-	return ICERR_OK;
+	return 0;
 }
 
-LRESULT CUL00Codec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut)
+size_t CUL00Codec::EncodeGetExtraDataSize(void)
 {
-	BITMAPINFOEXT *pbieOut = (BITMAPINFOEXT *)pbihOut;
-	DWORD dwDivideCount;
-
-	if (pbihOut == NULL)
-		return sizeof(BITMAPINFOEXT);
-
-	memset(pbihOut, 0, sizeof(BITMAPINFOEXT));
-
-	dwDivideCount = min(ROUNDUP(pbihIn->biHeight, 2) / 2, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
-
-	_ASSERT(dwDivideCount >= 1 && dwDivideCount <= 256);
-
-	pbieOut->bih.biSize          = sizeof(BITMAPINFOEXT);
-	pbieOut->bih.biWidth         = pbihIn->biWidth;
-	pbieOut->bih.biHeight        = pbihIn->biHeight;
-	pbieOut->bih.biPlanes        = 1;
-	pbieOut->bih.biBitCount      = GetFalseBitCount();
-	pbieOut->bih.biCompression   = m_fcc;
-	pbieOut->bih.biSizeImage     = pbihIn->biSizeImage;
-	pbieOut->bih.biXPelsPerMeter = pbihIn->biXPelsPerMeter;
-	pbieOut->bih.biYPelsPerMeter = pbihIn->biYPelsPerMeter;
-	pbieOut->bih.biClrUsed       = 0;
-	pbieOut->bih.biClrImportant  = 0;
-	pbieOut->dwEncoderVersionAndImplementation  = UTVIDEO_VERSION_AND_IMPLEMENTATION;
-	pbieOut->fccOriginalFormat = pbihIn->biCompression;
-	pbieOut->dwFrameInfoSize   = sizeof(FRAMEINFO);
-	pbieOut->dwFlags0          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | ((dwDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT) | (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE ? BIE_FLAGS0_ASSUME_INTERLACE : 0);
-
-	return ICERR_OK;
+	return sizeof(EXTRADATA);
 }
 
-LRESULT CUL00Codec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+int CUL00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
-	return ROUNDUP(pbihIn->biWidth, 4) * ROUNDUP(pbihIn->biHeight, 2) * GetRealBitCount() / 8 + 4096; // +4096 はどんぶり勘定。
+	EXTRADATA *p = (EXTRADATA *)pExtraData;
+	unsigned int nDivideCount;
+
+	if (cb < sizeof(EXTRADATA))
+		return -1;
+
+	memset(p, 0, cb);
+
+	nDivideCount = min(ROUNDUP(height, 2) / 2, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
+
+	p->EncoderVersionAndImplementation = UTVIDEO_VERSION_AND_IMPLEMENTATION;
+	p->fccOriginalFormat               = UNFCC(infmt);
+	p->cbFrameInfo                     = sizeof(FRAMEINFO);
+	p->flags0                          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | ((nDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT) | (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE ? BIE_FLAGS0_ASSUME_INTERLACE : 0);
+
+	return 0;
 }
 
-LRESULT CUL00Codec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+size_t CUL00Codec::EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
-	if (pbihIn->biWidth % GetMacroPixelWidth() != 0 || pbihIn->biHeight % GetMacroPixelHeight() != 0)
-		return ICERR_BADFORMAT;
+	return ROUNDUP(width, 4) * ROUNDUP(height, 2) * GetRealBitCount() / 8 + 4096; // +4096 はどんぶり勘定。
+}
 
-	if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE && pbihIn->biHeight % (GetMacroPixelHeight() * 2) != 0)
-		return ICERR_BADFORMAT;
+int CUL00Codec::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+{
+	if (width % GetMacroPixelWidth() != 0 || height % GetMacroPixelHeight() != 0)
+		return -1;
 
-	for (const FORMATINFO *pfi = GetEncoderInputFormat(); !IS_FORMATINFO_END(pfi); pfi++)
+	if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE && height % (GetMacroPixelHeight() * 2) != 0)
+		return -1;
+
+	for (const utvf_t *utvf = GetEncoderInputFormat(); *utvf; utvf++)
 	{
-		if (pbihIn->biCompression == pfi->fcc && pbihIn->biBitCount == pfi->nBitCount && pbihIn->biHeight > 0)
-			return ICERR_OK;
+		if (infmt == *utvf)
+			return 0;
 	}
 
-	return ICERR_BADFORMAT;
+	return -1;
 }
 
 void CUL00Codec::PredictProc(DWORD nBandIndex)
@@ -591,17 +563,23 @@ void CUL00Codec::EncodeProc(DWORD nBandIndex)
 	}
 }
 
-LRESULT CUL00Codec::Decompress(const ICDECOMPRESS *icd, size_t cb)
+size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame)
 {
-	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)icd->lpbiInput;
 	/* const */ BYTE *p;
 
-	m_icd = icd;
+	m_pInput = pInput;
+	m_pOutput = pOutput;
 
+	p = (BYTE *)pInput;
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	{
+		p += 256 + sizeof(DWORD) * m_dwDivideCount;
+		p += ((const DWORD *)p)[-1];
+	}
 	memset(&m_fi, 0, sizeof(FRAMEINFO));
-	memcpy(&m_fi, ((BYTE *)icd->lpInput) + pbieIn->bih.biSizeImage - pbieIn->dwFrameInfoSize, pbieIn->dwFrameInfoSize);
+	memcpy(&m_fi, p, m_ed.cbFrameInfo);
 
-	p = (BYTE *)icd->lpInput;
+	p = (BYTE *)pInput;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		m_pCodeLengthTable[nPlaneIndex] = p;
@@ -625,23 +603,27 @@ LRESULT CUL00Codec::Decompress(const ICDECOMPRESS *icd, size_t cb)
 		m_ptm->SubmitJob(new CDecodeJob(this, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
-	icd->lpbiOutput->biSizeImage = m_dwRawSize;
-
-	return ICERR_OK;
+	return m_dwRawSize;
 }
 
-LRESULT CUL00Codec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+int CUL00Codec::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
-	LRESULT ret;
-	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
+	int ret;
 
-	ret = DecompressQuery(pbihIn, pbihOut);
-	if (ret != ICERR_OK)
+	ret = DecodeQuery(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	if (ret != 0)
 		return ret;
 
-	ret = CalcFrameMetric(pbihOut, pbieIn);
-	if (ret != ICERR_OK)
+	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	if (ret != 0)
 		return ret;
+
+	memset(&m_ed, 0, sizeof(m_ed));
+	memcpy(&m_ed, pExtraData, min(sizeof(m_ed), cbExtraData));
+
+	m_utvfRaw = outfmt;
+	m_nWidth = width;
+	m_nHeight = height;
 
 	m_pRestoredFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
@@ -653,87 +635,59 @@ LRESULT CUL00Codec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAP
 
 	m_ptm = new CThreadManager();
 
-	return ICERR_OK;
+	return 0;
 }
 
-LRESULT CUL00Codec::DecompressEnd(void)
+int CUL00Codec::DecodeEnd(void)
 {
 	delete m_pRestoredFrame;
 	delete m_pDecodedFrame;
 
 	delete m_ptm;
 
-	return ICERR_OK;
+	return 0;
 }
 
-LRESULT CUL00Codec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut, const FORMATINFO *pfiOut)
+size_t CUL00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
-	if (pbihOut == NULL)
-		return sizeof(BITMAPINFOHEADER);
+	int ret;
 
-	if (pfiOut == NULL)
-		pfiOut = GetDecoderOutputFormat();
+	ret = DecodeQuery(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	if (ret != 0)
+		return 0;
 
-	memset(pbihOut, 0, sizeof(BITMAPINFOHEADER));
-
-	pbihOut->biSize          = sizeof(BITMAPINFOHEADER);
-	pbihOut->biWidth         = pbihIn->biWidth;
-	pbihOut->biHeight        = pbihIn->biHeight;
-	pbihOut->biPlanes        = 1;
-	pbihOut->biBitCount      = pfiOut->nBitCount;
-	pbihOut->biCompression   = pfiOut->fcc;
-	pbihOut->biSizeImage     = pbihIn->biSizeImage;
-	pbihOut->biXPelsPerMeter = pbihIn->biXPelsPerMeter;
-	pbihOut->biYPelsPerMeter = pbihIn->biYPelsPerMeter;
-	pbihOut->biClrUsed       = 0;
-	pbihOut->biClrImportant  = 0;
-
-	return ICERR_OK;
-}
-
-LRESULT CUL00Codec::DecompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
-{
-	LRESULT ret;
-	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
-
-	ret = CalcFrameMetric(pbihOut, pbieIn);
-	if (ret != ICERR_OK)
-		return ret;
+	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	if (ret != 0)
+		return 0;
 
 	return m_dwRawSize;
 }
 
-LRESULT CUL00Codec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
+int CUL00Codec::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
-	BITMAPINFOEXT *pbieIn = (BITMAPINFOEXT *)pbihIn;
+	const EXTRADATA *p = (const EXTRADATA *)pExtraData;
 
-	if (pbihIn->biCompression != m_fcc)
-		return ICERR_BADFORMAT;
+	if (width % GetMacroPixelWidth() != 0 || height % GetMacroPixelHeight() != 0)
+		return -1;
 
-	if (pbihIn->biWidth % GetMacroPixelWidth() != 0 || pbihIn->biHeight % GetMacroPixelHeight() != 0)
-		return ICERR_BADFORMAT;
+	if (cbExtraData > sizeof(EXTRADATA))
+		return -1;
 
-	if (pbihIn->biSize > sizeof(BITMAPINFOEXT))
-		return ICERR_BADFORMAT;
+	if (p->flags0 & BIE_FLAGS0_ASSUME_INTERLACE && height % (GetMacroPixelHeight() * 2) != 0)
+		return -1;
 
-	if (pbieIn->dwFlags0 & BIE_FLAGS0_ASSUME_INTERLACE && pbihIn->biHeight % (GetMacroPixelHeight() * 2) != 0)
-		return ICERR_BADFORMAT;
+	if (p->cbFrameInfo > sizeof(FRAMEINFO))
+		return -1;
+	if (p->flags0 & BIE_FLAGS0_RESERVED)
+		return -1;
 
-	if (pbieIn->dwFrameInfoSize > sizeof(FRAMEINFO))
-		return ICERR_BADFORMAT;
-	if (pbieIn->dwFlags0 & BIE_FLAGS0_RESERVED)
-		return ICERR_BADFORMAT;
-
-	if (pbihOut == NULL)
-		return ICERR_OK;
-
-	for (const FORMATINFO *pfi = GetDecoderOutputFormat(); !IS_FORMATINFO_END(pfi); pfi++)
+	for (const utvf_t *utvf = GetDecoderOutputFormat(); *utvf; utvf++)
 	{
-		if (pbihOut->biCompression == pfi->fcc && pbihOut->biBitCount == pfi->nBitCount && pbihOut->biHeight > 0 && pbihOut->biHeight == pbihIn->biHeight && pbihOut->biWidth == pbihIn->biWidth)
-			return ICERR_OK;
+		if (outfmt == *utvf)
+			return 0;
 	}
 
-	return ICERR_BADFORMAT;
+	return -1;
 }
 
 void CUL00Codec::DecodeProc(DWORD nBandIndex)
