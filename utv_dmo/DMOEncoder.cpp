@@ -117,7 +117,7 @@ HRESULT STDMETHODCALLTYPE CDMOEncoder::Load(IStream *pStm)
 
 	LockIt lck(this);
 
-	cbState = m_pCodec->GetStateSize();
+	cbState = (ULONG)m_pCodec->GetStateSize();
 	pState = malloc(cbState);
 	hr = pStm->Read(pState, cbState, &cbRead);
 	if (FAILED(hr))
@@ -140,7 +140,7 @@ HRESULT STDMETHODCALLTYPE CDMOEncoder::Save(IStream *pStm, BOOL fClearDirty)
 
 	LockIt lck(this);
 
-	cbState = m_pCodec->GetStateSize();
+	cbState = (ULONG)m_pCodec->GetStateSize();
 	pState = malloc(cbState);
 	m_pCodec->GetState(pState, cbState);
 	hr = pStm->Write(pState, cbState, &cbWritten);
