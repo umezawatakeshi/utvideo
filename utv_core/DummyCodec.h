@@ -21,6 +21,7 @@ public:
 	virtual const utvf_t *GetEncoderInputFormat(void);
 	virtual const utvf_t *GetDecoderOutputFormat(void);
 	virtual const utvf_t *GetCompressedFormat(void);
+	virtual bool IsTemporalCompressionSupported(void) { return false; }
 
 #ifdef _WIN32
 	virtual INT_PTR Configure(HWND hwnd);
@@ -41,6 +42,6 @@ public:
 	virtual int DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual size_t DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame);
 	virtual int DecodeEnd(void);
-	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
+	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	virtual int DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 };

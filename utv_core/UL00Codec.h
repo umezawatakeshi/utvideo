@@ -129,6 +129,7 @@ public:
 	virtual const utvf_t *GetEncoderInputFormat(void) = 0;
 	virtual const utvf_t *GetDecoderOutputFormat(void) = 0;
 	virtual const utvf_t *GetCompressedFormat(void) = 0;
+	virtual bool IsTemporalCompressionSupported(void) { return false; }
 
 #ifdef _WIN32
 	virtual INT_PTR Configure(HWND hwnd);
@@ -150,13 +151,14 @@ public:
 	virtual int DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual size_t DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame);
 	virtual int DecodeEnd(void);
-	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
+	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	virtual int DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 
 protected:
 	int LoadConfig(void);
 	int SaveConfig(void);
 	int InternalSetState(const void *pState, size_t cb);
+	int CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual const char *GetColorFormatName(void) = 0;
 	virtual WORD GetRealBitCount(void) = 0;

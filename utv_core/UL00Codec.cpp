@@ -342,14 +342,8 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	return p - ((BYTE *)pOutput);
 }
 
-int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
-	const EXTRADATA *p = (const EXTRADATA *)pExtraData;
-
-	m_dwDivideCount = ((p->flags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
-	m_bInterlace = p->flags0 & BIE_FLAGS0_ASSUME_INTERLACE;
-	m_dwNumStripes = height / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
-
 	m_bBottomUpFrame = FALSE;
 	switch (rawfmt)
 	{
@@ -388,6 +382,18 @@ int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int 
 			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight();
 	}
 
+	return 0;
+}
+
+int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+{
+	const EXTRADATA *p = (const EXTRADATA *)pExtraData;
+
+	m_dwDivideCount = ((p->flags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
+	m_bInterlace = p->flags0 & BIE_FLAGS0_ASSUME_INTERLACE;
+	m_dwNumStripes = height / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
+
+	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
 	CalcPlaneSizes(width, height);
 
 	if (m_bInterlace)
@@ -648,15 +654,11 @@ int CUL00Codec::DecodeEnd(void)
 	return 0;
 }
 
-size_t CUL00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+size_t CUL00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
 	int ret;
 
-	ret = DecodeQuery(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
-	if (ret != 0)
-		return 0;
-
-	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	ret = CalcRawFrameMetric(outfmt, width, height, cbGrossWidth);
 	if (ret != 0)
 		return 0;
 
@@ -680,6 +682,9 @@ int CUL00Codec::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int heig
 		return -1;
 	if (p->flags0 & BIE_FLAGS0_RESERVED)
 		return -1;
+
+	if (!outfmt)
+		return 0;
 
 	for (const utvf_t *utvf = GetDecoderOutputFormat(); *utvf; utvf++)
 	{

@@ -132,7 +132,7 @@ int CDummyCodec::DecodeEnd(void)
 	return 0;
 }
 
-size_t CDummyCodec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+size_t CDummyCodec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
 	return 0;
 }
