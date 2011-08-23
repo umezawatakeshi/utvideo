@@ -5,6 +5,7 @@
 
 #include "stdafx.h"
 #include "DMODecoder.h"
+#include <Format.h>
 
 // CDMODecoder
 
@@ -18,8 +19,13 @@ HRESULT CDMODecoder::InternalAllocateStreamingResources()
 	const DMO_MEDIA_TYPE *pmtOut = OutputType(0);
 	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
 	const VIDEOINFOHEADER *pvihOut = (const VIDEOINFOHEADER *)pmtOut->pbFormat;
+	utvf_t outfmt;
 
-	if (m_pCodec->DecompressBegin(&pvihIn->bmiHeader, &pvihOut->bmiHeader) == 0)
+	if (WindowsFormatToUtVideoFormat(&outfmt, pvihOut->bmiHeader.biCompression, pvihOut->bmiHeader.biBitCount, pmtOut->subtype) != 0)
+		return DMO_E_INVALIDTYPE;
+
+	if (m_pCodec->DecodeBegin(outfmt, pvihOut->bmiHeader.biWidth, pvihOut->bmiHeader.biHeight, CBGROSSWIDTH_WINDOWS,
+			((BYTE *)&pvihIn->bmiHeader) + sizeof(BITMAPINFOHEADER), pvihIn->bmiHeader.biSize - sizeof(BITMAPINFOHEADER)) == 0)
 		return S_OK;
 	else
 		return E_FAIL;
@@ -29,7 +35,7 @@ HRESULT CDMODecoder::InternalFreeStreamingResources()
 {
 	_RPT0(_CRT_WARN, "CDMODecoder::InternalFreeStreamingResources()\n");
 
-	m_pCodec->DecompressEnd();
+	m_pCodec->DecodeEnd();
 
 	return S_OK;
 }
@@ -38,26 +44,17 @@ HRESULT CDMODecoder::InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCou
 {
 	_RPT0(_CRT_WARN, "CDMODecoder::InternalProcessOutput()\n");
 
-	const DMO_MEDIA_TYPE *pmtIn  = InputType(0);
-	const DMO_MEDIA_TYPE *pmtOut = OutputType(0);
-	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
-	const VIDEOINFOHEADER *pvihOut = (const VIDEOINFOHEADER *)pmtOut->pbFormat;
-	ICDECOMPRESS icd;
+	BYTE *pInput;
+	BYTE *pOutput;
+	size_t cbOutput;
 
 	if (m_pInputBuffer == NULL)
 		return S_FALSE;
 
-	memset(&icd, 0, sizeof(icd));
-	icd.dwFlags = m_bInputKeyFrame ? 0 : ICDECOMPRESS_NOTKEYFRAME;
-	icd.lpbiOutput = (BITMAPINFOHEADER *)malloc(pvihOut->bmiHeader.biSize);
-	memcpy(icd.lpbiOutput, &pvihOut->bmiHeader, pvihOut->bmiHeader.biSize);
-	pOutputBuffers->pBuffer->GetBufferAndLength((BYTE **)&icd.lpOutput, NULL);
-	icd.lpbiInput = (BITMAPINFOHEADER *)malloc(pvihIn->bmiHeader.biSize);
-	memcpy(icd.lpbiInput, &pvihIn->bmiHeader, pvihIn->bmiHeader.biSize);
-	m_pInputBuffer->GetBufferAndLength((BYTE **)&icd.lpInput, &icd.lpbiInput->biSizeImage);
-	icd.ckid = FCC('dcdc');
+	pOutputBuffers->pBuffer->GetBufferAndLength(&pOutput, NULL);
+	m_pInputBuffer->GetBufferAndLength(&pInput, NULL);
 
-	m_pCodec->Decompress(&icd, sizeof(icd));
+	cbOutput = m_pCodec->DecodeFrame(pOutput, pInput, m_bInputKeyFrame != 0);
 
 	pOutputBuffers->dwStatus = 0;
 	pOutputBuffers->dwStatus |= DMO_OUTPUT_DATA_BUFFERF_SYNCPOINT;
@@ -71,11 +68,8 @@ HRESULT CDMODecoder::InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCou
 		pOutputBuffers->dwStatus |= DMO_OUTPUT_DATA_BUFFERF_TIMELENGTH;
 		pOutputBuffers->rtTimelength = m_rtInputTimelength;
 	}
-	pOutputBuffers->pBuffer->SetLength(icd.lpbiOutput->biSizeImage);
-	_RPT1(_CRT_WARN, "Size = %d\n", icd.lpbiOutput->biSizeImage);
-
-	free(icd.lpbiOutput);
-	free(icd.lpbiInput);
+	pOutputBuffers->pBuffer->SetLength((DWORD)cbOutput);
+	_RPT1(_CRT_WARN, "Size = %u\n", (unsigned int)cbOutput);
 
 	m_pInputBuffer->Release();
 	m_pInputBuffer = NULL;

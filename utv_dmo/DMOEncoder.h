@@ -46,13 +46,29 @@ public:
 	static const UINT IDR = IDR_DMOENCODER;
 	static const bool bEncoding = true;
 
-	static const FORMATINFO *GetInputFormatInfo(CCodec *pCodec) { return pCodec->GetEncoderInputFormat(); }
-	static const FORMATINFO *GetOutputFormatInfo(CCodec *pCodec) { return pCodec->GetCompressedFormat(); }
+	static const utvf_t *GetInputFormatInfo(CCodec *pCodec) { return pCodec->GetEncoderInputFormat(); }
+	static const utvf_t *GetOutputFormatInfo(CCodec *pCodec) { return pCodec->GetCompressedFormat(); }
 	static const void GetName(CCodec *pCodec, WCHAR *szCodecName, size_t cchCodecName) { pCodec->GetLongFriendlyName(szCodecName, cchCodecName); }
 
-	LRESULT GetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut, const FORMATINFO *pfiOut) { return m_pCodec->CompressGetFormat(pbihIn, pbihOut); }
-	LRESULT GetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) {return m_pCodec->CompressGetSize(pbihIn, pbihOut); }
-	LRESULT Query(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) {return m_pCodec->CompressQuery(pbihIn, pbihOut); }
+	size_t GetExtraDataSize(void)
+	{
+		return m_pCodec->EncodeGetExtraDataSize();
+	}
+
+	int GetExtraData(void *pExtraData, size_t cbExtraData, utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height)
+	{
+		return m_pCodec->EncodeGetExtraData(pExtraData, cbExtraData, infmt, width, height, CBGROSSWIDTH_WINDOWS);
+	}
+
+	size_t GetSize(utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height)
+	{
+		return m_pCodec->EncodeGetOutputSize(infmt, width, height, CBGROSSWIDTH_WINDOWS);
+	}
+
+	int Query(utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height, const void *pOutExtraData, size_t cbOutExtraData, const void *pInExtraData, size_t cbInExtraData)
+	{
+		return m_pCodec->EncodeQuery(infmt, width, height, CBGROSSWIDTH_WINDOWS);
+	}
 
 public:
 	// IMediaObjectImpl

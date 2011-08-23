@@ -41,13 +41,29 @@ public:
 	static const UINT IDR = IDR_DMODECODER;
 	static const bool bEncoding = false;
 
-	static const FORMATINFO *GetInputFormatInfo(CCodec *pCodec) { return pCodec->GetCompressedFormat(); }
-	static const FORMATINFO *GetOutputFormatInfo(CCodec *pCodec) { return pCodec->GetDecoderOutputFormat(); }
-	static const void GetName(CCodec *pCodec, WCHAR *szCodecName, size_t cchCodecName) { DWORD fcc = pCodec->GetFCC(); wsprintfW(szCodecName, L"%C%C%C%C DMO Decoder", FCC4PRINTF(fcc)); }
+	static const utvf_t *GetInputFormatInfo(CCodec *pCodec) { return pCodec->GetCompressedFormat(); }
+	static const utvf_t *GetOutputFormatInfo(CCodec *pCodec) { return pCodec->GetDecoderOutputFormat(); }
+	static const void GetName(CCodec *pCodec, WCHAR *szCodecName, size_t cchCodecName) { wsprintfW(szCodecName, L"%S DMO Decoder", pCodec->GetTinyName()); }
 
-	LRESULT GetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOHEADER *pbihOut, const FORMATINFO *pfiOut) { return m_pCodec->DecompressGetFormat(pbihIn, pbihOut, pfiOut); }
-	LRESULT GetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) {return m_pCodec->DecompressGetSize(pbihIn, pbihOut); }
-	LRESULT Query(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut) {return m_pCodec->DecompressQuery(pbihIn, pbihOut); }
+	size_t GetExtraDataSize(void)
+	{
+		return 0;
+	}
+
+	int GetExtraData(void *pExtraData, size_t cbExtraData, utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height)
+	{
+		return 0;
+	}
+
+	size_t GetSize(utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height)
+	{
+		return m_pCodec->DecodeGetOutputSize(outfmt, width, height, CBGROSSWIDTH_WINDOWS);
+	}
+
+	int Query(utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height, const void *pOutExtraData, size_t cbOutExtraData, const void *pInExtraData, size_t cbInExtraData)
+	{
+		return m_pCodec->DecodeQuery(outfmt, width, height, CBGROSSWIDTH_WINDOWS, pInExtraData, cbInExtraData);
+	}
 
 public:
 	// IMediaObjectImpl
