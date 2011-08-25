@@ -102,15 +102,15 @@ inline uint32_t ROUNDUP(uint32_t a, uint32_t b)
 	return ((a + b - 1) / b) * b;
 }
 
-inline bool IS_ALIGNED(DWORD_PTR v, DWORD_PTR a)
+inline bool IS_ALIGNED(uintptr_t v, uintptr_t a)
 {
 	_ASSERT(a > 0 && (a & (a - 1)) == 0); // a ÇÕ 2 ÇÃó›èÊÇ≈Ç†ÇÈÅB
 	return (v & (a - 1)) == 0; // v ÇÕ a ÇÃî{êîÇ≈Ç†ÇÈÅB
 }
 
-inline bool IS_ALIGNED(const void *p, DWORD_PTR a)
+inline bool IS_ALIGNED(const void *p, uintptr_t a)
 {
-	return IS_ALIGNED((DWORD_PTR)p, a);
+	return IS_ALIGNED((uintptr_t)p, a);
 }
 
 inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
