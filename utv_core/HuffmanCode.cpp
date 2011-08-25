@@ -83,8 +83,8 @@ struct CODE_LENGTH_SORT
 
 inline void sort_codelength(struct CODE_LENGTH_SORT *p)
 {
-	_ASSERT(sizeof(CODE_LENGTH_SORT) == sizeof(WORD));
-	sort((WORD *)p, (WORD *)p+256);
+	_ASSERT(sizeof(CODE_LENGTH_SORT) == sizeof(uint16_t));
+	sort((uint16_t *)p, (uint16_t *)p+256);
 }
 
 void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const BYTE *pCodeLengthTable)
