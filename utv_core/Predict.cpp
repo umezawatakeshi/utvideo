@@ -1,7 +1,7 @@
 /* •¶šƒR[ƒh‚Í‚r‚i‚h‚r ‰üsƒR[ƒh‚Í‚b‚q‚k‚e */
 /* $Id$ */
 
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "utvideo.h"
 #include "Predict.h"
 #include "TunedFunc.h"
