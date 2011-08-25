@@ -79,14 +79,14 @@ int CUL00Codec::LoadConfig(void)
 		return -1;
 
 	cb = sizeof(DWORD);
-	if (RegQueryValueEx(hkUtVideo, "SaveConfig", NULL, &dwType, (BYTE *)&dwSaveConfig, &cb) != ERROR_SUCCESS)
+	if (RegQueryValueEx(hkUtVideo, "SaveConfig", NULL, &dwType, (uint8_t *)&dwSaveConfig, &cb) != ERROR_SUCCESS)
 		goto notloaded;
 	if (!dwSaveConfig)
 		goto notloaded;
 
 	wsprintf(buf, "Config%s", GetTinyName());
 	cb = sizeof(ENCODERCONF);
-	if (RegQueryValueEx(hkUtVideo, buf, NULL, &dwType, (BYTE *)&ec, &cb) != ERROR_SUCCESS)
+	if (RegQueryValueEx(hkUtVideo, buf, NULL, &dwType, (uint8_t *)&ec, &cb) != ERROR_SUCCESS)
 		goto notloaded;
 	InternalSetState(&ec, cb);
 
@@ -110,13 +110,13 @@ int CUL00Codec::SaveConfig(void)
 		return -1;
 
 	cb = sizeof(DWORD);
-	if (RegQueryValueEx(hkUtVideo, "SaveConfig", NULL, &dwType, (BYTE *)&dwSaveConfig, &cb) != ERROR_SUCCESS)
+	if (RegQueryValueEx(hkUtVideo, "SaveConfig", NULL, &dwType, (uint8_t *)&dwSaveConfig, &cb) != ERROR_SUCCESS)
 		goto notsaved;
 	if (!dwSaveConfig)
 		goto notsaved;
 
 	wsprintf(buf, "Config%s", GetTinyName());
-	if (RegSetValueEx(hkUtVideo, buf, 0, REG_BINARY, (const BYTE *)&m_ec, sizeof(ENCODERCONF)) != ERROR_SUCCESS)
+	if (RegSetValueEx(hkUtVideo, buf, 0, REG_BINARY, (const uint8_t *)&m_ec, sizeof(ENCODERCONF)) != ERROR_SUCCESS)
 		goto notsaved;
 
 	RegCloseKey(hkUtVideo);
@@ -245,7 +245,7 @@ int CUL00Codec::SetState(const void *pState, size_t cb)
 		goto doset_noclose;
 
 	cbRegData = sizeof(DWORD);
-	if (RegQueryValueEx(hkUtVideo, "IgnoreSetConfig", NULL, &dwType, (BYTE *)&dwIgnoreSetConfig, &cbRegData) != ERROR_SUCCESS)
+	if (RegQueryValueEx(hkUtVideo, "IgnoreSetConfig", NULL, &dwType, (uint8_t *)&dwIgnoreSetConfig, &cbRegData) != ERROR_SUCCESS)
 		goto doset;
 	if (!dwIgnoreSetConfig)
 		goto doset;
@@ -278,7 +278,7 @@ int CUL00Codec::InternalSetState(const void *pState, size_t cb)
 size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput)
 {
 	FRAMEINFO fi;
-	BYTE *p;
+	uint8_t *p;
 	DWORD count[256];
 
 	m_pInput = pInput;
@@ -302,7 +302,7 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 		_ASSERT(false);
 	}
 
-	p = (BYTE *)pOutput;
+	p = (uint8_t *)pOutput;
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
@@ -339,7 +339,7 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 	*pbKeyFrame = true;
 
-	return p - ((BYTE *)pOutput);
+	return p - ((uint8_t *)pOutput);
 }
 
 int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
@@ -571,12 +571,12 @@ void CUL00Codec::EncodeProc(DWORD nBandIndex)
 
 size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame)
 {
-	/* const */ BYTE *p;
+	/* const */ uint8_t *p;
 
 	m_pInput = pInput;
 	m_pOutput = pOutput;
 
-	p = (BYTE *)pInput;
+	p = (uint8_t *)pInput;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		p += 256 + sizeof(DWORD) * m_dwDivideCount;
@@ -585,7 +585,7 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 	memset(&m_fi, 0, sizeof(FRAMEINFO));
 	memcpy(&m_fi, p, m_ed.cbFrameInfo);
 
-	p = (BYTE *)pInput;
+	p = (uint8_t *)pInput;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		m_pCodeLengthTable[nPlaneIndex] = p;

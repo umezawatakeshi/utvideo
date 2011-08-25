@@ -62,11 +62,11 @@ void CULRACodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 
 void CULRACodec::ConvertToPlanar(DWORD nBandIndex)
 {
-	BYTE *g, *b, *r, *a;
-	const BYTE *pSrcBegin, *pSrcEnd, *pStrideBegin, *p;
+	uint8_t *g, *b, *r, *a;
+	const uint8_t *pSrcBegin, *pSrcEnd, *pStrideBegin, *p;
 
-	pSrcBegin = ((BYTE *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	pSrcEnd   = ((BYTE *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
 	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
@@ -78,7 +78,7 @@ void CULRACodec::ConvertToPlanar(DWORD nBandIndex)
 	case UTVF_RGB32_WIN:
 		for (pStrideBegin = pSrcEnd - m_dwRawGrossWidth; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwRawGrossWidth)
 		{
-			const BYTE *pStrideEnd = pStrideBegin + m_nWidth * 4;
+			const uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
 			for (p = pStrideBegin; p < pStrideEnd; p += 4)
 			{
 				*g++ = *(p+1);
@@ -93,11 +93,11 @@ void CULRACodec::ConvertToPlanar(DWORD nBandIndex)
 
 void CULRACodec::ConvertFromPlanar(DWORD nBandIndex)
 {
-	const BYTE *g, *b, *r, *a;
-	BYTE *pDstBegin, *pDstEnd, *pStrideBegin, *p;
+	const uint8_t *g, *b, *r, *a;
+	uint8_t *pDstBegin, *pDstEnd, *pStrideBegin, *p;
 
-	pDstBegin = ((BYTE *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	pDstEnd   = ((BYTE *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
 	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
@@ -109,7 +109,7 @@ void CULRACodec::ConvertFromPlanar(DWORD nBandIndex)
 	case UTVF_RGB32_WIN:
 		for (pStrideBegin = pDstEnd - m_dwRawGrossWidth; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwRawGrossWidth)
 		{
-			BYTE *pStrideEnd = pStrideBegin + m_nWidth * 4;
+			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
 			for (p = pStrideBegin; p < pStrideEnd; p += 4)
 			{
 				*(p+1) = *g;
@@ -128,8 +128,8 @@ bool CULRACodec::DecodeDirect(DWORD nBandIndex)
 	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
 		return false;
 
-	BYTE *pDstBegin = ((BYTE *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	BYTE *pDstEnd   = ((BYTE *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 
 	switch (m_utvfRaw)
 	{

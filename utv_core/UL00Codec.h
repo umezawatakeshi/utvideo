@@ -105,14 +105,14 @@ protected:
 	{
 		DWORD dwCount[4][256];
 	} *m_counts;
-	/* const */ BYTE *m_pCodeLengthTable[4];
+	/* const */ uint8_t *m_pCodeLengthTable[4];
 	HUFFMAN_ENCODE_TABLE m_het[4];
 
 	CFrameBuffer *m_pRestoredFrame;
 	CFrameBuffer *m_pDecodedFrame;
 	FRAMEINFO m_fi;
 	HUFFMAN_DECODE_TABLE m_hdt[4];
-	const BYTE *m_pDecodeCode[4][256];
+	const uint8_t *m_pDecodeCode[4][256];
 
 	EXTRADATA m_ed;
 

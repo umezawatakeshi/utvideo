@@ -63,11 +63,11 @@ void CULY2Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 
 void CULY2Codec::ConvertToPlanar(DWORD nBandIndex)
 {
-	BYTE *y, *u, *v;
-	const BYTE *pSrcBegin, *pSrcEnd, *p;
+	uint8_t *y, *u, *v;
+	const uint8_t *pSrcBegin, *pSrcEnd, *p;
 
-	pSrcBegin = ((BYTE *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	pSrcEnd   = ((BYTE *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 	y = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 	u = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
 	v = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
@@ -106,11 +106,11 @@ void CULY2Codec::ConvertToPlanar(DWORD nBandIndex)
 
 void CULY2Codec::ConvertFromPlanar(DWORD nBandIndex)
 {
-	const BYTE *y, *u, *v;
-	BYTE *pDstBegin, *pDstEnd, *p;
+	const uint8_t *y, *u, *v;
+	uint8_t *pDstBegin, *pDstEnd, *p;
 
-	pDstBegin = ((BYTE *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	pDstEnd   = ((BYTE *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 	y = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 	u = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
 	v = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
@@ -152,8 +152,8 @@ bool CULY2Codec::DecodeDirect(DWORD nBandIndex)
 	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
 		return false;
 
-	BYTE *pDstBegin = ((BYTE *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	BYTE *pDstEnd   = ((BYTE *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 
 	switch (m_utvfRaw)
 	{

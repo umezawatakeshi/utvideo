@@ -28,10 +28,10 @@ public:
 	virtual const utvf_t *GetCompressedFormat(void) { return m_utvfCompressed; }
 
 private:
-	void ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD bypp);
-	void ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD nYOffset);
-	void ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD bypp);
-	void ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD nYOffset);
+	void ConvertBottomupRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, DWORD nBandIndex, DWORD bypp);
+	void ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, DWORD nBandIndex, DWORD nYOffset);
+	void ConvertULY0ToBottomupRGB(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, DWORD nBandIndex, DWORD bypp);
+	void ConvertULY0ToYUV422(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, DWORD nBandIndex, DWORD nYOffset);
 
 protected:
 	virtual const char *GetColorFormatName(void) { return "YUV420"; }

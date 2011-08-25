@@ -5,7 +5,7 @@ include Common_asm_x64.inc
 
 _TEXT_ASM	SEGMENT	page 'CODE'
 
-; void x64_sse2_PredictLeftAndCount_align1(BYTE *pDstBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable)
+; void x64_sse2_PredictLeftAndCount_align1(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD *pCountTable)
 public	x64_sse2_PredictLeftAndCount_align1
 x64_sse2_PredictLeftAndCount_align1	proc
 
@@ -83,7 +83,7 @@ label4:
 x64_sse2_PredictLeftAndCount_align1	endp
 
 
-; void x64_sse2_PredictMedianAndCount_align16(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
+; void x64_sse2_PredictMedianAndCount_align16(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
 public	x64_sse2_PredictMedianAndCount_align16
 x64_sse2_PredictMedianAndCount_align16	proc
 
@@ -183,7 +183,7 @@ endm
 x64_sse2_PredictMedianAndCount_align16	endp
 
 
-; void x64_sse2_PredictMedianAndCount_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
+; void x64_sse2_PredictMedianAndCount_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
 public	x64_sse2_PredictMedianAndCount_align1
 x64_sse2_PredictMedianAndCount_align1	proc
 
@@ -358,7 +358,7 @@ x64_sse2_PredictMedianAndCount_align1	endp
 
 
 ; p{min,max}ub ÇÕ SSE1 Ç≈í«â¡Ç≥ÇÍÇΩ MMX ñΩóﬂÅiÇ¢ÇÌÇ‰ÇÈ MMX2 ñΩóﬂÅjÇ≈Ç†ÇÈÅB
-; void x64_sse1mmx_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+; void x64_sse1mmx_RestoreMedian_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD dwStride)
 x64_sse1mmx_RestoreMedian_align1	proc
 
 	STD_PROLOG	0

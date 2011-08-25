@@ -15,7 +15,7 @@ _TEXT_ASM	SEGMENT	page public flat 'CODE'
 
 
 
-; void x86_sse2_PredictLeftAndCount_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable)
+; void x86_sse2_PredictLeftAndCount_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD *pCountTable)
 public	_x86_sse2_PredictLeftAndCount_align1
 _x86_sse2_PredictLeftAndCount_align1	proc
 
@@ -92,7 +92,7 @@ label4:
 _x86_sse2_PredictLeftAndCount_align1	endp
 
 
-; void x86_sse2_PredictMedianAndCount_align16(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
+; void x86_sse2_PredictMedianAndCount_align16(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
 public	_x86_sse2_PredictMedianAndCount_align16
 _x86_sse2_PredictMedianAndCount_align16	proc
 
@@ -195,7 +195,7 @@ _x86_sse2_PredictMedianAndCount_align16	endp
 ; prediction は前後にマージンを持つ CFrameBuffer 上で行うので、計算結果が変わらない限り、はみ出し読み込みは許容される。
 ; 一方、マルチスレッド動作した時に問題が発生するので、はみ出し書き込みは許容されない。
 
-; void x86_sse2_PredictMedianAndCount_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
+; void x86_sse2_PredictMedianAndCount_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD dwStride, DWORD *pCountTable)
 public	_x86_sse2_PredictMedianAndCount_align1
 _x86_sse2_PredictMedianAndCount_align1	proc
 
@@ -368,7 +368,7 @@ label6:
 _x86_sse2_PredictMedianAndCount_align1	endp
 
 
-; void x86_i686_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+; void x86_i686_RestoreMedian_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD dwStride)
 _x86_i686_RestoreMedian_align1	proc
 
 	STD_PROLOG	0
@@ -431,7 +431,7 @@ _x86_i686_RestoreMedian_align1	endp
 
 
 ; p{min,max}ub は SSE1 で追加された MMX 命令（いわゆる MMX2 命令）である。
-; void x86_sse1mmx_RestoreMedian_align1(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride)
+; void x86_sse1mmx_RestoreMedian_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD dwStride)
 _x86_sse1mmx_RestoreMedian_align1	proc
 
 	STD_PROLOG	0

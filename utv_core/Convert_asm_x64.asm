@@ -23,7 +23,7 @@ uv2b	dq	00000408D0000408Dh
 
 CONVERT_ULY2_TO_BOTTOMUP_RGB	macro	procname, rgb32
 
-; procname(BYTE *pDstBegin, BYTE *pDstEnd, const BYTE *pYBegin, const BYTE *pUBegin, const BYTE *pVBegin, DWORD dwStride, DWORD dwDataStride);
+; procname(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, DWORD dwStride, DWORD dwDataStride);
 public	&procname
 &procname	proc
 
@@ -217,7 +217,7 @@ yuvoff	dq	00004200000042000h
 
 CONVERT_BOTTOMUP_RGB_TO_ULY2	macro	procname, rgb32
 
-; procname(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVBegin, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD dwStride, DWORD dwDataStride);
+; procname(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD dwStride, DWORD dwDataStride);
 public	&procname
 &procname	proc
 

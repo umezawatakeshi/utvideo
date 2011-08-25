@@ -12,10 +12,10 @@
 #endif
 
 #define FCC4PRINTF(fcc) \
-	(BYTE)(fcc), \
-	(BYTE)(fcc >> 8), \
-	(BYTE)(fcc >> 16), \
-	(BYTE)(fcc >> 24)
+	(uint8_t)(fcc), \
+	(uint8_t)(fcc >> 8), \
+	(uint8_t)(fcc >> 16), \
+	(uint8_t)(fcc >> 24)
 
 #define UNFCC(fcc) ( \
 	(((DWORD)(fcc) & 0x000000ff) << 24) | \

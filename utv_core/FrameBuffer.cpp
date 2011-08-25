@@ -30,7 +30,7 @@ void CFrameBuffer::AddPlane(DWORD dwSize, DWORD dwMarginSize)
 	DWORD dwPageSize;
 	DWORD dwPrecedingMarginSize;
 	DWORD dwAllocateSize;
-	BYTE *pAllocatedAddr;
+	uint8_t *pAllocatedAddr;
 
 	GetSystemInfo(&si);
 	dwPageSize = si.dwPageSize;
@@ -38,7 +38,7 @@ void CFrameBuffer::AddPlane(DWORD dwSize, DWORD dwMarginSize)
 	dwPrecedingMarginSize = ROUNDUP(dwMarginSize, dwPageSize);
 	dwAllocateSize = dwPrecedingMarginSize + ROUNDUP(dwSize + max(dwMarginSize, dwPageSize), dwPageSize);
 
-	pAllocatedAddr = (BYTE *)VirtualAlloc(NULL, dwAllocateSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	pAllocatedAddr = (uint8_t *)VirtualAlloc(NULL, dwAllocateSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	if (pAllocatedAddr == NULL)
 		return;
 

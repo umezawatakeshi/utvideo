@@ -62,24 +62,24 @@ void CULY0Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 	m_dwPlanePredictStride[2] = width / 2;
 }
 
-void CULY0Codec::ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD bypp)
+void CULY0Codec::ConvertBottomupRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, DWORD nBandIndex, DWORD bypp)
 {
-	BYTE *y = pDstYBegin;
-	BYTE *u = pDstUBegin;
-	BYTE *v = pDstVBegin;
+	uint8_t *y = pDstYBegin;
+	uint8_t *u = pDstUBegin;
+	uint8_t *v = pDstVBegin;
 
 	DWORD dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
 
-	const BYTE *pSrcBegin = ((BYTE *)m_pInput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
-	const BYTE *pSrcEnd   = ((BYTE *)m_pInput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
+	const uint8_t *pSrcBegin = ((uint8_t *)m_pInput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
+	const uint8_t *pSrcEnd   = ((uint8_t *)m_pInput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
 
-	for (const BYTE *pStripeBegin = pSrcEnd; pStripeBegin > pSrcBegin; pStripeBegin -= m_dwRawStripeSize) {
-		for (const BYTE *pStrideBegin = pStripeBegin - m_dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= m_dwRawGrossWidth)
+	for (const uint8_t *pStripeBegin = pSrcEnd; pStripeBegin > pSrcBegin; pStripeBegin -= m_dwRawStripeSize) {
+		for (const uint8_t *pStrideBegin = pStripeBegin - m_dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= m_dwRawGrossWidth)
 		{
-			const BYTE *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
-			for (const BYTE *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
+			const uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			for (const uint8_t *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
 			{
-				const BYTE *p = q - dwRawPredictStride;
+				const uint8_t *p = q - dwRawPredictStride;
 				*(y+0)                           = min(max(int((*(q     +0))*0.098 + (*(q     +1))*0.504 + (*(q     +2))*0.257 + 16.5), 16), 235);
 				*(y+1)                           = min(max(int((*(q+bypp+0))*0.098 + (*(q+bypp+1))*0.504 + (*(q+bypp+2))*0.257 + 16.5), 16), 235);
 				*(y+m_dwPlanePredictStride[0]+0) = min(max(int((*(p     +0))*0.098 + (*(p     +1))*0.504 + (*(p     +2))*0.257 + 16.5), 16), 235);
@@ -93,21 +93,21 @@ void CULY0Codec::ConvertBottomupRGBToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BY
 	}
 }
 
-void CULY0Codec::ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *pDstVBegin, DWORD nBandIndex, DWORD nYOffset)
+void CULY0Codec::ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, DWORD nBandIndex, DWORD nYOffset)
 {
-	BYTE *y = pDstYBegin;
-	BYTE *u = pDstUBegin;
-	BYTE *v = pDstVBegin;
+	uint8_t *y = pDstYBegin;
+	uint8_t *u = pDstUBegin;
+	uint8_t *v = pDstVBegin;
 
-	const BYTE *pSrcBegin = ((BYTE *)m_pInput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	const BYTE *pSrcEnd   = ((BYTE *)m_pInput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	const uint8_t *pSrcBegin = ((uint8_t *)m_pInput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	const uint8_t *pSrcEnd   = ((uint8_t *)m_pInput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 
-	for (const BYTE *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += m_dwRawStripeSize)
+	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += m_dwRawStripeSize)
 	{
-		const BYTE *pStrideEnd = pStrideBegin + m_dwRawStripeSize / 2;
-		for (const BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
+		const uint8_t *pStrideEnd = pStrideBegin + m_dwRawStripeSize / 2;
+		for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += 4)
 		{
-			const BYTE *q = p + m_dwRawStripeSize / 2;
+			const uint8_t *q = p + m_dwRawStripeSize / 2;
 			*(y+0) = *(p+0+nYOffset);
 			*(y+1) = *(p+2+nYOffset);
 			*(y+m_dwPlanePredictStride[0]+0) = *(q+0+nYOffset);
@@ -123,17 +123,17 @@ void CULY0Codec::ConvertYUV422ToULY0(BYTE *pDstYBegin, BYTE *pDstUBegin, BYTE *p
 
 void CULY0Codec::ConvertToPlanar(DWORD nBandIndex)
 {
-	BYTE *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
-	BYTE *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
-	BYTE *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
+	uint8_t *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
+	uint8_t *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
+	uint8_t *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_YV12:
 		{
-			const BYTE *pSrcYBegin, *pSrcVBegin, *pSrcUBegin;
+			const uint8_t *pSrcYBegin, *pSrcVBegin, *pSrcUBegin;
 
-			pSrcYBegin = ((BYTE *)m_pInput);
+			pSrcYBegin = ((uint8_t *)m_pInput);
 			pSrcVBegin = pSrcYBegin + m_nWidth * m_nHeight;
 			pSrcUBegin = pSrcVBegin + m_nWidth * m_nHeight / 4;
 
@@ -164,24 +164,24 @@ void CULY0Codec::ConvertToPlanar(DWORD nBandIndex)
 	}
 }
 
-void CULY0Codec::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD bypp)
+void CULY0Codec::ConvertULY0ToBottomupRGB(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, DWORD nBandIndex, DWORD bypp)
 {
-	const BYTE *y = pSrcYBegin;
-	const BYTE *u = pSrcUBegin;
-	const BYTE *v = pSrcVBegin;
+	const uint8_t *y = pSrcYBegin;
+	const uint8_t *u = pSrcUBegin;
+	const uint8_t *v = pSrcVBegin;
 
 	DWORD dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
 
-	BYTE *pDstBegin = ((BYTE *)m_pOutput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
-	BYTE *pDstEnd   = ((BYTE *)m_pOutput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
+	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + (m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex]  ) * m_dwRawStripeSize;
+	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + (m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex]) * m_dwRawStripeSize;
 
-	for (BYTE *pStripeBegin = pDstEnd; pStripeBegin > pDstBegin; pStripeBegin -= m_dwRawStripeSize) {
-		for (BYTE *pStrideBegin = pStripeBegin - m_dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= m_dwRawGrossWidth)
+	for (uint8_t *pStripeBegin = pDstEnd; pStripeBegin > pDstBegin; pStripeBegin -= m_dwRawStripeSize) {
+		for (uint8_t *pStrideBegin = pStripeBegin - m_dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= m_dwRawGrossWidth)
 		{
-			BYTE *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
-			for (BYTE *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
+			uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			for (uint8_t *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
 			{
-				BYTE *p = q - dwRawPredictStride;
+				uint8_t *p = q - dwRawPredictStride;
 				*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
 				*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
 				*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
@@ -212,21 +212,21 @@ void CULY0Codec::ConvertULY0ToBottomupRGB(const BYTE *pSrcYBegin, const BYTE *pS
 	}
 }
 
-void CULY0Codec::ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcUBegin, const BYTE *pSrcVBegin, DWORD nBandIndex, DWORD nYOffset)
+void CULY0Codec::ConvertULY0ToYUV422(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, DWORD nBandIndex, DWORD nYOffset)
 {
-	const BYTE *y = pSrcYBegin;
-	const BYTE *u = pSrcUBegin;
-	const BYTE *v = pSrcVBegin;
+	const uint8_t *y = pSrcYBegin;
+	const uint8_t *u = pSrcUBegin;
+	const uint8_t *v = pSrcVBegin;
 
-	BYTE *pDstBegin = ((BYTE *)m_pOutput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	BYTE *pDstEnd   = ((BYTE *)m_pOutput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
 
-	for (BYTE *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawStripeSize)
+	for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawStripeSize)
 	{
-		BYTE *pStrideEnd = pStrideBegin + m_dwRawStripeSize / 2;
-		for (BYTE *p = pStrideBegin; p < pStrideEnd; p += 4)
+		uint8_t *pStrideEnd = pStrideBegin + m_dwRawStripeSize / 2;
+		for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += 4)
 		{
-			BYTE *q = p + m_dwRawStripeSize / 2;
+			uint8_t *q = p + m_dwRawStripeSize / 2;
 			*(p+0+nYOffset) = *(y+0);
 			*(p+2+nYOffset) = *(y+1);
 			*(q+0+nYOffset) = *(y+m_dwPlanePredictStride[0]+0);
@@ -244,17 +244,17 @@ void CULY0Codec::ConvertULY0ToYUV422(const BYTE *pSrcYBegin, const BYTE *pSrcUBe
 
 void CULY0Codec::ConvertFromPlanar(DWORD nBandIndex)
 {
-	const BYTE *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
-	const BYTE *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
-	const BYTE *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
+	const uint8_t *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
+	const uint8_t *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
+	const uint8_t *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_YV12:
 		{
-			BYTE *pDstYBegin, *pDstVBegin, *pDstUBegin;
+			uint8_t *pDstYBegin, *pDstVBegin, *pDstUBegin;
 
-			pDstYBegin = ((BYTE *)m_pOutput);
+			pDstYBegin = ((uint8_t *)m_pOutput);
 			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
 			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight / 4;
 
@@ -294,15 +294,15 @@ bool CULY0Codec::DecodeDirect(DWORD nBandIndex)
 	{
 	case UTVF_YV12:
 		{
-			BYTE *pDstYBegin, *pDstVBegin, *pDstUBegin;
+			uint8_t *pDstYBegin, *pDstVBegin, *pDstUBegin;
 
-			pDstYBegin = ((BYTE *)m_pOutput);
+			pDstYBegin = ((uint8_t *)m_pOutput);
 			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
 			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight / 4;
 
-			BYTE *pDstYEnd = pDstYBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[0];
-			BYTE *pDstUEnd = pDstUBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[1];
-			BYTE *pDstVEnd = pDstVBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[2];
+			uint8_t *pDstYEnd = pDstYBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[0];
+			uint8_t *pDstUEnd = pDstUBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[1];
+			uint8_t *pDstVEnd = pDstVBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[2];
 
 			pDstYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];

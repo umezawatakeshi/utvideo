@@ -10,8 +10,8 @@ private:
 
 private:
 	int m_nPlanes;
-	BYTE *m_pAllocatedAddr[MAX_PLANE];
-	BYTE *m_pBufferAddr[MAX_PLANE];
+	uint8_t *m_pAllocatedAddr[MAX_PLANE];
+	uint8_t *m_pBufferAddr[MAX_PLANE];
 
 public:
 	CFrameBuffer(void);
@@ -21,12 +21,12 @@ public:
 	void AddPlane(DWORD dwSize, DWORD dwMarginSize);
 
 public:
-	inline BYTE *GetPlane(int n)
+	inline uint8_t *GetPlane(int n)
 	{
 		return m_pBufferAddr[n];
 	}
 
-	inline BYTE *GetBuffer(void)
+	inline uint8_t *GetBuffer(void)
 	{
 		return GetPlane(0);
 	}

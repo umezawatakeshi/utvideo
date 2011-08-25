@@ -6,12 +6,12 @@
 #include "Predict.h"
 #include "TunedFunc.h"
 
-inline BYTE median(BYTE a, BYTE b, BYTE c)
+inline uint8_t median(uint8_t a, uint8_t b, uint8_t c)
 {
 	return max(min(max(a,b),c),min(a,b));
 }
 
-void PredictMedianAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride, DWORD *pCountTable)
+void PredictMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, DWORD *pCountTable)
 {
 	if (IS_ALIGNED(pDst, 16) && IS_ALIGNED(pSrcBegin, 16) && IS_ALIGNED(dwStride, 16))
 		tfn.pfnPredictMedianAndCount_align16(pDst, pSrcBegin, pSrcEnd, dwStride, pCountTable);
@@ -19,10 +19,10 @@ void PredictMedianAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEn
 		tfn.pfnPredictMedianAndCount_align1(pDst, pSrcBegin, pSrcEnd, dwStride, pCountTable);
 }
 
-void cpp_PredictMedianAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride, DWORD *pCountTable)
+void cpp_PredictMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, DWORD *pCountTable)
 {
-	const BYTE *p = pSrcBegin;
-	BYTE *q = pDst;
+	const uint8_t *p = pSrcBegin;
+	uint8_t *q = pDst;
 
 	// 最初のラインの最初のピクセルは 0x80 を予測しておく。
 	*q = *p - 0x80;
@@ -56,10 +56,10 @@ void cpp_PredictMedianAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pS
 	}
 }
 
-void cpp_PredictLeftAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, DWORD *pCountTable)
+void cpp_PredictLeftAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD *pCountTable)
 {
-	const BYTE *p = pSrcBegin;
-	BYTE *q = pDst;
+	const uint8_t *p = pSrcBegin;
+	uint8_t *q = pDst;
 
 	// 最初のラインの最初のピクセルは 0x80 を予測しておく。
 	*q = *p - 0x80;
@@ -75,10 +75,10 @@ void cpp_PredictLeftAndCount(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrc
 	}
 }
 
-void cpp_RestoreMedian(BYTE *pDst, const BYTE *pSrcBegin, const BYTE *pSrcEnd, size_t dwStride)
+void cpp_RestoreMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride)
 {
-	const BYTE *p = pSrcBegin;
-	BYTE *q = pDst;
+	const uint8_t *p = pSrcBegin;
+	uint8_t *q = pDst;
 
 	*q++ = *p++ + 0x80;
 
