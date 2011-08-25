@@ -18,6 +18,7 @@ CCodec::~CCodec(void)
 {
 }
 
+#ifdef _WIN32
 INT_PTR CCodec::About(HWND hwnd)
 {
 	char buf[256];
@@ -31,6 +32,7 @@ INT_PTR CCodec::About(HWND hwnd)
 
 	return ICERR_OK;
 }
+#endif
 
 struct CODECLIST
 {
