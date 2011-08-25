@@ -6,7 +6,6 @@
 #include "ULY2Codec.h"
 #include "Predict.h"
 #include "Convert.h"
-#include "MediaSubType.h"
 
 const utvf_t CULY2Codec::m_utvfEncoderInput[] = {
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,

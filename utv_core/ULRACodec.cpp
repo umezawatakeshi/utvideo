@@ -5,7 +5,6 @@
 #include "utvideo.h"
 #include "ULRACodec.h"
 #include "Predict.h"
-#include "MediaSubType.h"
 
 const utvf_t CULRACodec::m_utvfEncoderInput[] = {
 	UTVF_ARGB32_WIN,

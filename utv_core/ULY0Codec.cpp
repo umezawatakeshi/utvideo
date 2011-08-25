@@ -5,7 +5,6 @@
 #include "utvideo.h"
 #include "ULY0Codec.h"
 #include "Predict.h"
-#include "MediaSubType.h"
 
 const utvf_t CULY0Codec::m_utvfEncoderInput[] = {
 	UTVF_YV12,

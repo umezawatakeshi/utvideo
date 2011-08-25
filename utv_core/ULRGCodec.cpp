@@ -5,7 +5,6 @@
 #include "utvideo.h"
 #include "ULRGCodec.h"
 #include "Predict.h"
-#include "MediaSubType.h"
 
 const utvf_t CULRGCodec::m_utvfEncoderInput[] = {
 	UTVF_RGB24_WIN,
