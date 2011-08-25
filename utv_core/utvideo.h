@@ -5,10 +5,10 @@
 
 #ifndef FCC
 #define FCC(fcc) ( \
-	(((DWORD)(fcc) & 0x000000ff) << 24) | \
-	(((DWORD)(fcc) & 0x0000ff00) <<  8) | \
-	(((DWORD)(fcc) & 0x00ff0000) >>  8) | \
-	(((DWORD)(fcc) & 0xff000000) >> 24))
+	(((uint32_t)(fcc) & 0x000000ff) << 24) | \
+	(((uint32_t)(fcc) & 0x0000ff00) <<  8) | \
+	(((uint32_t)(fcc) & 0x00ff0000) >>  8) | \
+	(((uint32_t)(fcc) & 0xff000000) >> 24))
 #endif
 
 #define FCC4PRINTF(fcc) \
@@ -18,10 +18,10 @@
 	(uint8_t)(fcc >> 24)
 
 #define UNFCC(fcc) ( \
-	(((DWORD)(fcc) & 0x000000ff) << 24) | \
-	(((DWORD)(fcc) & 0x0000ff00) <<  8) | \
-	(((DWORD)(fcc) & 0x00ff0000) >>  8) | \
-	(((DWORD)(fcc) & 0xff000000) >> 24))
+	(((uint32_t)(fcc) & 0x000000ff) << 24) | \
+	(((uint32_t)(fcc) & 0x0000ff00) <<  8) | \
+	(((uint32_t)(fcc) & 0x00ff0000) >>  8) | \
+	(((uint32_t)(fcc) & 0xff000000) >> 24))
 
 
 #define UTVIDEO_VERSION_MASK                      0xffffff00
@@ -96,7 +96,7 @@ typedef uint32_t utvf_t;
 #define UTVF_YV12 ((utvf_t)'YV12')
 
 
-inline uint32_t ROUNDUP(DWORD a, DWORD b)
+inline uint32_t ROUNDUP(uint32_t a, uint32_t b)
 {
 	_ASSERT(b > 0 && (b & (b - 1)) == 0); // b ÇÕ 2 ÇÃó›èÊÇ≈Ç†ÇÈÅB
 	return ((a + b - 1) / b) * b;

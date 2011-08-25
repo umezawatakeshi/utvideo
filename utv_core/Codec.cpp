@@ -52,7 +52,7 @@ __declspec(dllexport) CCodec *CCodec::CreateInstance(utvf_t utvf, const char *ps
 {
 	int idx;
 
-	DEBUG_ENTER_LEAVE("CCodec::CreateInstance(DWORD) utvf=%08X", utvf);
+	DEBUG_ENTER_LEAVE("CCodec::CreateInstance(uint32_t) utvf=%08X", utvf);
 
 	for (idx = 0; idx < _countof(codeclist); idx++)
 	{

@@ -10,8 +10,8 @@
 struct hufftree {
 	struct hufftree *left;
 	struct hufftree *right;
-	DWORD count;
-	DWORD symbol;	// uint8_t ではないシンボルが入ることがある
+	uint32_t count;
+	uint32_t symbol;	// uint8_t ではないシンボルが入ることがある
 };
 
 inline bool hufftree_gt(const struct hufftree *a, const struct hufftree *b)
@@ -37,7 +37,7 @@ static void GenerateLengthLimitedHuffmanCodeLengthTable(uint8_t *pCodeLengthTabl
 	memset(pCodeLengthTable, 8, 256);
 }
 
-void GenerateHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, const DWORD *pCountTable)
+void GenerateHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, const uint32_t *pCountTable)
 {
 	struct hufftree *huffsort[256];
 	struct hufftree huffleaf[256];
@@ -90,7 +90,7 @@ inline void sort_codelength(struct CODE_LENGTH_SORT *p)
 void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const uint8_t *pCodeLengthTable)
 {
 	struct CODE_LENGTH_SORT cls[256];
-	DWORD curcode;
+	uint32_t curcode;
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -120,7 +120,7 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const uint8_
 
 // IA-32 の BSR 命令
 // 本物の BSR 命令では入力が 0 の場合に出力が不定になる。
-inline int bsr(DWORD curcode)
+inline int bsr(uint32_t curcode)
 {
 	_ASSERT(curcode != 0);
 
@@ -136,7 +136,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_
 	int nLastIndex;
 	int j;
 	int base;
-	DWORD curcode;
+	uint32_t curcode;
 	int nextfillidx;
 	int lastfillidx;
 	int prevbsrval;
@@ -225,10 +225,10 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_
 	}
 }
 
-inline void EncodeSymbol(uint8_t bySymbol, const HUFFMAN_ENCODE_TABLE *pEncodeTable, DWORD *&pDst, DWORD &dwTmpEncoded, int &nBits)
+inline void EncodeSymbol(uint8_t bySymbol, const HUFFMAN_ENCODE_TABLE *pEncodeTable, uint32_t *&pDst, uint32_t &dwTmpEncoded, int &nBits)
 {
 	int nCurBits = pEncodeTable->dwTableMux[bySymbol] & 0xff;
-	DWORD dwCurEncoded = pEncodeTable->dwTableMux[bySymbol] & 0xffffff00;
+	uint32_t dwCurEncoded = pEncodeTable->dwTableMux[bySymbol] & 0xffffff00;
 
 	dwTmpEncoded |= dwCurEncoded >> nBits;
 	nBits += nCurBits;
@@ -243,8 +243,8 @@ inline void EncodeSymbol(uint8_t bySymbol, const HUFFMAN_ENCODE_TABLE *pEncodeTa
 size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable)
 {
 	int nBits;
-	DWORD dwTmpEncoded;
-	DWORD *pDst;
+	uint32_t dwTmpEncoded;
+	uint32_t *pDst;
 	const uint8_t *p;
 
 	if (pEncodeTable->dwTableMux[0] == 0)
@@ -252,7 +252,7 @@ size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uin
 
 	nBits = 0;
 	dwTmpEncoded = 0;
-	pDst = (DWORD *)pDstBegin;
+	pDst = (uint32_t *)pDstBegin;
 
 	for (p = pSrcBegin; p < pSrcEnd; p++)
 		EncodeSymbol(*p, pEncodeTable, pDst, dwTmpEncoded, nBits);
@@ -263,9 +263,9 @@ size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uin
 	return ((uint8_t *)pDst) - pDstBegin;
 }
 
-inline void DecodeSymbol(DWORD *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, uint8_t &byPrevSymbol, uint8_t *pDst, int nCorrPos, bool bDummyAlpha)
+inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, uint8_t &byPrevSymbol, uint8_t *pDst, int nCorrPos, bool bDummyAlpha)
 {
-	DWORD code;
+	uint32_t code;
 	uint8_t symbol;
 	int codelen;
 
@@ -314,13 +314,13 @@ inline void DecodeSymbol(DWORD *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *p
 static void cpp_HuffmanDecode_common(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, int nStep, bool bBottomup, size_t dwNetWidth, size_t dwGrossWidth, int nCorrPos, bool bDummyAlpha)
 {
 	int nBits;
-	DWORD *pSrc;
+	uint32_t *pSrc;
 	uint8_t *p;
 	uint8_t prevsym;
 	uint8_t *pStripeBegin;
 
 	nBits = 0;
-	pSrc = (DWORD *)pSrcBegin;
+	pSrc = (uint32_t *)pSrcBegin;
 	prevsym = 0x80;
 
 	if (!bBottomup)

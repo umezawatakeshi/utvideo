@@ -10,10 +10,10 @@
 struct BITMAPINFOEXT
 {
 	BITMAPINFOHEADER bih;
-	DWORD dwEncoderVersionAndImplementation;
-	DWORD fccOriginalFormat;
-	DWORD dwFrameInfoSize;
-	DWORD dwFlags0;
+	uint32_t dwEncoderVersionAndImplementation;
+	uint32_t fccOriginalFormat;
+	uint32_t dwFrameInfoSize;
+	uint32_t dwFlags0;
 };
 
 struct EXTRADATA
@@ -38,7 +38,7 @@ struct EXTRADATA
 
 struct FRAMEINFO
 {
-	DWORD dwFlags0;
+	uint32_t dwFlags0;
 };
 
 #define FI_FLAGS0_INTRAFRAME_PREDICT_MASK        0x00000300
@@ -52,7 +52,7 @@ struct FRAMEINFO
 
 struct ENCODERCONF
 {
-	DWORD dwFlags0;
+	uint32_t dwFlags0;
 };
 
 #define EC_FLAGS0_DIVIDE_COUNT_MASK              0x000000ff
@@ -82,28 +82,28 @@ protected:
 	const void *m_pInput;
 	void *m_pOutput;
 	bool m_bBottomUpFrame;
-	DWORD m_dwNumStripes;
-	DWORD m_dwDivideCount;
+	uint32_t m_dwNumStripes;
+	uint32_t m_dwDivideCount;
 	bool m_bInterlace;
-	DWORD m_dwRawSize;
-	DWORD m_dwRawGrossWidth;
-	DWORD m_dwRawNetWidth;
-	DWORD m_dwPlaneSize[4];
-	DWORD m_dwPlaneWidth[4];
-	DWORD m_dwPlaneStripeSize[4];
-	DWORD m_dwPlanePredictStride[4];
-	DWORD m_dwPlaneStripeBegin[256];
-	DWORD m_dwPlaneStripeEnd[256];
-	DWORD m_dwRawStripeBegin[256];
-	DWORD m_dwRawStripeEnd[256];
-	DWORD m_dwRawStripeSize;
+	uint32_t m_dwRawSize;
+	uint32_t m_dwRawGrossWidth;
+	uint32_t m_dwRawNetWidth;
+	uint32_t m_dwPlaneSize[4];
+	uint32_t m_dwPlaneWidth[4];
+	uint32_t m_dwPlaneStripeSize[4];
+	uint32_t m_dwPlanePredictStride[4];
+	uint32_t m_dwPlaneStripeBegin[256];
+	uint32_t m_dwPlaneStripeEnd[256];
+	uint32_t m_dwRawStripeBegin[256];
+	uint32_t m_dwRawStripeEnd[256];
+	uint32_t m_dwRawStripeSize;
 
 	CThreadManager *m_ptm;
 	CFrameBuffer *m_pCurFrame;
 	CFrameBuffer *m_pMedianPredicted;
 	struct COUNTS
 	{
-		DWORD dwCount[4][256];
+		uint32_t dwCount[4][256];
 	} *m_counts;
 	/* const */ uint8_t *m_pCodeLengthTable[4];
 	HUFFMAN_ENCODE_TABLE m_het[4];
@@ -164,22 +164,22 @@ protected:
 	virtual int GetRealBitCount(void) = 0;
 	virtual int GetNumPlanes(void) = 0;
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height) = 0;
-	virtual void ConvertToPlanar(DWORD nBandIndex) = 0;
+	virtual void ConvertToPlanar(uint32_t nBandIndex) = 0;
 	virtual int GetMacroPixelWidth(void) = 0;
 	virtual int GetMacroPixelHeight(void) = 0;
 
-	virtual void ConvertFromPlanar(DWORD nBandIndex) = 0;
-	virtual bool DecodeDirect(DWORD nBandIndex);
+	virtual void ConvertFromPlanar(uint32_t nBandIndex) = 0;
+	virtual bool DecodeDirect(uint32_t nBandIndex);
 
 private:
-	void PredictProc(DWORD nBandIndex);
+	void PredictProc(uint32_t nBandIndex);
 	class CPredictJob : public CThreadJob
 	{
 	private:
-		DWORD m_nBandIndex;
+		uint32_t m_nBandIndex;
 		CUL00Codec *m_pEncoder;
 	public:
-		CPredictJob(CUL00Codec *pEncoder, DWORD nBandIndex)
+		CPredictJob(CUL00Codec *pEncoder, uint32_t nBandIndex)
 		{
 			m_nBandIndex = nBandIndex;
 			m_pEncoder = pEncoder;
@@ -190,14 +190,14 @@ private:
 		}
 	};
 
-	void EncodeProc(DWORD nBandIndex);
+	void EncodeProc(uint32_t nBandIndex);
 	class CEncodeJob : public CThreadJob
 	{
 	private:
-		DWORD m_nBandIndex;
+		uint32_t m_nBandIndex;
 		CUL00Codec *m_pEncoder;
 	public:
-		CEncodeJob(CUL00Codec *pEncoder, DWORD nBandIndex)
+		CEncodeJob(CUL00Codec *pEncoder, uint32_t nBandIndex)
 		{
 			m_nBandIndex = nBandIndex;
 			m_pEncoder = pEncoder;
@@ -208,14 +208,14 @@ private:
 		}
 	};
 
-	void DecodeProc(DWORD nBandIndex);
+	void DecodeProc(uint32_t nBandIndex);
 	class CDecodeJob : public CThreadJob
 	{
 	private:
-		DWORD m_nBandIndex;
+		uint32_t m_nBandIndex;
 		CUL00Codec *m_pDecoder;
 	public:
-		CDecodeJob(CUL00Codec *pDecoder, DWORD nBandIndex)
+		CDecodeJob(CUL00Codec *pDecoder, uint32_t nBandIndex)
 		{
 			m_nBandIndex = nBandIndex;
 			m_pDecoder = pDecoder;

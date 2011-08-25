@@ -279,14 +279,14 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 {
 	FRAMEINFO fi;
 	uint8_t *p;
-	DWORD count[256];
+	uint32_t count[256];
 
 	m_pInput = pInput;
 	m_pOutput = pOutput;
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
-	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		m_ptm->SubmitJob(new CPredictJob(this, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
@@ -306,10 +306,10 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwCurrentOffset;
+		uint32_t dwCurrentOffset;
 		for (int i = 0; i < 256; i++)
 			count[i] = 0;
-		for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 			for (int i = 0; i < 256; i++)
 				count[i] += m_counts[nBandIndex].dwCount[nPlaneIndex][i];
 		m_pCodeLengthTable[nPlaneIndex] = p;
@@ -317,14 +317,14 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 		GenerateHuffmanEncodeTable(&m_het[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 		p += 256;
 		dwCurrentOffset = 0;
-		for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		{
-			DWORD dwBits;
+			uint32_t dwBits;
 			dwBits = 0;
 			for (int i = 0; i < 256; i++)
 				dwBits += m_pCodeLengthTable[nPlaneIndex][i] * m_counts[nBandIndex].dwCount[nPlaneIndex][i];
 			dwCurrentOffset += ROUNDUP(dwBits, 32) / 8;
-			*(DWORD *)p = dwCurrentOffset;
+			*(uint32_t *)p = dwCurrentOffset;
 			p += 4;
 		}
 		p += dwCurrentOffset;
@@ -333,7 +333,7 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	memcpy(p, &fi, sizeof(FRAMEINFO));
 	p += sizeof(FRAMEINFO);
 
-	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		m_ptm->SubmitJob(new CEncodeJob(this, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
@@ -405,7 +405,7 @@ int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int 
 		}
 	}
 
-	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 	{
 		m_dwPlaneStripeBegin[nBandIndex] = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
 		m_dwPlaneStripeEnd[nBandIndex]   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
@@ -517,14 +517,14 @@ int CUL00Codec::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int heigh
 	return -1;
 }
 
-void CUL00Codec::PredictProc(DWORD nBandIndex)
+void CUL00Codec::PredictProc(uint32_t nBandIndex)
 {
 	ConvertToPlanar(nBandIndex);
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
-		DWORD dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
+		uint32_t dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
+		uint32_t dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
 
 		for (int i = 0; i < 256; i++)
 			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
@@ -543,28 +543,28 @@ void CUL00Codec::PredictProc(DWORD nBandIndex)
 	}
 }
 
-void CUL00Codec::EncodeProc(DWORD nBandIndex)
+void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
-		DWORD dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
+		uint32_t dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
+		uint32_t dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
 
-		DWORD dwDstOffset;
+		uint32_t dwDstOffset;
 #ifdef _DEBUG
-		DWORD dwDstEnd;
-		DWORD dwEncodedSize;
+		uint32_t dwDstEnd;
+		uint32_t dwEncodedSize;
 #endif
 
 		if (nBandIndex == 0)
 			dwDstOffset = 0;
 		else
-			dwDstOffset = ((DWORD *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
+			dwDstOffset = ((uint32_t *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
 #ifdef _DEBUG
-		dwDstEnd = ((DWORD *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex];
+		dwDstEnd = ((uint32_t *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex];
 		dwEncodedSize =
 #endif
-		HuffmanEncode(m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwDstOffset, m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneEnd, &m_het[nPlaneIndex]);
+		HuffmanEncode(m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwDstOffset, m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneEnd, &m_het[nPlaneIndex]);
 		_ASSERT(dwEncodedSize == dwDstEnd - dwDstOffset);
 	}
 }
@@ -579,8 +579,8 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 	p = (uint8_t *)pInput;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		p += 256 + sizeof(DWORD) * m_dwDivideCount;
-		p += ((const DWORD *)p)[-1];
+		p += 256 + sizeof(uint32_t) * m_dwDivideCount;
+		p += ((const uint32_t *)p)[-1];
 	}
 	memset(&m_fi, 0, sizeof(FRAMEINFO));
 	memcpy(&m_fi, p, m_ed.cbFrameInfo);
@@ -590,22 +590,22 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 	{
 		m_pCodeLengthTable[nPlaneIndex] = p;
 		GenerateHuffmanDecodeTable(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
-		p += 256 + sizeof(DWORD) * m_dwDivideCount;
-		p += ((const DWORD *)p)[-1];
-		for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+		p += 256 + sizeof(uint32_t) * m_dwDivideCount;
+		p += ((const uint32_t *)p)[-1];
+		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		{
-			DWORD dwCodeOffset;
+			uint32_t dwCodeOffset;
 
 			if (nBandIndex == 0)
 				dwCodeOffset = 0;
 			else
-				dwCodeOffset = ((const DWORD *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
+				dwCodeOffset = ((const uint32_t *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
 
-			m_pDecodeCode[nPlaneIndex][nBandIndex] = m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(DWORD) * m_dwDivideCount + dwCodeOffset;
+			m_pDecodeCode[nPlaneIndex][nBandIndex] = m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwCodeOffset;
 		}
 	}
 
-	for (DWORD nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		m_ptm->SubmitJob(new CDecodeJob(this, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
@@ -695,15 +695,15 @@ int CUL00Codec::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int heig
 	return -1;
 }
 
-void CUL00Codec::DecodeProc(DWORD nBandIndex)
+void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 {
 	if (DecodeDirect(nBandIndex))
 		return;
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		DWORD dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
-		DWORD dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
+		uint32_t dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
+		uint32_t dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
 
 		if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) == FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
 			HuffmanDecodeAndAccum(m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
@@ -726,7 +726,7 @@ void CUL00Codec::DecodeProc(DWORD nBandIndex)
 	ConvertFromPlanar(nBandIndex);
 }
 
-bool CUL00Codec::DecodeDirect(DWORD nBandIndex)
+bool CUL00Codec::DecodeDirect(uint32_t nBandIndex)
 {
 	return false;
 }

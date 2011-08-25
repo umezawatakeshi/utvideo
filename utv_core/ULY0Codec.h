@@ -28,20 +28,20 @@ public:
 	virtual const utvf_t *GetCompressedFormat(void) { return m_utvfCompressed; }
 
 private:
-	void ConvertBottomupRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, DWORD nBandIndex, DWORD bypp);
-	void ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, DWORD nBandIndex, DWORD nYOffset);
-	void ConvertULY0ToBottomupRGB(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, DWORD nBandIndex, DWORD bypp);
-	void ConvertULY0ToYUV422(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, DWORD nBandIndex, DWORD nYOffset);
+	void ConvertBottomupRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, uint32_t nBandIndex, uint32_t bypp);
+	void ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, uint32_t nBandIndex, uint32_t nYOffset);
+	void ConvertULY0ToBottomupRGB(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nBandIndex, uint32_t bypp);
+	void ConvertULY0ToYUV422(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nBandIndex, uint32_t nYOffset);
 
 protected:
 	virtual const char *GetColorFormatName(void) { return "YUV420"; }
 	virtual int GetRealBitCount(void) { return 12; }
 	virtual int GetNumPlanes(void) { return 3; }
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height);
-	virtual void ConvertToPlanar(DWORD nBandIndex);
+	virtual void ConvertToPlanar(uint32_t nBandIndex);
 	virtual int GetMacroPixelWidth(void) { return 2; }
 	virtual int GetMacroPixelHeight(void) { return 2; }
 
-	virtual void ConvertFromPlanar(DWORD nBandIndex);
-	virtual bool DecodeDirect(DWORD nBandIndex);
+	virtual void ConvertFromPlanar(uint32_t nBandIndex);
+	virtual bool DecodeDirect(uint32_t nBandIndex);
 };

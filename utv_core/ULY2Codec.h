@@ -32,10 +32,10 @@ protected:
 	virtual int GetRealBitCount(void) { return 16; }
 	virtual int GetNumPlanes(void) { return 3; }
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height);
-	virtual void ConvertToPlanar(DWORD nBandIndex);
+	virtual void ConvertToPlanar(uint32_t nBandIndex);
 	virtual int GetMacroPixelWidth(void) { return 2; }
 	virtual int GetMacroPixelHeight(void) { return 1; }
 
-	virtual void ConvertFromPlanar(DWORD nBandIndex);
-	virtual bool DecodeDirect(DWORD nBandIndex);
+	virtual void ConvertFromPlanar(uint32_t nBandIndex);
+	virtual bool DecodeDirect(uint32_t nBandIndex);
 };

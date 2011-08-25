@@ -60,8 +60,8 @@ const TUNEDFUNC &tfnSSSE3 = tfnSSE2;
 
 void InitializeTunedFunc(void)
 {
-	DWORD	cpuid_1_ecx = 0;
-	DWORD	cpuid_1_edx = 0;
+	uint32_t	cpuid_1_ecx = 0;
+	uint32_t	cpuid_1_edx = 0;
 	int info[4];
 
 	__cpuid(info, 0);

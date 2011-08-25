@@ -6,7 +6,7 @@
 
 struct HUFFMAN_ENCODE_TABLE
 {
-	DWORD dwTableMux[256];
+	uint32_t dwTableMux[256];
 };
 
 #define HUFFMAN_DECODE_TABLELOOKUP_BITS 12
@@ -19,7 +19,7 @@ struct HUFFMAN_DECODE_TABLE
 		uint8_t nCodeLength;
 	} LookupSymbolAndCodeLength[1<<HUFFMAN_DECODE_TABLELOOKUP_BITS];
 	uint8_t nCodeShift[32];
-	DWORD dwSymbolBase[32];
+	uint32_t dwSymbolBase[32];
 	struct
 	{
 		uint8_t bySymbol;
@@ -27,7 +27,7 @@ struct HUFFMAN_DECODE_TABLE
 	} SymbolAndCodeLength[1024];
 };
 
-void GenerateHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, const DWORD *pCountTable);
+void GenerateHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, const uint32_t *pCountTable);
 void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const uint8_t *pCodeLengthTable);
 void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_t *pCodeLengthTable);
 

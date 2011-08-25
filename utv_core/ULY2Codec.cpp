@@ -61,7 +61,7 @@ void CULY2Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 	m_dwPlanePredictStride[2] = width / 2;
 }
 
-void CULY2Codec::ConvertToPlanar(DWORD nBandIndex)
+void CULY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 {
 	uint8_t *y, *u, *v;
 	const uint8_t *pSrcBegin, *pSrcEnd, *p;
@@ -104,7 +104,7 @@ void CULY2Codec::ConvertToPlanar(DWORD nBandIndex)
 	}
 }
 
-void CULY2Codec::ConvertFromPlanar(DWORD nBandIndex)
+void CULY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 {
 	const uint8_t *y, *u, *v;
 	uint8_t *pDstBegin, *pDstEnd, *p;
@@ -147,7 +147,7 @@ void CULY2Codec::ConvertFromPlanar(DWORD nBandIndex)
 	}
 }
 
-bool CULY2Codec::DecodeDirect(DWORD nBandIndex)
+bool CULY2Codec::DecodeDirect(uint32_t nBandIndex)
 {
 	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
 		return false;

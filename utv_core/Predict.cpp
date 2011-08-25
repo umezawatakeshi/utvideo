@@ -11,7 +11,7 @@ inline uint8_t median(uint8_t a, uint8_t b, uint8_t c)
 	return max(min(max(a,b),c),min(a,b));
 }
 
-void PredictMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, DWORD *pCountTable)
+void PredictMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
 {
 	if (IS_ALIGNED(pDst, 16) && IS_ALIGNED(pSrcBegin, 16) && IS_ALIGNED(dwStride, 16))
 		tfn.pfnPredictMedianAndCount_align16(pDst, pSrcBegin, pSrcEnd, dwStride, pCountTable);
@@ -19,7 +19,7 @@ void PredictMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_
 		tfn.pfnPredictMedianAndCount_align1(pDst, pSrcBegin, pSrcEnd, dwStride, pCountTable);
 }
 
-void cpp_PredictMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, DWORD *pCountTable)
+void cpp_PredictMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
@@ -56,7 +56,7 @@ void cpp_PredictMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const ui
 	}
 }
 
-void cpp_PredictLeftAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, DWORD *pCountTable)
+void cpp_PredictLeftAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable)
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;

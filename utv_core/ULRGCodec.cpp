@@ -56,7 +56,7 @@ void CULRGCodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 	m_dwPlanePredictStride[2] = width;
 }
 
-void CULRGCodec::ConvertToPlanar(DWORD nBandIndex)
+void CULRGCodec::ConvertToPlanar(uint32_t nBandIndex)
 {
 	uint8_t *g, *b, *r;
 	const uint8_t *pSrcBegin, *pSrcEnd, *pStrideBegin, *p;
@@ -96,7 +96,7 @@ void CULRGCodec::ConvertToPlanar(DWORD nBandIndex)
 	}
 }
 
-void CULRGCodec::ConvertFromPlanar(DWORD nBandIndex)
+void CULRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 {
 	const uint8_t *g, *b, *r;
 	uint8_t *pDstBegin, *pDstEnd, *pStrideBegin, *p;
@@ -139,7 +139,7 @@ void CULRGCodec::ConvertFromPlanar(DWORD nBandIndex)
 	}
 }
 
-bool CULRGCodec::DecodeDirect(DWORD nBandIndex)
+bool CULRGCodec::DecodeDirect(uint32_t nBandIndex)
 {
 	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
 		return false;
