@@ -81,10 +81,10 @@ protected:
 	unsigned int m_nHeight;
 	const void *m_pInput;
 	void *m_pOutput;
-	BOOL m_bBottomUpFrame;
+	bool m_bBottomUpFrame;
 	DWORD m_dwNumStripes;
 	DWORD m_dwDivideCount;
-	BOOL m_bInterlace;
+	bool m_bInterlace;
 	DWORD m_dwRawSize;
 	DWORD m_dwRawGrossWidth;
 	DWORD m_dwRawNetWidth;
@@ -169,7 +169,7 @@ protected:
 	virtual int GetMacroPixelHeight(void) = 0;
 
 	virtual void ConvertFromPlanar(DWORD nBandIndex) = 0;
-	virtual BOOL DecodeDirect(DWORD nBandIndex);
+	virtual bool DecodeDirect(DWORD nBandIndex);
 
 private:
 	void PredictProc(DWORD nBandIndex);

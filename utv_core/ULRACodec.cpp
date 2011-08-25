@@ -123,10 +123,10 @@ void CULRACodec::ConvertFromPlanar(DWORD nBandIndex)
 	}
 }
 
-BOOL CULRACodec::DecodeDirect(DWORD nBandIndex)
+bool CULRACodec::DecodeDirect(DWORD nBandIndex)
 {
 	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
-		return FALSE;
+		return false;
 
 	BYTE *pDstBegin = ((BYTE *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
 	BYTE *pDstEnd   = ((BYTE *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
@@ -139,8 +139,8 @@ BOOL CULRACodec::DecodeDirect(DWORD nBandIndex)
 		HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue (pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
 		HuffmanDecodeAndAccumStep4ForBottomupRGB32Red  (pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
 		HuffmanDecodeAndAccumStep4ForBottomupRGB32Green(pDstBegin+3, pDstEnd+3, m_pDecodeCode[3][nBandIndex], &m_hdt[3], m_dwRawNetWidth, m_dwRawGrossWidth);
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }

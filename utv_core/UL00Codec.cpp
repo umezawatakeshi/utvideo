@@ -344,7 +344,7 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
-	m_bBottomUpFrame = FALSE;
+	m_bBottomUpFrame = false;
 	switch (rawfmt)
 	{
 	case UTVF_YV12:
@@ -390,7 +390,7 @@ int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int 
 	const EXTRADATA *p = (const EXTRADATA *)pExtraData;
 
 	m_dwDivideCount = ((p->flags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
-	m_bInterlace = p->flags0 & BIE_FLAGS0_ASSUME_INTERLACE;
+	m_bInterlace = (p->flags0 & BIE_FLAGS0_ASSUME_INTERLACE) != 0;
 	m_dwNumStripes = height / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
 
 	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
@@ -726,7 +726,7 @@ void CUL00Codec::DecodeProc(DWORD nBandIndex)
 	ConvertFromPlanar(nBandIndex);
 }
 
-BOOL CUL00Codec::DecodeDirect(DWORD nBandIndex)
+bool CUL00Codec::DecodeDirect(DWORD nBandIndex)
 {
-	return FALSE;
+	return false;
 }

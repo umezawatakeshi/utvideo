@@ -147,10 +147,10 @@ void CULY2Codec::ConvertFromPlanar(DWORD nBandIndex)
 	}
 }
 
-BOOL CULY2Codec::DecodeDirect(DWORD nBandIndex)
+bool CULY2Codec::DecodeDirect(DWORD nBandIndex)
 {
 	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
-		return FALSE;
+		return false;
 
 	BYTE *pDstBegin = ((BYTE *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
 	BYTE *pDstEnd   = ((BYTE *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
@@ -163,14 +163,14 @@ BOOL CULY2Codec::DecodeDirect(DWORD nBandIndex)
 		HuffmanDecodeAndAccumStep2(pDstBegin+0, pDstEnd+0, m_pDecodeCode[0][nBandIndex], &m_hdt[0]);
 		HuffmanDecodeAndAccumStep4(pDstBegin+1, pDstEnd+1, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
 		HuffmanDecodeAndAccumStep4(pDstBegin+3, pDstEnd+3, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
-		return TRUE;
+		return true;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
 		HuffmanDecodeAndAccumStep2(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0]);
 		HuffmanDecodeAndAccumStep4(pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
 		HuffmanDecodeAndAccumStep4(pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }

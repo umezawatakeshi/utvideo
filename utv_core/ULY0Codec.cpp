@@ -285,10 +285,10 @@ void CULY0Codec::ConvertFromPlanar(DWORD nBandIndex)
 	}
 }
 
-BOOL CULY0Codec::DecodeDirect(DWORD nBandIndex)
+bool CULY0Codec::DecodeDirect(DWORD nBandIndex)
 {
 	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
-		return FALSE;
+		return false;
 
 	switch (m_utvfRaw)
 	{
@@ -312,8 +312,8 @@ BOOL CULY0Codec::DecodeDirect(DWORD nBandIndex)
 			HuffmanDecodeAndAccum(pDstUBegin, pDstUEnd, m_pDecodeCode[1][nBandIndex], &m_hdt[1]);
 			HuffmanDecodeAndAccum(pDstVBegin, pDstVEnd, m_pDecodeCode[2][nBandIndex], &m_hdt[2]);
 		}
-		return TRUE;
+		return true;
 	}
 
-	return FALSE;
+	return false;
 }
