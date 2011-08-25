@@ -29,7 +29,7 @@ public:
 
 protected:
 	virtual const char *GetColorFormatName(void) { return "RGBA"; }
-	virtual WORD GetRealBitCount(void) { return 32; }
+	virtual int GetRealBitCount(void) { return 32; }
 	virtual int GetNumPlanes(void) { return 4; }
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height);
 	virtual void ConvertToPlanar(DWORD nBandIndex);

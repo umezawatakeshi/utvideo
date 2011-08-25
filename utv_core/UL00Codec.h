@@ -161,7 +161,7 @@ protected:
 	int CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual const char *GetColorFormatName(void) = 0;
-	virtual WORD GetRealBitCount(void) = 0;
+	virtual int GetRealBitCount(void) = 0;
 	virtual int GetNumPlanes(void) = 0;
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height) = 0;
 	virtual void ConvertToPlanar(DWORD nBandIndex) = 0;

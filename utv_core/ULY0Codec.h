@@ -35,7 +35,7 @@ private:
 
 protected:
 	virtual const char *GetColorFormatName(void) { return "YUV420"; }
-	virtual WORD GetRealBitCount(void) { return 12; }
+	virtual int GetRealBitCount(void) { return 12; }
 	virtual int GetNumPlanes(void) { return 3; }
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height);
 	virtual void ConvertToPlanar(DWORD nBandIndex);
