@@ -11,8 +11,6 @@ static void cpp_ConvertULY2ToBottomupRGB(BYTE *pDstBegin, BYTE *pDstEnd, const B
 	const BYTE *u = pUBegin;
 	const BYTE *v = pVBegin;
 
-	_ASSERT(dwStride == ROUNDUP(dwDataStride, 4));
-
 	for (BYTE *pStrideBegin = pDstEnd - dwStride; pStrideBegin >= pDstBegin; pStrideBegin -= dwStride)
 	{
 		BYTE *pStrideEnd = pStrideBegin + dwDataStride;
@@ -50,8 +48,6 @@ static void cpp_ConvertBottomupRGBToULY2(BYTE *pYBegin, BYTE *pUBegin, BYTE *pVB
 	BYTE *y = pYBegin;
 	BYTE *u = pUBegin;
 	BYTE *v = pVBegin;
-
-	_ASSERT(dwStride == ROUNDUP(dwDataStride, 4));
 
 	for (const BYTE *pStrideBegin = pSrcEnd - dwStride; pStrideBegin >= pSrcBegin; pStrideBegin -= dwStride)
 	{
