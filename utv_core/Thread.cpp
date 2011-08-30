@@ -112,7 +112,7 @@ DWORD CThreadManager::ThreadProc(int nThreadIndex)
 	return 0;
 }
 
-void CThreadManager::SubmitJob(CThreadJob *pJob, DWORD dwAffinityHint)
+void CThreadManager::SubmitJob(CThreadJob *pJob, uint32_t dwAffinityHint)
 {
 	HANDLE hCompletionEvent;
 	int nThreadIndex;
