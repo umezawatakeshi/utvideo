@@ -68,6 +68,12 @@ public:
 		};
 		WCHAR szCodecName[128];
 
+#define FCC4PRINTF(fcc) \
+	(uint8_t)(fcc), \
+	(uint8_t)(fcc >> 8), \
+	(uint8_t)(fcc >> 16), \
+	(uint8_t)(fcc >> 24)
+
 		wsprintfW(szFcc, L"%C%C%C%C", FCC4PRINTF(fcc));
 		StringFromGUID2(clsid, szClsID, _countof(szClsID));
 		hr = ATL::_pAtlModule->UpdateRegistryFromResource(T::IDR, bRegister, regmap);

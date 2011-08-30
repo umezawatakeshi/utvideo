@@ -11,12 +11,6 @@
 	(((uint32_t)(fcc) & 0xff000000) >> 24))
 #endif
 
-#define FCC4PRINTF(fcc) \
-	(uint8_t)(fcc), \
-	(uint8_t)(fcc >> 8), \
-	(uint8_t)(fcc >> 16), \
-	(uint8_t)(fcc >> 24)
-
 #define UNFCC(fcc) ( \
 	(((uint32_t)(fcc) & 0x000000ff) << 24) | \
 	(((uint32_t)(fcc) & 0x0000ff00) <<  8) | \
