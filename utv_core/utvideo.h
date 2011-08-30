@@ -102,6 +102,12 @@ inline uint32_t ROUNDUP(uint32_t a, uint32_t b)
 	return ((a + b - 1) / b) * b;
 }
 
+inline uint64_t ROUNDUP(uint64_t a, uint64_t b)
+{
+	_ASSERT(b > 0 && (b & (b - 1)) == 0); // b ‚Í 2 ‚Ì—Ýæ‚Å‚ ‚éB
+	return ((a + b - 1) / b) * b;
+}
+
 inline bool IS_ALIGNED(uintptr_t v, uintptr_t a)
 {
 	_ASSERT(a > 0 && (a & (a - 1)) == 0); // a ‚Í 2 ‚Ì—Ýæ‚Å‚ ‚éB
