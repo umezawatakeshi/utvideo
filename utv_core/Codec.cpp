@@ -30,7 +30,7 @@ INT_PTR CCodec::About(HWND hwnd)
 		UTVIDEO_VERSION_STR);
 	MessageBox(hwnd, buf, "Ut Video Codec Suite", MB_OK);
 
-	return ICERR_OK;
+	return 0;
 }
 #endif
 

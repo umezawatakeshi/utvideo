@@ -422,7 +422,7 @@ int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int 
 		}
 	}
 
-	return ICERR_OK;
+	return 0;
 }
 
 int CUL00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
@@ -455,7 +455,7 @@ int CUL00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int heigh
 
 	m_ptm = new CThreadManager();
 
-	return ICERR_OK;
+	return 0;
 }
 
 int CUL00Codec::EncodeEnd(void)
