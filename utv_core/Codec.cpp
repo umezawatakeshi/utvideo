@@ -48,7 +48,7 @@ static const struct CODECLIST codeclist[] = {
 	{ UTVF_ULY2,    CULY2Codec::CreateInstance  },
 };
 
-__declspec(dllexport) CCodec *CCodec::CreateInstance(utvf_t utvf, const char *pszInterfaceName)
+DLLEXPORT CCodec *CCodec::CreateInstance(utvf_t utvf, const char *pszInterfaceName)
 {
 	int idx;
 
@@ -67,7 +67,7 @@ __declspec(dllexport) CCodec *CCodec::CreateInstance(utvf_t utvf, const char *ps
 	return codeclist[idx].pfnCreateInstace(pszInterfaceName);
 }
 
-__declspec(dllexport) void CCodec::DeleteInstance(CCodec *pCodec)
+DLLEXPORT void CCodec::DeleteInstance(CCodec *pCodec)
 {
 	delete pCodec;
 }

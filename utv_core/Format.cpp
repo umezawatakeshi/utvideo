@@ -14,7 +14,7 @@ inline bool is_fourcc(uint32_t x)
 
 #include "MediaSubType.h"
 
-__declspec(dllexport) int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, GUID *subtype, utvf_t utvf)
+DLLEXPORT int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, GUID *subtype, utvf_t utvf)
 {
 	DWORD dwtmp;
 	WORD wtmp;
@@ -82,7 +82,7 @@ __declspec(dllexport) int UtVideoFormatToWindowsFormat(DWORD *biCompression, WOR
 	return 0;
 }
 
-__declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype)
+DLLEXPORT int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype)
 {
 	utvf_t bybi, byguid;
 
@@ -100,7 +100,7 @@ __declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCom
 		return -1;
 }
 
-__declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount)
+DLLEXPORT int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount)
 {
 	DWORD dwtmp;
 
@@ -126,7 +126,7 @@ __declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCom
 	return 0;
 }
 
-__declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
+DLLEXPORT int WindowsFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 {
 	GUID guidtmp;
 	utvf_t utvftmp;
@@ -154,6 +154,6 @@ __declspec(dllexport) int WindowsFormatToUtVideoFormat(utvf_t *utvf, REFGUID sub
 #endif
 
 #if 0
-int UtVideoFormatToQuickTimeFormat(OSType *pixelFormat, utvf_t utvf);
-int QuickTimeFormatToUtVideoFormat(utvf_t *utvf, OSType pixelFormat);
+DLLEXPORT int UtVideoFormatToQuickTimeFormat(OSType *pixelFormat, utvf_t utvf);
+DLLEXPORT int QuickTimeFormatToUtVideoFormat(utvf_t *utvf, OSType pixelFormat);
 #endif

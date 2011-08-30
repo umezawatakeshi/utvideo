@@ -70,6 +70,10 @@
 
 #define UTVIDEO_VERSION_AND_IMPLEMENTATION (UTVIDEO_VERSION | UTVIDEO_IMPLEMENTATION)
 
+#ifdef _WIN32
+#define DLLEXPORT __declspec(dllexport)
+#endif
+
 
 typedef uint32_t utvf_t;
 

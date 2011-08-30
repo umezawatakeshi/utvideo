@@ -9,8 +9,8 @@
 class CCodec
 {
 public:
-	__declspec(dllexport) static CCodec *CreateInstance(utvf_t utvf, const char *pszInterfaceName);
-	__declspec(dllexport) static void DeleteInstance(CCodec *pCodec);
+	DLLEXPORT static CCodec *CreateInstance(utvf_t utvf, const char *pszInterfaceName);
+	DLLEXPORT static void DeleteInstance(CCodec *pCodec);
 
 protected:
 	CCodec(void);
