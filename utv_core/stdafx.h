@@ -33,12 +33,6 @@ extern "C" void __cpuid(int *, int);
 
 // Windows ヘッダー ファイル:
 #include <windows.h>
-// mmreg.h に「現在のコードページで表示できない文字」が含まれていて警告が出るので、それを抑制する。
-#pragma warning(push)
-#pragma warning(disable:4819)
-#include <vfw.h>
-#pragma warning(pop)
-#include <msi.h>
 
 #include <uuids.h> // for MEDIATYPE_* and MEDIASUBTYPE_*
 
