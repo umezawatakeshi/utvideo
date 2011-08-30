@@ -12,13 +12,14 @@ private:
 	int m_nPlanes;
 	uint8_t *m_pAllocatedAddr[MAX_PLANE];
 	uint8_t *m_pBufferAddr[MAX_PLANE];
+	size_t m_cbAllocated[MAX_PLANE];
 
 public:
 	CFrameBuffer(void);
 	~CFrameBuffer(void);
 
 public:
-	void AddPlane(DWORD dwSize, DWORD dwMarginSize);
+	void AddPlane(size_t cbBuffer, size_t cbMargin);
 
 public:
 	inline uint8_t *GetPlane(int n)

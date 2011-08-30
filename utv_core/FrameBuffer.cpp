@@ -24,25 +24,25 @@ CFrameBuffer::~CFrameBuffer(void)
 	}
 }
 
-void CFrameBuffer::AddPlane(DWORD dwSize, DWORD dwMarginSize)
+void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 {
 	SYSTEM_INFO si;
-	DWORD dwPageSize;
-	DWORD dwPrecedingMarginSize;
-	DWORD dwAllocateSize;
+	size_t cbAllocateUnit;
+	size_t cbAllocated;
 	uint8_t *pAllocatedAddr;
 
 	GetSystemInfo(&si);
-	dwPageSize = si.dwPageSize;
+	cbAllocateUnit = si.dwPageSize;
 
-	dwPrecedingMarginSize = ROUNDUP(dwMarginSize, dwPageSize);
-	dwAllocateSize = dwPrecedingMarginSize + ROUNDUP(dwSize + max(dwMarginSize, dwPageSize), dwPageSize);
+	cbMargin = ROUNDUP(cbMargin, cbAllocateUnit);
+	cbAllocated = cbMargin + ROUNDUP(cbBuffer + cbMargin, cbAllocateUnit);
 
-	pAllocatedAddr = (uint8_t *)VirtualAlloc(NULL, dwAllocateSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+	pAllocatedAddr = (uint8_t *)VirtualAlloc(NULL, cbAllocated, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	if (pAllocatedAddr == NULL)
 		return;
 
 	m_pAllocatedAddr[m_nPlanes] = pAllocatedAddr;
+	m_cbAllocated[m_nPlanes] = cbAllocated;
 	/*
 	 * プレーンごとに開始アドレスを少しずつずらし、キャッシュのスラッシングを回避する。
 	 * 256 はマジックナンバーであるが、
@@ -50,7 +50,7 @@ void CFrameBuffer::AddPlane(DWORD dwSize, DWORD dwMarginSize)
 	 *   - キャッシュサイズより十分小さい
 	 * を満たす必要がある。
 	 */
-	m_pBufferAddr[m_nPlanes] = pAllocatedAddr + dwPrecedingMarginSize + m_nPlanes * 256;
+	m_pBufferAddr[m_nPlanes] = pAllocatedAddr + cbMargin + m_nPlanes * 256;
 
 	m_nPlanes++;
 
