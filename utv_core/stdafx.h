@@ -36,8 +36,36 @@ extern "C" void __cpuid(int *, int);
 
 #include <uuids.h> // for MEDIATYPE_* and MEDIASUBTYPE_*
 
+inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
+{
+	return EnableWindow(GetDlgItem(hwndParent, nID), bEnable);
+}
+
 #include <queue>
 #include <algorithm>
 using namespace std;
 
 #include <stdint.h>
+
+inline uint32_t ROUNDUP(uint32_t a, uint32_t b)
+{
+	_ASSERT(b > 0 && (b & (b - 1)) == 0); // b は 2 の累乗である。
+	return ((a + b - 1) / b) * b;
+}
+
+inline uint64_t ROUNDUP(uint64_t a, uint64_t b)
+{
+	_ASSERT(b > 0 && (b & (b - 1)) == 0); // b は 2 の累乗である。
+	return ((a + b - 1) / b) * b;
+}
+
+inline bool IS_ALIGNED(uintptr_t v, uintptr_t a)
+{
+	_ASSERT(a > 0 && (a & (a - 1)) == 0); // a は 2 の累乗である。
+	return (v & (a - 1)) == 0; // v は a の倍数である。
+}
+
+inline bool IS_ALIGNED(const void *p, uintptr_t a)
+{
+	return IS_ALIGNED((uintptr_t)p, a);
+}
