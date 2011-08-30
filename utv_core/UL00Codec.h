@@ -7,15 +7,6 @@
 #include "Thread.h"
 #include "HuffmanCode.h"
 
-struct BITMAPINFOEXT
-{
-	BITMAPINFOHEADER bih;
-	uint32_t dwEncoderVersionAndImplementation;
-	uint32_t fccOriginalFormat;
-	uint32_t dwFrameInfoSize;
-	uint32_t dwFlags0;
-};
-
 struct EXTRADATA
 {
 	uint32_t EncoderVersionAndImplementation;
