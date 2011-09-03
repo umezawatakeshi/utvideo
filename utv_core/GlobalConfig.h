@@ -3,4 +3,6 @@
 
 #pragma once
 
+#ifdef _WIN32
 __declspec(dllexport) INT_PTR GlobalConfigDialog(HWND hwnd);
+#endif

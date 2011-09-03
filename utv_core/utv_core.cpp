@@ -5,6 +5,8 @@
 #include "utvideo.h"
 #include "TunedFunc.h"
 
+#ifdef _WIN32
+
 #ifdef _MANAGED
 #pragma managed(push, off)
 #endif
@@ -24,4 +26,6 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 
 #ifdef _MANAGED
 #pragma managed(pop)
+#endif
+
 #endif

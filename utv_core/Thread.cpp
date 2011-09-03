@@ -6,6 +6,7 @@
 
 int CThreadManager::GetNumProcessors(void)
 {
+#ifdef _WIN32
 	DWORD_PTR dwpProcessAffinityMask;
 	DWORD_PTR dwpSystemAffinityMask;
 	int nNumProcessors;
@@ -19,10 +20,15 @@ int CThreadManager::GetNumProcessors(void)
 	}
 
 	return nNumProcessors;
+#endif
+#ifdef __APPLE__
+	return 1; // XXX
+#endif
 }
 
 CThreadManager::CThreadManager(void)
 {
+#ifdef _WIN32
 	DWORD_PTR dwpProcessAffinityMask;
 	DWORD_PTR dwpSystemAffinityMask;
 
@@ -52,10 +58,12 @@ CThreadManager::CThreadManager(void)
 	for (int i = 0; i < m_nNumThreads; i++)
 		ResumeThread(m_hThread[i]);
 	_RPT1(_CRT_WARN, "leave CThreadManager::CThreadManager() this=%p\n", this);
+#endif
 }
 
 CThreadManager::~CThreadManager(void)
 {
+#ifdef _WIN32
 	_ASSERT(m_nNumJobs == 0);
 	_RPT1(_CRT_WARN, "enter CThreadManager::~CThreadManager() this=%p\n", this);
 	EnterCriticalSection(&m_csJob);
@@ -74,8 +82,10 @@ CThreadManager::~CThreadManager(void)
 	}
 	DeleteCriticalSection(&m_csJob);
 	_RPT1(_CRT_WARN, "leave CThreadManager::~CThreadManager() this=%p\n", this);
+#endif
 }
 
+#ifdef _WIN32
 DWORD WINAPI CThreadManager::StaticThreadProc(LPVOID lpParameter)
 {
 	CThreadManager *pThis = (CThreadManager *)lpParameter;
@@ -111,9 +121,11 @@ DWORD CThreadManager::ThreadProc(int nThreadIndex)
 	_RPT3(_CRT_WARN, "leave CThreadManager::ThreadProc() this=%p index=%d ID=%08X\n", this, nThreadIndex, GetCurrentThreadId());
 	return 0;
 }
+#endif
 
 void CThreadManager::SubmitJob(CThreadJob *pJob, uint32_t dwAffinityHint)
 {
+#ifdef _WIN32
 	HANDLE hCompletionEvent;
 	int nThreadIndex;
 
@@ -128,15 +140,22 @@ void CThreadManager::SubmitJob(CThreadJob *pJob, uint32_t dwAffinityHint)
 	m_queueJob[nThreadIndex].push(pJob);
 	LeaveCriticalSection(&m_csJob);
 	ReleaseSemaphore(m_hThreadSemaphore[nThreadIndex], 1, NULL);
+#endif
+#ifdef __APPLE__
+	pJob->JobProc(this);
+	delete pJob;
+#endif
 }
 
 void CThreadManager::WaitForJobCompletion(void)
 {
+#ifdef _WIN32
 	// 待機中にジョブが追加されることは考慮していない。
 	WaitForMultipleObjects(m_nNumJobs, m_hCompletionEvent, TRUE, INFINITE);
 	for (int i = 0; i < m_nNumJobs; i++)
 		CloseHandle(m_hCompletionEvent[i]);
 	m_nNumJobs = 0;
+#endif
 }
 
 CThreadJob::CThreadJob(void)

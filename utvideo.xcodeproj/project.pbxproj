@@ -6,14 +6,146 @@
 	objectVersion = 42;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		258DB4001411F91A0059F47E /* Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D41411F8600059F47E /* Codec.cpp */; };
+		258DB4011411F9290059F47E /* Convert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D61411F8600059F47E /* Convert.cpp */; };
+		258DB4021411F9290059F47E /* DummyCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D81411F8600059F47E /* DummyCodec.cpp */; };
+		258DB4031411F9290059F47E /* Format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3DA1411F8600059F47E /* Format.cpp */; };
+		258DB4041411F9290059F47E /* FrameBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3DC1411F8600059F47E /* FrameBuffer.cpp */; };
+		258DB4051411F9290059F47E /* GlobalConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3DE1411F8600059F47E /* GlobalConfig.cpp */; };
+		258DB4061411F9290059F47E /* HuffmanCode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3E01411F8600059F47E /* HuffmanCode.cpp */; };
+		258DB4071411F9290059F47E /* Predict.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3E21411F8600059F47E /* Predict.cpp */; };
+		258DB4081411F9290059F47E /* Thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3E51411F8600059F47E /* Thread.cpp */; };
+		258DB4091411F9290059F47E /* TunedFunc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3E71411F8600059F47E /* TunedFunc.cpp */; };
+		258DB40A1411F9290059F47E /* UL00Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3E91411F8600059F47E /* UL00Codec.cpp */; };
+		258DB40B1411F9290059F47E /* ULRACodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3EB1411F8600059F47E /* ULRACodec.cpp */; };
+		258DB40C1411F9290059F47E /* ULRGCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3ED1411F8600059F47E /* ULRGCodec.cpp */; };
+		258DB40D1411F9290059F47E /* ULY0Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3EF1411F8600059F47E /* ULY0Codec.cpp */; };
+		258DB40E1411F9290059F47E /* ULY2Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3F11411F8600059F47E /* ULY2Codec.cpp */; };
+		258DB40F1411F9290059F47E /* utv_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3F31411F8600059F47E /* utv_core.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		258DB3D41411F8600059F47E /* Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = Codec.cpp; path = utv_core/Codec.cpp; sourceTree = "<group>"; };
+		258DB3D51411F8600059F47E /* Codec.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = Codec.h; path = utv_core/Codec.h; sourceTree = "<group>"; };
+		258DB3D61411F8600059F47E /* Convert.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = Convert.cpp; path = utv_core/Convert.cpp; sourceTree = "<group>"; };
+		258DB3D71411F8600059F47E /* Convert.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = Convert.h; path = utv_core/Convert.h; sourceTree = "<group>"; };
+		258DB3D81411F8600059F47E /* DummyCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = DummyCodec.cpp; path = utv_core/DummyCodec.cpp; sourceTree = "<group>"; };
+		258DB3D91411F8600059F47E /* DummyCodec.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = DummyCodec.h; path = utv_core/DummyCodec.h; sourceTree = "<group>"; };
+		258DB3DA1411F8600059F47E /* Format.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = Format.cpp; path = utv_core/Format.cpp; sourceTree = "<group>"; };
+		258DB3DB1411F8600059F47E /* Format.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = Format.h; path = utv_core/Format.h; sourceTree = "<group>"; };
+		258DB3DC1411F8600059F47E /* FrameBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = FrameBuffer.cpp; path = utv_core/FrameBuffer.cpp; sourceTree = "<group>"; };
+		258DB3DD1411F8600059F47E /* FrameBuffer.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = FrameBuffer.h; path = utv_core/FrameBuffer.h; sourceTree = "<group>"; };
+		258DB3DE1411F8600059F47E /* GlobalConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = GlobalConfig.cpp; path = utv_core/GlobalConfig.cpp; sourceTree = "<group>"; };
+		258DB3DF1411F8600059F47E /* GlobalConfig.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = GlobalConfig.h; path = utv_core/GlobalConfig.h; sourceTree = "<group>"; };
+		258DB3E01411F8600059F47E /* HuffmanCode.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = HuffmanCode.cpp; path = utv_core/HuffmanCode.cpp; sourceTree = "<group>"; };
+		258DB3E11411F8600059F47E /* HuffmanCode.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = HuffmanCode.h; path = utv_core/HuffmanCode.h; sourceTree = "<group>"; };
+		258DB3E21411F8600059F47E /* Predict.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = Predict.cpp; path = utv_core/Predict.cpp; sourceTree = "<group>"; };
+		258DB3E31411F8600059F47E /* Predict.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = Predict.h; path = utv_core/Predict.h; sourceTree = "<group>"; };
+		258DB3E41411F8600059F47E /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = utv_core/stdafx.h; sourceTree = "<group>"; };
+		258DB3E51411F8600059F47E /* Thread.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = Thread.cpp; path = utv_core/Thread.cpp; sourceTree = "<group>"; };
+		258DB3E61411F8600059F47E /* Thread.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = Thread.h; path = utv_core/Thread.h; sourceTree = "<group>"; };
+		258DB3E71411F8600059F47E /* TunedFunc.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = TunedFunc.cpp; path = utv_core/TunedFunc.cpp; sourceTree = "<group>"; };
+		258DB3E81411F8600059F47E /* TunedFunc.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = TunedFunc.h; path = utv_core/TunedFunc.h; sourceTree = "<group>"; };
+		258DB3E91411F8600059F47E /* UL00Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = UL00Codec.cpp; path = utv_core/UL00Codec.cpp; sourceTree = "<group>"; };
+		258DB3EA1411F8600059F47E /* UL00Codec.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = UL00Codec.h; path = utv_core/UL00Codec.h; sourceTree = "<group>"; };
+		258DB3EB1411F8600059F47E /* ULRACodec.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = ULRACodec.cpp; path = utv_core/ULRACodec.cpp; sourceTree = "<group>"; };
+		258DB3EC1411F8600059F47E /* ULRACodec.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = ULRACodec.h; path = utv_core/ULRACodec.h; sourceTree = "<group>"; };
+		258DB3ED1411F8600059F47E /* ULRGCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = ULRGCodec.cpp; path = utv_core/ULRGCodec.cpp; sourceTree = "<group>"; };
+		258DB3EE1411F8600059F47E /* ULRGCodec.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = ULRGCodec.h; path = utv_core/ULRGCodec.h; sourceTree = "<group>"; };
+		258DB3EF1411F8600059F47E /* ULY0Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = ULY0Codec.cpp; path = utv_core/ULY0Codec.cpp; sourceTree = "<group>"; };
+		258DB3F01411F8600059F47E /* ULY0Codec.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = ULY0Codec.h; path = utv_core/ULY0Codec.h; sourceTree = "<group>"; };
+		258DB3F11411F8600059F47E /* ULY2Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = ULY2Codec.cpp; path = utv_core/ULY2Codec.cpp; sourceTree = "<group>"; };
+		258DB3F21411F8600059F47E /* ULY2Codec.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = ULY2Codec.h; path = utv_core/ULY2Codec.h; sourceTree = "<group>"; };
+		258DB3F31411F8600059F47E /* utv_core.cpp */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.cpp.cpp; name = utv_core.cpp; path = utv_core/utv_core.cpp; sourceTree = "<group>"; };
+		258DB3F41411F8600059F47E /* utv_core.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = utv_core.h; path = utv_core/utv_core.h; sourceTree = "<group>"; };
+		258DB3F51411F8600059F47E /* utvideo.h */ = {isa = PBXFileReference; fileEncoding = 2147486209; lastKnownFileType = sourcecode.c.h; name = utvideo.h; path = utv_core/utvideo.h; sourceTree = "<group>"; };
+		258DB3FA1411F8C80059F47E /* utvideo.component */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = utvideo.component; sourceTree = BUILT_PRODUCTS_DIR; };
+		258DB3FC1411F8C80059F47E /* utvideo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "utvideo-Info.plist"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		258DB3F81411F8C80059F47E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
 /* Begin PBXGroup section */
 		258DB3C31411F4BA0059F47E = {
 			isa = PBXGroup;
 			children = (
+				258DB3D41411F8600059F47E /* Codec.cpp */,
+				258DB3D51411F8600059F47E /* Codec.h */,
+				258DB3D61411F8600059F47E /* Convert.cpp */,
+				258DB3D71411F8600059F47E /* Convert.h */,
+				258DB3D81411F8600059F47E /* DummyCodec.cpp */,
+				258DB3D91411F8600059F47E /* DummyCodec.h */,
+				258DB3DA1411F8600059F47E /* Format.cpp */,
+				258DB3DB1411F8600059F47E /* Format.h */,
+				258DB3DC1411F8600059F47E /* FrameBuffer.cpp */,
+				258DB3DD1411F8600059F47E /* FrameBuffer.h */,
+				258DB3DE1411F8600059F47E /* GlobalConfig.cpp */,
+				258DB3DF1411F8600059F47E /* GlobalConfig.h */,
+				258DB3E01411F8600059F47E /* HuffmanCode.cpp */,
+				258DB3E11411F8600059F47E /* HuffmanCode.h */,
+				258DB3E21411F8600059F47E /* Predict.cpp */,
+				258DB3E31411F8600059F47E /* Predict.h */,
+				258DB3E41411F8600059F47E /* stdafx.h */,
+				258DB3E51411F8600059F47E /* Thread.cpp */,
+				258DB3E61411F8600059F47E /* Thread.h */,
+				258DB3E71411F8600059F47E /* TunedFunc.cpp */,
+				258DB3E81411F8600059F47E /* TunedFunc.h */,
+				258DB3E91411F8600059F47E /* UL00Codec.cpp */,
+				258DB3EA1411F8600059F47E /* UL00Codec.h */,
+				258DB3EB1411F8600059F47E /* ULRACodec.cpp */,
+				258DB3EC1411F8600059F47E /* ULRACodec.h */,
+				258DB3ED1411F8600059F47E /* ULRGCodec.cpp */,
+				258DB3EE1411F8600059F47E /* ULRGCodec.h */,
+				258DB3EF1411F8600059F47E /* ULY0Codec.cpp */,
+				258DB3F01411F8600059F47E /* ULY0Codec.h */,
+				258DB3F11411F8600059F47E /* ULY2Codec.cpp */,
+				258DB3F21411F8600059F47E /* ULY2Codec.h */,
+				258DB3F31411F8600059F47E /* utv_core.cpp */,
+				258DB3F41411F8600059F47E /* utv_core.h */,
+				258DB3F51411F8600059F47E /* utvideo.h */,
+				258DB3FB1411F8C80059F47E /* Products */,
+				258DB3FC1411F8C80059F47E /* utvideo-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
+		258DB3FB1411F8C80059F47E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				258DB3FA1411F8C80059F47E /* utvideo.component */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		258DB3F91411F8C80059F47E /* utvideo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 258DB3FF1411F8C90059F47E /* Build configuration list for PBXNativeTarget "utvideo" */;
+			buildPhases = (
+				258DB3F61411F8C80059F47E /* Resources */,
+				258DB3F71411F8C80059F47E /* Sources */,
+				258DB3F81411F8C80059F47E /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = utvideo;
+			productName = utvideo;
+			productReference = 258DB3FA1411F8C80059F47E /* utvideo.component */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		258DB3C51411F4BA0059F47E /* Project object */ = {
@@ -29,12 +161,50 @@
 				German,
 			);
 			mainGroup = 258DB3C31411F4BA0059F47E;
+			productRefGroup = 258DB3FB1411F8C80059F47E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				258DB3F91411F8C80059F47E /* utvideo */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		258DB3F61411F8C80059F47E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		258DB3F71411F8C80059F47E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				258DB4001411F91A0059F47E /* Codec.cpp in Sources */,
+				258DB4011411F9290059F47E /* Convert.cpp in Sources */,
+				258DB4021411F9290059F47E /* DummyCodec.cpp in Sources */,
+				258DB4031411F9290059F47E /* Format.cpp in Sources */,
+				258DB4041411F9290059F47E /* FrameBuffer.cpp in Sources */,
+				258DB4051411F9290059F47E /* GlobalConfig.cpp in Sources */,
+				258DB4061411F9290059F47E /* HuffmanCode.cpp in Sources */,
+				258DB4071411F9290059F47E /* Predict.cpp in Sources */,
+				258DB4081411F9290059F47E /* Thread.cpp in Sources */,
+				258DB4091411F9290059F47E /* TunedFunc.cpp in Sources */,
+				258DB40A1411F9290059F47E /* UL00Codec.cpp in Sources */,
+				258DB40B1411F9290059F47E /* ULRACodec.cpp in Sources */,
+				258DB40C1411F9290059F47E /* ULRGCodec.cpp in Sources */,
+				258DB40D1411F9290059F47E /* ULY0Codec.cpp in Sources */,
+				258DB40E1411F9290059F47E /* ULY2Codec.cpp in Sources */,
+				258DB40F1411F9290059F47E /* utv_core.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
 		258DB3C61411F4BA0059F47E /* Debug */ = {
@@ -51,6 +221,46 @@
 			};
 			name = Release;
 		};
+		258DB3FD1411F8C90059F47E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "utvideo-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = utvideo;
+				WRAPPER_EXTENSION = component;
+			};
+			name = Debug;
+		};
+		258DB3FE1411F8C90059F47E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "";
+				INFOPLIST_FILE = "utvideo-Info.plist";
+				INSTALL_PATH = "$(HOME)/Library/Bundles";
+				OTHER_LDFLAGS = "";
+				PREBINDING = NO;
+				PRODUCT_NAME = utvideo;
+				WRAPPER_EXTENSION = component;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -59,6 +269,15 @@
 			buildConfigurations = (
 				258DB3C61411F4BA0059F47E /* Debug */,
 				258DB3C71411F4BA0059F47E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		258DB3FF1411F8C90059F47E /* Build configuration list for PBXNativeTarget "utvideo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				258DB3FD1411F8C90059F47E /* Debug */,
+				258DB3FE1411F8C90059F47E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

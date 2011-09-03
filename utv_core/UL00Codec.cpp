@@ -68,6 +68,7 @@ void CUL00Codec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
 
 int CUL00Codec::LoadConfig(void)
 {
+#ifdef _WIN32
 	HKEY hkUtVideo;
 	DWORD dwSaveConfig;
 	DWORD cb;
@@ -96,10 +97,15 @@ int CUL00Codec::LoadConfig(void)
 notloaded:
 	RegCloseKey(hkUtVideo);
 	return -1;
+#endif
+#ifdef __APPLE__
+	return 0;
+#endif
 }
 
 int CUL00Codec::SaveConfig(void)
 {
+#ifdef _WIN32
 	HKEY hkUtVideo;
 	DWORD dwSaveConfig;
 	DWORD cb;
@@ -125,8 +131,13 @@ int CUL00Codec::SaveConfig(void)
 notsaved:
 	RegCloseKey(hkUtVideo);
 	return -1;
+#endif
+#ifdef __APPLE__
+	return 0;
+#endif
 }
 
+#ifdef _WIN32
 INT_PTR CUL00Codec::Configure(HWND hwnd)
 {
 	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_CONFIG_DIALOG), hwnd, DialogProc, (LPARAM)this);
@@ -219,6 +230,7 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 
 	return FALSE;
 }
+#endif
 
 size_t CUL00Codec::GetStateSize(void)
 {
@@ -236,6 +248,7 @@ int CUL00Codec::GetState(void *pState, size_t cb)
 
 int CUL00Codec::SetState(const void *pState, size_t cb)
 {
+#ifdef _WIN32
 	HKEY hkUtVideo;
 	DWORD dwIgnoreSetConfig;
 	DWORD cbRegData;
@@ -257,6 +270,10 @@ doset:
 	RegCloseKey(hkUtVideo);
 doset_noclose:
 	return InternalSetState(pState, cb);
+#endif
+#ifdef __APPLE__
+	return InternalSetState(pState, cb);
+#endif
 }
 
 int CUL00Codec::InternalSetState(const void *pState, size_t cb)
@@ -451,7 +468,12 @@ int CUL00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int heigh
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pMedianPredicted->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
 
+#ifdef _WIN32
 	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+#endif
+#ifdef __APPLE__
+	m_counts = (COUNTS *)mmap(NULL, sizeof(COUNTS) * m_dwDivideCount, PROT_READ | PROT_WRITE, MAP_ANON, -1, 0);
+#endif
 
 	m_ptm = new CThreadManager();
 
@@ -463,7 +485,12 @@ int CUL00Codec::EncodeEnd(void)
 	delete m_pCurFrame;
 	delete m_pMedianPredicted;
 
+#ifdef _WIN32
 	VirtualFree(m_counts, 0, MEM_RELEASE);
+#endif
+#ifdef __APPLE__
+	munmap(m_counts, sizeof(COUNTS) * m_dwDivideCount);
+#endif
 
 	delete m_ptm;
 

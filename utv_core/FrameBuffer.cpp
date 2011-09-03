@@ -20,26 +20,44 @@ CFrameBuffer::~CFrameBuffer(void)
 	for (int i = 0; i < MAX_PLANE; i++)
 	{
 		if (m_pAllocatedAddr[i] != NULL)
+		{
+#ifdef _WIN32
 			VirtualFree(m_pAllocatedAddr[i], 0, MEM_RELEASE);
+#endif
+#ifdef __APPLE__
+			munmap(m_pAllocatedAddr[i], m_cbAllocated[i]);
+#endif
+		}
 	}
 }
 
 void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 {
+#ifdef _WIN32
 	SYSTEM_INFO si;
+#endif
 	size_t cbAllocateUnit;
 	size_t cbAllocated;
 	uint8_t *pAllocatedAddr;
 
+#ifdef _WIN32
 	GetSystemInfo(&si);
 	cbAllocateUnit = si.dwPageSize;
-
+#endif
+#ifdef __APPLE__
+	cbAllocateUnit = getpagesize();
+#endif
 	cbMargin = ROUNDUP(cbMargin, cbAllocateUnit);
 	cbAllocated = cbMargin + ROUNDUP(cbBuffer + cbMargin, cbAllocateUnit);
 
+#ifdef _WIN32
 	pAllocatedAddr = (uint8_t *)VirtualAlloc(NULL, cbAllocated, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 	if (pAllocatedAddr == NULL)
 		return;
+#endif
+#ifdef __APPLE__
+	pAllocatedAddr = (uint8_t *)mmap(NULL, cbAllocated, PROT_READ | PROT_WRITE, MAP_ANON, -1, 0);
+#endif
 
 	m_pAllocatedAddr[m_nPlanes] = pAllocatedAddr;
 	m_cbAllocated[m_nPlanes] = cbAllocated;

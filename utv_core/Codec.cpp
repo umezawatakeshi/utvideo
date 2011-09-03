@@ -62,7 +62,7 @@ DLLEXPORT CCodec *CCodec::CreateInstance(utvf_t utvf, const char *pszInterfaceNa
 	if (idx == _countof(codeclist))
 		idx = 0;
 
-	_RPT2(_CRT_WARN, "in=%08X found=%08X\n", utvf, codeclist[idx].utvf);
+//	_RPT2(_CRT_WARN, "in=%08X found=%08X\n", utvf, codeclist[idx].utvf);
 
 	return codeclist[idx].pfnCreateInstace(pszInterfaceName);
 }

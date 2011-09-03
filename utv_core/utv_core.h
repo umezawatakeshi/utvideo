@@ -3,4 +3,6 @@
 
 #pragma once
 
+#ifdef _WIN32
 extern HINSTANCE hModule;
+#endif

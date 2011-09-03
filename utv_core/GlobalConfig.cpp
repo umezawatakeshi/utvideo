@@ -4,8 +4,11 @@
 #include "stdafx.h"
 #include "utvideo.h"
 #include "utv_core.h"
-#include "resource.h"
 #include "GlobalConfig.h"
+
+#ifdef _WIN32
+
+#include "resource.h"
 
 static INT_PTR CALLBACK GlobalConfigDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 static void OnInitDialog(HWND hWnd);
@@ -76,3 +79,5 @@ void OnOK(HWND hWnd)
 
 	RegCloseKey(hkUtVideo);
 }
+
+#endif

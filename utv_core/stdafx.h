@@ -3,6 +3,8 @@
 
 #pragma once
 
+#ifdef _WIN32
+
 // 下で指定された定義の前に対象プラットフォームを指定しなければならない場合、以下の定義を変更してください。
 // 異なるプラットフォームに対応する値に関する最新情報については、MSDN を参照してください。
 #ifndef WINVER				// Windows XP 以降のバージョンに固有の機能の使用を許可します。
@@ -41,6 +43,21 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 	return EnableWindow(GetDlgItem(hwndParent, nID), bEnable);
 }
 
+#endif
+
+#ifdef __APPLE__
+
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define _ASSERT(x) do {} while(/*CONSTCOND*/0)
+#define _countof(x) (sizeof(x) / sizeof((x)[0]))
+
+#endif
+
+
 #include <queue>
 #include <algorithm>
 using namespace std;
@@ -58,6 +75,14 @@ inline uint64_t ROUNDUP(uint64_t a, uint64_t b)
 	_ASSERT(b > 0 && (b & (b - 1)) == 0); // b は 2 の累乗である。
 	return ((a + b - 1) / b) * b;
 }
+
+#ifdef __APPLE__
+inline size_t ROUNDUP(size_t a, size_t b)
+{
+	_ASSERT(b > 0 && (b & (b - 1)) == 0); // b は 2 の累乗である。
+	return ((a + b - 1) / b) * b;
+}
+#endif
 
 inline bool IS_ALIGNED(uintptr_t v, uintptr_t a)
 {
