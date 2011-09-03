@@ -1,0 +1,43 @@
+/*  */
+/* $Id$ */
+
+ComponentSelectorOffset(8)
+	ComponentRangeCount(3)
+	ComponentRangeShift(8)
+	ComponentRangeMask(FF)
+
+	ComponentRangeBegin(0)
+		ComponentError(GetMPWorkFunction)
+		ComponentError(Unregister)
+		StdComponentCall(Target)
+		ComponentError(Register)
+		StdComponentCall(Version)
+		StdComponentCall(CanDo)
+		StdComponentCall(Close)
+		StdComponentCall(Open)
+	ComponentRangeEnd(0)
+
+	ComponentRangeBegin (1)
+		ComponentCall (GetCodecInfo)
+	ComponentRangeEnd (1)
+
+	ComponentRangeUnused(2)
+
+	ComponentRangeBegin(3)
+		ComponentCall(Preflight)
+		ComponentCall(Initialize)
+		ComponentCall(BeginBand)
+		ComponentCall(DrawBand)
+		ComponentCall(EndBand)
+		ComponentNoError(QueueStarting)
+		ComponentNoError(QueueStopping)
+		ComponentDelegate(DroppingFrame)
+		ComponentDelegate(ScheduleFrame)
+		ComponentDelegate(CancelTrigger)
+		ComponentDelegate(10)
+		ComponentDelegate(11)
+		ComponentDelegate(12)
+		ComponentDelegate(13)
+		ComponentDelegate(14)
+		ComponentCall(DecodeBand)
+	ComponentRangeEnd(3)
