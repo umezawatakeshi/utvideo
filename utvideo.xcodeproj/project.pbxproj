@@ -1,0 +1,69 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXGroup section */
+		258DB3C31411F4BA0059F47E = {
+			isa = PBXGroup;
+			children = (
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXProject section */
+		258DB3C51411F4BA0059F47E /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 258DB3C81411F4BA0059F47E /* Build configuration list for PBXProject "utvideo" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 258DB3C31411F4BA0059F47E;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		258DB3C61411F4BA0059F47E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+			};
+			name = Debug;
+		};
+		258DB3C71411F4BA0059F47E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		258DB3C81411F4BA0059F47E /* Build configuration list for PBXProject "utvideo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				258DB3C61411F4BA0059F47E /* Debug */,
+				258DB3C71411F4BA0059F47E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 258DB3C51411F4BA0059F47E /* Project object */;
+}
