@@ -3,10 +3,13 @@
 
 #pragma once
 
+#include "Codec.h"
+
 struct CQTDecoder {
 	ComponentInstance self;
 	ComponentInstance delegateComponent;
 	ComponentInstance target;
-	OSType componentType;
 	OSType componentSubType;
+	CCodec *codec;
+	OSType **wantedDestinationPixelTypes;
 };

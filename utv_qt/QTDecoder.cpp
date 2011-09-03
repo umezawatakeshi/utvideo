@@ -3,7 +3,10 @@
 
 
 #include "stdafx.h"
+#include "utvideo.h"
 #include "QTDecoder.h"
+#include "Codec.h"
+#include "Format.h"
 
 extern "C" pascal ComponentResult QTDecoderComponentDispatch(ComponentParameters *params, CQTDecoder *glob);
 
@@ -25,6 +28,7 @@ extern "C" pascal ComponentResult QTDecoderComponentDispatch(ComponentParameters
 pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 {
 	ComponentDescription descout;
+	utvf_t utvf;
 
 	GetComponentInfo((Component)self, &descout, 0, 0, 0);
 
@@ -33,8 +37,34 @@ pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 	glob->self = self;
 	glob->target = self;
 	glob->componentSubType = descout.componentSubType;
+	QuickTimeFormatToUtVideoFormat(&utvf, glob->componentSubType);
+	glob->codec = CCodec::CreateInstance(utvf, "QT");
 	OpenADefaultComponent(decompressorComponentType, kBaseCodecType, &glob->delegateComponent);
 	ComponentSetTarget(glob->delegateComponent, self);
+
+	{
+		const utvf_t *p;
+		OSType *post;
+		int n;
+
+		p = glob->codec->GetDecoderOutputFormat();
+		n = 0;
+		while (*p)
+		{
+			n++;
+			p++;
+		}
+
+		glob->wantedDestinationPixelTypes = (OSType **)NewHandleClear(sizeof(OSType) * (n + 1));
+		post = *glob->wantedDestinationPixelTypes;
+		for (p = glob->codec->GetDecoderOutputFormat(); *p; p++)
+		{
+			if (UtVideoFormatToQuickTimeFormat(post, *p) == 0)
+				post++;
+		}
+		*post = 0;
+	}
+
 	return noErr;
 }
 
@@ -42,11 +72,14 @@ pascal ComponentResult QTDecoderClose(CQTDecoder *glob, ComponentInstance self)
 {
 	if (glob != NULL)
 	{
+		CCodec::DeleteInstance(glob->codec);
+		if (glob->wantedDestinationPixelTypes != NULL)
+			DisposeHandle((Handle)glob->wantedDestinationPixelTypes);
 		if (glob->delegateComponent != NULL)
 			CloseComponent(glob->delegateComponent);
 		DisposePtr((Ptr)glob);
 	}
-	
+
 	return noErr;
 }
 
@@ -81,9 +114,8 @@ pascal ComponentResult QTDecoderPreflight(CQTDecoder *glob, CodecDecompressParam
 {
 	CodecCapabilities *cap = param->capabilities;
 
-	param->wantedDestinationPixelTypes = (OSType **)NewHandleClear(sizeof(OSType) * 2);
-	(*param->wantedDestinationPixelTypes)[0] = k32ARGBPixelFormat;
-	(*param->wantedDestinationPixelTypes)[1] = 0;
+	param->wantedDestinationPixelTypes = glob->wantedDestinationPixelTypes;
+
 	return noErr;
 }
 
