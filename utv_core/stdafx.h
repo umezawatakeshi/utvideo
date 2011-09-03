@@ -51,6 +51,8 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 #include <sys/mman.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <Carbon/Carbon.h>
+#include <QuickTime/QuickTime.h>
 
 #define _ASSERT(x) do {} while(/*CONSTCOND*/0)
 #define _countof(x) (sizeof(x) / sizeof((x)[0]))
