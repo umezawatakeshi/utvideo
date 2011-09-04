@@ -56,8 +56,8 @@ void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 		return;
 #endif
 #ifdef __APPLE__
-	pAllocatedAddr = (uint8_t *)mmap(NULL, cbAllocated, PROT_READ | PROT_WRITE, MAP_ANON, -1, 0);
-	if (pAllocatedAddr == NULL)
+	pAllocatedAddr = (uint8_t *)mmap(NULL, cbAllocated, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+	if (pAllocatedAddr == MAP_FAILED)
 		return;
 #endif
 
