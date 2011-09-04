@@ -15,6 +15,7 @@ const utvf_t CULRACodec::m_utvfEncoderInput[] = {
 const utvf_t CULRACodec::m_utvfDecoderOutput[] = {
 	UTVF_ARGB32_WIN,
 	UTVF_RGB32_WIN,
+	UTVF_ARGB32_QT,
 	UTVF_INVALID,
 };
 
@@ -115,6 +116,20 @@ void CULRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 				*(p+0) = *b + *g - 0x80;
 				*(p+2) = *r + *g - 0x80;
 				*(p+3) = *a;
+				g++; b++; r++; a++;
+			}
+		}
+		break;
+	case UTVF_ARGB32_QT:
+		for (pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawGrossWidth)
+		{
+			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
+			for (p = pStrideBegin; p < pStrideEnd; p += 4)
+			{
+				*(p+2) = *g;
+				*(p+3) = *b + *g - 0x80;
+				*(p+1) = *r + *g - 0x80;
+				*(p+0) = *a;
 				g++; b++; r++; a++;
 			}
 		}
