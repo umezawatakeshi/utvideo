@@ -15,6 +15,8 @@ const utvf_t CULRGCodec::m_utvfEncoderInput[] = {
 const utvf_t CULRGCodec::m_utvfDecoderOutput[] = {
 	UTVF_RGB24_WIN,
 	UTVF_RGB32_WIN,
+	UTVF_RGB24_QT,
+	UTVF_ARGB32_QT,
 	UTVF_INVALID,
 };
 
@@ -131,6 +133,33 @@ void CULRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 				*(p+0) = *b + *g - 0x80;
 				*(p+2) = *r + *g - 0x80;
 				*(p+3) = 0xff;
+				g++; b++; r++;
+			}
+		}
+		break;
+	case UTVF_RGB24_QT:
+		for (pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawGrossWidth)
+		{
+			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 3;
+			for (p = pStrideBegin; p < pStrideEnd; p += 3)
+			{
+				*(p+1) = *g;
+				*(p+2) = *b + *g - 0x80;
+				*(p+0) = *r + *g - 0x80;
+				g++; b++; r++;
+			}
+		}
+		break;
+	case UTVF_ARGB32_QT:
+		for (pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawGrossWidth)
+		{
+			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
+			for (p = pStrideBegin; p < pStrideEnd; p += 4)
+			{
+				*(p+2) = *g;
+				*(p+3) = *b + *g - 0x80;
+				*(p+1) = *r + *g - 0x80;
+				*(p+0) = 0xff;
 				g++; b++; r++;
 			}
 		}
