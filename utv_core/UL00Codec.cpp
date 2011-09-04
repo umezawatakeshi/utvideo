@@ -381,6 +381,14 @@ int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 			m_dwRawNetWidth = width * 4;
 			m_dwRawGrossWidth = m_dwRawNetWidth;
 			break;
+		case UTVF_RGB24_QT:
+			m_dwRawNetWidth = width * 3;
+			m_dwRawGrossWidth = cbGrossWidth;
+			break;
+		case UTVF_ARGB32_QT:
+			m_dwRawNetWidth = width * 4;
+			m_dwRawGrossWidth = cbGrossWidth;
+			break;
 		case UTVF_YUY2:
 		case UTVF_YUYV:
 		case UTVF_YUNV:
