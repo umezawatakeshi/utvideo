@@ -12,4 +12,5 @@ struct CQTDecoder {
 	OSType componentSubType;
 	CCodec *codec;
 	OSType **wantedDestinationPixelTypes;
+	int beginBandDone;
 };

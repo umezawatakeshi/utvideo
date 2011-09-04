@@ -38,6 +38,7 @@ pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 	glob->target = self;
 	glob->componentSubType = descout.componentSubType;
 	QuickTimeFormatToUtVideoFormat(&utvf, glob->componentSubType);
+	glob->beginBandDone = false;
 	glob->codec = CCodec::CreateInstance(utvf, "QT");
 	OpenADefaultComponent(decompressorComponentType, kBaseCodecType, &glob->delegateComponent);
 	ComponentSetTarget(glob->delegateComponent, self);
@@ -121,6 +122,8 @@ pascal ComponentResult QTDecoderPreflight(CQTDecoder *glob, CodecDecompressParam
 
 pascal ComponentResult QTDecoderInitialize(CQTDecoder *glob, ImageSubCodecDecompressCapabilities *cap)
 {
+	cap->decompressRecordSize = sizeof(bool);
+
 	return noErr;
 }
 
@@ -129,32 +132,53 @@ pascal ComponentResult QTDecoderBeginBand(CQTDecoder *glob, CodecDecompressParam
 	int i;
 	long c;
 	Handle imgDescExt;
+	size_t imgDescExtSize;
+	utvf_t outfmt;
 
-	CountImageDescriptionExtensionType(param->imageDescription, 'strf', &c);
-
+	if (glob->beginBandDone)
+	{
+		*(bool *)drp->userDecompressRecord = true;
+		return paramErr;
+	}
+	glob->beginBandDone = true;
+	*(bool *)drp->userDecompressRecord = false;
+	
+#define SIZEOF_BITMAPINFOHEADER 40
+	
+	if (QuickTimeFormatToUtVideoFormat(&outfmt, param->dstPixMap.pixelFormat) != 0)
+		return paramErr;
+	
 	imgDescExt = NULL;
-	GetImageDescriptionExtension(param->imageDescription, &imgDescExt, 'strf', 1);
+	if (GetImageDescriptionExtension(param->imageDescription, &imgDescExt, 'strf', 1) != noErr)
+		return paramErr;
+	imgDescExtSize = GetHandleSize(imgDescExt);
+	if (imgDescExtSize < SIZEOF_BITMAPINFOHEADER)
+	{
+		DisposeHandle(imgDescExt);
+		return paramErr;
+	}
+	glob->codec->DecodeBegin(outfmt, (*param->imageDescription)->width, (*param->imageDescription)->height, drp->rowBytes,
+							 ((char *)(*imgDescExt)) + SIZEOF_BITMAPINFOHEADER, imgDescExtSize - SIZEOF_BITMAPINFOHEADER);
 	DisposeHandle(imgDescExt);
+
 	return noErr;
 }
 
 pascal ComponentResult QTDecoderDrawBand(CQTDecoder *glob, ImageSubCodecDecompressRecord *drp)
 {
-	unsigned char *p = (unsigned char *)drp->baseAddr;
-
-	for (int i = 0; i < 644*200; i++)
-	{
-		p[i*4    ] = 0; // A?
-		p[i*4 + 1] = 255; // R
-		p[i*4 + 2] = 0; // G
-		p[i*4 + 3] = 0; // B
-	}
+	glob->codec->DecodeFrame(drp->baseAddr, drp->codecData, true /* XXX */);
 
 	return noErr;
 }
 
 pascal ComponentResult QTDecoderEndBand(CQTDecoder *glob, ImageSubCodecDecompressRecord *drp, OSErr result, long flags)
 {
+	if (*(bool *)drp->userDecompressRecord)
+		return noErr;
+
+	glob->codec->DecodeEnd();
+	glob->beginBandDone = false;
+
 	return noErr;
 }
 
