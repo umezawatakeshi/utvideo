@@ -154,12 +154,12 @@
 		25F09D3D14122EB200D214B9 /* utv_qt */ = {
 			isa = PBXGroup;
 			children = (
-				2510B6C31417BDDE00EA5F2F /* utv_qt.in.r */,
 				2510B6B41417BCB100EA5F2F /* Mutex.h */,
 				25F09D3E14122EC800D214B9 /* QTDecoder.cpp */,
 				25F09D3F14122EC800D214B9 /* QTDecoder.h */,
 				25F09D4014122EC800D214B9 /* QTDecoderDispatch.h */,
 				25F09D4114122EC800D214B9 /* stdafx.h */,
+				2510B6C31417BDDE00EA5F2F /* utv_qt.in.r */,
 				25F09D4214122EC900D214B9 /* utv_qt.r */,
 			);
 			name = utv_qt;
