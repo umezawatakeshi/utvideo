@@ -29,40 +29,34 @@ resource 'cdci' (256) {
 	0									// Private Data
 };
 
-resource 'strn' (256) {
-	"UtVideo (ULRG)"
-};
-
-resource 'stri' (256) {
-	"Ut Video Codec RGB (ULRG) QT"
-};
-
 resource 'dlle' (256) {
 	"QTDecoderComponentDispatch"
 };
 
-resource 'thng' (256) {
-	decompressorComponentType,			// Type                 
-	'ULRG',								// SubType
-	'Umzw',								// Manufacturer
-	0,									// - use componentHasMultiplePlatforms
-	0,
-	0,
-	0,
-	'strn',								// Name Type
-	256,								// Name ID
-	'stri',								// Info Type
-	256,								// Info ID
-	0,									// Icon Type
-	0,									// Icon ID
-	0x1000000,							// Version
-	componentHasMultiplePlatforms +		// Registration Flags 
-	componentDoAutoVersion,				// Registration Flags
-	0,									// Resource ID of Icon Family
-	{
-		codecInfoDepth24,
-		'dlle',
-		256,
-		platformIA32NativeEntryPoint,
-	};
-};
+#define SUBTYPE      ULRA
+#define SUBTYPE_VAL  'ULRA'
+#define SUBTYPE_STR  "ULRA"
+#define SUBTYPE_RID  256
+#define SUBTYPE_STRI "RGBA"
+#include "utv_qt.in.r"
+
+#define SUBTYPE      ULRG
+#define SUBTYPE_VAL  'ULRG'
+#define SUBTYPE_STR  "ULRG"
+#define SUBTYPE_RID  257
+#define SUBTYPE_STRI "RGB"
+#include "utv_qt.in.r"
+
+#define SUBTYPE      ULY0
+#define SUBTYPE_VAL  'ULY0'
+#define SUBTYPE_STR  "ULY0"
+#define SUBTYPE_RID  258
+#define SUBTYPE_STRI "YUV420"
+#include "utv_qt.in.r"
+
+#define SUBTYPE      ULY2
+#define SUBTYPE_VAL  'ULY2'
+#define SUBTYPE_STR  "ULY2"
+#define SUBTYPE_RID  259
+#define SUBTYPE_STRI "YUV422"
+#include "utv_qt.in.r"

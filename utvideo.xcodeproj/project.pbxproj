@@ -31,6 +31,7 @@
 
 /* Begin PBXFileReference section */
 		2510B6B41417BCB100EA5F2F /* Mutex.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Mutex.h; path = utv_qt/Mutex.h; sourceTree = "<group>"; };
+		2510B6C31417BDDE00EA5F2F /* utv_qt.in.r */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.rez; name = utv_qt.in.r; path = utv_qt/utv_qt.in.r; sourceTree = "<group>"; };
 		258DB3D41411F8600059F47E /* Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Codec.cpp; path = utv_core/Codec.cpp; sourceTree = "<group>"; };
 		258DB3D51411F8600059F47E /* Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Codec.h; path = utv_core/Codec.h; sourceTree = "<group>"; };
 		258DB3D61411F8600059F47E /* Convert.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Convert.cpp; path = utv_core/Convert.cpp; sourceTree = "<group>"; };
@@ -153,6 +154,7 @@
 		25F09D3D14122EB200D214B9 /* utv_qt */ = {
 			isa = PBXGroup;
 			children = (
+				2510B6C31417BDDE00EA5F2F /* utv_qt.in.r */,
 				2510B6B41417BCB100EA5F2F /* Mutex.h */,
 				25F09D3E14122EC800D214B9 /* QTDecoder.cpp */,
 				25F09D3F14122EC800D214B9 /* QTDecoder.h */,
