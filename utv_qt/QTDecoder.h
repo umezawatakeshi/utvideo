@@ -4,8 +4,10 @@
 #pragma once
 
 #include "Codec.h"
+#include "Mutex.h"
 
-struct CQTDecoder {
+struct CQTDecoder
+{
 	ComponentInstance self;
 	ComponentInstance delegateComponent;
 	ComponentInstance target;
@@ -13,4 +15,5 @@ struct CQTDecoder {
 	CCodec *codec;
 	OSType **wantedDestinationPixelTypes;
 	int beginBandDone;
+	CMutex *mutex;
 };
