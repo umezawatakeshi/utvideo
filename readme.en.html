@@ -2,10 +2,10 @@
 <!-- $Id$ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
-<title>Ut Video Codec Suite 9.0.3 readme (English)</title>
+<title>Ut Video Codec Suite 10.0.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 9.0.3 readme (English)</h1>
+<h1>Ut Video Codec Suite 10.0.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008-2011  UMEZAWA Takeshi</p>
@@ -21,17 +21,22 @@ GNU General Public License for more details.</p>
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <h2 id="overview">Overview</h2>
-<p>Ut Video Codec Suite is a lossless video codec for Windows, which is implemented as a VCM codec (also called "VfW codec") and a DMO codec.</p>
+<p>Ut Video Codec Suite is a multi-platform and multi-interface lossless video codec.</p>
 <h2 id="environment">Environment</h2>
-<h3>Minimum requirement (x86)</h3>
+<h3>Minimum requirement (Windows x86)</h3>
 <dl>
 <dt>OS</dt><dd>Windows XP or later</dd>
 <dt>CPU</dt><dd>i686-compatible CPU with SSE2 support<br>(e.g. Pentium 4 or later)</dd>
 </dl>
-<h3>Minimum requirement (x64)</h3>
+<h3>Minimum requirement (Windows x64)</h3>
 <dl>
 <dt>OS</dt><dd>Windows Vista (x64) or later</dd>
 <dt>CPU</dt><dd>CPU with AMD64 or Intel 64 (formerly EM64T) support</dd>
+</dl>
+<h3>Minimum requirement (Mac OS X)</h3>
+<dl>
+<dt>OS</dt><dd>Mac OS X 10.6 Snow Leopard or later</dd>
+<dt>CPU</dt><dd>i686-compatible CPU with SSE2 support<br>(All Intel Mac meet this requirements)</dd>
 </dl>
 <h3>Recommended</h3>
 <dl>
@@ -44,14 +49,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 </ul>
 <h2 id="fourcc">List of FourCC</h2>
 <table border>
-<tr><th>FourCC</th><th>Internal format</th><th>Supported input/output format (in order of priority)</th></tr>
-<tr><td>ULRA</td><td>RGBA 4:4:4:4 8bit full-range</td><td><strong>RGBA</strong></td></tr>
-<tr><td>ULRG</td><td>RGB 4:4:4 8bit full-range</td><td><strong>RGB24<br>RGB32</strong></td></tr>
-<tr><td>ULY2</td><td>YCbCr 4:2:2 8bit limited</td><td><strong>YUY2 (YUYV YUNV)</strong><br><strong>UYVY (UYNV)</strong><br>RGB24<br>RGB32</td></tr>
-<tr><td>ULY0</td><td>YCbCr 4:2:0 8bit limited</td><td><strong>YV12</strong><br>YUY2 (YUYV YUNV)<br>UYVY (UYNV)<br>RGB24<br>RGB32</td></tr>
+<tr><th rowspan="2">FourCC</th><th rowspan="2">Internal format</th><th colspan="2">Supported input/output format (in order of priority)</th></tr>
+<tr><th>VCM / DMO</th><th>QT</th></tr>
+<tr><td>ULRA</td><td>RGBA 4:4:4:4 8bit full-range</td><td><strong>RGBA</strong></td><td><strong>ARGB</strong></td></tr>
+<tr><td>ULRG</td><td>RGB 4:4:4 8bit full-range</td><td><strong>RGB24<br>RGB32</strong></td><td><strong>RGB<br>ARGB</strong></td></tr>
+<tr><td>ULY2</td><td>YCbCr 4:2:2 8bit limited</td><td><strong>YUY2 (YUYV YUNV)</strong><br><strong>UYVY (UYNV)</strong><br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
+<tr><td>ULY0</td><td>YCbCr 4:2:0 8bit limited</td><td><strong>YV12</strong><br>YUY2 (YUYV YUNV)<br>UYVY (UYNV)<br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
 </table>
 <ul>
-<li>Currentry supported input formats and supported output formats are same.</li>
+<li>For VCM and DMO interface, supported input formats and supported output formats are same.</li>
+<li>For QuickTime interface, only decoding is supported.</li>
 <li>In &quot;8-bit full-range&quot; of RGB formats, R,G,B=0-255. In &quot;8-bit limited&quot; of YUV formats, Y=16-235 and U,V=16-240.</li>
 <li><strong>Bold</strong> are &quot;native&quot; (no colorspace conversion occurs) formats. It is recommended to input/output with that formats.</li>
 <li>Formats written in brackets are equivalent format with preceding format. For example, YUY2, YUYV and YUNV are equivalent.</li>
@@ -59,6 +66,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <h2 id="donations">About Donations</h2>
 <p>Ut Video Codec Suite is a free software. Donations to support development are always welcome. For more information, visit <a href="http://umezawa.dyndns.info/wordpress/?page_id=1577">&quot;About Donations&quot; page</a>.</p>
 <h2 id="devenv">Development Environment</h2>
+<h3>Windows</h3>
 <dl>
 <dt>OS</dt><dd>Windows 7 Ultimate x64 (ja)</dd>
 <dt>CPU</dt><dd>Intel Core i7-2600K</dd>
@@ -68,7 +76,24 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <dd>Windows SDK for Windows Server 2008 and .NET Framework 3.5 (Windows SDK 6.1)</dd>
 <dd>AMD CodeAnalyst for Windows v3.1</dd>
 </dl>
+<h3>Mac OS X</h3>
+<dl>
+<dt>OS</dt><dd>Mac OS X 10.6 Snow Leopard</dd>
+<dt>CPU</dt><dd>Intel Core 2 Duo T8100</dd>
+<dt>RAM</dt><dd>DDR2-533 3GB</dd>
+<dt>Development Tools</dt>
+<dd>Xcode 3.2.6</dd>
+</dl>
 <h2 id="history">Version history</h2>
+<h3>Version 10.0.0</h3>
+<dl>
+<dt>New features</dt><dd><ul>
+<li>Add QuickTime components for Mac OS X. Decoding to RGB24/ARGB32 are supported. Very slow.</li>
+</ul></dd>
+<dt>Others</dt><dd><ul>
+<li>Input/output format checking is more accurate.</li>
+</ul></dd>
+</dl>
 <h3>Version 9.0.3</h3>
 <dl>
 <dt>Bug fixes</dt><dd><ul>
