@@ -16,11 +16,15 @@ const utvf_t CULY0Codec::m_utvfEncoderInput[] = {
 };
 
 const utvf_t CULY0Codec::m_utvfDecoderOutput[] = {
+#ifndef __APPLE__
 	UTVF_YV12,
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
 	UTVF_UYVY, UTVF_UYNV,
+#endif
 	UTVF_RGB24_WIN,
 	UTVF_RGB32_WIN,
+	UTVF_RGB24_QT,
+	UTVF_ARGB32_QT,
 	UTVF_INVALID,
 };
 
@@ -211,6 +215,55 @@ void CULY0Codec::ConvertULY0ToBottomupRGB(const uint8_t *pSrcYBegin, const uint8
 	}
 }
 
+void CULY0Codec::ConvertULY0ToTopdownRGB(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nBandIndex, uint32_t bypp)
+{
+	const uint8_t *y = pSrcYBegin;
+	const uint8_t *u = pSrcUBegin;
+	const uint8_t *v = pSrcVBegin;
+
+	uint32_t dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
+
+	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+
+	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin < pDstEnd; pStripeBegin += m_dwRawStripeSize) {
+		for (uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += m_dwRawGrossWidth)
+		{
+			uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			for (uint8_t *qq = pStrideBegin; qq < pStrideEnd; qq += bypp * 2)
+			{
+				uint8_t *q = bypp == 3 ? qq : qq + 1;
+				uint8_t *p = q + dwRawPredictStride;
+				*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(q+2) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(q+0) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				if (bypp == 4)
+				{
+					*(q-1) = 255;
+					*(p-1) = 255;
+				}
+				y++;
+				*(q+bypp+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(q+bypp+2) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(q+bypp+0) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+bypp+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+bypp+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+bypp+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				if (bypp == 4)
+				{
+					*(q+bypp-1) = 255;
+					*(p+bypp-1) = 255;
+				}
+				y++; u++; v++;
+			}
+		}
+		y += m_dwPlanePredictStride[0];
+	}
+}
+
 void CULY0Codec::ConvertULY0ToYUV422(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nBandIndex, uint32_t nYOffset)
 {
 	const uint8_t *y = pSrcYBegin;
@@ -280,6 +333,12 @@ void CULY0Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		break;
 	case UTVF_RGB32_WIN:
 		ConvertULY0ToBottomupRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
+		break;
+	case UTVF_RGB24_QT:
+		ConvertULY0ToTopdownRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 3);
+		break;
+	case UTVF_ARGB32_QT:
+		ConvertULY0ToTopdownRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
 		break;
 	}
 }
