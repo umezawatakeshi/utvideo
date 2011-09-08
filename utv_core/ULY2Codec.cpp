@@ -95,10 +95,10 @@ void CULY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 		}
 		break;
 	case UTVF_RGB24_WIN:
-		ConvertBottomupRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_nWidth * 3);
+		ConvertBottomupRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	case UTVF_RGB32_WIN:
-		ConvertBottomupRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawGrossWidth);
+		ConvertBottomupRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	}
 }
@@ -138,10 +138,10 @@ void CULY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		}
 		break;
 	case UTVF_RGB24_WIN:
-		ConvertULY2ToBottomupRGB24(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_nWidth * 3);
+		ConvertULY2ToBottomupRGB24(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	case UTVF_RGB32_WIN:
-		ConvertULY2ToBottomupRGB32(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawGrossWidth);
+		ConvertULY2ToBottomupRGB32(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	}
 }
