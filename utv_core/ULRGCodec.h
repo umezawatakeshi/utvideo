@@ -22,7 +22,6 @@ public:
 	static CCodec *CreateInstance(const char *pszInterfaceName);
 
 public:
-	virtual const char *GetTinyName(void) { return "ULRG"; }
 	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }
 	virtual const utvf_t *GetDecoderOutputFormat(void) { return m_utvfDecoderOutput; }
 	virtual const utvf_t *GetCompressedFormat(void) { return m_utvfCompressed; }

@@ -33,7 +33,7 @@ const utvf_t CULY0Codec::m_utvfCompressed[] = {
 	UTVF_INVALID,
 };
 
-CULY0Codec::CULY0Codec(const char *pszInterfaceName) : CUL00Codec(pszInterfaceName)
+CULY0Codec::CULY0Codec(const char *pszInterfaceName) : CUL00Codec("ULY0", pszInterfaceName)
 {
 }
 

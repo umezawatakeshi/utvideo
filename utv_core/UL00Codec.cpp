@@ -8,7 +8,7 @@
 #include "Predict.h"
 #include "resource.h"
 
-CUL00Codec::CUL00Codec(const char *pszInterfaceName) : m_pszInterfaceName(pszInterfaceName)
+CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : m_pszTinyName(pszTinyName), m_pszInterfaceName(pszInterfaceName)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
@@ -18,6 +18,11 @@ CUL00Codec::CUL00Codec(const char *pszInterfaceName) : m_pszInterfaceName(pszInt
 
 CUL00Codec::~CUL00Codec(void)
 {
+}
+
+const char *CUL00Codec::GetTinyName(void)
+{
+	return m_pszTinyName;
 }
 
 void CUL00Codec::GetShortFriendlyName(char *pszName, size_t cchName)

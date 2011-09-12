@@ -24,7 +24,7 @@ const utvf_t CULRACodec::m_utvfCompressed[] = {
 	UTVF_INVALID,
 };
 
-CULRACodec::CULRACodec(const char *pszInterfaceName) : CUL00Codec(pszInterfaceName)
+CULRACodec::CULRACodec(const char *pszInterfaceName) : CUL00Codec("ULRA", pszInterfaceName)
 {
 }
 

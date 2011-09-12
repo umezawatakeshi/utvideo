@@ -63,6 +63,7 @@ class CUL00Codec :
 	public CCodec
 {
 protected:
+	const char *const m_pszTinyName;
 	const char *const m_pszInterfaceName;
 
 	ENCODERCONF m_ec;
@@ -108,11 +109,11 @@ protected:
 	EXTRADATA m_ed;
 
 public:
-	CUL00Codec(const char *pszInterfaceName);
+	CUL00Codec(const char *pszTinyName, const char *pszInterfaceName);
 	virtual ~CUL00Codec(void);
 
 public:
-	virtual const char *GetTinyName(void) = 0;
+	virtual const char *GetTinyName(void);
 	virtual void GetShortFriendlyName(char *pszName, size_t cchName);
 	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName);
