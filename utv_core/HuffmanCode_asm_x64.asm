@@ -95,6 +95,7 @@ else
 	mov			r8,  qword ptr [rsp + $pDstEnd]
 endif
 	mov			cl, -32
+	mov			ah, 32
 if &accum
  if &corrpos ne 0
 	mov			r11b, 00h
@@ -102,14 +103,23 @@ if &accum
 	mov			r11b, 80h
  endif
 endif
-	mov			r9d, dword ptr [rsi]
+	mov			edx, dword ptr [rsi]
+	sub			rsi, 4
 
 	align		64
 label1:
 	cmp			rdi, r8
 	jae			label2
-	mov			eax, r9d
 
+	add			cl, ah
+	jnc			label4
+	sub			cl, 32
+	add			rsi, 4
+	mov			r9d, edx
+	mov			edx, dword ptr [rsi+4]
+
+label4:
+	mov			eax, r9d
 	shld		eax, edx, cl
 	shr			eax, 20
 	movzx		eax, word ptr [rbx + rax*2]
@@ -145,12 +155,6 @@ if &step eq 1
 else
 	add			rdi, &step
 endif
-	add			cl, ah
-	jnc			label1
-	sub			cl, 32
-	add			rsi, 4
-	mov			r9d, edx
-	mov			edx, dword ptr [rsi+4]
 	jmp			label1
 
 label2:

@@ -107,6 +107,7 @@ else
 	mov			dword ptr [esp + $pLineEnd], eax
 endif
 	mov			cl, -32
+	mov			ah, 32
 if &accum
  if &corrpos ne 0
 	mov			byte ptr [esp + $byCorrBuf], 00h
@@ -114,21 +115,30 @@ if &accum
 	mov			byte ptr [esp + $byCorrBuf], 80h
  endif
 endif
-	mov			ebp, dword ptr [esi]
+	mov			edx, dword ptr [esi]
+	sub			esi, 4
 
 	align		64
 label1:
 	cmp			edi, dword ptr [esp + $pLineEnd]
 	jae			label2
-	mov			eax, ebp
 
+	add			cl, ah
+	jnc			label4
+	sub			cl, 32
+	add			esi, 4
+	mov			ebp, edx
+	mov			edx, dword ptr [esi+4]
+
+label4:
+	mov			eax, ebp
 	shld		eax, edx, cl
 	shr			eax, 20
 	movzx		eax, word ptr [ebx + eax*2]
 	cmp			ah, 255
 	jne			label0
 
-	mov			eax, dword ptr [esi]
+	mov			eax, ebp
 	shld		eax, edx, cl
 	mov			ch, cl
 	or			eax, 1
@@ -158,22 +168,17 @@ if &step eq 1
 else
 	add			edi, &step
 endif
-	add			cl, ah
-	jnc			label1
-	sub			cl, 32
-	add			esi, 4
-	mov			ebp, edx
-	mov			edx, dword ptr [esi+4]
 	jmp			label1
 
 label2:
 if &multiscan
  if &bottomup
-	mov			eax, dword ptr [esp + $pLineEnd]
-	sub			eax, dword ptr [esp + $dwGrossWidth]
-	cmp			eax, dword ptr [esp + $pDstBegin]
+	mov			edx, dword ptr [esp + $pLineEnd]
+	sub			edx, dword ptr [esp + $dwGrossWidth]
+	cmp			edx, dword ptr [esp + $pDstBegin]
 	jbe			label3
-	mov			dword ptr [esp + $pLineEnd], eax
+	mov			dword ptr [esp + $pLineEnd], edx
+	mov			edx, dword ptr [esi+4]
 
 	sub			edi, dword ptr [esp + $dwLineOffset]
  else
