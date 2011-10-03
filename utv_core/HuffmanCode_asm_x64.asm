@@ -78,7 +78,6 @@ $dwGrossWidth = argsoffset + 40
 
 	mov			rsi, qword ptr [rsp + $pSrcBegin]
 	mov			rbx, qword ptr [rsp + $pDecodeTable]
-	mov			edx, dword ptr [rsi+4]
 if &multiscan
  if &bottomup
 	mov			rdi, qword ptr [rsp + $pDstEnd]

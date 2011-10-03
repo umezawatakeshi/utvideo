@@ -87,7 +87,6 @@ $dwLineOffset =  8
 
 	mov			esi, dword ptr [esp + $pSrcBegin]
 	mov			ebx, dword ptr [esp + $pDecodeTable]
-	mov			edx, dword ptr [esi+4]
 if &multiscan
  if &bottomup
 	mov			edi, dword ptr [esp + $pDstEnd]
