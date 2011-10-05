@@ -19,8 +19,8 @@
 
 
 #define UTVIDEO_VERSION_MASK                      0xffffff00
-#define UTVIDEO_VERSION                           0x0a000100
-#define UTVIDEO_VERSION_STR                       "10.0.1"
+#define UTVIDEO_VERSION                           0x0a000200
+#define UTVIDEO_VERSION_STR                       "10.0.2"
 
 /*
  * NOTE:
