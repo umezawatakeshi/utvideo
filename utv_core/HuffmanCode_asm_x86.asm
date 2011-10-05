@@ -191,7 +191,9 @@ if &multiscan
 	cmp			edx, dword ptr [esp + $pDstBegin]
 	jbe			label3
 	mov			dword ptr [esp + $pLineEnd], edx
+if &dohuffman
 	mov			edx, dword ptr [esi+4]
+endif
 
 	sub			edi, dword ptr [esp + $dwLineOffset]
  else
