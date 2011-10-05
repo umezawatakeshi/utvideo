@@ -105,6 +105,10 @@ else
 	mov			eax, dword ptr [esp + $pDstEnd]
 	mov			dword ptr [esp + $pLineEnd], eax
 endif
+
+DO_OUTPUT	macro	dohuffman
+	local		label1, label2, label3
+
 if &accum
  if &corrpos ne 0
 	mov			byte ptr [esp + $byCorrBuf], 00h
@@ -112,16 +116,22 @@ if &accum
 	mov			byte ptr [esp + $byCorrBuf], 80h
  endif
 endif
+
+if &dohuffman
 	mov			cl, -32
 	mov			ah, 32
 	mov			edx, dword ptr [esi]
 	sub			esi, 4
+else
+	mov			ah, byte ptr [ebx]
+endif
 
 	align		64
 label1:
 	cmp			edi, dword ptr [esp + $pLineEnd]
 	jae			label2
 
+if &dohuffman
 	add			cl, ah
 	jnc			label4
 	sub			cl, 32
@@ -151,6 +161,10 @@ label4:
 	mov			ebp, dword ptr [esi]
 
 label0:
+else
+	mov			al, ah
+endif
+
 if &accum
 	add			al, byte ptr [esp + $byCorrBuf]
 	mov			byte ptr [esp + $byCorrBuf], al
@@ -186,6 +200,15 @@ if &multiscan
 	jmp			label1
 label3:
 endif
+endm
+
+	cmp			byte ptr [ebx + 1], 0
+	je			solidframe
+	DO_OUTPUT	1
+	jmp			funcend
+solidframe:
+	DO_OUTPUT	0
+funcend:
 	STD_EPILOG
 	ret
 

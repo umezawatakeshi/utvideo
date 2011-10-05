@@ -93,6 +93,10 @@ else
 	mov			rdi, qword ptr [rsp + $pDstBegin]
 	mov			r8,  qword ptr [rsp + $pDstEnd]
 endif
+
+DO_OUTPUT	macro	dohuffman
+	local		label1, label2, label3
+
 if &accum
  if &corrpos ne 0
 	mov			r11b, 00h
@@ -100,16 +104,22 @@ if &accum
 	mov			r11b, 80h
  endif
 endif
+
+if &dohuffman
 	mov			cl, -32
 	mov			ah, 32
 	mov			edx, dword ptr [rsi]
 	sub			rsi, 4
+else
+	mov			ah, byte ptr [ebx]
+endif
 
 	align		64
 label1:
 	cmp			rdi, r8
 	jae			label2
 
+if &dohuffman
 	add			cl, ah
 	jnc			label4
 	sub			cl, 32
@@ -138,6 +148,10 @@ label4:
 	mov			eax, dword ptr [rbx + 8192+32+4*32 + r10*2]		; pDecodeTable->SymbolAndCodeLength[r10]
 
 label0:
+else
+	mov			al, ah
+endif
+
 if &accum
 	add			al, r11b
 	mov			r11b, al
@@ -170,7 +184,15 @@ if &multiscan
 	jmp			label1
 label3:
 endif
+endm
 
+	cmp			byte ptr [ebx + 1], 0
+	je			solidframe
+	DO_OUTPUT	1
+	jmp			funcend
+solidframe:
+	DO_OUTPUT	0
+funcend:
 	STD_EPILOG
 	ret
 
