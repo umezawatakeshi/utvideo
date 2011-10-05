@@ -93,8 +93,6 @@ else
 	mov			rdi, qword ptr [rsp + $pDstBegin]
 	mov			r8,  qword ptr [rsp + $pDstEnd]
 endif
-	mov			cl, -32
-	mov			ah, 32
 if &accum
  if &corrpos ne 0
 	mov			r11b, 00h
@@ -102,6 +100,8 @@ if &accum
 	mov			r11b, 80h
  endif
 endif
+	mov			cl, -32
+	mov			ah, 32
 	mov			edx, dword ptr [rsi]
 	sub			rsi, 4
 

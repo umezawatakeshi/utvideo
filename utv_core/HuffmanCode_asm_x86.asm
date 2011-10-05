@@ -105,8 +105,6 @@ else
 	mov			eax, dword ptr [esp + $pDstEnd]
 	mov			dword ptr [esp + $pLineEnd], eax
 endif
-	mov			cl, -32
-	mov			ah, 32
 if &accum
  if &corrpos ne 0
 	mov			byte ptr [esp + $byCorrBuf], 00h
@@ -114,6 +112,8 @@ if &accum
 	mov			byte ptr [esp + $byCorrBuf], 80h
  endif
 endif
+	mov			cl, -32
+	mov			ah, 32
 	mov			edx, dword ptr [esi]
 	sub			esi, 4
 
