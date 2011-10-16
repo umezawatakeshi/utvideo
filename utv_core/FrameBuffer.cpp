@@ -24,7 +24,7 @@ CFrameBuffer::~CFrameBuffer(void)
 #ifdef _WIN32
 			VirtualFree(m_pAllocatedAddr[i], 0, MEM_RELEASE);
 #endif
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__GNUC__)
 			munmap(m_pAllocatedAddr[i], m_cbAllocated[i]);
 #endif
 		}
@@ -44,7 +44,7 @@ void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 	GetSystemInfo(&si);
 	cbAllocateUnit = si.dwPageSize;
 #endif
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__GNUC__)
 	cbAllocateUnit = getpagesize();
 #endif
 	cbMargin = ROUNDUP(cbMargin, cbAllocateUnit);
@@ -55,7 +55,7 @@ void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 	if (pAllocatedAddr == NULL)
 		return;
 #endif
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__GNUC__)
 	pAllocatedAddr = (uint8_t *)mmap(NULL, cbAllocated, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 	if (pAllocatedAddr == MAP_FAILED)
 		return;

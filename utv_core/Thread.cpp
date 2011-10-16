@@ -21,7 +21,7 @@ int CThreadManager::GetNumProcessors(void)
 
 	return nNumProcessors;
 #endif
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__GNUC__)
 	return 1; // XXX
 #endif
 }
@@ -141,7 +141,7 @@ void CThreadManager::SubmitJob(CThreadJob *pJob, uint32_t dwAffinityHint)
 	LeaveCriticalSection(&m_csJob);
 	ReleaseSemaphore(m_hThreadSemaphore[nThreadIndex], 1, NULL);
 #endif
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__GNUC__)
 	pJob->JobProc(this);
 	delete pJob;
 #endif

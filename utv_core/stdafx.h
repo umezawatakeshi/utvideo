@@ -45,7 +45,7 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__GNUC__)
 
 #include <sys/types.h>
 #include <sys/mman.h>
@@ -54,8 +54,10 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 #include <string.h>
 #include <unistd.h>
 
+#if defined(__APPLE__)
 #include <Carbon/Carbon.h>
 #include <QuickTime/QuickTime.h>
+#endif
 
 #define _ASSERT(x) do {} while(/*CONSTCOND*/0)
 #define _countof(x) (sizeof(x) / sizeof((x)[0]))
