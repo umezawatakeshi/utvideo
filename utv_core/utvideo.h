@@ -66,8 +66,7 @@
 #ifdef __APPLE__ // XXX
  #define UTVIDEO_IMPLEMENTATION UTVIDEO_IMPLEMENTATION_ORIGINAL_MACOSX_I386
  #define UTVIDEO_IMPLEMENTATION_STR "i386"
-#endif
-#ifdef __GNUC__
+#elif defined(__GNUC__) // XXX
  #define UTVIDEO_IMPLEMENTATION UTVIDEO_IMPLEMENTATION_ORIGINAL_UNIX
  #define UTVIDEO_IMPLEMENTATION_STR "UNIX-like"
 #endif
@@ -76,9 +75,7 @@
 
 #ifdef _WIN32
 #define DLLEXPORT __declspec(dllexport)
-#endif
-
-#if defined(__APPLE__) || defined(__GNUC__)
+#else
 #define DLLEXPORT
 #endif
 
