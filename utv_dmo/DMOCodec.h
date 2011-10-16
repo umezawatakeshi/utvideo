@@ -227,7 +227,7 @@ public:
 		if (WindowsFormatToUtVideoFormat(&outfmt, pvih->bmiHeader.biCompression, pvih->bmiHeader.biBitCount, pmt->subtype) != 0)
 			return DMO_E_INVALIDTYPE;
 
-		if (pvih->bmiHeader.biHeight < 0)
+		if (pvih->bmiHeader.biWidth != pvihIn->bmiHeader.biWidth || pvih->bmiHeader.biHeight != pvihIn->bmiHeader.biHeight)
 			return DMO_E_INVALIDTYPE;
 
 		if (((T *)this)->Query(outfmt, infmt,

@@ -126,8 +126,13 @@ LRESULT CVCMCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 LRESULT CVCMCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	utvf_t infmt;
+	LRESULT ret;
 
 	DEBUG_ENTER_LEAVE("CVCMCodec::CompressBegin() this=%p", this);
+
+	ret = CompressQuery(pbihIn, pbihOut);
+	if (ret != ICERR_OK)
+		return ret;
 
 	if (WindowsFormatToUtVideoFormat(&infmt, pbihIn->biCompression, pbihIn->biBitCount) != 0)
 		return ICERR_BADFORMAT;
@@ -184,7 +189,7 @@ LRESULT CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINF
 	if (pbihIn->biHeight < 0)
 		return ICERR_BADFORMAT;
 
-	if (pbihOut != NULL && pbihOut->biHeight < 0)
+	if (pbihOut != NULL && (pbihOut->biWidth != pbihIn->biWidth || pbihOut->biHeight != pbihIn->biHeight))
 		return ICERR_BADFORMAT;
 
 	return m_pCodec->EncodeQuery(infmt, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS) == 0 ? ICERR_OK : ICERR_BADFORMAT;
@@ -202,8 +207,13 @@ LRESULT CVCMCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 LRESULT CVCMCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	utvf_t utvf;
+	LRESULT ret;
 
 	DEBUG_ENTER_LEAVE("CVCMCodec::DecompressBegin() this=%p", this);
+
+	ret = DecompressQuery(pbihIn, pbihOut);
+	if (ret != ICERR_OK)
+		return ret;
 
 	if (WindowsFormatToUtVideoFormat(&utvf, pbihOut->biCompression, pbihOut->biBitCount) != 0)
 		return ICERR_BADFORMAT;
@@ -255,10 +265,10 @@ LRESULT CVCMCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPI
 	if (pbihOut == NULL)
 		return ICERR_OK;
 
-	if (WindowsFormatToUtVideoFormat(&utvf, pbihOut->biCompression, pbihOut->biBitCount) != 0)
+	if (pbihOut->biWidth != pbihIn->biWidth || pbihOut->biHeight != pbihIn->biHeight)
 		return ICERR_BADFORMAT;
 
-	if (pbihOut->biHeight < 0)
+	if (WindowsFormatToUtVideoFormat(&utvf, pbihOut->biCompression, pbihOut->biBitCount) != 0)
 		return ICERR_BADFORMAT;
 
 	for (putvf = m_pCodec->GetDecoderOutputFormat(); *putvf; putvf++)
