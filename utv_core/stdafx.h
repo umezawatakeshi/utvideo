@@ -49,8 +49,11 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
+
 #include <Carbon/Carbon.h>
 #include <QuickTime/QuickTime.h>
 
