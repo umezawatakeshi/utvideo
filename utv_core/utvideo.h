@@ -40,8 +40,6 @@
   #ifndef _WIN64_X64
    #define _WIN64_X64
   #endif
- #else
-  #error This platform is not supported.
  #endif
 #else
 #ifdef _WIN32
@@ -49,8 +47,6 @@
   #ifndef _WIN32_X86
    #define _WIN32_X86
   #endif
- #else
-  #error This platform is not supported.
  #endif
 #endif
 #endif
@@ -70,6 +66,10 @@
 #ifdef __unix__
  #define UTVIDEO_IMPLEMENTATION UTVIDEO_IMPLEMENTATION_ORIGINAL_POSIX
  #define UTVIDEO_IMPLEMENTATION_STR "posix"
+#endif
+
+#ifndef UTVIDEO_IMPLEMENTATION
+#error This platform is not supported.
 #endif
 
 #define UTVIDEO_VERSION_AND_IMPLEMENTATION (UTVIDEO_VERSION | UTVIDEO_IMPLEMENTATION)
