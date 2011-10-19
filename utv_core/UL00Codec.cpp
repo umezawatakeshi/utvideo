@@ -103,7 +103,7 @@ notloaded:
 	RegCloseKey(hkUtVideo);
 	return -1;
 #endif
-#if defined(__APPLE__) || defined(__GNUC__)
+#if defined(__APPLE__) || defined(__unix__)
 	return 0;
 #endif
 }
@@ -137,7 +137,7 @@ notsaved:
 	RegCloseKey(hkUtVideo);
 	return -1;
 #endif
-#if defined(__APPLE__) || defined (__GNUC__)
+#if defined(__APPLE__) || defined (__unix__)
 	return 0;
 #endif
 }
@@ -276,7 +276,7 @@ doset:
 doset_noclose:
 	return InternalSetState(pState, cb);
 #endif
-#if defined(__APPLE__) || defined (__GNUC__)
+#if defined(__APPLE__) || defined (__unix__)
 	return InternalSetState(pState, cb);
 #endif
 }
@@ -484,7 +484,7 @@ int CUL00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int heigh
 #ifdef _WIN32
 	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 #endif
-#if defined(__APPLE__) || defined(__GNUC__)
+#if defined(__APPLE__) || defined(__unix__)
 	m_counts = (COUNTS *)mmap(NULL, sizeof(COUNTS) * m_dwDivideCount, PROT_READ | PROT_WRITE, MAP_ANON, -1, 0);
 #endif
 
@@ -501,7 +501,7 @@ int CUL00Codec::EncodeEnd(void)
 #ifdef _WIN32
 	VirtualFree(m_counts, 0, MEM_RELEASE);
 #endif
-#if defined(__APPLE__) || defined(__GNUC__)
+#if defined(__APPLE__) || defined(__unix__)
 	munmap(m_counts, sizeof(COUNTS) * m_dwDivideCount);
 #endif
 
