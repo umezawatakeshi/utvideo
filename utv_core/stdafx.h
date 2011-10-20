@@ -61,7 +61,9 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 #include <QuickTime/QuickTime.h>
 #endif
 
-#ifndef _RPT0 // XXX
+#ifndef _MSC_VER // XXX
+#define _countof(x) (sizeof(x) / sizeof((x)[0]))
+#define _ASSERT(x) do {} while(/*CONSTCOND*/0)
 #define _RPT(...) do {} while(/*CONSTCOND*/0)
 #define _RPT0 _RPT
 #define _RPT1 _RPT
@@ -69,14 +71,6 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 #define _RPT3 _RPT
 #define _RPT4 _RPT
 #define _RPT5 _RPT
-#endif
-
-#ifndef _MSC_VAR
-#define _countof(x) (sizeof(x) / sizeof((x)[0]))
-#endif
-
-#ifndef _ASSERT // XXX
-#define _ASSERT(x) do {} while(/*CONSTCOND*/0)
 #endif
 
 #include <queue>
