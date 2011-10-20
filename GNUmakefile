@@ -1,6 +1,6 @@
-# UT Video Linux/BSD Makefile
+# Ut Video Codec Suite  POSIX/MinGW Makefile
 #
-# Written by: Derek Buitenhuis <derek.buitenhuis AT gmail.com>
+# Originally written by: Derek Buitenhuis <derek.buitenhuis AT gmail.com>
 #
 # Usage: make
 #        make install prefix=/some/dir/here
@@ -20,6 +20,10 @@ RANLIB=$(CROSS_PREFIX)ranlib
 UTV_CORE_DIR=utv_core
 
 CXXFLAGS=-g -O2 -Wall -Wextra -Wno-multichar -Wno-unused-parameter
+
+# on MinGW env, uncomment following lines and set proper value to WINSDK_ROOT.
+#WINSDK_ROOT="/c/Program Files/Microsoft SDKs/Windows/v6.1"
+#CPPFLAGS=-I/usr/include/w32api -I$(WINSDK_ROOT)/Include
 
 # Pretty-ify Building
 ifndef V
