@@ -35,7 +35,7 @@ extern "C" void __cpuid(int *, int);
 
 // Windows ヘッダー ファイル:
 #include <windows.h>
-
+#include <guiddef.h>
 #include <uuids.h> // for MEDIATYPE_* and MEDIASUBTYPE_*
 
 inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
@@ -43,20 +43,17 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 	return EnableWindow(GetDlgItem(hwndParent, nID), bEnable);
 }
 
+#include <stdio.h>
+
 #endif
 
 #if defined(__APPLE__) || defined(__unix__)
-
 #include <sys/types.h>
 #include <sys/mman.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#define _ASSERT(x) do {} while(/*CONSTCOND*/0)
-#define _countof(x) (sizeof(x) / sizeof((x)[0]))
-
 #endif
 
 #if defined(__APPLE__)
@@ -64,6 +61,23 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 #include <QuickTime/QuickTime.h>
 #endif
 
+#ifndef _RPT0 // XXX
+#define _RPT(...) do {} while(/*CONSTCOND*/0)
+#define _RPT0 _RPT
+#define _RPT1 _RPT
+#define _RPT2 _RPT
+#define _RPT3 _RPT
+#define _RPT4 _RPT
+#define _RPT5 _RPT
+#endif
+
+#ifndef _MSC_VAR
+#define _countof(x) (sizeof(x) / sizeof((x)[0]))
+#endif
+
+#ifndef _ASSERT // XXX
+#define _ASSERT(x) do {} while(/*CONSTCOND*/0)
+#endif
 
 #include <queue>
 #include <algorithm>
