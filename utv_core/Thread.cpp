@@ -4,9 +4,10 @@
 #include "stdafx.h"
 #include "Thread.h"
 
+#ifdef _WIN32
+
 int CThreadManager::GetNumProcessors(void)
 {
-#ifdef _WIN32
 	DWORD_PTR dwpProcessAffinityMask;
 	DWORD_PTR dwpSystemAffinityMask;
 	int nNumProcessors;
@@ -20,15 +21,10 @@ int CThreadManager::GetNumProcessors(void)
 	}
 
 	return nNumProcessors;
-#endif
-#if defined(__APPLE__) || defined(__unix__)
-	return 1; // XXX
-#endif
 }
 
 CThreadManager::CThreadManager(void)
 {
-#ifdef _WIN32
 	DWORD_PTR dwpProcessAffinityMask;
 	DWORD_PTR dwpSystemAffinityMask;
 
@@ -58,12 +54,10 @@ CThreadManager::CThreadManager(void)
 	for (int i = 0; i < m_nNumThreads; i++)
 		ResumeThread(m_hThread[i]);
 	_RPT1(_CRT_WARN, "leave CThreadManager::CThreadManager() this=%p\n", this);
-#endif
 }
 
 CThreadManager::~CThreadManager(void)
 {
-#ifdef _WIN32
 	_ASSERT(m_nNumJobs == 0);
 	_RPT1(_CRT_WARN, "enter CThreadManager::~CThreadManager() this=%p\n", this);
 	EnterCriticalSection(&m_csJob);
@@ -82,10 +76,8 @@ CThreadManager::~CThreadManager(void)
 	}
 	DeleteCriticalSection(&m_csJob);
 	_RPT1(_CRT_WARN, "leave CThreadManager::~CThreadManager() this=%p\n", this);
-#endif
 }
 
-#ifdef _WIN32
 DWORD WINAPI CThreadManager::StaticThreadProc(LPVOID lpParameter)
 {
 	CThreadManager *pThis = (CThreadManager *)lpParameter;
@@ -121,11 +113,9 @@ DWORD CThreadManager::ThreadProc(int nThreadIndex)
 	_RPT3(_CRT_WARN, "leave CThreadManager::ThreadProc() this=%p index=%d ID=%08X\n", this, nThreadIndex, GetCurrentThreadId());
 	return 0;
 }
-#endif
 
 void CThreadManager::SubmitJob(CThreadJob *pJob, uint32_t dwAffinityHint)
 {
-#ifdef _WIN32
 	HANDLE hCompletionEvent;
 	int nThreadIndex;
 
@@ -140,23 +130,112 @@ void CThreadManager::SubmitJob(CThreadJob *pJob, uint32_t dwAffinityHint)
 	m_queueJob[nThreadIndex].push(pJob);
 	LeaveCriticalSection(&m_csJob);
 	ReleaseSemaphore(m_hThreadSemaphore[nThreadIndex], 1, NULL);
-#endif
-#if defined(__APPLE__) || defined(__unix__)
-	pJob->JobProc(this);
-	delete pJob;
-#endif
 }
 
 void CThreadManager::WaitForJobCompletion(void)
 {
-#ifdef _WIN32
 	// 待機中にジョブが追加されることは考慮していない。
 	WaitForMultipleObjects(m_nNumJobs, m_hCompletionEvent, TRUE, INFINITE);
 	for (int i = 0; i < m_nNumJobs; i++)
 		CloseHandle(m_hCompletionEvent[i]);
 	m_nNumJobs = 0;
-#endif
 }
+
+#endif
+
+#if defined(__APPLE__) || defined(__unix__)
+
+int CThreadManager::GetNumProcessors(void)
+{
+	return sysconf(_SC_NPROCESSORS_ONLN); // XXX
+}
+
+CThreadManager::CThreadManager(void)
+{
+	m_nNumJobs = 0;
+	m_nNumCompleteJobs = 0;
+	for (int i = 0; i < MAX_THREAD; i++)
+		m_ptidThread[i] = NULL;
+
+	pthread_mutex_init(&m_ptmJobMutex, NULL);
+	pthread_cond_init(&m_ptcJobCond, NULL);
+
+	m_nNumThreads = sysconf(_SC_NPROCESSORS_ONLN);
+	for (int i = 0; i < m_nNumThreads; i++)
+	{
+		pthread_create(&m_ptidThread[i], NULL, StaticThreadProc, this);
+	}
+}
+
+CThreadManager::~CThreadManager(void)
+{
+	pthread_mutex_lock(&m_ptmJobMutex);
+	for (int i = 0; i < m_nNumThreads; i++)
+		m_queueJob.push(NULL);
+	m_nNumJobs = m_nNumThreads;
+	pthread_cond_broadcast(&m_ptcJobCond);
+	pthread_mutex_unlock(&m_ptmJobMutex);
+
+	for (int i = 0; i < m_nNumThreads; i++)
+		pthread_join(m_ptidThread[i], NULL);
+
+	pthread_mutex_destroy(&m_ptmJobMutex);
+	pthread_cond_destroy(&m_ptcJobCond);
+}
+
+void *CThreadManager::StaticThreadProc(void *arg)
+{
+	CThreadManager *pThis = (CThreadManager *)arg;
+
+	return pThis->ThreadProc(0);
+}
+
+void *CThreadManager::ThreadProc(int nThreadIndex)
+{
+	CThreadJob *pJob;
+
+	for (;;)
+	{
+		pthread_mutex_lock(&m_ptmJobMutex);
+		while (m_queueJob.size() == 0)
+			pthread_cond_wait(&m_ptcJobCond, &m_ptmJobMutex);
+		pJob = m_queueJob.front();
+		m_queueJob.pop();
+		pthread_mutex_unlock(&m_ptmJobMutex);
+		if (pJob == NULL)
+			break;
+		pJob->JobProc(this);
+		pthread_mutex_lock(&m_ptmJobMutex);
+		m_nNumCompleteJobs++;
+		pthread_cond_broadcast(&m_ptcJobCond);
+		pthread_mutex_unlock(&m_ptmJobMutex);
+		delete pJob;
+	}
+
+	return NULL;
+}
+
+void CThreadManager::SubmitJob(CThreadJob *pJob, uint32_t dwAffinityHint)
+{
+	pthread_mutex_lock(&m_ptmJobMutex);
+	m_queueJob.push(pJob);
+	m_nNumJobs++;
+	pthread_cond_signal(&m_ptcJobCond);
+	pthread_mutex_unlock(&m_ptmJobMutex);
+}
+
+void CThreadManager::WaitForJobCompletion(void)
+{
+	pthread_mutex_lock(&m_ptmJobMutex);
+	while (m_nNumCompleteJobs != m_nNumJobs)
+		pthread_cond_wait(&m_ptcJobCond, &m_ptmJobMutex);
+	pthread_mutex_unlock(&m_ptmJobMutex);
+
+	m_nNumJobs = 0;
+	m_nNumCompleteJobs = 0;
+}
+
+#endif
 
 CThreadJob::CThreadJob(void)
 {
