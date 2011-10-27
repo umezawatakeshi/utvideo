@@ -7,25 +7,18 @@
 
 #ifdef _WIN32
 
-#ifdef _MANAGED
-#pragma managed(push, off)
-#endif
-
 HMODULE hModule;
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 {
+	//_RPT3(_CRT_WARN, "DllMain(HMODULE, DWORD, LPVOID) hModule=%p dwReason=%08X lpReserved=%p\n", hModule, dwReason, lpReserved);
+
 	if (dwReason == DLL_PROCESS_ATTACH)
 	{
 		::hModule = hModule;
-		InitializeTunedFunc();
 	}
 
 	return TRUE;
 }
-
-#ifdef _MANAGED
-#pragma managed(pop)
-#endif
 
 #endif

@@ -58,40 +58,44 @@ const TUNEDFUNC &tfnSSE3 = tfnSSE2;
 
 const TUNEDFUNC &tfnSSSE3 = tfnSSE2;
 
-void InitializeTunedFunc(void)
+class CTunedFuncInitializer
 {
-	uint32_t	cpuid_1_ecx = 0;
-	uint32_t	cpuid_1_edx = 0;
-	int info[4];
+public:
+	CTunedFuncInitializer()
+	{
+		uint32_t cpuid_1_ecx = 0;
+		uint32_t cpuid_1_edx = 0;
+		int info[4];
 
-	__cpuid(info, 0);
-	if (info[0] >= 1)
-	{
-		__cpuid(info, 1);
-		cpuid_1_ecx = info[2];
-		cpuid_1_edx = info[3];
-	}
+		__cpuid(info, 0);
+		if (info[0] >= 1)
+		{
+			__cpuid(info, 1);
+			cpuid_1_ecx = info[2];
+			cpuid_1_edx = info[3];
+		}
 
-	_RPT2(_CRT_WARN, "CPUID.1 ECX=%08X EDX=%08X\n", cpuid_1_ecx, cpuid_1_edx);
+		_RPT2(_CRT_WARN, "CPUID.1 ECX=%08X EDX=%08X\n", cpuid_1_ecx, cpuid_1_edx);
 
-	if (cpuid_1_ecx & (1 << 9))
-	{
-		_RPT0(_CRT_WARN, "supports SSSE3\n");
-		tfn = tfnSSSE3;
+		if (cpuid_1_ecx & (1 << 9))
+		{
+			_RPT0(_CRT_WARN, "supports SSSE3\n");
+			tfn = tfnSSSE3;
+		}
+		else if (cpuid_1_ecx & (1 << 0))
+		{
+			_RPT0(_CRT_WARN, "supports SSE3\n");
+			tfn = tfnSSE3;
+		}
+		else if (cpuid_1_edx & (1 << 26))
+		{
+			_RPT0(_CRT_WARN, "supports SSE2\n");
+			tfn = tfnSSE2;
+		}
+		else
+		{
+			_RPT0(_CRT_WARN, "supports no SSE-integer\n");
+			tfn = tfnI686;
+		}
 	}
-	else if (cpuid_1_ecx & (1 << 0))
-	{
-		_RPT0(_CRT_WARN, "supports SSE3\n");
-		tfn = tfnSSE3;
-	}
-	else if (cpuid_1_edx & (1 << 26))
-	{
-		_RPT0(_CRT_WARN, "supports SSE2\n");
-		tfn = tfnSSE2;
-	}
-	else
-	{
-		_RPT0(_CRT_WARN, "supports no SSE-integer\n");
-		tfn = tfnI686;
-	}
-}
+} tfi;
