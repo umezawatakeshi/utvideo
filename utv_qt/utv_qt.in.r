@@ -6,7 +6,7 @@ resource 'strn' (SUBTYPE_RID) {
 };
 
 resource 'stri' (SUBTYPE_RID) {
-	"Ut Video Codec " SUBTYPE_STRI "(" SUBTYPE_STR ") QT"
+	"Ut Video Codec " SUBTYPE_STRI " (" SUBTYPE_STR ") QT"
 };
 
 resource 'thng' (SUBTYPE_RID) {
