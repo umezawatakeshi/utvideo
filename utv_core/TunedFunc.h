@@ -31,5 +31,3 @@ struct TUNEDFUNC
 };
 
 extern TUNEDFUNC tfn;
-
-void InitializeTunedFunc(void);
