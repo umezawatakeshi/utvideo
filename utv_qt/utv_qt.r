@@ -13,9 +13,9 @@ resource 'cdci' (256) {
 	1,									// Version
 	1,									// Revision level
 	'Umzw',								// Manufacturer
-	codecInfoDepth24,					// Decompression Flags
+	codecInfoDoes32,					// Decompression Flags
 	0,									// Compression Flags
-	codecInfoDepth24,					// Format Flags
+	codecInfoDepth32,					// Format Flags
 	128,								// Compression Accuracy
 	128,								// Decomression Accuracy
 	200,								// Compression Speed

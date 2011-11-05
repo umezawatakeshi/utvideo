@@ -28,7 +28,7 @@ resource 'thng' (SUBTYPE_RID) {
 	componentDoAutoVersion,				// Registration Flags
 	0,									// Resource ID of Icon Family
 	{
-		codecInfoDepth24,
+		codecInfoDoes32,
 		'dlle',
 		256,
 		platformIA32NativeEntryPoint,
