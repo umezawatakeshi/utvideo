@@ -50,6 +50,7 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 #if defined(__APPLE__) || defined(__unix__)
 #include <sys/types.h>
 #include <sys/mman.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
