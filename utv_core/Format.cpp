@@ -12,8 +12,6 @@ inline bool is_fourcc(uint32_t x)
 
 #ifdef _WIN32
 
-#include "MediaSubType.h"
-
 DLLEXPORT int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, GUID *subtype, utvf_t utvf)
 {
 	DWORD dwtmp;
