@@ -155,7 +155,7 @@ CThreadManager::CThreadManager(void)
 	m_nNumJobs = 0;
 	m_nNumCompleteJobs = 0;
 	for (int i = 0; i < MAX_THREAD; i++)
-		m_ptidThread[i] = NULL;
+		m_ptidThread[i] = 0;
 
 	pthread_mutex_init(&m_ptmJobMutex, NULL);
 	pthread_cond_init(&m_ptcJobCond, NULL);
