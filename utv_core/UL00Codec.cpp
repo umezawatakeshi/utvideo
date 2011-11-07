@@ -485,7 +485,7 @@ int CUL00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int heigh
 	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 #endif
 #if defined(__APPLE__) || defined(__unix__)
-	m_counts = (COUNTS *)mmap(NULL, sizeof(COUNTS) * m_dwDivideCount, PROT_READ | PROT_WRITE, MAP_ANON, -1, 0);
+	m_counts = (COUNTS *)mmap(NULL, sizeof(COUNTS) * m_dwDivideCount, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 #endif
 
 	m_ptm = new CThreadManager();
