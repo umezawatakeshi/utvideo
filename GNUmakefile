@@ -19,7 +19,7 @@ RANLIB=$(CROSS_PREFIX)ranlib
 
 UTV_CORE_DIR=utv_core
 
-CXXFLAGS=-g -O2 -Wall -Wextra -Wno-multichar -Wno-unused-parameter
+CXXFLAGS=-g -O2 -Wall -Wextra -Wno-multichar -Wno-unused-parameter -Wno-sign-compare
 
 # on MinGW env, uncomment following lines and set proper value to WINSDK_ROOT.
 #WINSDK_ROOT="/c/Program Files/Microsoft SDKs/Windows/v6.1"
