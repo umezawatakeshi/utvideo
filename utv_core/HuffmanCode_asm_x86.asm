@@ -218,17 +218,17 @@ funcend:
 
 		endm
 
-HUFFMAN_DECODE	_x86_i686_HuffmanDecode, 0, 1, 0, 0, 0, 0
-HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccum, 1, 1, 0, 0, 0, 0
-HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep2, 1, 2, 0, 0, 0, 0
-HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4, 1, 4, 0, 0, 0, 0
-HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Green, 1, 4, 1, 1, 0, 0
-HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue, 1, 4, 1, 1, 1, 0
-HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Red, 1, 4, 1, 1, -1, 0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecode,                                              0, 1, 0, 0,  0, 0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccum,                                      1, 1, 0, 0,  0, 0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep2,                                 1, 2, 0, 0,  0, 0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4,                                 1, 4, 0, 0,  0, 0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Green,            1, 4, 1, 1,  0, 0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue,             1, 4, 1, 1,  1, 0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32Red,              1, 4, 1, 1, -1, 0
 HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32RedAndDummyAlpha, 1, 4, 1, 1, -1, 1
-HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Green, 1, 3, 1, 1, 0, 0
-HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue, 1, 3, 1, 1, 1, 0
-HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Red, 1, 3, 1, 1, -1, 0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Green,            1, 3, 1, 1,  0, 0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue,             1, 3, 1, 1,  1, 0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Red,              1, 3, 1, 1, -1, 0
 
 
 end
