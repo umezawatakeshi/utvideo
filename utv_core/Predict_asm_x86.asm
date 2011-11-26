@@ -1,45 +1,34 @@
 ; 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ
 ; $Id$
 
-include Common_asm_x86.inc
 
-.686
-.no87
-.xmm
-
-.model	flat
-
-_TEXT_ASM	SEGMENT	page public flat 'CODE'
-
-; 似た関数が増えてきた…マクロ技で統合せねば…
+%include "Common_asm_x86.mac"
 
 
+section .text
 
-; void x86_sse2_PredictLeftAndCount_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable)
-public	_x86_sse2_PredictLeftAndCount_align1
-_x86_sse2_PredictLeftAndCount_align1	proc
 
-	STD_PROLOG	0
-$pDstBegin   = argsoffset +  0
-$pSrcBegin   = argsoffset +  4
-$pSrcEnd     = argsoffset +  8
-$pCountTable = argsoffset + 12
+%push
+
+global _x86_sse2_PredictLeftAndCount_align1
+_x86_sse2_PredictLeftAndCount_align1:
+	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, pCountTable
 
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			esi, dword ptr [esp + $pSrcBegin]
-	mov			edi, dword ptr [esp + $pDstBegin]
-	mov			eax, dword ptr [esp + $pSrcEnd]
+	mov			esi, dword [esp + %$pSrcBegin]
+	mov			edi, dword [esp + %$pDstBegin]
+	mov			eax, dword [esp + %$pSrcEnd]
 	sub			eax, esi
 	and			eax, 0fffffff0h
 	add			eax, esi
 
-	mov			ebx, dword ptr [esp + $pCountTable]
+	mov			ebx, dword [esp + %$pCountTable]
 
 	align		64
-label1:
-	movdqu		xmm0, oword ptr [esi]
+.label1:
+	movdqu		xmm0, oword [esi]
 	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
@@ -47,76 +36,72 @@ label1:
 	psrldq		xmm1, 15
 
 	psubb		xmm0, xmm2
-	movdqu		oword ptr [edi], xmm0
+	movdqu		oword [edi], xmm0
 
-for pos, <0, 1, 2, 3, 4, 5, 6, 7>
-	pextrw		ecx, xmm0, &pos
+%assign pos 0
+%rep 8
+	pextrw		ecx, xmm0, pos
 	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
+	inc			dword [ebx+ebp*4]
 	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-endm
+	inc			dword [ebx+ebp*4]
+%assign pos pos+1
+%endrep
 
 	add			esi, 16
 	add			edi, 16
 	cmp			esi, eax
-	jb			label1
+	jb			.label1
 
 	; 最初のラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			eax, dword ptr [esp + $pSrcEnd]
+	mov			eax, dword [esp + %$pSrcEnd]
 	cmp			esi, eax
-	jae			label4
+	jae			.label4
 
-	movdqu		xmm0, oword ptr [esi]
+	movdqu		xmm0, oword [esi]
 	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
 	psubb		xmm0, xmm2
 
-label3:
+.label3:
 	movd		ecx, xmm0
-	mov			byte ptr [edi], cl
+	mov			byte [edi], cl
 	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
+	inc			dword [ebx+ebp*4]
 	psrldq		xmm0, 1
 	inc			esi
 	inc			edi
 	cmp			esi, eax
-	jb			label3
+	jb			.label3
 
-label4:
-	STD_EPILOG
-	ret
+.label4:
+	SIMPLE_EPILOGUE
 
-_x86_sse2_PredictLeftAndCount_align1	endp
+%pop
 
 
-; void x86_sse2_PredictMedianAndCount_align16(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t dwStride, uint32_t *pCountTable)
-public	_x86_sse2_PredictMedianAndCount_align16
-_x86_sse2_PredictMedianAndCount_align16	proc
+%push
 
-	STD_PROLOG	0
-$pDstBegin   = argsoffset +  0
-$pSrcBegin   = argsoffset +  4
-$pSrcEnd     = argsoffset +  8
-$dwStride    = argsoffset + 12
-$pCountTable = argsoffset + 16
+global _x86_sse2_PredictMedianAndCount_align16
+_x86_sse2_PredictMedianAndCount_align16:
+	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride, pCountTable
 
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			esi, dword ptr [esp + $pSrcBegin]
-	mov			edi, dword ptr [esp + $pDstBegin]
+	mov			esi, dword [esp + %$pSrcBegin]
+	mov			edi, dword [esp + %$pDstBegin]
 	mov			eax, esi
-	mov			edx, dword ptr [esp + $dwStride]
+	mov			edx, dword [esp + %$dwStride]
 	add			eax, edx
 	neg			edx
-	mov			ebx, dword ptr [esp + $pCountTable]
+	mov			ebx, dword [esp + %$pCountTable]
 
 	align		64
-label1:
-	movdqa		xmm0, oword ptr [esi]
+.label1:
+	movdqa		xmm0, oword [esi]
 	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
@@ -124,36 +109,38 @@ label1:
 	psrldq		xmm1, 15
 
 	psubb		xmm0, xmm2
-	movdqa		oword ptr [edi], xmm0
+	movdqa		oword [edi], xmm0
 
-for pos, <0, 1, 2, 3, 4, 5, 6, 7>
-	pextrw		ecx, xmm0, &pos
+%assign pos 0
+%rep 8
+	pextrw		ecx, xmm0, pos
 	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
+	inc			dword [ebx+ebp*4]
 	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-endm
+	inc			dword [ebx+ebp*4]
+%assign pos pos+1
+%endrep
 
 	add			esi, 16
 	add			edi, 16
 	cmp			esi, eax
-	jb			label1
+	jb			.label1
 
-	mov			eax, dword ptr [esp + $pSrcEnd]
+	mov			eax, dword [esp + %$pSrcEnd]
 
 	pxor		xmm1, xmm1
 	pxor		xmm5, xmm5
 
 	align		64
-label2:
-	movdqa		xmm0, oword ptr [esi]
+.label2:
+	movdqa		xmm0, oword [esi]
 	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
 	movdqa		xmm1, xmm0
 	psrldq		xmm1, 15
 
-	movdqa		xmm4, oword ptr [esi+edx]
+	movdqa		xmm4, oword [esi+edx]
 	movdqa		xmm6, xmm4
 	pslldq		xmm6, 1
 	por			xmm6, xmm5
@@ -171,56 +158,52 @@ label2:
 	pminub		xmm7, xmm3	; predicted = min(max(min(left, above), grad), max(left, above))
 
 	psubb		xmm0, xmm7
-	movdqa		oword ptr [edi], xmm0
+	movdqa		oword [edi], xmm0
 
-for pos, <0, 1, 2, 3, 4, 5, 6, 7>
-	pextrw		ecx, xmm0, &pos
+%assign pos 0
+%rep 8
+	pextrw		ecx, xmm0, pos
 	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
+	inc			dword [ebx+ebp*4]
 	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-endm
+	inc			dword [ebx+ebp*4]
+%assign pos pos+1
+%endrep
 
 	add			esi, 16
 	add			edi, 16
 	cmp			esi, eax
-	jb			label2
+	jb			.label2
 
-	STD_EPILOG
-	ret
+	SIMPLE_EPILOGUE
 
-_x86_sse2_PredictMedianAndCount_align16	endp
+%pop
 
 
 ; prediction は前後にマージンを持つ CFrameBuffer 上で行うので、計算結果が変わらない限り、はみ出し読み込みは許容される。
 ; 一方、マルチスレッド動作した時に問題が発生するので、はみ出し書き込みは許容されない。
 
-; void x86_sse2_PredictMedianAndCount_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t dwStride, uint32_t *pCountTable)
-public	_x86_sse2_PredictMedianAndCount_align1
-_x86_sse2_PredictMedianAndCount_align1	proc
+%push
 
-	STD_PROLOG	0
-$pDstBegin   = argsoffset +  0
-$pSrcBegin   = argsoffset +  4
-$pSrcEnd     = argsoffset +  8
-$dwStride    = argsoffset + 12
-$pCountTable = argsoffset + 16
+global _x86_sse2_PredictMedianAndCount_align1
+_x86_sse2_PredictMedianAndCount_align1:
+	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride, pCountTable
 
 	mov			eax, 80h
 	movd		xmm1, eax
 
-	mov			esi, dword ptr [esp + $pSrcBegin]
-	mov			edi, dword ptr [esp + $pDstBegin]
+	mov			esi, dword [esp + %$pSrcBegin]
+	mov			edi, dword [esp + %$pDstBegin]
 	mov			eax, esi
-	mov			edx, dword ptr [esp + $dwStride]
+	mov			edx, dword [esp + %$dwStride]
 	and			edx, 0fffffff0h
 	add			eax, edx
-	mov			ebx, dword ptr [esp + $pCountTable]
+	mov			ebx, dword [esp + %$pCountTable]
 
 	; 最初のラインを16バイトずつ処理する。
 	align		64
-label1:
-	movdqu		xmm0, oword ptr [esi]
+.label1:
+	movdqu		xmm0, oword [esi]
 	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
@@ -228,50 +211,52 @@ label1:
 	psrldq		xmm1, 15
 
 	psubb		xmm0, xmm2
-	movdqu		oword ptr [edi], xmm0
+	movdqu		oword [edi], xmm0
 
-for pos, <0, 1, 2, 3, 4, 5, 6, 7>
-	pextrw		ecx, xmm0, &pos
+%assign pos 0
+%rep 8
+	pextrw		ecx, xmm0, pos
 	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
+	inc			dword [ebx+ebp*4]
 	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-endm
+	inc			dword [ebx+ebp*4]
+%assign pos pos+1
+%endrep
 
 	add			esi, 16
 	add			edi, 16
 	cmp			esi, eax
-	jb			label1
+	jb			.label1
 
 	; 最初のラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			eax, dword ptr [esp + $pSrcBegin]
-	add			eax, dword ptr [esp + $dwStride]
+	mov			eax, dword [esp + %$pSrcBegin]
+	add			eax, dword [esp + %$dwStride]
 	cmp			esi, eax
-	jae			label4
+	jae			.label4
 
-	movdqu		xmm0, oword ptr [esi]
+	movdqu		xmm0, oword [esi]
 	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
 	psubb		xmm0, xmm2
 
-label3:
+.label3:
 	movd		ecx, xmm0
-	mov			byte ptr [edi], cl
+	mov			byte [edi], cl
 	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
+	inc			dword [ebx+ebp*4]
 	psrldq		xmm0, 1
 	inc			esi
 	inc			edi
 	cmp			esi, eax
-	jb			label3
+	jb			.label3
 
 	; 残りのラインを16バイトずつ処理する。
-label4:
-	mov			edx, dword ptr [esp + $dwStride]
+.label4:
+	mov			edx, dword [esp + %$dwStride]
 	neg			edx
-	mov			eax, dword ptr [esp + $pSrcEnd]
+	mov			eax, dword [esp + %$pSrcEnd]
 	sub			eax, esi
 	and			eax, 0fffffff0h
 	add			eax, esi
@@ -280,15 +265,15 @@ label4:
 	pxor		xmm5, xmm5
 
 	align		64
-label2:
-	movdqu		xmm0, oword ptr [esi]
+.label2:
+	movdqu		xmm0, oword [esi]
 	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
 	movdqa		xmm1, xmm0
 	psrldq		xmm1, 15
 
-	movdqu		xmm4, oword ptr [esi+edx]
+	movdqu		xmm4, oword [esi+edx]
 	movdqa		xmm6, xmm4
 	pslldq		xmm6, 1
 	por			xmm6, xmm5
@@ -306,33 +291,35 @@ label2:
 	pminub		xmm7, xmm3	; predicted = min(max(min(left, above), grad), max(left, above))
 
 	psubb		xmm0, xmm7
-	movdqu		oword ptr [edi], xmm0
+	movdqu		oword [edi], xmm0
 
-for pos, <0, 1, 2, 3, 4, 5, 6, 7>
-	pextrw		ecx, xmm0, &pos
+%assign pos 0
+%rep 8
+	pextrw		ecx, xmm0, pos
 	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
+	inc			dword [ebx+ebp*4]
 	movzx		ebp, ch
-	inc			dword ptr [ebx+ebp*4]
-endm
+	inc			dword [ebx+ebp*4]
+%assign pos pos+1
+%endrep
 
 	add			esi, 16
 	add			edi, 16
 	cmp			esi, eax
-	jb			label2
+	jb			.label2
 
 	; 残りのラインの16バイトに満たない部分を処理する。
 	; 若干のはみ出し読み込みが発生する。
-	mov			eax, dword ptr [esp + $pSrcEnd]
+	mov			eax, dword [esp + %$pSrcEnd]
 	cmp			esi, eax
-	jae			label6
+	jae			.label6
 
-	movdqu		xmm0, oword ptr [esi]
+	movdqu		xmm0, oword [esi]
 	movdqa		xmm2, xmm0
 	pslldq		xmm2, 1
 	por			xmm2, xmm1
 
-	movdqu		xmm4, oword ptr [esi+edx]
+	movdqu		xmm4, oword [esi+edx]
 	movdqa		xmm6, xmm4
 	pslldq		xmm6, 1
 	por			xmm6, xmm5
@@ -349,60 +336,55 @@ endm
 
 	psubb		xmm0, xmm7
 
-label5:
+.label5:
 	movd		ecx, xmm0
-	mov			byte ptr [edi], cl
+	mov			byte [edi], cl
 	movzx		ebp, cl
-	inc			dword ptr [ebx+ebp*4]
+	inc			dword [ebx+ebp*4]
 	psrldq		xmm0, 1
 	inc			esi
 	inc			edi
 	cmp			esi, eax
-	jb			label5
+	jb			.label5
+
+.label6:
+	SIMPLE_EPILOGUE
+
+%pop
 
 
-label6:
-	STD_EPILOG
-	ret
+%push
 
-_x86_sse2_PredictMedianAndCount_align1	endp
+global _x86_i686_RestoreMedian_align1
+_x86_i686_RestoreMedian_align1:
+	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride
 
-
-; void x86_i686_RestoreMedian_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t dwStride)
-_x86_i686_RestoreMedian_align1	proc
-
-	STD_PROLOG	0
-$pDstBegin   = argsoffset +  0
-$pSrcBegin   = argsoffset +  4
-$pSrcEnd     = argsoffset +  8
-$dwStride    = argsoffset + 12
-
-	mov			esi, dword ptr [esp + $pSrcBegin]	; pSrcBegin
-	mov			edi, dword ptr [esp + $pDstBegin]	; pDst
+	mov			esi, dword [esp + %$pSrcBegin]
+	mov			edi, dword [esp + %$pDstBegin]
 	mov			eax, esi
-	mov			ebp, dword ptr [esp + $dwStride]	; dwStride
+	mov			ebp, dword [esp + %$dwStride]
 	add			eax, ebp
 	neg			ebp
 
 	mov			edx, 80h
 
 	align		64
-label1:
-	add			dl, byte ptr [esi]
-	mov			byte ptr [edi], dl
+.label1:
+	add			dl, byte [esi]
+	mov			byte [edi], dl
 	inc 		esi
 	inc			edi
 	cmp			esi, eax
-	jb			label1
+	jb			.label1
 
 	xor			ecx, ecx
 	xor			edx, edx
 
 	align		64
-label2:
+.label2:
 	mov			ebx, edx
 	sub			ebx, ecx
-	movzx		ecx, byte ptr [edi+ebp]
+	movzx		ecx, byte [edi+ebp]
 	add			ebx, ecx	; bl = grad
 
 	mov			eax, edx
@@ -415,58 +397,55 @@ label2:
 	cmp			dl, al
 	cmovae		edx, eax	; dl = min(dl,al)
 
-	movzx		ebx, byte ptr [esi]
+	movzx		ebx, byte [esi]
 	add			edx, ebx
-	mov			byte ptr [edi], dl
+	mov			byte [edi], dl
 
 	inc			esi
 	inc			edi
-	cmp			esi, dword ptr [esp + $pSrcEnd]	; pSrcEnd
-	jb			label2
+	cmp			esi, dword [esp + %$pSrcEnd]	; pSrcEnd
+	jb			.label2
 
-	STD_EPILOG
-	ret
+	SIMPLE_EPILOGUE
 
-_x86_i686_RestoreMedian_align1	endp
+%pop
 
 
 ; p{min,max}ub は SSE1 で追加された MMX 命令（いわゆる MMX2 命令）である。
-; void x86_sse1mmx_RestoreMedian_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t dwStride)
-_x86_sse1mmx_RestoreMedian_align1	proc
 
-	STD_PROLOG	0
-$pDstBegin   = argsoffset +  0
-$pSrcBegin   = argsoffset +  4
-$pSrcEnd     = argsoffset +  8
-$dwStride    = argsoffset + 12
+%push
 
-	mov			esi, dword ptr [esp + $pSrcBegin]	; pSrcBegin
-	mov			edi, dword ptr [esp + $pDstBegin]	; pDst
+global _x86_sse1mmx_RestoreMedian_align1
+_x86_sse1mmx_RestoreMedian_align1:
+	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride
+
+	mov			esi, dword [esp + %$pSrcBegin]
+	mov			edi, dword [esp + %$pDstBegin]
 	mov			eax, esi
-	mov			ebp, dword ptr [esp + $dwStride]	; dwStride
+	mov			ebp, dword [esp + %$dwStride]
 	add			eax, ebp
 	neg			ebp
 
 	mov			edx, 80h
 
 	align		64
-label1:
-	add			dl, byte ptr [esi]
-	mov			byte ptr [edi], dl
+.label1:
+	add			dl, byte [esi]
+	mov			byte [edi], dl
 	inc 		esi
 	inc			edi
 	cmp			esi, eax
-	jb			label1
+	jb			.label1
 
 	pxor		mm4, mm4
 	pxor		mm2, mm2
 
 	align		64
-label2:
+.label2:
 	movq		mm6, mm2
 	movq		mm7, mm2
 	psubb		mm6, mm4
-	movd		mm4, dword ptr [edi+ebp]	; mm4 = above
+	movd		mm4, dword [edi+ebp]		; mm4 = above
 	paddb		mm6, mm4					; mm6 = grad
 
 	pminub		mm2, mm6
@@ -474,20 +453,16 @@ label2:
 	pmaxub		mm2, mm4
 	pminub		mm2, mm6					; mm2 = median
 
-	paddb		mm2, qword ptr [esi]		; アライメントがずれていても xmm レジスタの場合と違って一般保護例外にはならない
+	paddb		mm2, qword [esi]			; アライメントがずれていても xmm レジスタの場合と違って一般保護例外にはならない
 	movd		eax, mm2
-	mov			byte ptr [edi], al
+	mov			byte [edi], al
 
 	inc			esi
 	inc			edi
-	cmp			esi, dword ptr [esp + $pSrcEnd]	; pSrcEnd
-	jb			label2
+	cmp			esi, dword [esp + %$pSrcEnd]
+	jb			.label2
 
-	STD_EPILOG
 	emms
-	ret
+	SIMPLE_EPILOGUE
 
-_x86_sse1mmx_RestoreMedian_align1	endp
-
-
-end
+%pop

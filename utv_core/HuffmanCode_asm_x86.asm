@@ -1,222 +1,208 @@
 ; •¶ŽšƒR[ƒh‚Í‚r‚i‚h‚r ‰üsƒR[ƒh‚Í‚b‚q‚k‚e
 ; $Id$
 
-include Common_asm_x86.inc
 
-.686
-.no87
-.xmm
+%include "Common_asm_x86.mac"
 
-.model	flat
 
-_TEXT_ASM	SEGMENT	page public flat 'CODE'
+section .text
 
-; void x86_i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable)
-public	_x86_i686_HuffmanEncode
-_x86_i686_HuffmanEncode	proc
 
-	STD_PROLOG	0
-$pDstBegin    = argsoffset
-$pSrcBegin    = argsoffset +  4
-$pSrcEnd      = argsoffset +  8
-$pEncodeTable = argsoffset + 12
+%push
 
-	mov			esi, dword ptr [esp + $pSrcBegin]
-	mov			edi, dword ptr [esp + $pDstBegin]
-	mov			edx, dword ptr [esp + $pSrcEnd]
-	mov			ebp, dword ptr [esp + $pEncodeTable]
-	cmp			dword ptr [ebp], 0
-	je			label3
+global _x86_i686_HuffmanEncode
+_x86_i686_HuffmanEncode:
+	SIMPLE_PROLOGUE	0, pDstBegin, pSrcBegin, pSrcEnd, pEncodeTable
+
+	mov			esi, dword [esp + %$pSrcBegin]
+	mov			edi, dword [esp + %$pDstBegin]
+	mov			edx, dword [esp + %$pSrcEnd]
+	mov			ebp, dword [esp + %$pEncodeTable]
+	cmp			dword [ebp], 0
+	je			.label3
 
 	mov			bl, -32
 	mov			cl, 0
 
 	align		64
-label1:
+.label1:
 	shld		eax, ecx, cl
 	cmp			esi, edx
-	jnb			label4
-	movzx		ecx, byte ptr [esi]
+	jnb			.label4
+	movzx		ecx, byte [esi]
 	inc			esi
-	mov			ecx, dword ptr [ebp+ecx*4]
+	mov			ecx, dword [ebp+ecx*4]
 	add			bl, cl
-	jnc			label1
+	jnc			.label1
 	sub			cl, bl
 	shld		eax, ecx, cl
-	mov			dword ptr [edi], eax
+	mov			dword [edi], eax
 	add			edi, 4
 	add			cl, bl
 	sub			bl, 32
-	jmp			label1
+	jmp			.label1
 
-label4:
+.label4:
 	test		bl, 1fh
-	jz			label3
+	jz			.label3
 	neg			bl
 	mov			cl, bl
 	shl			eax, cl
-	mov			dword ptr [edi], eax
+	mov			dword [edi], eax
 	add			edi, 4
-label3:
+.label3:
 	mov			eax, edi
-	sub			eax, dword ptr [esp + $pDstBegin]
+	sub			eax, dword [esp + %$pDstBegin]
 
-	STD_EPILOG
-	ret
+	SIMPLE_EPILOGUE
 
-_x86_i686_HuffmanEncode	endp
+%pop
 
 
-HUFFMAN_DECODE	macro	procname, accum, step, multiscan, bottomup, corrpos, dummyalpha
+%macro HUFFMAN_DECODE 7
+%push
+	MULTI_CONTEXT_XDEFINE procname, %1, accum, %2, step, %3, multiscan, %4, bottomup, %5, corrpos, %6, dummyalpha, %7
 
-; void procname(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable)
-; void procname(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, uint32_t dwNetWidth, uint32_t dwGrossWidth)
-public	&procname
-&procname	proc
+global %$procname
+%$procname:
+	SIMPLE_PROLOGUE 12, pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, dwNetWidth, dwGrossWidth
 
-	STD_PROLOG	12
-$pDstBegin    = argsoffset
-$pDstEnd      = argsoffset +  4
-$pSrcBegin    = argsoffset +  8
-$pDecodeTable = argsoffset + 12
-$dwNetWidth   = argsoffset + 16
-$dwGrossWidth = argsoffset + 20
-$byCorrBuf    =  0
-$pLineEnd     =  4
-$dwLineOffset =  8
+%define %$byCorrBuf     0
+%define %$pLineEnd      4
+%define %$dwLineOffset  8
 
-	mov			esi, dword ptr [esp + $pSrcBegin]
-	mov			ebx, dword ptr [esp + $pDecodeTable]
-if &multiscan
- if &bottomup
-	mov			edi, dword ptr [esp + $pDstEnd]
-	sub			edi, dword ptr [esp + $dwGrossWidth]
+	mov			esi, dword [esp + %$pSrcBegin]
+	mov			ebx, dword [esp + %$pDecodeTable]
+%if %$multiscan
+ %if %$bottomup
+	mov			edi, dword [esp + %$pDstEnd]
+	sub			edi, dword [esp + %$dwGrossWidth]
 	mov			eax, edi
-	add			eax, dword ptr [esp + $dwNetWidth]
-	mov			dword ptr [esp + $pLineEnd], eax
-	mov			eax, dword ptr [esp + $dwGrossWidth]
-	add			eax, dword ptr [esp + $dwNetWidth]
-	mov			dword ptr [esp + $dwLineOffset], eax
- else
+	add			eax, dword [esp + %$dwNetWidth]
+	mov			dword [esp + %$pLineEnd], eax
+	mov			eax, dword [esp + %$dwGrossWidth]
+	add			eax, dword [esp + %$dwNetWidth]
+	mov			dword [esp + %$dwLineOffset], eax
+ %else
 	NOTIMPL
- endif
-else
-	mov			edi, dword ptr [esp + $pDstBegin]
-	mov			eax, dword ptr [esp + $pDstEnd]
-	mov			dword ptr [esp + $pLineEnd], eax
-endif
+ %endif
+%else
+	mov			edi, dword [esp + %$pDstBegin]
+	mov			eax, dword [esp + %$pDstEnd]
+	mov			dword [esp + %$pLineEnd], eax
+%endif
 
-DO_OUTPUT	macro	dohuffman
-	local		label1, label2, label3
+%macro DO_OUTPUT_%$procname 1
+%push
+	MULTI_CONTEXT_XDEFINE dohuffman, %1
 
-if &accum
- if &corrpos ne 0
-	mov			byte ptr [esp + $byCorrBuf], 00h
- else
-	mov			byte ptr [esp + $byCorrBuf], 80h
- endif
-endif
+%if %$$accum
+ %if %$$corrpos != 0
+	mov			byte [esp + %$$byCorrBuf], 00h
+ %else
+	mov			byte [esp + %$$byCorrBuf], 80h
+ %endif
+%endif
 
-if &dohuffman
+%if %$dohuffman
 	mov			cl, -32
 	mov			ah, 32
-	mov			edx, dword ptr [esi]
+	mov			edx, dword [esi]
 	sub			esi, 4
-else
-	mov			ah, byte ptr [ebx]
-endif
+%else
+	mov			ah, byte [ebx]
+%endif
 
 	align		64
-label1:
-	cmp			edi, dword ptr [esp + $pLineEnd]
-	jae			label2
+%%label1:
+	cmp			edi, dword [esp + %$$pLineEnd]
+	jae			%%label2
 
-if &dohuffman
+%if %$dohuffman
 	add			cl, ah
-	jnc			label4
+	jnc			%%label4
 	sub			cl, 32
 	add			esi, 4
 	mov			ebp, edx
-	mov			edx, dword ptr [esi+4]
+	mov			edx, dword [esi+4]
 
-label4:
+%%label4:
 	mov			eax, ebp
 	shld		eax, edx, cl
 	shr			eax, 20
-	movzx		eax, word ptr [ebx + eax*2]
+	movzx		eax, word [ebx + eax*2]
 	cmp			ah, 255
-	jne			label0
+	jne			%%label0
 
 	mov			eax, ebp
 	shld		eax, edx, cl
 	mov			ch, cl
 	or			eax, 1
 	bsr			ebp, eax
-	mov			cl, byte ptr [ebx + 8192 + ebp]					; pDecodeTable->nCodeShift[ebp]
+	mov			cl, byte [ebx + 8192 + ebp]					; pDecodeTable->nCodeShift[ebp]
 	shr			eax, cl
 	mov			cl, ch
-	mov			ebp, dword ptr [ebx + 8192+32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
+	mov			ebp, dword [ebx + 8192+32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
 	add			ebp, eax
-	mov			eax, dword ptr [ebx + 8192+32+4*32 + ebp*2]		; pDecodeTable->SymbolAndCodeLength[ebp]
-	mov			ebp, dword ptr [esi]
+	mov			eax, dword [ebx + 8192+32+4*32 + ebp*2]		; pDecodeTable->SymbolAndCodeLength[ebp]
+	mov			ebp, dword [esi]
 
-label0:
-else
+%%label0:
+%else
 	mov			al, ah
-endif
+%endif
 
-if &accum
-	add			al, byte ptr [esp + $byCorrBuf]
-	mov			byte ptr [esp + $byCorrBuf], al
-endif
-if &corrpos ne 0
-	add			al, byte ptr [edi + &corrpos]
-endif
-	mov			byte ptr [edi], al
-if &dummyalpha
-	mov			byte ptr [edi+1], 0ffh
-endif
-if &step eq 1
+%if %$$accum
+	add			al, byte [esp + %$$byCorrBuf]
+	mov			byte [esp + %$$byCorrBuf], al
+%endif
+%if %$$corrpos != 0
+	add			al, byte [edi + %$$corrpos]
+%endif
+	mov			byte [edi], al
+%if %$$dummyalpha
+	mov			byte [edi+1], 0ffh
+%endif
+%if %$$step == 1
 	inc			edi
-else
-	add			edi, &step
-endif
-	jmp			label1
+%else
+	add			edi, %$$step
+%endif
+	jmp			%%label1
 
-label2:
-if &multiscan
- if &bottomup
-	mov			edx, dword ptr [esp + $pLineEnd]
-	sub			edx, dword ptr [esp + $dwGrossWidth]
-	cmp			edx, dword ptr [esp + $pDstBegin]
-	jbe			label3
-	mov			dword ptr [esp + $pLineEnd], edx
-if &dohuffman
-	mov			edx, dword ptr [esi+4]
-endif
+%%label2:
+%if %$$multiscan
+ %if %$$bottomup
+	mov			edx, dword [esp + %$$pLineEnd]
+	sub			edx, dword [esp + %$$dwGrossWidth]
+	cmp			edx, dword [esp + %$$pDstBegin]
+	jbe			%%label3
+	mov			dword [esp + %$$pLineEnd], edx
+%if %$dohuffman
+	mov			edx, dword [esi+4]
+%endif
 
-	sub			edi, dword ptr [esp + $dwLineOffset]
- else
+	sub			edi, dword [esp + %$$dwLineOffset]
+ %else
 	NOTIMPL
- endif
-	jmp			label1
-label3:
-endif
-endm
+ %endif
+	jmp			%%label1
+%%label3:
+%endif
+%pop
+%endmacro
 
-	cmp			byte ptr [ebx + 1], 0
-	je			solidframe
-	DO_OUTPUT	1
-	jmp			funcend
-solidframe:
-	DO_OUTPUT	0
-funcend:
-	STD_EPILOG
-	ret
+	cmp			byte [ebx + 1], 0
+	je			.solidframe
+	DO_OUTPUT_%$procname	1
+	jmp			.funcend
+.solidframe:
+	DO_OUTPUT_%$procname	0
+.funcend:
+	SIMPLE_EPILOGUE
 
-&procname	endp
-
-		endm
+%pop
+%endmacro
 
 HUFFMAN_DECODE	_x86_i686_HuffmanDecode,                                              0, 1, 0, 0,  0, 0
 HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccum,                                      1, 1, 0, 0,  0, 0
@@ -229,6 +215,3 @@ HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4ForBottomupRGB32RedAndDummyAl
 HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Green,            1, 3, 1, 1,  0, 0
 HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue,             1, 3, 1, 1,  1, 0
 HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForBottomupRGB24Red,              1, 3, 1, 1, -1, 0
-
-
-end

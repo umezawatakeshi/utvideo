@@ -1,0 +1,43 @@
+; •¶šƒR[ƒh‚Í‚r‚i‚h‚r ‰üsƒR[ƒh‚Í‚b‚q‚k‚e
+; $Id$
+
+%macro SIMPLE_PROLOGUE 1-*
+%xdefine %$numlocal %1
+%xdefine %$argsoffset (%$numlocal + 4 * 4 + 4)
+	push		ebp
+	mov			ebp, esp
+	push		ebx
+	push		esi
+	push		edi
+%if %$numlocal != 0
+	sub			esp, %$numlocal
+%endif
+%assign i 0
+%rep %0-1
+%xdefine %$%2 (%$argsoffset + i)
+%rotate 1
+%assign i i+4
+%endrep
+%undef i
+%endmacro
+
+%macro SIMPLE_EPILOGUE 0
+%if %$numlocal != 0
+	add			esp, %$numlocal
+%endif
+	pop			edi
+	pop			esi
+	pop			ebx
+	pop			ebp
+	ret
+%endmacro
+
+%macro MULTI_CONTEXT_XDEFINE 0-*
+%if (%0 % 2) != 0
+%fatal MULTI_CONTEXT_XDEFINE accepts even number of arguments
+%endif
+%rep %0/2
+%xdefine %$%1 %2
+%rotate 2
+%endrep
+%endmacro

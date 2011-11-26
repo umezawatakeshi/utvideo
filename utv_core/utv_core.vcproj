@@ -403,8 +403,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -413,8 +413,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -422,8 +422,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -432,8 +432,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -507,8 +507,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -517,8 +517,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -526,8 +526,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -536,8 +536,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -595,8 +595,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -605,8 +605,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -614,8 +614,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -624,8 +624,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
-						Outputs="$(IntDir)\$(InputName).obj"
+						CommandLine="nasm -f win32 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
 			</File>
@@ -752,7 +752,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common_asm_x86.inc"
+				RelativePath=".\Common_asm_x86.mac"
 				>
 			</File>
 			<File
