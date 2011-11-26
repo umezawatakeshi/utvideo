@@ -22,3 +22,14 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 }
 
 #endif
+
+#ifdef _DEBUG
+
+#include "Predict.h"
+
+DLLEXPORT void UnitTest_core(void)
+{
+	UnitTest_Predict();
+}
+
+#endif
