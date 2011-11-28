@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2564C7B914823C7E00F1A9EB /* Convert_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B414823C7E00F1A9EB /* Convert_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
+		2564C7BA14823C7E00F1A9EB /* HuffmanCode_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B514823C7E00F1A9EB /* HuffmanCode_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
+		2564C7BB14823C7E00F1A9EB /* Predict_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B614823C7E00F1A9EB /* Predict_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
+		2564C7BC14823C7E00F1A9EB /* TunedFunc_x86.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B714823C7E00F1A9EB /* TunedFunc_x86.cpp */; };
 		258DB4001411F91A0059F47E /* Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D41411F8600059F47E /* Codec.cpp */; };
 		258DB4011411F9290059F47E /* Convert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D61411F8600059F47E /* Convert.cpp */; };
 		258DB4021411F9290059F47E /* DummyCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D81411F8600059F47E /* DummyCodec.cpp */; };
@@ -32,6 +36,11 @@
 /* Begin PBXFileReference section */
 		2510B6B41417BCB100EA5F2F /* Mutex.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Mutex.h; path = utv_qt/Mutex.h; sourceTree = "<group>"; };
 		2510B6C31417BDDE00EA5F2F /* utv_qt.in.r */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.rez; name = utv_qt.in.r; path = utv_qt/utv_qt.in.r; sourceTree = "<group>"; };
+		2564C7B314823C7D00F1A9EB /* Common_asm_x86.mac */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Common_asm_x86.mac; path = utv_core/Common_asm_x86.mac; sourceTree = "<group>"; };
+		2564C7B414823C7E00F1A9EB /* Convert_asm_x86.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Convert_asm_x86.asm; path = utv_core/Convert_asm_x86.asm; sourceTree = "<group>"; };
+		2564C7B514823C7E00F1A9EB /* HuffmanCode_asm_x86.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = HuffmanCode_asm_x86.asm; path = utv_core/HuffmanCode_asm_x86.asm; sourceTree = "<group>"; };
+		2564C7B614823C7E00F1A9EB /* Predict_asm_x86.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Predict_asm_x86.asm; path = utv_core/Predict_asm_x86.asm; sourceTree = "<group>"; };
+		2564C7B714823C7E00F1A9EB /* TunedFunc_x86.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = TunedFunc_x86.cpp; path = utv_core/TunedFunc_x86.cpp; sourceTree = "<group>"; };
 		258DB3D41411F8600059F47E /* Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Codec.cpp; path = utv_core/Codec.cpp; sourceTree = "<group>"; };
 		258DB3D51411F8600059F47E /* Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Codec.h; path = utv_core/Codec.h; sourceTree = "<group>"; };
 		258DB3D61411F8600059F47E /* Convert.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Convert.cpp; path = utv_core/Convert.cpp; sourceTree = "<group>"; };
@@ -115,8 +124,10 @@
 			children = (
 				258DB3D41411F8600059F47E /* Codec.cpp */,
 				258DB3D51411F8600059F47E /* Codec.h */,
+				2564C7B314823C7D00F1A9EB /* Common_asm_x86.mac */,
 				258DB3D61411F8600059F47E /* Convert.cpp */,
 				258DB3D71411F8600059F47E /* Convert.h */,
+				2564C7B414823C7E00F1A9EB /* Convert_asm_x86.asm */,
 				258DB3D81411F8600059F47E /* DummyCodec.cpp */,
 				258DB3D91411F8600059F47E /* DummyCodec.h */,
 				258DB3DA1411F8600059F47E /* Format.cpp */,
@@ -127,13 +138,16 @@
 				258DB3DF1411F8600059F47E /* GlobalConfig.h */,
 				258DB3E01411F8600059F47E /* HuffmanCode.cpp */,
 				258DB3E11411F8600059F47E /* HuffmanCode.h */,
+				2564C7B514823C7E00F1A9EB /* HuffmanCode_asm_x86.asm */,
 				258DB3E21411F8600059F47E /* Predict.cpp */,
 				258DB3E31411F8600059F47E /* Predict.h */,
+				2564C7B614823C7E00F1A9EB /* Predict_asm_x86.asm */,
 				258DB3E41411F8600059F47E /* stdafx.h */,
 				258DB3E51411F8600059F47E /* Thread.cpp */,
 				258DB3E61411F8600059F47E /* Thread.h */,
 				258DB3E71411F8600059F47E /* TunedFunc.cpp */,
 				258DB3E81411F8600059F47E /* TunedFunc.h */,
+				2564C7B714823C7E00F1A9EB /* TunedFunc_x86.cpp */,
 				258DB3E91411F8600059F47E /* UL00Codec.cpp */,
 				258DB3EA1411F8600059F47E /* UL00Codec.h */,
 				258DB3EB1411F8600059F47E /* ULRACodec.cpp */,
@@ -239,14 +253,18 @@
 			files = (
 				258DB4001411F91A0059F47E /* Codec.cpp in Sources */,
 				258DB4011411F9290059F47E /* Convert.cpp in Sources */,
+				2564C7B914823C7E00F1A9EB /* Convert_asm_x86.asm in Sources */,
 				258DB4021411F9290059F47E /* DummyCodec.cpp in Sources */,
 				258DB4031411F9290059F47E /* Format.cpp in Sources */,
 				258DB4041411F9290059F47E /* FrameBuffer.cpp in Sources */,
 				258DB4051411F9290059F47E /* GlobalConfig.cpp in Sources */,
 				258DB4061411F9290059F47E /* HuffmanCode.cpp in Sources */,
+				2564C7BA14823C7E00F1A9EB /* HuffmanCode_asm_x86.asm in Sources */,
 				258DB4071411F9290059F47E /* Predict.cpp in Sources */,
+				2564C7BB14823C7E00F1A9EB /* Predict_asm_x86.asm in Sources */,
 				258DB4081411F9290059F47E /* Thread.cpp in Sources */,
 				258DB4091411F9290059F47E /* TunedFunc.cpp in Sources */,
+				2564C7BC14823C7E00F1A9EB /* TunedFunc_x86.cpp in Sources */,
 				258DB40A1411F9290059F47E /* UL00Codec.cpp in Sources */,
 				258DB40B1411F9290059F47E /* ULRACodec.cpp in Sources */,
 				258DB40C1411F9290059F47E /* ULRGCodec.cpp in Sources */,
@@ -287,7 +305,10 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "utvideo-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-read_only_relocs",
+					suppress,
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = utvideo;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
@@ -301,13 +322,17 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "utvideo-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-read_only_relocs",
+					suppress,
+				);
 				PREBINDING = NO;
 				PRODUCT_NAME = utvideo;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;

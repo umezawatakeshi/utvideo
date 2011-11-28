@@ -174,10 +174,10 @@ void UnitTest_Predict(void)
 
 	predictleftfunc pleft1[] = {
 		cpp_PredictLeftAndCount,
-#ifdef _WIN32_X86
+#ifdef __i386__
 		x86_sse2_PredictLeftAndCount_align1,
 #endif
-#ifdef _WIN64_X64
+#ifdef __x86_64__
 		x64_sse2_PredictLeftAndCount_align1,
 #endif
 		NULL
@@ -347,10 +347,10 @@ void UnitTest_Predict(void)
 
 	predictmedianfunc pmed1[] = {
 		cpp_PredictMedianAndCount,
-#ifdef _WIN32_X86
+#ifdef __i386__
 		x86_sse2_PredictMedianAndCount_align1,
 #endif
-#ifdef _WIN64_X64
+#ifdef __x86_64__
 		x64_sse2_PredictMedianAndCount_align1,
 #endif
 		NULL
@@ -522,10 +522,10 @@ void UnitTest_Predict(void)
 
 	predictmedianfunc pmed16[] = {
 		cpp_PredictMedianAndCount,
-#ifdef _WIN32_X86
+#ifdef __i386__
 		x86_sse2_PredictMedianAndCount_align16,
 #endif
-#ifdef _WIN64_X64
+#ifdef __x86_64__
 		x64_sse2_PredictMedianAndCount_align16,
 #endif
 		NULL
@@ -544,11 +544,11 @@ void UnitTest_Predict(void)
 
 	restoremedianfunc rmed[] = {
 		cpp_RestoreMedian,
-#ifdef _WIN32_X86
+#ifdef __i386__
 		x86_i686_RestoreMedian_align1,
 		x86_sse1mmx_RestoreMedian_align1,
 #endif
-#ifdef _WIN64_X64
+#ifdef __x86_64__
 		x64_sse1mmx_RestoreMedian_align1,
 #endif
 		NULL

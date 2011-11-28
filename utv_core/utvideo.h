@@ -39,6 +39,7 @@
  #ifdef _M_X64
   #ifndef _WIN64_X64
    #define _WIN64_X64
+   #define __x64_86__
   #endif
  #endif
 #else
@@ -46,6 +47,7 @@
  #ifdef _M_IX86
   #ifndef _WIN32_X86
    #define _WIN32_X86
+   #define __i386__
   #endif
  #endif
 #endif

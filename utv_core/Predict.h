@@ -15,7 +15,7 @@ void cpp_PredictMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const ui
 void cpp_PredictLeftAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
 void cpp_RestoreMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
 
-#ifdef _WIN32_X86
+#ifdef __i386__
 extern "C" void x86_sse2_PredictMedianAndCount_align16(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
 extern "C" void x86_sse2_PredictMedianAndCount_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
 extern "C" void x86_sse2_PredictLeftAndCount_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
@@ -23,7 +23,7 @@ extern "C" void x86_i686_RestoreMedian_align1(uint8_t *pDst, const uint8_t *pSrc
 extern "C" void x86_sse1mmx_RestoreMedian_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
 #endif
 
-#ifdef _WIN64_X64
+#ifdef __x86_64__
 extern "C" void x64_sse2_PredictMedianAndCount_align16(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
 extern "C" void x64_sse2_PredictMedianAndCount_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
 extern "C" void x64_sse2_PredictLeftAndCount_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
