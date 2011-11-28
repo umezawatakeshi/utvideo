@@ -8,6 +8,11 @@
 #include "HuffmanCode.h"
 #include "Convert.h"
 
+// intrin.h をインクルードすると
+// error C2733: オーバーロードされた関数 '_interlockedbittestandset' の C リンケージの 2 回以上の宣言は許されません。
+// などとエラーが出る。
+extern "C" void __cpuid(int *, int);
+
 const TUNEDFUNC tfnI686 = {
 	cpp_PredictMedianAndCount,
 	cpp_PredictMedianAndCount,

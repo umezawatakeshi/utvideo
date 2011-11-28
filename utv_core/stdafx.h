@@ -26,13 +26,6 @@
 #define WIN32_LEAN_AND_MEAN		// Windows ヘッダーから使用されていない部分を除外します。
 #define _CRT_SECURE_NO_WARNINGS
 
-// intrin.h をインクルードすると
-// error C2733: オーバーロードされた関数 '_interlockedbittestandset' の C リンケージの 2 回以上の宣言は許されません。
-// などとエラーが出るので、手書きで intrinsic 宣言を行う。
-// #include <intrin.h>
-extern "C" void __cpuid(int *, int);
-#pragma intrinsic(__cpuid)
-
 // Windows ヘッダー ファイル:
 #include <windows.h>
 #include <guiddef.h>
