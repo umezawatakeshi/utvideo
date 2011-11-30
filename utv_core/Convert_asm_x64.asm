@@ -44,6 +44,10 @@ $dwDataStride = argsoffset + 48
 	sub			rsi, rdx
 	add			rsi, qword ptr [rsp + $dwDataStride]
 
+	pxor		xmm7, xmm7				; xmm7 = 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+	pcmpeqb		xmm6, xmm6				; xmm6 = ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+	psrlw		xmm6, 8					; xmm6 = 00 ff 00 ff 00 ff 00 ff 00 ff 00 ff 00 ff 00 ff
+
 	align	64
 label0:
 	mov			rdi, rsi
@@ -51,17 +55,15 @@ label0:
 
 	; align	64	; さすがに入れすぎな気がするのでコメントアウト。
 label1:
-	pxor		xmm3, xmm3				; xmm3 = 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-
 	movd		xmm0, dword ptr [rbp]	; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 Y3 Y2 Y1 Y0
-	punpcklbw	xmm0, xmm3				; xmm0 = 00 00 00 00 00 00 00 00 00 Y3 00 Y2 00 Y1 00 Y0
+	punpcklbw	xmm0, xmm7				; xmm0 = 00 00 00 00 00 00 00 00 00 Y3 00 Y2 00 Y1 00 Y0
 	psubw		xmm0, oword ptr [yoff]	; xmm0 = 00 00 00 00 00 00 00 00 ---Y3 ---Y2 ---Y1 ---Y0 (de-offset)
-	punpcklwd	xmm0, xmm3				; xmm0 = 00 00 ---Y3 00 00 ---Y2 00 00 ---Y1 00 00 ---Y0 (de-offset)
+	punpcklwd	xmm0, xmm7				; xmm0 = 00 00 ---Y3 00 00 ---Y2 00 00 ---Y1 00 00 ---Y0 (de-offset)
 
 	movd		xmm1, dword ptr [rbx]	; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 U6 U4 U2 U0
 	movd		xmm2, dword ptr [rcx]	; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 V6 V4 V2 V0
 	punpcklbw	xmm1, xmm2				; xmm1 = 00 00 00 00 00 00 00 00 V6 U6 V4 U4 V2 U2 V0 U0
-	punpcklbw	xmm1, xmm3				; xmm1 = 00 V6 00 U6 00 V4 00 U4 00 V2 00 U2 00 V0 00 U0
+	punpcklbw	xmm1, xmm7				; xmm1 = 00 V6 00 U6 00 V4 00 U4 00 V2 00 U2 00 V0 00 U0
 	psubw		xmm1, oword ptr [uvoff]	; xmm1 = 00 V6 00 U6 00 V4 00 U4 ---V2 ---U2 ---V0 ---U0 (de-offset)
 	punpckldq	xmm1, xmm1				; xmm1 = ---V2 ---U2 ---V2 ---U2 ---V0 ---U0 ---V0 ---U0 (de-offset)
 	paddw		xmm1, xmm1
@@ -82,23 +84,15 @@ label1:
 	paddd		xmm1, xmm0				; xmm1 = -G3-------- -G2-------- -G1-------- -G0--------
 	psrad		xmm1, 14				; xmm1 = ---------G3 ---------G2 ---------G1 ---------G0
 
-	pxor		xmm0, xmm0				; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 	packssdw	xmm1, xmm3				; xmm1 = ---R3 ---R2 ---R1 ---R0 ---G3 ---G2 ---G1 ---G0
-	packssdw	xmm2, xmm0				; xmm2 = 00 00 00 00 00 00 00 00 ---B3 ---B2 ---B1 ---B0
-	pmaxsw		xmm1, xmm0				; 計算過程でマイナスになることがあるので、
-	pmaxsw		xmm2, xmm0				; ここの pmaxsw xmmN, xmm0 は必要。
+	packssdw	xmm2, xmm7				; xmm2 = 00 00 00 00 00 00 00 00 ---B3 ---B2 ---B1 ---B0
+	pmaxsw		xmm1, xmm7				; 計算過程でマイナスになることがあるので、
+	pmaxsw		xmm2, xmm7				; ここの pmaxsw xmmN, xmm7 は必要。
 	punpcklwd	xmm2, xmm1				; xmm2 = ---G3 ---B3 ---G2 ---B2 ---G1 ---B1 ---G0 ---B0
-	punpckhwd	xmm1, xmm0				; xmm1 = 00 00 ---R3 00 00 ---R2 00 00 ---R1 00 00 ---R0
-if &rgb32
-	pcmpeqb		xmm0, xmm0				; xmm0 = ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
-	pslld		xmm0, 24				; xmm0 = ff 00 00 00 ff 00 00 00 ff 00 00 00 ff 00 00 00
-endif
+	punpckhwd	xmm1, xmm6				; xmm1 = 00 ff ---R3 00 ff ---R2 00 ff ---R1 00 ff ---R0
 	packuswb	xmm2, xmm2				; xmm2 = XX XX XX XX XX XX XX XX G3 B3 G2 B2 G1 B1 G0 B0
-	packuswb	xmm1, xmm1				; xmm2 = XX XX XX XX XX XX XX XX 00 R3 00 R2 00 R1 00 R0
-	punpcklwd	xmm2, xmm1				; xmm2 = 00 R3 G3 B3 00 R2 G2 B2 00 R1 G1 B1 00 R0 G0 B0
-if &rgb32
-	por			xmm2, xmm0				; xmm2 = ff R3 G3 B3 ff R2 G2 B2 ff R1 G1 B1 ff R0 G0 B0
-endif
+	packuswb	xmm1, xmm1				; xmm2 = XX XX XX XX XX XX XX XX ff R3 ff R2 ff R1 ff R0
+	punpcklwd	xmm2, xmm1				; xmm2 = ff R3 G3 B3 ff R2 G2 B2 ff R1 G1 B1 ff R0 G0 B0
 
 if &rgb32
 	add			rdi, 16
