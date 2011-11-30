@@ -41,6 +41,8 @@ const TUNEDFUNC tfnI686 = {
 	x86_i686_HuffmanDecodeAndAccumStep3ForTopdownRGB24Red,
 	cpp_ConvertULY2ToBottomupRGB24,
 	cpp_ConvertULY2ToBottomupRGB32,
+	cpp_ConvertULY2ToTopdownRGB24,
+	cpp_ConvertULY2ToTopdownRGB32,
 	cpp_ConvertBottomupRGB24ToULY2,
 	cpp_ConvertBottomupRGB32ToULY2,
 };
@@ -71,6 +73,8 @@ const TUNEDFUNC tfnSSE2 = {
 	x86_i686_HuffmanDecodeAndAccumStep3ForTopdownRGB24Red,
 	x86_sse2_ConvertULY2ToBottomupRGB24,
 	x86_sse2_ConvertULY2ToBottomupRGB32,
+	x86_sse2_ConvertULY2ToTopdownRGB24,
+	x86_sse2_ConvertULY2ToTopdownRGB32,
 	x86_sse2_ConvertBottomupRGB24ToULY2,
 	x86_sse2_ConvertBottomupRGB32ToULY2,
 };

@@ -24,9 +24,9 @@ uv2r	dq	03313000033130000h
 uv2b	dq	00000408D0000408Dh
 		dq	00000408D0000408Dh
 
-%macro CONVERT_ULY2_TO_BOTTOMUP_RGB	2
+%macro CONVERT_ULY2_TO_RGB 4
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, rgb32, %2
+	MULTI_CONTEXT_XDEFINE procname, %1, bottomup, %2, littleendian, %3, rgb32, %4
 
 global %$procname
 %$procname:
@@ -36,9 +36,14 @@ global %$procname
 	mov			ebx, dword [esp + %$pUBegin]
 	mov			ecx, dword [esp + %$pVBegin]
 	mov			edx, dword [esp + %$dwStride]
+%if %$bottomup
 	mov			esi, dword [esp + %$pDstEnd]			; esi なのに dst のポインタを保持するのは気持ちが悪いが。
 	sub			esi, edx
 	add			esi, dword [esp + %$dwDataStride]
+%else
+	mov			esi, dword [esp + %$pDstBegin]			; esi なのに dst のポインタを保持するのは気持ちが悪いが。
+	add			esi, dword [esp + %$dwDataStride]
+%endif
 
 	pxor		xmm7, xmm7				; xmm7 = 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 	pcmpeqb		xmm6, xmm6				; xmm6 = ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
@@ -80,6 +85,7 @@ global %$procname
 	paddd		xmm1, xmm0				; xmm1 = -G3-------- -G2-------- -G1-------- -G0--------
 	psrad		xmm1, 14				; xmm1 = ---------G3 ---------G2 ---------G1 ---------G0
 
+%if %$littleendian
 	packssdw	xmm1, xmm3				; xmm1 = ---R3 ---R2 ---R1 ---R0 ---G3 ---G2 ---G1 ---G0
 	packssdw	xmm2, xmm7				; xmm2 = 00 00 00 00 00 00 00 00 ---B3 ---B2 ---B1 ---B0
 	pmaxsw		xmm1, xmm7				; 計算過程でマイナスになることがあるので、
@@ -89,6 +95,25 @@ global %$procname
 	packuswb	xmm2, xmm2				; xmm2 = XX XX XX XX XX XX XX XX G3 B3 G2 B2 G1 B1 G0 B0
 	packuswb	xmm1, xmm1				; xmm1 = XX XX XX XX XX XX XX XX ff R3 ff R2 ff R1 ff R0
 	punpcklwd	xmm2, xmm1				; xmm2 = ff R3 G3 B3 ff R2 G2 B2 ff R1 G1 B1 ff R0 G0 B0
+%else
+	packssdw	xmm3, xmm2				; xmm3 = ---B3 ---B2 ---B1 ---B0 ---R3 ---R2 ---R1 ---R0
+	movdqa		xmm2, xmm6
+	packssdw	xmm1, xmm1				; xmm1 = ---G3 ---G2 ---G1 ---G0 ---G3 ---G2 ---G1 ---G0
+	pmaxsw		xmm3, xmm7				; 計算過程でマイナスになることがあるので、
+	pmaxsw		xmm1, xmm7				; ここの pmaxsw xmmN, xmm7 は必要。
+	punpcklwd	xmm2, xmm3				; xmm2 = ---R3 00 ff ---R2 00 ff ---R1 00 ff ---R0 00 ff
+	punpckhwd	xmm1, xmm3				; xmm1 = ---B3 ---G3 ---B2 ---G2 ---B1 ---G1 ---B0 ---G0
+	packuswb	xmm2, xmm2				; xmm2 = XX XX XX XX XX XX XX XX R3 ff R2 ff R1 ff R0 ff
+	packuswb	xmm1, xmm1				; xmm1 = XX XX XX XX XX XX XX XX B3 G3 B2 G2 B1 G1 B0 G0
+	punpcklwd	xmm2, xmm1				; xmm2 = B3 G3 R3 ff B2 G2 R2 ff B1 G1 R1 ff B0 G0 R0 ff
+ %if ! %$rgb32
+	; めんどくさいので
+	movdqa		xmm1, xmm2
+	psrldq		xmm2, 1
+	pslldq		xmm1, 15
+	por			xmm2, xmm1
+ %endif
+%endif
 
 %if %$rgb32
 	add			edi, 16
@@ -163,17 +188,25 @@ global %$procname
 %endif
 
 .label3:
+%if %$bottomup
 	sub			esi, edx
 	cmp			esi, dword [esp + %$pDstBegin]
 	ja			.label0
+%else
+	add			esi, edx
+	cmp			esi, dword [esp + %$pDstEnd]
+	jb			.label0
+%endif
 
 	SIMPLE_EPILOGUE
 
 %pop
 %endmacro
 
-CONVERT_ULY2_TO_BOTTOMUP_RGB	_x86_sse2_ConvertULY2ToBottomupRGB24, 0
-CONVERT_ULY2_TO_BOTTOMUP_RGB	_x86_sse2_ConvertULY2ToBottomupRGB32, 1
+CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToBottomupRGB24, 1, 1, 0
+CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToBottomupRGB32, 1, 1, 1
+CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToTopdownRGB24,  0, 0, 0
+CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToTopdownRGB32,  0, 0, 1
 
 
 ; Y  =  0.29891 R + 0.58661 G + 0.11448 B
