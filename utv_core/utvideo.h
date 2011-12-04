@@ -37,17 +37,17 @@
 
 #ifdef _WIN64
  #ifdef _M_X64
-  #ifndef _WIN64_X64
-   #define _WIN64_X64
-   #define __x86_64__
+  #define _WIN64_X64 1
+  #ifndef __x86_64__
+   #define __x86_64__ 1
   #endif
  #endif
 #else
 #ifdef _WIN32
  #ifdef _M_IX86
-  #ifndef _WIN32_X86
-   #define _WIN32_X86
-   #define __i386__
+  #define _WIN32_X86 1
+  #ifndef __i386__
+   #define __i386__ 1
   #endif
  #endif
 #endif
