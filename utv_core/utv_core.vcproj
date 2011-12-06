@@ -362,7 +362,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -371,7 +371,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -381,7 +381,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -390,7 +390,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -466,7 +466,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -475,7 +475,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -485,7 +485,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -494,7 +494,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -554,7 +554,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -563,7 +563,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -573,7 +573,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -582,7 +582,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="ml64.exe /c  /nologo /Fo&quot;$(IntDir)\$(InputName).obj&quot; /W3 /Zi /errorReport:prompt  /Ta $(InputFileName)&#x0D;&#x0A;"
+						CommandLine="nasm -f win64 -g -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -768,7 +768,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Common_asm_x64.inc"
+				RelativePath=".\Common_asm_x64.mac"
 				>
 			</File>
 			<File

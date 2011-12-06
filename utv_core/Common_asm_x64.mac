@@ -1,14 +1,17 @@
 ; ï∂éöÉRÅ[ÉhÇÕÇrÇiÇhÇr â¸çsÉRÅ[ÉhÇÕÇbÇqÇkÇe
 ; $Id$
 
-STD_PROLOG	macro	_numlocal
-numlocal = &_numlocal
-argsoffset = numlocal + 16 * 10 + 8 * 8 + 8 + 8
-	sub			rsp, 8
-	mov			qword ptr [rsp + 16 +  0], rcx
-	mov			qword ptr [rsp + 16 +  8], rdx
-	mov			qword ptr [rsp + 16 + 16], r8
-	mov			qword ptr [rsp + 16 + 24], r9
+default rel		; use RIP-relative address
+
+%macro SIMPLE_PROLOGUE 1-*
+%xdefine %$numlocal %1
+%xdefine %$argsoffset (%$numlocal + 16 * 10 + 8 * 8 + 8 + 8)
+	push		rbp
+	mov			rbp, rsp
+	mov			qword [rsp + 16 +  0], rcx
+	mov			qword [rsp + 16 +  8], rdx
+	mov			qword [rsp + 16 + 16], r8
+	mov			qword [rsp + 16 + 24], r9
 	push		rbx
 	push		rbp
 	push		rsi
@@ -27,11 +30,18 @@ argsoffset = numlocal + 16 * 10 + 8 * 8 + 8 + 8
 	movdqa		[rsp - 128], xmm13
 	movdqa		[rsp - 144], xmm14
 	movdqa		[rsp - 160], xmm15
-	sub			rsp, numlocal + 16 * 10
-endm
+	sub			rsp, %$numlocal + 16 * 10
+%assign i 0
+%rep %0-1
+%xdefine %$%2 (%$argsoffset + i)
+%rotate 1
+%assign i i+8
+%endrep
+%undef i
+%endmacro
 
-STD_EPILOG macro
-	add			rsp, numlocal + 16 * 10
+%macro SIMPLE_EPILOGUE 0
+	add			rsp, %$numlocal + 16 * 10
 	movdqa		xmm15, [rsp - 160]
 	movdqa		xmm14, [rsp - 144]
 	movdqa		xmm13, [rsp - 128]
@@ -50,5 +60,16 @@ STD_EPILOG macro
 	pop			rsi
 	pop			rbp
 	pop			rbx
-	add			rsp, 8
-endm
+	pop			rbp
+	ret
+%endmacro
+
+%macro MULTI_CONTEXT_XDEFINE 0-*
+%if (%0 % 2) != 0
+%fatal MULTI_CONTEXT_XDEFINE accepts even number of arguments
+%endif
+%rep %0/2
+%xdefine %$%1 %2
+%rotate 2
+%endrep
+%endmacro
