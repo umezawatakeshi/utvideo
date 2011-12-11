@@ -49,6 +49,10 @@ const TUNEDFUNC &tfnSSE3 = tfnSSE2;
 
 const TUNEDFUNC &tfnSSSE3 = tfnSSE2;
 
+const TUNEDFUNC &tfnSSE41 = tfnSSE2;
+
+const TUNEDFUNC &tfnSSE42 = tfnSSE2;
+
 class CTunedFuncInitializer
 {
 public:
@@ -68,7 +72,17 @@ public:
 
 		_RPT2(_CRT_WARN, "CPUID.1 ECX=%08X EDX=%08X\n", cpuid_1_ecx, cpuid_1_edx);
 
-		if (cpuid_1_ecx & (1 << 9))
+		if (cpuid_1_ecx & (1 << 20))
+		{
+			_RPT0(_CRT_WARN, "supports SSE4.2\n");
+			tfn = tfnSSE42;
+		}
+		else if (cpuid_1_ecx & (1 << 19))
+		{
+			_RPT0(_CRT_WARN, "supports SSE4.1\n");
+			tfn = tfnSSE41;
+		}
+		else if (cpuid_1_ecx & (1 << 9))
 		{
 			_RPT0(_CRT_WARN, "supports SSSE3\n");
 			tfn = tfnSSSE3;
