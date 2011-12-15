@@ -1,3 +1,4 @@
+; ï∂éöÉRÅ[ÉhÇÕÇrÇiÇhÇr â¸çsÉRÅ[ÉhÇÕÇbÇqÇkÇe
 ; $Id$
 
 [Setup]
@@ -31,8 +32,8 @@ Source: "..\Release\utv_cfg.exe";      DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.rtf";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.txt";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.ja.sjis.txt";        DestDir: "{app}"; Flags: ignoreversion;
-Source: "..\readme.en.html";           DestDir: "{app}"; Flags: ignoreversion isreadme;
-Source: "..\readme.ja.html";           DestDir: "{app}"; Flags: ignoreversion isreadme;
+Source: "..\readme.en.html";           DestDir: "{app}"; Flags: ignoreversion;
+Source: "..\readme.ja.html";           DestDir: "{app}"; Flags: ignoreversion;
 
 [Registry]
 Root: HKLM; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32";             ValueName: "VIDC.ULRA"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
@@ -51,3 +52,7 @@ Name: "{group}\License Agreement (English)";      Filename: "{app}\gplv2.txt"
 Name: "{group}\License Agreement (Japanese)";     Filename: "{app}\gplv2.ja.sjis.txt"
 Name: "{group}\Readme (English)";                 Filename: "{app}\readme.en.html"
 Name: "{group}\Readme (Japanese)";                Filename: "{app}\readme.ja.html"
+
+[Run]
+Filename: "{app}\readme.en.html"; Description: "View readme";   Flags: postinstall shellexec skipifsilent; Languages: en
+Filename: "{app}\readme.ja.html"; Description: "readme ÇÃï\é¶"; Flags: postinstall shellexec skipifsilent; Languages: ja
