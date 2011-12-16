@@ -147,6 +147,7 @@ pascal ComponentResult QTDecoderBeginBand(CQTDecoder *glob, CodecDecompressParam
 	long c;
 	Handle imgDescExt;
 	size_t imgDescExtSize;
+	size_t extDataOffset;
 	utvf_t outfmt;
 
 	if (glob->beginBandDone)
@@ -156,23 +157,25 @@ pascal ComponentResult QTDecoderBeginBand(CQTDecoder *glob, CodecDecompressParam
 	}
 	glob->beginBandDone = true;
 	*(bool *)drp->userDecompressRecord = false;
-	
-#define SIZEOF_BITMAPINFOHEADER 40
-	
+
 	if (QuickTimeFormatToUtVideoFormat(&outfmt, param->dstPixMap.pixelFormat) != 0)
 		return paramErr;
-	
+
 	imgDescExt = NULL;
-	if (GetImageDescriptionExtension(param->imageDescription, &imgDescExt, 'strf', 1) != noErr)
+	if (GetImageDescriptionExtension(param->imageDescription, &imgDescExt, 'strf', 1) == noErr) // AVI file
+		extDataOffset = 40; // sizeof(BITMAPINFOHEADER)
+	else if (GetImageDescriptionExtension(param->imageDescription, &imgDescExt, 'glbl', 1) == noErr) // MOV file (converted by ffmpeg/avconv)
+		extDataOffset = 0;
+	else
 		return paramErr;
 	imgDescExtSize = GetHandleSize(imgDescExt);
-	if (imgDescExtSize < SIZEOF_BITMAPINFOHEADER)
+	if (imgDescExtSize < extDataOffset)
 	{
 		DisposeHandle(imgDescExt);
 		return paramErr;
 	}
 	glob->codec->DecodeBegin(outfmt, (*param->imageDescription)->width, (*param->imageDescription)->height, drp->rowBytes,
-							 ((char *)(*imgDescExt)) + SIZEOF_BITMAPINFOHEADER, imgDescExtSize - SIZEOF_BITMAPINFOHEADER);
+							 ((char *)(*imgDescExt)) + extDataOffset, imgDescExtSize - extDataOffset);
 	DisposeHandle(imgDescExt);
 
 	return noErr;
