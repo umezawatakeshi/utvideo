@@ -36,14 +36,14 @@ Source: "..\readme.en.html";           DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\readme.ja.html";           DestDir: "{app}"; Flags: ignoreversion;
 
 [Registry]
-Root: HKLM; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32";             ValueName: "VIDC.ULRA"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
-Root: HKLM; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32";             ValueName: "VIDC.ULRG"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
-Root: HKLM; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32";             ValueName: "VIDC.ULY0"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
-Root: HKLM; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32";             ValueName: "VIDC.ULY2"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
-Root: HKLM; Subkey: "Software\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULRA"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
-Root: HKLM; Subkey: "Software\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULRG"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
-Root: HKLM; Subkey: "Software\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULY0"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
-Root: HKLM; Subkey: "Software\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULY2"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
+Root: HKLM32; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULRA"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
+Root: HKLM32; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULRG"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
+Root: HKLM32; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULY0"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
+Root: HKLM32; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULY2"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
+Root: HKLM64; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULRA"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
+Root: HKLM64; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULRG"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
+Root: HKLM64; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULY0"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
+Root: HKLM64; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULY2"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
 
 [Icons]
 Name: "{group}\Global Configuration";             Filename: "{app}\utv_cfg.exe"
