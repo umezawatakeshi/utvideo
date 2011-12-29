@@ -107,7 +107,7 @@ LRESULT CVCMCodec::GetState(void *pState, SIZE_T cb)
 LRESULT CVCMCodec::SetState(const void *pState, SIZE_T cb)
 {
 	DEBUG_ENTER_LEAVE("CVCMCodec::SetState() this=%p pState=%p, cb=%z", this, pState, cb);
-	return m_pCodec->SetState(pState, cb) == 0 ? ICERR_OK : ICERR_INTERNAL;
+	return m_pCodec->SetState(pState, cb) == 0 ? cb : 0;
 }
 
 LRESULT CVCMCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
