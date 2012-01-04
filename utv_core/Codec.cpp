@@ -25,7 +25,7 @@ INT_PTR CCodec::About(HWND hwnd)
 
 	wsprintf(buf,
 		"Ut Video Codec Suite, version %s\n"
-		"Copyright (C) 2008-2011  UMEZAWA Takeshi\n\n"
+		"Copyright (C) 2008-2012  UMEZAWA Takeshi\n\n"
 		"Licensed under GNU General Public License version 2 or later.",
 		UTVIDEO_VERSION_STR);
 	MessageBox(hwnd, buf, "Ut Video Codec Suite", MB_OK);
