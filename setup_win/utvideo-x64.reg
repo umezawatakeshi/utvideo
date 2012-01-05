@@ -1,0 +1,13 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Drivers32]
+"VIDC.ULRA"="C:\\Windows\\system32\\utv_vcm.dll"
+"VIDC.ULRG"="C:\\Windows\\system32\\utv_vcm.dll"
+"VIDC.ULY0"="C:\\Windows\\system32\\utv_vcm.dll"
+"VIDC.ULY2"="C:\\Windows\\system32\\utv_vcm.dll"
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Drivers32]
+"VIDC.ULRA"="C:\\Windows\\system32\\utv_vcm.dll"
+"VIDC.ULRG"="C:\\Windows\\system32\\utv_vcm.dll"
+"VIDC.ULY0"="C:\\Windows\\system32\\utv_vcm.dll"
+"VIDC.ULY2"="C:\\Windows\\system32\\utv_vcm.dll"

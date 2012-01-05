@@ -34,6 +34,8 @@ Source: "..\gplv2.txt";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.ja.sjis.txt";        DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\readme.en.html";           DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\readme.ja.html";           DestDir: "{app}"; Flags: ignoreversion;
+Source: "utvideo-x86.reg";             DestDir: "{app}"; Flags: ignoreversion 32bit;           Check: not Is64BitInstallMode
+Source: "utvideo-x64.reg";             DestDir: "{app}"; Flags: ignoreversion 64bit;           Check: Is64BitInstallMode
 
 [Registry]
 Root: HKLM32; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULRA"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
