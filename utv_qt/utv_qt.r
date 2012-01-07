@@ -37,26 +37,26 @@ resource 'dlle' (256) {
 #define SUBTYPE_VAL  'ULRA'
 #define SUBTYPE_STR  "ULRA"
 #define SUBTYPE_RID  256
-#define SUBTYPE_STRI "RGBA"
+#define SUBTYPE_INFO "RGBA"
 #include "utv_qt.in.r"
 
 #define SUBTYPE      ULRG
 #define SUBTYPE_VAL  'ULRG'
 #define SUBTYPE_STR  "ULRG"
 #define SUBTYPE_RID  257
-#define SUBTYPE_STRI "RGB"
+#define SUBTYPE_INFO "RGB"
 #include "utv_qt.in.r"
 
 #define SUBTYPE      ULY0
 #define SUBTYPE_VAL  'ULY0'
 #define SUBTYPE_STR  "ULY0"
 #define SUBTYPE_RID  258
-#define SUBTYPE_STRI "YUV420"
+#define SUBTYPE_INFO "YUV420"
 #include "utv_qt.in.r"
 
 #define SUBTYPE      ULY2
 #define SUBTYPE_VAL  'ULY2'
 #define SUBTYPE_STR  "ULY2"
 #define SUBTYPE_RID  259
-#define SUBTYPE_STRI "YUV422"
+#define SUBTYPE_INFO "YUV422"
 #include "utv_qt.in.r"

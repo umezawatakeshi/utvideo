@@ -1,12 +1,14 @@
 /*  */
 /* $Id$ */
 
+#define SUBTYPE_FMTN "Ut Video Codec " SUBTYPE_INFO " (" SUBTYPE_STR ")"
+
 resource 'strn' (SUBTYPE_RID) {
-	"UtVideo (" SUBTYPE_STR ")"
+	SUBTYPE_FMTN " QT"
 };
 
 resource 'stri' (SUBTYPE_RID) {
-	"Ut Video Codec " SUBTYPE_STRI " (" SUBTYPE_STR ") QT"
+	"Decompresses video stored in " SUBTYPE_FMTN " format."
 };
 
 resource 'thng' (SUBTYPE_RID) {
@@ -17,12 +19,9 @@ resource 'thng' (SUBTYPE_RID) {
 	0,
 	0,
 	0,
-	'strn',								// Name Type
-	SUBTYPE_RID,						// Name ID
-	'stri',								// Info Type
-	SUBTYPE_RID,						// Info ID
-	0,									// Icon Type
-	0,									// Icon ID
+	'strn', SUBTYPE_RID,				// Name Type & ID
+	'stri', SUBTYPE_RID,				// Info Type & ID
+	0, 0,								// Icon Type & ID
 	0x1000000,							// Version
 	componentHasMultiplePlatforms +		// Registration Flags 
 	componentDoAutoVersion,				// Registration Flags
@@ -35,7 +34,9 @@ resource 'thng' (SUBTYPE_RID) {
 	};
 };
 
+#undef SUBTYPE_FMTN
+
 #undef SUBTYPE
 #undef SUBTYPE_VAL
 #undef SUBTYPE_RID
-#undef SUBTYPE_STRI
+#undef SUBTYPE_INFO
