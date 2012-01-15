@@ -17,9 +17,9 @@ ComponentSelectorOffset(8)
 		StdComponentCall(Open)
 	ComponentRangeEnd(0)
 
-	ComponentRangeBegin (1)
-		ComponentCall (GetCodecInfo)
-	ComponentRangeEnd (1)
+	ComponentRangeBegin(1)
+		ComponentCall(GetCodecInfo)
+	ComponentRangeEnd(1)
 
 	ComponentRangeUnused(2)
 
