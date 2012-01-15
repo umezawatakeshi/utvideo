@@ -109,13 +109,26 @@ pascal ComponentResult QTDecoderGetCodecInfo(CQTDecoder *glob, CodecInfo *info)
 
 	ComponentResult err;
 	CodecInfo **tempCodecInfo;
+	char name[sizeof(info->typeName)];
 
 	err = GetComponentResource((Component)glob->self, codecInfoResourceType, 256, (Handle *)&tempCodecInfo);
-	if (err == noErr)
+	if (err != noErr)
+		return err;
+
+	*info = **tempCodecInfo;
+	DisposeHandle((Handle)tempCodecInfo);
+
+	glob->codec->GetShortFriendlyName(name, sizeof(name));
 	{
-		*((CodecInfo *)info) = **tempCodecInfo;
-		DisposeHandle((Handle)tempCodecInfo);
+		char *src;
+		unsigned char *dst;
+		info->typeName[0] = (unsigned char)strlen(name);
+		src = name;
+		dst = info->typeName + 1;
+		for (; *src; src++, dst++)
+			*dst = *src;
 	}
+
 	return noErr;
 }
 
