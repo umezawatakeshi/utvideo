@@ -15,11 +15,12 @@ SolidCompression=yes
 OutputBaseFilename=utvideo-win
 ArchitecturesInstallIn64BitMode=x64
 LicenseFile=..\gplv2.rtf
+InfoBeforeFile=before.en.rtf
 InfoAfterFile=info.en.rtf
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl";
-Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"; InfoAfterFile: "info.ja.rtf"
+Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"; InfoBeforeFile: "before.ja.rtf"; InfoAfterFile: "info.ja.rtf"
 
 [Files]
 Source: "..\Release\utv_core.dll";     DestDir: "{sys}"; Flags: ignoreversion 32bit;
