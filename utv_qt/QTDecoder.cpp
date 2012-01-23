@@ -70,12 +70,15 @@ pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 
 pascal ComponentResult QTDecoderClose(CQTDecoder *glob, ComponentInstance self)
 {
-	if (glob->wantedDestinationPixelTypes != NULL)
-		DisposeHandle((Handle)glob->wantedDestinationPixelTypes);
+	if (glob != NULL)
+	{
+		if (glob->wantedDestinationPixelTypes != NULL)
+			DisposeHandle((Handle)glob->wantedDestinationPixelTypes);
 
-	QTCodecClose(glob, self);
+		QTCodecClose(glob, self);
 
-	DisposePtr((Ptr)glob);
+		DisposePtr((Ptr)glob);
+	}
 
 	return noErr;
 }
