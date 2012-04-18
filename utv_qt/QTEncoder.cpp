@@ -8,7 +8,7 @@
 #include "Codec.h"
 #include "Format.h"
 
-//extern "C" pascal ComponentResult QTEncoderComponentDispatch(ComponentParameters *params, CQTEncoder *glob);
+extern "C" pascal ComponentResult QTEncoderComponentDispatch(ComponentParameters *params, CQTEncoder *glob);
 
 #define IMAGECODEC_BASENAME()		QTEncoder
 #define IMAGECODEC_GLOBALS()		CQTEncoder *storage
@@ -110,22 +110,16 @@ pascal ComponentResult QTEncoderGetSettings(CQTEncoder *glob, Handle settings)
 {
 	size_t cbState;
 
-//	fprintf(fp, "a\n");
 	cbState = glob->codec->GetStateSize();
-//	fprintf(fp, "b\n");
 	SetHandleSize(settings, cbState);
-//	fprintf(fp, "c\n");
 	glob->codec->GetState(*settings, cbState);
-//	fprintf(fp, "d\n");
 
 	return noErr;
 }
 
 pascal ComponentResult QTEncoderSetSettings(CQTEncoder *glob, Handle settings)
 {
-//	fprintf(fp, "a\n");
 	glob->codec->SetState(*settings, GetHandleSize(settings));
-//	fprintf(fp, "b\n");
 
 	return noErr;
 }
@@ -140,8 +134,6 @@ pascal ComponentResult QTEncoderPrepareToCompressFrames(CQTEncoder *glob, ICMCom
 	glob->sessionOptions = sessionOptions;
 	ICMCompressionSessionOptionsRetain(glob->sessionOptions);
 
-	SInt32 n;
-
 	size_t imgDescExtSize;
 	Handle imgDescExt;
 
@@ -154,23 +146,33 @@ pascal ComponentResult QTEncoderPrepareToCompressFrames(CQTEncoder *glob, ICMCom
 	CFMutableDictionaryRef dic;
 	CFMutableArrayRef array;
 	CFNumberRef num;
+	SInt32 n;
 
 	dic = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
 
 	array = CFArrayCreateMutable(NULL, 0, &kCFTypeArrayCallBacks);
 	CFDictionaryAddValue(dic, kCVPixelBufferPixelFormatTypeKey, array);
-	CFRelease(array);
+	{
+		const utvf_t *utvf;
+		OSType ost;
 
-	n = k32ARGBPixelFormat;
-	num = CFNumberCreate(NULL, kCFNumberSInt32Type, &n);
-	CFArrayAppendValue(array, num);
-	CFRelease(num);
+		for (utvf = glob->codec->GetEncoderInputFormat(); *utvf; utvf++)
+		{
+			if (UtVideoFormatToQuickTimeFormat(&ost, *utvf) != 0)
+				continue;
+			n = ost;
+			num = CFNumberCreate(NULL, kCFNumberSInt32Type, &n);
+			CFArrayAppendValue(array, num);
+			CFRelease(num);
+		}
+	}
+	CFRelease(array);
 
 	n = (*imageDescription)->width;
 	num = CFNumberCreate(NULL, kCFNumberSInt32Type, &n);
 	CFDictionaryAddValue(dic, kCVPixelBufferWidthKey, num);
 	CFRelease(num);
-	
+
 	n = (*imageDescription)->height;
 	num = CFNumberCreate(NULL, kCFNumberSInt32Type, &n);
 	CFDictionaryAddValue(dic, kCVPixelBufferWidthKey, num);
@@ -197,23 +199,30 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 	void *dstPtr;
 	OSType srcType;
 	utvf_t utvf;
+	size_t rowBytes;
+	unsigned int width, height;
 
 	sourcePixelBuffer = ICMCompressorSourceFrameGetPixelBuffer(sourceFrame);
 	CVPixelBufferLockBaseAddress(sourcePixelBuffer, 0);
 	srcType = CVPixelBufferGetPixelFormatType(sourcePixelBuffer);
 //	fprintf(fp, "srctype=%08lx\n", srcType);
-	QuickTimeFormatToUtVideoFormat(&utvf, srcType);
+	if (QuickTimeFormatToUtVideoFormat(&utvf, srcType) != 0)
+	{
+		CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
+		return paramErr;
+	}
 //	fprintf(fp, "utvf=%08x\n", utvf);
 //	fprintf(fp, "width=%zu height=%zu row=%zu\n",CVPixelBufferGetWidth(sourcePixelBuffer), CVPixelBufferGetHeight(sourcePixelBuffer), CVPixelBufferGetBytesPerRow(sourcePixelBuffer));
-	err = glob->codec->EncodeBegin(utvf, CVPixelBufferGetWidth(sourcePixelBuffer), CVPixelBufferGetHeight(sourcePixelBuffer), CVPixelBufferGetBytesPerRow(sourcePixelBuffer));
+	width = (unsigned int)CVPixelBufferGetWidth(sourcePixelBuffer);
+	height = (unsigned int)CVPixelBufferGetHeight(sourcePixelBuffer);
+	rowBytes = CVPixelBufferGetBytesPerRow(sourcePixelBuffer);
+	err = glob->codec->EncodeBegin(utvf, width, height, rowBytes);
 
 //	fprintf(fp, "a %ld\n", err);
-	err = ICMEncodedFrameCreateMutable(glob->session, sourceFrame, 1024*1024*16, &encoded);
+	err = ICMEncodedFrameCreateMutable(glob->session, sourceFrame, glob->codec->EncodeGetOutputSize(utvf, width, height, rowBytes), &encoded);
 //	fprintf(fp, "b %ld\n", err);
 	dstPtr = ICMEncodedFrameGetDataPtr(encoded);
 	srcPtr = CVPixelBufferGetBaseAddress(sourcePixelBuffer);
-//	fprintf(fp, "src=%p dst=%p\n", srcPtr, dstPtr);
-	memcpy(dstPtr, srcPtr, CVPixelBufferGetHeight(sourcePixelBuffer) * CVPixelBufferGetBytesPerRow(sourcePixelBuffer));
 //	fprintf(fp, "src=%p dst=%p\n", srcPtr, dstPtr);
 	encodedSize = glob->codec->EncodeFrame(dstPtr, &keyFrame, srcPtr);
 //	fprintf(fp, "b1 encodedSize=%zu\n", encodedSize);
@@ -235,8 +244,5 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 
 pascal ComponentResult QTEncoderCompleteFrame(CQTEncoder *glob, ICMCompressorSourceFrameRef sourceFrame, UInt32 flags)
 {
-//	fprintf(fp, "QTEncoderCompleteFrame(glob=%p, sourceFrame=%p, flags=%lu)\n", glob, sourceFrame, flags);
-	
-	/* nothing to do */
 	return noErr;
 }
