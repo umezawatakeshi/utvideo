@@ -34,6 +34,34 @@ resource 'thng' (SUBTYPE_RID) {
 	};
 };
 
+resource 'stri' (SUBTYPE_RID + 256) {
+	"Decompresses video stored in " SUBTYPE_FMTN " format."
+};
+
+resource 'thng' (SUBTYPE_RID + 256) {
+	compressorComponentType,			// Type                 
+	SUBTYPE_VAL,						// SubType
+	'Umzw',								// Manufacturer
+	0,									// - use componentHasMultiplePlatforms
+	0,
+	0,
+	0,
+	'strn', SUBTYPE_RID,				// Name Type & ID
+	'stri', SUBTYPE_RID + 256,			// Info Type & ID
+	0, 0,								// Icon Type & ID
+	0x1000000,							// Version
+	componentHasMultiplePlatforms +		// Registration Flags 
+	componentDoAutoVersion,				// Registration Flags
+	0,									// Resource ID of Icon Family
+	{
+		codecInfoDoes32,
+		'dlle',
+		257,
+		platformIA32NativeEntryPoint,
+	};
+};
+
+
 #undef SUBTYPE_FMTN
 
 #undef SUBTYPE

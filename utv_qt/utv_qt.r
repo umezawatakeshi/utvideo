@@ -33,6 +33,10 @@ resource 'dlle' (256) {
 	"QTDecoderComponentDispatch"
 };
 
+resource 'dlle' (257) {
+	"QTEncoderComponentDispatch"
+};
+
 #define SUBTYPE      ULRA
 #define SUBTYPE_VAL  'ULRA'
 #define SUBTYPE_STR  "ULRA"

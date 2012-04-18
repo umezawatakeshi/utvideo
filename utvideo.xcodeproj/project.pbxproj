@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2529170114D02DCB00A3813C /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2529170014D02DCB00A3813C /* CoreVideo.framework */; };
 		2564C7B914823C7E00F1A9EB /* Convert_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B414823C7E00F1A9EB /* Convert_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
 		2564C7BA14823C7E00F1A9EB /* HuffmanCode_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B514823C7E00F1A9EB /* HuffmanCode_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
 		2564C7BB14823C7E00F1A9EB /* Predict_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B614823C7E00F1A9EB /* Predict_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
@@ -28,6 +29,7 @@
 		258DB40E1411F9290059F47E /* ULY2Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3F11411F8600059F47E /* ULY2Codec.cpp */; };
 		258DB40F1411F9290059F47E /* utv_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3F31411F8600059F47E /* utv_core.cpp */; };
 		25D59BCE14CD624800FDCD1F /* QTCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D59BCC14CD624800FDCD1F /* QTCodec.cpp */; };
+		25D59BE014CD6BA300FDCD1F /* QTEncoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D59BDD14CD6BA300FDCD1F /* QTEncoder.cpp */; };
 		25F09D4314122EC900D214B9 /* QTDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25F09D3E14122EC800D214B9 /* QTDecoder.cpp */; };
 		25F09D4414122EC900D214B9 /* utv_qt.r in Rez */ = {isa = PBXBuildFile; fileRef = 25F09D4214122EC900D214B9 /* utv_qt.r */; };
 		25F09D5514122FB800D214B9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25F09D5414122FB800D214B9 /* Carbon.framework */; };
@@ -37,6 +39,7 @@
 /* Begin PBXFileReference section */
 		2510B6B41417BCB100EA5F2F /* Mutex.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Mutex.h; path = utv_qt/Mutex.h; sourceTree = "<group>"; };
 		2510B6C31417BDDE00EA5F2F /* utv_qt.in.r */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.rez; name = utv_qt.in.r; path = utv_qt/utv_qt.in.r; sourceTree = "<group>"; };
+		2529170014D02DCB00A3813C /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		2564C7B314823C7D00F1A9EB /* Common_asm_x86.mac */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Common_asm_x86.mac; path = utv_core/Common_asm_x86.mac; sourceTree = "<group>"; };
 		2564C7B414823C7E00F1A9EB /* Convert_asm_x86.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Convert_asm_x86.asm; path = utv_core/Convert_asm_x86.asm; sourceTree = "<group>"; };
 		2564C7B514823C7E00F1A9EB /* HuffmanCode_asm_x86.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = HuffmanCode_asm_x86.asm; path = utv_core/HuffmanCode_asm_x86.asm; sourceTree = "<group>"; };
@@ -80,6 +83,9 @@
 		258DB3FC1411F8C80059F47E /* utvideo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "utvideo-Info.plist"; sourceTree = "<group>"; };
 		25D59BCC14CD624800FDCD1F /* QTCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = QTCodec.cpp; path = utv_qt/QTCodec.cpp; sourceTree = "<group>"; };
 		25D59BCD14CD624800FDCD1F /* QTCodec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTCodec.h; path = utv_qt/QTCodec.h; sourceTree = "<group>"; };
+		25D59BDD14CD6BA300FDCD1F /* QTEncoder.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = QTEncoder.cpp; path = utv_qt/QTEncoder.cpp; sourceTree = "<group>"; };
+		25D59BDE14CD6BA300FDCD1F /* QTEncoder.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTEncoder.h; path = utv_qt/QTEncoder.h; sourceTree = "<group>"; };
+		25D59BDF14CD6BA300FDCD1F /* QTEncoderDispatch.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTEncoderDispatch.h; path = utv_qt/QTEncoderDispatch.h; sourceTree = "<group>"; };
 		25F09D3E14122EC800D214B9 /* QTDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = QTDecoder.cpp; path = utv_qt/QTDecoder.cpp; sourceTree = "<group>"; };
 		25F09D3F14122EC800D214B9 /* QTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTDecoder.h; path = utv_qt/QTDecoder.h; sourceTree = "<group>"; };
 		25F09D4014122EC800D214B9 /* QTDecoderDispatch.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTDecoderDispatch.h; path = utv_qt/QTDecoderDispatch.h; sourceTree = "<group>"; };
@@ -96,6 +102,7 @@
 			files = (
 				25F09D5514122FB800D214B9 /* Carbon.framework in Frameworks */,
 				25F09D5C14122FCF00D214B9 /* QuickTime.framework in Frameworks */,
+				2529170114D02DCB00A3813C /* CoreVideo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -110,6 +117,7 @@
 				258DB3FB1411F8C80059F47E /* Products */,
 				258DB3FC1411F8C80059F47E /* utvideo-Info.plist */,
 				25F09D5414122FB800D214B9 /* Carbon.framework */,
+				2529170014D02DCB00A3813C /* CoreVideo.framework */,
 				25F09D5B14122FCF00D214B9 /* QuickTime.framework */,
 			);
 			sourceTree = "<group>";
@@ -177,6 +185,9 @@
 				25F09D3E14122EC800D214B9 /* QTDecoder.cpp */,
 				25F09D3F14122EC800D214B9 /* QTDecoder.h */,
 				25F09D4014122EC800D214B9 /* QTDecoderDispatch.h */,
+				25D59BDD14CD6BA300FDCD1F /* QTEncoder.cpp */,
+				25D59BDE14CD6BA300FDCD1F /* QTEncoder.h */,
+				25D59BDF14CD6BA300FDCD1F /* QTEncoderDispatch.h */,
 				25F09D4114122EC800D214B9 /* stdafx.h */,
 				2510B6C31417BDDE00EA5F2F /* utv_qt.in.r */,
 				25F09D4214122EC900D214B9 /* utv_qt.r */,
@@ -278,6 +289,7 @@
 				258DB40F1411F9290059F47E /* utv_core.cpp in Sources */,
 				25F09D4314122EC900D214B9 /* QTDecoder.cpp in Sources */,
 				25D59BCE14CD624800FDCD1F /* QTCodec.cpp in Sources */,
+				25D59BE014CD6BA300FDCD1F /* QTEncoder.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
