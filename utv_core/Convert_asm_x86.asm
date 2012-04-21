@@ -127,26 +127,11 @@ global %$procname
 	jmp			.label3
 
 .label2:
-	sub			edi, 16
-	sub			ebp, 4
-	sub			ebx, 2
-	sub			ecx, 2
-	test		edx, 8
-	jz			.label4
-	movq		qword [edi], xmm2
-	psrldq		xmm2, 8
-	add			edi, 8
-	add			ebp, 2
-	add			ebx, 1
-	add			ecx, 1
-.label4:
-	test		edx, 4
-	jz			.label3
-	movd		dword [edi], xmm2
-	add			edi, 4
-	add			ebp, 2
-	add			ebx, 1
-	add			ecx, 1
+	movq		qword [edi-16], xmm2
+	sub			edi, 8
+	sub			ebp, 2
+	sub			ebx, 1
+	sub			ecx, 1
 %else
 	movd		eax, xmm2
 	psrldq		xmm2, 4
