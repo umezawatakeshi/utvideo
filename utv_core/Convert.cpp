@@ -112,3 +112,35 @@ void cpp_ConvertBottomupRGB32ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t 
 {
 	cpp_ConvertBottomupRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, dwStride, dwDataStride, 4);
 }
+
+static void cpp_ConvertTopdownRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, size_t dwDataStride, int bypp)
+{
+	uint8_t *y = pYBegin;
+	uint8_t *u = pUBegin;
+	uint8_t *v = pVBegin;
+	
+	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += dwStride)
+	{
+		const uint8_t *pStrideEnd = pStrideBegin + dwDataStride;
+		for (const uint8_t *pp = pStrideBegin; pp < pStrideEnd; pp += bypp * 2)
+		{
+			const uint8_t *p = bypp == 3 ? pp : pp + 1;
+			const uint8_t *q = p + bypp;
+			*(y+0) = min(max(int((*(p+2))*0.098 + (*(p+1))*0.504 + (*(p+0))*0.257 + 16.5), 16), 235);
+			*(y+1) = min(max(int((*(q+2))*0.098 + (*(q+1))*0.504 + (*(q+0))*0.257 + 16.5), 16), 235);
+			*u     = min(max(int(((*(p+2)+*(q+2))*0.439 + (*(p+1)+*(q+1))*-0.291 + (*(p+0)+*(q+0))*-0.148)/2 + 128.5), 16), 240);
+			*v     = min(max(int(((*(p+2)+*(q+2))*-0.071 + (*(p+1)+*(q+1))*-0.368 + (*(p+0)+*(q+0))*0.439)/2 + 128.5), 16), 240);
+			y+=2; u++; v++;
+		}
+	}
+}
+
+void cpp_ConvertTopdownRGB24ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, size_t dwDataStride)
+{
+	cpp_ConvertTopdownRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, dwStride, dwDataStride, 3);
+}
+
+void cpp_ConvertTopdownRGB32ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, size_t dwDataStride)
+{
+	cpp_ConvertTopdownRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, dwStride, dwDataStride, 4);
+}
