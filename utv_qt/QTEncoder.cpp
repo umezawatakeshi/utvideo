@@ -229,9 +229,7 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 	err = ICMEncodedFrameSetDataSize(encoded, encodedSize);
 //	fprintf(fp, "c %ld\n", err);
 	mediaSampleFlags = 0;
-	if (keyFrame)
-		mediaSampleFlags |= mediaSampleDoesNotDependOnOthers;
-	else
+	if (!keyFrame)
 		mediaSampleFlags |= mediaSampleNotSync;
 
 	err = ICMEncodedFrameSetMediaSampleFlags(encoded, mediaSampleFlags);
