@@ -2,10 +2,10 @@
 <!-- $Id$ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
-<title>Ut Video Codec Suite 10.2.4 readme (English)</title>
+<title>Ut Video Codec Suite 11.0.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 10.2.4 readme (English)</h1>
+<h1>Ut Video Codec Suite 11.0.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008-2012  UMEZAWA Takeshi</p>
@@ -57,7 +57,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 </table>
 <ul>
 <li>For VCM and DMO interface, supported input formats and supported output formats are same.</li>
-<li>For QuickTime interface, only decoding is supported.</li>
 <li>In &quot;8-bit full-range&quot; of RGB formats, R,G,B=0-255. In &quot;8-bit limited&quot; of YUV formats, Y=16-235 and U,V=16-240.</li>
 <li><strong>Bold</strong> are &quot;native&quot; (no colorspace conversion occurs) formats. It is recommended to input/output with that formats.</li>
 <li>Formats written in brackets are equivalent format with preceding format. For example, YUY2, YUYV and YUNV are equivalent.</li>
@@ -87,6 +86,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <dd>NASM 2.9.10</dd>
 </dl>
 <h2 id="history">Version history</h2>
+<h3>Version 11.0.0</h3>
+<dl>
+<dt>New features</dt><dd><ul>
+<li>Add QuickTime encoder components for Mac OS X. Encoding from RGB24/ARGB32 are supported. ULY2 is not very fast.</li>
+</ul></dd>
+<dt>Bug fixes</dt><dd><ul>
+<li>ULY2: QuickTime decoder may output corrupted data in case of certain width of video and output buffer.</li>
+</ul></dd>
+</dl>
 <h3>Version 10.2.4</h3>
 <dl>
 <dt>Others</dt><dd><ul>

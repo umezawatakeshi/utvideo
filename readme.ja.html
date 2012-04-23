@@ -2,10 +2,10 @@
 <!-- $Id$ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
-<title>Ut Video Codec Suite 10.2.4 readme （日本語）</title>
+<title>Ut Video Codec Suite 11.0.0 readme （日本語）</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 10.2.4 readme （日本語）</h1>
+<h1>Ut Video Codec Suite 11.0.0 readme （日本語）</h1>
 <hr>
 <h2 id="copyright_notice">著作権表示</h2>
 <h3>英語</h3>
@@ -72,7 +72,6 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 </table>
 <ul>
 <li>VCM と DMO では、対応入力フォーマットと対応出力フォーマットは同じです。</li>
-<li>QuickTime では、デコードしかできません。</li>
 <li>RGB 系のフォーマットにおける「8bit フルレンジ」とは、R,G,B=0-255 のものを指します。YUV 系のフォーマットにおける「8bit リミテッド」とは、Y=16-235, U,V=16-240 のものを指します。</li>
 <li><strong>太字</strong>はネイティブな（=色空間の変換が発生しない）フォーマットです。可能な限りこのフォーマットで入出力することが推奨されます。</li>
 <li>カッコ内は、その前に書いてあるものと FourCC が異なるだけで中身が同じフォーマットです。例えば、YUY2 と YUYV と YUNV は中身が同じフォーマットです。</li>
@@ -104,6 +103,15 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 <dd>NASM 2.9.10</dd>
 </dl>
 <h2 id="history">改版履歴</h2>
+<h3>バージョン 11.0.0</h3>
+<dl>
+<dt>機能追加</dt><dd><ul>
+<li>QuickTime for Mac 用エンコーダコンポーネントを追加した。RGB24/ARGB32 からのエンコードデコードのみ。ULY2 は Windows と比較してあまり速くない。</li>
+</ul></dd>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY2: QuickTime デコーダで、映像の幅や出力バッファの寸法によっては、映像が乱れてデコードされる。</li>
+</ul></dd>
+</dl>
 <h3>バージョン 10.2.4</h3>
 <dl>
 <dt>その他</dt><dd><ul>
