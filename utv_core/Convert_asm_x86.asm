@@ -138,36 +138,31 @@ global %$procname
 	mov			word [edi], ax
 	shr			eax, 16
 	mov			byte [edi+2], al
-	add			edi, 3
-	add			ebp, 2
-	add			ebx, 1
-	add			ecx, 1
-	cmp			edi, esi
-	jae			.label3
 	movd		eax, xmm2
 	psrldq		xmm2, 4
 	mov			word [edi], ax
 	shr			eax, 16
 	mov			byte [edi+2], al
-	add			edi, 3
-	cmp			edi, esi
-	jae			.label3
-	movd		eax, xmm2
-	psrldq		xmm2, 4
-	mov			word [edi], ax
-	shr			eax, 16
-	mov			byte [edi+2], al
-	add			edi, 3
+	add			edi, 6
 	add			ebp, 2
 	add			ebx, 1
 	add			ecx, 1
 	cmp			edi, esi
 	jae			.label3
+
+	movd		eax, xmm2
+	psrldq		xmm2, 4
+	mov			word [edi], ax
+	shr			eax, 16
+	mov			byte [edi+2], al
 	movd		eax, xmm2
 	mov			word [edi], ax
 	shr			eax, 16
 	mov			byte [edi+2], al
-	add			edi, 3
+	add			edi, 6
+	add			ebp, 2
+	add			ebx, 1
+	add			ecx, 1
 	cmp			edi, esi
 	jb			.label1
 %endif
