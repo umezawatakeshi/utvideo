@@ -5,7 +5,7 @@
 
 #pragma once
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1600 /* Visual C++ 2010 or older */
+#if !defined(_MSC_VER) || _MSC_VER >= 1600 /* Visual C++ 2010 or later */
 #error This stdint.h is for Visual C++ 2008 or older
 #endif
 
