@@ -21,33 +21,40 @@ x64_i686_HuffmanEncode:
 	cmp			qword [rdx], 0
 	je			.label3
 
-	mov			bl, -32
+	mov			bl, -64
 	mov			cl, 0
 
 	align		64
 .label1:
-	shld		eax, ecx, cl
+	shld		rax, rcx, cl
 	cmp			rsi, r8
 	jnb			.label4
 	movzx		rcx, byte [rsi]
 	inc			rsi
-	mov			ecx, dword [rdx+rcx*4]
+	mov			rcx, qword [rdx+rcx*8]
 	add			bl, cl
 	jnc			.label1
 	sub			cl, bl
-	shld		eax, ecx, cl
-	mov			dword [rdi], eax
-	add			rdi, 4
+	shld		rax, rcx, cl
+	rol			rax, 32
+	mov			qword [rdi], rax
+	add			rdi, 8
 	add			cl, bl
-	sub			bl, 32
+	sub			bl, 64
 	jmp			.label1
 
 .label4:
-	test		bl, 1fh
+	test		bl, 3fh
 	jz			.label3
 	neg			bl
 	mov			cl, bl
-	shl			eax, cl
+	shl			rax, cl
+	rol			rax, 32
+	mov			dword [rdi], eax
+	add			rdi, 4
+	cmp			bl, 32
+	jae			.label3
+	rol			rax, 32
 	mov			dword [rdi], eax
 	add			rdi, 4
 .label3:

@@ -2,6 +2,7 @@
 /* $Id$ */
 
 #include "stdafx.h"
+#include "utvideo.h"
 //#include <windows.h>
 //#include <algorithm>
 //using namespace std;
@@ -90,7 +91,7 @@ inline void sort_codelength(struct CODE_LENGTH_SORT *p)
 void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const uint8_t *pCodeLengthTable)
 {
 	struct CODE_LENGTH_SORT cls[256];
-	uint32_t curcode;
+	uintenc_t curcode;
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -114,7 +115,7 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const uint8_
 		if (cls[i].codelen == 255)
 			continue;
 		pEncodeTable->dwTableMux[cls[i].symbol] = curcode | cls[i].codelen;
-		curcode += 0x80000000 >> (cls[i].codelen - 1);
+		curcode += UINTENC_MSB >> (cls[i].codelen - 1);
 	}
 }
 
@@ -225,17 +226,30 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_
 	}
 }
 
-inline void EncodeSymbol(uint8_t bySymbol, const HUFFMAN_ENCODE_TABLE *pEncodeTable, uint32_t *&pDst, uint32_t &dwTmpEncoded, int &nBits)
+inline void FlushEncoded(uint32_t *&pDst, uintenc_t &dwTmpEncoded, int &nBits)
 {
-	int nCurBits = pEncodeTable->dwTableMux[bySymbol] & 0xff;
-	uint32_t dwCurEncoded = pEncodeTable->dwTableMux[bySymbol] & 0xffffff00;
+#if defined(__x86_64__)
+	if (nBits > 0)
+		*pDst++ = (uint32_t)(dwTmpEncoded >> 32);
+	if (nBits > 32)
+		*pDst++ = (uint32_t)(dwTmpEncoded & 0xffffffff);
+#else
+	if (nBits > 0)
+		*pDst++ = dwTmpEncoded;
+#endif
+}
+
+inline void EncodeSymbol(uint8_t bySymbol, const HUFFMAN_ENCODE_TABLE *pEncodeTable, uint32_t *&pDst, uintenc_t &dwTmpEncoded, int &nBits)
+{
+	int nCurBits = (int)(pEncodeTable->dwTableMux[bySymbol] & 0xff);
+	uintenc_t dwCurEncoded = pEncodeTable->dwTableMux[bySymbol] & UINTENC_MASK;
 
 	dwTmpEncoded |= dwCurEncoded >> nBits;
 	nBits += nCurBits;
-	if (nBits >= 32)
+	if (nBits >= UINTENC_BITS)
 	{
-		*pDst++ = dwTmpEncoded;
-		nBits -= 32;
+		FlushEncoded(pDst, dwTmpEncoded, nBits);
+		nBits -= UINTENC_BITS;
 		dwTmpEncoded = dwCurEncoded << (nCurBits - nBits);
 	}
 }
@@ -243,7 +257,7 @@ inline void EncodeSymbol(uint8_t bySymbol, const HUFFMAN_ENCODE_TABLE *pEncodeTa
 size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable)
 {
 	int nBits;
-	uint32_t dwTmpEncoded;
+	uintenc_t dwTmpEncoded;
 	uint32_t *pDst;
 	const uint8_t *p;
 
@@ -257,8 +271,7 @@ size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uin
 	for (p = pSrcBegin; p < pSrcEnd; p++)
 		EncodeSymbol(*p, pEncodeTable, pDst, dwTmpEncoded, nBits);
 
-	if (nBits != 0)
-		*pDst++ = dwTmpEncoded;
+	FlushEncoded(pDst, dwTmpEncoded, nBits);
 
 	return ((uint8_t *)pDst) - pDstBegin;
 }

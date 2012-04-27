@@ -4,9 +4,21 @@
 #pragma once
 #include "TunedFunc.h"
 
+#if defined(__x86_64__)
+typedef uint64_t uintenc_t;
+#define UINTENC_BITS 64
+#define UINTENC_MSB  0x8000000000000000ULL
+#define UINTENC_MASK 0xffffffffffffff00ULL
+#else
+typedef uint32_t uintenc_t;
+#define UINTENC_BITS 32
+#define UINTENC_MSB  0x80000000U
+#define UINTENC_MASK 0xffffff00U
+#endif
+
 struct HUFFMAN_ENCODE_TABLE
 {
-	uint32_t dwTableMux[256];
+	uintenc_t dwTableMux[256];
 };
 
 #define HUFFMAN_DECODE_TABLELOOKUP_BITS 12
