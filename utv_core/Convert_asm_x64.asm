@@ -140,9 +140,9 @@ global %$procname
 	mov			byte [rdi+2], al
 	movd		eax, xmm2
 	psrldq		xmm2, 4
-	mov			word [rdi], ax
+	mov			word [rdi+3], ax
 	shr			eax, 16
-	mov			byte [rdi+2], al
+	mov			byte [rdi+5], al
 	add			rdi, 6
 	add			rbp, 2
 	add			rbx, 1
@@ -156,9 +156,9 @@ global %$procname
 	shr			eax, 16
 	mov			byte [rdi+2], al
 	movd		eax, xmm2
-	mov			word [rdi], ax
+	mov			word [rdi+3], ax
 	shr			eax, 16
-	mov			byte [rdi+2], al
+	mov			byte [rdi+5], al
 	add			rdi, 6
 	add			rbp, 2
 	add			rbx, 1
