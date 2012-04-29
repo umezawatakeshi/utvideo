@@ -126,9 +126,9 @@ global %$procname
 	add			cl, ah
 	jnc			%%label4
 	sub			cl, 32
-	add			rsi, 4
 	mov			r9d, edx
-	mov			edx, dword [rsi+4]
+	mov			edx, dword [rsi+4+4]
+	add			rsi, 4
 
 %%label4:
 	mov			eax, r9d
