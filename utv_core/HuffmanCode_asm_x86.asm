@@ -148,9 +148,8 @@ global %$procname
 	mov			cl, byte [ebx + 8192 + ebp]					; pDecodeTable->nCodeShift[ebp]
 	shr			eax, cl
 	mov			cl, ch
-	mov			ebp, dword [ebx + 8192+32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
-	add			ebp, eax
-	mov			eax, dword [ebx + 8192+32+4*32 + ebp*2]		; pDecodeTable->SymbolAndCodeLength[ebp]
+	add			eax, dword [ebx + 8192+32 + ebp*4]			; pDecodeTable->dwSymbolBase[ebp]
+	mov			eax, dword [ebx + 8192+32+4*32 + eax*2]		; pDecodeTable->SymbolAndCodeLength[eax]
 	mov			ebp, dword [esi]
 
 %%label0:
