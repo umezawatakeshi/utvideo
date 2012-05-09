@@ -45,6 +45,8 @@ const TUNEDFUNC tfnI686 = {
 	cpp_ConvertULY2ToTopdownRGB32,
 	cpp_ConvertBottomupRGB24ToULY2,
 	cpp_ConvertBottomupRGB32ToULY2,
+	cpp_ConvertTopdownRGB24ToULY2,
+	cpp_ConvertTopdownRGB32ToULY2,
 };
 
 const TUNEDFUNC tfnSSE2 = {
@@ -77,6 +79,8 @@ const TUNEDFUNC tfnSSE2 = {
 	x86_sse2_ConvertULY2ToTopdownRGB32,
 	x86_sse2_ConvertBottomupRGB24ToULY2,
 	x86_sse2_ConvertBottomupRGB32ToULY2,
+	x86_sse2_ConvertTopdownRGB24ToULY2,
+	x86_sse2_ConvertTopdownRGB32ToULY2,
 };
 
 const TUNEDFUNC &tfnSSE3 = tfnSSE2;

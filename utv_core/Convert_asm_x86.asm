@@ -214,9 +214,9 @@ r2yuv	dq	01073000000001073h
 yuvoff	dq	00004200000042000h
 		dq	00020200000202000h
 
-%macro CONVERT_BOTTOMUP_RGB_TO_ULY2 2
+%macro CONVERT_RGB_TO_ULY2 4
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, rgb32, %2
+	MULTI_CONTEXT_XDEFINE procname, %1, bottomup, %2, littleendian, %3, rgb32, %4
 
 global %$procname
 %$procname:
@@ -225,9 +225,14 @@ global %$procname
 	mov			edi, dword [esp + %$pYBegin]
 	mov			ebx, dword [esp + %$pUBegin]
 	mov			ecx, dword [esp + %$pVBegin]
+%if %$bottomup
 	mov			ebp, dword [esp + %$pSrcEnd]
 	sub			ebp, dword [esp + %$dwStride]
 	add			ebp, dword [esp + %$dwDataStride]
+%else
+	mov			ebp, dword [esp + %$pSrcBegin]
+	add			ebp, dword [esp + %$dwDataStride]
+%endif
 
 	align	64
 .label0:
@@ -242,22 +247,35 @@ global %$procname
 	;align	64
 .label1:
 %if %$rgb32
-	movd		xmm0, dword [esi-4]					; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0
-	movd		xmm1, dword [esi]					; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R1 G1 B1
+	movd		xmm0, dword [esi-4]					; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0 / B0 G0 R0 XX
+	movd		xmm1, dword [esi]					; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R1 G1 B1 / B1 G1 R1 XX
 %else
-	movd		xmm0, dword [esi-3]					; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0
-	movd		xmm1, dword [esi-1]					; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 R1 G1 B1 XX
-	psrld		xmm1, 8								; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 00 R1 G1 B1
+	movd		xmm0, dword [esi-3]					; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0 / XX B0 G0 R0
+	movd		xmm1, dword [esi-1]					; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 R1 G1 B1 XX / B1 G1 R1 XX
+	psrld		xmm1, 8								; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 00 R1 G1 B1 / 00 B1 G1 R1
 %endif
 
-	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 00 00 00 00 00 00 XX R1 R0 G1 G0 B1 B0
+	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 00 00 00 00 00 00 XX R1 R0 G1 G0 B1 B0 / B1 B0 G1 G0 R1 R0 XX XX
+													;                                                        / XX XX B1 B0 G1 G0 R1 R0 (rgb24be)
 .label3:
 	pxor		xmm1, xmm1
 	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 XX 00 R1 00 R0 00 G1 00 G0 00 B1 00 B0
 
+%if %$littleendian
 	pshufd		xmm1, xmm0, 055h					; xmm1 = 00 G1 00 G0 00 G1 00 G0 00 G1 00 G0 00 G1 00 G0
 	pshufd		xmm2, xmm0, 0aah					; xmm2 = 00 R1 00 R0 00 R1 00 R0 00 R1 00 R0 00 R1 00 R0
 	pshufd		xmm0, xmm0, 000h					; xmm0 = 00 B1 00 B0 00 B1 00 B0 00 B1 00 B0 00 B1 00 B0
+%else
+ %if %$rgb32
+	pshufd		xmm1, xmm0, 0aah					; xmm1 = 00 G1 00 G0 00 G1 00 G0 00 G1 00 G0 00 G1 00 G0
+	pshufd		xmm2, xmm0, 055h					; xmm2 = 00 R1 00 R0 00 R1 00 R0 00 R1 00 R0 00 R1 00 R0
+	pshufd		xmm0, xmm0, 0ffh					; xmm0 = 00 B1 00 B0 00 B1 00 B0 00 B1 00 B0 00 B1 00 B0
+ %else
+	pshufd		xmm1, xmm0, 055h					; xmm1 = 00 G1 00 G0 00 G1 00 G0 00 G1 00 G0 00 G1 00 G0
+	pshufd		xmm2, xmm0, 000h					; xmm2 = 00 R1 00 R0 00 R1 00 R0 00 R1 00 R0 00 R1 00 R0
+	pshufd		xmm0, xmm0, 0aah					; xmm0 = 00 B1 00 B0 00 B1 00 B0 00 B1 00 B0 00 B1 00 B0
+ %endif
+%endif
 
 	pmaddwd		xmm0, oword [b2yuv]					; xmm0 = ----B2V---- ----B2U---- ----B2Y1--- ----B2Y0---
 	pmaddwd		xmm1, oword [g2yuv]					; xmm1 = ----G2V---- ----G2U---- ----G2Y1--- ----G2Y0---
@@ -298,14 +316,22 @@ global %$procname
 	jmp			.label3
 
 .label2:
+%if %$bottomup
 	sub			ebp, dword [esp + %$dwStride]
 	cmp			ebp, dword [esp + %$pSrcBegin]
 	ja			.label0
+%else
+	add			ebp, dword [esp + %$dwStride]
+	cmp			ebp, dword [esp + %$pSrcEnd]
+	jbe			.label0
+%endif
 
 	SIMPLE_EPILOGUE
 
 %pop
 %endmacro
 
-CONVERT_BOTTOMUP_RGB_TO_ULY2	_x86_sse2_ConvertBottomupRGB24ToULY2, 0
-CONVERT_BOTTOMUP_RGB_TO_ULY2	_x86_sse2_ConvertBottomupRGB32ToULY2, 1
+CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertBottomupRGB24ToULY2, 1, 1, 0
+CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertBottomupRGB32ToULY2, 1, 1, 1
+CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertTopdownRGB24ToULY2,  0, 0, 0
+CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertTopdownRGB32ToULY2,  0, 0, 1

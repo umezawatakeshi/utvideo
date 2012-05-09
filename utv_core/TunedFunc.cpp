@@ -37,6 +37,8 @@ const TUNEDFUNC tfnCPP = {
 	cpp_ConvertULY2ToTopdownRGB32,
 	cpp_ConvertBottomupRGB24ToULY2,
 	cpp_ConvertBottomupRGB32ToULY2,
+	cpp_ConvertTopdownRGB24ToULY2,
+	cpp_ConvertTopdownRGB32ToULY2,
 };
 
 TUNEDFUNC tfn = tfnCPP;
