@@ -72,24 +72,24 @@ x64_i686_HuffmanEncode:
 
 global %$procname
 %$procname:
-	SIMPLE_PROLOGUE 0, pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, dwNetWidth, dwGrossWidth
+	SIMPLE_PROLOGUE 0, pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, cbNetWidth, cbGrossWidth
 
 	mov			rsi, qword [rsp + %$pSrcBegin]
 	mov			rbx, qword [rsp + %$pDecodeTable]
 %if %$multiscan
  %if %$bottomup
 	mov			rdi, qword [rsp + %$pDstEnd]
-	sub			rdi, qword [rsp + %$dwGrossWidth]
+	sub			rdi, qword [rsp + %$cbGrossWidth]
 	mov			r8,  rdi
-	add			r8,  qword [rsp + %$dwNetWidth]
-	mov			r12, qword [rsp + %$dwGrossWidth]
-	add			r12, qword [rsp + %$dwNetWidth]
+	add			r8,  qword [rsp + %$cbNetWidth]
+	mov			r12, qword [rsp + %$cbGrossWidth]
+	add			r12, qword [rsp + %$cbNetWidth]
  %else
 	mov			rdi, qword [rsp + %$pDstBegin]
 	mov			r8,  rdi
-	add			r8,  qword [rsp + %$dwNetWidth]
-	mov			r12, qword [rsp + %$dwGrossWidth]
-	sub			r12, qword [rsp + %$dwNetWidth]
+	add			r8,  qword [rsp + %$cbNetWidth]
+	mov			r12, qword [rsp + %$cbGrossWidth]
+	sub			r12, qword [rsp + %$cbNetWidth]
  %endif
 %else
 	mov			rdi, qword [rsp + %$pDstBegin]
@@ -176,13 +176,13 @@ global %$procname
 %%label2:
 %if %$$multiscan
  %if %$$bottomup
-	sub			r8, qword [rsp + %$$dwGrossWidth]
+	sub			r8, qword [rsp + %$$cbGrossWidth]
 	cmp			r8, qword [rsp + %$$pDstBegin]
 	jbe			%%label3
 
 	sub			rdi, r12
  %else
-	add			r8, qword [rsp + %$$dwGrossWidth]
+	add			r8, qword [rsp + %$$cbGrossWidth]
 	cmp			r8, qword [rsp + %$$pDstEnd]
 	jae			%%label3
 

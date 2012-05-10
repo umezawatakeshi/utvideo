@@ -30,19 +30,19 @@ uv2b	dq	00000408D0000408Dh
 
 global %$procname
 %$procname:
-	SIMPLE_PROLOGUE 0, pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, dwStride, dwDataStride
+	SIMPLE_PROLOGUE 0, pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbGrossWidth, cbNetWidth
 
 	mov			rbp, qword [rsp + %$pYBegin]
 	mov			rbx, qword [rsp + %$pUBegin]
 	mov			rcx, qword [rsp + %$pVBegin]
-	mov			rdx, qword [rsp + %$dwStride]
+	mov			rdx, qword [rsp + %$cbGrossWidth]
 %if %$bottomup
 	mov			rsi, qword [rsp + %$pDstEnd]			; esi なのに dst のポインタを保持するのは気持ちが悪いが。
 	sub			rsi, rdx
-	add			rsi, qword [rsp + %$dwDataStride]
+	add			rsi, qword [rsp + %$cbNetWidth]
 %else
 	mov			rsi, qword [rsp + %$pDstBegin]			; esi なのに dst のポインタを保持するのは気持ちが悪いが。
-	add			rsi, qword [rsp + %$dwDataStride]
+	add			rsi, qword [rsp + %$cbNetWidth]
 %endif
 
 	pxor		xmm7, xmm7				; xmm7 = 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -52,7 +52,7 @@ global %$procname
 	align	64
 .label0:
 	mov			rdi, rsi
-	sub			rdi, qword [rsp + %$dwDataStride]
+	sub			rdi, qword [rsp + %$cbNetWidth]
 
 	; align	64	; さすがに入れすぎな気がするのでコメントアウト。
 .label1:
@@ -220,24 +220,24 @@ yuvoff	dq	00004200000042000h
 
 global %$procname
 %$procname:
-	SIMPLE_PROLOGUE 0, pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, dwStride, dwDataStride
+	SIMPLE_PROLOGUE 0, pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbGrossWidth, cbNetWidth
 
 	mov			rdi, qword [rsp + %$pYBegin]
 	mov			rbx, qword [rsp + %$pUBegin]
 	mov			rcx, qword [rsp + %$pVBegin]
 %if %$bottomup
 	mov			rbp, qword [rsp + %$pSrcEnd]
-	sub			rbp, qword [rsp + %$dwStride]
-	add			rbp, qword [rsp + %$dwDataStride]
+	sub			rbp, qword [rsp + %$cbGrossWidth]
+	add			rbp, qword [rsp + %$cbNetWidth]
 %else
 	mov			rbp, qword [rsp + %$pSrcBegin]
-	add			rbp, qword [rsp + %$dwDataStride]
+	add			rbp, qword [rsp + %$cbNetWidth]
 %endif
 
 	align	64
 .label0:
 	mov			rsi, rbp
-	sub			rsi, qword [rsp + %$dwDataStride]
+	sub			rsi, qword [rsp + %$cbNetWidth]
 %if %$rgb32
 	add			rsi, 4
 %else
@@ -317,11 +317,11 @@ global %$procname
 
 .label2:
 %if %$bottomup
-	sub			rbp, qword [rsp + %$dwStride]
+	sub			rbp, qword [rsp + %$cbGrossWidth]
 	cmp			rbp, qword [rsp + %$pSrcBegin]
 	ja			.label0
 %else
-	add			rbp, qword [rsp + %$dwStride]
+	add			rbp, qword [rsp + %$cbGrossWidth]
 	cmp			rbp, qword [rsp + %$pSrcEnd]
 	jbe			.label0
 %endif

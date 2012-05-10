@@ -5,15 +5,15 @@
 #include "utvideo.h"
 #include "Convert.h"
 
-static void cpp_ConvertULY2ToBottomupRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t dwStride, size_t dwDataStride, int bypp)
+static void cpp_ConvertULY2ToBottomupRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbGrossWidth, size_t cbNetWidth, int bypp)
 {
 	const uint8_t *y = pYBegin;
 	const uint8_t *u = pUBegin;
 	const uint8_t *v = pVBegin;
 
-	for (uint8_t *pStrideBegin = pDstEnd - dwStride; pStrideBegin >= pDstBegin; pStrideBegin -= dwStride)
+	for (uint8_t *pStrideBegin = pDstEnd - cbGrossWidth; pStrideBegin >= pDstBegin; pStrideBegin -= cbGrossWidth)
 	{
-		uint8_t *pStrideEnd = pStrideBegin + dwDataStride;
+		uint8_t *pStrideEnd = pStrideBegin + cbNetWidth;
 		for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += bypp * 2)
 		{
 			uint8_t *q = p + bypp;
@@ -33,25 +33,25 @@ static void cpp_ConvertULY2ToBottomupRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, c
 	}
 }
 
-void cpp_ConvertULY2ToBottomupRGB24(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t dwStride, size_t dwDataStride)
+void cpp_ConvertULY2ToBottomupRGB24(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbGrossWidth, size_t cbNetWidth)
 {
-	cpp_ConvertULY2ToBottomupRGB(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, dwStride, dwDataStride, 3);
+	cpp_ConvertULY2ToBottomupRGB(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbGrossWidth, cbNetWidth, 3);
 }
 
-void cpp_ConvertULY2ToBottomupRGB32(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t dwStride, size_t dwDataStride)
+void cpp_ConvertULY2ToBottomupRGB32(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbGrossWidth, size_t cbNetWidth)
 {
-	cpp_ConvertULY2ToBottomupRGB(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, dwStride, dwDataStride, 4);
+	cpp_ConvertULY2ToBottomupRGB(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbGrossWidth, cbNetWidth, 4);
 }
 
-static void cpp_ConvertULY2ToTopdownRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t dwStride, size_t dwDataStride, int bypp)
+static void cpp_ConvertULY2ToTopdownRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbGrossWidth, size_t cbNetWidth, int bypp)
 {
 	const uint8_t *y = pYBegin;
 	const uint8_t *u = pUBegin;
 	const uint8_t *v = pVBegin;
 
-	for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += dwStride)
+	for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += cbGrossWidth)
 	{
-		uint8_t *pStrideEnd = pStrideBegin + dwDataStride;
+		uint8_t *pStrideEnd = pStrideBegin + cbNetWidth;
 		for (uint8_t *pp = pStrideBegin; pp < pStrideEnd; pp += bypp * 2)
 		{
 			uint8_t *p = bypp == 3 ? pp : pp + 1;
@@ -72,25 +72,25 @@ static void cpp_ConvertULY2ToTopdownRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, co
 	}
 }
 
-void cpp_ConvertULY2ToTopdownRGB24(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t dwStride, size_t dwDataStride)
+void cpp_ConvertULY2ToTopdownRGB24(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbGrossWidth, size_t cbNetWidth)
 {
-	cpp_ConvertULY2ToTopdownRGB(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, dwStride, dwDataStride, 3);
+	cpp_ConvertULY2ToTopdownRGB(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbGrossWidth, cbNetWidth, 3);
 }
 
-void cpp_ConvertULY2ToTopdownRGB32(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t dwStride, size_t dwDataStride)
+void cpp_ConvertULY2ToTopdownRGB32(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbGrossWidth, size_t cbNetWidth)
 {
-	cpp_ConvertULY2ToTopdownRGB(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, dwStride, dwDataStride, 4);
+	cpp_ConvertULY2ToTopdownRGB(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbGrossWidth, cbNetWidth, 4);
 }
 
-static void cpp_ConvertBottomupRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, size_t dwDataStride, int bypp)
+static void cpp_ConvertBottomupRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbGrossWidth, size_t cbNetWidth, int bypp)
 {
 	uint8_t *y = pYBegin;
 	uint8_t *u = pUBegin;
 	uint8_t *v = pVBegin;
 
-	for (const uint8_t *pStrideBegin = pSrcEnd - dwStride; pStrideBegin >= pSrcBegin; pStrideBegin -= dwStride)
+	for (const uint8_t *pStrideBegin = pSrcEnd - cbGrossWidth; pStrideBegin >= pSrcBegin; pStrideBegin -= cbGrossWidth)
 	{
-		const uint8_t *pStrideEnd = pStrideBegin + dwDataStride;
+		const uint8_t *pStrideEnd = pStrideBegin + cbNetWidth;
 		for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += bypp * 2)
 		{
 			const uint8_t *q = p + bypp;
@@ -103,25 +103,25 @@ static void cpp_ConvertBottomupRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uin
 	}
 }
 
-void cpp_ConvertBottomupRGB24ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, size_t dwDataStride)
+void cpp_ConvertBottomupRGB24ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbGrossWidth, size_t cbNetWidth)
 {
-	cpp_ConvertBottomupRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, dwStride, dwDataStride, 3);
+	cpp_ConvertBottomupRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbGrossWidth, cbNetWidth, 3);
 }
 
-void cpp_ConvertBottomupRGB32ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, size_t dwDataStride)
+void cpp_ConvertBottomupRGB32ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbGrossWidth, size_t cbNetWidth)
 {
-	cpp_ConvertBottomupRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, dwStride, dwDataStride, 4);
+	cpp_ConvertBottomupRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbGrossWidth, cbNetWidth, 4);
 }
 
-static void cpp_ConvertTopdownRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, size_t dwDataStride, int bypp)
+static void cpp_ConvertTopdownRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbGrossWidth, size_t cbNetWidth, int bypp)
 {
 	uint8_t *y = pYBegin;
 	uint8_t *u = pUBegin;
 	uint8_t *v = pVBegin;
 	
-	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += dwStride)
+	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += cbGrossWidth)
 	{
-		const uint8_t *pStrideEnd = pStrideBegin + dwDataStride;
+		const uint8_t *pStrideEnd = pStrideBegin + cbNetWidth;
 		for (const uint8_t *pp = pStrideBegin; pp < pStrideEnd; pp += bypp * 2)
 		{
 			const uint8_t *p = bypp == 3 ? pp : pp + 1;
@@ -135,12 +135,12 @@ static void cpp_ConvertTopdownRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint
 	}
 }
 
-void cpp_ConvertTopdownRGB24ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, size_t dwDataStride)
+void cpp_ConvertTopdownRGB24ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbGrossWidth, size_t cbNetWidth)
 {
-	cpp_ConvertTopdownRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, dwStride, dwDataStride, 3);
+	cpp_ConvertTopdownRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbGrossWidth, cbNetWidth, 3);
 }
 
-void cpp_ConvertTopdownRGB32ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, size_t dwDataStride)
+void cpp_ConvertTopdownRGB32ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbGrossWidth, size_t cbNetWidth)
 {
-	cpp_ConvertTopdownRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, dwStride, dwDataStride, 4);
+	cpp_ConvertTopdownRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbGrossWidth, cbNetWidth, 4);
 }

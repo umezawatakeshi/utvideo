@@ -65,7 +65,7 @@ _x86_i686_HuffmanEncode:
 
 global %$procname
 %$procname:
-	SIMPLE_PROLOGUE 12, pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, dwNetWidth, dwGrossWidth
+	SIMPLE_PROLOGUE 12, pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, cbNetWidth, cbGrossWidth
 
 %define %$byCorrBuf     0
 %define %$pLineEnd      4
@@ -76,20 +76,20 @@ global %$procname
 %if %$multiscan
  %if %$bottomup
 	mov			edi, dword [esp + %$pDstEnd]
-	sub			edi, dword [esp + %$dwGrossWidth]
+	sub			edi, dword [esp + %$cbGrossWidth]
 	mov			eax, edi
-	add			eax, dword [esp + %$dwNetWidth]
+	add			eax, dword [esp + %$cbNetWidth]
 	mov			dword [esp + %$pLineEnd], eax
-	mov			eax, dword [esp + %$dwGrossWidth]
-	add			eax, dword [esp + %$dwNetWidth]
+	mov			eax, dword [esp + %$cbGrossWidth]
+	add			eax, dword [esp + %$cbNetWidth]
 	mov			dword [esp + %$dwLineOffset], eax
  %else
 	mov			edi, dword [esp + %$pDstBegin]
 	mov			eax, edi
-	add			eax, dword [esp + %$dwNetWidth]
+	add			eax, dword [esp + %$cbNetWidth]
 	mov			dword [esp + %$pLineEnd], eax
-	mov			eax, dword [esp + %$dwGrossWidth]
-	sub			eax, dword [esp + %$dwNetWidth]
+	mov			eax, dword [esp + %$cbGrossWidth]
+	sub			eax, dword [esp + %$cbNetWidth]
 	mov			dword [esp + %$dwLineOffset], eax
  %endif
 %else
@@ -179,7 +179,7 @@ global %$procname
 %if %$$multiscan
  %if %$$bottomup
 	mov			edx, dword [esp + %$$pLineEnd]
-	sub			edx, dword [esp + %$$dwGrossWidth]
+	sub			edx, dword [esp + %$$cbGrossWidth]
 	cmp			edx, dword [esp + %$$pDstBegin]
 	jbe			%%label3
 	mov			dword [esp + %$$pLineEnd], edx
@@ -189,7 +189,7 @@ global %$procname
 	sub			edi, dword [esp + %$$dwLineOffset]
  %else
 	mov			edx, dword [esp + %$$pLineEnd]
-	add			edx, dword [esp + %$$dwGrossWidth]
+	add			edx, dword [esp + %$$cbGrossWidth]
 	cmp			edx, dword [esp + %$$pDstEnd]
 	jae			%%label3
 	mov			dword [esp + %$$pLineEnd], edx
