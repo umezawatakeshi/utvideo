@@ -151,17 +151,14 @@ INT_PTR CUL00Codec::Configure(HWND hwnd)
 
 INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// 一旦 LONG_PTR にキャストするのは、/Wp64 環境下で誤って 警告C4312 が発生するため。
-	CUL00Codec *pThis = (CUL00Codec *)(LONG_PTR)GetWindowLongPtr(hwnd, DWLP_USER);
+	CUL00Codec *pThis = (CUL00Codec *)GetWindowLongPtr(hwnd, DWLP_USER);
 	char buf[256];
 	int	n;
 
 	switch(uMsg)
 	{
 	case WM_INITDIALOG:
-		// 一旦 __int3264 にキャストするのは、/Wp64 環境下で誤って 警告C4244 が発生するため。
-		// LONG_PTR にキャストするのではダメらしい。
-		SetWindowLongPtr(hwnd, DWLP_USER, (__int3264)lParam);
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
 		pThis = (CUL00Codec *)lParam;
 		pThis->GetLongFriendlyName(buf, _countof(buf));
 		SetWindowText(hwnd, buf);
