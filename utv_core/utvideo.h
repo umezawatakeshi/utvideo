@@ -17,6 +17,13 @@
 	(((uint32_t)(fcc) & 0x00ff0000) >>  8) | \
 	(((uint32_t)(fcc) & 0xff000000) >> 24))
 
+#ifdef _MSC_VER
+#ifndef _SSIZE_T_DEFINED
+typedef ptrdiff_t ssize_t;
+#define _SSIZE_T_DEFINED
+#endif
+#endif
+
 
 #define UTVIDEO_VERSION_MASK                      0xffffff00
 #define UTVIDEO_VERSION                           0x0b000000
