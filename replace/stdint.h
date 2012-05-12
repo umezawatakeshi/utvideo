@@ -34,9 +34,6 @@ typedef unsigned __int64 uint64_t;
 #define UINT32_MAX (0xffffffffU)
 #define UINT64_MAX (0xffffffffffffffffULL)
 
-typedef signed __int3264   intptr_t;
-typedef unsigned __int3264 uintptr_t;
-
 #ifdef _WIN64
 #define INTPTR_MAX  INT64_MAX
 #define INTPTR_MIN  INT64_MIN
