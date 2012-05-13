@@ -2,10 +2,10 @@
 <!-- $Id$ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
-<title>Ut Video Codec Suite 11.0.0 readme (English)</title>
+<title>Ut Video Codec Suite 11.1.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 11.0.0 readme (English)</h1>
+<h1>Ut Video Codec Suite 11.1.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008-2012  UMEZAWA Takeshi</p>
@@ -86,6 +86,17 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <dd>NASM 2.9.10</dd>
 </dl>
 <h2 id="history">Version history</h2>
+<h3>Version 11.1.0</h3>
+<dl>
+<dt>Performance Improvements</dt><dd><ul>
+<li>(Mac) Add assembly language version of colorspace conversion routine from RGB to ULY2.</li>
+<li>Common: Speed up decoding a little.</li>
+<li>Common: Speed up encoding on x64 about 10%</li>
+</ul></dd>
+<dt>Others</dt><dd><ul>
+<li>(Mac) encoded size becomes a little smaller by omitting unnecessary media sample flags.</li>
+</ul></dd>
+</dl>
 <h3>Version 11.0.0</h3>
 <dl>
 <dt>New features</dt><dd><ul>
