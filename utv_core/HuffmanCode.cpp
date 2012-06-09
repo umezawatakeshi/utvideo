@@ -180,6 +180,10 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_
 
 		for (int i = nLastIndex; i >= 0; i--)
 		{
+			// 短い符号語の場合は高速テーブルでデコードされるので、低速テーブルの生成は不要である。
+			if (cls[i].codelen <= HUFFMAN_DECODE_TABLELOOKUP_BITS)
+				break;
+
 			int bsrval = bsr(curcode);
 			if (bsrval != prevbsrval)
 			{
