@@ -135,12 +135,6 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_
 {
 	struct CODE_LENGTH_SORT cls[256];
 	int nLastIndex;
-	int j;
-	int base;
-	uint32_t curcode;
-	int nextfillidx;
-	int lastfillidx;
-	int prevbsrval;
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -150,6 +144,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_
 
 	sort_codelength(cls);
 
+	// 出現するシンボルが１種類しかない場合の処理
 	if (cls[0].codelen == 0)
 	{
 		memset(pDecodeTable, 0, sizeof(HUFFMAN_DECODE_TABLE));
@@ -175,54 +170,57 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_
 			break;
 	}
 
-	curcode = 1;
-	j = 0;
-	base = 0;
-	nextfillidx = 0;
-	prevbsrval = 0;
-	for (int i = nLastIndex; i >= 0; i--)
+	// 低速テーブルの生成
 	{
-		int bsrval = bsr(curcode);
-		if (bsrval != prevbsrval)
+		uint32_t curcode = 1; // bsr 対策で 0 ではなく 1。符号語長は 24 以下なので 1 にしてあっても問題ない。
+		int j = 0;
+		int base = 0;
+		int nextfillidx = 0;
+		int prevbsrval = 0;
+
+		for (int i = nLastIndex; i >= 0; i--)
 		{
-			base = nextfillidx - (curcode >> (32 - cls[i].codelen));
+			int bsrval = bsr(curcode);
+			if (bsrval != prevbsrval)
+			{
+				base = nextfillidx - (curcode >> (32 - cls[i].codelen));
+			}
+			for (; j <= bsrval; j++)
+			{
+				pDecodeTable->nCodeShift[j] = 32 - cls[i].codelen;
+				pDecodeTable->dwSymbolBase[j] = base;
+			}
+			int lastfillidx = nextfillidx + (1 << (32 - pDecodeTable->nCodeShift[bsrval] - cls[i].codelen));
+			for (; nextfillidx < lastfillidx; nextfillidx++)
+			{
+				pDecodeTable->SymbolAndCodeLength[nextfillidx].bySymbol    = cls[i].symbol;
+				pDecodeTable->SymbolAndCodeLength[nextfillidx].nCodeLength = cls[i].codelen;
+			}
+			curcode += 0x80000000 >> (cls[i].codelen - 1);
+			prevbsrval = bsrval;
 		}
-		for (; j <= bsrval; j++)
-		{
-			pDecodeTable->nCodeShift[j] = 32 - cls[i].codelen;
-			pDecodeTable->dwSymbolBase[j] = base;
-		}
-		lastfillidx = nextfillidx + (1 << (32 - pDecodeTable->nCodeShift[bsrval] - cls[i].codelen));
-		for (; nextfillidx < lastfillidx; nextfillidx++)
-		{
-			pDecodeTable->SymbolAndCodeLength[nextfillidx].bySymbol    = cls[i].symbol;
-			pDecodeTable->SymbolAndCodeLength[nextfillidx].nCodeLength = cls[i].codelen;
-		}
-		curcode += 0x80000000 >> (cls[i].codelen - 1);
-		prevbsrval = bsrval;
 	}
 
-
-	// テーブル一発参照用
-
-	for (int i = 0; i < _countof(pDecodeTable->LookupSymbolAndCodeLength); i++)
-		pDecodeTable->LookupSymbolAndCodeLength[i].nCodeLength = 255;
-
-	curcode = 0;
-	for (int i = 255; i >= 0; i--)
+	// 高速テーブルの生成（テーブル一発参照用）
 	{
-		if (cls[i].codelen == 255)
-			continue;
-		if (cls[i].codelen <= HUFFMAN_DECODE_TABLELOOKUP_BITS)
+		uint32_t curcode = 0;
+
+		for (int i = 0; i < _countof(pDecodeTable->LookupSymbolAndCodeLength); i++)
+			pDecodeTable->LookupSymbolAndCodeLength[i].nCodeLength = 255;
+
+		for (int i = nLastIndex; i >= 0; i--)
 		{
-			int idx = curcode >> (32 - HUFFMAN_DECODE_TABLELOOKUP_BITS);
-			for (int j = 0; j < (1 << (HUFFMAN_DECODE_TABLELOOKUP_BITS - cls[i].codelen)); j++)
+			if (cls[i].codelen <= HUFFMAN_DECODE_TABLELOOKUP_BITS)
 			{
-				pDecodeTable->LookupSymbolAndCodeLength[idx+j].nCodeLength = cls[i].codelen;
-				pDecodeTable->LookupSymbolAndCodeLength[idx+j].bySymbol = cls[i].symbol;
+				int idx = curcode >> (32 - HUFFMAN_DECODE_TABLELOOKUP_BITS);
+				for (int j = 0; j < (1 << (HUFFMAN_DECODE_TABLELOOKUP_BITS - cls[i].codelen)); j++)
+				{
+					pDecodeTable->LookupSymbolAndCodeLength[idx+j].nCodeLength = cls[i].codelen;
+					pDecodeTable->LookupSymbolAndCodeLength[idx+j].bySymbol = cls[i].symbol;
+				}
 			}
+			curcode += 0x80000000 >> (cls[i].codelen - 1);
 		}
-		curcode += 0x80000000 >> (cls[i].codelen - 1);
 	}
 }
 
