@@ -15,7 +15,6 @@
 		258DB4001411F91A0059F47E /* Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D41411F8600059F47E /* Codec.cpp */; };
 		258DB4011411F9290059F47E /* Convert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D61411F8600059F47E /* Convert.cpp */; };
 		258DB4021411F9290059F47E /* DummyCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D81411F8600059F47E /* DummyCodec.cpp */; };
-		258DB4031411F9290059F47E /* Format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3DA1411F8600059F47E /* Format.cpp */; };
 		258DB4041411F9290059F47E /* FrameBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3DC1411F8600059F47E /* FrameBuffer.cpp */; };
 		258DB4051411F9290059F47E /* GlobalConfig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3DE1411F8600059F47E /* GlobalConfig.cpp */; };
 		258DB4061411F9290059F47E /* HuffmanCode.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3E01411F8600059F47E /* HuffmanCode.cpp */; };
@@ -28,6 +27,7 @@
 		258DB40D1411F9290059F47E /* ULY0Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3EF1411F8600059F47E /* ULY0Codec.cpp */; };
 		258DB40E1411F9290059F47E /* ULY2Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3F11411F8600059F47E /* ULY2Codec.cpp */; };
 		258DB40F1411F9290059F47E /* utv_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3F31411F8600059F47E /* utv_core.cpp */; };
+		25A0B6631605DC4F005B2E55 /* Format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25A0B6611605DC4F005B2E55 /* Format.cpp */; };
 		25D59BCE14CD624800FDCD1F /* QTCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D59BCC14CD624800FDCD1F /* QTCodec.cpp */; };
 		25D59BE014CD6BA300FDCD1F /* QTEncoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D59BDD14CD6BA300FDCD1F /* QTEncoder.cpp */; };
 		25F09D4314122EC900D214B9 /* QTDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25F09D3E14122EC800D214B9 /* QTDecoder.cpp */; };
@@ -51,8 +51,6 @@
 		258DB3D71411F8600059F47E /* Convert.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Convert.h; path = utv_core/Convert.h; sourceTree = "<group>"; };
 		258DB3D81411F8600059F47E /* DummyCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = DummyCodec.cpp; path = utv_core/DummyCodec.cpp; sourceTree = "<group>"; };
 		258DB3D91411F8600059F47E /* DummyCodec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = DummyCodec.h; path = utv_core/DummyCodec.h; sourceTree = "<group>"; };
-		258DB3DA1411F8600059F47E /* Format.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Format.cpp; path = utv_core/Format.cpp; sourceTree = "<group>"; };
-		258DB3DB1411F8600059F47E /* Format.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Format.h; path = utv_core/Format.h; sourceTree = "<group>"; };
 		258DB3DC1411F8600059F47E /* FrameBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = FrameBuffer.cpp; path = utv_core/FrameBuffer.cpp; sourceTree = "<group>"; };
 		258DB3DD1411F8600059F47E /* FrameBuffer.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = FrameBuffer.h; path = utv_core/FrameBuffer.h; sourceTree = "<group>"; };
 		258DB3DE1411F8600059F47E /* GlobalConfig.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = GlobalConfig.cpp; path = utv_core/GlobalConfig.cpp; sourceTree = "<group>"; };
@@ -81,6 +79,8 @@
 		258DB3F51411F8600059F47E /* utvideo.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = utvideo.h; path = utv_core/utvideo.h; sourceTree = "<group>"; };
 		258DB3FA1411F8C80059F47E /* utvideo.component */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = utvideo.component; sourceTree = BUILT_PRODUCTS_DIR; };
 		258DB3FC1411F8C80059F47E /* utvideo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "utvideo-Info.plist"; sourceTree = "<group>"; };
+		25A0B6611605DC4F005B2E55 /* Format.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Format.cpp; path = utv_qt/Format.cpp; sourceTree = "<group>"; };
+		25A0B6621605DC4F005B2E55 /* Format.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Format.h; path = utv_qt/Format.h; sourceTree = "<group>"; };
 		25D59BCC14CD624800FDCD1F /* QTCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = QTCodec.cpp; path = utv_qt/QTCodec.cpp; sourceTree = "<group>"; };
 		25D59BCD14CD624800FDCD1F /* QTCodec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTCodec.h; path = utv_qt/QTCodec.h; sourceTree = "<group>"; };
 		25D59BDD14CD6BA300FDCD1F /* QTEncoder.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = QTEncoder.cpp; path = utv_qt/QTEncoder.cpp; sourceTree = "<group>"; };
@@ -141,8 +141,6 @@
 				2564C7B414823C7E00F1A9EB /* Convert_asm_x86.asm */,
 				258DB3D81411F8600059F47E /* DummyCodec.cpp */,
 				258DB3D91411F8600059F47E /* DummyCodec.h */,
-				258DB3DA1411F8600059F47E /* Format.cpp */,
-				258DB3DB1411F8600059F47E /* Format.h */,
 				258DB3DC1411F8600059F47E /* FrameBuffer.cpp */,
 				258DB3DD1411F8600059F47E /* FrameBuffer.h */,
 				258DB3DE1411F8600059F47E /* GlobalConfig.cpp */,
@@ -179,6 +177,8 @@
 		25F09D3D14122EB200D214B9 /* utv_qt */ = {
 			isa = PBXGroup;
 			children = (
+				25A0B6611605DC4F005B2E55 /* Format.cpp */,
+				25A0B6621605DC4F005B2E55 /* Format.h */,
 				2510B6B41417BCB100EA5F2F /* Mutex.h */,
 				25D59BCC14CD624800FDCD1F /* QTCodec.cpp */,
 				25D59BCD14CD624800FDCD1F /* QTCodec.h */,
@@ -271,7 +271,6 @@
 				258DB4011411F9290059F47E /* Convert.cpp in Sources */,
 				2564C7B914823C7E00F1A9EB /* Convert_asm_x86.asm in Sources */,
 				258DB4021411F9290059F47E /* DummyCodec.cpp in Sources */,
-				258DB4031411F9290059F47E /* Format.cpp in Sources */,
 				258DB4041411F9290059F47E /* FrameBuffer.cpp in Sources */,
 				258DB4051411F9290059F47E /* GlobalConfig.cpp in Sources */,
 				258DB4061411F9290059F47E /* HuffmanCode.cpp in Sources */,
@@ -290,6 +289,7 @@
 				25F09D4314122EC900D214B9 /* QTDecoder.cpp in Sources */,
 				25D59BCE14CD624800FDCD1F /* QTCodec.cpp in Sources */,
 				25D59BE014CD6BA300FDCD1F /* QTEncoder.cpp in Sources */,
+				25A0B6631605DC4F005B2E55 /* Format.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
