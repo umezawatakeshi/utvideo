@@ -55,7 +55,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\replace;..\utv_core"
+				AdditionalIncludeDirectories="..\replace;..\utv_core;..\utv_wfmt"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -149,7 +149,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\replace;..\utv_core"
+				AdditionalIncludeDirectories="..\replace;..\utv_core;..\utv_wfmt"
 				PreprocessorDefinitions="WIN32;_WINDOWS;_DEBUG;_USRDLL"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -244,7 +244,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="..\replace;..\utv_core"
+				AdditionalIncludeDirectories="..\replace;..\utv_core;..\utv_wfmt"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"
@@ -338,7 +338,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				AdditionalIncludeDirectories="..\replace;..\utv_core"
+				AdditionalIncludeDirectories="..\replace;..\utv_core;..\utv_wfmt"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG;_USRDLL"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="2"

@@ -63,7 +63,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="amstrmid.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
@@ -142,7 +141,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="amstrmid.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
@@ -218,7 +216,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="amstrmid.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
@@ -297,7 +294,6 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="amstrmid.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile=""
 				GenerateDebugInformation="true"
@@ -435,10 +431,6 @@
 			</File>
 			<File
 				RelativePath=".\DummyCodec.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Format.cpp"
 				>
 			</File>
 			<File
@@ -777,10 +769,6 @@
 			</File>
 			<File
 				RelativePath=".\DummyCodec.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Format.h"
 				>
 			</File>
 			<File
