@@ -12,35 +12,21 @@ inline bool is_fourcc(uint32_t x)
 
 #ifdef _WIN32
 
-DLLEXPORT int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, GUID *subtype, utvf_t utvf)
+DLLEXPORT int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, utvf_t utvf)
 {
-	DWORD dwtmp;
-	WORD wtmp;
-	GUID guidtmp;
-
-	if (biCompression == NULL)
-		biCompression = &dwtmp;
-	if (biBitCount == NULL)
-		biBitCount = &wtmp;
-	if (subtype == NULL)
-		subtype = &guidtmp;
-
 	switch (utvf)
 	{
 	case UTVF_RGB24_WIN:
 		*biCompression = BI_RGB;
 		*biBitCount    = 24;
-		*subtype       = MEDIASUBTYPE_RGB24;
 		return 0;
 	case UTVF_RGB32_WIN:
 		*biCompression = BI_RGB;
 		*biBitCount    = 32;
-		*subtype       = MEDIASUBTYPE_RGB32;
 		return 0;
 	case UTVF_ARGB32_WIN:
 		*biCompression = BI_RGB;
 		*biBitCount    = 32;
-		*subtype       = MEDIASUBTYPE_ARGB32;
 		return 0;
 	}
 
@@ -74,6 +60,28 @@ DLLEXPORT int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCoun
 	}
 
 	*biCompression = FCC(utvf);
+
+	return 0;
+}
+
+DLLEXPORT int UtVideoFormatToWindowsFormat(GUID *subtype, utvf_t utvf)
+{
+	switch (utvf)
+	{
+	case UTVF_RGB24_WIN:
+		*subtype       = MEDIASUBTYPE_RGB24;
+		return 0;
+	case UTVF_RGB32_WIN:
+		*subtype       = MEDIASUBTYPE_RGB32;
+		return 0;
+	case UTVF_ARGB32_WIN:
+		*subtype       = MEDIASUBTYPE_ARGB32;
+		return 0;
+	}
+
+	if (!is_fourcc(utvf))
+		return -1;
+
 	*subtype = MEDIASUBTYPE_YUY2;
 	subtype->Data1 = FCC(utvf);
 
@@ -101,6 +109,7 @@ DLLEXPORT int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WO
 DLLEXPORT int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount)
 {
 	DWORD dwtmp;
+	WORD wtmp;
 
 	if (biCompression == BI_RGB)
 	{
@@ -117,7 +126,7 @@ DLLEXPORT int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WO
 		}
 	}
 
-	if (UtVideoFormatToWindowsFormat(&dwtmp, NULL, NULL, (utvf_t)UNFCC(biCompression)) != 0)
+	if (UtVideoFormatToWindowsFormat(&dwtmp, &wtmp, (utvf_t)UNFCC(biCompression)) != 0)
 		return -1;
 
 	*utvf = UNFCC(biCompression);
@@ -142,7 +151,7 @@ DLLEXPORT int WindowsFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 	else
 		return -1;
 
-	if (UtVideoFormatToWindowsFormat(NULL, NULL, NULL, utvftmp) != 0)
+	if (UtVideoFormatToWindowsFormat(&guidtmp, utvftmp) != 0)
 		return -1;
 
 	*utvf = utvftmp;

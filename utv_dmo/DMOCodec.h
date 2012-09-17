@@ -139,7 +139,7 @@ public:
 		ppmt = *ppTypes;
 		for (p = putvf; *p; p++)
 		{
-			if (UtVideoFormatToWindowsFormat(NULL, NULL, &ppmt->subtype, *p) == 0)
+			if (UtVideoFormatToWindowsFormat(&ppmt->subtype, *p) == 0)
 			{
 				ppmt->type = MEDIATYPE_Video;
 				ppmt++;
@@ -252,7 +252,7 @@ public:
 		{
 			if (!*putvf)
 				return DMO_E_NO_MORE_ITEMS;
-			if (UtVideoFormatToWindowsFormat(NULL, NULL, &subtype, *putvf) != 0)
+			if (UtVideoFormatToWindowsFormat(&subtype, *putvf) != 0)
 				continue;
 			if (dwTypeIndex == 0)
 				break;
@@ -282,7 +282,7 @@ public:
 		{
 			if (!*putvf)
 				return DMO_E_NO_MORE_ITEMS;
-			if (UtVideoFormatToWindowsFormat(NULL, NULL, &subtype, *putvf) != 0)
+			if (UtVideoFormatToWindowsFormat(&subtype, *putvf) != 0)
 				continue;
 			if (dwTypeIndex == 0)
 				break;
@@ -314,7 +314,7 @@ public:
 			pmt->formattype = FORMAT_VideoInfo;
 			pvih = (VIDEOINFOHEADER *)pmt->pbFormat;
 			memcpy(pvih, pvihIn, sizeof(VIDEOINFOHEADER));
-			UtVideoFormatToWindowsFormat(&pvih->bmiHeader.biCompression, &pvih->bmiHeader.biBitCount, NULL, *putvf);
+			UtVideoFormatToWindowsFormat(&pvih->bmiHeader.biCompression, &pvih->bmiHeader.biBitCount, *putvf);
 			pvih->bmiHeader.biSizeImage = (DWORD)((T *)this)->GetSize(outfmt, infmt, pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight);
 			pvih->bmiHeader.biSize = (DWORD)(sizeof(BITMAPINFOHEADER) + cbExtraData);
 			((T *)this)->GetExtraData(((BYTE *)&pvih->bmiHeader) + sizeof(BITMAPINFOHEADER), cbExtraData, outfmt, infmt, pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight);
