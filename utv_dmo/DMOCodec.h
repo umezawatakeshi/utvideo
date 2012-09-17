@@ -139,7 +139,7 @@ public:
 		ppmt = *ppTypes;
 		for (p = putvf; *p; p++)
 		{
-			if (UtVideoFormatToWindowsFormat(&ppmt->subtype, *p) == 0)
+			if (UtVideoFormatToDirectShowFormat(&ppmt->subtype, *p) == 0)
 			{
 				ppmt->type = MEDIATYPE_Video;
 				ppmt++;
@@ -183,7 +183,7 @@ public:
 
 		pvih = (const VIDEOINFOHEADER *)pmt->pbFormat;
 
-		if (WindowsFormatToUtVideoFormat(&infmt, pvih->bmiHeader.biCompression, pvih->bmiHeader.biBitCount, pmt->subtype) != 0)
+		if (DirectShowFormatToUtVideoFormat(&infmt, pvih->bmiHeader.biCompression, pvih->bmiHeader.biBitCount, pmt->subtype) != 0)
 			return DMO_E_INVALIDTYPE;
 
 		if (pvih->bmiHeader.biHeight < 0)
@@ -222,9 +222,9 @@ public:
 
 		pvih = (const VIDEOINFOHEADER *)pmt->pbFormat;
 
-		if (WindowsFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
+		if (DirectShowFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
 			return DMO_E_INVALIDTYPE;
-		if (WindowsFormatToUtVideoFormat(&outfmt, pvih->bmiHeader.biCompression, pvih->bmiHeader.biBitCount, pmt->subtype) != 0)
+		if (DirectShowFormatToUtVideoFormat(&outfmt, pvih->bmiHeader.biCompression, pvih->bmiHeader.biBitCount, pmt->subtype) != 0)
 			return DMO_E_INVALIDTYPE;
 
 		if (pvih->bmiHeader.biWidth != pvihIn->bmiHeader.biWidth || pvih->bmiHeader.biHeight != pvihIn->bmiHeader.biHeight)
@@ -252,7 +252,7 @@ public:
 		{
 			if (!*putvf)
 				return DMO_E_NO_MORE_ITEMS;
-			if (UtVideoFormatToWindowsFormat(&subtype, *putvf) != 0)
+			if (UtVideoFormatToDirectShowFormat(&subtype, *putvf) != 0)
 				continue;
 			if (dwTypeIndex == 0)
 				break;
@@ -282,7 +282,7 @@ public:
 		{
 			if (!*putvf)
 				return DMO_E_NO_MORE_ITEMS;
-			if (UtVideoFormatToWindowsFormat(&subtype, *putvf) != 0)
+			if (UtVideoFormatToDirectShowFormat(&subtype, *putvf) != 0)
 				continue;
 			if (dwTypeIndex == 0)
 				break;
@@ -307,7 +307,7 @@ public:
 			utvf_t infmt;
 			utvf_t outfmt = *putvf;
 
-			WindowsFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype);
+			DirectShowFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype);
 
 			cbExtraData = ((T *)this)->GetExtraDataSize();
 			MoInitMediaType(pmt, (DWORD)(sizeof(VIDEOINFOHEADER) + cbExtraData));
@@ -345,9 +345,9 @@ public:
 		utvf_t infmt;
 		utvf_t outfmt;
 
-		if (WindowsFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
+		if (DirectShowFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
 			return DMO_E_INVALIDTYPE;
-		if (WindowsFormatToUtVideoFormat(&outfmt, pvihOut->bmiHeader.biCompression, pvihOut->bmiHeader.biBitCount, pmtOut->subtype) != 0)
+		if (DirectShowFormatToUtVideoFormat(&outfmt, pvihOut->bmiHeader.biCompression, pvihOut->bmiHeader.biBitCount, pmtOut->subtype) != 0)
 			return DMO_E_INVALIDTYPE;
 
 		*pcbSize = (DWORD)((T *)this)->GetSize(outfmt, infmt, pvihIn->bmiHeader.biWidth, pvihIn->bmiHeader.biHeight);

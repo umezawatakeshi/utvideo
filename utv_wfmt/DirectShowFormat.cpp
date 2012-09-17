@@ -10,7 +10,7 @@ inline bool is_fourcc(uint32_t x)
 	return (x >= '    ' /* four SP */ && x <= 0x7e7e7e7e);
 }
 
-int UtVideoFormatToWindowsFormat(GUID *subtype, utvf_t utvf)
+int UtVideoFormatToDirectShowFormat(GUID *subtype, utvf_t utvf)
 {
 	switch (utvf)
 	{
@@ -34,13 +34,13 @@ int UtVideoFormatToWindowsFormat(GUID *subtype, utvf_t utvf)
 	return 0;
 }
 
-int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype)
+int DirectShowFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype)
 {
 	utvf_t bybi, byguid;
 
 	if (VCMFormatToUtVideoFormat(&bybi, biCompression, biBitCount) != 0)
 		return -1;
-	if (WindowsFormatToUtVideoFormat(&byguid, subtype) != 0)
+	if (DirectShowFormatToUtVideoFormat(&byguid, subtype) != 0)
 		return -1;
 
 	if (bybi == byguid || (bybi == UTVF_RGB32_WIN && byguid == UTVF_ARGB32_WIN))
@@ -52,7 +52,7 @@ int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCo
 		return -1;
 }
 
-int WindowsFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
+int DirectShowFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 {
 	GUID guidtmp;
 	utvf_t utvftmp;
@@ -70,7 +70,7 @@ int WindowsFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 	else
 		return -1;
 
-	if (UtVideoFormatToWindowsFormat(&guidtmp, utvftmp) != 0)
+	if (UtVideoFormatToDirectShowFormat(&guidtmp, utvftmp) != 0)
 		return -1;
 
 	*utvf = utvftmp;

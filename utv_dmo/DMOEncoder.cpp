@@ -19,7 +19,7 @@ HRESULT CDMOEncoder::InternalAllocateStreamingResources()
 	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
 	utvf_t infmt;
 
-	if (WindowsFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
+	if (DirectShowFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
 		return DMO_E_INVALIDTYPE;
 
 	if (m_pCodec->EncodeBegin(infmt, pvihIn->bmiHeader.biWidth, pvihIn->bmiHeader.biHeight, CBGROSSWIDTH_WINDOWS) == 0)
