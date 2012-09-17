@@ -50,11 +50,6 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 #include <unistd.h>
 #endif
 
-#if defined(__APPLE__)
-#include <Carbon/Carbon.h>
-#include <QuickTime/QuickTime.h>
-#endif
-
 #ifndef _MSC_VER // XXX
 #define _countof(x) (sizeof(x) / sizeof((x)[0]))
 #define _ASSERT(x) do {} while(/*CONSTCOND*/0)
