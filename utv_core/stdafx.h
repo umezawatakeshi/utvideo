@@ -28,8 +28,6 @@
 
 // Windows ヘッダー ファイル:
 #include <windows.h>
-#include <guiddef.h>
-#include <uuids.h> // for MEDIATYPE_* and MEDIASUBTYPE_*
 
 inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 {
