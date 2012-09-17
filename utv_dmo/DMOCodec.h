@@ -42,7 +42,7 @@ public:
 	{
 		utvf_t utvf;
 
-		WindowsFormatToUtVideoFormat(&utvf, fcc, 0);
+		VCMFormatToUtVideoFormat(&utvf, fcc, 0);
 		m_pCodec = CCodec::CreateInstance(utvf, "DMO");
 		m_pInputBuffer = NULL;
 	}
@@ -88,7 +88,7 @@ public:
 			DWORD cInTypes, cOutTypes;
 			utvf_t utvf;
 
-			WindowsFormatToUtVideoFormat(&utvf, fcc, 0);
+			VCMFormatToUtVideoFormat(&utvf, fcc, 0);
 			pCodec = CCodec::CreateInstance(utvf, "DMO");
 			FormatInfoToPartialMediaType(T::GetInputFormatInfo(pCodec), &cInTypes, &pInTypes);
 			FormatInfoToPartialMediaType(T::GetOutputFormatInfo(pCodec), &cOutTypes, &pOutTypes);
@@ -314,7 +314,7 @@ public:
 			pmt->formattype = FORMAT_VideoInfo;
 			pvih = (VIDEOINFOHEADER *)pmt->pbFormat;
 			memcpy(pvih, pvihIn, sizeof(VIDEOINFOHEADER));
-			UtVideoFormatToWindowsFormat(&pvih->bmiHeader.biCompression, &pvih->bmiHeader.biBitCount, *putvf);
+			UtVideoFormatToVCMFormat(&pvih->bmiHeader.biCompression, &pvih->bmiHeader.biBitCount, *putvf);
 			pvih->bmiHeader.biSizeImage = (DWORD)((T *)this)->GetSize(outfmt, infmt, pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight);
 			pvih->bmiHeader.biSize = (DWORD)(sizeof(BITMAPINFOHEADER) + cbExtraData);
 			((T *)this)->GetExtraData(((BYTE *)&pvih->bmiHeader) + sizeof(BITMAPINFOHEADER), cbExtraData, outfmt, infmt, pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight);

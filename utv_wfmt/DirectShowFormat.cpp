@@ -38,7 +38,7 @@ int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCo
 {
 	utvf_t bybi, byguid;
 
-	if (WindowsFormatToUtVideoFormat(&bybi, biCompression, biBitCount) != 0)
+	if (VCMFormatToUtVideoFormat(&bybi, biCompression, biBitCount) != 0)
 		return -1;
 	if (WindowsFormatToUtVideoFormat(&byguid, subtype) != 0)
 		return -1;

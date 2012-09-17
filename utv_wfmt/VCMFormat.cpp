@@ -10,7 +10,7 @@ inline bool is_fourcc(uint32_t x)
 	return (x >= '    ' /* four SP */ && x <= 0x7e7e7e7e);
 }
 
-int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, utvf_t utvf)
+int UtVideoFormatToVCMFormat(DWORD *biCompression, WORD *biBitCount, utvf_t utvf)
 {
 	switch (utvf)
 	{
@@ -62,7 +62,7 @@ int UtVideoFormatToWindowsFormat(DWORD *biCompression, WORD *biBitCount, utvf_t 
 	return 0;
 }
 
-int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount)
+int VCMFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount)
 {
 	DWORD dwtmp;
 	WORD wtmp;
@@ -82,7 +82,7 @@ int WindowsFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCo
 		}
 	}
 
-	if (UtVideoFormatToWindowsFormat(&dwtmp, &wtmp, (utvf_t)UNFCC(biCompression)) != 0)
+	if (UtVideoFormatToVCMFormat(&dwtmp, &wtmp, (utvf_t)UNFCC(biCompression)) != 0)
 		return -1;
 
 	*utvf = UNFCC(biCompression);
