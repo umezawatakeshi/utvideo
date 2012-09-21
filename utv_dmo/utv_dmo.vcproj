@@ -86,6 +86,7 @@
 				ModuleDefinitionFile=".\utv_dmo.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -180,6 +181,7 @@
 				ModuleDefinitionFile=".\utv_dmo.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -275,6 +277,7 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -369,6 +372,7 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				LinkTimeCodeGeneration="1"
 				TargetMachine="17"
 			/>
 			<Tool
