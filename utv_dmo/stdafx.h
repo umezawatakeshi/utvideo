@@ -38,6 +38,7 @@
 #include <atlbase.h>
 #include <atlcom.h>
 
+#define NO_DSHOW_STRSAFE
 #include <dshow.h>
 #include <uuids.h> // for MEDIATYPE_* and MEDIASUBTYPE_*
 
