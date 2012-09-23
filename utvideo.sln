@@ -30,6 +30,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_wfmt", "utv_wfmt\utv_wf
 		{7922358B-FEC7-43F8-82DC-0E6A57C1FD18} = {7922358B-FEC7-43F8-82DC-0E6A57C1FD18}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_mft", "utv_mft\utv_mft.vcproj", "{3DEF0B0B-AB6C-4E57-A12D-153F5FBE55FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -86,6 +88,14 @@ Global
 		{AA0F0E72-A0CC-49C7-A418-5680838E773C}.Release|Win32.Build.0 = Release|Win32
 		{AA0F0E72-A0CC-49C7-A418-5680838E773C}.Release|x64.ActiveCfg = Release|x64
 		{AA0F0E72-A0CC-49C7-A418-5680838E773C}.Release|x64.Build.0 = Release|x64
+		{3DEF0B0B-AB6C-4E57-A12D-153F5FBE55FE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3DEF0B0B-AB6C-4E57-A12D-153F5FBE55FE}.Debug|Win32.Build.0 = Debug|Win32
+		{3DEF0B0B-AB6C-4E57-A12D-153F5FBE55FE}.Debug|x64.ActiveCfg = Debug|x64
+		{3DEF0B0B-AB6C-4E57-A12D-153F5FBE55FE}.Debug|x64.Build.0 = Debug|x64
+		{3DEF0B0B-AB6C-4E57-A12D-153F5FBE55FE}.Release|Win32.ActiveCfg = Release|Win32
+		{3DEF0B0B-AB6C-4E57-A12D-153F5FBE55FE}.Release|Win32.Build.0 = Release|Win32
+		{3DEF0B0B-AB6C-4E57-A12D-153F5FBE55FE}.Release|x64.ActiveCfg = Release|x64
+		{3DEF0B0B-AB6C-4E57-A12D-153F5FBE55FE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

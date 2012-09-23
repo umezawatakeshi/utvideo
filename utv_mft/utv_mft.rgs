@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		'%APPID%' = s 'UtVideoMFT'
+		'UtVideoMFT.dll'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
+}
