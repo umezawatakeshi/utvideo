@@ -414,6 +414,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\DMOCodec.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\DMODecoder.cpp"
 				>
 			</File>

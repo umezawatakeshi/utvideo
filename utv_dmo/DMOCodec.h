@@ -6,6 +6,7 @@
 #pragma once
 #include "resource.h"       // メイン シンボル
 
+#include "utvideo.h"
 #include "utv_dmo.h"
 //#include <vfw.h>
 #include "Codec.h"
@@ -16,6 +17,7 @@
 #error "DCOM の完全サポートを含んでいない Windows Mobile プラットフォームのような Windows CE プラットフォームでは、単一スレッド COM オブジェクトは正しくサポートされていません。ATL が単一スレッド COM オブジェクトの作成をサポートすること、およびその単一スレッド COM オブジェクトの実装の使用を許可することを強制するには、_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA を定義してください。ご使用の rgs ファイルのスレッド モデルは 'Free' に設定されており、DCOM Windows CE 以外のプラットフォームでサポートされる唯一のスレッド モデルと設定されていました。"
 #endif
 
+void FormatInfoToPartialMediaType(const utvf_t *putvf, DWORD *pcTypes, DMO_PARTIAL_MEDIATYPE **ppTypes);
 
 
 // CDMOCodec
@@ -117,38 +119,6 @@ public:
 	}
 
 public:
-	// IMediaObjectImpl
-
-	static void FormatInfoToPartialMediaType(const utvf_t *putvf, DWORD *pcTypes, DMO_PARTIAL_MEDIATYPE **ppTypes)
-	{
-		const utvf_t *p;
-		DMO_PARTIAL_MEDIATYPE *ppmt;
-		DWORD n;
-
-		p = putvf;
-		n = 0;
-		while (*p)
-		{
-			n++;
-			p++;
-		}
-
-		*pcTypes = 0;
-		*ppTypes = new DMO_PARTIAL_MEDIATYPE[n];
-
-		ppmt = *ppTypes;
-		for (p = putvf; *p; p++)
-		{
-			if (UtVideoFormatToDirectShowFormat(&ppmt->subtype, *p) == 0)
-			{
-				ppmt->type = MEDIATYPE_Video;
-				ppmt++;
-				(*pcTypes)++;
-			}
-		}
-	}
-
-
 	// IMediaObjectImpl
 
 	HRESULT InternalGetInputStreamInfo(DWORD dwInputStreamIndex, DWORD *pdwFlags)
