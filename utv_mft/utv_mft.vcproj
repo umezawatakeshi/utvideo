@@ -81,7 +81,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="true"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="mfplat.lib"
+				AdditionalDependencies="mfplat.lib mfuuid.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile=".\utv_mft.def"
 				GenerateDebugInformation="true"
@@ -174,7 +174,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="true"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="mfplat.lib"
+				AdditionalDependencies="mfplat.lib mfuuid.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile=".\utv_mft.def"
 				GenerateDebugInformation="true"
@@ -270,7 +270,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="true"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="mfplat.lib"
+				AdditionalDependencies="mfplat.lib mfuuid.lib"
 				LinkIncremental="2"
 				ModuleDefinitionFile=".\utv_mft.def"
 				GenerateDebugInformation="true"
@@ -362,7 +362,7 @@
 				Name="VCLinkerTool"
 				RegisterOutput="true"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="mfplat.lib"
+				AdditionalDependencies="mfplat.lib mfuuid.lib"
 				LinkIncremental="1"
 				ModuleDefinitionFile=".\utv_mft.def"
 				GenerateDebugInformation="true"
@@ -408,42 +408,6 @@
 			<File
 				RelativePath=".\ClsID.cpp"
 				>
-			</File>
-			<File
-				RelativePath=".\MFGuids.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Debug|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|x64"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\MFTCodec.cpp"
