@@ -38,4 +38,10 @@
 #include <atlbase.h>
 #include <atlcom.h>
 
+#include <mfapi.h>
+#include <mferror.h>
+#include <mftransform.h>
+
 using namespace ATL;
+
+#include <stdint.h>

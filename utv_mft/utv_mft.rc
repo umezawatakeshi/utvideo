@@ -92,6 +92,7 @@ END
 //
 
 IDR_UTVIDEOMFT          REGISTRY                "utv_mft.rgs"
+IDR_MFTDECODER          REGISTRY                "MFTDecoder.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
