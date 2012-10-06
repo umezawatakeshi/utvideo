@@ -412,13 +412,22 @@ public:
 	HRESULT STDMETHODCALLTYPE GetInputStatus(DWORD dwInputStreamID, DWORD *pdwFlags)
 	{
 		_RPT0(_CRT_WARN, "CMFTCodec::GetInputStatus()\n");
-		return E_NOTIMPL; // TODO
+
+		if (dwInputStreamID != 0)
+			return MF_E_INVALIDSTREAMNUMBER;
+
+		*pdwFlags = m_pSample == NULL ? MFT_INPUT_STATUS_ACCEPT_DATA : 0;
+
+		return S_OK;
 	}
 
 	HRESULT STDMETHODCALLTYPE GetOutputStatus(DWORD *pdwFlags)
 	{
 		_RPT0(_CRT_WARN, "CMFTCodec::GetOutputStatus()\n");
-		return E_NOTIMPL; // TODO
+
+		*pdwFlags = m_pSample == NULL ? 0 : MFT_OUTPUT_STATUS_SAMPLE_READY;
+
+		return S_OK;
 	}
 
 	HRESULT STDMETHODCALLTYPE SetOutputBounds(LONGLONG hnsLowerBound, LONGLONG hnsUpperBound)
@@ -443,7 +452,6 @@ public:
 	HRESULT STDMETHODCALLTYPE ProcessInput(DWORD dwInputStreamID, IMFSample *pSample, DWORD dwFlags)
 	{
 		_RPT0(_CRT_WARN, "CMFTCodec::ProcessInput()\n");
-//		return E_NOTIMPL; // TODO
 
 		if (dwInputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
