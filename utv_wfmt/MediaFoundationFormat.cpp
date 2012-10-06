@@ -70,7 +70,7 @@ int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 	else
 		return -1;
 
-	if (UtVideoFormatToDirectShowFormat(&guidtmp, utvftmp) != 0)
+	if (UtVideoFormatToMediaFoundationFormat(&guidtmp, utvftmp) != 0)
 		return -1;
 
 	*utvf = utvftmp;
