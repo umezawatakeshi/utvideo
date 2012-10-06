@@ -20,6 +20,8 @@
 #include <windows.h>
 #include <uuids.h> // for MEDIATYPE_* and MEDIASUBTYPE_*
 
+#include <mfapi.h>
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -9,3 +9,7 @@ int VCMFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount)
 int UtVideoFormatToDirectShowFormat(GUID *subtype, utvf_t utvf);
 int DirectShowFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype);
 int DirectShowFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype);
+
+int UtVideoFormatToMediaFoundationFormat(GUID *subtype, utvf_t utvf);
+int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype);
+int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype);

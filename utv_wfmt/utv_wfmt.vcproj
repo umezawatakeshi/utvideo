@@ -282,6 +282,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MediaFoundationFormat.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
