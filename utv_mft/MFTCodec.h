@@ -61,7 +61,7 @@ protected:
 	const DWORD m_fcc;
 	const CLSID m_clsid;
 	CCodec *m_pCodec;
-	IMFSample *m_pSample;
+	IMFSample *m_pInputSample;
 	IMFMediaType *m_pInputMediaType;
 	IMFMediaType *m_pOutputMediaType;
 	bool m_bStreamBegin;
@@ -74,7 +74,7 @@ public:
 
 		VCMFormatToUtVideoFormat(&utvf, fcc, 0);
 		m_pCodec = CCodec::CreateInstance(utvf, "MFT");
-		m_pSample = NULL;
+		m_pInputSample = NULL;
 		m_pInputMediaType = NULL;
 		m_pOutputMediaType = NULL;
 		m_bStreamBegin = false;
@@ -84,8 +84,8 @@ public:
 	{
 		EndStream();
 
-		if (m_pSample != NULL)
-			m_pSample->Release();
+		if (m_pInputSample != NULL)
+			m_pInputSample->Release();
 		if (m_pInputMediaType != NULL)
 			m_pInputMediaType->Release();
 		if (m_pOutputMediaType != NULL)
@@ -479,7 +479,7 @@ public:
 		if (dwInputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
 
-		*pdwFlags = m_pSample == NULL ? MFT_INPUT_STATUS_ACCEPT_DATA : 0;
+		*pdwFlags = m_pInputSample == NULL ? MFT_INPUT_STATUS_ACCEPT_DATA : 0;
 
 		return S_OK;
 	}
@@ -490,7 +490,7 @@ public:
 
 		LockIt lck(static_cast<T *>(this));
 
-		*pdwFlags = m_pSample == NULL ? 0 : MFT_OUTPUT_STATUS_SAMPLE_READY;
+		*pdwFlags = m_pInputSample == NULL ? 0 : MFT_OUTPUT_STATUS_SAMPLE_READY;
 
 		return S_OK;
 	}
@@ -525,11 +525,11 @@ public:
 		if (dwInputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
 
-		if (m_pSample != NULL)
+		if (m_pInputSample != NULL)
 			return MF_E_NOTACCEPTING;
 
-		m_pSample = pSample;
-		m_pSample->AddRef();
+		m_pInputSample = pSample;
+		m_pInputSample->AddRef();
 
 		return S_OK;
 	}
@@ -553,7 +553,7 @@ public:
 		LONGLONG ll;
 		UINT32 bKeyFrame;
 
-		if (m_pSample == NULL)
+		if (m_pInputSample == NULL)
 			return MF_E_TRANSFORM_NEED_MORE_INPUT;
 
 		m_pOutputMediaType->GetGUID(MF_MT_SUBTYPE, &guidSubtype);
@@ -564,7 +564,7 @@ public:
 		if (MediaFoundationFormatToUtVideoFormat(&infmt, guidSubtype))
 			return MF_E_INVALIDMEDIATYPE;
 
-		hr = m_pSample->ConvertToContiguousBuffer(&pInputBuffer);
+		hr = m_pInputSample->ConvertToContiguousBuffer(&pInputBuffer);
 		if (FAILED(hr))
 			return hr;
 		hr = MFCreateSample(&pOutputSample);
@@ -577,7 +577,7 @@ public:
 		MFGetAttributeSize(m_pInputMediaType, MF_MT_FRAME_SIZE, &u32FrameWidth, &u32FrameHeight);
 		MFCreateAlignedMemoryBuffer((DWORD)((T *)this)->GetSize(outfmt, infmt, u32FrameWidth, u32FrameHeight), 4, &pOutputBuffer);
 		pOutputSample->AddBuffer(pOutputBuffer);
-		if (FAILED(m_pSample->GetUINT32(MFSampleExtension_CleanPoint, &bKeyFrame)))
+		if (FAILED(m_pInputSample->GetUINT32(MFSampleExtension_CleanPoint, &bKeyFrame)))
 			bKeyFrame = FALSE;
 
 		pInputBuffer->Lock(&pInputByteBuffer, NULL, NULL);
@@ -587,9 +587,9 @@ public:
 		pOutputBuffer->Unlock();
 		pOutputBuffer->SetCurrentLength((DWORD)cbOutput);
 
-		if (SUCCEEDED(m_pSample->GetSampleTime(&ll)))
+		if (SUCCEEDED(m_pInputSample->GetSampleTime(&ll)))
 			pOutputSample->SetSampleTime(ll);
-		if (SUCCEEDED(m_pSample->GetSampleDuration(&ll)))
+		if (SUCCEEDED(m_pInputSample->GetSampleDuration(&ll)))
 			pOutputSample->SetSampleDuration(ll);
 		pOutputSample->SetUINT32(MFSampleExtension_CleanPoint, TRUE);
 
@@ -598,8 +598,8 @@ public:
 
 		pOutputSamples->pSample = pOutputSample;
 
-		m_pSample->Release();
-		m_pSample = NULL;
+		m_pInputSample->Release();
+		m_pInputSample = NULL;
 		return S_OK;
 	}
 
