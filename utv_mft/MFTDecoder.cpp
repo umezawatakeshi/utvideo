@@ -15,8 +15,9 @@ HRESULT CMFTDecoder::InternalBeginStream(void)
 {
 	_RPT0(_CRT_WARN, "CMFTDecoder::InternalBeginStream()\n");
 
-	UINT8 *pData;
-	UINT32 cbData;
+	UINT8 *pExtraData;
+	UINT8 dummy;
+	UINT32 cbExtraData;
 	UINT32 u32FrameWidth, u32FrameHeight;
 	GUID guidSubtype;
 	utvf_t outfmt;
@@ -26,10 +27,15 @@ HRESULT CMFTDecoder::InternalBeginStream(void)
 	if (MediaFoundationFormatToUtVideoFormat(&outfmt, guidSubtype))
 		return MF_E_INVALIDMEDIATYPE;
 	MFGetAttributeSize(m_pInputMediaType, MF_MT_FRAME_SIZE, &u32FrameWidth, &u32FrameHeight);
-	m_pInputMediaType->GetAllocatedBlob(MF_MT_USER_DATA, &pData, &cbData);
+	if (FAILED(m_pInputMediaType->GetAllocatedBlob(MF_MT_USER_DATA, &pExtraData, &cbExtraData)))
+	{
+		pExtraData = &dummy;
+		cbExtraData = 0;
+	}
 
-	ret = m_pCodec->DecodeBegin(outfmt, u32FrameWidth, u32FrameHeight, CBGROSSWIDTH_WINDOWS, pData, cbData);
-	CoTaskMemFree(pData);
+	ret = m_pCodec->DecodeBegin(outfmt, u32FrameWidth, u32FrameHeight, CBGROSSWIDTH_WINDOWS, pExtraData, cbExtraData);
+	if (pExtraData != &dummy)
+		CoTaskMemFree(pExtraData);
 	if (ret == 0)
 		return S_OK;
 	else
