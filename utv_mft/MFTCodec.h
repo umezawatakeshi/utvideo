@@ -551,7 +551,7 @@ public:
 		BYTE *pOutputByteBuffer;
 		GUID guidSubtype;
 		LONGLONG ll;
-		UINT32 bKeyFrmae;
+		UINT32 bKeyFrame;
 
 		if (m_pSample == NULL)
 			return MF_E_TRANSFORM_NEED_MORE_INPUT;
@@ -582,7 +582,7 @@ public:
 
 		pInputBuffer->Lock(&pInputByteBuffer, NULL, NULL);
 		pOutputBuffer->Lock(&pOutputByteBuffer, NULL, NULL);
-		cbOutput = m_pCodec->DecodeFrame(pOutputByteBuffer, pInputByteBuffer, bKeyFrame);
+		cbOutput = m_pCodec->DecodeFrame(pOutputByteBuffer, pInputByteBuffer, (bKeyFrame != FALSE) /* convert to bool */);
 		pInputBuffer->Unlock();
 		pOutputBuffer->Unlock();
 		pOutputBuffer->SetCurrentLength((DWORD)cbOutput);
