@@ -318,19 +318,38 @@ public:
 	{
 		_RPT0(_CRT_WARN, "CMFTCodec::SetInputType()\n");
 
-//		return E_NOTIMPL; // TODO
-		HRESULT hr;
+		LockIt lck(static_cast<T *>(this));
 
-		hr = MFCreateMediaType(&m_pInputMediaType);
-		if (FAILED(hr))
-			return hr;
-		hr = pType->CopyAllItems(m_pInputMediaType);
-		if (FAILED(hr))
+		HRESULT hr;
+		IMFMediaType *pNewType;
+
+		if (dwInputStreamID != 0)
+			return MF_E_INVALIDSTREAMNUMBER;
+
+		if (pType == NULL)
 		{
 			m_pInputMediaType->Release();
 			m_pInputMediaType = NULL;
+			return S_OK;
+		}
+
+		// TODO: check type
+
+		if (dwFlags & MFT_SET_TYPE_TEST_ONLY)
+			return S_OK;
+
+		hr = MFCreateMediaType(&pNewType);
+		if (FAILED(hr))
+			return hr;
+		hr = pType->CopyAllItems(pNewType);
+		if (FAILED(hr))
+		{
+			pNewType->Release();
 			return hr;
 		}
+		if (m_pInputMediaType != NULL)
+			m_pInputMediaType->Release();
+		m_pInputMediaType = pNewType;
 
 		return S_OK;
 	}
@@ -338,19 +357,39 @@ public:
 	HRESULT STDMETHODCALLTYPE SetOutputType(DWORD dwOutputStreamID, IMFMediaType *pType, DWORD dwFlags)
 	{
 		_RPT0(_CRT_WARN, "CMFTCodec::SetOutputType()\n");
-//		return E_NOTIMPL; // TODO
-		HRESULT hr;
 
-		hr = MFCreateMediaType(&m_pOutputMediaType);
-		if (FAILED(hr))
-			return hr;
-		hr = pType->CopyAllItems(m_pOutputMediaType);
-		if (FAILED(hr))
+		LockIt lck(static_cast<T *>(this));
+
+		HRESULT hr;
+		IMFMediaType *pNewType;
+
+		if (dwOutputStreamID != 0)
+			return MF_E_INVALIDSTREAMNUMBER;
+
+		if (pType == NULL)
 		{
 			m_pOutputMediaType->Release();
 			m_pOutputMediaType = NULL;
+			return S_OK;
+		}
+
+		// TODO: check type
+
+		if (dwFlags & MFT_SET_TYPE_TEST_ONLY)
+			return S_OK;
+
+		hr = MFCreateMediaType(&pNewType);
+		if (FAILED(hr))
+			return hr;
+		hr = pType->CopyAllItems(pNewType);
+		if (FAILED(hr))
+		{
+			pNewType->Release();
 			return hr;
 		}
+		if (m_pOutputMediaType != NULL)
+			m_pOutputMediaType->Release();
+		m_pOutputMediaType = pNewType;
 
 		return S_OK;
 	}
@@ -413,6 +452,8 @@ public:
 	{
 		_RPT0(_CRT_WARN, "CMFTCodec::GetInputStatus()\n");
 
+		LockIt lck(static_cast<T *>(this));
+
 		if (dwInputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
 
@@ -424,6 +465,8 @@ public:
 	HRESULT STDMETHODCALLTYPE GetOutputStatus(DWORD *pdwFlags)
 	{
 		_RPT0(_CRT_WARN, "CMFTCodec::GetOutputStatus()\n");
+
+		LockIt lck(static_cast<T *>(this));
 
 		*pdwFlags = m_pSample == NULL ? 0 : MFT_OUTPUT_STATUS_SAMPLE_READY;
 
@@ -453,6 +496,8 @@ public:
 	{
 		_RPT0(_CRT_WARN, "CMFTCodec::ProcessInput()\n");
 
+		LockIt lck(static_cast<T *>(this));
+
 		if (dwInputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
 
@@ -468,6 +513,9 @@ public:
 	HRESULT STDMETHODCALLTYPE ProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, MFT_OUTPUT_DATA_BUFFER *pOutputSamples, DWORD *pdwStatus)
 	{
 		_RPT0(_CRT_WARN, "CMFTCodec::ProcessOutput()\n");
+
+		LockIt lck(static_cast<T *>(this));
+
 //		return E_NOTIMPL; // TODO
 
 		if (m_pSample == NULL)
