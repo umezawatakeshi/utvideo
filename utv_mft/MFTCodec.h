@@ -198,7 +198,7 @@ public:
 		if (dwOutputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
 
-		pStreamInfo->dwFlags = MFT_OUTPUT_STREAM_WHOLE_SAMPLES | MFT_OUTPUT_STREAM_SINGLE_SAMPLE_PER_BUFFER;
+		pStreamInfo->dwFlags = MFT_OUTPUT_STREAM_WHOLE_SAMPLES | MFT_OUTPUT_STREAM_SINGLE_SAMPLE_PER_BUFFER | MFT_OUTPUT_STREAM_PROVIDES_SAMPLES;
 		pStreamInfo->cbSize = 0;
 		pStreamInfo->cbAlignment = 4;
 
@@ -540,15 +540,67 @@ public:
 
 		LockIt lck(static_cast<T *>(this));
 
-//		return E_NOTIMPL; // TODO
+		HRESULT hr;
+		IMFMediaBuffer *pInputBuffer;
+		IMFMediaBuffer *pOutputBuffer;
+		IMFSample *pOutputSample;
+		size_t cbOutput;
+		utvf_t infmt, outfmt;
+		UINT32 u32FrameWidth, u32FrameHeight;
+		BYTE *pInputByteBuffer;
+		BYTE *pOutputByteBuffer;
+		GUID guidSubtype;
+		LONGLONG ll;
+		UINT32 bKeyFrmae;
 
 		if (m_pSample == NULL)
 			return MF_E_TRANSFORM_NEED_MORE_INPUT;
 
-		//TODO
+		m_pOutputMediaType->GetGUID(MF_MT_SUBTYPE, &guidSubtype);
+		if (MediaFoundationFormatToUtVideoFormat(&outfmt, guidSubtype))
+			return MF_E_INVALIDMEDIATYPE;
+
+		m_pInputMediaType->GetGUID(MF_MT_SUBTYPE, &guidSubtype);
+		if (MediaFoundationFormatToUtVideoFormat(&infmt, guidSubtype))
+			return MF_E_INVALIDMEDIATYPE;
+
+		hr = m_pSample->ConvertToContiguousBuffer(&pInputBuffer);
+		if (FAILED(hr))
+			return hr;
+		hr = MFCreateSample(&pOutputSample);
+		if (FAILED(hr))
+		{
+			pInputBuffer->Release();
+			return hr;
+		}
+
+		MFGetAttributeSize(m_pInputMediaType, MF_MT_FRAME_SIZE, &u32FrameWidth, &u32FrameHeight);
+		MFCreateAlignedMemoryBuffer((DWORD)((T *)this)->GetSize(outfmt, infmt, u32FrameWidth, u32FrameHeight), 4, &pOutputBuffer);
+		pOutputSample->AddBuffer(pOutputBuffer);
+		if (FAILED(m_pSample->GetUINT32(MFSampleExtension_CleanPoint, &bKeyFrame)))
+			bKeyFrame = FALSE;
+
+		pInputBuffer->Lock(&pInputByteBuffer, NULL, NULL);
+		pOutputBuffer->Lock(&pOutputByteBuffer, NULL, NULL);
+		cbOutput = m_pCodec->DecodeFrame(pOutputByteBuffer, pInputByteBuffer, bKeyFrame);
+		pInputBuffer->Unlock();
+		pOutputBuffer->Unlock();
+		pOutputBuffer->SetCurrentLength((DWORD)cbOutput);
+
+		if (SUCCEEDED(m_pSample->GetSampleTime(&ll)))
+			pOutputSample->SetSampleTime(ll);
+		if (SUCCEEDED(m_pSample->GetSampleDuration(&ll)))
+			pOutputSample->SetSampleDuration(ll);
+		pOutputSample->SetUINT32(MFSampleExtension_CleanPoint, TRUE);
+
+		pInputBuffer->Release();
+		pOutputBuffer->Release();
+
+		pOutputSamples->pSample = pOutputSample;
+
 		m_pSample->Release();
 		m_pSample = NULL;
-		return MF_E_TRANSFORM_NEED_MORE_INPUT; // TODO
+		return S_OK;
 	}
 
 
