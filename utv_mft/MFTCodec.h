@@ -19,6 +19,21 @@
 
 void FormatInfoToRegisterTypeInfo(const utvf_t *putvf, UINT32 *pcTypes, MFT_REGISTER_TYPE_INFO **ppTypes);
 
+class LockAttr
+{
+private:
+	IMFAttributes *m_p;
+public:
+	LockAttr(IMFAttributes *p) : m_p(p)
+	{
+		m_p->LockStore();
+	}
+	~LockAttr()
+	{
+		m_p->UnlockStore();
+	}
+};
+
 // CMFTCodec
 
 template<class T>
@@ -29,6 +44,8 @@ class ATL_NO_VTABLE CMFTCodec :
 protected:
 	class LockIt
 	{
+	private:
+		T *const m_p;
 	public:
 		LockIt(T *p) : m_p(p)
 		{
@@ -38,7 +55,6 @@ protected:
 		{
 			m_p->Unlock();
 		}
-		T *const m_p;
 	};
 
 protected:
@@ -333,6 +349,8 @@ public:
 			return S_OK;
 		}
 
+		LockAttr lockattr(pType);
+
 		// TODO: check type
 
 		if (dwFlags & MFT_SET_TYPE_TEST_ONLY)
@@ -372,6 +390,8 @@ public:
 			m_pOutputMediaType = NULL;
 			return S_OK;
 		}
+
+		LockAttr lockattr(pType);
 
 		// TODO: check type
 
