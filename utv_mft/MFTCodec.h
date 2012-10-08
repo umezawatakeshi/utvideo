@@ -64,6 +64,10 @@ protected:
 	IMFSample *m_pInputSample;
 	IMFMediaType *m_pInputMediaType;
 	IMFMediaType *m_pOutputMediaType;
+	UINT8 *m_pInputUserData;
+	UINT8 *m_pOutputUserData;
+	UINT32 m_cbInputUserData;
+	UINT32 m_cbOutputUserData;
 	bool m_bStreamBegin;
 
 public:
@@ -77,6 +81,8 @@ public:
 		m_pInputSample = NULL;
 		m_pInputMediaType = NULL;
 		m_pOutputMediaType = NULL;
+		m_pInputUserData = NULL;
+		m_pOutputUserData = NULL;
 		m_bStreamBegin = false;
 	}
 
@@ -90,6 +96,10 @@ public:
 			m_pInputMediaType->Release();
 		if (m_pOutputMediaType != NULL)
 			m_pOutputMediaType->Release();
+		if (m_pInputUserData != NULL)
+			CoTaskMemFree(m_pInputUserData);
+		if (m_pOutputUserData != NULL)
+			CoTaskMemFree(m_pOutputUserData);
 		CCodec::DeleteInstance(m_pCodec);
 	}
 
@@ -340,6 +350,8 @@ public:
 
 		HRESULT hr;
 		IMFMediaType *pNewType;
+		UINT8 *pNewUserData;
+		UINT32 cbNewUserData;
 
 		if (dwInputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
@@ -348,6 +360,8 @@ public:
 		{
 			m_pInputMediaType->Release();
 			m_pInputMediaType = NULL;
+			CoTaskMemFree(m_pInputUserData);
+			m_pInputUserData = NULL;
 			return S_OK;
 		}
 
@@ -367,9 +381,18 @@ public:
 			pNewType->Release();
 			return hr;
 		}
+		if (FAILED(pType->GetAllocatedBlob(MF_MT_USER_DATA, &pNewUserData, &cbNewUserData)))
+		{
+			pNewUserData = (UINT8 *)CoTaskMemAlloc(0);
+			cbNewUserData = 0;
+		}
 		if (m_pInputMediaType != NULL)
 			m_pInputMediaType->Release();
+		if (m_pInputUserData != NULL)
+			CoTaskMemFree(m_pInputUserData);
 		m_pInputMediaType = pNewType;
+		m_pInputUserData = pNewUserData;
+		m_cbInputUserData = cbNewUserData;
 
 		return S_OK;
 	}
@@ -382,6 +405,8 @@ public:
 
 		HRESULT hr;
 		IMFMediaType *pNewType;
+		UINT8 *pNewUserData;
+		UINT32 cbNewUserData;
 
 		if (dwOutputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
@@ -390,6 +415,8 @@ public:
 		{
 			m_pOutputMediaType->Release();
 			m_pOutputMediaType = NULL;
+			CoTaskMemFree(m_pOutputUserData);
+			m_pOutputUserData = NULL;
 			return S_OK;
 		}
 
@@ -409,9 +436,18 @@ public:
 			pNewType->Release();
 			return hr;
 		}
+		if (FAILED(pType->GetAllocatedBlob(MF_MT_USER_DATA, &pNewUserData, &cbNewUserData)))
+		{
+			pNewUserData = (UINT8 *)CoTaskMemAlloc(0);
+			cbNewUserData = 0;
+		}
 		if (m_pOutputMediaType != NULL)
 			m_pOutputMediaType->Release();
+		if (m_pOutputUserData != NULL)
+			CoTaskMemFree(m_pOutputUserData);
 		m_pOutputMediaType = pNewType;
+		m_pOutputUserData = pNewUserData;
+		m_cbOutputUserData = cbNewUserData;
 
 		return S_OK;
 	}
