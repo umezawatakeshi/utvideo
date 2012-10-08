@@ -67,6 +67,8 @@ public:
 
 public:
 	// IMediaObjectImpl
+	HRESULT InternalBeginStream(void);
+	HRESULT InternalEndStream(void);
 /*	HRESULT InternalAllocateStreamingResources();
 	HRESULT InternalFreeStreamingResources();
 	HRESULT InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, MFT_OUTPUT_DATA_BUFFER *pOutputBuffers, DWORD *pdwStatus);*/

@@ -64,6 +64,7 @@ protected:
 	IMFSample *m_pSample;
 	IMFMediaType *m_pInputMediaType;
 	IMFMediaType *m_pOutputMediaType;
+	bool m_bStreamBegin;
 
 public:
 	CMFTCodec(DWORD fcc, REFCLSID clsid) :
@@ -76,11 +77,12 @@ public:
 		m_pSample = NULL;
 		m_pInputMediaType = NULL;
 		m_pOutputMediaType = NULL;
+		m_bStreamBegin = false;
 	}
 
 	virtual ~CMFTCodec()
 	{
-//		FreeStreamingResources();
+		EndStream();
 
 		if (m_pSample != NULL)
 			m_pSample->Release();
@@ -518,6 +520,8 @@ public:
 
 		LockIt lck(static_cast<T *>(this));
 
+		BeginStream();
+
 		if (dwInputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
 
@@ -547,6 +551,34 @@ public:
 		return MF_E_TRANSFORM_NEED_MORE_INPUT; // TODO
 	}
 
+
+	HRESULT BeginStream(void)
+	{
+		HRESULT hr;
+
+		if (m_bStreamBegin)
+			return S_OK;
+
+		hr = ((T *)this)->InternalBeginStream();
+		if (SUCCEEDED(hr))
+			m_bStreamBegin = true;
+
+		return hr;
+	}
+
+	HRESULT EndStream(void)
+	{
+		HRESULT hr;
+
+		if (!m_bStreamBegin)
+			return S_OK;
+
+		hr = ((T *)this)->InternalEndStream();
+		if (SUCCEEDED(hr))
+			m_bStreamBegin = false;
+
+		return S_OK;
+	}
 
 	// IMediaObjectImpl
 	/*

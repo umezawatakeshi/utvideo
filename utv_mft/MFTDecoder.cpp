@@ -10,6 +10,41 @@
 // CMFTDecoder
 
 const GUID &CMFTDecoder::MFTCATEGORY = MFT_CATEGORY_VIDEO_DECODER;
+
+HRESULT CMFTDecoder::InternalBeginStream(void)
+{
+	_RPT0(_CRT_WARN, "CMFTDecoder::InternalBeginStream()\n");
+
+	UINT8 *pData;
+	UINT32 cbData;
+	UINT32 u32FrameWidth, u32FrameHeight;
+	GUID guidSubtype;
+	utvf_t outfmt;
+	int ret;
+
+	m_pOutputMediaType->GetGUID(MF_MT_SUBTYPE, &guidSubtype);
+	if (MediaFoundationFormatToUtVideoFormat(&outfmt, guidSubtype))
+		return MF_E_INVALIDMEDIATYPE;
+	MFGetAttributeSize(m_pInputMediaType, MF_MT_FRAME_SIZE, &u32FrameWidth, &u32FrameHeight);
+	m_pInputMediaType->GetAllocatedBlob(MF_MT_USER_DATA, &pData, &cbData);
+
+	ret = m_pCodec->DecodeBegin(outfmt, u32FrameWidth, u32FrameHeight, CBGROSSWIDTH_WINDOWS, pData, cbData);
+	CoTaskMemFree(pData);
+	if (ret == 0)
+		return S_OK;
+	else
+		return E_FAIL;
+}
+
+HRESULT CMFTDecoder::InternalEndStream(void)
+{
+	_RPT0(_CRT_WARN, "CMFTDecoder::InternalEndStream()\n");
+
+	m_pCodec->DecodeEnd();
+
+	return S_OK;
+}
+
 /*
 HRESULT CMFTDecoder::InternalAllocateStreamingResources()
 {
