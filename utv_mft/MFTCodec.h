@@ -310,7 +310,7 @@ public:
 			size_t cbExtraData;
 			GUID inputSubtype;
 			UINT32 u32FrameWidth, u32FrameHeight;
-			UINT32 u32FrameRateNumerator, u32FrameRateDenominator;
+			UINT64 u64FrameRate;
 			utvf_t infmt;
 			utvf_t outfmt = *putvf;
 
@@ -318,9 +318,9 @@ public:
 			MediaFoundationFormatToUtVideoFormat(&infmt, inputSubtype);
 			MFGetAttributeSize(m_pInputMediaType, MF_MT_FRAME_SIZE, &u32FrameWidth, &u32FrameHeight);
 			MFSetAttributeSize((*ppType), MF_MT_FRAME_SIZE, u32FrameWidth, u32FrameHeight);
-			MFGetAttributeRatio(m_pInputMediaType, MF_MT_FRAME_RATE, &u32FrameRateNumerator, &u32FrameRateDenominator);
-			MFSetAttributeRatio((*ppType), MF_MT_FRAME_RATE, u32FrameRateNumerator, u32FrameRateDenominator);
-			// 最低限フレームサイズとフレームレートは設定しておく必要があるようだ
+			if (SUCCEEDED(m_pInputMediaType->GetUINT64(MF_MT_FRAME_RATE, &u64FrameRate)))
+				(*ppType)->SetUINT64(MF_MT_FRAME_RATE, u64FrameRate);
+			// 最低限フレームサイズ（とフレームレート）は設定しておく必要があるようだ
 
 			cbExtraData = ((T *)this)->GetExtraDataSize();
 			buf = malloc(max(cbExtraData, 1)); // cbExtraData が 0 の時に malloc() に 0 を渡して NULL が返ってくるのを防ぐ
