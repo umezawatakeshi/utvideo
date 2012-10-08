@@ -59,7 +59,7 @@ int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 
 	guidtmp = subtype;
 	guidtmp.Data1 = MFVideoFormat_YUY2.Data1;
-	if (IsEqualGUID(guidtmp, MFVideoFormat_YUY2))
+	if (IsEqualGUID(guidtmp, MFVideoFormat_YUY2) && is_fourcc(subtype.Data1))
 		utvftmp = UNFCC(subtype.Data1);
 	else if (IsEqualGUID(subtype, MFVideoFormat_RGB24))
 		utvftmp = UTVF_RGB24_WIN;
