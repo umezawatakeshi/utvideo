@@ -64,10 +64,12 @@ protected:
 	IMFSample *m_pInputSample;
 	IMFMediaType *m_pInputMediaType;
 	IMFMediaType *m_pOutputMediaType;
+	utvf_t m_infmt, m_outfmt;
 	UINT8 *m_pInputUserData;
 	UINT8 *m_pOutputUserData;
 	UINT32 m_cbInputUserData;
 	UINT32 m_cbOutputUserData;
+	UINT32 m_nFrameWidth, m_nFrameHeight;
 	bool m_bStreamBegin;
 
 public:
@@ -318,23 +320,17 @@ public:
 		{
 			void *buf;
 			size_t cbExtraData;
-			GUID inputSubtype;
-			UINT32 u32FrameWidth, u32FrameHeight;
 			UINT64 u64FrameRate;
-			utvf_t infmt;
 			utvf_t outfmt = *putvf;
 
-			m_pInputMediaType->GetGUID(MF_MT_SUBTYPE, &inputSubtype);
-			MediaFoundationFormatToUtVideoFormat(&infmt, inputSubtype);
-			MFGetAttributeSize(m_pInputMediaType, MF_MT_FRAME_SIZE, &u32FrameWidth, &u32FrameHeight);
-			MFSetAttributeSize((*ppType), MF_MT_FRAME_SIZE, u32FrameWidth, u32FrameHeight);
+			MFSetAttributeSize((*ppType), MF_MT_FRAME_SIZE, m_nFrameWidth, m_nFrameHeight);
 			if (SUCCEEDED(m_pInputMediaType->GetUINT64(MF_MT_FRAME_RATE, &u64FrameRate)))
 				(*ppType)->SetUINT64(MF_MT_FRAME_RATE, u64FrameRate);
 			// 最低限フレームサイズ（とフレームレート）は設定しておく必要があるようだ
 
 			cbExtraData = ((T *)this)->GetExtraDataSize();
 			buf = malloc(max(cbExtraData, 1)); // cbExtraData が 0 の時に malloc() に 0 を渡して NULL が返ってくるのを防ぐ
-			((T *)this)->GetExtraData(buf, cbExtraData, outfmt, infmt, u32FrameWidth, u32FrameHeight);
+			((T *)this)->GetExtraData(buf, cbExtraData, outfmt, m_infmt, m_nFrameWidth, m_nFrameHeight);
 			(*ppType)->SetBlob(MF_MT_USER_DATA, (UINT8 *)buf, (UINT32)cbExtraData);
 			free(buf);
 		}
@@ -349,9 +345,13 @@ public:
 		LockIt lck(static_cast<T *>(this));
 
 		HRESULT hr;
+		int ret;
 		IMFMediaType *pNewType;
 		UINT8 *pNewUserData;
 		UINT32 cbNewUserData;
+		GUID guidNewMajorType, guidNewSubtype;
+		UINT32 nFrameWidth, nFrameHeight;
+		utvf_t infmt;
 
 		if (dwInputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
@@ -367,24 +367,53 @@ public:
 
 		LockAttr lockattr(pType);
 
-		// TODO: check type
+		// check type
 
-		if (dwFlags & MFT_SET_TYPE_TEST_ONLY)
-			return S_OK;
+		if (FAILED(pType->GetGUID(MF_MT_MAJOR_TYPE, &guidNewMajorType)))
+			return MF_E_INVALIDTYPE;
+		if (FAILED(pType->GetGUID(MF_MT_SUBTYPE, &guidNewSubtype)))
+			return MF_E_INVALIDTYPE;
+		if (FAILED(MFGetAttributeSize(pType, MF_MT_FRAME_SIZE, &nFrameWidth, &nFrameHeight)))
+			return MF_E_INVALIDTYPE;
 
-		hr = MFCreateMediaType(&pNewType);
-		if (FAILED(hr))
-			return hr;
-		hr = pType->CopyAllItems(pNewType);
-		if (FAILED(hr))
-		{
-			pNewType->Release();
-			return hr;
-		}
+		if (!IsEqualGUID(guidNewMajorType, MFMediaType_Video))
+			return MF_E_INVALIDMEDIATYPE;
+		if (MediaFoundationFormatToUtVideoFormat(&infmt, guidNewSubtype) != 0)
+			return MF_E_INVALIDMEDIATYPE;
+
 		if (FAILED(pType->GetAllocatedBlob(MF_MT_USER_DATA, &pNewUserData, &cbNewUserData)))
 		{
 			pNewUserData = (UINT8 *)CoTaskMemAlloc(0);
 			cbNewUserData = 0;
+		}
+
+		ret = ((T *)this)->Query(UTVF_INVALID, infmt, nFrameWidth, nFrameHeight, NULL, 0, pNewUserData, cbNewUserData);
+		if (ret != 0)
+		{
+			CoTaskMemFree(pNewUserData);
+			return MF_E_INVALIDMEDIATYPE;
+		}
+
+		// set type
+
+		if (dwFlags & MFT_SET_TYPE_TEST_ONLY)
+		{
+			CoTaskMemFree(pNewUserData);
+			return S_OK;
+		}
+
+		hr = MFCreateMediaType(&pNewType);
+		if (FAILED(hr))
+		{
+			CoTaskMemFree(pNewUserData);
+			return hr;
+		}
+		hr = pType->CopyAllItems(pNewType);
+		if (FAILED(hr))
+		{
+			CoTaskMemFree(pNewUserData);
+			pNewType->Release();
+			return hr;
 		}
 		if (m_pInputMediaType != NULL)
 			m_pInputMediaType->Release();
@@ -393,6 +422,9 @@ public:
 		m_pInputMediaType = pNewType;
 		m_pInputUserData = pNewUserData;
 		m_cbInputUserData = cbNewUserData;
+		m_nFrameWidth = nFrameWidth;
+		m_nFrameHeight = nFrameHeight;
+		m_infmt = infmt;
 
 		return S_OK;
 	}
@@ -404,9 +436,13 @@ public:
 		LockIt lck(static_cast<T *>(this));
 
 		HRESULT hr;
+		int ret;
 		IMFMediaType *pNewType;
 		UINT8 *pNewUserData;
 		UINT32 cbNewUserData;
+		GUID guidNewMajorType, guidNewSubtype;
+		UINT32 nFrameWidth, nFrameHeight;
+		utvf_t outfmt;
 
 		if (dwOutputStreamID != 0)
 			return MF_E_INVALIDSTREAMNUMBER;
@@ -420,26 +456,60 @@ public:
 			return S_OK;
 		}
 
+		if (m_pInputMediaType == NULL)
+			return MF_E_TRANSFORM_TYPE_NOT_SET;
+
 		LockAttr lockattr(pType);
 
-		// TODO: check type
+		// check type
 
-		if (dwFlags & MFT_SET_TYPE_TEST_ONLY)
-			return S_OK;
+		if (FAILED(pType->GetGUID(MF_MT_MAJOR_TYPE, &guidNewMajorType)))
+			return MF_E_INVALIDTYPE;
+		if (FAILED(pType->GetGUID(MF_MT_SUBTYPE, &guidNewSubtype)))
+			return MF_E_INVALIDTYPE;
+		if (FAILED(MFGetAttributeSize(pType, MF_MT_FRAME_SIZE, &nFrameWidth, &nFrameHeight)))
+			return MF_E_INVALIDTYPE;
 
-		hr = MFCreateMediaType(&pNewType);
-		if (FAILED(hr))
-			return hr;
-		hr = pType->CopyAllItems(pNewType);
-		if (FAILED(hr))
-		{
-			pNewType->Release();
-			return hr;
-		}
+		if (!IsEqualGUID(guidNewMajorType, MFMediaType_Video))
+			return MF_E_INVALIDMEDIATYPE;
+		if (MediaFoundationFormatToUtVideoFormat(&outfmt, guidNewSubtype) != 0)
+			return MF_E_INVALIDMEDIATYPE;
+		if (nFrameWidth != m_nFrameWidth || nFrameHeight != m_nFrameHeight)
+			return MF_E_INVALIDMEDIATYPE;
+
 		if (FAILED(pType->GetAllocatedBlob(MF_MT_USER_DATA, &pNewUserData, &cbNewUserData)))
 		{
 			pNewUserData = (UINT8 *)CoTaskMemAlloc(0);
 			cbNewUserData = 0;
+		}
+
+		ret = ((T *)this)->Query(outfmt, m_infmt, m_nFrameWidth, m_nFrameHeight, pNewUserData, cbNewUserData, m_pInputUserData, m_cbInputUserData);
+		if (ret != 0)
+		{
+			CoTaskMemFree(pNewUserData);
+			return MF_E_INVALIDMEDIATYPE;
+		}
+
+		// set type
+
+		if (dwFlags & MFT_SET_TYPE_TEST_ONLY)
+		{
+			CoTaskMemFree(pNewUserData);
+			return S_OK;
+		}
+
+		hr = MFCreateMediaType(&pNewType);
+		if (FAILED(hr))
+		{
+			CoTaskMemFree(pNewUserData);
+			return hr;
+		}
+		hr = pType->CopyAllItems(pNewType);
+		if (FAILED(hr))
+		{
+			CoTaskMemFree(pNewUserData);
+			pNewType->Release();
+			return hr;
 		}
 		if (m_pOutputMediaType != NULL)
 			m_pOutputMediaType->Release();
@@ -448,6 +518,7 @@ public:
 		m_pOutputMediaType = pNewType;
 		m_pOutputUserData = pNewUserData;
 		m_cbOutputUserData = cbNewUserData;
+		m_outfmt = outfmt;
 
 		return S_OK;
 	}
