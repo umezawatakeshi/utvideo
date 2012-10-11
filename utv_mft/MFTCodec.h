@@ -652,24 +652,13 @@ public:
 		IMFMediaBuffer *pOutputBuffer;
 		IMFSample *pOutputSample;
 		size_t cbOutput;
-		utvf_t infmt, outfmt;
-		UINT32 u32FrameWidth, u32FrameHeight;
 		BYTE *pInputByteBuffer;
 		BYTE *pOutputByteBuffer;
-		GUID guidSubtype;
 		LONGLONG ll;
 		UINT32 bKeyFrame;
 
 		if (m_pInputSample == NULL)
 			return MF_E_TRANSFORM_NEED_MORE_INPUT;
-
-		m_pOutputMediaType->GetGUID(MF_MT_SUBTYPE, &guidSubtype);
-		if (MediaFoundationFormatToUtVideoFormat(&outfmt, guidSubtype))
-			return MF_E_INVALIDMEDIATYPE;
-
-		m_pInputMediaType->GetGUID(MF_MT_SUBTYPE, &guidSubtype);
-		if (MediaFoundationFormatToUtVideoFormat(&infmt, guidSubtype))
-			return MF_E_INVALIDMEDIATYPE;
 
 		hr = m_pInputSample->ConvertToContiguousBuffer(&pInputBuffer);
 		if (FAILED(hr))
@@ -681,8 +670,7 @@ public:
 			return hr;
 		}
 
-		MFGetAttributeSize(m_pInputMediaType, MF_MT_FRAME_SIZE, &u32FrameWidth, &u32FrameHeight);
-		MFCreateAlignedMemoryBuffer((DWORD)((T *)this)->GetSize(outfmt, infmt, u32FrameWidth, u32FrameHeight), 4, &pOutputBuffer);
+		MFCreateAlignedMemoryBuffer((DWORD)((T *)this)->GetSize(m_outfmt, m_infmt, m_nFrameWidth, m_nFrameHeight), 4, &pOutputBuffer);
 		pOutputSample->AddBuffer(pOutputBuffer);
 		if (FAILED(m_pInputSample->GetUINT32(MFSampleExtension_CleanPoint, &bKeyFrame)))
 			bKeyFrame = FALSE;
