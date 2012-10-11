@@ -219,19 +219,16 @@ public:
 
 	HRESULT STDMETHODCALLTYPE GetAttributes(IMFAttributes **pAttributes)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::GetAttributes()\n");
 		return E_NOTIMPL; // XXX?
 	}
 
 	HRESULT STDMETHODCALLTYPE GetInputStreamAttributes(DWORD dwInputStreamID, IMFAttributes **pAttributes)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::GetInputStreamAttributes()\n");
 		return E_NOTIMPL; // XXX?
 	}
 
 	HRESULT STDMETHODCALLTYPE GetOutputStreamAttributes(DWORD dwOutputStreamID, IMFAttributes **pAttributes)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::GetOutputStreamAttributes()\n");
 		return E_NOTIMPL; // XXX?
 	}
 
@@ -604,20 +601,18 @@ public:
 
 	HRESULT STDMETHODCALLTYPE SetOutputBounds(LONGLONG hnsLowerBound, LONGLONG hnsUpperBound)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::SetOutputBounds()\n");
 		return E_NOTIMPL;
 	}
 
 	HRESULT STDMETHODCALLTYPE ProcessEvent(DWORD dwInputStreamID, IMFMediaEvent *pEvent)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::ProcessEvent()\n");
 		return E_NOTIMPL;
 	}
 
 	HRESULT STDMETHODCALLTYPE ProcessMessage(MFT_MESSAGE_TYPE eMessage, ULONG_PTR ulParam)
 	{
 		_RPT1(_CRT_WARN, "CMFTCodec::ProcessMessage() eMessage=%08x\n", eMessage);
-//		return E_NOTIMPL; // TODO
+
 		return S_OK;
 	}
 
@@ -726,277 +721,4 @@ public:
 
 		return S_OK;
 	}
-
-	// IMediaObjectImpl
-	/*
-	HRESULT InternalGetInputStreamInfo(DWORD dwInputStreamIndex, DWORD *pdwFlags)
-	{
-		*pdwFlags = MFT_INPUT_STREAMF_WHOLE_SAMPLES |
-					MFT_INPUT_STREAMF_SINGLE_SAMPLE_PER_BUFFER |
-					(T::bEncoding ? MFT_INPUT_STREAMF_FIXED_SAMPLE_SIZE : 0);
-
-		return S_OK;
-	}
-
-	HRESULT InternalGetOutputStreamInfo(DWORD dwOutputStreamIndex, DWORD *pdwFlags)
-	{
-		*pdwFlags = MFT_OUTPUT_STREAMF_WHOLE_SAMPLES |
-					MFT_OUTPUT_STREAMF_SINGLE_SAMPLE_PER_BUFFER |
-					(T::bEncoding ? 0 : MFT_OUTPUT_STREAMF_FIXED_SAMPLE_SIZE);
-
-		return S_OK;
-	}
-
-	HRESULT InternalCheckInputType(DWORD dwInputStreamIndex, const MFT_MEDIA_TYPE *pmt)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalCheckInputType()\n");
-
-		const VIDEOINFOHEADER *pvih;
-		utvf_t infmt;
-
-		if (!IsEqualGUID(pmt->majortype, MEDIATYPE_Video))
-			return MFT_E_INVALIDTYPE;
-		if (!IsEqualGUID(pmt->formattype, FORMAT_VideoInfo))
-			return MFT_E_INVALIDTYPE;
-
-		pvih = (const VIDEOINFOHEADER *)pmt->pbFormat;
-
-		if (DirectShowFormatToUtVideoFormat(&infmt, pvih->bmiHeader.biCompression, pvih->bmiHeader.biBitCount, pmt->subtype) != 0)
-			return MFT_E_INVALIDTYPE;
-
-		if (pvih->bmiHeader.biHeight < 0)
-			return MFT_E_INVALIDTYPE;
-
-		if (((T *)this)->Query(UTVF_INVALID, infmt,
-				pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight,
-				NULL, 0,
-				((const BYTE *)&pvih->bmiHeader) + sizeof(BITMAPINFOHEADER), pvih->bmiHeader.biSize - sizeof(BITMAPINFOHEADER)) != 0)
-		{
-			return MFT_E_INVALIDTYPE;
-		}
-
-		return S_OK;
-	}
-
-	HRESULT InternalCheckOutputType(DWORD dwOutputStreamIndex, const MFT_MEDIA_TYPE *pmt)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalCheckOutputType()\n");
-
-		const MFT_MEDIA_TYPE *pmtIn;
-		const VIDEOINFOHEADER *pvih;
-		const VIDEOINFOHEADER *pvihIn;
-		utvf_t infmt;
-		utvf_t outfmt;
-
-		if (!InputTypeSet(0))
-			return MFT_E_INVALIDTYPE;
-		pmtIn = InputType(0);
-		pvihIn = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
-
-		if (!IsEqualGUID(pmt->majortype, MEDIATYPE_Video))
-			return MFT_E_INVALIDTYPE;
-		if (!IsEqualGUID(pmt->formattype, FORMAT_VideoInfo))
-			return MFT_E_INVALIDTYPE;
-
-		pvih = (const VIDEOINFOHEADER *)pmt->pbFormat;
-
-		if (DirectShowFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
-			return MFT_E_INVALIDTYPE;
-		if (DirectShowFormatToUtVideoFormat(&outfmt, pvih->bmiHeader.biCompression, pvih->bmiHeader.biBitCount, pmt->subtype) != 0)
-			return MFT_E_INVALIDTYPE;
-
-		if (pvih->bmiHeader.biWidth != pvihIn->bmiHeader.biWidth || pvih->bmiHeader.biHeight != pvihIn->bmiHeader.biHeight)
-			return MFT_E_INVALIDTYPE;
-
-		if (((T *)this)->Query(outfmt, infmt,
-				pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight,
-				((const BYTE *)&pvih->bmiHeader) + sizeof(BITMAPINFOHEADER), pvih->bmiHeader.biSize - sizeof(BITMAPINFOHEADER),
-				((const BYTE *)&pvihIn->bmiHeader) + sizeof(BITMAPINFOHEADER), pvihIn->bmiHeader.biSize - sizeof(BITMAPINFOHEADER)) != 0)
-		{
-			return MFT_E_INVALIDTYPE;
-		}
-
-		return S_OK;
-	}
-
-	HRESULT InternalGetInputType(DWORD dwInputStreamIndex, DWORD dwTypeIndex, MFT_MEDIA_TYPE *pmt)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalGetInputType()\n");
-
-		const utvf_t *putvf = T::GetInputFormatInfo(m_pCodec);
-		GUID subtype;
-
-		for (;; putvf++)
-		{
-			if (!*putvf)
-				return MFT_E_NO_MORE_ITEMS;
-			if (UtVideoFormatToDirectShowFormat(&subtype, *putvf) != 0)
-				continue;
-			if (dwTypeIndex == 0)
-				break;
-			dwTypeIndex--;
-		}
-
-		if (pmt == NULL)
-			return S_OK;
-
-		memset(pmt, 0, sizeof(MFT_MEDIA_TYPE));
-		pmt->majortype            = MEDIATYPE_Video;
-		pmt->subtype              = subtype;
-		pmt->bFixedSizeSamples    = T::bEncoding;
-		pmt->bTemporalCompression = m_pCodec->IsTemporalCompressionSupported() && !T::bEncoding;
-
-		return S_OK;
-	}
-
-	HRESULT InternalGetOutputType(DWORD dwOutputStreamIndex, DWORD dwTypeIndex, MFT_MEDIA_TYPE *pmt)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalGetOutputType()\n");
-
-		const utvf_t *putvf = T::GetOutputFormatInfo(m_pCodec);
-		GUID subtype;
-
-		for (;; putvf++)
-		{
-			if (!*putvf)
-				return MFT_E_NO_MORE_ITEMS;
-			if (UtVideoFormatToDirectShowFormat(&subtype, *putvf) != 0)
-				continue;
-			if (dwTypeIndex == 0)
-				break;
-			dwTypeIndex--;
-		}
-
-		if (pmt == NULL)
-			return S_OK;
-
-		memset(pmt, 0, sizeof(MFT_MEDIA_TYPE));
-		pmt->majortype            = MEDIATYPE_Video;
-		pmt->subtype              = subtype;
-		pmt->bFixedSizeSamples    = !T::bEncoding;
-		pmt->bTemporalCompression = m_pCodec->IsTemporalCompressionSupported() && T::bEncoding;
-
-		if (InputTypeSet(0))
-		{
-			const MFT_MEDIA_TYPE *pmtIn = InputType(0);
-			const VIDEOINFOHEADER *pvihIn = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
-			VIDEOINFOHEADER *pvih;
-			size_t cbExtraData;
-			utvf_t infmt;
-			utvf_t outfmt = *putvf;
-
-			DirectShowFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype);
-
-			cbExtraData = ((T *)this)->GetExtraDataSize();
-			MoInitMediaType(pmt, (DWORD)(sizeof(VIDEOINFOHEADER) + cbExtraData));
-			pmt->formattype = FORMAT_VideoInfo;
-			pvih = (VIDEOINFOHEADER *)pmt->pbFormat;
-			memcpy(pvih, pvihIn, sizeof(VIDEOINFOHEADER));
-			UtVideoFormatToVCMFormat(&pvih->bmiHeader.biCompression, &pvih->bmiHeader.biBitCount, *putvf);
-			pvih->bmiHeader.biSizeImage = (DWORD)((T *)this)->GetSize(outfmt, infmt, pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight);
-			pvih->bmiHeader.biSize = (DWORD)(sizeof(BITMAPINFOHEADER) + cbExtraData);
-			((T *)this)->GetExtraData(((BYTE *)&pvih->bmiHeader) + sizeof(BITMAPINFOHEADER), cbExtraData, outfmt, infmt, pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight);
-		}
-
-		return S_OK;
-	}
-
-	HRESULT InternalGetInputSizeInfo(DWORD dwInputStreamIndex, DWORD *pcbSize, DWORD *pcbMaxLookahead, DWORD *pcbAlignment)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalGetInputSizeInfo()\n");
-
-		*pcbSize = 0;
-		*pcbMaxLookahead = 0;
-		*pcbAlignment = 4;
-
-		return S_OK;
-	}
-
-	HRESULT InternalGetOutputSizeInfo(DWORD dwOutputStreamIndex, DWORD *pcbSize, DWORD *pcbAlignment)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalGetOutputSizeInfo()\n");
-
-		const MFT_MEDIA_TYPE *pmtIn  = InputType(0);
-		const MFT_MEDIA_TYPE *pmtOut = OutputType(0);
-		const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
-		const VIDEOINFOHEADER *pvihOut = (const VIDEOINFOHEADER *)pmtOut->pbFormat;
-		utvf_t infmt;
-		utvf_t outfmt;
-
-		if (DirectShowFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
-			return MFT_E_INVALIDTYPE;
-		if (DirectShowFormatToUtVideoFormat(&outfmt, pvihOut->bmiHeader.biCompression, pvihOut->bmiHeader.biBitCount, pmtOut->subtype) != 0)
-			return MFT_E_INVALIDTYPE;
-
-		*pcbSize = (DWORD)((T *)this)->GetSize(outfmt, infmt, pvihIn->bmiHeader.biWidth, pvihIn->bmiHeader.biHeight);
-		*pcbAlignment = 4;
-
-		return S_OK;
-	}
-
-	HRESULT InternalGetInputMaxLatency(DWORD dwInputStreamIndex, REFERENCE_TIME *prtMaxLatency)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalGetInputMaxLatency()\n");
-
-		return E_NOTIMPL;
-	}
-
-	HRESULT InternalSetInputMaxLatency(DWORD dwInputStreamIndex, REFERENCE_TIME rtMaxLatency)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalSetInputMaxLatency()\n");
-
-		return E_NOTIMPL;
-	}
-
-	HRESULT InternalFlush()
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalFlush()\n");
-
-		if (m_pInputBuffer != NULL)
-		{
-			m_pInputBuffer->Release();
-			m_pInputBuffer = NULL;
-		}
-
-		return S_OK;
-	}
-
-	HRESULT InternalDiscontinuity(DWORD dwInputStreamIndex)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalDiscontinuity()\n");
-
-		return S_OK;
-	}
-
-	//HRESULT InternalAllocateStreamingResources();
-
-	//HRESULT InternalFreeStreamingResources();
-
-	HRESULT InternalProcessInput(DWORD dwInputStreamIndex, IMediaBuffer *pBuffer, DWORD dwFlags, REFERENCE_TIME rtTimestamp, REFERENCE_TIME rtTimelength)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalProcessInput()\n");
-
-		m_pInputBuffer = pBuffer;
-		m_pInputBuffer->AddRef();
-		m_bInputKeyFrame = dwFlags & MFT_INPUT_DATA_BUFFERF_SYNCPOINT;
-		m_bInputTimestampValid = dwFlags & MFT_INPUT_DATA_BUFFERF_TIME;
-		m_bInputTimelengthValid = dwFlags & MFT_INPUT_DATA_BUFFERF_TIMELENGTH;
-		m_rtInputTimestamp = rtTimestamp;
-		m_rtInputTimelength = rtTimelength;
-
-		return S_OK;
-	}
-
-	//HRESULT InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, MFT_OUTPUT_DATA_BUFFER *pOutputBuffers, DWORD *pdwStatus);
-
-	HRESULT InternalAcceptingInput(DWORD dwInputStreamIndex)
-	{
-		_RPT0(_CRT_WARN, "CMFTCodec::InternalAcceptingInput()\n");
-
-		if (m_pInputBuffer == NULL)
-			return S_OK;
-		else
-			return S_FALSE;
-	}
-	*/
 };
