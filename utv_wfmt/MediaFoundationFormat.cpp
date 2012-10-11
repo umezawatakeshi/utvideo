@@ -34,24 +34,6 @@ int UtVideoFormatToMediaFoundationFormat(GUID *subtype, utvf_t utvf)
 	return 0;
 }
 
-int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount, REFGUID subtype)
-{
-	utvf_t bybi, byguid;
-
-	if (VCMFormatToUtVideoFormat(&bybi, biCompression, biBitCount) != 0)
-		return -1;
-	if (MediaFoundationFormatToUtVideoFormat(&byguid, subtype) != 0)
-		return -1;
-
-	if (bybi == byguid || (bybi == UTVF_RGB32_WIN && byguid == UTVF_ARGB32_WIN))
-	{
-		*utvf = byguid;
-		return 0;
-	}
-	else
-		return -1;
-}
-
 int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 {
 	GUID guidtmp;
