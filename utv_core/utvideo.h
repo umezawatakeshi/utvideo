@@ -96,11 +96,18 @@ typedef uint32_t utvf_t;
 #define UTVF_INVALID 0
 
 // Non-FourCC RGB formats
-#define UTVF_NFCC_BGR_BU  ((utvf_t)0x00000118)
-#define UTVF_NFCC_BGRX_BU ((utvf_t)0x00000218)
-#define UTVF_NFCC_BGRA_BU ((utvf_t)0x00000120)
-#define UTVF_NFCC_RGB_TD  ((utvf_t)0x00000018)
-#define UTVF_NFCC_ARGB_TD ((utvf_t)0x00000020)
+//      UTVF_NFCC_RGB_MASK_EFFECTIVE_BITCOUNT 0x000000ff
+//      UTVF_NFCC_RGB_FLAG_HAVE_DUMMY_CHANNEL 0x00000100
+//      UTVF_NFCC_RGB_FLAG_BOTTOMUP           0x00000200
+//      UTVF_NFCC_RGB_FLAG_ORDER_BGR          0x00000400
+#define UTVF_NFCC_RGB_TD             ((utvf_t)0x00000018)
+#define UTVF_NFCC_ARGB_TD            ((utvf_t)0x00000020)
+#define UTVF_NFCC_BGR_TD             ((utvf_t)0x00000418)
+#define UTVF_NFCC_BGRX_TD            ((utvf_t)0x00000518)
+#define UTVF_NFCC_BGRA_TD            ((utvf_t)0x00000420)
+#define UTVF_NFCC_BGR_BU             ((utvf_t)0x00000618)
+#define UTVF_NFCC_BGRX_BU            ((utvf_t)0x00000718)
+#define UTVF_NFCC_BGRA_BU            ((utvf_t)0x00000620)
 
 // FourCC formats
 #define UTVF_ULRA ((utvf_t)'ULRA')

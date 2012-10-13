@@ -14,13 +14,13 @@ int UtVideoFormatToMediaFoundationFormat(GUID *subtype, utvf_t utvf)
 {
 	switch (utvf)
 	{
-	case UTVF_NFCC_BGR_BU:
+	case UTVF_NFCC_BGR_TD:
 		*subtype       = MFVideoFormat_RGB24;
 		return 0;
-	case UTVF_NFCC_BGRX_BU:
+	case UTVF_NFCC_BGRX_TD:
 		*subtype       = MFVideoFormat_RGB32;
 		return 0;
-	case UTVF_NFCC_BGRA_BU:
+	case UTVF_NFCC_BGRA_TD:
 		*subtype       = MFVideoFormat_ARGB32;
 		return 0;
 	}
@@ -44,11 +44,11 @@ int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 	if (IsEqualGUID(guidtmp, MFVideoFormat_YUY2) && is_fourcc(subtype.Data1))
 		utvftmp = UNFCC(subtype.Data1);
 	else if (IsEqualGUID(subtype, MFVideoFormat_RGB24))
-		utvftmp = UTVF_NFCC_BGR_BU;
+		utvftmp = UTVF_NFCC_BGR_TD;
 	else if (IsEqualGUID(subtype, MFVideoFormat_RGB32))
-		utvftmp = UTVF_NFCC_BGRX_BU;
+		utvftmp = UTVF_NFCC_BGRX_TD;
 	else if (IsEqualGUID(subtype, MFVideoFormat_ARGB32))
-		utvftmp = UTVF_NFCC_BGRA_BU;
+		utvftmp = UTVF_NFCC_BGRA_TD;
 	else
 		return -1;
 
