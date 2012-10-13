@@ -374,12 +374,15 @@ int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 		{
 		case UTVF_NFCC_BGR_BU:
 			m_bBottomUpFrame = true;
+		case UTVF_NFCC_BGR_TD:
 			m_dwRawNetWidth = width * 3;
 			m_dwRawGrossWidth = ROUNDUP(m_dwRawNetWidth, 4);
 			break;
 		case UTVF_NFCC_BGRX_BU:
 		case UTVF_NFCC_BGRA_BU:
 			m_bBottomUpFrame = true;
+		case UTVF_NFCC_BGRX_TD:
+		case UTVF_NFCC_BGRA_TD:
 			m_dwRawNetWidth = width * 4;
 			m_dwRawGrossWidth = m_dwRawNetWidth;
 			break;
