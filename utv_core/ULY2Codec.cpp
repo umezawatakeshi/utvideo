@@ -103,16 +103,16 @@ void CULY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 		}
 		break;
 	case UTVF_NFCC_BGR_BU:
-		ConvertBottomupRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertBottomupBGRToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertBottomupRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertBottomupBGRXToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertTopdownRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertTopdownRGBToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertTopdownRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertTopdownXRGBToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	}
 }
@@ -152,16 +152,16 @@ void CULY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		}
 		break;
 	case UTVF_NFCC_BGR_BU:
-		ConvertULY2ToBottomupRGB24(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertULY2ToBottomupBGR(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULY2ToBottomupRGB32(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertULY2ToBottomupBGRX(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertULY2ToTopdownRGB24(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertULY2ToTopdownRGB(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULY2ToTopdownRGB32(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertULY2ToTopdownXRGB(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	}
 }

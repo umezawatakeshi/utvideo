@@ -204,24 +204,24 @@ bool CULRGCodec::DecodeDirect(uint32_t nBandIndex)
 	switch (m_utvfRaw)
 	{
 	case UTVF_NFCC_BGR_BU:
-		HuffmanDecodeAndAccumStep3ForBottomupRGB24Green(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
-		HuffmanDecodeAndAccumStep3ForBottomupRGB24Blue (pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
-		HuffmanDecodeAndAccumStep3ForBottomupRGB24Red  (pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep3ForBottomupBGRGreen(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep3ForBottomupBGRBlue (pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep3ForBottomupBGRRed  (pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
 		return true;
 	case UTVF_NFCC_BGRX_BU:
-		HuffmanDecodeAndAccumStep4ForBottomupRGB32Green           (pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
-		HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue            (pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
-		HuffmanDecodeAndAccumStep4ForBottomupRGB32RedAndDummyAlpha(pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep4ForBottomupBGRXGreen           (pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep4ForBottomupBGRXBlue            (pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep4ForBottomupBGRXRedAndDummyAlpha(pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
 		return true;
 	case UTVF_NFCC_RGB_TD:
-		HuffmanDecodeAndAccumStep3ForTopdownRGB24Green(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
-		HuffmanDecodeAndAccumStep3ForTopdownRGB24Blue (pDstBegin+2, pDstEnd+2, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
-		HuffmanDecodeAndAccumStep3ForTopdownRGB24Red  (pDstBegin+0, pDstEnd+0, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep3ForTopdownRGBGreen(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep3ForTopdownRGBBlue (pDstBegin+2, pDstEnd+2, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep3ForTopdownRGBRed  (pDstBegin+0, pDstEnd+0, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
 		return true;
 	case UTVF_NFCC_ARGB_TD:
-		HuffmanDecodeAndAccumStep4ForTopdownRGB32Green           (pDstBegin+2, pDstEnd+2, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
-		HuffmanDecodeAndAccumStep4ForTopdownRGB32Blue            (pDstBegin+3, pDstEnd+3, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
-		HuffmanDecodeAndAccumStep4ForTopdownRGB32RedAndDummyAlpha(pDstBegin+1, pDstEnd+1, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep4ForTopdownXRGBGreen           (pDstBegin+2, pDstEnd+2, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep4ForTopdownXRGBBlue            (pDstBegin+3, pDstEnd+3, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep4ForTopdownXRGBRedAndDummyAlpha(pDstBegin+1, pDstEnd+1, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
 		return true;
 	}
 

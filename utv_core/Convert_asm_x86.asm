@@ -183,10 +183,10 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToBottomupRGB24, 1, 1, 0
-CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToBottomupRGB32, 1, 1, 1
-CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToTopdownRGB24,  0, 0, 0
-CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToTopdownRGB32,  0, 0, 1
+CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToBottomupBGR,  1, 1, 0
+CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToBottomupBGRX, 1, 1, 1
+CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToTopdownRGB,   0, 0, 0
+CONVERT_ULY2_TO_RGB	_x86_sse2_ConvertULY2ToTopdownXRGB,  0, 0, 1
 
 
 ; Y  =  0.29891 R + 0.58661 G + 0.11448 B
@@ -331,7 +331,7 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertBottomupRGB24ToULY2, 1, 1, 0
-CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertBottomupRGB32ToULY2, 1, 1, 1
-CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertTopdownRGB24ToULY2,  0, 0, 0
-CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertTopdownRGB32ToULY2,  0, 0, 1
+CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertBottomupBGRToULY2,  1, 1, 0
+CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertBottomupBGRXToULY2, 1, 1, 1
+CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertTopdownRGBToULY2,   0, 0, 0
+CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertTopdownXRGBToULY2,  0, 0, 1
