@@ -14,6 +14,8 @@ const utvf_t CULY0Codec::m_utvfEncoderInput[] = {
 #endif
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_BGR_TD,
+	UTVF_NFCC_BGRX_TD,
 	UTVF_NFCC_RGB_TD,
 	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
@@ -27,6 +29,8 @@ const utvf_t CULY0Codec::m_utvfDecoderOutput[] = {
 #endif
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_BGR_TD,
+	UTVF_NFCC_BGRX_TD,
 	UTVF_NFCC_RGB_TD,
 	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
@@ -69,7 +73,7 @@ void CULY0Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 	m_dwPlanePredictStride[2] = width / 2;
 }
 
-void CULY0Codec::ConvertBottomupRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, uint32_t nBandIndex, uint32_t bypp)
+void CULY0Codec::ConvertBottomupBGRxToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, uint32_t nBandIndex, uint32_t bypp)
 {
 	uint8_t *y = pDstYBegin;
 	uint8_t *u = pDstUBegin;
@@ -100,7 +104,38 @@ void CULY0Codec::ConvertBottomupRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBeg
 	}
 }
 
-void CULY0Codec::ConvertTopdownRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, uint32_t nBandIndex, uint32_t bypp)
+void CULY0Codec::ConvertTopdownBGRxToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, uint32_t nBandIndex, uint32_t bypp)
+{
+	uint8_t *y = pDstYBegin;
+	uint8_t *u = pDstUBegin;
+	uint8_t *v = pDstVBegin;
+	
+	uint32_t dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
+	
+	const uint8_t *pSrcBegin = ((uint8_t *)m_pInput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	const uint8_t *pSrcEnd   = ((uint8_t *)m_pInput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	
+	for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin < pSrcEnd; pStripeBegin += m_dwRawStripeSize) {
+		for (const uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += m_dwRawGrossWidth)
+		{
+			const uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			for (const uint8_t *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
+			{
+				const uint8_t *p = q + dwRawPredictStride;
+				*(y+0)                           = min(max(int((*(q     +0))*0.098 + (*(q     +1))*0.504 + (*(q     +2))*0.257 + 16.5), 16), 235);
+				*(y+1)                           = min(max(int((*(q+bypp+0))*0.098 + (*(q+bypp+1))*0.504 + (*(q+bypp+2))*0.257 + 16.5), 16), 235);
+				*(y+m_dwPlanePredictStride[0]+0) = min(max(int((*(p     +0))*0.098 + (*(p     +1))*0.504 + (*(p     +2))*0.257 + 16.5), 16), 235);
+				*(y+m_dwPlanePredictStride[0]+1) = min(max(int((*(p+bypp+0))*0.098 + (*(p+bypp+1))*0.504 + (*(p+bypp+2))*0.257 + 16.5), 16), 235);
+				*u                               = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*0.439 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.291 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*-0.148)/4 + 128.5), 16), 240);
+				*v                               = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*-0.071 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.368 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*0.439)/4 + 128.5), 16), 240);
+				y+=2; u++; v++;
+			}
+		}
+		y += m_dwPlanePredictStride[0];
+	}
+}
+
+void CULY0Codec::ConvertTopdownxRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, uint32_t nBandIndex, uint32_t bypp)
 {
 	uint8_t *y = pDstYBegin;
 	uint8_t *u = pDstUBegin;
@@ -195,21 +230,27 @@ void CULY0Codec::ConvertToPlanar(uint32_t nBandIndex)
 		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 1);
 		break;
 	case UTVF_NFCC_BGR_BU:
-		ConvertBottomupRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 3);
+		ConvertBottomupBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 3);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertBottomupRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 4);
+		ConvertBottomupBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 4);
+		break;
+	case UTVF_NFCC_BGR_TD:
+		ConvertTopdownBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 3);
+		break;
+	case UTVF_NFCC_BGRX_TD:
+		ConvertTopdownBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 4);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertTopdownRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 3);
+		ConvertTopdownxRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 3);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertTopdownRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 4);
+		ConvertTopdownxRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 4);
 		break;
 	}
 }
 
-void CULY0Codec::ConvertULY0ToBottomupRGB(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nBandIndex, uint32_t bypp)
+void CULY0Codec::ConvertULY0ToBottomupBGRx(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nBandIndex, uint32_t bypp)
 {
 	const uint8_t *y = pSrcYBegin;
 	const uint8_t *u = pSrcUBegin;
@@ -257,7 +298,55 @@ void CULY0Codec::ConvertULY0ToBottomupRGB(const uint8_t *pSrcYBegin, const uint8
 	}
 }
 
-void CULY0Codec::ConvertULY0ToTopdownRGB(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nBandIndex, uint32_t bypp)
+void CULY0Codec::ConvertULY0ToTopdownBGRx(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nBandIndex, uint32_t bypp)
+{
+	const uint8_t *y = pSrcYBegin;
+	const uint8_t *u = pSrcUBegin;
+	const uint8_t *v = pSrcVBegin;
+
+	uint32_t dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
+
+	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwPlaneStripeBegin[nBandIndex] * m_dwRawStripeSize;
+	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwPlaneStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+
+	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin < pDstEnd; pStripeBegin += m_dwRawStripeSize) {
+		for (uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += m_dwRawGrossWidth)
+		{
+			uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			for (uint8_t *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
+			{
+				uint8_t *p = q + dwRawPredictStride;
+				*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				if (bypp == 4)
+				{
+					*(q+3) = 255;
+					*(p+3) = 255;
+				}
+				y++;
+				*(q+bypp+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(q+bypp+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(q+bypp+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+bypp+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+bypp+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+bypp+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				if (bypp == 4)
+				{
+					*(q+bypp+3) = 255;
+					*(p+bypp+3) = 255;
+				}
+				y++; u++; v++;
+			}
+		}
+		y += m_dwPlanePredictStride[0];
+	}
+}
+
+void CULY0Codec::ConvertULY0ToTopdownxRGB(const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nBandIndex, uint32_t bypp)
 {
 	const uint8_t *y = pSrcYBegin;
 	const uint8_t *u = pSrcUBegin;
@@ -371,16 +460,22 @@ void CULY0Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		ConvertULY0ToYUV422(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 1);
 		break;
 	case UTVF_NFCC_BGR_BU:
-		ConvertULY0ToBottomupRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 3);
+		ConvertULY0ToBottomupBGRx(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 3);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULY0ToBottomupRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
+		ConvertULY0ToBottomupBGRx(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
+		break;
+	case UTVF_NFCC_BGR_TD:
+		ConvertULY0ToTopdownBGRx(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 3);
+		break;
+	case UTVF_NFCC_BGRX_TD:
+		ConvertULY0ToTopdownBGRx(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertULY0ToTopdownRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 3);
+		ConvertULY0ToTopdownxRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 3);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULY0ToTopdownRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
+		ConvertULY0ToTopdownxRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
 		break;
 	}
 }
