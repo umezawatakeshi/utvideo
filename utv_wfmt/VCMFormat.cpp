@@ -14,15 +14,15 @@ int UtVideoFormatToVCMFormat(DWORD *biCompression, WORD *biBitCount, utvf_t utvf
 {
 	switch (utvf)
 	{
-	case UTVF_RGB24_WIN:
+	case UTVF_NFCC_BGR_BU:
 		*biCompression = BI_RGB;
 		*biBitCount    = 24;
 		return 0;
-	case UTVF_RGB32_WIN:
+	case UTVF_NFCC_BGRX_BU:
 		*biCompression = BI_RGB;
 		*biBitCount    = 32;
 		return 0;
-	case UTVF_ARGB32_WIN:
+	case UTVF_NFCC_BGRA_BU:
 		*biCompression = BI_RGB;
 		*biBitCount    = 32;
 		return 0;
@@ -72,10 +72,10 @@ int VCMFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount)
 		switch (biBitCount)
 		{
 		case 24:
-			*utvf = UTVF_RGB24_WIN;
+			*utvf = UTVF_NFCC_BGR_BU;
 			return 0;
 		case 32:
-			*utvf = UTVF_RGB32_WIN;
+			*utvf = UTVF_NFCC_BGRX_BU;
 			return 0;
 		default:
 			return -1;

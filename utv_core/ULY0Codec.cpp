@@ -12,10 +12,10 @@ const utvf_t CULY0Codec::m_utvfEncoderInput[] = {
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
 	UTVF_UYVY, UTVF_UYNV,
 #endif
-	UTVF_RGB24_WIN,
-	UTVF_RGB32_WIN,
-	UTVF_RGB24_QT,
-	UTVF_ARGB32_QT,
+	UTVF_NFCC_BGR_BU,
+	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_RGB_TD,
+	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
 };
 
@@ -25,10 +25,10 @@ const utvf_t CULY0Codec::m_utvfDecoderOutput[] = {
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
 	UTVF_UYVY, UTVF_UYNV,
 #endif
-	UTVF_RGB24_WIN,
-	UTVF_RGB32_WIN,
-	UTVF_RGB24_QT,
-	UTVF_ARGB32_QT,
+	UTVF_NFCC_BGR_BU,
+	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_RGB_TD,
+	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
 };
 
@@ -194,16 +194,16 @@ void CULY0Codec::ConvertToPlanar(uint32_t nBandIndex)
 	case UTVF_UYNV:
 		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 1);
 		break;
-	case UTVF_RGB24_WIN:
+	case UTVF_NFCC_BGR_BU:
 		ConvertBottomupRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 3);
 		break;
-	case UTVF_RGB32_WIN:
+	case UTVF_NFCC_BGRX_BU:
 		ConvertBottomupRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 4);
 		break;
-	case UTVF_RGB24_QT:
+	case UTVF_NFCC_RGB_TD:
 		ConvertTopdownRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 3);
 		break;
-	case UTVF_ARGB32_QT:
+	case UTVF_NFCC_ARGB_TD:
 		ConvertTopdownRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, nBandIndex, 4);
 		break;
 	}
@@ -370,16 +370,16 @@ void CULY0Codec::ConvertFromPlanar(uint32_t nBandIndex)
 	case UTVF_UYNV:
 		ConvertULY0ToYUV422(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 1);
 		break;
-	case UTVF_RGB24_WIN:
+	case UTVF_NFCC_BGR_BU:
 		ConvertULY0ToBottomupRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 3);
 		break;
-	case UTVF_RGB32_WIN:
+	case UTVF_NFCC_BGRX_BU:
 		ConvertULY0ToBottomupRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
 		break;
-	case UTVF_RGB24_QT:
+	case UTVF_NFCC_RGB_TD:
 		ConvertULY0ToTopdownRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 3);
 		break;
-	case UTVF_ARGB32_QT:
+	case UTVF_NFCC_ARGB_TD:
 		ConvertULY0ToTopdownRGB(pSrcYBegin, pSrcUBegin, pSrcVBegin, nBandIndex, 4);
 		break;
 	}

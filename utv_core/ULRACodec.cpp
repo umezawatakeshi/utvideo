@@ -7,16 +7,16 @@
 #include "Predict.h"
 
 const utvf_t CULRACodec::m_utvfEncoderInput[] = {
-	UTVF_ARGB32_WIN,
-	UTVF_RGB32_WIN,
-	UTVF_ARGB32_QT,
+	UTVF_NFCC_BGRA_BU,
+	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
 };
 
 const utvf_t CULRACodec::m_utvfDecoderOutput[] = {
-	UTVF_ARGB32_WIN,
-	UTVF_RGB32_WIN,
-	UTVF_ARGB32_QT,
+	UTVF_NFCC_BGRA_BU,
+	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
 };
 
@@ -75,8 +75,8 @@ void CULRACodec::ConvertToPlanar(uint32_t nBandIndex)
 
 	switch (m_utvfRaw)
 	{
-	case UTVF_ARGB32_WIN:
-	case UTVF_RGB32_WIN:
+	case UTVF_NFCC_BGRA_BU:
+	case UTVF_NFCC_BGRX_BU:
 		for (pStrideBegin = pSrcEnd - m_dwRawGrossWidth; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwRawGrossWidth)
 		{
 			const uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
@@ -89,7 +89,7 @@ void CULRACodec::ConvertToPlanar(uint32_t nBandIndex)
 			}
 		}
 		break;
-	case UTVF_ARGB32_QT:
+	case UTVF_NFCC_ARGB_TD:
 		for (pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += m_dwRawGrossWidth)
 		{
 			const uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
@@ -119,8 +119,8 @@ void CULRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 
 	switch (m_utvfRaw)
 	{
-	case UTVF_ARGB32_WIN:
-	case UTVF_RGB32_WIN:
+	case UTVF_NFCC_BGRA_BU:
+	case UTVF_NFCC_BGRX_BU:
 		for (pStrideBegin = pDstEnd - m_dwRawGrossWidth; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwRawGrossWidth)
 		{
 			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
@@ -134,7 +134,7 @@ void CULRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 			}
 		}
 		break;
-	case UTVF_ARGB32_QT:
+	case UTVF_NFCC_ARGB_TD:
 		for (pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawGrossWidth)
 		{
 			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
@@ -161,14 +161,14 @@ bool CULRACodec::DecodeDirect(uint32_t nBandIndex)
 
 	switch (m_utvfRaw)
 	{
-	case UTVF_ARGB32_WIN:
-	case UTVF_RGB32_WIN:
+	case UTVF_NFCC_BGRA_BU:
+	case UTVF_NFCC_BGRX_BU:
 		HuffmanDecodeAndAccumStep4ForBottomupRGB32Green(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
 		HuffmanDecodeAndAccumStep4ForBottomupRGB32Blue (pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
 		HuffmanDecodeAndAccumStep4ForBottomupRGB32Red  (pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
 		HuffmanDecodeAndAccumStep4ForBottomupRGB32Green(pDstBegin+3, pDstEnd+3, m_pDecodeCode[3][nBandIndex], &m_hdt[3], m_dwRawNetWidth, m_dwRawGrossWidth);
 		return true;
-	case UTVF_ARGB32_QT:
+	case UTVF_NFCC_ARGB_TD:
 		HuffmanDecodeAndAccumStep4ForTopdownRGB32Green(pDstBegin+2, pDstEnd+2, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
 		HuffmanDecodeAndAccumStep4ForTopdownRGB32Blue (pDstBegin+3, pDstEnd+3, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
 		HuffmanDecodeAndAccumStep4ForTopdownRGB32Red  (pDstBegin+1, pDstEnd+1, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);

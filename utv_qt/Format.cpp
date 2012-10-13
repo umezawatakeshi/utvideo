@@ -14,10 +14,10 @@ DLLEXPORT int UtVideoFormatToQuickTimeFormat(OSType *pixelFormat, utvf_t utvf)
 {
 	switch (utvf)
 	{
-	case UTVF_RGB24_QT:
+	case UTVF_NFCC_RGB_TD:
 		*pixelFormat = k24RGBPixelFormat;
 		return 0;
-	case UTVF_ARGB32_QT:
+	case UTVF_NFCC_ARGB_TD:
 		*pixelFormat = k32ARGBPixelFormat;
 		return 0;
 	}
@@ -37,10 +37,10 @@ DLLEXPORT int QuickTimeFormatToUtVideoFormat(utvf_t *utvf, OSType pixelFormat)
 	switch (pixelFormat)
 	{
 	case k24RGBPixelFormat:
-		*utvf = UTVF_RGB24_QT;
+		*utvf = UTVF_NFCC_RGB_TD;
 		return 0;
 	case k32ARGBPixelFormat:
-		*utvf = UTVF_ARGB32_QT;
+		*utvf = UTVF_NFCC_ARGB_TD;
 		return 0;
 	}
 

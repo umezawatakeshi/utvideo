@@ -95,12 +95,12 @@ typedef uint32_t utvf_t;
 
 #define UTVF_INVALID 0
 
-// standard RGB formats
-#define UTVF_RGB24_WIN   ((utvf_t)0x00000118)
-#define UTVF_RGB32_WIN   ((utvf_t)0x00000218)
-#define UTVF_ARGB32_WIN  ((utvf_t)0x00000120)
-#define UTVF_RGB24_QT    ((utvf_t)0x00000018)
-#define UTVF_ARGB32_QT   ((utvf_t)0x00000020)
+// Non-FourCC RGB formats
+#define UTVF_NFCC_BGR_BU  ((utvf_t)0x00000118)
+#define UTVF_NFCC_BGRX_BU ((utvf_t)0x00000218)
+#define UTVF_NFCC_BGRA_BU ((utvf_t)0x00000120)
+#define UTVF_NFCC_RGB_TD  ((utvf_t)0x00000018)
+#define UTVF_NFCC_ARGB_TD ((utvf_t)0x00000020)
 
 // FourCC formats
 #define UTVF_ULRA ((utvf_t)'ULRA')

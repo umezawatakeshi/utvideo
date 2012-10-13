@@ -14,13 +14,13 @@ int UtVideoFormatToDirectShowFormat(GUID *subtype, utvf_t utvf)
 {
 	switch (utvf)
 	{
-	case UTVF_RGB24_WIN:
+	case UTVF_NFCC_BGR_BU:
 		*subtype       = MEDIASUBTYPE_RGB24;
 		return 0;
-	case UTVF_RGB32_WIN:
+	case UTVF_NFCC_BGRX_BU:
 		*subtype       = MEDIASUBTYPE_RGB32;
 		return 0;
-	case UTVF_ARGB32_WIN:
+	case UTVF_NFCC_BGRA_BU:
 		*subtype       = MEDIASUBTYPE_ARGB32;
 		return 0;
 	}
@@ -43,7 +43,7 @@ int DirectShowFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBi
 	if (DirectShowFormatToUtVideoFormat(&byguid, subtype) != 0)
 		return -1;
 
-	if (bybi == byguid || (bybi == UTVF_RGB32_WIN && byguid == UTVF_ARGB32_WIN))
+	if (bybi == byguid || (bybi == UTVF_NFCC_BGRX_BU && byguid == UTVF_NFCC_BGRA_BU))
 	{
 		*utvf = byguid;
 		return 0;
@@ -62,11 +62,11 @@ int DirectShowFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 	if (IsEqualGUID(guidtmp, MEDIASUBTYPE_YUY2))
 		utvftmp = UNFCC(subtype.Data1);
 	else if (IsEqualGUID(subtype, MEDIASUBTYPE_RGB24))
-		utvftmp = UTVF_RGB24_WIN;
+		utvftmp = UTVF_NFCC_BGR_BU;
 	else if (IsEqualGUID(subtype, MEDIASUBTYPE_RGB32))
-		utvftmp = UTVF_RGB32_WIN;
+		utvftmp = UTVF_NFCC_BGRX_BU;
 	else if (IsEqualGUID(subtype, MEDIASUBTYPE_ARGB32))
-		utvftmp = UTVF_ARGB32_WIN;
+		utvftmp = UTVF_NFCC_BGRA_BU;
 	else
 		return -1;
 

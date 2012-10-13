@@ -12,10 +12,10 @@ const utvf_t CULY2Codec::m_utvfEncoderInput[] = {
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
 	UTVF_UYVY, UTVF_UYNV,
 #endif
-	UTVF_RGB24_WIN,
-	UTVF_RGB32_WIN,
-	UTVF_RGB24_QT,
-	UTVF_ARGB32_QT,
+	UTVF_NFCC_BGR_BU,
+	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_RGB_TD,
+	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
 };
 
@@ -24,10 +24,10 @@ const utvf_t CULY2Codec::m_utvfDecoderOutput[] = {
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
 	UTVF_UYVY, UTVF_UYNV,
 #endif
-	UTVF_RGB24_WIN,
-	UTVF_RGB32_WIN,
-	UTVF_RGB24_QT,
-	UTVF_ARGB32_QT,
+	UTVF_NFCC_BGR_BU,
+	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_RGB_TD,
+	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
 };
 
@@ -102,16 +102,16 @@ void CULY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 			*y++ = *(p+3);
 		}
 		break;
-	case UTVF_RGB24_WIN:
+	case UTVF_NFCC_BGR_BU:
 		ConvertBottomupRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
-	case UTVF_RGB32_WIN:
+	case UTVF_NFCC_BGRX_BU:
 		ConvertBottomupRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
-	case UTVF_RGB24_QT:
+	case UTVF_NFCC_RGB_TD:
 		ConvertTopdownRGB24ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
-	case UTVF_ARGB32_QT:
+	case UTVF_NFCC_ARGB_TD:
 		ConvertTopdownRGB32ToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	}
@@ -151,16 +151,16 @@ void CULY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 			*(p+3) = *y++;
 		}
 		break;
-	case UTVF_RGB24_WIN:
+	case UTVF_NFCC_BGR_BU:
 		ConvertULY2ToBottomupRGB24(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
-	case UTVF_RGB32_WIN:
+	case UTVF_NFCC_BGRX_BU:
 		ConvertULY2ToBottomupRGB32(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
-	case UTVF_RGB24_QT:
+	case UTVF_NFCC_RGB_TD:
 		ConvertULY2ToTopdownRGB24(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
-	case UTVF_ARGB32_QT:
+	case UTVF_NFCC_ARGB_TD:
 		ConvertULY2ToTopdownRGB32(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	}
