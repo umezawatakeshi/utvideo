@@ -45,6 +45,7 @@ const TUNEDFUNC tfnSSE2 = {
 	x64_sse2_ConvertBottomupRGB32ToULY2,
 	x64_sse2_ConvertTopdownRGB24ToULY2,
 	x64_sse2_ConvertTopdownRGB32ToULY2,
+	DummyTunedFunc
 };
 
 const TUNEDFUNC &tfnSSE3 = tfnSSE2;

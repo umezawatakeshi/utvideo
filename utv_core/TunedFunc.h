@@ -39,6 +39,9 @@ struct TUNEDFUNC
 	void (*pfnConvertBottomupRGB32ToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbGrossWidth, size_t cbNetWidth);
 	void (*pfnConvertTopdownRGB24ToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbGrossWidth, size_t cbNetWidth);
 	void (*pfnConvertTopdownRGB32ToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbGrossWidth, size_t cbNetWidth);
+	void (*pfnDummyTunedFunc)(TUNEDFUNC *);
 };
+
+#define DummyTunedFunc ((void (*)(TUNEDFUNC *))NULL)
 
 extern TUNEDFUNC tfn;
