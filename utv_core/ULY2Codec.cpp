@@ -14,6 +14,8 @@ const utvf_t CULY2Codec::m_utvfEncoderInput[] = {
 #endif
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_BGR_TD,
+	UTVF_NFCC_BGRX_TD,
 	UTVF_NFCC_RGB_TD,
 	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
@@ -26,6 +28,8 @@ const utvf_t CULY2Codec::m_utvfDecoderOutput[] = {
 #endif
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_BGR_TD,
+	UTVF_NFCC_BGRX_TD,
 	UTVF_NFCC_RGB_TD,
 	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
@@ -108,6 +112,12 @@ void CULY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 	case UTVF_NFCC_BGRX_BU:
 		ConvertBottomupBGRXToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
+	case UTVF_NFCC_BGR_TD:
+		ConvertTopdownBGRToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		break;
+	case UTVF_NFCC_BGRX_TD:
+		ConvertTopdownBGRXToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		break;
 	case UTVF_NFCC_RGB_TD:
 		ConvertTopdownRGBToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
@@ -156,6 +166,12 @@ void CULY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		break;
 	case UTVF_NFCC_BGRX_BU:
 		ConvertULY2ToBottomupBGRX(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		break;
+	case UTVF_NFCC_BGR_TD:
+		ConvertULY2ToTopdownBGR(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		break;
+	case UTVF_NFCC_BGRX_TD:
+		ConvertULY2ToTopdownBGRX(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
 		break;
 	case UTVF_NFCC_RGB_TD:
 		ConvertULY2ToTopdownRGB(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
