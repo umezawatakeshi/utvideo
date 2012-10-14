@@ -185,6 +185,8 @@ global %$procname
 
 CONVERT_ULY2_TO_RGB	x64_sse2_ConvertULY2ToBottomupBGR,  1, 1, 0
 CONVERT_ULY2_TO_RGB	x64_sse2_ConvertULY2ToBottomupBGRX, 1, 1, 1
+CONVERT_ULY2_TO_RGB	x64_sse2_ConvertULY2ToTopdownBGR,   0, 1, 0
+CONVERT_ULY2_TO_RGB	x64_sse2_ConvertULY2ToTopdownBGRX,  0, 1, 1
 CONVERT_ULY2_TO_RGB	x64_sse2_ConvertULY2ToTopdownRGB,   0, 0, 0
 CONVERT_ULY2_TO_RGB	x64_sse2_ConvertULY2ToTopdownXRGB,  0, 0, 1
 
@@ -333,5 +335,7 @@ global %$procname
 
 CONVERT_RGB_TO_ULY2	x64_sse2_ConvertBottomupBGRToULY2,  1, 1, 0
 CONVERT_RGB_TO_ULY2	x64_sse2_ConvertBottomupBGRXToULY2, 1, 1, 1
+CONVERT_RGB_TO_ULY2	x64_sse2_ConvertTopdownBGRToULY2,   0, 1, 0
+CONVERT_RGB_TO_ULY2	x64_sse2_ConvertTopdownBGRXToULY2,  0, 1, 1
 CONVERT_RGB_TO_ULY2	x64_sse2_ConvertTopdownRGBToULY2,   0, 0, 0
 CONVERT_RGB_TO_ULY2	x64_sse2_ConvertTopdownXRGBToULY2,  0, 0, 1
