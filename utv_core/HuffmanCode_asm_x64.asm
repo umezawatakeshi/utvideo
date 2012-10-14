@@ -184,7 +184,7 @@ global %$procname
  %else
 	add			r8, qword [rsp + %$$cbGrossWidth]
 	cmp			r8, qword [rsp + %$$pDstEnd]
-	jae			%%label3
+	ja			%%label3
 
 	add			rdi, r12
  %endif

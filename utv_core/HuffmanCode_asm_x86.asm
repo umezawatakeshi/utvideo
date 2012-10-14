@@ -191,7 +191,7 @@ global %$procname
 	mov			edx, dword [esp + %$$pLineEnd]
 	add			edx, dword [esp + %$$cbGrossWidth]
 	cmp			edx, dword [esp + %$$pDstEnd]
-	jae			%%label3
+	ja			%%label3
 	mov			dword [esp + %$$pLineEnd], edx
   %if %$dohuffman
 	mov			edx, dword [esi+4]
