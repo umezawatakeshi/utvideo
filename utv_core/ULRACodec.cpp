@@ -197,6 +197,12 @@ bool CULRACodec::DecodeDirect(uint32_t nBandIndex)
 		HuffmanDecodeAndAccumStep4ForBottomupBGRXRed  (pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
 		HuffmanDecodeAndAccumStep4ForBottomupBGRXGreen(pDstBegin+3, pDstEnd+3, m_pDecodeCode[3][nBandIndex], &m_hdt[3], m_dwRawNetWidth, m_dwRawGrossWidth);
 		return true;
+	case UTVF_NFCC_BGRA_TD:
+		HuffmanDecodeAndAccumStep4ForTopdownXRGBGreen(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep4ForTopdownXRGBRed  (pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep4ForTopdownXRGBBlue (pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
+		HuffmanDecodeAndAccumStep4ForTopdownXRGBGreen(pDstBegin+3, pDstEnd+3, m_pDecodeCode[3][nBandIndex], &m_hdt[3], m_dwRawNetWidth, m_dwRawGrossWidth);
+		return true;
 	case UTVF_NFCC_ARGB_TD:
 		HuffmanDecodeAndAccumStep4ForTopdownXRGBGreen(pDstBegin+2, pDstEnd+2, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
 		HuffmanDecodeAndAccumStep4ForTopdownXRGBBlue (pDstBegin+3, pDstEnd+3, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);

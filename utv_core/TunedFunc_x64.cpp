@@ -37,6 +37,7 @@ const TUNEDFUNC tfnSSE2 = {
 	x64_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBGreen,
 	x64_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBBlue,
 	x64_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBRed,
+	x64_i686_HuffmanDecodeAndAccumStep4ForTopdownBGRXRedAndDummyAlpha,
 	x64_sse2_ConvertULY2ToBottomupBGR,
 	x64_sse2_ConvertULY2ToBottomupBGRX,
 	x64_sse2_ConvertULY2ToTopdownBGR,

@@ -447,3 +447,8 @@ void cpp_HuffmanDecodeAndAccumStep3ForTopdownRGBRed(uint8_t *pDstBegin, uint8_t 
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, false, cbNetWidth, cbGrossWidth, +1, 0);
 }
+
+void cpp_HuffmanDecodeAndAccumStep4ForTopdownBGRXRedAndDummyAlpha(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbNetWidth, size_t cbGrossWidth)
+{
+	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, false, cbNetWidth, cbGrossWidth, -1, +1);
+}

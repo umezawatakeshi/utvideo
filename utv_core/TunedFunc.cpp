@@ -32,6 +32,7 @@ const TUNEDFUNC tfnCPP = {
 	cpp_HuffmanDecodeAndAccumStep3ForTopdownRGBGreen,
 	cpp_HuffmanDecodeAndAccumStep3ForTopdownRGBBlue,
 	cpp_HuffmanDecodeAndAccumStep3ForTopdownRGBRed,
+	cpp_HuffmanDecodeAndAccumStep4ForTopdownBGRXRedAndDummyAlpha,
 	cpp_ConvertULY2ToBottomupBGR,
 	cpp_ConvertULY2ToBottomupBGRX,
 	cpp_ConvertULY2ToTopdownBGR,

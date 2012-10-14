@@ -234,3 +234,4 @@ HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBRedAndDummyAlph
 HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBGreen,              1, 3, 1, 0,  0,  0
 HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBBlue,               1, 3, 1, 0, -1,  0
 HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBRed,                1, 3, 1, 0, +1,  0
+HUFFMAN_DECODE	_x86_i686_HuffmanDecodeAndAccumStep4ForTopdownBGRXRedAndDummyAlpha,  1, 4, 1, 0, -1, +1
