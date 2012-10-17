@@ -68,6 +68,7 @@ public:
 public:
 	HRESULT InternalBeginStream(void);
 	HRESULT InternalEndStream(void);
+	HRESULT InternalProcessOutput(IMFSample *pOutputSample, IMFSample *pInputSample);
 };
 
 

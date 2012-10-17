@@ -646,11 +646,7 @@ public:
 		IMFMediaBuffer *pInputBuffer;
 		IMFMediaBuffer *pOutputBuffer;
 		IMFSample *pOutputSample;
-		size_t cbOutput;
-		BYTE *pInputByteBuffer;
-		BYTE *pOutputByteBuffer;
 		LONGLONG ll;
-		UINT32 bKeyFrame;
 
 		if (m_pInputSample == NULL)
 			return MF_E_TRANSFORM_NEED_MORE_INPUT;
@@ -667,21 +663,13 @@ public:
 
 		MFCreateAlignedMemoryBuffer((DWORD)((T *)this)->GetSize(m_outfmt, m_infmt, m_nFrameWidth, m_nFrameHeight), 4, &pOutputBuffer);
 		pOutputSample->AddBuffer(pOutputBuffer);
-		if (FAILED(m_pInputSample->GetUINT32(MFSampleExtension_CleanPoint, &bKeyFrame)))
-			bKeyFrame = FALSE;
 
-		pInputBuffer->Lock(&pInputByteBuffer, NULL, NULL);
-		pOutputBuffer->Lock(&pOutputByteBuffer, NULL, NULL);
-		cbOutput = m_pCodec->DecodeFrame(pOutputByteBuffer, pInputByteBuffer, (bKeyFrame != FALSE) /* convert to bool */);
-		pInputBuffer->Unlock();
-		pOutputBuffer->Unlock();
-		pOutputBuffer->SetCurrentLength((DWORD)cbOutput);
+		((T *)this)->InternalProcessOutput(pOutputSample, m_pInputSample);
 
 		if (SUCCEEDED(m_pInputSample->GetSampleTime(&ll)))
 			pOutputSample->SetSampleTime(ll);
 		if (SUCCEEDED(m_pInputSample->GetSampleDuration(&ll)))
 			pOutputSample->SetSampleDuration(ll);
-		pOutputSample->SetUINT32(MFSampleExtension_CleanPoint, TRUE);
 
 		pInputBuffer->Release();
 		pOutputBuffer->Release();
