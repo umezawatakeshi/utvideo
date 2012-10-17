@@ -43,7 +43,7 @@ public:
 
 	static const utvf_t *GetInputFormatInfo(CCodec *pCodec) { return pCodec->GetCompressedFormat(); }
 	static const utvf_t *GetOutputFormatInfo(CCodec *pCodec) { return pCodec->GetDecoderOutputFormat(); }
-	static const void GetName(CCodec *pCodec, WCHAR *szCodecName, size_t cchCodecName) { wsprintfW(szCodecName, L"%S MFT Decoder", pCodec->GetTinyName()); }
+	static const void GetName(CCodec *pCodec, WCHAR *szCodecName, size_t cchCodecName) { wsprintfW(szCodecName, L"%S Decoder MFT", pCodec->GetTinyName()); }
 
 	size_t GetExtraDataSize(void)
 	{
