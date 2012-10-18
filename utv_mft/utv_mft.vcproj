@@ -418,6 +418,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MFTEncoder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -484,6 +488,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MFTEncoder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\resource.h"
 				>
 			</File>
@@ -499,6 +507,10 @@
 			>
 			<File
 				RelativePath=".\MFTDecoder.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\MFTEncoder.rgs"
 				>
 			</File>
 			<File
