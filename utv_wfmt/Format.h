@@ -11,4 +11,4 @@ int DirectShowFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBi
 int DirectShowFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype);
 
 int UtVideoFormatToMediaFoundationFormat(GUID *subtype, utvf_t utvf);
-int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype);
+int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype, bool bBottomup);

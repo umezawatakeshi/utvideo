@@ -375,7 +375,7 @@ public:
 
 		if (!IsEqualGUID(guidNewMajorType, MFMediaType_Video))
 			return MF_E_INVALIDMEDIATYPE;
-		if (MediaFoundationFormatToUtVideoFormat(&infmt, guidNewSubtype) != 0)
+		if (MediaFoundationFormatToUtVideoFormat(&infmt, guidNewSubtype, (INT32)MFGetAttributeUINT32(pType, MF_MT_DEFAULT_STRIDE, 1) < 0) != 0)
 			return MF_E_INVALIDMEDIATYPE;
 
 		if (FAILED(pType->GetAllocatedBlob(MF_MT_USER_DATA, &pNewUserData, &cbNewUserData)))
@@ -469,7 +469,7 @@ public:
 
 		if (!IsEqualGUID(guidNewMajorType, MFMediaType_Video))
 			return MF_E_INVALIDMEDIATYPE;
-		if (MediaFoundationFormatToUtVideoFormat(&outfmt, guidNewSubtype) != 0)
+		if (MediaFoundationFormatToUtVideoFormat(&outfmt, guidNewSubtype, (INT32)MFGetAttributeUINT32(pType, MF_MT_DEFAULT_STRIDE, 1) < 0) != 0)
 			return MF_E_INVALIDMEDIATYPE;
 		if (nFrameWidth != m_nFrameWidth || nFrameHeight != m_nFrameHeight)
 			return MF_E_INVALIDMEDIATYPE;

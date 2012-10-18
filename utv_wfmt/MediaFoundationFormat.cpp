@@ -15,12 +15,15 @@ int UtVideoFormatToMediaFoundationFormat(GUID *subtype, utvf_t utvf)
 	switch (utvf)
 	{
 	case UTVF_NFCC_BGR_TD:
+	case UTVF_NFCC_BGR_BU:
 		*subtype       = MFVideoFormat_RGB24;
 		return 0;
 	case UTVF_NFCC_BGRX_TD:
+	case UTVF_NFCC_BGRX_BU:
 		*subtype       = MFVideoFormat_RGB32;
 		return 0;
 	case UTVF_NFCC_BGRA_TD:
+	case UTVF_NFCC_BGRA_BU:
 		*subtype       = MFVideoFormat_ARGB32;
 		return 0;
 	}
@@ -34,7 +37,7 @@ int UtVideoFormatToMediaFoundationFormat(GUID *subtype, utvf_t utvf)
 	return 0;
 }
 
-int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
+int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype, bool bBottomup)
 {
 	GUID guidtmp;
 	utvf_t utvftmp;
@@ -42,13 +45,33 @@ int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 	guidtmp = subtype;
 	guidtmp.Data1 = MFVideoFormat_YUY2.Data1;
 	if (IsEqualGUID(guidtmp, MFVideoFormat_YUY2) && is_fourcc(subtype.Data1))
-		utvftmp = UNFCC(subtype.Data1);
+	{
+		if (bBottomup)
+			return -1;
+		else
+			utvftmp = UNFCC(subtype.Data1);
+	}
 	else if (IsEqualGUID(subtype, MFVideoFormat_RGB24))
-		utvftmp = UTVF_NFCC_BGR_TD;
+	{
+		if (bBottomup)
+			utvftmp = UTVF_NFCC_BGR_BU;
+		else
+			utvftmp = UTVF_NFCC_BGR_TD;
+	}
 	else if (IsEqualGUID(subtype, MFVideoFormat_RGB32))
-		utvftmp = UTVF_NFCC_BGRX_TD;
+	{
+		if (bBottomup)
+			utvftmp = UTVF_NFCC_BGRX_BU;
+		else
+			utvftmp = UTVF_NFCC_BGRX_TD;
+	}
 	else if (IsEqualGUID(subtype, MFVideoFormat_ARGB32))
-		utvftmp = UTVF_NFCC_BGRA_TD;
+	{
+		if (bBottomup)
+			utvftmp = UTVF_NFCC_BGRA_BU;
+		else
+			utvftmp = UTVF_NFCC_BGRA_TD;
+	}
 	else
 		return -1;
 
