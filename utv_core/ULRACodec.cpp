@@ -9,7 +9,7 @@
 const utvf_t CULRACodec::m_utvfEncoderInput[] = {
 	UTVF_NFCC_BGRA_BU,
 	UTVF_NFCC_BGRX_BU,
-	UTVF_NFCC_BGRA_BU,
+	UTVF_NFCC_BGRA_TD,
 	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
 };
@@ -17,7 +17,7 @@ const utvf_t CULRACodec::m_utvfEncoderInput[] = {
 const utvf_t CULRACodec::m_utvfDecoderOutput[] = {
 	UTVF_NFCC_BGRA_BU,
 	UTVF_NFCC_BGRX_BU,
-	UTVF_NFCC_BGRA_BU,
+	UTVF_NFCC_BGRA_TD,
 	UTVF_NFCC_ARGB_TD,
 	UTVF_INVALID,
 };
