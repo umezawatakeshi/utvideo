@@ -613,6 +613,16 @@ public:
 	{
 		_RPT1(_CRT_WARN, "CMFTCodec::ProcessMessage() eMessage=%08x\n", eMessage);
 
+		switch (eMessage)
+		{
+		case MFT_MESSAGE_COMMAND_FLUSH:
+			return Flush();
+		case MFT_MESSAGE_NOTIFY_BEGIN_STREAMING:
+			return BeginStream();
+		case MFT_MESSAGE_NOTIFY_END_STREAMING:
+			return EndStream();
+		}
+
 		return S_OK;
 	}
 
@@ -703,9 +713,22 @@ public:
 		if (!m_bStreamBegin)
 			return S_OK;
 
+		Flush();
+
 		hr = ((T *)this)->InternalEndStream();
 		if (SUCCEEDED(hr))
 			m_bStreamBegin = false;
+
+		return S_OK;
+	}
+
+	HRESULT Flush(void)
+	{
+		if (m_pInputSample != NULL)
+		{
+			m_pInputSample->Release();
+			m_pInputSample = NULL;
+		}
 
 		return S_OK;
 	}
