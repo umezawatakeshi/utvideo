@@ -84,6 +84,8 @@ int VCMFormatToUtVideoFormat(utvf_t *utvf, DWORD biCompression, WORD biBitCount)
 
 	if (UtVideoFormatToVCMFormat(&dwtmp, &wtmp, (utvf_t)UNFCC(biCompression)) != 0)
 		return -1;
+	if (dwtmp != biCompression) // biBitCount はチェックしない
+		return -1;
 
 	*utvf = UNFCC(biCompression);
 	return 0;

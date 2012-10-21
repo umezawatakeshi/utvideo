@@ -72,6 +72,8 @@ int DirectShowFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype)
 
 	if (UtVideoFormatToDirectShowFormat(&guidtmp, utvftmp) != 0)
 		return -1;
+	if (!IsEqualGUID(guidtmp, subtype))
+		return -1;
 
 	*utvf = utvftmp;
 	return 0;

@@ -77,6 +77,8 @@ int MediaFoundationFormatToUtVideoFormat(utvf_t *utvf, REFGUID subtype, bool bBo
 
 	if (UtVideoFormatToMediaFoundationFormat(&guidtmp, utvftmp) != 0)
 		return -1;
+	if (!IsEqualGUID(guidtmp, subtype))
+		return -1;
 
 	*utvf = utvftmp;
 	return 0;
