@@ -150,7 +150,12 @@ public:
 		}
 		else
 		{
-			return MFTUnregister(clsid);
+			// http://social.msdn.microsoft.com/Forums/zh/mediafoundationdevelopment/thread/7d3dc70f-8eae-4ad0-ad90-6c596cf78c80
+			// ‚É‚æ‚é‚ÆAMFTUnregister ‚ª¬Œ÷‚Å‚à 0x80070002 ‚ğ•Ô‚·‚±‚Æ‚ª‚ ‚é‚Ì‚Í "known bug" ‚ç‚µ‚¢c
+			hr = MFTUnregister(clsid);
+			if (hr == 0x80070002) // 0x80070002 is HRESULT-style ERROR_FILE_NOT_FOUND (2)
+				hr = S_OK;
+			return hr;
 		}
 	}
 
