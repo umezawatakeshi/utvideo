@@ -114,7 +114,7 @@ global %$procname
 	mov			edx, dword [rsi]
 	sub			rsi, 4
 %else
-	mov			ah, byte [ebx]
+	mov			ah, byte [rbx]
 %endif
 
 	align		64
@@ -194,7 +194,7 @@ global %$procname
 %pop
 %endmacro
 
-	cmp			byte [ebx + 1], 0
+	cmp			byte [rbx + 1], 0
 	je			.solidframe
 	DO_OUTPUT_%$procname	1
 	jmp			.funcend
