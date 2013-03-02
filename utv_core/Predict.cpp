@@ -6,7 +6,8 @@
 #include "Predict.h"
 #include "TunedFunc.h"
 
-inline uint8_t median(uint8_t a, uint8_t b, uint8_t c)
+template<class T>
+inline T median(T a, T b, T c)
 {
 	return max(min(max(a,b),c),min(a,b));
 }
@@ -51,7 +52,7 @@ void cpp_PredictMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const ui
 	// 残りのピクセルが predict median の本番
 	for (; p < pSrcEnd; p++, q++)
 	{
-		*q = *p - median(*(p - dwStride), *(p - 1), *(p - dwStride) + *(p - 1) - *(p - 1 - dwStride));
+		*q = *p - median<uint8_t>(*(p - dwStride), *(p - 1), *(p - dwStride) + *(p - 1) - *(p - 1 - dwStride));
 		pCountTable[*q]++;
 	}
 }
@@ -96,6 +97,6 @@ void cpp_RestoreMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *p
 
 	for (; p < pSrcEnd; p++, q++)
 	{
-		*q = *p + median(*(q - dwStride), *(q - 1), *(q - dwStride) + *(q - 1) - *(q - 1 - dwStride));
+		*q = *p + median<uint8_t>(*(q - dwStride), *(q - 1), *(q - dwStride) + *(q - 1) - *(q - 1 - dwStride));
 	}
 }
