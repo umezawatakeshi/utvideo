@@ -29,7 +29,3 @@ extern "C" void x64_sse2_PredictMedianAndCount_align1(uint8_t *pDst, const uint8
 extern "C" void x64_sse2_PredictLeftAndCount_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
 extern "C" void x64_sse1mmx_RestoreMedian_align1(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
 #endif
-
-#ifdef _DEBUG
-void UnitTest_Predict(void);
-#endif
