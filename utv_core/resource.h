@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by utvideo.rc
+// Used by utv_core.rc
 //
 #define IDD_DIALOG1                     101
 #define IDD_CONFIG_DIALOG               101
