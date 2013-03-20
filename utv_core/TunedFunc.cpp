@@ -9,10 +9,10 @@
 #include "Convert.h"
 
 const TUNEDFUNC tfnCPP = {
-	cpp_PredictMedianAndCount,
-	cpp_PredictMedianAndCount,
+	cpp_PredictWrongMedianAndCount,
+	cpp_PredictWrongMedianAndCount,
 	cpp_PredictLeftAndCount,
-	cpp_RestoreMedian,
+	cpp_RestoreWrongMedian,
 	cpp_HuffmanEncode,
 	cpp_HuffmanDecode,
 	cpp_HuffmanDecodeAndAccum,

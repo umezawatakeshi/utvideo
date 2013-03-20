@@ -16,10 +16,10 @@ extern "C" void __cpuid(int *, int);
 #endif
 
 const TUNEDFUNC tfnI686 = {
-	cpp_PredictMedianAndCount,
-	cpp_PredictMedianAndCount,
+	cpp_PredictWrongMedianAndCount,
+	cpp_PredictWrongMedianAndCount,
 	cpp_PredictLeftAndCount,
-	x86_i686_RestoreMedian_align1,
+	x86_i686_RestoreWrongMedian_align1,
 	x86_i686_HuffmanEncode,
 	x86_i686_HuffmanDecode,
 	x86_i686_HuffmanDecodeAndAccum,
@@ -56,10 +56,10 @@ const TUNEDFUNC tfnI686 = {
 };
 
 const TUNEDFUNC tfnSSE2 = {
-	x86_sse2_PredictMedianAndCount_align16,
-	x86_sse2_PredictMedianAndCount_align1,
+	x86_sse2_PredictWrongMedianAndCount_align16,
+	x86_sse2_PredictWrongMedianAndCount_align1,
 	x86_sse2_PredictLeftAndCount_align1,
-	x86_sse1mmx_RestoreMedian_align1,
+	x86_sse1mmx_RestoreWrongMedian_align1,
 	x86_i686_HuffmanEncode,
 	x86_i686_HuffmanDecode,
 	x86_i686_HuffmanDecodeAndAccum,

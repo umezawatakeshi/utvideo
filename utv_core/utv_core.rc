@@ -61,7 +61,7 @@ BEGIN
     EDITTEXT        IDC_DIVIDE_COUNT_EDIT,67,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
     CONTROL         "論理プロセッサ数と同じにする",IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,20,108,10
-    CONTROL         "圧縮率優先 (Predict median)",IDC_INTRAFRAME_PREDICT_MEDIAN_RADIO,
+    CONTROL         "圧縮率優先 (Predict median)",IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP,7,35,110,10
     CONTROL         "デコード速度優先 (Predict left)",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,
                     "Button",BS_AUTORADIOBUTTON,7,53,115,10
@@ -136,7 +136,7 @@ BEGIN
     EDITTEXT        IDC_DIVIDE_COUNT_EDIT,75,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
     CONTROL         "Same as # of logical processors",IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,20,117,10
-    CONTROL         "Optimize for compression ratio (Predict median)",IDC_INTRAFRAME_PREDICT_MEDIAN_RADIO,
+    CONTROL         "Optimize for compression ratio (Predict median)",IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP,7,43,167,10
     CONTROL         "Optimize for decoding speed (Predict left)",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,
                     "Button",BS_AUTORADIOBUTTON,7,58,149,10

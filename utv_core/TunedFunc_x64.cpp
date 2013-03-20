@@ -14,10 +14,10 @@
 extern "C" void __cpuid(int *, int);
 
 const TUNEDFUNC tfnSSE2 = {
-	x64_sse2_PredictMedianAndCount_align16,
-	x64_sse2_PredictMedianAndCount_align1,
+	x64_sse2_PredictWrongMedianAndCount_align16,
+	x64_sse2_PredictWrongMedianAndCount_align1,
 	x64_sse2_PredictLeftAndCount_align1,
-	x64_sse1mmx_RestoreMedian_align1,
+	x64_sse1mmx_RestoreWrongMedian_align1,
 	x64_i686_HuffmanEncode,
 	x64_i686_HuffmanDecode,
 	x64_i686_HuffmanDecodeAndAccum,

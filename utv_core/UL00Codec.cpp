@@ -172,8 +172,8 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
 			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO, BST_CHECKED);
 			break;
-		case EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_MEDIAN_RADIO, BST_CHECKED);
+		case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO, BST_CHECKED);
 			break;
 		}
 		CheckDlgButton(hwnd, IDC_ASSUME_INTERLACE_CHECK, pThis->m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE);
@@ -206,8 +206,8 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			}
 			if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO))
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
-			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_MEDIAN_RADIO))
-				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
+			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO))
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
 			if (IsDlgButtonChecked(hwnd, IDC_ASSUME_INTERLACE_CHECK))
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_ASSUME_INTERLACE;
 			pThis->SaveConfig();
@@ -285,7 +285,7 @@ int CUL00Codec::InternalSetState(const void *pState, size_t cb)
 	memcpy(&m_ec, pState, min(sizeof(ENCODERCONF), cb));
 	m_ec.dwFlags0 &= ~EC_FLAGS0_RESERVED;
 	if ((m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK) == EC_FLAGS0_INTRAFRAME_PREDICT_RESERVED)
-		m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
+		m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
 	if (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS)
 	{
 		m_ec.dwFlags0 &= ~EC_FLAGS0_DIVIDE_COUNT_MASK;
@@ -314,8 +314,8 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
 		fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_LEFT;
 		break;
-	case EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-		fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN;
+	case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
 		break;
 	default:
 		_ASSERT(false);
@@ -574,8 +574,8 @@ void CUL00Codec::PredictProc(uint32_t nBandIndex)
 		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
 			PredictLeftAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
-		case EC_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			PredictMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+		case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+			PredictWrongMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		default:
 			_ASSERT(false);
@@ -756,8 +756,8 @@ void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 		case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
 			m_pCurFrame = m_pDecodedFrame;
 			break;
-		case FI_FLAGS0_INTRAFRAME_PREDICT_MEDIAN:
-			RestoreMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlanePredictStride[nPlaneIndex]);
+		case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+			RestoreWrongMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlanePredictStride[nPlaneIndex]);
 			m_pCurFrame = m_pRestoredFrame;
 			break;
 		}

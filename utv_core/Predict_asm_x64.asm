@@ -84,8 +84,8 @@ x64_sse2_PredictLeftAndCount_align1:
 
 %push
 
-global x64_sse2_PredictMedianAndCount_align16
-x64_sse2_PredictMedianAndCount_align16:
+global x64_sse2_PredictWrongMedianAndCount_align16
+x64_sse2_PredictWrongMedianAndCount_align16:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride, pCountTable
 
 	mov			eax, 80h
@@ -185,8 +185,8 @@ x64_sse2_PredictMedianAndCount_align16:
 
 %push
 
-global x64_sse2_PredictMedianAndCount_align1
-x64_sse2_PredictMedianAndCount_align1:
+global x64_sse2_PredictWrongMedianAndCount_align1
+x64_sse2_PredictWrongMedianAndCount_align1:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride, pCountTable
 
 	mov			eax, 80h
@@ -357,8 +357,8 @@ x64_sse2_PredictMedianAndCount_align1:
 
 %push
 
-global x64_sse1mmx_RestoreMedian_align1
-x64_sse1mmx_RestoreMedian_align1:
+global x64_sse1mmx_RestoreWrongMedian_align1
+x64_sse1mmx_RestoreWrongMedian_align1:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride
 
 	mov			rsi, qword [rsp + %$pSrcBegin]
