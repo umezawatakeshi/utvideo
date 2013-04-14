@@ -7,13 +7,7 @@
 #include "Predict.h"
 #include "HuffmanCode.h"
 #include "Convert.h"
-
-#ifdef _MSC_VER
-// intrin.h をインクルードすると
-// error C2733: オーバーロードされた関数 '_interlockedbittestandset' の C リンケージの 2 回以上の宣言は許されません。
-// などとエラーが出る。
-extern "C" void __cpuid(int *, int);
-#endif
+#include "CPUID.h"
 
 const TUNEDFUNC tfnI686 = {
 	cpp_PredictWrongMedianAndCount,
@@ -108,52 +102,33 @@ class CTunedFuncInitializer
 public:
 	CTunedFuncInitializer()
 	{
-		uint32_t cpuid_1_ecx = 0;
-		uint32_t cpuid_1_edx = 0;
+		cpuid_result cpuid_1   = { 0, 0, 0, 0 };
 
-#if defined(_MSC_VER)
-		int info[4];
-		__cpuid(info, 0);
-		if (info[0] >= 1)
-		{
-			__cpuid(info, 1);
-			cpuid_1_ecx = info[2];
-			cpuid_1_edx = info[3];
-		}
-#elif defined(__GNUC__)
-		int tmp0, tmp1;
-		asm volatile (
-			"cpuid"
-			: "=a"(tmp0), "=b"(tmp1), "=c"(cpuid_1_ecx), "=d"(cpuid_1_edx)
-			: "a"(1)
-		);
-#else
-#error
-#endif
+		cpuid(&cpuid_1, 1, 0);
 
-		_RPT2(_CRT_WARN, "CPUID.1 ECX=%08X EDX=%08X\n", cpuid_1_ecx, cpuid_1_edx);
+		_RPT2(_CRT_WARN, "CPUID.1 ECX=%08X EDX=%08X\n", cpuid_1.ecx, cpuid_1.edx);
 
-		if (cpuid_1_ecx & (1 << 20))
+		if (cpuid_1.ecx & (1 << 20))
 		{
 			_RPT0(_CRT_WARN, "supports SSE4.2\n");
 			tfn = tfnSSE42;
 		}
-		else if (cpuid_1_ecx & (1 << 19))
+		else if (cpuid_1.ecx & (1 << 19))
 		{
 			_RPT0(_CRT_WARN, "supports SSE4.1\n");
 			tfn = tfnSSE41;
 		}
-		else if (cpuid_1_ecx & (1 << 9))
+		else if (cpuid_1.ecx & (1 << 9))
 		{
 			_RPT0(_CRT_WARN, "supports SSSE3\n");
 			tfn = tfnSSSE3;
 		}
-		else if (cpuid_1_ecx & (1 << 0))
+		else if (cpuid_1.ecx & (1 << 0))
 		{
 			_RPT0(_CRT_WARN, "supports SSE3\n");
 			tfn = tfnSSE3;
 		}
-		else if (cpuid_1_edx & (1 << 26))
+		else if (cpuid_1.edx & (1 << 26))
 		{
 			_RPT0(_CRT_WARN, "supports SSE2\n");
 			tfn = tfnSSE2;
