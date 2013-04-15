@@ -438,7 +438,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="nasm -f win64 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						CommandLine="nasm -f win64 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -447,7 +447,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="nasm -f win64 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						CommandLine="nasm -f win64 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -457,7 +457,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="nasm -f win64 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						CommandLine="nasm -f win64 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -466,7 +466,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="nasm -f win64 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						CommandLine="nasm -f win64 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="$(IntDir)\$(InputName).obj"
 					/>
 				</FileConfiguration>
@@ -479,7 +479,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="nasm -f win32 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						CommandLine="nasm -f win32 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
@@ -489,7 +489,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="nasm -f win32 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						CommandLine="nasm -f win32 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
@@ -498,7 +498,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="nasm -f win32 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						CommandLine="nasm -f win32 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
@@ -508,7 +508,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="nasm -f win32 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)"
+						CommandLine="nasm -f win32 -g -Xvc -o &quot;$(IntDir)\$(InputName).obj&quot; $(InputFileName)&#x0D;&#x0A;"
 						Outputs="&quot;$(IntDir)\$(InputName).obj&quot;"
 					/>
 				</FileConfiguration>
@@ -782,6 +782,38 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\TunedFunc_x86x64.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|x64"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
 					/>
 				</FileConfiguration>
 			</File>
