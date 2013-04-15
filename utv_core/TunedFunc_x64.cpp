@@ -7,7 +7,6 @@
 #include "Predict.h"
 #include "HuffmanCode.h"
 #include "Convert.h"
-#include "CPUID.h"
 
 const TUNEDFUNC tfnSSE2 = {
 	x64_sse2_PredictWrongMedianAndCount_align16,

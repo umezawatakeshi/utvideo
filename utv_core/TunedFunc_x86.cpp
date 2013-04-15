@@ -7,7 +7,6 @@
 #include "Predict.h"
 #include "HuffmanCode.h"
 #include "Convert.h"
-#include "CPUID.h"
 
 const TUNEDFUNC tfnI686 = {
 	cpp_PredictWrongMedianAndCount,
