@@ -339,3 +339,217 @@ CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertTopdownBGRToULY2,   0, 1, 0
 CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertTopdownBGRXToULY2,  0, 1, 1
 CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertTopdownRGBToULY2,   0, 0, 0
 CONVERT_RGB_TO_ULY2	_x86_sse2_ConvertTopdownXRGBToULY2,  0, 0, 1
+
+
+
+
+	align	64
+bgr2planarpshufb16	dq	05020f0c09060300h
+					dq	0d0a0704010e0b08h
+bgrx2planarpshufb16	dq	0d0905010c080400h
+					dq	0f0b07030e0a0602h
+xrgb2planarpshufb16	dq	0e0a06020f0b0703h
+					dq	0c0804000d090501h
+_0x80b				dq	8080808080808080h
+					dq	8080808080808080h
+
+%push
+global _x86_avx1_ConvertBGRToULRG
+_x86_avx1_ConvertBGRToULRG:
+	SIMPLE_PROLOGUE	0, pGBegin, pBBegin, pRBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride
+
+	vmovdqa		xmm7, [bgr2planarpshufb16]
+	vmovdqa		xmm6, [_0x80b]
+	mov			esi, [esp + %$pSrcBegin]
+	mov			edi, [esp + %$pGBegin]
+	mov			ebx, [esp + %$pBBegin]
+	mov			edx, [esp + %$pRBegin]
+
+.label1:
+	mov			ecx, esi
+	add			ecx, [esp + %$cbWidth]
+	sub			ecx, 48 - 3
+.label0:
+	vlddqu		xmm0, [esi   ]			; xmm0 = B5 R4 G4 B4 R3 G3 B3 R2 G2 B2 R1 G1 B1 R0 G0 B0
+	vlddqu		xmm1, [esi+16]			; xmm1 = Ga Ba R9 G9 B9 R8 G8 B8 R7 G7 B7 R6 G6 B6 R5 G5
+	vlddqu		xmm2, [esi+32]			; xmm2 = Rf Gf Bf Re Ge Be Rd Gd Bd Rc Gc Bc Rb Gb Bb Ra
+
+	vpshufb		xmm0, xmm0, xmm7		; xmm0 = G4 G3 G2 G1 G0 R4 R3 R2 R1 R0 B5 B4 B3 B2 B1 B0
+	vpshufb		xmm1, xmm1, xmm7		; xmm1 = R9 R8 R7 R6 R5 Ba B9 B8 B7 B6 Ga G9 G8 G7 G6 G5
+	vpshufb		xmm2, xmm2, xmm7		; xmm2 = Bf Be Bd Bc Bb Gf Ge Gd Gc Gb Rf Re Rd Rc Rb Ra
+
+	vpalignr	xmm5, xmm2, xmm1, 6		; xmm5 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 Ba B9 B8 B7 B6
+	vpalignr	xmm4, xmm1, xmm0, 6		; xmm4 = Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0 R4 R3 R2 R1 R0
+	vpalignr	xmm3, xmm0, xmm2, 6		; xmm3 = B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb Gf Ge Gd Gc Gb
+
+	vpalignr	xmm0, xmm3, xmm4, 5		; xmm0 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
+	vpalignr	xmm1, xmm4, xmm5, 5		; xmm1 = R4 R3 R2 R1 R0 Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5
+	vpalignr	xmm2, xmm5, xmm3, 5		; xmm2 = Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb
+
+	vmovdqu		[edi], xmm0
+	vpsubb		xmm0, xmm0, xmm6
+
+	vpalignr	xmm1, xmm1, xmm1, 11	; xmm1 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
+	vpalignr	xmm2, xmm2, xmm2, 5		; xmm2 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
+
+	vpsubb		xmm1, xmm1, xmm0
+	vpsubb		xmm2, xmm2, xmm0
+	vmovdqu		[ebx], xmm2
+	vmovdqu		[edx], xmm1
+
+	add			edi, 16
+	add			ebx, 16
+	add			edx, 16
+	add			esi, 48
+	cmp			esi, ecx
+	jb			.label0
+
+	add			ecx, 48 - 3
+
+.label3:
+	cmp			esi, ecx
+	jae			.label2
+	mov			al, [esi+1]
+	mov			[edi], al
+	sub			al, 80h
+
+	mov			ah, [esi  ]
+	sub			ah, al
+	mov			[ebx], ah
+
+	mov			ah, [esi+2]
+	sub			ah, al
+	mov			[edx], ah
+
+	add			edi, 1
+	add			ebx, 1
+	add			edx, 1
+	add			esi, 3
+	jmp			.label3
+
+.label2:
+	sub			esi, [esp + %$cbWidth]
+	add			esi, [esp + %$scbStride]
+	cmp			esi, [esp + %$pSrcEnd]
+	jne			.label1
+
+	SIMPLE_EPILOGUE
+%pop
+
+
+;dummy0			dq	3121110130201000h
+;				dq	3323130332221202h
+;dummy1			dq	3525150534241404h
+;				dq	3727170736261606h
+;dummy2			dq	3929190938281808h
+;				dq	3b2b1b0b3a2a1a0ah
+;dummy3			dq	3d2d1d0d3c2c1c0ch
+;				dq	3f2f1f0f3e2e1e0eh
+
+%macro CONVERT_XRGB_TO_ULRG 2
+%push
+	MULTI_CONTEXT_XDEFINE procname, %1, bgrx, %2
+
+global %$procname
+%$procname:
+	SIMPLE_PROLOGUE 0, pGBegin, pBBegin, pRBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride
+
+%if %$bgrx
+	vmovdqa		xmm7, [bgrx2planarpshufb16]
+%else
+	vmovdqa		xmm7, [xrgb2planarpshufb16]
+%endif
+	vmovdqa		xmm6, [_0x80b]
+	mov			esi, [esp + %$pSrcBegin]
+	mov			edi, [esp + %$pGBegin]
+	mov			ebx, [esp + %$pBBegin]
+	mov			edx, [esp + %$pRBegin]
+
+.label1:
+	mov			ecx, esi
+	add			ecx, [esp + %$cbWidth]
+	sub			ecx, 64 - 4
+.label0:
+	vlddqu		xmm0, [esi   ]		; xmm0 = A3 R3 G3 B3 A2 R2 G2 B2 A1 R1 G1 B1 A0 R0 G0 B0 (bgrx)
+	vlddqu		xmm1, [esi+16]		; xmm1 = A7 R7 G7 B7 A6 R6 G6 B6 A5 R5 G5 B5 A4 R4 G4 B4
+	vlddqu		xmm2, [esi+32]		; xmm2 = Ab Rb Gb Bb Aa Ra Ga Ba A9 R9 G9 B9 A8 R8 G8 B8
+	vlddqu		xmm3, [esi+48]		; xmm3 = Af Rf Gf Bf Ae Re Ge Be Ad Rd Gd Bd Ac Rc Gc Bc
+
+	vpshufb		xmm0, xmm0, xmm7	; xmm0 = A3 A2 A1 A0 R3 R2 R1 R0 G3 G2 G1 G0 B3 B2 B1 B0
+	vpshufb		xmm1, xmm1, xmm7	; xmm1 = A7 A6 A5 A4 R7 R6 R5 R4 G7 G6 G5 G4 B7 B6 B5 B4
+	vpshufb		xmm2, xmm2, xmm7	; xmm2 = Ab Aa A9 A8 Rb Ra R9 R8 Gb Ga G9 G8 Bb Ba B9 B8
+	vpshufb		xmm3, xmm3, xmm7	; xmm3 = Af Ae Ad Ac Rf Re Rd Rc Gf Ge Gd Gc Bf Be Bd Bc
+
+	vpunpckldq	xmm4, xmm0, xmm1	; xmm4 = G7 G6 G5 G4 G3 G2 G1 G0 B7 B6 B5 B4 B3 B2 B1 B0
+	vpunpckhdq	xmm0, xmm0, xmm1	; xmm0 = A7 A6 A5 A4 A3 A2 A1 A0 R7 R6 R5 R4 R3 R2 R1 R0
+	vpunpckldq	xmm5, xmm2, xmm3	; xmm6 = Gf Ge Gd Gc Gb Ga G9 G8 Bf Be Bd Bc Bb Ba B9 B8
+	vpunpckhdq	xmm2, xmm2, xmm3	; xmm2 = Af Ae Ad Ac Ab Aa A9 A8 Rf Re Rd Rc Rb Ra R9 R8
+
+	vpunpcklqdq	xmm1, xmm4, xmm5	; xmm1 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
+	vpunpckhqdq	xmm4, xmm4, xmm5	; xmm4 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
+	vpunpcklqdq	xmm3, xmm0, xmm2	; xmm3 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
+;	vpunpckhqdq	xmm0, xmm0, xmm2	; xmm0 = Af Ae Ad Ac Ab Aa A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+
+	vmovdqu		[edi], xmm4
+	vpsubb		xmm4, xmm4, xmm6
+;	vmovdqu		[ebp], xmm0
+
+	vpsubb		xmm1, xmm1, xmm4
+	vmovdqu		[ebx], xmm1
+	vpsubb		xmm3, xmm3, xmm4
+	vmovdqu		[edx], xmm3
+
+	add			edi, 16
+	add			ebx, 16
+	add			edx, 16
+	add			esi, 64
+	cmp			esi, ecx
+	jb			.label0
+
+	add			ecx, 64 - 4
+
+.label3:
+	cmp			esi, ecx
+	jae			.label2
+%if %$bgrx
+	mov			al, [esi+1]
+%else
+	mov			al, [esi+2]
+%endif
+	mov			[edi], al
+	sub			al, 80h
+
+%if %$bgrx
+	mov			ah, [esi  ]
+%else
+	mov			al, [esi+3]
+%endif
+	sub			ah, al
+	mov			[ebx], ah
+
+%if %$bgrx
+	mov			ah, [esi+2]
+%else
+	mov			al, [esi+1]
+%endif
+	sub			ah, al
+	mov			[edx], ah
+
+	add			edi, 1
+	add			ebx, 1
+	add			edx, 1
+	add			esi, 4
+	jmp			.label3
+
+.label2:
+	sub			esi, [esp + %$cbWidth]
+	add			esi, [esp + %$scbStride]
+	cmp			esi, [esp + %$pSrcEnd]
+	jne			.label1
+
+	SIMPLE_EPILOGUE
+%pop
+%endmacro
+
+CONVERT_XRGB_TO_ULRG	_x86_avx1_ConvertBGRXToULRG, 1
+CONVERT_XRGB_TO_ULRG	_x86_avx1_ConvertXRGBToULRG, 0

@@ -102,8 +102,49 @@ const TUNEDFUNC &tfnSSE41 = tfnSSE2;
 
 const TUNEDFUNC &tfnSSE42 = tfnSSE2;
 
-const TUNEDFUNC &tfnAVX1 = tfnSSE2;
+const TUNEDFUNC tfnAVX1 = {
+	x86_sse2_PredictWrongMedianAndCount_align16,
+	x86_sse2_PredictWrongMedianAndCount_align1,
+	x86_sse2_PredictLeftAndCount_align1,
+	x86_sse1mmx_RestoreWrongMedian_align1,
+	x86_i686_HuffmanEncode,
+	x86_i686_HuffmanDecode,
+	x86_i686_HuffmanDecodeAndAccum,
+	x86_i686_HuffmanDecodeAndAccumStep2,
+	x86_i686_HuffmanDecodeAndAccumStep4,
+	x86_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXGreen,
+	x86_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXBlue,
+	x86_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXRed,
+	x86_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXRedAndDummyAlpha,
+	x86_i686_HuffmanDecodeAndAccumStep3ForBottomupBGRGreen,
+	x86_i686_HuffmanDecodeAndAccumStep3ForBottomupBGRBlue,
+	x86_i686_HuffmanDecodeAndAccumStep3ForBottomupBGRRed,
+	x86_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBGreen,
+	x86_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBBlue,
+	x86_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBRed,
+	x86_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBRedAndDummyAlpha,
+	x86_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBGreen,
+	x86_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBBlue,
+	x86_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBRed,
+	x86_i686_HuffmanDecodeAndAccumStep4ForTopdownBGRXRedAndDummyAlpha,
+	x86_sse2_ConvertULY2ToBottomupBGR,
+	x86_sse2_ConvertULY2ToBottomupBGRX,
+	x86_sse2_ConvertULY2ToTopdownBGR,
+	x86_sse2_ConvertULY2ToTopdownBGRX,
+	x86_sse2_ConvertULY2ToTopdownRGB,
+	x86_sse2_ConvertULY2ToTopdownXRGB,
+	x86_sse2_ConvertBottomupBGRToULY2,
+	x86_sse2_ConvertBottomupBGRXToULY2,
+	x86_sse2_ConvertTopdownBGRToULY2,
+	x86_sse2_ConvertTopdownBGRXToULY2,
+	x86_sse2_ConvertTopdownRGBToULY2,
+	x86_sse2_ConvertTopdownXRGBToULY2,
+	x86_avx1_ConvertBGRToULRG,
+	x86_avx1_ConvertBGRXToULRG,
+	x86_avx1_ConvertXRGBToULRG,
+	DummyTunedFunc
+};
 
-const TUNEDFUNC &tfnAVX2 = tfnSSE2;
+const TUNEDFUNC &tfnAVX2 = tfnAVX1;
 
 #include "TunedFunc_x86x64.cpp"
