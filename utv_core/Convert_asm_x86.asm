@@ -446,13 +446,17 @@ _x86_avx1_ConvertBGRToULRG:
 ;dummy3			dq	3d2d1d0d3c2c1c0ch
 ;				dq	3f2f1f0f3e2e1e0eh
 
-%macro CONVERT_XRGB_TO_ULRG 2
+%macro CONVERT_XRGB_TO_ULRGA 3
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, bgrx, %2
+	MULTI_CONTEXT_XDEFINE procname, %1, bgrx, %2, havealpha, %3
 
 global %$procname
 %$procname:
+%if %$havealpha
+	SIMPLE_PROLOGUE 0, pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride
+%else
 	SIMPLE_PROLOGUE 0, pGBegin, pBBegin, pRBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride
+%endif
 
 %if %$bgrx
 	vmovdqa		xmm7, [bgrx2planarpshufb16]
@@ -464,6 +468,9 @@ global %$procname
 	mov			edi, [esp + %$pGBegin]
 	mov			ebx, [esp + %$pBBegin]
 	mov			edx, [esp + %$pRBegin]
+%if %$havealpha
+	mov			ebp, [esp + %$pABegin]
+%endif
 
 .label1:
 	mov			ecx, esi
@@ -488,11 +495,15 @@ global %$procname
 	vpunpcklqdq	xmm1, xmm4, xmm5	; xmm1 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
 	vpunpckhqdq	xmm4, xmm4, xmm5	; xmm4 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
 	vpunpcklqdq	xmm3, xmm0, xmm2	; xmm3 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
-;	vpunpckhqdq	xmm0, xmm0, xmm2	; xmm0 = Af Ae Ad Ac Ab Aa A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+%if %$havealpha
+	vpunpckhqdq	xmm0, xmm0, xmm2	; xmm0 = Af Ae Ad Ac Ab Aa A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+%endif
 
 	vmovdqu		[edi], xmm4
 	vpsubb		xmm4, xmm4, xmm6
-;	vmovdqu		[ebp], xmm0
+%if %$havealpha
+	vmovdqu		[ebp], xmm0
+%endif
 
 	vpsubb		xmm1, xmm1, xmm4
 	vmovdqu		[ebx], xmm1
@@ -502,6 +513,9 @@ global %$procname
 	add			edi, 16
 	add			ebx, 16
 	add			edx, 16
+%if %$havealpha
+	add			ebp, 16
+%endif
 	add			esi, 64
 	cmp			esi, ecx
 	jb			.label0
@@ -518,6 +532,15 @@ global %$procname
 %endif
 	mov			[edi], al
 	sub			al, 80h
+
+%if %$havealpha
+ %if %$bgrx
+	mov			ah, [esi+3]
+ %else
+	mov			ah, [esi  ]
+ %endif
+	mov			[ebp], ah
+%endif
 
 %if %$bgrx
 	mov			ah, [esi  ]
@@ -538,6 +561,9 @@ global %$procname
 	add			edi, 1
 	add			ebx, 1
 	add			edx, 1
+%if %$havealpha
+	add			ebp, 1
+%endif
 	add			esi, 4
 	jmp			.label3
 
@@ -551,5 +577,7 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_XRGB_TO_ULRG	_x86_avx1_ConvertBGRXToULRG, 1
-CONVERT_XRGB_TO_ULRG	_x86_avx1_ConvertXRGBToULRG, 0
+CONVERT_XRGB_TO_ULRGA	_x86_avx1_ConvertBGRXToULRG, 1, 0
+CONVERT_XRGB_TO_ULRGA	_x86_avx1_ConvertXRGBToULRG, 0, 0
+CONVERT_XRGB_TO_ULRGA	_x86_avx1_ConvertBGRAToULRA, 1, 1
+CONVERT_XRGB_TO_ULRGA	_x86_avx1_ConvertARGBToULRA, 0, 1
