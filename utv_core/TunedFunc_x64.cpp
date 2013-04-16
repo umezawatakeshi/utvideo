@@ -48,6 +48,8 @@ const TUNEDFUNC tfnSSE2 = {
 	cpp_ConvertBGRToULRG,
 	cpp_ConvertBGRXToULRG,
 	cpp_ConvertXRGBToULRG,
+	cpp_ConvertBGRAToULRA,
+	cpp_ConvertARGBToULRA,
 	DummyTunedFunc
 };
 

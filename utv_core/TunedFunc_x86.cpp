@@ -48,6 +48,8 @@ const TUNEDFUNC tfnI686 = {
 	cpp_ConvertBGRToULRG,
 	cpp_ConvertBGRXToULRG,
 	cpp_ConvertXRGBToULRG,
+	cpp_ConvertBGRAToULRA,
+	cpp_ConvertARGBToULRA,
 	DummyTunedFunc
 };
 
@@ -91,6 +93,8 @@ const TUNEDFUNC tfnSSE2 = {
 	cpp_ConvertBGRToULRG,
 	cpp_ConvertBGRXToULRG,
 	cpp_ConvertXRGBToULRG,
+	cpp_ConvertBGRAToULRA,
+	cpp_ConvertARGBToULRA,
 	DummyTunedFunc
 };
 
@@ -142,6 +146,8 @@ const TUNEDFUNC tfnAVX1 = {
 	x86_avx1_ConvertBGRToULRG,
 	x86_avx1_ConvertBGRXToULRG,
 	x86_avx1_ConvertXRGBToULRG,
+	cpp_ConvertBGRAToULRA,
+	cpp_ConvertARGBToULRA,
 	DummyTunedFunc
 };
 

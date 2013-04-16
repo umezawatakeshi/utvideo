@@ -5,6 +5,7 @@
 #include "utvideo.h"
 #include "ULRACodec.h"
 #include "Predict.h"
+#include "Convert.h"
 
 const utvf_t CULRACodec::m_utvfEncoderInput[] = {
 	UTVF_NFCC_BGRA_BU,
@@ -66,7 +67,7 @@ void CULRACodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 void CULRACodec::ConvertToPlanar(uint32_t nBandIndex)
 {
 	uint8_t *g, *b, *r, *a;
-	const uint8_t *pSrcBegin, *pSrcEnd, *pStrideBegin, *p;
+	const uint8_t *pSrcBegin, *pSrcEnd;
 
 	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
 	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
@@ -79,43 +80,13 @@ void CULRACodec::ConvertToPlanar(uint32_t nBandIndex)
 	{
 	case UTVF_NFCC_BGRA_BU:
 	case UTVF_NFCC_BGRX_BU:
-		for (pStrideBegin = pSrcEnd - m_dwRawGrossWidth; pStrideBegin >= pSrcBegin; pStrideBegin -= m_dwRawGrossWidth)
-		{
-			const uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
-			for (p = pStrideBegin; p < pStrideEnd; p += 4)
-			{
-				*g++ = *(p+1);
-				*b++ = *(p+0) - *(p+1) + 0x80;
-				*r++ = *(p+2) - *(p+1) + 0x80;
-				*a++ = *(p+3);
-			}
-		}
+		ConvertBGRAToULRA(g, b, r, a, pSrcEnd - m_dwRawGrossWidth, pSrcBegin - m_dwRawGrossWidth, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGRA_TD:
-		for (pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += m_dwRawGrossWidth)
-		{
-			const uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
-			for (p = pStrideBegin; p < pStrideEnd; p += 4)
-			{
-				*g++ = *(p+1);
-				*b++ = *(p+0) - *(p+1) + 0x80;
-				*r++ = *(p+2) - *(p+1) + 0x80;
-				*a++ = *(p+3);
-			}
-		}
+		ConvertBGRAToULRA(g, b, r, a, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		for (pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += m_dwRawGrossWidth)
-		{
-			const uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
-			for (p = pStrideBegin; p < pStrideEnd; p += 4)
-			{
-				*g++ = *(p+2);
-				*b++ = *(p+3) - *(p+2) + 0x80;
-				*r++ = *(p+1) - *(p+2) + 0x80;
-				*a++ = *(p+0);
-			}
-		}
+		ConvertARGBToULRA(g, b, r, a, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	}
 }

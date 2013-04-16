@@ -276,3 +276,45 @@ void cpp_ConvertXRGBToULRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin,
 		}
 	}
 }
+
+void cpp_ConvertBGRAToULRA(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	const uint8_t *pStrideBegin, *p;
+	uint8_t *g = pGBegin;
+	uint8_t *b = pBBegin;
+	uint8_t *r = pRBegin;
+	uint8_t *a = pABegin;
+
+	for (pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += scbStride)
+	{
+		const uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (p = pStrideBegin; p < pStrideEnd; p += 4)
+		{
+			*g++ = *(p+1);
+			*b++ = *(p+0) - *(p+1) + 0x80;
+			*r++ = *(p+2) - *(p+1) + 0x80;
+			*a++ = *(p+3);
+		}
+	}
+}
+
+void cpp_ConvertARGBToULRA(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	const uint8_t *pStrideBegin, *p;
+	uint8_t *g = pGBegin;
+	uint8_t *b = pBBegin;
+	uint8_t *r = pRBegin;
+	uint8_t *a = pABegin;
+
+	for (pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += scbStride)
+	{
+		const uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (p = pStrideBegin; p < pStrideEnd; p += 4)
+		{
+			*g++ = *(p+2);
+			*b++ = *(p+3) - *(p+2) + 0x80;
+			*r++ = *(p+1) - *(p+2) + 0x80;
+			*a++ = *(p+0);
+		}
+	}
+}
