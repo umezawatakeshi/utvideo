@@ -45,6 +45,9 @@ const TUNEDFUNC tfnCPP = {
 	cpp_ConvertTopdownBGRXToULY2,
 	cpp_ConvertTopdownRGBToULY2,
 	cpp_ConvertTopdownXRGBToULY2,
+	cpp_ConvertBGRToULRG,
+	cpp_ConvertBGRXToULRG,
+	cpp_ConvertXRGBToULRG,
 	DummyTunedFunc
 };
 

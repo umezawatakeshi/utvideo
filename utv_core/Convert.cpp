@@ -219,3 +219,60 @@ void cpp_ConvertTopdownXRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *p
 {
 	cpp_ConvertTopdownxRGBToULY2(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbGrossWidth, cbNetWidth, 4);
 }
+
+void cpp_ConvertBGRToULRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	const uint8_t *pStrideBegin, *p;
+	uint8_t *g = pGBegin;
+	uint8_t *b = pBBegin;
+	uint8_t *r = pRBegin;
+
+	for (pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += scbStride)
+	{
+		const uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (p = pStrideBegin; p < pStrideEnd; p += 3)
+		{
+			*g++ = *(p+1);
+			*b++ = *(p+0) - *(p+1) + 0x80;
+			*r++ = *(p+2) - *(p+1) + 0x80;
+		}
+	}
+}
+
+void cpp_ConvertBGRXToULRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	const uint8_t *pStrideBegin, *p;
+	uint8_t *g = pGBegin;
+	uint8_t *b = pBBegin;
+	uint8_t *r = pRBegin;
+
+	for (pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += scbStride)
+	{
+		const uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (p = pStrideBegin; p < pStrideEnd; p += 4)
+		{
+			*g++ = *(p+1);
+			*b++ = *(p+0) - *(p+1) + 0x80;
+			*r++ = *(p+2) - *(p+1) + 0x80;
+		}
+	}
+}
+
+void cpp_ConvertXRGBToULRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	const uint8_t *pStrideBegin, *p;
+	uint8_t *g = pGBegin;
+	uint8_t *b = pBBegin;
+	uint8_t *r = pRBegin;
+
+	for (pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += scbStride)
+	{
+		const uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (p = pStrideBegin; p < pStrideEnd; p += 4)
+		{
+			*g++ = *(p+2);
+			*b++ = *(p+3) - *(p+2) + 0x80;
+			*r++ = *(p+1) - *(p+2) + 0x80;
+		}
+	}
+}

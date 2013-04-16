@@ -45,6 +45,9 @@ const TUNEDFUNC tfnI686 = {
 	cpp_ConvertTopdownBGRXToULY2,
 	cpp_ConvertTopdownRGBToULY2,
 	cpp_ConvertTopdownXRGBToULY2,
+	cpp_ConvertBGRToULRG,
+	cpp_ConvertBGRXToULRG,
+	cpp_ConvertXRGBToULRG,
 	DummyTunedFunc
 };
 
@@ -85,6 +88,9 @@ const TUNEDFUNC tfnSSE2 = {
 	x86_sse2_ConvertTopdownBGRXToULY2,
 	x86_sse2_ConvertTopdownRGBToULY2,
 	x86_sse2_ConvertTopdownXRGBToULY2,
+	cpp_ConvertBGRToULRG,
+	cpp_ConvertBGRXToULRG,
+	cpp_ConvertXRGBToULRG,
 	DummyTunedFunc
 };
 

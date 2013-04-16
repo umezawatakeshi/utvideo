@@ -45,6 +45,9 @@ const TUNEDFUNC tfnSSE2 = {
 	x64_sse2_ConvertTopdownBGRXToULY2,
 	x64_sse2_ConvertTopdownRGBToULY2,
 	x64_sse2_ConvertTopdownXRGBToULY2,
+	cpp_ConvertBGRToULRG,
+	cpp_ConvertBGRXToULRG,
+	cpp_ConvertXRGBToULRG,
 	DummyTunedFunc
 };
 
