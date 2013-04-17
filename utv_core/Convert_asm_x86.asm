@@ -581,3 +581,94 @@ CONVERT_XRGB_TO_ULRGA	_x86_avx1_ConvertBGRXToULRG, 1, 0
 CONVERT_XRGB_TO_ULRGA	_x86_avx1_ConvertXRGBToULRG, 0, 0
 CONVERT_XRGB_TO_ULRGA	_x86_avx1_ConvertBGRAToULRA, 1, 1
 CONVERT_XRGB_TO_ULRGA	_x86_avx1_ConvertARGBToULRA, 0, 1
+
+
+	align	64
+yuyv2planarpshufb16	dq	0e0c0a0806040200h
+					dq	0f0b07030d090501h
+uyvy2planarpshufb16	dq	0f0d0b0907050301h
+					dq	0e0a06020c080400h
+
+%macro CONVERT_YUV422_TO_ULY2 2
+%push
+	MULTI_CONTEXT_XDEFINE procname, %1, yuyv, %2
+
+global %$procname
+%$procname:
+	SIMPLE_PROLOGUE 0, pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd
+
+%if %$yuyv
+	vmovdqa		xmm7, [yuyv2planarpshufb16]
+%else
+	vmovdqa		xmm7, [uyvy2planarpshufb16]
+%endif
+	mov			esi, [esp + %$pSrcBegin]
+	mov			edi, [esp + %$pYBegin]
+	mov			ebx, [esp + %$pUBegin]
+	mov			edx, [esp + %$pVBegin]
+
+	mov			ecx, [esp + %$pSrcEnd]
+	sub			ecx, 64 - 4
+.label0:
+	vlddqu		xmm0, [esi   ]		; xmm0 = V06 Y07 U06 Y06 V04 Y05 U04 Y04 V02 Y03 U02 Y02 V00 Y01 U00 Y00 (yuyv)
+	vlddqu		xmm1, [esi+16]		; xmm1 = V0e Y0f U0e Y0e V0c Y0d U0c Y0c V0a Y0b U0a Y0a V08 Y09 U08 Y08
+	vlddqu		xmm2, [esi+32]		; xmm2 = V16 Y17 U16 Y16 V14 Y15 U14 Y14 V12 Y13 U12 Y12 V10 Y11 U10 Y10
+	vlddqu		xmm3, [esi+48]		; xmm3 = V1e Y1f U1e Y1e V1c Y1d U1c Y1c V1a Y1b U1a Y1a V18 Y19 U18 Y18
+
+	vpshufb		xmm0, xmm0, xmm7	; xmm0 = V06 V04 V02 V00 U06 U04 U02 U00 Y07 Y06 Y05 Y04 Y03 Y02 Y01 Y00
+	vpshufb		xmm1, xmm1, xmm7	; xmm1 = V0e V0c V0a V08 U0e U0c U0a U08 Y0f Y0e Y0d Y0c Y0b Y0a Y09 Y08
+	vpshufb		xmm2, xmm2, xmm7	; xmm2 = V16 V14 V12 V10 U16 U14 U12 U10 Y17 Y16 Y15 Y14 Y13 Y12 Y11 Y10
+	vpshufb		xmm3, xmm3, xmm7	; xmm3 = V1e V1c V1a V18 U1e U1c U1a U18 Y1f Y1e Y1d Y1c Y1b Y1a Y19 Y18
+
+	vpunpcklqdq	xmm4, xmm0, xmm1	; xmm4 = Y0f Y0e Y0d Y0c Y0b Y0a Y09 Y08 Y07 Y06 Y05 Y04 Y03 Y02 Y01 Y00
+	vpunpcklqdq	xmm5, xmm2, xmm3	; xmm5 = Y1f Y1e Y1d Y1c Y1b Y1a Y19 Y18 Y17 Y16 Y15 Y14 Y13 Y12 Y11 Y10
+	vmovdqu		[edi   ], xmm4
+	vmovdqu		[edi+16], xmm5
+
+	vpunpckhdq	xmm0, xmm0, xmm1	; xmm0 = V0e V0c V0a V08 V06 V04 V02 V00 U0e U0c U0a U08 U06 U04 U02 U00
+	vpunpckhdq	xmm2, xmm2, xmm3	; xmm2 = V1e V1c V1a V18 V16 V14 V12 V10 U1e U1c U1a U18 U16 U14 U12 U10
+
+	vpunpcklqdq	xmm4, xmm0, xmm2	; xmm4 = U1e U1c U1a U18 U16 U14 U12 U10 U0e U0c U0a U08 U06 U04 U02 U00
+	vpunpckhqdq	xmm5, xmm0, xmm2	; xmm5 = V1e V1c V1a V18 V16 V14 V12 V10 V0e V0c V0a V08 V06 V04 V02 V00
+	vmovdqu		[ebx], xmm4
+	vmovdqu		[edx], xmm5
+
+	add			edi, 32
+	add			ebx, 16
+	add			edx, 16
+	add			esi, 64
+	cmp			esi, ecx
+	jb			.label0
+
+	add			ecx, 64 - 4
+
+.label3:
+	cmp			esi, ecx
+	jae			.label2
+
+	mov			al, [esi+1-%$yuyv]
+	mov			[edi  ], al
+
+	mov			al, [esi+3-%$yuyv]
+	mov			[edi+1], al
+
+	mov			al, [esi  +%$yuyv]
+	mov			[ebx], al
+
+	mov			al, [esi+2+%$yuyv]
+	mov			[edx], al
+
+	add			edi, 2
+	add			ebx, 1
+	add			edx, 1
+	add			esi, 4
+	jmp			.label3
+
+.label2:
+
+	SIMPLE_EPILOGUE
+%pop
+%endmacro
+
+CONVERT_YUV422_TO_ULY2	_x86_avx1_ConvertYUYVToULY2, 1
+CONVERT_YUV422_TO_ULY2	_x86_avx1_ConvertUYVYToULY2, 0
