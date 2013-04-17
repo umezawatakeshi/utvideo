@@ -75,7 +75,7 @@ void CULY2Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 void CULY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 {
 	uint8_t *y, *u, *v;
-	const uint8_t *pSrcBegin, *pSrcEnd, *p;
+	const uint8_t *pSrcBegin, *pSrcEnd;
 
 	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
 	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
@@ -88,23 +88,11 @@ void CULY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		for (p = pSrcBegin; p < pSrcEnd; p += 4)
-		{
-			*y++ = *p;
-			*u++ = *(p+1);
-			*y++ = *(p+2);
-			*v++ = *(p+3);
-		}
+		ConvertYUYVToULY2(y, u, v, pSrcBegin, pSrcEnd);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
-		for (p = pSrcBegin; p < pSrcEnd; p += 4)
-		{
-			*u++ = *p;
-			*y++ = *(p+1);
-			*v++ = *(p+2);
-			*y++ = *(p+3);
-		}
+		ConvertUYVYToULY2(y, u, v, pSrcBegin, pSrcEnd);
 		break;
 	case UTVF_NFCC_BGR_BU:
 		ConvertBottomupBGRToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);

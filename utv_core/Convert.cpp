@@ -318,3 +318,35 @@ void cpp_ConvertARGBToULRA(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin,
 		}
 	}
 }
+
+void cpp_ConvertYUYVToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd)
+{
+	const uint8_t *p;
+	uint8_t *y = pYBegin;
+	uint8_t *u = pUBegin;
+	uint8_t *v = pVBegin;
+
+	for (p = pSrcBegin; p < pSrcEnd; p += 4)
+	{
+		*y++ = *p;
+		*u++ = *(p+1);
+		*y++ = *(p+2);
+		*v++ = *(p+3);
+	}
+}
+
+void cpp_ConvertUYVYToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd)
+{
+	const uint8_t *p;
+	uint8_t *y = pYBegin;
+	uint8_t *u = pUBegin;
+	uint8_t *v = pVBegin;
+
+	for (p = pSrcBegin; p < pSrcEnd; p += 4)
+	{
+		*u++ = *p;
+		*y++ = *(p+1);
+		*v++ = *(p+2);
+		*y++ = *(p+3);
+	}
+}

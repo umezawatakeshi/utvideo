@@ -50,6 +50,8 @@ const TUNEDFUNC tfnCPP = {
 	cpp_ConvertXRGBToULRG,
 	cpp_ConvertBGRAToULRA,
 	cpp_ConvertARGBToULRA,
+	cpp_ConvertYUYVToULY2,
+	cpp_ConvertUYVYToULY2,
 	DummyTunedFunc
 };
 
