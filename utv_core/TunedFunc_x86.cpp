@@ -168,13 +168,13 @@ const TUNEDFUNC tfnAVX1 = {
 	x86_avx1_ConvertARGBToULRA,
 	x86_avx1_ConvertYUYVToULY2,
 	x86_avx1_ConvertUYVYToULY2,
-	cpp_ConvertULRGToBGR,
-	cpp_ConvertULRGToBGRX,
-	cpp_ConvertULRGToXRGB,
-	cpp_ConvertULRAToBGRA,
-	cpp_ConvertULRAToARGB,
-	cpp_ConvertULY2ToYUYV,
-	cpp_ConvertULY2ToUYVY,
+	x86_avx1_ConvertULRGToBGR,
+	x86_avx1_ConvertULRGToBGRX,
+	x86_avx1_ConvertULRGToXRGB,
+	x86_avx1_ConvertULRAToBGRA,
+	x86_avx1_ConvertULRAToARGB,
+	x86_avx1_ConvertULY2ToYUYV,
+	x86_avx1_ConvertULY2ToUYVY,
 	DummyTunedFunc
 };
 
