@@ -94,7 +94,7 @@ void CULRACodec::ConvertToPlanar(uint32_t nBandIndex)
 void CULRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 {
 	const uint8_t *g, *b, *r, *a;
-	uint8_t *pDstBegin, *pDstEnd, *pStrideBegin, *p;
+	uint8_t *pDstBegin, *pDstEnd;
 
 	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
 	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
@@ -107,46 +107,13 @@ void CULRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 	{
 	case UTVF_NFCC_BGRA_BU:
 	case UTVF_NFCC_BGRX_BU:
-		for (pStrideBegin = pDstEnd - m_dwRawGrossWidth; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
-			for (p = pStrideBegin; p < pStrideEnd; p += 4)
-			{
-				*(p+1) = *g;
-				*(p+0) = *b + *g - 0x80;
-				*(p+2) = *r + *g - 0x80;
-				*(p+3) = *a;
-				g++; b++; r++; a++;
-			}
-		}
+		ConvertULRAToBGRA(pDstEnd - m_dwRawGrossWidth, pDstBegin - m_dwRawGrossWidth, g, b, r, a, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGRA_TD:
-		for (pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
-			for (p = pStrideBegin; p < pStrideEnd; p += 4)
-			{
-				*(p+1) = *g;
-				*(p+0) = *b + *g - 0x80;
-				*(p+2) = *r + *g - 0x80;
-				*(p+3) = *a;
-				g++; b++; r++; a++;
-			}
-		}
+		ConvertULRAToBGRA(pDstBegin, pDstEnd, g, b, r, a, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		for (pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
-			for (p = pStrideBegin; p < pStrideEnd; p += 4)
-			{
-				*(p+2) = *g;
-				*(p+3) = *b + *g - 0x80;
-				*(p+1) = *r + *g - 0x80;
-				*(p+0) = *a;
-				g++; b++; r++; a++;
-			}
-		}
+		ConvertULRAToARGB(pDstBegin, pDstEnd, g, b, r, a, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	}
 }

@@ -52,6 +52,13 @@ const TUNEDFUNC tfnI686 = {
 	cpp_ConvertARGBToULRA,
 	cpp_ConvertYUYVToULY2,
 	cpp_ConvertUYVYToULY2,
+	cpp_ConvertULRGToBGR,
+	cpp_ConvertULRGToBGRX,
+	cpp_ConvertULRGToXRGB,
+	cpp_ConvertULRAToBGRA,
+	cpp_ConvertULRAToARGB,
+	cpp_ConvertULY2ToYUYV,
+	cpp_ConvertULY2ToUYVY,
 	DummyTunedFunc
 };
 
@@ -99,6 +106,13 @@ const TUNEDFUNC tfnSSE2 = {
 	cpp_ConvertARGBToULRA,
 	cpp_ConvertYUYVToULY2,
 	cpp_ConvertUYVYToULY2,
+	cpp_ConvertULRGToBGR,
+	cpp_ConvertULRGToBGRX,
+	cpp_ConvertULRGToXRGB,
+	cpp_ConvertULRAToBGRA,
+	cpp_ConvertULRAToARGB,
+	cpp_ConvertULY2ToYUYV,
+	cpp_ConvertULY2ToUYVY,
 	DummyTunedFunc
 };
 
@@ -154,6 +168,13 @@ const TUNEDFUNC tfnAVX1 = {
 	x86_avx1_ConvertARGBToULRA,
 	x86_avx1_ConvertYUYVToULY2,
 	x86_avx1_ConvertUYVYToULY2,
+	cpp_ConvertULRGToBGR,
+	cpp_ConvertULRGToBGRX,
+	cpp_ConvertULRGToXRGB,
+	cpp_ConvertULRAToBGRA,
+	cpp_ConvertULRAToARGB,
+	cpp_ConvertULY2ToYUYV,
+	cpp_ConvertULY2ToUYVY,
 	DummyTunedFunc
 };
 

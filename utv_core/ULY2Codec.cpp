@@ -118,7 +118,7 @@ void CULY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 void CULY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 {
 	const uint8_t *y, *u, *v;
-	uint8_t *pDstBegin, *pDstEnd, *p;
+	uint8_t *pDstBegin, *pDstEnd;
 
 	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
 	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
@@ -131,23 +131,11 @@ void CULY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		for (p = pDstBegin; p < pDstEnd; p += 4)
-		{
-			*p     = *y++;
-			*(p+1) = *u++;
-			*(p+2) = *y++;
-			*(p+3) = *v++;
-		}
+		ConvertULY2ToYUYV(pDstBegin, pDstEnd, y, u, v);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
-		for (p = pDstBegin; p < pDstEnd; p += 4)
-		{
-			*p     = *u++;
-			*(p+1) = *y++;
-			*(p+2) = *v++;
-			*(p+3) = *y++;
-		}
+		ConvertULY2ToUYVY(pDstBegin, pDstEnd, y, u, v);
 		break;
 	case UTVF_NFCC_BGR_BU:
 		ConvertULY2ToBottomupBGR(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);

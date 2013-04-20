@@ -101,7 +101,7 @@ void CULRGCodec::ConvertToPlanar(uint32_t nBandIndex)
 void CULRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 {
 	const uint8_t *g, *b, *r;
-	uint8_t *pDstBegin, *pDstEnd, *pStrideBegin, *p;
+	uint8_t *pDstBegin, *pDstEnd;
 
 	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
 	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
@@ -112,85 +112,22 @@ void CULRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 	switch (m_utvfRaw)
 	{
 	case UTVF_NFCC_BGR_BU:
-		for (pStrideBegin = pDstEnd - m_dwRawGrossWidth; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 3;
-			for (p = pStrideBegin; p < pStrideEnd; p += 3)
-			{
-				*(p+1) = *g;
-				*(p+0) = *b + *g - 0x80;
-				*(p+2) = *r + *g - 0x80;
-				g++; b++; r++;
-			}
-		}
+		ConvertULRGToBGR(pDstEnd - m_dwRawGrossWidth, pDstBegin - m_dwRawGrossWidth, g, b, r, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		for (pStrideBegin = pDstEnd - m_dwRawGrossWidth; pStrideBegin >= pDstBegin; pStrideBegin -= m_dwRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
-			for (p = pStrideBegin; p < pStrideEnd; p += 4)
-			{
-				*(p+1) = *g;
-				*(p+0) = *b + *g - 0x80;
-				*(p+2) = *r + *g - 0x80;
-				*(p+3) = 0xff;
-				g++; b++; r++;
-			}
-		}
+		ConvertULRGToBGRX(pDstEnd - m_dwRawGrossWidth, pDstBegin - m_dwRawGrossWidth, g, b, r, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGR_TD:
-		for (pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 3;
-			for (p = pStrideBegin; p < pStrideEnd; p += 3)
-			{
-				*(p+1) = *g;
-				*(p+0) = *b + *g - 0x80;
-				*(p+2) = *r + *g - 0x80;
-				g++; b++; r++;
-			}
-		}
+		ConvertULRGToBGR(pDstBegin, pDstEnd, g, b, r, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGRX_TD:
-		for (pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
-			for (p = pStrideBegin; p < pStrideEnd; p += 4)
-			{
-				*(p+1) = *g;
-				*(p+0) = *b + *g - 0x80;
-				*(p+2) = *r + *g - 0x80;
-				*(p+3) = 0xff;
-				g++; b++; r++;
-			}
-		}
+		ConvertULRGToBGRX(pDstBegin, pDstEnd, g, b, r, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		for (pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 3;
-			for (p = pStrideBegin; p < pStrideEnd; p += 3)
-			{
-				*(p+1) = *g;
-				*(p+2) = *b + *g - 0x80;
-				*(p+0) = *r + *g - 0x80;
-				g++; b++; r++;
-			}
-		}
+		ConvertULRGToRGB(pDstBegin, pDstEnd, g, b, r, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		for (pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_nWidth * 4;
-			for (p = pStrideBegin; p < pStrideEnd; p += 4)
-			{
-				*(p+2) = *g;
-				*(p+3) = *b + *g - 0x80;
-				*(p+1) = *r + *g - 0x80;
-				*(p+0) = 0xff;
-				g++; b++; r++;
-			}
-		}
+		ConvertULRGToXRGB(pDstBegin, pDstEnd, g, b, r, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	}
 }
