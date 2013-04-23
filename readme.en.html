@@ -2,10 +2,10 @@
 <!-- $Id$ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
-<title>Ut Video Codec Suite 12.0.1 readme (English)</title>
+<title>Ut Video Codec Suite 12.1.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 12.0.1 readme (English)</h1>
+<h1>Ut Video Codec Suite 12.1.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008-2013  UMEZAWA Takeshi</p>
@@ -71,7 +71,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <dt>Development Tools</dt>
 <dd>Visual Studio 2005 SP1</dd>
 <dd>Windows SDK for Windows Server 2008 and .NET Framework 3.5 (Windows SDK 6.1)</dd>
-<dd>NASM 2.9.10</dd>
+<dd>NASM 2.10.07</dd>
 <dd>AMD CodeAnalyst for Windows v3.1</dd>
 <dd>Inno Setup 5.4.2 (ANSI)</dd>
 </dl>
@@ -82,9 +82,16 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <dt>RAM</dt><dd>DDR3-1333 8GB</dd>
 <dt>Development Tools</dt>
 <dd>Xcode 3.2.6</dd>
-<dd>NASM 2.9.10</dd>
+<dd>NASM 2.10.07</dd>
 </dl>
 <h2 id="history">Version history</h2>
+<h3>Version 12.1.0</h3>
+<dl>
+<dt>Performance Improvements</dt><dd><ul>
+<li>ULRG,ULRA,ULY2: Speed up encoding if AVX instructions are available. About 10% faster in case of x86, and about 12% faster in case of x64.</li>
+<li>ULRG,ULRA,ULY2: Speed up decoding video that were encoded with "Optimize for compression ratio" option if AVX instructions are available. About 5% faster in case of both x86 and x64.</li>
+</ul></dd>
+</dl>
 <h3>Version 12.0.1</h3>
 <dl>
 <dt>Bug fixes</dt><dd><ul>
