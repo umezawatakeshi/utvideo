@@ -95,22 +95,22 @@ void CULY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 		ConvertUYVYToULY2(y, u, v, pSrcBegin, pSrcEnd);
 		break;
 	case UTVF_NFCC_BGR_BU:
-		ConvertBottomupBGRToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertBGRToULY2(y, u, v, pSrcEnd - m_dwRawGrossWidth, pSrcBegin - m_dwRawGrossWidth, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertBottomupBGRXToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertBGRXToULY2(y, u, v, pSrcEnd - m_dwRawGrossWidth, pSrcBegin - m_dwRawGrossWidth, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGR_TD:
-		ConvertTopdownBGRToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertBGRToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertTopdownBGRXToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertBGRXToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertTopdownRGBToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertRGBToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertTopdownXRGBToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertXRGBToULY2(y, u, v, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	}
 }
@@ -138,22 +138,22 @@ void CULY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		ConvertULY2ToUYVY(pDstBegin, pDstEnd, y, u, v);
 		break;
 	case UTVF_NFCC_BGR_BU:
-		ConvertULY2ToBottomupBGR(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertULY2ToBGR(pDstEnd - m_dwRawGrossWidth, pDstBegin - m_dwRawGrossWidth, y, u, v, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULY2ToBottomupBGRX(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertULY2ToBGRX(pDstEnd - m_dwRawGrossWidth, pDstBegin - m_dwRawGrossWidth, y, u, v, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGR_TD:
-		ConvertULY2ToTopdownBGR(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertULY2ToBGR(pDstBegin, pDstEnd, y, u, v, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertULY2ToTopdownBGRX(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertULY2ToBGRX(pDstBegin, pDstEnd, y, u, v, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertULY2ToTopdownRGB(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertULY2ToRGB(pDstBegin, pDstEnd, y, u, v, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULY2ToTopdownXRGB(pDstBegin, pDstEnd, y, u, v, m_dwRawGrossWidth, m_dwRawNetWidth);
+		ConvertULY2ToXRGB(pDstBegin, pDstEnd, y, u, v, m_dwRawNetWidth, m_dwRawGrossWidth);
 		break;
 	}
 }
