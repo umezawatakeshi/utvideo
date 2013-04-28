@@ -170,10 +170,10 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_ULY2_TO_RGB	x64_sse2_ConvertULY2ToBGR,   1, 0
-CONVERT_ULY2_TO_RGB	x64_sse2_ConvertULY2ToBGRX,  1, 1
-CONVERT_ULY2_TO_RGB	x64_sse2_ConvertULY2ToRGB,   0, 0
-CONVERT_ULY2_TO_RGB	x64_sse2_ConvertULY2ToXRGB,  0, 1
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGR,   1, 0
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGRX,  1, 1
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToRGB,   0, 0
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToXRGB,  0, 1
 
 
 ; Y  =  0.29891 R + 0.58661 G + 0.11448 B
@@ -291,10 +291,10 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_RGB_TO_ULY2	x64_sse2_ConvertBGRToULY2,   1, 0
-CONVERT_RGB_TO_ULY2	x64_sse2_ConvertBGRXToULY2,  1, 1
-CONVERT_RGB_TO_ULY2	x64_sse2_ConvertRGBToULY2,   0, 0
-CONVERT_RGB_TO_ULY2	x64_sse2_ConvertXRGBToULY2,  0, 1
+CONVERT_RGB_TO_ULY2	sse2_ConvertBGRToULY2,   1, 0
+CONVERT_RGB_TO_ULY2	sse2_ConvertBGRXToULY2,  1, 1
+CONVERT_RGB_TO_ULY2	sse2_ConvertRGBToULY2,   0, 0
+CONVERT_RGB_TO_ULY2	sse2_ConvertXRGBToULY2,  0, 1
 
 
 
@@ -319,8 +319,8 @@ _0x80b				dq	8080808080808080h
 					dq	8080808080808080h
 
 %push
-global x64_avx1_ConvertBGRToULRG
-x64_avx1_ConvertBGRToULRG:
+global avx1_ConvertBGRToULRG
+avx1_ConvertBGRToULRG:
 	SIMPLE_PROLOGUE	0, pGBegin, pBBegin, pRBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride
 
 	vmovdqa		xmm7, [bgr2planarpshufb16]
@@ -534,10 +534,10 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_XRGB_TO_ULRGA	x64_avx1_ConvertBGRXToULRG, 1, 0
-CONVERT_XRGB_TO_ULRGA	x64_avx1_ConvertXRGBToULRG, 0, 0
-CONVERT_XRGB_TO_ULRGA	x64_avx1_ConvertBGRAToULRA, 1, 1
-CONVERT_XRGB_TO_ULRGA	x64_avx1_ConvertARGBToULRA, 0, 1
+CONVERT_XRGB_TO_ULRGA	avx1_ConvertBGRXToULRG, 1, 0
+CONVERT_XRGB_TO_ULRGA	avx1_ConvertXRGBToULRG, 0, 0
+CONVERT_XRGB_TO_ULRGA	avx1_ConvertBGRAToULRA, 1, 1
+CONVERT_XRGB_TO_ULRGA	avx1_ConvertARGBToULRA, 0, 1
 
 
 	align	64
@@ -630,8 +630,8 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_YUV422_TO_ULY2	x64_avx1_ConvertYUYVToULY2, 1
-CONVERT_YUV422_TO_ULY2	x64_avx1_ConvertUYVYToULY2, 0
+CONVERT_YUV422_TO_ULY2	avx1_ConvertYUYVToULY2, 1
+CONVERT_YUV422_TO_ULY2	avx1_ConvertUYVYToULY2, 0
 
 
 
@@ -645,8 +645,8 @@ dummya		dq	3736353433323130h
 			dq	3f3e3d3c3b3a3938h
 
 %push
-global x64_avx1_ConvertULRGToBGR
-x64_avx1_ConvertULRGToBGR:
+global avx1_ConvertULRGToBGR
+avx1_ConvertULRGToBGR:
 	SIMPLE_PROLOGUE	0, pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, cbWidth, scbStride
 
 	vmovdqa		xmm7, [planar2bgrpshufb16]
@@ -861,10 +861,10 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_ULRGA_TO_XRGB	x64_avx1_ConvertULRGToBGRX, 1, 0
-CONVERT_ULRGA_TO_XRGB	x64_avx1_ConvertULRGToXRGB, 0, 0
-CONVERT_ULRGA_TO_XRGB	x64_avx1_ConvertULRAToBGRA, 1, 1
-CONVERT_ULRGA_TO_XRGB	x64_avx1_ConvertULRAToARGB, 0, 1
+CONVERT_ULRGA_TO_XRGB	avx1_ConvertULRGToBGRX, 1, 0
+CONVERT_ULRGA_TO_XRGB	avx1_ConvertULRGToXRGB, 0, 0
+CONVERT_ULRGA_TO_XRGB	avx1_ConvertULRAToBGRA, 1, 1
+CONVERT_ULRGA_TO_XRGB	avx1_ConvertULRAToARGB, 0, 1
 
 
 
@@ -947,5 +947,5 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_ULY2_TO_YUV422	x64_avx1_ConvertULY2ToYUYV, 1
-CONVERT_ULY2_TO_YUV422	x64_avx1_ConvertULY2ToUYVY, 0
+CONVERT_ULY2_TO_YUV422	avx1_ConvertULY2ToYUYV, 1
+CONVERT_ULY2_TO_YUV422	avx1_ConvertULY2ToUYVY, 0

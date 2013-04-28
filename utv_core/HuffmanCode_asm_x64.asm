@@ -10,8 +10,8 @@ section .text
 
 %push
 
-global x64_i686_HuffmanEncode
-x64_i686_HuffmanEncode:
+global i686_HuffmanEncode
+i686_HuffmanEncode:
 	SIMPLE_PROLOGUE	0, pDstBegin, pSrcBegin, pSrcEnd, pEncodeTable
 
 	mov			rsi, qword [rsp + %$pSrcBegin]
@@ -206,22 +206,22 @@ global %$procname
 %pop
 %endmacro
 
-HUFFMAN_DECODE	x64_i686_HuffmanDecode,                                             0, 1, 0, 0,  0,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccum,                                     1, 1, 0, 0,  0,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep2,                                1, 2, 0, 0,  0,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4,                                1, 4, 0, 0,  0,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXGreen,            1, 4, 1, 1,  0,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXBlue,             1, 4, 1, 1, +1,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXRed,              1, 4, 1, 1, -1,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXRedAndDummyAlpha, 1, 4, 1, 1, -1, +1
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep3ForBottomupBGRGreen,             1, 3, 1, 1,  0,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep3ForBottomupBGRBlue,              1, 3, 1, 1, +1,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep3ForBottomupBGRRed,               1, 3, 1, 1, -1,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBGreen,             1, 4, 1, 0,  0,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBBlue,              1, 4, 1, 0, -1,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBRed,               1, 4, 1, 0, +1,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBRedAndDummyAlpha,  1, 4, 1, 0, +1, -1
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBGreen,              1, 3, 1, 0,  0,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBBlue,               1, 3, 1, 0, -1,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBRed,                1, 3, 1, 0, +1,  0
-HUFFMAN_DECODE	x64_i686_HuffmanDecodeAndAccumStep4ForTopdownBGRXRedAndDummyAlpha,  1, 4, 1, 0, -1, +1
+HUFFMAN_DECODE	i686_HuffmanDecode,                                             0, 1, 0, 0,  0,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccum,                                     1, 1, 0, 0,  0,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep2,                                1, 2, 0, 0,  0,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4,                                1, 4, 0, 0,  0,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXGreen,            1, 4, 1, 1,  0,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXBlue,             1, 4, 1, 1, +1,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXRed,              1, 4, 1, 1, -1,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXRedAndDummyAlpha, 1, 4, 1, 1, -1, +1
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep3ForBottomupBGRGreen,             1, 3, 1, 1,  0,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep3ForBottomupBGRBlue,              1, 3, 1, 1, +1,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep3ForBottomupBGRRed,               1, 3, 1, 1, -1,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBGreen,             1, 4, 1, 0,  0,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBBlue,              1, 4, 1, 0, -1,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBRed,               1, 4, 1, 0, +1,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBRedAndDummyAlpha,  1, 4, 1, 0, +1, -1
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep3ForTopdownRGBGreen,              1, 3, 1, 0,  0,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep3ForTopdownRGBBlue,               1, 3, 1, 0, -1,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep3ForTopdownRGBRed,                1, 3, 1, 0, +1,  0
+HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForTopdownBGRXRedAndDummyAlpha,  1, 4, 1, 0, -1, +1

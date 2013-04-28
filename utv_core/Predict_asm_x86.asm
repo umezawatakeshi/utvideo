@@ -10,8 +10,8 @@ section .text
 
 %push
 
-global _x86_sse2_PredictLeftAndCount_align1
-_x86_sse2_PredictLeftAndCount_align1:
+global _sse2_PredictLeftAndCount_align1
+_sse2_PredictLeftAndCount_align1:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, pCountTable
 
 	mov			eax, 80h
@@ -84,8 +84,8 @@ _x86_sse2_PredictLeftAndCount_align1:
 
 %push
 
-global _x86_sse2_PredictWrongMedianAndCount_align16
-_x86_sse2_PredictWrongMedianAndCount_align16:
+global _sse2_PredictWrongMedianAndCount_align16
+_sse2_PredictWrongMedianAndCount_align16:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride, pCountTable
 
 	mov			eax, 80h
@@ -185,8 +185,8 @@ _x86_sse2_PredictWrongMedianAndCount_align16:
 
 %push
 
-global _x86_sse2_PredictWrongMedianAndCount_align1
-_x86_sse2_PredictWrongMedianAndCount_align1:
+global _sse2_PredictWrongMedianAndCount_align1
+_sse2_PredictWrongMedianAndCount_align1:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride, pCountTable
 
 	mov			eax, 80h
@@ -355,8 +355,8 @@ _x86_sse2_PredictWrongMedianAndCount_align1:
 
 %push
 
-global _x86_i686_RestoreWrongMedian_align1
-_x86_i686_RestoreWrongMedian_align1:
+global _i686_RestoreWrongMedian_align1
+_i686_RestoreWrongMedian_align1:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride
 
 	mov			esi, dword [esp + %$pSrcBegin]
@@ -415,8 +415,8 @@ _x86_i686_RestoreWrongMedian_align1:
 
 %push
 
-global _x86_sse1mmx_RestoreWrongMedian_align1
-_x86_sse1mmx_RestoreWrongMedian_align1:
+global _sse1mmx_RestoreWrongMedian_align1
+_sse1mmx_RestoreWrongMedian_align1:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride
 
 	mov			esi, dword [esp + %$pSrcBegin]
