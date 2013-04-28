@@ -11,9 +11,48 @@ public:
 		cpuid_result cpuid_0   = { 0, 0, 0, 0 };
 		cpuid_result cpuid_1   = { 0, 0, 0, 0 };
 		cpuid_result cpuid_7_0 = { 0, 0, 0, 0 };
+		cpuid_result cpuid_ex0 = { 0, 0, 0, 0 };
+		cpuid_result cpuid_ex2 = { 0, 0, 0, 0 };
+		cpuid_result cpuid_ex3 = { 0, 0, 0, 0 };
+		cpuid_result cpuid_ex4 = { 0, 0, 0, 0 };
+
+		char vendor[16];
+		char procbrand[64];
 
 		cpuid(&cpuid_0, 0, 0);
 		_RPT4(_CRT_WARN, "CPUID.0   EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", cpuid_0.eax, cpuid_0.ebx, cpuid_0.ecx, cpuid_0.edx);
+		*(uint32_t *)(vendor+0) = cpuid_0.ebx;
+		*(uint32_t *)(vendor+4) = cpuid_0.edx;
+		*(uint32_t *)(vendor+8) = cpuid_0.ecx;
+		vendor[12] = '\0';
+		_RPT1(_CRT_WARN, "CPUID     vendor=\"%s\"\n", vendor);
+
+		cpuid(&cpuid_ex0, 0x80000000, 0);
+		_RPT4(_CRT_WARN, "CPUID.ex0 EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", cpuid_ex0.eax, cpuid_ex0.ebx, cpuid_ex0.ecx, cpuid_ex0.edx);
+
+		if (cpuid_ex0.eax >= 0x80000004)
+		{
+			cpuid(&cpuid_ex2, 0x80000002, 0);
+			_RPT4(_CRT_WARN, "CPUID.ex2 EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", cpuid_ex2.eax, cpuid_ex2.ebx, cpuid_ex2.ecx, cpuid_ex2.edx);
+			cpuid(&cpuid_ex3, 0x80000003, 0);
+			_RPT4(_CRT_WARN, "CPUID.ex3 EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", cpuid_ex3.eax, cpuid_ex3.ebx, cpuid_ex3.ecx, cpuid_ex3.edx);
+			cpuid(&cpuid_ex4, 0x80000004, 0);
+			_RPT4(_CRT_WARN, "CPUID.ex4 EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", cpuid_ex4.eax, cpuid_ex4.ebx, cpuid_ex4.ecx, cpuid_ex4.edx);
+			*(uint32_t *)(procbrand+ 0) = cpuid_ex2.eax;
+			*(uint32_t *)(procbrand+ 4) = cpuid_ex2.ebx;
+			*(uint32_t *)(procbrand+ 8) = cpuid_ex2.ecx;
+			*(uint32_t *)(procbrand+12) = cpuid_ex2.edx;
+			*(uint32_t *)(procbrand+16) = cpuid_ex3.eax;
+			*(uint32_t *)(procbrand+20) = cpuid_ex3.ebx;
+			*(uint32_t *)(procbrand+24) = cpuid_ex3.ecx;
+			*(uint32_t *)(procbrand+28) = cpuid_ex3.edx;
+			*(uint32_t *)(procbrand+32) = cpuid_ex4.eax;
+			*(uint32_t *)(procbrand+36) = cpuid_ex4.ebx;
+			*(uint32_t *)(procbrand+40) = cpuid_ex4.ecx;
+			*(uint32_t *)(procbrand+44) = cpuid_ex4.edx;
+			procbrand[48] = '\0';
+			_RPT1(_CRT_WARN, "CPUID     procbrand=\"%s\"\n", procbrand);
+		}
 
 		if (cpuid_0.eax >= 1)
 		{
