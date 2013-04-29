@@ -59,13 +59,13 @@ _i686_HuffmanEncode:
 %pop
 
 
-%macro HUFFMAN_DECODE 7
+%macro HUFFMAN_DECODE 5
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, accum, %2, step, %3, multiscan, %4, bottomup, %5, corrpos, %6, dummyalphapos, %7
+	MULTI_CONTEXT_XDEFINE procname, %1, accum, %2, step, %3, corrpos, %4, dummyalphapos, %5
 
 global %$procname
 %$procname:
-	SIMPLE_PROLOGUE 12, pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, cbNetWidth, cbGrossWidth
+	SIMPLE_PROLOGUE 12, pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, cbWidth, scbStride
 
 %define %$byCorrBuf     0
 %define %$pLineEnd      4
@@ -73,30 +73,14 @@ global %$procname
 
 	mov			esi, dword [esp + %$pSrcBegin]
 	mov			ebx, dword [esp + %$pDecodeTable]
-%if %$multiscan
- %if %$bottomup
-	mov			edi, dword [esp + %$pDstEnd]
-	sub			edi, dword [esp + %$cbGrossWidth]
-	mov			eax, edi
-	add			eax, dword [esp + %$cbNetWidth]
-	mov			dword [esp + %$pLineEnd], eax
-	mov			eax, dword [esp + %$cbGrossWidth]
-	add			eax, dword [esp + %$cbNetWidth]
-	mov			dword [esp + %$dwLineOffset], eax
- %else
+
 	mov			edi, dword [esp + %$pDstBegin]
 	mov			eax, edi
-	add			eax, dword [esp + %$cbNetWidth]
+	add			eax, dword [esp + %$cbWidth]
 	mov			dword [esp + %$pLineEnd], eax
-	mov			eax, dword [esp + %$cbGrossWidth]
-	sub			eax, dword [esp + %$cbNetWidth]
+	mov			eax, dword [esp + %$scbStride]
+	sub			eax, dword [esp + %$cbWidth]
 	mov			dword [esp + %$dwLineOffset], eax
- %endif
-%else
-	mov			edi, dword [esp + %$pDstBegin]
-	mov			eax, dword [esp + %$pDstEnd]
-	mov			dword [esp + %$pLineEnd], eax
-%endif
 
 %macro DO_OUTPUT_%$procname 1
 %push
@@ -176,31 +160,18 @@ global %$procname
 	jmp			%%label1
 
 %%label2:
-%if %$$multiscan
- %if %$$bottomup
-	mov			edx, dword [esp + %$$pLineEnd]
-	sub			edx, dword [esp + %$$cbGrossWidth]
-	cmp			edx, dword [esp + %$$pDstBegin]
-	jbe			%%label3
-	mov			dword [esp + %$$pLineEnd], edx
-  %if %$dohuffman
-	mov			edx, dword [esi+4]
-  %endif
-	sub			edi, dword [esp + %$$dwLineOffset]
- %else
-	mov			edx, dword [esp + %$$pLineEnd]
-	add			edx, dword [esp + %$$cbGrossWidth]
-	cmp			edx, dword [esp + %$$pDstEnd]
-	ja			%%label3
-	mov			dword [esp + %$$pLineEnd], edx
-  %if %$dohuffman
-	mov			edx, dword [esi+4]
-  %endif
 	add			edi, dword [esp + %$$dwLineOffset]
- %endif
+	cmp			edi, dword [esp + %$$pDstEnd]
+	je			%%label3
+	mov			edx, edi
+	add			edx, dword [esp + %$$cbWidth]
+	mov			dword [esp + %$$pLineEnd], edx
+%if %$dohuffman
+	mov			edx, dword [esi+4]
+%endif
+
 	jmp			%%label1
 %%label3:
-%endif
 %pop
 %endmacro
 
@@ -216,22 +187,14 @@ global %$procname
 %pop
 %endmacro
 
-HUFFMAN_DECODE	_i686_HuffmanDecode,                                             0, 1, 0, 0,  0,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccum,                                     1, 1, 0, 0,  0,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep2,                                1, 2, 0, 0,  0,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4,                                1, 4, 0, 0,  0,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXGreen,            1, 4, 1, 1,  0,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXBlue,             1, 4, 1, 1, +1,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXRed,              1, 4, 1, 1, -1,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForBottomupBGRXRedAndDummyAlpha, 1, 4, 1, 1, -1, +1
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep3ForBottomupBGRGreen,             1, 3, 1, 1,  0,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep3ForBottomupBGRBlue,              1, 3, 1, 1, +1,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep3ForBottomupBGRRed,               1, 3, 1, 1, -1,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBGreen,             1, 4, 1, 0,  0,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBBlue,              1, 4, 1, 0, -1,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBRed,               1, 4, 1, 0, +1,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForTopdownXRGBRedAndDummyAlpha,  1, 4, 1, 0, +1, -1
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBGreen,              1, 3, 1, 0,  0,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBBlue,               1, 3, 1, 0, -1,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep3ForTopdownRGBRed,                1, 3, 1, 0, +1,  0
-HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForTopdownBGRXRedAndDummyAlpha,  1, 4, 1, 0, -1, +1
+HUFFMAN_DECODE	_i686_HuffmanDecode,                                     0, 1,  0,  0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccum,                             1, 1,  0,  0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep2,                        1, 2,  0,  0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep3,                        1, 3,  0,  0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4,                        1, 4,  0,  0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep3ForBGRBlue,              1, 3, +1,  0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep3ForBGRRed,               1, 3, -1,  0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForBGRXBlue,             1, 4, +1,  0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForBGRXRed,              1, 4, -1,  0
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha, 1, 4, -1, +1
+HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha, 1, 4, +1, -1
