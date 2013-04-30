@@ -36,44 +36,55 @@ global %$procname
 	mov			rsi, [rsp + %$pYBegin]
 	mov			rbx, [rsp + %$pUBegin]
 	mov			rdx, [rsp + %$pVBegin]
+	mov			r9,  [rsp + %$pDstEnd]
+	mov			r10, [rsp + %$cbWidth]
+	mov			r11, [rsp + %$scbStride]
+	sub			r11, r10
+	xor			rcx, rcx
 
 	pxor		xmm7, xmm7				; xmm7 = 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 	pcmpeqb		xmm6, xmm6				; xmm6 = ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
 	psrlw		xmm6, 8					; xmm6 = 00 ff 00 ff 00 ff 00 ff 00 ff 00 ff 00 ff 00 ff
 
+	movdqa		xmm8, [yoff]
+	movdqa		xmm9, [uvoff]
+	movdqa		xmm10, [y2rgb]
+	movdqa		xmm11, [uv2r]
+	movdqa		xmm12, [uv2b]
+	movdqa		xmm13, [uv2g]
+
 	align	64
 .label0:
-	mov			rcx, rdi
-	add			rcx, [rsp + %$cbWidth]
+	lea			r8, [rdi+r10]
 
 	; align	64	; さすがに入れすぎな気がするのでコメントアウト。
 .label1:
-	movd		xmm0, [rsi]				; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 Y3 Y2 Y1 Y0
+	movd		xmm0, [rsi+rcx*2]		; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 Y3 Y2 Y1 Y0
 	punpcklbw	xmm0, xmm7				; xmm0 = 00 00 00 00 00 00 00 00 00 Y3 00 Y2 00 Y1 00 Y0
-	psubw		xmm0, [yoff]			; xmm0 = 00 00 00 00 00 00 00 00 ---Y3 ---Y2 ---Y1 ---Y0 (de-offset)
+	psubw		xmm0, xmm8				; xmm0 = 00 00 00 00 00 00 00 00 ---Y3 ---Y2 ---Y1 ---Y0 (de-offset)
 	punpcklwd	xmm0, xmm7				; xmm0 = 00 00 ---Y3 00 00 ---Y2 00 00 ---Y1 00 00 ---Y0 (de-offset)
 
-	movd		xmm1, [rbx]				; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 U6 U4 U2 U0
-	movd		xmm2, [rdx]				; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 V6 V4 V2 V0
+	movd		xmm1, [rbx+rcx]			; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 U6 U4 U2 U0
+	movd		xmm2, [rdx+rcx]			; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 V6 V4 V2 V0
 	punpcklbw	xmm1, xmm2				; xmm1 = 00 00 00 00 00 00 00 00 V6 U6 V4 U4 V2 U2 V0 U0
 	punpcklbw	xmm1, xmm7				; xmm1 = 00 V6 00 U6 00 V4 00 U4 00 V2 00 U2 00 V0 00 U0
-	psubw		xmm1, [uvoff]			; xmm1 = ---V6 ---U6 ---V4 ---U4 ---V2 ---U2 ---V0 ---U0 (de-offset)
+	psubw		xmm1, xmm9				; xmm1 = ---V6 ---U6 ---V4 ---U4 ---V2 ---U2 ---V0 ---U0 (de-offset)
 	punpckldq	xmm1, xmm1				; xmm1 = ---V2 ---U2 ---V2 ---U2 ---V0 ---U0 ---V0 ---U0 (de-offset)
 	paddw		xmm1, xmm1
 
-	pmaddwd		xmm0, [y2rgb]
+	pmaddwd		xmm0, xmm10
 
 	movdqa		xmm3, xmm1
-	pmaddwd		xmm3, [uv2r]
+	pmaddwd		xmm3, xmm11
 	paddd		xmm3, xmm0				; xmm3 = -R3-------- -R2-------- -R1-------- -R0--------
 	psrad		xmm3, 14				; xmm3 = ---------R3 ---------R2 ---------R1 ---------R0
 
 	movdqa		xmm2, xmm1
-	pmaddwd		xmm2, [uv2b]
+	pmaddwd		xmm2, xmm12
 	paddd		xmm2, xmm0				; xmm2 = -B3-------- -B2-------- -B1-------- -B0--------
 	psrad		xmm2, 14				; xmm2 = ---------B3 ---------B2 ---------B1 ---------B0
 
-	pmaddwd		xmm1, [uv2g]
+	pmaddwd		xmm1, xmm13
 	paddd		xmm1, xmm0				; xmm1 = -G3-------- -G2-------- -G1-------- -G0--------
 	psrad		xmm1, 14				; xmm1 = ---------G3 ---------G2 ---------G1 ---------G0
 
@@ -109,10 +120,8 @@ global %$procname
 
 %if %$rgb32
 	add			rdi, 16
-	add			rsi, 4
-	add			rbx, 2
-	add			rdx, 2
-	cmp			rdi, rcx
+	add			rcx, 2
+	cmp			rdi, r8
 	ja			.label2
 	movdqu		[rdi-16], xmm2
 	jne			.label1
@@ -121,48 +130,39 @@ global %$procname
 .label2:
 	movq		[rdi-16], xmm2
 	sub			rdi, 8
-	sub			rsi, 2
-	sub			rbx, 1
-	sub			rdx, 1
+	sub			rcx, 1
 %else
-	movd		eax, xmm2
-	psrldq		xmm2, 4
+	movq		rax, xmm2
+	psrldq		xmm2, 8
 	mov			[rdi], ax
-	shr			eax, 16
+	shr			rax, 16
 	mov			[rdi+2], al
-	movd		eax, xmm2
-	psrldq		xmm2, 4
+	shr			rax, 16
 	mov			[rdi+3], ax
-	shr			eax, 16
+	shr			rax, 16
 	mov			[rdi+5], al
 	add			rdi, 6
-	add			rsi, 2
-	add			rbx, 1
-	add			rdx, 1
-	cmp			rdi, rcx
+	add			rcx, 1
+	cmp			rdi, r8
 	jae			.label3
 
-	movd		eax, xmm2
-	psrldq		xmm2, 4
+	movq		rax, xmm2
 	mov			[rdi], ax
-	shr			eax, 16
+	shr			rax, 16
 	mov			[rdi+2], al
-	movd		eax, xmm2
+	shr			rax, 16
 	mov			[rdi+3], ax
-	shr			eax, 16
+	shr			rax, 16
 	mov			[rdi+5], al
 	add			rdi, 6
-	add			rsi, 2
-	add			rbx, 1
-	add			rdx, 1
-	cmp			rdi, rcx
+	add			rcx, 1
+	cmp			rdi, r8
 	jb			.label1
 %endif
 
 .label3:
-	sub			rdi, [rsp + %$cbWidth]
-	add			rdi, [rsp + %$scbStride]
-	cmp			rdi, [rsp + %$pDstEnd]
+	add			rdi, r11
+	cmp			rdi, r9
 	jne			.label0
 
 	SIMPLE_EPILOGUE
@@ -213,6 +213,11 @@ global %$procname
 	mov			rdi, [rsp + %$pYBegin]
 	mov			rbx, [rsp + %$pUBegin]
 	mov			rdx, [rsp + %$pVBegin]
+	mov			r9,  [rsp + %$pSrcEnd]
+	mov			r10, [rsp + %$cbWidth]
+	mov			r11, [rsp + %$scbStride]
+	sub			r11, r10
+	xor			rcx, rcx
 
 	movdqa		xmm4, [b2yuv]
 	movdqa		xmm5, [g2yuv]
@@ -221,8 +226,7 @@ global %$procname
 
 	align	64
 .label0:
-	mov			rcx, rsi
-	add			rcx, [rsp + %$cbWidth]
+	lea			r8, [rsi+r10]
 
 	;align	64
 .label1:
@@ -269,26 +273,23 @@ global %$procname
 	packssdw	xmm0, xmm0							; xmm0 = XX XX XX XX XX XX XX XX ---V0 ---U0 ---Y1 ---Y0
 	packuswb	xmm0, xmm0							; xmm0 = XX XX XX XX XX XX XX XX XX XX XX XX V0 U0 Y1 Y0
 	movd		eax, xmm0
-	mov			[rdi], ax
+	mov			[rdi+rcx*2], ax
 	shr			eax, 16
-	mov			[rbx], al
-	mov			[rdx], ah
+	mov			[rbx+rcx], al
+	mov			[rdx+rcx], ah
 
-	add			rdi, 2
-	add			rbx, 1
-	add			rdx, 1
+	add			rcx, 1
 %if %$rgb32
 	add			rsi, 8
 %else
 	add			rsi, 6
 %endif
-	cmp			rsi, rcx
+	cmp			rsi, r8
 	jb			.label1
 
 .label2:
-	sub			rsi, [rsp + %$cbWidth]
-	add			rsi, [rsp + %$scbStride]
-	cmp			rsi, [rsp + %$pSrcEnd]
+	add			rsi, r11
+	cmp			rsi, r9
 	jne			.label0
 
 	SIMPLE_EPILOGUE
