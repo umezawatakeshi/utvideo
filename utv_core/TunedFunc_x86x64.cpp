@@ -293,4 +293,4 @@ public:
 		}
 #endif
 	}
-};// tfi;
+} tfi;
