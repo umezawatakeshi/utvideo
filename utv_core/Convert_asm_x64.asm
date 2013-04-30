@@ -214,6 +214,11 @@ global %$procname
 	mov			rbx, [rsp + %$pUBegin]
 	mov			rdx, [rsp + %$pVBegin]
 
+	movdqa		xmm4, [b2yuv]
+	movdqa		xmm5, [g2yuv]
+	movdqa		xmm6, [r2yuv]
+	movdqa		xmm7, [yuvoff]
+
 	align	64
 .label0:
 	mov			rcx, rsi
@@ -252,11 +257,11 @@ global %$procname
  %endif
 %endif
 
-	pmaddwd		xmm0, [b2yuv]						; xmm0 = ----B2V---- ----B2U---- ----B2Y1--- ----B2Y0---
-	pmaddwd		xmm1, [g2yuv]						; xmm1 = ----G2V---- ----G2U---- ----G2Y1--- ----G2Y0---
-	pmaddwd		xmm2, [r2yuv]						; xmm2 = ----R2V---- ----R2U---- ----R2Y1--- ----R2Y0---
+	pmaddwd		xmm0, xmm4							; xmm0 = ----B2V---- ----B2U---- ----B2Y1--- ----B2Y0---
+	pmaddwd		xmm1, xmm5							; xmm1 = ----G2V---- ----G2U---- ----G2Y1--- ----G2Y0---
+	pmaddwd		xmm2, xmm6							; xmm2 = ----R2V---- ----R2U---- ----R2Y1--- ----R2Y0---
 
-	paddd		xmm0, [yuvoff]
+	paddd		xmm0, xmm7
 	paddd		xmm2, xmm1
 	paddd		xmm0, xmm2							; xmm0 = -----V----- -----U----- -----Y1---- -----Y0----
 
