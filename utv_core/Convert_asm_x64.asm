@@ -752,6 +752,9 @@ global %$procname
 	vmovdqa		xmm7, [planar2xrgbpshufb16]
 %endif
 	vmovdqa		xmm6, [_0x80b]
+%if ! %$havealpha
+	vpcmpeqd	xmm3, xmm3, xmm3
+%endif
 	mov			rdi, [rsp + %$pDstBegin]
 	mov			rsi, [rsp + %$pGBegin]
 	mov			rbx, [rsp + %$pBBegin]
@@ -774,8 +777,6 @@ global %$procname
 	vlddqu		xmm2, [rdx+rcx]
 %if %$havealpha
 	vlddqu		xmm3, [rbp+rcx]		; xmm3 = Af Ae Ad Ac Ab Aa A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
-%else
-	vpcmpeqd	xmm3, xmm3, xmm3
 %endif
 ;	vlddqu		xmm0, [dummyg]
 ;	vlddqu		xmm1, [dummyb]
