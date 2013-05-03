@@ -30,7 +30,7 @@ _i686_HuffmanEncode:
 	cmp			esi, edx
 	jnb			.label4
 	movzx		ecx, byte [esi]
-	inc			esi
+	add			esi, 1
 	mov			ecx, dword [ebp+ecx*4]
 	add			bl, cl
 	jnc			.label1
@@ -152,11 +152,7 @@ global %$procname
 %if %$$dummyalphapos != 0
 	mov			byte [edi + %$$dummyalphapos], 0ffh
 %endif
-%if %$$step == 1
-	inc			edi
-%else
 	add			edi, %$$step
-%endif
 	jmp			%%label1
 
 %%label2:

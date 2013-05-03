@@ -30,7 +30,7 @@ i686_HuffmanEncode:
 	cmp			rsi, r8
 	jnb			.label4
 	movzx		rcx, byte [rsi]
-	inc			rsi
+	add			rsi, 1
 	mov			rcx, qword [rdx+rcx*8]
 	add			bl, cl
 	jnc			.label1
@@ -153,11 +153,7 @@ global %$procname
 %if %$$dummyalphapos != 0
 	mov			byte [rdi + %$$dummyalphapos], 0ffh
 %endif
-%if %$$step == 1
-	inc			rdi
-%else
 	add			rdi, %$$step
-%endif
 	jmp			%%label1
 
 %%label2:
