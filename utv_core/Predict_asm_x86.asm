@@ -71,8 +71,8 @@ _sse2_PredictLeftAndCount_align1:
 	movzx		ebp, cl
 	inc			dword [ebx+ebp*4]
 	psrldq		xmm0, 1
-	inc			esi
-	inc			edi
+	add			esi, 1
+	add			edi, 1
 	cmp			esi, eax
 	jb			.label3
 
@@ -247,8 +247,8 @@ _sse2_PredictWrongMedianAndCount_align1:
 	movzx		ebp, cl
 	inc			dword [ebx+ebp*4]
 	psrldq		xmm0, 1
-	inc			esi
-	inc			edi
+	add			esi, 1
+	add			edi, 1
 	cmp			esi, eax
 	jb			.label3
 
@@ -342,8 +342,8 @@ _sse2_PredictWrongMedianAndCount_align1:
 	movzx		ebp, cl
 	inc			dword [ebx+ebp*4]
 	psrldq		xmm0, 1
-	inc			esi
-	inc			edi
+	add			esi, 1
+	add			edi, 1
 	cmp			esi, eax
 	jb			.label5
 
@@ -372,8 +372,8 @@ _i686_RestoreWrongMedian_align1:
 .label1:
 	add			dl, byte [esi]
 	mov			byte [edi], dl
-	inc 		esi
-	inc			edi
+	add 		esi, 1
+	add			edi, 1
 	cmp			esi, eax
 	jb			.label1
 
@@ -401,8 +401,8 @@ _i686_RestoreWrongMedian_align1:
 	add			edx, ebx
 	mov			byte [edi], dl
 
-	inc			esi
-	inc			edi
+	add			esi, 1
+	add			edi, 1
 	cmp			esi, dword [esp + %$pSrcEnd]	; pSrcEnd
 	jb			.label2
 
@@ -432,8 +432,8 @@ _sse1mmx_RestoreWrongMedian_align1:
 .label1:
 	add			dl, byte [esi]
 	mov			byte [edi], dl
-	inc 		esi
-	inc			edi
+	add 		esi, 1
+	add			edi, 1
 	cmp			esi, eax
 	jb			.label1
 
@@ -457,8 +457,8 @@ _sse1mmx_RestoreWrongMedian_align1:
 	movd		eax, mm2
 	mov			byte [edi], al
 
-	inc			esi
-	inc			edi
+	add			esi, 1
+	add			edi, 1
 	cmp			esi, dword [esp + %$pSrcEnd]
 	jb			.label2
 

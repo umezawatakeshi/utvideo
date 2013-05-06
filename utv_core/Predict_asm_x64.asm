@@ -71,8 +71,8 @@ sse2_PredictLeftAndCount_align1:
 	movzx		ebp, cl
 	inc			dword [rbx+rbp*4]
 	psrldq		xmm0, 1
-	inc			rsi
-	inc			rdi
+	add			rsi, 1
+	add			rdi, 1
 	cmp			rsi, rax
 	jb			.label3
 
@@ -247,8 +247,8 @@ sse2_PredictWrongMedianAndCount_align1:
 	movzx		ebp, cl
 	inc			dword [rbx+rbp*4]
 	psrldq		xmm0, 1
-	inc			rsi
-	inc			rdi
+	add			rsi, 1
+	add			rdi, 1
 	cmp			rsi, rax
 	jb			.label3
 
@@ -342,8 +342,8 @@ sse2_PredictWrongMedianAndCount_align1:
 	movzx		ebp, cl
 	inc			dword [rbx+rbp*4]
 	psrldq		xmm0, 1
-	inc			rsi
-	inc			rdi
+	add			rsi, 1
+	add			rdi, 1
 	cmp			rsi, rax
 	jb			.label5
 
@@ -374,8 +374,8 @@ sse1mmx_RestoreWrongMedian_align1:
 .label1:
 	add			dl, byte [rsi]
 	mov			byte [rdi], dl
-	inc 		rsi
-	inc			rdi
+	add 		rsi, 1
+	add			rdi, 1
 	cmp			rsi, rax
 	jb			.label1
 
@@ -399,8 +399,8 @@ sse1mmx_RestoreWrongMedian_align1:
 	movd		eax, mm2
 	mov			byte [rdi], al
 
-	inc			rsi
-	inc			rdi
+	add			rsi, 1
+	add			rdi, 1
 	cmp			rsi, qword [rsp + %$pSrcEnd]
 	jb			.label2
 
