@@ -96,8 +96,12 @@ global %$procname
 %endif
 
 %if %$dohuffman
+ %if %$$accum || (%$$corrpos != 0)
+	mov			cl, 0
+ %else
 	mov			cl, -32
 	mov			ah, 32
+ %endif
 	mov			edx, dword [rsi]
 	sub			rsi, 4
 %else
@@ -110,8 +114,13 @@ global %$procname
 	jae			%%label2
 
 %if %$dohuffman
+ %if %$$accum || (%$$corrpos != 0)
+	test		cl, cl		; (*a)
+	js			%%label4
+ %else
 	add			cl, ah
 	jnc			%%label4
+ %endif
 	sub			cl, 32
 	mov			r9d, edx
 	mov			edx, dword [rsi+4+4]
@@ -138,6 +147,16 @@ global %$procname
 	mov			eax, dword [rbx + 8192+32+4*32 + r10*2]		; pDecodeTable->SymbolAndCodeLength[r10]
 
 %%label0:
+ %if %$$accum || (%$$corrpos != 0)
+	add			cl, ah		; 本来は cl への add はここではなく (*a) でやって uOP を減らしたいが、
+							; 下の al への add が eax への部分レジスタ更新になっているため、
+							; ah に対して偽の依存関係を生んでしまい、遅くなる。
+							;
+							; 下の al への add が無い場合は部分レジスタ更新をしないので
+							; cl への add をここに持ってきても逆に遅くなるはずで、
+							; Penryn の場合はその通りなのだが、
+							; Sandy Bridge の場合はこっちの方が速い。原因不明。
+ %endif
 %else
 	mov			al, ah
 %endif
