@@ -127,12 +127,12 @@ global %$procname
 
 	mov			eax, r9d
 	shld		eax, edx, cl
-	mov			ch, cl
+	mov			r15d, ecx
 	or			eax, 1
 	bsr			r10, rax
 	mov			cl, byte [rbx + 8192 + r10]					; pDecodeTable->nCodeShift[r10]
 	shr			eax, cl
-	mov			cl, ch
+	mov			ecx, r15d
 	mov			r10d, dword [rbx + 8192+32 + r10*4]			; pDecodeTable->dwSymbolBase[r10]
 	add			r10, rax
 	mov			eax, dword [rbx + 8192+32+4*32 + r10*2]		; pDecodeTable->SymbolAndCodeLength[r10]
