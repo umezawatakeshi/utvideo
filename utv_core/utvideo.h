@@ -26,8 +26,8 @@ typedef ptrdiff_t ssize_t;
 
 
 #define UTVIDEO_VERSION_MASK                      0xffffff00
-#define UTVIDEO_VERSION                           0x0c010000
-#define UTVIDEO_VERSION_STR                       "12.1.0"
+#define UTVIDEO_VERSION                           0x0c020000
+#define UTVIDEO_VERSION_STR                       "12.2.0"
 
 /*
  * NOTE:
