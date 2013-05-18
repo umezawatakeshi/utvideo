@@ -784,6 +784,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Coefficient.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Common_asm_x64.mac"
 				>
 			</File>
