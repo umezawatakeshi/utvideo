@@ -5,6 +5,46 @@
 #include "utvideo.h"
 #include "Convert.h"
 
+class CBGRPixelOrder
+{
+public:
+	const static int A = INT_MIN;
+	const static int R = 2;
+	const static int G = 1;
+	const static int B = 0;
+	const static int BYPP = 3;
+};
+
+class CBGRAPixelOrder
+{
+public:
+	const static int A = 3;
+	const static int R = 2;
+	const static int G = 1;
+	const static int B = 0;
+	const static int BYPP = 4;
+};
+
+class CRGBPixelOrder
+{
+public:
+	const static int R = 0;
+	const static int G = 1;
+	const static int B = 2;
+	const static int A = INT_MIN;
+	const static int BYPP = 3;
+};
+
+class CARGBPixelOrder
+{
+public:
+	const static int A = 0;
+	const static int R = 1;
+	const static int G = 2;
+	const static int B = 3;
+	const static int BYPP = 4;
+};
+
 static void cpp_ConvertULY2ToBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, int bypp)
 {
 	const uint8_t *y = pYBegin;
