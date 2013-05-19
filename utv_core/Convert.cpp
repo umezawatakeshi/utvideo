@@ -28,10 +28,10 @@ public:
 class CRGBPixelOrder
 {
 public:
+	const static int A = INT_MIN;
 	const static int R = 0;
 	const static int G = 1;
 	const static int B = 2;
-	const static int A = INT_MIN;
 	const static int BYPP = 3;
 };
 
