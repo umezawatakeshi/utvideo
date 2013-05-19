@@ -45,6 +45,24 @@ public:
 	const static int BYPP = 4;
 };
 
+class CYUYVPixelOrder
+{
+public:
+	const static int Y0 = 0;
+	const static int Y1 = 2;
+	const static int U  = 1;
+	const static int V  = 3;
+};
+
+class CUYVYPixelOrder
+{
+public:
+	const static int Y0 = 1;
+	const static int Y1 = 3;
+	const static int U  = 0;
+	const static int V  = 2;
+};
+
 static void cpp_ConvertULY2ToBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, int bypp)
 {
 	const uint8_t *y = pYBegin;
