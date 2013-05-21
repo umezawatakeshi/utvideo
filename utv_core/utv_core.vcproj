@@ -788,6 +788,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ColorOrder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Common_asm_x64.mac"
 				>
 			</File>
