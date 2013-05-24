@@ -26,16 +26,6 @@ public:
 	virtual const utvf_t *GetDecoderOutputFormat(void) { return m_utvfDecoderOutput; }
 	virtual const utvf_t *GetCompressedFormat(void) { return m_utvfCompressed; }
 
-private:
-	void ConvertBottomupBGRxToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t bypp);
-	void ConvertTopdownBGRxToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t bypp);
-	void ConvertTopdownxRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t bypp);
-	void ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t nYOffset);
-	void ConvertULY0ToBottomupBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t bypp);
-	void ConvertULY0ToTopdownBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t bypp);
-	void ConvertULY0ToTopdownxRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t bypp);
-	void ConvertULY0ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nYOffset);
-
 protected:
 	virtual const char *GetColorFormatName(void) { return "YUV420"; }
 	virtual int GetRealBitCount(void) { return 12; }

@@ -73,113 +73,118 @@ void CULY0Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 	m_dwPlanePredictStride[2] = width / 2;
 }
 
-void CULY0Codec::ConvertBottomupBGRxToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t bypp)
+void ConvertBottomupBGRxToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwRawNetWidth, size_t dwRawGrossWidth, size_t dwYPlaneGrossWidth, bool bInterlace, uint32_t bypp)
 {
 	uint8_t *y = pDstYBegin;
 	uint8_t *u = pDstUBegin;
 	uint8_t *v = pDstVBegin;
 
-	uint32_t dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
+	size_t dwRawPredictStride = dwRawGrossWidth * (bInterlace ? 2 : 1);
+	size_t dwRawStripeSize = dwRawGrossWidth * 2 * (bInterlace ? 2 : 1);
 
-	for (const uint8_t *pStripeBegin = pSrcEnd; pStripeBegin > pSrcBegin; pStripeBegin -= m_dwRawStripeSize) {
-		for (const uint8_t *pStrideBegin = pStripeBegin - m_dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= m_dwRawGrossWidth)
+	for (const uint8_t *pStripeBegin = pSrcEnd; pStripeBegin > pSrcBegin; pStripeBegin -= dwRawStripeSize) {
+		for (const uint8_t *pStrideBegin = pStripeBegin - dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= dwRawGrossWidth)
 		{
-			const uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			const uint8_t *pStrideEnd = pStrideBegin + dwRawNetWidth;
 			for (const uint8_t *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
 			{
 				const uint8_t *p = q - dwRawPredictStride;
-				*(y+0)                           = min(max(int((*(q     +0))*0.098 + (*(q     +1))*0.504 + (*(q     +2))*0.257 + 16.5), 16), 235);
-				*(y+1)                           = min(max(int((*(q+bypp+0))*0.098 + (*(q+bypp+1))*0.504 + (*(q+bypp+2))*0.257 + 16.5), 16), 235);
-				*(y+m_dwPlanePredictStride[0]+0) = min(max(int((*(p     +0))*0.098 + (*(p     +1))*0.504 + (*(p     +2))*0.257 + 16.5), 16), 235);
-				*(y+m_dwPlanePredictStride[0]+1) = min(max(int((*(p+bypp+0))*0.098 + (*(p+bypp+1))*0.504 + (*(p+bypp+2))*0.257 + 16.5), 16), 235);
-				*u                               = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*0.439 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.291 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*-0.148)/4 + 128.5), 16), 240);
-				*v                               = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*-0.071 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.368 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*0.439)/4 + 128.5), 16), 240);
+				*(y+0)                    = min(max(int((*(q     +0))*0.098 + (*(q     +1))*0.504 + (*(q     +2))*0.257 + 16.5), 16), 235);
+				*(y+1)                    = min(max(int((*(q+bypp+0))*0.098 + (*(q+bypp+1))*0.504 + (*(q+bypp+2))*0.257 + 16.5), 16), 235);
+				*(y+dwYPlaneGrossWidth+0) = min(max(int((*(p     +0))*0.098 + (*(p     +1))*0.504 + (*(p     +2))*0.257 + 16.5), 16), 235);
+				*(y+dwYPlaneGrossWidth+1) = min(max(int((*(p+bypp+0))*0.098 + (*(p+bypp+1))*0.504 + (*(p+bypp+2))*0.257 + 16.5), 16), 235);
+				*u                        = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*0.439 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.291 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*-0.148)/4 + 128.5), 16), 240);
+				*v                        = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*-0.071 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.368 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*0.439)/4 + 128.5), 16), 240);
 				y+=2; u++; v++;
 			}
 		}
-		y += m_dwPlanePredictStride[0];
+		y += dwYPlaneGrossWidth;
 	}
 }
 
-void CULY0Codec::ConvertTopdownBGRxToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t bypp)
+void ConvertTopdownBGRxToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwRawNetWidth, size_t dwRawGrossWidth, size_t dwYPlaneGrossWidth, bool bInterlace, uint32_t bypp)
 {
 	uint8_t *y = pDstYBegin;
 	uint8_t *u = pDstUBegin;
 	uint8_t *v = pDstVBegin;
 	
-	uint32_t dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
-	
-	for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin < pSrcEnd; pStripeBegin += m_dwRawStripeSize) {
-		for (const uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += m_dwRawGrossWidth)
+	size_t dwRawPredictStride = dwRawGrossWidth * (bInterlace ? 2 : 1);
+	size_t dwRawStripeSize = dwRawGrossWidth * 2 * (bInterlace ? 2 : 1);
+
+	for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin < pSrcEnd; pStripeBegin += dwRawStripeSize) {
+		for (const uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += dwRawGrossWidth)
 		{
-			const uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			const uint8_t *pStrideEnd = pStrideBegin + dwRawNetWidth;
 			for (const uint8_t *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
 			{
 				const uint8_t *p = q + dwRawPredictStride;
-				*(y+0)                           = min(max(int((*(q     +0))*0.098 + (*(q     +1))*0.504 + (*(q     +2))*0.257 + 16.5), 16), 235);
-				*(y+1)                           = min(max(int((*(q+bypp+0))*0.098 + (*(q+bypp+1))*0.504 + (*(q+bypp+2))*0.257 + 16.5), 16), 235);
-				*(y+m_dwPlanePredictStride[0]+0) = min(max(int((*(p     +0))*0.098 + (*(p     +1))*0.504 + (*(p     +2))*0.257 + 16.5), 16), 235);
-				*(y+m_dwPlanePredictStride[0]+1) = min(max(int((*(p+bypp+0))*0.098 + (*(p+bypp+1))*0.504 + (*(p+bypp+2))*0.257 + 16.5), 16), 235);
-				*u                               = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*0.439 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.291 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*-0.148)/4 + 128.5), 16), 240);
-				*v                               = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*-0.071 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.368 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*0.439)/4 + 128.5), 16), 240);
+				*(y+0)                    = min(max(int((*(q     +0))*0.098 + (*(q     +1))*0.504 + (*(q     +2))*0.257 + 16.5), 16), 235);
+				*(y+1)                    = min(max(int((*(q+bypp+0))*0.098 + (*(q+bypp+1))*0.504 + (*(q+bypp+2))*0.257 + 16.5), 16), 235);
+				*(y+dwYPlaneGrossWidth+0) = min(max(int((*(p     +0))*0.098 + (*(p     +1))*0.504 + (*(p     +2))*0.257 + 16.5), 16), 235);
+				*(y+dwYPlaneGrossWidth+1) = min(max(int((*(p+bypp+0))*0.098 + (*(p+bypp+1))*0.504 + (*(p+bypp+2))*0.257 + 16.5), 16), 235);
+				*u                        = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*0.439 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.291 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*-0.148)/4 + 128.5), 16), 240);
+				*v                        = min(max(int(((*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*-0.071 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.368 + (*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*0.439)/4 + 128.5), 16), 240);
 				y+=2; u++; v++;
 			}
 		}
-		y += m_dwPlanePredictStride[0];
+		y += dwYPlaneGrossWidth;
 	}
 }
 
-void CULY0Codec::ConvertTopdownxRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t bypp)
+void ConvertTopdownxRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwRawNetWidth, size_t dwRawGrossWidth, size_t dwYPlaneGrossWidth, bool bInterlace, uint32_t bypp)
 {
 	uint8_t *y = pDstYBegin;
 	uint8_t *u = pDstUBegin;
 	uint8_t *v = pDstVBegin;
 	
-	uint32_t dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
-	
-	for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin < pSrcEnd; pStripeBegin += m_dwRawStripeSize) {
-		for (const uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += m_dwRawGrossWidth)
+	size_t dwRawPredictStride = dwRawGrossWidth * (bInterlace ? 2 : 1);
+	size_t dwRawStripeSize = dwRawGrossWidth * 2 * (bInterlace ? 2 : 1);
+
+	for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin < pSrcEnd; pStripeBegin += dwRawStripeSize) {
+		for (const uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += dwRawGrossWidth)
 		{
-			const uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			const uint8_t *pStrideEnd = pStrideBegin + dwRawNetWidth;
 			for (const uint8_t *qq = pStrideBegin; qq < pStrideEnd; qq += bypp * 2)
 			{
 				const uint8_t *q = bypp == 3 ? qq : qq + 1;
 				const uint8_t *p = q + dwRawPredictStride;
-				*(y+0)                           = min(max(int((*(q     +2))*0.098 + (*(q     +1))*0.504 + (*(q     +0))*0.257 + 16.5), 16), 235);
-				*(y+1)                           = min(max(int((*(q+bypp+2))*0.098 + (*(q+bypp+1))*0.504 + (*(q+bypp+0))*0.257 + 16.5), 16), 235);
-				*(y+m_dwPlanePredictStride[0]+0) = min(max(int((*(p     +2))*0.098 + (*(p     +1))*0.504 + (*(p     +0))*0.257 + 16.5), 16), 235);
-				*(y+m_dwPlanePredictStride[0]+1) = min(max(int((*(p+bypp+2))*0.098 + (*(p+bypp+1))*0.504 + (*(p+bypp+0))*0.257 + 16.5), 16), 235);
-				*u                               = min(max(int(((*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*0.439 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.291 + (*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*-0.148)/4 + 128.5), 16), 240);
-				*v                               = min(max(int(((*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*-0.071 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.368 + (*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*0.439)/4 + 128.5), 16), 240);
+				*(y+0)                    = min(max(int((*(q     +2))*0.098 + (*(q     +1))*0.504 + (*(q     +0))*0.257 + 16.5), 16), 235);
+				*(y+1)                    = min(max(int((*(q+bypp+2))*0.098 + (*(q+bypp+1))*0.504 + (*(q+bypp+0))*0.257 + 16.5), 16), 235);
+				*(y+dwYPlaneGrossWidth+0) = min(max(int((*(p     +2))*0.098 + (*(p     +1))*0.504 + (*(p     +0))*0.257 + 16.5), 16), 235);
+				*(y+dwYPlaneGrossWidth+1) = min(max(int((*(p+bypp+2))*0.098 + (*(p+bypp+1))*0.504 + (*(p+bypp+0))*0.257 + 16.5), 16), 235);
+				*u                        = min(max(int(((*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*0.439 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.291 + (*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*-0.148)/4 + 128.5), 16), 240);
+				*v                        = min(max(int(((*(p+2)+*(p+bypp+2)+*(q+2)+*(q+bypp+2))*-0.071 + (*(p+1)+*(p+bypp+1)+*(q+1)+*(q+bypp+1))*-0.368 + (*(p+0)+*(p+bypp+0)+*(q+0)+*(q+bypp+0))*0.439)/4 + 128.5), 16), 240);
 				y+=2; u++; v++;
 			}
 		}
-		y += m_dwPlanePredictStride[0];
+		y += dwYPlaneGrossWidth;
 	}
 }
 
-void CULY0Codec::ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t nYOffset)
+void ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwRawNetWidth, size_t dwYPlaneGrossWidth, bool bInterlace, uint32_t nYOffset)
 {
 	uint8_t *y = pDstYBegin;
 	uint8_t *u = pDstUBegin;
 	uint8_t *v = pDstVBegin;
 
-	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += m_dwRawStripeSize)
+	size_t dwRawStripeSize = dwRawNetWidth * 2 * (bInterlace ? 2 : 1);
+
+	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += dwRawStripeSize)
 	{
-		const uint8_t *pStrideEnd = pStrideBegin + m_dwRawStripeSize / 2;
+		const uint8_t *pStrideEnd = pStrideBegin + dwRawStripeSize / 2;
 		for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += 4)
 		{
-			const uint8_t *q = p + m_dwRawStripeSize / 2;
+			const uint8_t *q = p + dwRawStripeSize / 2;
 			*(y+0) = *(p+0+nYOffset);
 			*(y+1) = *(p+2+nYOffset);
-			*(y+m_dwPlanePredictStride[0]+0) = *(q+0+nYOffset);
-			*(y+m_dwPlanePredictStride[0]+1) = *(q+2+nYOffset);
+			*(y+dwYPlaneGrossWidth+0) = *(q+0+nYOffset);
+			*(y+dwYPlaneGrossWidth+1) = *(q+2+nYOffset);
 			*u = (*(p+1-nYOffset) + *(q+1-nYOffset)) / 2;
 			*v = (*(p+3-nYOffset) + *(q+3-nYOffset)) / 2;
 
 			y+=2; u++; v++;
 		}
-		y += m_dwPlanePredictStride[0];
+		y += dwYPlaneGrossWidth;
 	}
 }
 
@@ -218,54 +223,55 @@ void CULY0Codec::ConvertToPlanar(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, 0);
+		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwPlanePredictStride[0], m_bInterlace, 0);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
-		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, 1);
+		ConvertYUV422ToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwPlanePredictStride[0], m_bInterlace, 1);
 		break;
 	case UTVF_NFCC_BGR_BU:
-		ConvertBottomupBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, 3);
+		ConvertBottomupBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 3);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertBottomupBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, 4);
+		ConvertBottomupBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 4);
 		break;
 	case UTVF_NFCC_BGR_TD:
-		ConvertTopdownBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, 3);
+		ConvertTopdownBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 3);
 		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertTopdownBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, 4);
+		ConvertTopdownBGRxToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 4);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertTopdownxRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, 3);
+		ConvertTopdownxRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 3);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertTopdownxRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, 4);
+		ConvertTopdownxRGBToULY0(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 4);
 		break;
 	}
 }
 
-void CULY0Codec::ConvertULY0ToBottomupBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t bypp)
+void ConvertULY0ToBottomupBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, size_t dwRawNetWidth, size_t dwRawGrossWidth, size_t dwYPlaneGrossWidth, bool bInterlace, uint32_t bypp)
 {
 	const uint8_t *y = pSrcYBegin;
 	const uint8_t *u = pSrcUBegin;
 	const uint8_t *v = pSrcVBegin;
 
-	uint32_t dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
+	uint32_t dwRawPredictStride = dwRawGrossWidth * (bInterlace ? 2 : 1);
+	size_t dwRawStripeSize = dwRawGrossWidth * 2 * (bInterlace ? 2 : 1);
 
-	for (uint8_t *pStripeBegin = pDstEnd; pStripeBegin > pDstBegin; pStripeBegin -= m_dwRawStripeSize) {
-		for (uint8_t *pStrideBegin = pStripeBegin - m_dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= m_dwRawGrossWidth)
+	for (uint8_t *pStripeBegin = pDstEnd; pStripeBegin > pDstBegin; pStripeBegin -= dwRawStripeSize) {
+		for (uint8_t *pStrideBegin = pStripeBegin - dwRawGrossWidth; pStrideBegin >= pStripeBegin - dwRawPredictStride; pStrideBegin -= dwRawGrossWidth)
 		{
-			uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			uint8_t *pStrideEnd = pStrideBegin + dwRawNetWidth;
 			for (uint8_t *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
 			{
 				uint8_t *p = q - dwRawPredictStride;
 				*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
 				*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
 				*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-				*(p+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-				*(p+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-				*(p+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+1) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+0) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+2) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164                  + (*v-128)*1.596), 0), 255);
 				if (bypp == 4)
 				{
 					*(q+3) = 255;
@@ -275,9 +281,9 @@ void CULY0Codec::ConvertULY0ToBottomupBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd,
 				*(q+bypp+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
 				*(q+bypp+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
 				*(q+bypp+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-				*(p+bypp+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-				*(p+bypp+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-				*(p+bypp+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+bypp+1) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+bypp+0) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+bypp+2) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164                  + (*v-128)*1.596), 0), 255);
 				if (bypp == 4)
 				{
 					*(q+bypp+3) = 255;
@@ -286,31 +292,32 @@ void CULY0Codec::ConvertULY0ToBottomupBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd,
 				y++; u++; v++;
 			}
 		}
-		y += m_dwPlanePredictStride[0];
+		y += dwYPlaneGrossWidth;
 	}
 }
 
-void CULY0Codec::ConvertULY0ToTopdownBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t bypp)
+void ConvertULY0ToTopdownBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, size_t dwRawNetWidth, size_t dwRawGrossWidth, size_t dwYPlaneGrossWidth, bool bInterlace, uint32_t bypp)
 {
 	const uint8_t *y = pSrcYBegin;
 	const uint8_t *u = pSrcUBegin;
 	const uint8_t *v = pSrcVBegin;
 
-	uint32_t dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
+	size_t dwRawPredictStride = dwRawGrossWidth * (bInterlace ? 2 : 1);
+	size_t dwRawStripeSize = dwRawGrossWidth * 2 * (bInterlace ? 2 : 1);
 
-	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin < pDstEnd; pStripeBegin += m_dwRawStripeSize) {
-		for (uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += m_dwRawGrossWidth)
+	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin < pDstEnd; pStripeBegin += dwRawStripeSize) {
+		for (uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += dwRawGrossWidth)
 		{
-			uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			uint8_t *pStrideEnd = pStrideBegin + dwRawNetWidth;
 			for (uint8_t *q = pStrideBegin; q < pStrideEnd; q += bypp * 2)
 			{
 				uint8_t *p = q + dwRawPredictStride;
 				*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
 				*(q+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
 				*(q+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-				*(p+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-				*(p+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-				*(p+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+1) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+0) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+2) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164                  + (*v-128)*1.596), 0), 255);
 				if (bypp == 4)
 				{
 					*(q+3) = 255;
@@ -320,9 +327,9 @@ void CULY0Codec::ConvertULY0ToTopdownBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd, 
 				*(q+bypp+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
 				*(q+bypp+0) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
 				*(q+bypp+2) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-				*(p+bypp+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-				*(p+bypp+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-				*(p+bypp+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+bypp+1) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+bypp+0) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+bypp+2) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164                  + (*v-128)*1.596), 0), 255);
 				if (bypp == 4)
 				{
 					*(q+bypp+3) = 255;
@@ -331,22 +338,23 @@ void CULY0Codec::ConvertULY0ToTopdownBGRx(uint8_t *pDstBegin, uint8_t *pDstEnd, 
 				y++; u++; v++;
 			}
 		}
-		y += m_dwPlanePredictStride[0];
+		y += dwYPlaneGrossWidth;
 	}
 }
 
-void CULY0Codec::ConvertULY0ToTopdownxRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t bypp)
+void ConvertULY0ToTopdownxRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, size_t dwRawNetWidth, size_t dwRawGrossWidth, size_t dwYPlaneGrossWidth, bool bInterlace, uint32_t bypp)
 {
 	const uint8_t *y = pSrcYBegin;
 	const uint8_t *u = pSrcUBegin;
 	const uint8_t *v = pSrcVBegin;
 
-	uint32_t dwRawPredictStride = m_dwRawGrossWidth * (m_bInterlace ? 2 : 1);
+	size_t dwRawPredictStride = dwRawGrossWidth * (bInterlace ? 2 : 1);
+	size_t dwRawStripeSize = dwRawGrossWidth * 2 * (bInterlace ? 2 : 1);
 
-	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin < pDstEnd; pStripeBegin += m_dwRawStripeSize) {
-		for (uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += m_dwRawGrossWidth)
+	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin < pDstEnd; pStripeBegin += dwRawStripeSize) {
+		for (uint8_t *pStrideBegin = pStripeBegin; pStrideBegin < pStripeBegin + dwRawPredictStride; pStrideBegin += dwRawGrossWidth)
 		{
-			uint8_t *pStrideEnd = pStrideBegin + m_dwRawNetWidth;
+			uint8_t *pStrideEnd = pStrideBegin + dwRawNetWidth;
 			for (uint8_t *qq = pStrideBegin; qq < pStrideEnd; qq += bypp * 2)
 			{
 				uint8_t *q = bypp == 3 ? qq : qq + 1;
@@ -354,9 +362,9 @@ void CULY0Codec::ConvertULY0ToTopdownxRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, 
 				*(q+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
 				*(q+2) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
 				*(q+0) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-				*(p+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-				*(p+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-				*(p+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+1) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+2) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+0) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164                  + (*v-128)*1.596), 0), 255);
 				if (bypp == 4)
 				{
 					*(q-1) = 255;
@@ -366,9 +374,9 @@ void CULY0Codec::ConvertULY0ToTopdownxRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, 
 				*(q+bypp+1) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
 				*(q+bypp+2) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
 				*(q+bypp+0) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-				*(p+bypp+1) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-				*(p+bypp+2) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-				*(p+bypp+0) = min(max(int((*(y+m_dwPlanePredictStride[0])-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+bypp+1) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+bypp+2) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+bypp+0) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164                  + (*v-128)*1.596), 0), 255);
 				if (bypp == 4)
 				{
 					*(q+bypp-1) = 255;
@@ -377,26 +385,28 @@ void CULY0Codec::ConvertULY0ToTopdownxRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, 
 				y++; u++; v++;
 			}
 		}
-		y += m_dwPlanePredictStride[0];
+		y += dwYPlaneGrossWidth;
 	}
 }
 
-void CULY0Codec::ConvertULY0ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, uint32_t nYOffset)
+void ConvertULY0ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, size_t dwRawNetWidth, size_t dwYPlaneGrossWidth, bool bInterlace, uint32_t nYOffset)
 {
 	const uint8_t *y = pSrcYBegin;
 	const uint8_t *u = pSrcUBegin;
 	const uint8_t *v = pSrcVBegin;
 
-	for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += m_dwRawStripeSize)
+	size_t dwRawStripeSize = dwRawNetWidth * 2 * (bInterlace ? 2 : 1);
+
+	for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += dwRawStripeSize)
 	{
-		uint8_t *pStrideEnd = pStrideBegin + m_dwRawStripeSize / 2;
+		uint8_t *pStrideEnd = pStrideBegin + dwRawStripeSize / 2;
 		for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += 4)
 		{
-			uint8_t *q = p + m_dwRawStripeSize / 2;
+			uint8_t *q = p + dwRawStripeSize / 2;
 			*(p+0+nYOffset) = *(y+0);
 			*(p+2+nYOffset) = *(y+1);
-			*(q+0+nYOffset) = *(y+m_dwPlanePredictStride[0]+0);
-			*(q+2+nYOffset) = *(y+m_dwPlanePredictStride[0]+1);
+			*(q+0+nYOffset) = *(y+dwYPlaneGrossWidth+0);
+			*(q+2+nYOffset) = *(y+dwYPlaneGrossWidth+1);
 			*(p+1-nYOffset) = *u;
 			*(q+1-nYOffset) = *u;
 			*(p+3-nYOffset) = *v;
@@ -404,7 +414,7 @@ void CULY0Codec::ConvertULY0ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const
 
 			y+=2; u++; v++;
 		}
-		y += m_dwPlanePredictStride[0];
+		y += dwYPlaneGrossWidth;
 	}
 }
 
@@ -443,29 +453,29 @@ void CULY0Codec::ConvertFromPlanar(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		ConvertULY0ToYUV422(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, 0);
+		ConvertULY0ToYUV422(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwPlanePredictStride[0], m_bInterlace, 0);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
-		ConvertULY0ToYUV422(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, 1);
+		ConvertULY0ToYUV422(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwPlanePredictStride[0], m_bInterlace, 1);
 		break;
 	case UTVF_NFCC_BGR_BU:
-		ConvertULY0ToBottomupBGRx(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, 3);
+		ConvertULY0ToBottomupBGRx(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 3);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULY0ToBottomupBGRx(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, 4);
+		ConvertULY0ToBottomupBGRx(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 4);
 		break;
 	case UTVF_NFCC_BGR_TD:
-		ConvertULY0ToTopdownBGRx(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, 3);
+		ConvertULY0ToTopdownBGRx(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 3);
 		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertULY0ToTopdownBGRx(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, 4);
+		ConvertULY0ToTopdownBGRx(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 4);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertULY0ToTopdownxRGB(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, 3);
+		ConvertULY0ToTopdownxRGB(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 3);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULY0ToTopdownxRGB(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, 4);
+		ConvertULY0ToTopdownxRGB(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace, 4);
 		break;
 	}
 }
