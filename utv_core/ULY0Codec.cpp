@@ -84,17 +84,18 @@ void ConvertRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBe
 	ssize_t scbPredictStride = scbStride * (bInterlace ? 2 : 1);
 	ssize_t scbRawStripeSize = scbStride * 2 * (bInterlace ? 2 : 1);
 
-	for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin != pSrcEnd; pStripeBegin += scbRawStripeSize) {
+	for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin != pSrcEnd; pStripeBegin += scbRawStripeSize)
+	{
 		for (const uint8_t *pStrideBegin = pStripeBegin; pStrideBegin != pStripeBegin + scbPredictStride; pStrideBegin += scbStride)
 		{
 			const uint8_t *pStrideEnd = pStrideBegin + cbWidth;
-			for (const uint8_t *q = pStrideBegin; q < pStrideEnd; q += T::BYPP * 2)
+			for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += T::BYPP * 2)
 			{
-				const uint8_t *p = q + scbPredictStride;
-				*(y+0)                    = min(max(int((*(q        +T::B))*0.098 + (*(q        +T::G))*0.504 + (*(q        +T::R))*0.257 + 16.5), 16), 235);
-				*(y+1)                    = min(max(int((*(q+T::BYPP+T::B))*0.098 + (*(q+T::BYPP+T::G))*0.504 + (*(q+T::BYPP+T::R))*0.257 + 16.5), 16), 235);
-				*(y+dwYPlaneGrossWidth+0) = min(max(int((*(p        +T::B))*0.098 + (*(p        +T::G))*0.504 + (*(p        +T::R))*0.257 + 16.5), 16), 235);
-				*(y+dwYPlaneGrossWidth+1) = min(max(int((*(p+T::BYPP+T::B))*0.098 + (*(p+T::BYPP+T::G))*0.504 + (*(p+T::BYPP+T::R))*0.257 + 16.5), 16), 235);
+				const uint8_t *q = p + scbPredictStride;
+				*(y+0)                    = min(max(int((*(p        +T::B))*0.098 + (*(p        +T::G))*0.504 + (*(p        +T::R))*0.257 + 16.5), 16), 235);
+				*(y+1)                    = min(max(int((*(p+T::BYPP+T::B))*0.098 + (*(p+T::BYPP+T::G))*0.504 + (*(p+T::BYPP+T::R))*0.257 + 16.5), 16), 235);
+				*(y+dwYPlaneGrossWidth+0) = min(max(int((*(q        +T::B))*0.098 + (*(q        +T::G))*0.504 + (*(q        +T::R))*0.257 + 16.5), 16), 235);
+				*(y+dwYPlaneGrossWidth+1) = min(max(int((*(q+T::BYPP+T::B))*0.098 + (*(q+T::BYPP+T::G))*0.504 + (*(q+T::BYPP+T::R))*0.257 + 16.5), 16), 235);
 				*u                        = min(max(int(((*(p+T::B)+*(p+T::BYPP+T::B)+*(q+T::B)+*(q+T::BYPP+T::B))* 0.439 + (*(p+T::G)+*(p+T::BYPP+T::G)+*(q+T::G)+*(q+T::BYPP+T::G))*-0.291 + (*(p+T::R)+*(p+T::BYPP+T::R)+*(q+T::R)+*(q+T::BYPP+T::R))*-0.148)/4 + 128.5), 16), 240);
 				*v                        = min(max(int(((*(p+T::B)+*(p+T::BYPP+T::B)+*(q+T::B)+*(q+T::BYPP+T::B))*-0.071 + (*(p+T::G)+*(p+T::BYPP+T::G)+*(q+T::G)+*(q+T::BYPP+T::G))*-0.368 + (*(p+T::R)+*(p+T::BYPP+T::R)+*(q+T::R)+*(q+T::BYPP+T::R))* 0.439)/4 + 128.5), 16), 240);
 				y+=2; u++; v++;
@@ -105,28 +106,32 @@ void ConvertRGBToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBe
 }
 
 template<class T>
-void ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwRawNetWidth, size_t dwYPlaneGrossWidth, bool bInterlace)
+void ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDstVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace)
 {
 	uint8_t *y = pDstYBegin;
 	uint8_t *u = pDstUBegin;
 	uint8_t *v = pDstVBegin;
 
-	size_t dwRawStripeSize = dwRawNetWidth * 2 * (bInterlace ? 2 : 1);
+	ssize_t scbPredictStride = scbStride * (bInterlace ? 2 : 1);
+	ssize_t scbRawStripeSize = scbStride * 2 * (bInterlace ? 2 : 1);
 
-	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin < pSrcEnd; pStrideBegin += dwRawStripeSize)
+	for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin != pSrcEnd; pStripeBegin += scbRawStripeSize)
 	{
-		const uint8_t *pStrideEnd = pStrideBegin + dwRawStripeSize / 2;
-		for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += 4)
+		for (const uint8_t *pStrideBegin = pStripeBegin; pStrideBegin != pStripeBegin + scbPredictStride; pStrideBegin += scbStride)
 		{
-			const uint8_t *q = p + dwRawStripeSize / 2;
-			*(y+0)                    = *(p+T::Y0);
-			*(y+1)                    = *(p+T::Y1);
-			*(y+dwYPlaneGrossWidth+0) = *(q+T::Y0);
-			*(y+dwYPlaneGrossWidth+1) = *(q+T::Y1);
-			*u                        = (*(p+T::U) + *(q+T::U)) / 2;
-			*v                        = (*(p+T::V) + *(q+T::V)) / 2;
+			const uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+			for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += 4)
+			{
+				const uint8_t *q = p + scbPredictStride;
+				*(y+0)                    = *(p+T::Y0);
+				*(y+1)                    = *(p+T::Y1);
+				*(y+dwYPlaneGrossWidth+0) = *(q+T::Y0);
+				*(y+dwYPlaneGrossWidth+1) = *(q+T::Y1);
+				*u                        = (*(p+T::U) + *(q+T::U)) / 2;
+				*v                        = (*(p+T::V) + *(q+T::V)) / 2;
 
-			y+=2; u++; v++;
+				y+=2; u++; v++;
+			}
 		}
 		y += dwYPlaneGrossWidth;
 	}
@@ -167,11 +172,11 @@ void CULY0Codec::ConvertToPlanar(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		ConvertYUV422ToULY0<CYUYVColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertYUV422ToULY0<CYUYVColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
-		ConvertYUV422ToULY0<CUYVYColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertYUV422ToULY0<CUYVYColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGR_BU:
 		ConvertRGBToULY0<CBGRColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_dwRawGrossWidth, pSrcBegin - m_dwRawGrossWidth, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
@@ -204,35 +209,36 @@ void ConvertULY0ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcY
 	ssize_t scbPredictStride = scbStride * (bInterlace ? 2 : 1);
 	ssize_t scbRawStripeSize = scbStride * 2 * (bInterlace ? 2 : 1);
 
-	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; pStripeBegin += scbRawStripeSize) {
+	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; pStripeBegin += scbRawStripeSize)
+	{
 		for (uint8_t *pStrideBegin = pStripeBegin; pStrideBegin != pStripeBegin + scbPredictStride; pStrideBegin += scbStride)
 		{
 			uint8_t *pStrideEnd = pStrideBegin + cbWidth;
-			for (uint8_t *q = pStrideBegin; q < pStrideEnd; q += T::BYPP * 2)
+			for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += T::BYPP * 2)
 			{
-				uint8_t *p = q + scbPredictStride;
-				*(q+T::G) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-				*(q+T::B) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-				*(q+T::R) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-				*(p+T::G) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-				*(p+T::B) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-				*(p+T::R) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				uint8_t *q = p + scbPredictStride;
+				*(p+T::G) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+T::B) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+T::R) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(q+T::G) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(q+T::B) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(q+T::R) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164                  + (*v-128)*1.596), 0), 255);
 				if (T::BYPP == 4)
 				{
-					*(q+T::A) = 255;
 					*(p+T::A) = 255;
+					*(q+T::A) = 255;
 				}
 				y++;
-				*(q+T::BYPP+T::G) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-				*(q+T::BYPP+T::B) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-				*(q+T::BYPP+T::R) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
-				*(p+T::BYPP+T::G) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-				*(p+T::BYPP+T::B) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-				*(p+T::BYPP+T::R) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(p+T::BYPP+T::G) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(p+T::BYPP+T::B) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(p+T::BYPP+T::R) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+				*(q+T::BYPP+T::G) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
+				*(q+T::BYPP+T::B) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
+				*(q+T::BYPP+T::R) = min(max(int((*(y+dwYPlaneGrossWidth)-16)*1.164                  + (*v-128)*1.596), 0), 255);
 				if (T::BYPP == 4)
 				{
-					*(q+T::BYPP+T::A) = 255;
 					*(p+T::BYPP+T::A) = 255;
+					*(q+T::BYPP+T::A) = 255;
 				}
 				y++; u++; v++;
 			}
@@ -242,30 +248,34 @@ void ConvertULY0ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcY
 }
 
 template<class T>
-void ConvertULY0ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, size_t dwRawNetWidth, size_t dwYPlaneGrossWidth, bool bInterlace)
+void ConvertULY0ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcYBegin, const uint8_t *pSrcUBegin, const uint8_t *pSrcVBegin, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace)
 {
 	const uint8_t *y = pSrcYBegin;
 	const uint8_t *u = pSrcUBegin;
 	const uint8_t *v = pSrcVBegin;
 
-	size_t dwRawStripeSize = dwRawNetWidth * 2 * (bInterlace ? 2 : 1);
+	ssize_t scbPredictStride = scbStride * (bInterlace ? 2 : 1);
+	ssize_t scbRawStripeSize = scbStride * 2 * (bInterlace ? 2 : 1);
 
-	for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin < pDstEnd; pStrideBegin += dwRawStripeSize)
+	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; pStripeBegin += scbRawStripeSize)
 	{
-		uint8_t *pStrideEnd = pStrideBegin + dwRawStripeSize / 2;
-		for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += 4)
+		for (uint8_t *pStrideBegin = pStripeBegin; pStrideBegin != pStripeBegin + scbPredictStride; pStrideBegin += scbStride)
 		{
-			uint8_t *q = p + dwRawStripeSize / 2;
-			*(p+T::Y0) = *(y+0);
-			*(p+T::Y1) = *(y+1);
-			*(q+T::Y0) = *(y+dwYPlaneGrossWidth+0);
-			*(q+T::Y1) = *(y+dwYPlaneGrossWidth+1);
-			*(p+T::U)  = *u;
-			*(q+T::U)  = *u;
-			*(p+T::V)  = *v;
-			*(q+T::V)  = *v;
+			uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+			for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += 4)
+			{
+				uint8_t *q = p + scbPredictStride;
+				*(p+T::Y0) = *(y+0);
+				*(p+T::Y1) = *(y+1);
+				*(q+T::Y0) = *(y+dwYPlaneGrossWidth+0);
+				*(q+T::Y1) = *(y+dwYPlaneGrossWidth+1);
+				*(p+T::U)  = *u;
+				*(q+T::U)  = *u;
+				*(p+T::V)  = *v;
+				*(q+T::V)  = *v;
 
-			y+=2; u++; v++;
+				y+=2; u++; v++;
+			}
 		}
 		y += dwYPlaneGrossWidth;
 	}
@@ -306,11 +316,11 @@ void CULY0Codec::ConvertFromPlanar(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		ConvertULY0ToYUV422<CYUYVColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertULY0ToYUV422<CYUYVColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
-		ConvertULY0ToYUV422<CUYVYColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertULY0ToYUV422<CUYVYColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGR_BU:
 		ConvertULY0ToRGB<CBGRColorOrder>(pDstEnd - m_dwRawGrossWidth, pDstBegin - m_dwRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
