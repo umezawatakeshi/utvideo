@@ -55,18 +55,65 @@
 #define COEFF_V2G8(Kr, Kb) COEFF_C2RGB8(2.0 * (1.0 - Kr) * Kr / (1.0 - Kr - Kb))
 
 
-#define SR2Y8 COEFF_R2Y8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SG2Y8 COEFF_G2Y8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SB2Y8 COEFF_B2Y8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SR2U8 COEFF_R2U8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SG2U8 COEFF_G2U8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SB2U8 COEFF_B2U8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SR2V8 COEFF_R2V8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SG2V8 COEFF_G2V8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SB2V8 COEFF_B2V8(COEFF_BT601_KR, COEFF_BT601_KB)
+class CBT601Coefficient
+{
+public:
+	/*
+	 * Visual C++ (2005-2012) では、以下の宣言は
+	 * 「スタティック const 整数データ メンバ以外をクラス内で初期化することはできません」
+	 * というエラーになる。
+	 * 次善の策として定数関数として定義する。
+	 */
+	//static const float R2Y = COEFF_R2Y8(COEFF_BT601_KR, COEFF_BT601_KB);
+	static inline float R2Y(void)   { return (float)COEFF_R2Y8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float G2Y(void)   { return (float)COEFF_G2Y8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float B2Y(void)   { return (float)COEFF_B2Y8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float R2U(void)   { return (float)COEFF_R2U8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float G2U(void)   { return (float)COEFF_G2U8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float B2U(void)   { return (float)COEFF_B2U8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float R2V(void)   { return (float)COEFF_R2V8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float G2V(void)   { return (float)COEFF_G2V8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float B2V(void)   { return (float)COEFF_B2V8(COEFF_BT601_KR, COEFF_BT601_KB); }
 
-#define SY2RGB8 COEFF_Y2RGB8
-#define SU2B8   COEFF_U2B8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SV2R8   COEFF_V2R8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SU2G8   COEFF_U2G8(COEFF_BT601_KR, COEFF_BT601_KB)
-#define SV2G8   COEFF_V2G8(COEFF_BT601_KR, COEFF_BT601_KB)
+	static inline float Y2RGB(void) { return (float)COEFF_Y2RGB8; }
+	static inline float U2B(void)   { return (float)COEFF_U2B8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float V2R(void)   { return (float)COEFF_V2R8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float U2G(void)   { return (float)COEFF_U2G8(COEFF_BT601_KR, COEFF_BT601_KB); }
+	static inline float V2G(void)   { return (float)COEFF_V2G8(COEFF_BT601_KR, COEFF_BT601_KB); }
+};
+
+class CBT709Coefficient
+{
+public:
+	static inline float R2Y(void)   { return (float)COEFF_R2Y8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float G2Y(void)   { return (float)COEFF_G2Y8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float B2Y(void)   { return (float)COEFF_B2Y8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float R2U(void)   { return (float)COEFF_R2U8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float G2U(void)   { return (float)COEFF_G2U8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float B2U(void)   { return (float)COEFF_B2U8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float R2V(void)   { return (float)COEFF_R2V8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float G2V(void)   { return (float)COEFF_G2V8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float B2V(void)   { return (float)COEFF_B2V8(COEFF_BT709_KR, COEFF_BT709_KB); }
+
+	static inline float Y2RGB(void) { return (float)COEFF_Y2RGB8; }
+	static inline float U2B(void)   { return (float)COEFF_U2B8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float V2R(void)   { return (float)COEFF_V2R8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float U2G(void)   { return (float)COEFF_U2G8(COEFF_BT709_KR, COEFF_BT709_KB); }
+	static inline float V2G(void)   { return (float)COEFF_V2G8(COEFF_BT709_KR, COEFF_BT709_KB); }
+};
+
+
+#define R2Y   R2Y()
+#define G2Y   G2Y()
+#define B2Y   B2Y()
+#define R2U   R2U()
+#define G2U   G2U()
+#define B2U   B2U()
+#define R2V   R2V()
+#define G2V   G2V()
+#define B2V   B2V()
+#define Y2RGB Y2RGB()
+#define U2B   U2B()
+#define V2R   V2R()
+#define U2G   U2G()
+#define V2G   V2G()
