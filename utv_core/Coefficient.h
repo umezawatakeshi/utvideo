@@ -41,18 +41,18 @@
 #define COEFF_G2Y8(Kr, Kb) COEFF_RGB2Y8(1.0 - Kr - Kb)
 #define COEFF_B2Y8(Kr, Kb) COEFF_RGB2Y8(Kb)
 
-#define COEFF_R2U8(Kr, Kb) COEFF_RGB2C8(-Kr / (1.0 - Kb) / 2)
-#define COEFF_G2U8(Kr, Kb) COEFF_RGB2C8((Kr + Kb - 1.0) / (1.0 - Kb) / 2.0)
+#define COEFF_R2U8(Kr, Kb) COEFF_RGB2C8(-Kr              / (1.0 - Kb) / 2.0)
+#define COEFF_G2U8(Kr, Kb) COEFF_RGB2C8(-(1.0 - Kr - Kb) / (1.0 - Kb) / 2.0)
 #define COEFF_B2U8(Kr, Kb) COEFF_RGB2C8(0.5)
 
 #define COEFF_R2V8(Kr, Kb) COEFF_RGB2C8(0.5)
-#define COEFF_G2V8(Kr, Kb) COEFF_RGB2C8((Kr + Kb - 1.0) / (1.0 - Kr) / 2.0)
-#define COEFF_B2V8(Kr, Kb) COEFF_RGB2C8(-Kb / (1.0 - Kr) / 2.0)
+#define COEFF_G2V8(Kr, Kb) COEFF_RGB2C8(-(1.0 - Kr - Kb) / (1.0 - Kr) / 2.0)
+#define COEFF_B2V8(Kr, Kb) COEFF_RGB2C8(-Kb              / (1.0 - Kr) / 2.0)
 
-#define COEFF_U2B8(Kr, Kb) COEFF_C2RGB8(2.0 * (1.0 - Kb))
-#define COEFF_V2R8(Kr, Kb) COEFF_C2RGB8(2.0 * (1.0 - Kr))
-#define COEFF_U2G8(Kr, Kb) COEFF_C2RGB8(2.0 * (1.0 - Kb) * Kb / (1.0 - Kr - Kb))
-#define COEFF_V2G8(Kr, Kb) COEFF_C2RGB8(2.0 * (1.0 - Kr) * Kr / (1.0 - Kr - Kb))
+#define COEFF_U2B8(Kr, Kb) COEFF_C2RGB8( 2.0 * (1.0 - Kb))
+#define COEFF_V2R8(Kr, Kb) COEFF_C2RGB8( 2.0 * (1.0 - Kr))
+#define COEFF_U2G8(Kr, Kb) COEFF_C2RGB8(-2.0 * (1.0 - Kb) * Kb / (1.0 - Kr - Kb))
+#define COEFF_V2G8(Kr, Kb) COEFF_C2RGB8(-2.0 * (1.0 - Kr) * Kr / (1.0 - Kr - Kb))
 
 
 class CBT601Coefficient
