@@ -6,6 +6,7 @@
 #include "ULY2Codec.h"
 #include "Predict.h"
 #include "Convert.h"
+#include "TunedFunc.h"
 
 const utvf_t CULY2Codec::m_utvfEncoderInput[] = {
 #ifndef __APPLE__

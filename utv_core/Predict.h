@@ -3,13 +3,7 @@
 
 #pragma once
 
-#include "TunedFunc.h"
-
-// intra-frame prediction
 void PredictWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
-#define PredictLeftAndCount tfn.pfnPredictLeftAndCount_align1
-//void RestoreWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
-#define RestoreWrongMedian tfn.pfnRestoreWrongMedian_align1
 
 void cpp_PredictWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
 void cpp_PredictLeftAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);

@@ -6,6 +6,7 @@
 #include "utv_core.h"
 #include "UL00Codec.h"
 #include "Predict.h"
+#include "TunedFunc.h"
 #include "resource.h"
 
 CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : m_pszTinyName(pszTinyName), m_pszInterfaceName(pszInterfaceName)

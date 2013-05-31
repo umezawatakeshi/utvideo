@@ -2,7 +2,6 @@
 /* $Id$ */
 
 #pragma once
-#include "TunedFunc.h"
 
 #if defined(__x86_64__)
 typedef uint64_t uintenc_t;
@@ -42,23 +41,6 @@ struct HUFFMAN_DECODE_TABLE
 void GenerateHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, const uint32_t *pCountTable);
 void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const uint8_t *pCodeLengthTable);
 void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_t *pCodeLengthTable);
-
-#define HuffmanEncode tfn.pfnHuffmanEncode
-#define HuffmanDecode tfn.pfnHuffmanDecode
-#define HuffmanDecodeAndAccum tfn.pfnHuffmanDecodeAndAccum
-#define HuffmanDecodeAndAccumStep2 tfn.pfnHuffmanDecodeAndAccumStep2
-#define HuffmanDecodeAndAccumStep3 tfn.pfnHuffmanDecodeAndAccumStep3
-#define HuffmanDecodeAndAccumStep4 tfn.pfnHuffmanDecodeAndAccumStep4
-#define HuffmanDecodeAndAccumStep3ForBGRBlue tfn.pfnHuffmanDecodeAndAccumStep3ForBGRBlue
-#define HuffmanDecodeAndAccumStep3ForBGRRed tfn.pfnHuffmanDecodeAndAccumStep3ForBGRRed
-#define HuffmanDecodeAndAccumStep4ForBGRXBlue tfn.pfnHuffmanDecodeAndAccumStep4ForBGRXBlue
-#define HuffmanDecodeAndAccumStep4ForBGRXRed tfn.pfnHuffmanDecodeAndAccumStep4ForBGRXRed
-#define HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha tfn.pfnHuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha
-#define HuffmanDecodeAndAccumStep3ForRGBBlue HuffmanDecodeAndAccumStep3ForBGRRed
-#define HuffmanDecodeAndAccumStep3ForRGBRed HuffmanDecodeAndAccumStep3ForBGRBlue
-#define HuffmanDecodeAndAccumStep4ForXRGBBlue HuffmanDecodeAndAccumStep4ForBGRXRed
-#define HuffmanDecodeAndAccumStep4ForXRGBRed HuffmanDecodeAndAccumStep4ForBGRXBlue
-#define HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha tfn.pfnHuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha
 
 size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
 void cpp_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);

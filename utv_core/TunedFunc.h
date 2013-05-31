@@ -52,3 +52,51 @@ struct TUNEDFUNC
 #define DummyTunedFunc ((void (*)(TUNEDFUNC *))NULL)
 
 extern TUNEDFUNC tfn;
+
+
+#define PredictWrongMedianAndCount_align16 tfn.pfnPredictWrongMedianAndCount_align16
+#define PredictWrongMedianAndCount_align1 tfn.pfnPredictWrongMedianAndCount_align1
+#define PredictLeftAndCount tfn.pfnPredictLeftAndCount_align1
+#define RestoreWrongMedian tfn.pfnRestoreWrongMedian_align1
+
+#define HuffmanEncode tfn.pfnHuffmanEncode
+#define HuffmanDecode tfn.pfnHuffmanDecode
+#define HuffmanDecodeAndAccum tfn.pfnHuffmanDecodeAndAccum
+#define HuffmanDecodeAndAccumStep2 tfn.pfnHuffmanDecodeAndAccumStep2
+#define HuffmanDecodeAndAccumStep3 tfn.pfnHuffmanDecodeAndAccumStep3
+#define HuffmanDecodeAndAccumStep4 tfn.pfnHuffmanDecodeAndAccumStep4
+#define HuffmanDecodeAndAccumStep3ForBGRBlue tfn.pfnHuffmanDecodeAndAccumStep3ForBGRBlue
+#define HuffmanDecodeAndAccumStep3ForBGRRed tfn.pfnHuffmanDecodeAndAccumStep3ForBGRRed
+#define HuffmanDecodeAndAccumStep4ForBGRXBlue tfn.pfnHuffmanDecodeAndAccumStep4ForBGRXBlue
+#define HuffmanDecodeAndAccumStep4ForBGRXRed tfn.pfnHuffmanDecodeAndAccumStep4ForBGRXRed
+#define HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha tfn.pfnHuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha
+#define HuffmanDecodeAndAccumStep3ForRGBBlue HuffmanDecodeAndAccumStep3ForBGRRed
+#define HuffmanDecodeAndAccumStep3ForRGBRed HuffmanDecodeAndAccumStep3ForBGRBlue
+#define HuffmanDecodeAndAccumStep4ForXRGBBlue HuffmanDecodeAndAccumStep4ForBGRXRed
+#define HuffmanDecodeAndAccumStep4ForXRGBRed HuffmanDecodeAndAccumStep4ForBGRXBlue
+#define HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha tfn.pfnHuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha
+
+#define ConvertULY2ToBGR tfn.pfnConvertULY2ToBGR
+#define ConvertULY2ToBGRX tfn.pfnConvertULY2ToBGRX
+#define ConvertULY2ToRGB tfn.pfnConvertULY2ToRGB
+#define ConvertULY2ToXRGB tfn.pfnConvertULY2ToXRGB
+#define ConvertBGRToULY2 tfn.pfnConvertBGRToULY2
+#define ConvertBGRXToULY2 tfn.pfnConvertBGRXToULY2
+#define ConvertRGBToULY2 tfn.pfnConvertRGBToULY2
+#define ConvertXRGBToULY2 tfn.pfnConvertXRGBToULY2
+#define ConvertBGRToULRG tfn.pfnConvertBGRToULRG
+#define ConvertRGBToULRG(g, b, r, p, q, w, s) ConvertBGRToULRG(g, r, b, p, q, w, s)
+#define ConvertBGRXToULRG tfn.pfnConvertBGRXToULRG
+#define ConvertXRGBToULRG tfn.pfnConvertXRGBToULRG
+#define ConvertBGRAToULRA tfn.pfnConvertBGRAToULRA
+#define ConvertARGBToULRA tfn.pfnConvertARGBToULRA
+#define ConvertYUYVToULY2 tfn.pfnConvertYUYVToULY2
+#define ConvertUYVYToULY2 tfn.pfnConvertUYVYToULY2
+#define ConvertULRGToBGR tfn.pfnConvertULRGToBGR
+#define ConvertULRGToRGB(p, q, g, b, r, w, s) ConvertULRGToBGR(p, q, g, r, b, w, s)
+#define ConvertULRGToBGRX tfn.pfnConvertULRGToBGRX
+#define ConvertULRGToXRGB tfn.pfnConvertULRGToXRGB
+#define ConvertULRAToBGRA tfn.pfnConvertULRAToBGRA
+#define ConvertULRAToARGB tfn.pfnConvertULRAToARGB
+#define ConvertULY2ToYUYV tfn.pfnConvertULY2ToYUYV
+#define ConvertULY2ToUYVY tfn.pfnConvertULY2ToUYVY

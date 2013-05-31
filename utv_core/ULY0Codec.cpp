@@ -5,6 +5,7 @@
 #include "utvideo.h"
 #include "ULY0Codec.h"
 #include "Predict.h"
+#include "TunedFunc.h"
 #include "ColorOrder.h"
 
 const utvf_t CULY0Codec::m_utvfEncoderInput[] = {

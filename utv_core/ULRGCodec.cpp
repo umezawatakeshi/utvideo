@@ -6,6 +6,7 @@
 #include "ULRGCodec.h"
 #include "Predict.h"
 #include "Convert.h"
+#include "TunedFunc.h"
 
 const utvf_t CULRGCodec::m_utvfEncoderInput[] = {
 	UTVF_NFCC_BGR_BU,
