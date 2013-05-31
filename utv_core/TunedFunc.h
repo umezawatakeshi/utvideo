@@ -6,6 +6,18 @@
 struct HUFFMAN_ENCODE_TABLE;
 struct HUFFMAN_DECODE_TABLE;
 
+struct TUNEDFUNC_YUV
+{
+	void (*pfnConvertULY2ToBGR)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertULY2ToBGRX)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertULY2ToRGB)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertULY2ToXRGB)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertBGRToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertBGRXToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertRGBToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertXRGBToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+};
+
 struct TUNEDFUNC
 {
 	void (*pfnPredictWrongMedianAndCount_align16)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
@@ -24,14 +36,8 @@ struct TUNEDFUNC
 	void (*pfnHuffmanDecodeAndAccumStep4ForBGRXRed)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 	void (*pfnHuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 	void (*pfnHuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnConvertULY2ToBGR)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
-	void (*pfnConvertULY2ToBGRX)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
-	void (*pfnConvertULY2ToRGB)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
-	void (*pfnConvertULY2ToXRGB)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
-	void (*pfnConvertBGRToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
-	void (*pfnConvertBGRXToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
-	void (*pfnConvertRGBToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
-	void (*pfnConvertXRGBToULY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	TUNEDFUNC_YUV bt601;
+	TUNEDFUNC_YUV bt709;
 	void (*pfnConvertBGRToULRG)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertBGRXToULRG)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertXRGBToULRG)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
@@ -76,14 +82,15 @@ extern TUNEDFUNC tfn;
 #define HuffmanDecodeAndAccumStep4ForXRGBRed HuffmanDecodeAndAccumStep4ForBGRXBlue
 #define HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha tfn.pfnHuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha
 
-#define ConvertULY2ToBGR tfn.pfnConvertULY2ToBGR
-#define ConvertULY2ToBGRX tfn.pfnConvertULY2ToBGRX
-#define ConvertULY2ToRGB tfn.pfnConvertULY2ToRGB
-#define ConvertULY2ToXRGB tfn.pfnConvertULY2ToXRGB
-#define ConvertBGRToULY2 tfn.pfnConvertBGRToULY2
-#define ConvertBGRXToULY2 tfn.pfnConvertBGRXToULY2
-#define ConvertRGBToULY2 tfn.pfnConvertRGBToULY2
-#define ConvertXRGBToULY2 tfn.pfnConvertXRGBToULY2
+#define ConvertULY2ToBGR tfn.bt601.pfnConvertULY2ToBGR
+#define ConvertULY2ToBGRX tfn.bt601.pfnConvertULY2ToBGRX
+#define ConvertULY2ToRGB tfn.bt601.pfnConvertULY2ToRGB
+#define ConvertULY2ToXRGB tfn.bt601.pfnConvertULY2ToXRGB
+#define ConvertBGRToULY2 tfn.bt601.pfnConvertBGRToULY2
+#define ConvertBGRXToULY2 tfn.bt601.pfnConvertBGRXToULY2
+#define ConvertRGBToULY2 tfn.bt601.pfnConvertRGBToULY2
+#define ConvertXRGBToULY2 tfn.bt601.pfnConvertXRGBToULY2
+
 #define ConvertBGRToULRG tfn.pfnConvertBGRToULRG
 #define ConvertRGBToULRG(g, b, r, p, q, w, s) ConvertBGRToULRG(g, r, b, p, q, w, s)
 #define ConvertBGRXToULRG tfn.pfnConvertBGRXToULRG

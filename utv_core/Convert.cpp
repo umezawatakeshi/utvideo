@@ -5,8 +5,9 @@
 #include "utvideo.h"
 #include "Convert.h"
 #include "ColorOrder.h"
+#include "Coefficient.h"
 
-template<class T>
+template<class C, class T>
 void cpp_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
 {
 	const uint8_t *y = pYBegin;
@@ -19,15 +20,15 @@ void cpp_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *p
 		for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += T::BYPP * 2)
 		{
 			uint8_t *q = p + T::BYPP;
-			*(p+T::G) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-			*(p+T::B) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-			*(p+T::R) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+			*(p+T::G) = min(max(int((*y-16)*C::Y2RGB + (*u-128)*C::U2G + (*v-128)*C::V2G), 0), 255);
+			*(p+T::B) = min(max(int((*y-16)*C::Y2RGB + (*u-128)*C::U2B                  ), 0), 255);
+			*(p+T::R) = min(max(int((*y-16)*C::Y2RGB                   + (*v-128)*C::V2R), 0), 255);
 			if (T::BYPP == 4)
 				*(p+T::A) = 0xff;
 			y++;
-			*(q+T::G) = min(max(int((*y-16)*1.164 - (*u-128)*0.391 - (*v-128)*0.813), 0), 255);
-			*(q+T::B) = min(max(int((*y-16)*1.164 + (*u-128)*2.018                 ), 0), 255);
-			*(q+T::R) = min(max(int((*y-16)*1.164                  + (*v-128)*1.596), 0), 255);
+			*(q+T::G) = min(max(int((*y-16)*C::Y2RGB + (*u-128)*C::U2G + (*v-128)*C::V2G), 0), 255);
+			*(q+T::B) = min(max(int((*y-16)*C::Y2RGB + (*u-128)*C::U2B                  ), 0), 255);
+			*(q+T::R) = min(max(int((*y-16)*C::Y2RGB                   + (*v-128)*C::V2R), 0), 255);
 			if (T::BYPP == 4)
 				*(q+T::A) = 0xff;
 			y++; u++; v++;
@@ -35,14 +36,18 @@ void cpp_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *p
 	}
 }
 
-template void cpp_ConvertULY2ToRGB<CBGRColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
-template void cpp_ConvertULY2ToRGB<CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
-template void cpp_ConvertULY2ToRGB<CRGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
-template void cpp_ConvertULY2ToRGB<CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToRGB<CBT601Coefficient, CBGRColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToRGB<CBT601Coefficient, CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToRGB<CBT601Coefficient, CRGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToRGB<CBT601Coefficient, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToRGB<CBT709Coefficient, CBGRColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToRGB<CBT709Coefficient, CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToRGB<CBT709Coefficient, CRGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToRGB<CBT709Coefficient, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 
 //
 
-template<class T>
+template<class C, class T>
 void cpp_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
 	uint8_t *y = pYBegin;
@@ -55,19 +60,23 @@ void cpp_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, 
 		for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += T::BYPP * 2)
 		{
 			const uint8_t *q = p + T::BYPP;
-			*(y+0) = min(max(int((*(p+T::B))*0.098 + (*(p+T::G))*0.504 + (*(p+T::R))*0.257 + 16.5), 16), 235);
-			*(y+1) = min(max(int((*(q+T::B))*0.098 + (*(q+T::G))*0.504 + (*(q+T::R))*0.257 + 16.5), 16), 235);
-			*u     = min(max(int(((*(p+T::B)+*(q+T::B))* 0.439 + (*(p+T::G)+*(q+T::G))*-0.291 + (*(p+T::R)+*(q+T::R))*-0.148)/2 + 128.5), 16), 240);
-			*v     = min(max(int(((*(p+T::B)+*(q+T::B))*-0.071 + (*(p+T::G)+*(q+T::G))*-0.368 + (*(p+T::R)+*(q+T::R))* 0.439)/2 + 128.5), 16), 240);
+			*(y+0) = min(max(int((*(p+T::B))*C::B2Y + (*(p+T::G))*C::G2Y + (*(p+T::R))*C::R2Y + 16.5), 16), 235);
+			*(y+1) = min(max(int((*(q+T::B))*C::B2Y + (*(q+T::G))*C::G2Y + (*(q+T::R))*C::R2Y + 16.5), 16), 235);
+			*u     = min(max(int(((*(p+T::B)+*(q+T::B))*C::B2U + (*(p+T::G)+*(q+T::G))*C::G2U + (*(p+T::R)+*(q+T::R))*C::R2U)/2 + 128.5), 16), 240);
+			*v     = min(max(int(((*(p+T::B)+*(q+T::B))*C::B2V + (*(p+T::G)+*(q+T::G))*C::G2V + (*(p+T::R)+*(q+T::R))*C::R2V)/2 + 128.5), 16), 240);
 			y+=2; u++; v++;
 		}
 	}
 }
 
-template void cpp_ConvertRGBToULY2<CBGRColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
-template void cpp_ConvertRGBToULY2<CBGRAColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
-template void cpp_ConvertRGBToULY2<CRGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
-template void cpp_ConvertRGBToULY2<CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertRGBToULY2<CBT601Coefficient, CBGRColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertRGBToULY2<CBT601Coefficient, CBGRAColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertRGBToULY2<CBT601Coefficient, CRGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertRGBToULY2<CBT601Coefficient, CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertRGBToULY2<CBT709Coefficient, CBGRColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertRGBToULY2<CBT709Coefficient, CBGRAColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertRGBToULY2<CBT709Coefficient, CRGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertRGBToULY2<CBT709Coefficient, CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 
 //
 
