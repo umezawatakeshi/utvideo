@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "Coefficient.h"
+
 struct HUFFMAN_ENCODE_TABLE;
 struct HUFFMAN_DECODE_TABLE;
 
@@ -60,6 +62,21 @@ struct TUNEDFUNC
 extern TUNEDFUNC tfn;
 
 
+template<class C> class CYUVTunedFunc;
+
+template<> class CYUVTunedFunc<CBT601Coefficient>
+{
+public:
+	static TUNEDFUNC_YUV &tf() { return tfn.bt601; }
+};
+
+template<> class CYUVTunedFunc<CBT709Coefficient>
+{
+public:
+	static TUNEDFUNC_YUV &tf() { return tfn.bt709; }
+};
+
+
 #define PredictWrongMedianAndCount_align16 tfn.pfnPredictWrongMedianAndCount_align16
 #define PredictWrongMedianAndCount_align1 tfn.pfnPredictWrongMedianAndCount_align1
 #define PredictLeftAndCount tfn.pfnPredictLeftAndCount_align1
@@ -82,14 +99,14 @@ extern TUNEDFUNC tfn;
 #define HuffmanDecodeAndAccumStep4ForXRGBRed HuffmanDecodeAndAccumStep4ForBGRXBlue
 #define HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha tfn.pfnHuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha
 
-#define ConvertULY2ToBGR tfn.bt601.pfnConvertULY2ToBGR
-#define ConvertULY2ToBGRX tfn.bt601.pfnConvertULY2ToBGRX
-#define ConvertULY2ToRGB tfn.bt601.pfnConvertULY2ToRGB
-#define ConvertULY2ToXRGB tfn.bt601.pfnConvertULY2ToXRGB
-#define ConvertBGRToULY2 tfn.bt601.pfnConvertBGRToULY2
-#define ConvertBGRXToULY2 tfn.bt601.pfnConvertBGRXToULY2
-#define ConvertRGBToULY2 tfn.bt601.pfnConvertRGBToULY2
-#define ConvertXRGBToULY2 tfn.bt601.pfnConvertXRGBToULY2
+#define ConvertULY2ToBGR(C) CYUVTunedFunc<C>::tf().pfnConvertULY2ToBGR
+#define ConvertULY2ToBGRX(C) CYUVTunedFunc<C>::tf().pfnConvertULY2ToBGRX
+#define ConvertULY2ToRGB(C) CYUVTunedFunc<C>::tf().pfnConvertULY2ToRGB
+#define ConvertULY2ToXRGB(C) CYUVTunedFunc<C>::tf().pfnConvertULY2ToXRGB
+#define ConvertBGRToULY2(C) CYUVTunedFunc<C>::tf().pfnConvertBGRToULY2
+#define ConvertBGRXToULY2(C) CYUVTunedFunc<C>::tf().pfnConvertBGRXToULY2
+#define ConvertRGBToULY2(C) CYUVTunedFunc<C>::tf().pfnConvertRGBToULY2
+#define ConvertXRGBToULY2(C) CYUVTunedFunc<C>::tf().pfnConvertXRGBToULY2
 
 #define ConvertBGRToULRG tfn.pfnConvertBGRToULRG
 #define ConvertRGBToULRG(g, b, r, p, q, w, s) ConvertBGRToULRG(g, r, b, p, q, w, s)

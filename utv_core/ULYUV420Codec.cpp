@@ -8,7 +8,7 @@
 #include "TunedFunc.h"
 #include "ColorOrder.h"
 
-const utvf_t CULY0Codec::m_utvfEncoderInput[] = {
+const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfEncoderInput[] = {
 #ifndef __APPLE__
 	UTVF_YV12,
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
@@ -23,7 +23,7 @@ const utvf_t CULY0Codec::m_utvfEncoderInput[] = {
 	UTVF_INVALID,
 };
 
-const utvf_t CULY0Codec::m_utvfDecoderOutput[] = {
+const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfDecoderOutput[] = {
 #ifndef __APPLE__
 	UTVF_YV12,
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
@@ -38,16 +38,68 @@ const utvf_t CULY0Codec::m_utvfDecoderOutput[] = {
 	UTVF_INVALID,
 };
 
-const utvf_t CULY0Codec::m_utvfCompressed[] = {
+const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfCompressed[] = {
 	UTVF_ULY0,
 	UTVF_INVALID,
 };
 
-CULY0Codec::CULY0Codec(const char *pszInterfaceName) : CUL00Codec("ULY0", pszInterfaceName)
+const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfEncoderInput[] = {
+#ifndef __APPLE__
+	UTVF_YV12,
+	UTVF_HDYC,
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
+	UTVF_UYVY, UTVF_UYNV,
+#endif
+	UTVF_NFCC_BGR_BU,
+	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_BGR_TD,
+	UTVF_NFCC_BGRX_TD,
+	UTVF_NFCC_RGB_TD,
+	UTVF_NFCC_ARGB_TD,
+	UTVF_INVALID,
+};
+
+const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfDecoderOutput[] = {
+#ifndef __APPLE__
+	UTVF_YV12,
+	UTVF_HDYC,
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
+	UTVF_UYVY, UTVF_UYNV,
+#endif
+	UTVF_NFCC_BGR_BU,
+	UTVF_NFCC_BGRX_BU,
+	UTVF_NFCC_BGR_TD,
+	UTVF_NFCC_BGRX_TD,
+	UTVF_NFCC_RGB_TD,
+	UTVF_NFCC_ARGB_TD,
+	UTVF_INVALID,
+};
+
+const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfCompressed[] = {
+	UTVF_ULH0,
+	UTVF_INVALID,
+};
+
+CULYUV420Codec<CBT601Coefficient>::CULYUV420Codec(const char *pszInterfaceName) : CUL00Codec("ULY0", pszInterfaceName)
 {
 }
 
-void CULY0Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
+CULYUV420Codec<CBT709Coefficient>::CULYUV420Codec(const char *pszInterfaceName) : CUL00Codec("ULH0", pszInterfaceName)
+{
+}
+
+const char *CULYUV420Codec<CBT601Coefficient>::GetColorFormatName(void)
+{
+	return "YUV420 BT.601";
+}
+
+const char *CULYUV420Codec<CBT709Coefficient>::GetColorFormatName(void)
+{
+	return "YUV420 BT.709";
+}
+
+template<class C>
+void CULYUV420Codec<C>::CalcPlaneSizes(unsigned int width, unsigned int height)
 {
 	m_dwPlaneSize[0]          = width * height;
 	m_dwPlaneSize[1]          = width * height / 4;
@@ -129,7 +181,8 @@ void ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDst
 	}
 }
 
-void CULY0Codec::ConvertToPlanar(uint32_t nBandIndex)
+template<class C>
+void CULYUV420Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 {
 	uint8_t *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 	uint8_t *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
@@ -168,6 +221,7 @@ void CULY0Codec::ConvertToPlanar(uint32_t nBandIndex)
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
+	case UTVF_HDYC:
 		ConvertYUV422ToULY0<CUYVYColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGR_BU:
@@ -273,7 +327,8 @@ void ConvertULY0ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pS
 	}
 }
 
-void CULY0Codec::ConvertFromPlanar(uint32_t nBandIndex)
+template<class C>
+void CULYUV420Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 {
 	const uint8_t *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
 	const uint8_t *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
@@ -312,6 +367,7 @@ void CULY0Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
+	case UTVF_HDYC:
 		ConvertULY0ToYUV422<CUYVYColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGR_BU:
@@ -335,7 +391,8 @@ void CULY0Codec::ConvertFromPlanar(uint32_t nBandIndex)
 	}
 }
 
-bool CULY0Codec::DecodeDirect(uint32_t nBandIndex)
+template<class C>
+bool CULYUV420Codec<C>::DecodeDirect(uint32_t nBandIndex)
 {
 	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
 		return false;

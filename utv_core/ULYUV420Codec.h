@@ -9,20 +9,19 @@
 #include "HuffmanCode.h"
 #include "Coefficient.h"
 
-class CULY0Codec :
+template<class C>
+class CULYUV420Codec :
 	public CUL00Codec
 {
-	typedef CBT601Coefficient C;
-
 private:
 	static const utvf_t m_utvfEncoderInput[];
 	static const utvf_t m_utvfDecoderOutput[];
 	static const utvf_t m_utvfCompressed[];
 
 public:
-	CULY0Codec(const char *pszInterfaceName);
-	virtual ~CULY0Codec(void) {}
-	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CULY0Codec(pszInterfaceName); }
+	CULYUV420Codec(const char *pszInterfaceName);
+	virtual ~CULYUV420Codec(void) {}
+	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CULYUV420Codec(pszInterfaceName); }
 
 public:
 	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }
@@ -30,7 +29,7 @@ public:
 	virtual const utvf_t *GetCompressedFormat(void) { return m_utvfCompressed; }
 
 protected:
-	virtual const char *GetColorFormatName(void) { return "YUV420"; }
+	virtual const char *GetColorFormatName(void);
 	virtual int GetRealBitCount(void) { return 12; }
 	virtual int GetNumPlanes(void) { return 3; }
 	virtual int GetMacroPixelWidth(void) { return 2; }
@@ -41,3 +40,6 @@ protected:
 	virtual void ConvertFromPlanar(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 };
+
+typedef CULYUV420Codec<CBT601Coefficient> CULY0Codec;
+typedef CULYUV420Codec<CBT709Coefficient> CULH0Codec;

@@ -7,8 +7,10 @@
 #include "FrameBuffer.h"
 #include "Thread.h"
 #include "HuffmanCode.h"
+#include "Coefficient.h"
 
-class CULY2Codec :
+template<class C>
+class CULYUV422Codec :
 	public CUL00Codec
 {
 private:
@@ -17,9 +19,9 @@ private:
 	static const utvf_t m_utvfCompressed[];
 
 public:
-	CULY2Codec(const char *pszInterfaceName);
-	virtual ~CULY2Codec(void) {}
-	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CULY2Codec(pszInterfaceName); }
+	CULYUV422Codec(const char *pszInterfaceName);
+	virtual ~CULYUV422Codec(void) {}
+	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CULYUV422Codec(pszInterfaceName); }
 
 public:
 	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }
@@ -27,7 +29,7 @@ public:
 	virtual const utvf_t *GetCompressedFormat(void) { return m_utvfCompressed; }
 
 protected:
-	virtual const char *GetColorFormatName(void) { return "YUV422"; }
+	virtual const char *GetColorFormatName(void);
 	virtual int GetRealBitCount(void) { return 16; }
 	virtual int GetNumPlanes(void) { return 3; }
 	virtual int GetMacroPixelWidth(void) { return 2; }
@@ -38,3 +40,6 @@ protected:
 	virtual void ConvertFromPlanar(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 };
+
+typedef CULYUV422Codec<CBT601Coefficient> CULY2Codec;
+typedef CULYUV422Codec<CBT709Coefficient> CULH2Codec;
