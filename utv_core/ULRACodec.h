@@ -30,11 +30,11 @@ protected:
 	virtual const char *GetColorFormatName(void) { return "RGBA"; }
 	virtual int GetRealBitCount(void) { return 32; }
 	virtual int GetNumPlanes(void) { return 4; }
-	virtual void CalcPlaneSizes(unsigned int width, unsigned int height);
-	virtual void ConvertToPlanar(uint32_t nBandIndex);
 	virtual int GetMacroPixelWidth(void) { return 1; }
 	virtual int GetMacroPixelHeight(void) { return 1; }
 
+	virtual void CalcPlaneSizes(unsigned int width, unsigned int height);
+	virtual void ConvertToPlanar(uint32_t nBandIndex);
 	virtual void ConvertFromPlanar(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 };

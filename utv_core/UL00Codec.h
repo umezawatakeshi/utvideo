@@ -152,14 +152,15 @@ protected:
 	int InternalSetState(const void *pState, size_t cb);
 	int CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
+
 	virtual const char *GetColorFormatName(void) = 0;
 	virtual int GetRealBitCount(void) = 0;
 	virtual int GetNumPlanes(void) = 0;
-	virtual void CalcPlaneSizes(unsigned int width, unsigned int height) = 0;
-	virtual void ConvertToPlanar(uint32_t nBandIndex) = 0;
 	virtual int GetMacroPixelWidth(void) = 0;
 	virtual int GetMacroPixelHeight(void) = 0;
 
+	virtual void CalcPlaneSizes(unsigned int width, unsigned int height) = 0;
+	virtual void ConvertToPlanar(uint32_t nBandIndex) = 0;
 	virtual void ConvertFromPlanar(uint32_t nBandIndex) = 0;
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 
