@@ -37,15 +37,6 @@ CULRGCodec::CULRGCodec(const char *pszInterfaceName) : CUL00Codec("ULRG", pszInt
 {
 }
 
-CULRGCodec::~CULRGCodec(void)
-{
-}
-
-CCodec *CULRGCodec::CreateInstance(const char *pszInterfaceName)
-{
-	return new CULRGCodec(pszInterfaceName);
-}
-
 void CULRGCodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 {
 	m_dwPlaneSize[0]          = width * height;

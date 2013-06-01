@@ -33,15 +33,6 @@ CULRACodec::CULRACodec(const char *pszInterfaceName) : CUL00Codec("ULRA", pszInt
 {
 }
 
-CULRACodec::~CULRACodec(void)
-{
-}
-
-CCodec *CULRACodec::CreateInstance(const char *pszInterfaceName)
-{
-	return new CULRACodec(pszInterfaceName);
-}
-
 void CULRACodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 {
 	m_dwPlaneSize[0]          = width * height;

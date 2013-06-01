@@ -18,8 +18,8 @@ private:
 
 public:
 	CULRACodec(const char *pszInterfaceName);
-	virtual ~CULRACodec(void);
-	static CCodec *CreateInstance(const char *pszInterfaceName);
+	virtual ~CULRACodec(void) {}
+	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CULRACodec(pszInterfaceName); }
 
 public:
 	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }

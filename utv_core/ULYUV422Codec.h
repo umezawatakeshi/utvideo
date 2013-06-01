@@ -18,8 +18,8 @@ private:
 
 public:
 	CULY2Codec(const char *pszInterfaceName);
-	virtual ~CULY2Codec(void);
-	static CCodec *CreateInstance(const char *pszInterfaceName);
+	virtual ~CULY2Codec(void) {}
+	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CULY2Codec(pszInterfaceName); }
 
 public:
 	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }

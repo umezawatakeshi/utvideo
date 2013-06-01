@@ -110,7 +110,7 @@ protected:
 
 public:
 	CUL00Codec(const char *pszTinyName, const char *pszInterfaceName);
-	virtual ~CUL00Codec(void);
+	virtual ~CUL00Codec(void) {}
 
 public:
 	virtual const char *GetTinyName(void);

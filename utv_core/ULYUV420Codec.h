@@ -21,8 +21,8 @@ private:
 
 public:
 	CULY0Codec(const char *pszInterfaceName);
-	virtual ~CULY0Codec(void);
-	static CCodec *CreateInstance(const char *pszInterfaceName);
+	virtual ~CULY0Codec(void) {}
+	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CULY0Codec(pszInterfaceName); }
 
 public:
 	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }

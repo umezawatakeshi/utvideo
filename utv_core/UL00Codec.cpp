@@ -17,10 +17,6 @@ CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : 
 	LoadConfig();
 }
 
-CUL00Codec::~CUL00Codec(void)
-{
-}
-
 const char *CUL00Codec::GetTinyName(void)
 {
 	return m_pszTinyName;

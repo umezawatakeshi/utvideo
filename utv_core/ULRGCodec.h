@@ -18,8 +18,8 @@ private:
 
 public:
 	CULRGCodec(const char *pszInterfaceName);
-	virtual ~CULRGCodec(void);
-	static CCodec *CreateInstance(const char *pszInterfaceName);
+	virtual ~CULRGCodec(void) {}
+	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CULRGCodec(pszInterfaceName); }
 
 public:
 	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }

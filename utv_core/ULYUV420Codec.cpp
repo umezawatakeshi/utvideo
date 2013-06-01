@@ -47,15 +47,6 @@ CULY0Codec::CULY0Codec(const char *pszInterfaceName) : CUL00Codec("ULY0", pszInt
 {
 }
 
-CULY0Codec::~CULY0Codec(void)
-{
-}
-
-CCodec *CULY0Codec::CreateInstance(const char *pszInterfaceName)
-{
-	return new CULY0Codec(pszInterfaceName);
-}
-
 void CULY0Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 {
 	m_dwPlaneSize[0]          = width * height;
