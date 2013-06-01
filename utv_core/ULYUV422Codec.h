@@ -40,6 +40,3 @@ protected:
 	virtual void ConvertFromPlanar(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 };
-
-typedef CULYUV422Codec<CBT601Coefficient> CULY2Codec;
-typedef CULYUV422Codec<CBT709Coefficient> CULH2Codec;
