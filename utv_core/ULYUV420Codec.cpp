@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "utvideo.h"
-#include "ULY0Codec.h"
+#include "ULYUV420Codec.h"
 #include "Predict.h"
 #include "TunedFunc.h"
 #include "ColorOrder.h"

@@ -7,8 +7,8 @@
 #include "DummyCodec.h"
 #include "ULRACodec.h"
 #include "ULRGCodec.h"
-#include "ULY0Codec.h"
-#include "ULY2Codec.h"
+#include "ULYUV420Codec.h"
+#include "ULYUV422Codec.h"
 
 CCodec::CCodec(void)
 {
