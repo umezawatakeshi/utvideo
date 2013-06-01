@@ -30,7 +30,7 @@ void CUL00Codec::GetShortFriendlyName(char *pszName, size_t cchName)
 {
 	char buf[16];
 
-	sprintf(buf, "Ut Video (%s)", GetTinyName());
+	sprintf(buf, "UtVideo (%s)", GetTinyName());
 	strncpy(pszName, buf, cchName);
 	pszName[cchName - 1] = '\0';
 }
@@ -51,11 +51,10 @@ void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 {
 	char buf[128];
 
-	sprintf(buf, "Ut Video Codec %s (%s) %s %s",
+	sprintf(buf, "UtVideo %s (%s) %s",
 		GetColorFormatName(),
 		GetTinyName(),
-		m_pszInterfaceName,
-		UTVIDEO_IMPLEMENTATION_STR);
+		m_pszInterfaceName);
 	strncpy(pszName, buf, cchName);
 	pszName[cchName - 1] = '\0';
 }
