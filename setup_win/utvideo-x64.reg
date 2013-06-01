@@ -5,9 +5,13 @@ REGEDIT4
 "VIDC.ULRG"="C:\\Windows\\system32\\utv_vcm.dll"
 "VIDC.ULY0"="C:\\Windows\\system32\\utv_vcm.dll"
 "VIDC.ULY2"="C:\\Windows\\system32\\utv_vcm.dll"
+"VIDC.ULH0"="C:\\Windows\\system32\\utv_vcm.dll"
+"VIDC.ULH2"="C:\\Windows\\system32\\utv_vcm.dll"
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\Drivers32]
 "VIDC.ULRA"="C:\\Windows\\system32\\utv_vcm.dll"
 "VIDC.ULRG"="C:\\Windows\\system32\\utv_vcm.dll"
 "VIDC.ULY0"="C:\\Windows\\system32\\utv_vcm.dll"
 "VIDC.ULY2"="C:\\Windows\\system32\\utv_vcm.dll"
+"VIDC.ULH0"="C:\\Windows\\system32\\utv_vcm.dll"
+"VIDC.ULH2"="C:\\Windows\\system32\\utv_vcm.dll"
