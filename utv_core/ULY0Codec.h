@@ -7,10 +7,13 @@
 #include "FrameBuffer.h"
 #include "Thread.h"
 #include "HuffmanCode.h"
+#include "Coefficient.h"
 
 class CULY0Codec :
 	public CUL00Codec
 {
+	typedef CBT601Coefficient C;
+
 private:
 	static const utvf_t m_utvfEncoderInput[];
 	static const utvf_t m_utvfDecoderOutput[];
