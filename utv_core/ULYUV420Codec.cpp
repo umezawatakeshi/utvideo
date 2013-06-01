@@ -8,6 +8,7 @@
 #include "TunedFunc.h"
 #include "ColorOrder.h"
 
+template<>
 const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfEncoderInput[] = {
 #ifndef __APPLE__
 	UTVF_YV12,
@@ -23,6 +24,7 @@ const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfEncoderInput[] = {
 	UTVF_INVALID,
 };
 
+template<>
 const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfDecoderOutput[] = {
 #ifndef __APPLE__
 	UTVF_YV12,
@@ -38,11 +40,13 @@ const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfDecoderOutput[] = {
 	UTVF_INVALID,
 };
 
+template<>
 const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfCompressed[] = {
 	UTVF_ULY0,
 	UTVF_INVALID,
 };
 
+template<>
 const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfEncoderInput[] = {
 #ifndef __APPLE__
 	UTVF_YV12,
@@ -59,6 +63,7 @@ const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfEncoderInput[] = {
 	UTVF_INVALID,
 };
 
+template<>
 const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfDecoderOutput[] = {
 #ifndef __APPLE__
 	UTVF_YV12,
@@ -75,24 +80,29 @@ const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfDecoderOutput[] = {
 	UTVF_INVALID,
 };
 
+template<>
 const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfCompressed[] = {
 	UTVF_ULH0,
 	UTVF_INVALID,
 };
 
+template<>
 CULYUV420Codec<CBT601Coefficient>::CULYUV420Codec(const char *pszInterfaceName) : CUL00Codec("ULY0", pszInterfaceName)
 {
 }
 
+template<>
 CULYUV420Codec<CBT709Coefficient>::CULYUV420Codec(const char *pszInterfaceName) : CUL00Codec("ULH0", pszInterfaceName)
 {
 }
 
+template<>
 const char *CULYUV420Codec<CBT601Coefficient>::GetColorFormatName(void)
 {
 	return "YUV420 BT.601";
 }
 
+template<>
 const char *CULYUV420Codec<CBT709Coefficient>::GetColorFormatName(void)
 {
 	return "YUV420 BT.709";
