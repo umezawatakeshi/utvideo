@@ -788,6 +788,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Coefficient_asm_x86x64.mac"
+				>
+			</File>
+			<File
+				RelativePath=".\Coefficient_nasm.mac"
+				>
+			</File>
+			<File
 				RelativePath=".\ColorOrder.h"
 				>
 			</File>

@@ -8,21 +8,8 @@
 section .text
 
 
-	align	64
-;			 fedcba9876543210
-yoff	dq	00010001000100010h
-		dq	00000000000000000h
-uvoff	dq	00080008000800080h
-		dq	00000000000000000h
+%include "Coefficient_asm_x86x64.mac"
 
-y2rgb	dq	000004A8500004A85h
-		dq	000004A8500004A85h
-uv2g	dq	0E5FCF377E5FCF377h
-		dq	0E5FCF377E5FCF377h
-uv2r	dq	03313000033130000h
-		dq	03313000033130000h
-uv2b	dq	00000408D0000408Dh
-		dq	00000408D0000408Dh
 
 %macro CONVERT_ULY2_TO_RGB 3
 %push
@@ -59,23 +46,22 @@ global %$procname
 	punpcklbw	xmm1, xmm7				; xmm1 = 00 V6 00 U6 00 V4 00 U4 00 V2 00 U2 00 V0 00 U0
 	psubw		xmm1, [uvoff]			; xmm1 = ---V6 ---U6 ---V4 ---U4 ---V2 ---U2 ---V0 ---U0 (de-offset)
 	punpckldq	xmm1, xmm1				; xmm1 = ---V2 ---U2 ---V2 ---U2 ---V0 ---U0 ---V0 ---U0 (de-offset)
-	paddw		xmm1, xmm1
 
 	pmaddwd		xmm0, [y2rgb]
 
 	movdqa		xmm3, xmm1
 	pmaddwd		xmm3, [uv2r]
 	paddd		xmm3, xmm0				; xmm3 = -R3-------- -R2-------- -R1-------- -R0--------
-	psrad		xmm3, 14				; xmm3 = ---------R3 ---------R2 ---------R1 ---------R0
+	psrad		xmm3, 13				; xmm3 = ---------R3 ---------R2 ---------R1 ---------R0
 
 	movdqa		xmm2, xmm1
 	pmaddwd		xmm2, [uv2b]
 	paddd		xmm2, xmm0				; xmm2 = -B3-------- -B2-------- -B1-------- -B0--------
-	psrad		xmm2, 14				; xmm2 = ---------B3 ---------B2 ---------B1 ---------B0
+	psrad		xmm2, 13				; xmm2 = ---------B3 ---------B2 ---------B1 ---------B0
 
 	pmaddwd		xmm1, [uv2g]
 	paddd		xmm1, xmm0				; xmm1 = -G3-------- -G2-------- -G1-------- -G0--------
-	psrad		xmm1, 14				; xmm1 = ---------G3 ---------G2 ---------G1 ---------G0
+	psrad		xmm1, 13				; xmm1 = ---------G3 ---------G2 ---------G1 ---------G0
 
 %if %$littleendian
 	packssdw	xmm1, xmm3				; xmm1 = ---R3 ---R2 ---R1 ---R0 ---G3 ---G2 ---G1 ---G0
@@ -175,31 +161,6 @@ CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToBGRX,  1, 1
 CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToRGB,   0, 0
 CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToXRGB,  0, 1
 
-
-; Y  =  0.29891 R + 0.58661 G + 0.11448 B
-; Cb = -0.16874 R - 0.33126 G + 0.50000 B
-; Cr =  0.50000 R - 0.41869 G - 0.08131 B
-
-; Y  =  0.257 R + 0.504 G + 0.098 B + 16
-; Cb = -0.148 R - 0.291 G + 0.439 B + 128
-; Cr =  0.439 R - 0.368 G - 0.071 B + 128
-
-	align	64
-;			 fedcba9876543210
-;b2yuv	dq	0064b00000000064bh
-;		dq	0fdb7fdb70e0e0e0eh
-;g2yuv	dq	0203e00000000203eh
-;		dq	0f3fbf3fbf6b0f6b0h
-;r2yuv	dq	0106e00000000106eh
-;		dq	00e0e0e0efb42fb42h
-b2yuv	dq	00646000000000646h
-		dq	0fdbafdba0e0c0e0ch
-g2yuv	dq	02042000000002042h
-		dq	0f439f439f6b0f6b0h
-r2yuv	dq	01073000000001073h
-		dq	00e0c0e0cfb44fb44h
-yuvoff	dq	00004200000042000h
-		dq	00020200000202000h
 
 %macro CONVERT_RGB_TO_ULY2 3
 %push

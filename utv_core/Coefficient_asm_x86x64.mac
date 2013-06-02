@@ -1,0 +1,54 @@
+; •¶ŽšƒR[ƒh‚Í‚r‚i‚h‚r ‰üsƒR[ƒh‚Í‚b‚q‚k‚e
+; $Id$
+
+%include "Coefficient_nasm.mac"
+
+
+	align	64
+yoff	dw	16, 16, 16, 16
+		dw	0, 0, 0, 0
+uvoff	dw	128, 128, 128, 128
+		dw	0, 0, 0, 0
+
+y2rgb	dw	(((BT601_Y2RGB >> 10) + 1) >> 1) & 0ffffh, 0
+		dw	(((BT601_Y2RGB >> 10) + 1) >> 1) & 0ffffh, 0
+		dw	(((BT601_Y2RGB >> 10) + 1) >> 1) & 0ffffh, 0
+		dw	(((BT601_Y2RGB >> 10) + 1) >> 1) & 0ffffh, 0
+uv2g	dw	(((BT601_U2G >> 10) + 1) >> 1) & 0ffffh, (((BT601_V2G >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_U2G >> 10) + 1) >> 1) & 0ffffh, (((BT601_V2G >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_U2G >> 10) + 1) >> 1) & 0ffffh, (((BT601_V2G >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_U2G >> 10) + 1) >> 1) & 0ffffh, (((BT601_V2G >> 10) + 1) >> 1) & 0ffffh
+uv2r	dw	0, (((BT601_V2R >> 10) + 1) >> 1) & 0ffffh
+		dw	0, (((BT601_V2R >> 10) + 1) >> 1) & 0ffffh
+		dw	0, (((BT601_V2R >> 10) + 1) >> 1) & 0ffffh
+		dw	0, (((BT601_V2R >> 10) + 1) >> 1) & 0ffffh
+uv2b	dw	(((BT601_U2B >> 10) + 1) >> 1) & 0ffffh, 0
+		dw	(((BT601_U2B >> 10) + 1) >> 1) & 0ffffh, 0
+		dw	(((BT601_U2B >> 10) + 1) >> 1) & 0ffffh, 0
+		dw	(((BT601_U2B >> 10) + 1) >> 1) & 0ffffh, 0
+
+b2yuv	dw	(((BT601_B2Y >> 9) + 1) >> 1) & 0ffffh
+		dw	0, 0
+		dw	(((BT601_B2Y >> 9) + 1) >> 1) & 0ffffh
+		dw	(((BT601_B2U >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_B2U >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_B2V >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_B2V >> 10) + 1) >> 1) & 0ffffh
+g2yuv	dw	(((BT601_G2Y >> 9) + 1) >> 1) & 0ffffh
+		dw	0, 0
+		dw	(((BT601_G2Y >> 9) + 1) >> 1) & 0ffffh
+		dw	(((BT601_G2U >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_G2U >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_G2V >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_G2V >> 10) + 1) >> 1) & 0ffffh
+r2yuv	dw	(((BT601_R2Y >> 9) + 1) >> 1) & 0ffffh
+		dw	0, 0
+		dw	(((BT601_R2Y >> 9) + 1) >> 1) & 0ffffh
+		dw	(((BT601_R2U >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_R2U >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_R2V >> 10) + 1) >> 1) & 0ffffh
+		dw	(((BT601_R2V >> 10) + 1) >> 1) & 0ffffh
+yuvoff	dd	((16 << 1) + 1) << 13
+		dd	((16 << 1) + 1) << 13
+		dd	((128 << 1) + 1) << 13
+		dd	((128 << 1) + 1) << 13
