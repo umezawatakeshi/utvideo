@@ -35,50 +35,56 @@ yuvoff	dd	RSHLD(16, 14)
 		dd	RSHLD(128, 14)
 		dd	RSHLD(128, 14)
 
-bt601coeff:
+%macro	DEFINE_YUVCOEFF 2
+
+%1:
 	istruc	yuvcoeff
 		at yuvcoeff.y2rgb
-					dw	RSHRW(BT601_Y2RGB, 11), 0
-					dw	RSHRW(BT601_Y2RGB, 11), 0
-					dw	RSHRW(BT601_Y2RGB, 11), 0
-					dw	RSHRW(BT601_Y2RGB, 11), 0
+					dw	RSHRW(%2_Y2RGB, 11), 0
+					dw	RSHRW(%2_Y2RGB, 11), 0
+					dw	RSHRW(%2_Y2RGB, 11), 0
+					dw	RSHRW(%2_Y2RGB, 11), 0
 		at yuvcoeff.uv2b
-					dw	RSHRW(BT601_U2B, 11), 0
-					dw	RSHRW(BT601_U2B, 11), 0
-					dw	RSHRW(BT601_U2B, 11), 0
-					dw	RSHRW(BT601_U2B, 11), 0
+					dw	RSHRW(%2_U2B, 11), 0
+					dw	RSHRW(%2_U2B, 11), 0
+					dw	RSHRW(%2_U2B, 11), 0
+					dw	RSHRW(%2_U2B, 11), 0
 		at yuvcoeff.uv2g
-					dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
-					dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
-					dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
-					dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
+					dw	RSHRW(%2_U2G, 11), RSHRW(%2_V2G, 11)
+					dw	RSHRW(%2_U2G, 11), RSHRW(%2_V2G, 11)
+					dw	RSHRW(%2_U2G, 11), RSHRW(%2_V2G, 11)
+					dw	RSHRW(%2_U2G, 11), RSHRW(%2_V2G, 11)
 		at yuvcoeff.uv2r
-					dw	0, RSHRW(BT601_V2R, 11)
-					dw	0, RSHRW(BT601_V2R, 11)
-					dw	0, RSHRW(BT601_V2R, 11)
-					dw	0, RSHRW(BT601_V2R, 11)
+					dw	0, RSHRW(%2_V2R, 11)
+					dw	0, RSHRW(%2_V2R, 11)
+					dw	0, RSHRW(%2_V2R, 11)
+					dw	0, RSHRW(%2_V2R, 11)
 		at yuvcoeff.b2yuv
-					dw	RSHRW(BT601_B2Y, 10)
+					dw	RSHRW(%2_B2Y, 10)
 					dw	0, 0
-					dw	RSHRW(BT601_B2Y, 10)
-					dw	RSHRW(BT601_B2U, 11)
-					dw	RSHRW(BT601_B2U, 11)
-					dw	RSHRW(BT601_B2V, 11)
-					dw	RSHRW(BT601_B2V, 11)
+					dw	RSHRW(%2_B2Y, 10)
+					dw	RSHRW(%2_B2U, 11)
+					dw	RSHRW(%2_B2U, 11)
+					dw	RSHRW(%2_B2V, 11)
+					dw	RSHRW(%2_B2V, 11)
 		at yuvcoeff.g2yuv
-					dw	RSHRW(BT601_G2Y, 10)
+					dw	RSHRW(%2_G2Y, 10)
 					dw	0, 0
-					dw	RSHRW(BT601_G2Y, 10)
-					dw	RSHRW(BT601_G2U, 11)
-					dw	RSHRW(BT601_G2U, 11)
-					dw	RSHRW(BT601_G2V, 11)
-					dw	RSHRW(BT601_G2V, 11)
+					dw	RSHRW(%2_G2Y, 10)
+					dw	RSHRW(%2_G2U, 11)
+					dw	RSHRW(%2_G2U, 11)
+					dw	RSHRW(%2_G2V, 11)
+					dw	RSHRW(%2_G2V, 11)
 		at yuvcoeff.r2yuv
-					dw	RSHRW(BT601_R2Y, 10)
+					dw	RSHRW(%2_R2Y, 10)
 					dw	0, 0
-					dw	RSHRW(BT601_R2Y, 10)
-					dw	RSHRW(BT601_R2U, 11)
-					dw	RSHRW(BT601_R2U, 11)
-					dw	RSHRW(BT601_R2V, 11)
-					dw	RSHRW(BT601_R2V, 11)
+					dw	RSHRW(%2_R2Y, 10)
+					dw	RSHRW(%2_R2U, 11)
+					dw	RSHRW(%2_R2U, 11)
+					dw	RSHRW(%2_R2V, 11)
+					dw	RSHRW(%2_R2V, 11)
 	iend
+
+%endmacro
+
+DEFINE_YUVCOEFF	bt601coeff, BT601
