@@ -331,4 +331,4 @@ public:
 		}
 #endif
 	}
-};// tfi;
+} tfi;
