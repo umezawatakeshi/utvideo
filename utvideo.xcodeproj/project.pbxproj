@@ -40,6 +40,8 @@
 		2510B6B41417BCB100EA5F2F /* Mutex.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Mutex.h; path = utv_qt/Mutex.h; sourceTree = "<group>"; };
 		2510B6C31417BDDE00EA5F2F /* utv_qt.in.r */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.rez; name = utv_qt.in.r; path = utv_qt/utv_qt.in.r; sourceTree = "<group>"; };
 		2529170014D02DCB00A3813C /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		25307212175CC27500FB4793 /* Coefficient_asm_x86x64.mac */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Coefficient_asm_x86x64.mac; path = utv_core/Coefficient_asm_x86x64.mac; sourceTree = "<group>"; };
+		25307213175CC27500FB4793 /* Coefficient_nasm.mac */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Coefficient_nasm.mac; path = utv_core/Coefficient_nasm.mac; sourceTree = "<group>"; };
 		2564C7B314823C7D00F1A9EB /* Common_asm_x86.mac */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Common_asm_x86.mac; path = utv_core/Common_asm_x86.mac; sourceTree = "<group>"; };
 		2564C7B414823C7E00F1A9EB /* Convert_asm_x86.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Convert_asm_x86.asm; path = utv_core/Convert_asm_x86.asm; sourceTree = "<group>"; };
 		2564C7B514823C7E00F1A9EB /* HuffmanCode_asm_x86.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = HuffmanCode_asm_x86.asm; path = utv_core/HuffmanCode_asm_x86.asm; sourceTree = "<group>"; };
@@ -140,6 +142,8 @@
 				258DB3D41411F8600059F47E /* Codec.cpp */,
 				258DB3D51411F8600059F47E /* Codec.h */,
 				25817AE4175A052D00888CE2 /* Coefficient.h */,
+				25307212175CC27500FB4793 /* Coefficient_asm_x86x64.mac */,
+				25307213175CC27500FB4793 /* Coefficient_nasm.mac */,
 				25817AE5175A052D00888CE2 /* ColorOrder.h */,
 				2564C7B314823C7D00F1A9EB /* Common_asm_x86.mac */,
 				258DB3D61411F8600059F47E /* Convert.cpp */,
