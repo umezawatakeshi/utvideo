@@ -8,6 +8,9 @@ class CDummyCodec :
 	public CCodec
 {
 public:
+	static const utvf_t m_utvfCodec = UTVF_INVALID;
+
+public:
 	CDummyCodec(void);
 	~CDummyCodec(void);
 	static CCodec *CreateInstance(const char *pszInterfaceName);

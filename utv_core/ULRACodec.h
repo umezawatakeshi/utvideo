@@ -11,6 +11,9 @@
 class CULRACodec :
 	public CUL00Codec
 {
+public:
+	static const utvf_t m_utvfCodec = UTVF_ULRA;
+
 private:
 	static const utvf_t m_utvfEncoderInput[];
 	static const utvf_t m_utvfDecoderOutput[];

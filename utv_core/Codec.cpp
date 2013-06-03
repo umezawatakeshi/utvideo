@@ -40,14 +40,16 @@ struct CODECLIST
 	CCodec *(*pfnCreateInstace)(const char *pszInterfaceName);
 };
 
+#define CODECENTRY(c) { c::m_utvfCodec, c::CreateInstance }
+
 static const struct CODECLIST codeclist[] = {
-	{ UTVF_INVALID, CDummyCodec::CreateInstance                        },
-	{ UTVF_ULRA,    CULRACodec::CreateInstance                         },
-	{ UTVF_ULRG,    CULRGCodec::CreateInstance                         },
-	{ UTVF_ULY0,    CULYUV420Codec<CBT601Coefficient>::CreateInstance  },
-	{ UTVF_ULY2,    CULYUV422Codec<CBT601Coefficient>::CreateInstance  },
-	{ UTVF_ULH0,    CULYUV420Codec<CBT709Coefficient>::CreateInstance  },
-	{ UTVF_ULH2,    CULYUV422Codec<CBT709Coefficient>::CreateInstance  },
+	CODECENTRY(CDummyCodec),
+	CODECENTRY(CULRACodec),
+	CODECENTRY(CULRGCodec),
+	CODECENTRY(CULYUV420Codec<CBT601Coefficient>), // ULY0
+	CODECENTRY(CULYUV422Codec<CBT601Coefficient>), // ULY2
+	CODECENTRY(CULYUV420Codec<CBT709Coefficient>), // ULH0
+	CODECENTRY(CULYUV422Codec<CBT709Coefficient>), // ULH2
 };
 
 DLLEXPORT CCodec *CCodec::CreateInstance(utvf_t utvf, const char *pszInterfaceName)

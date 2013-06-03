@@ -39,12 +39,6 @@ const utvf_t CULYUV422Codec<CBT601Coefficient>::m_utvfDecoderOutput[] = {
 };
 
 template<>
-const utvf_t CULYUV422Codec<CBT601Coefficient>::m_utvfCompressed[] = {
-	UTVF_ULY2,
-	UTVF_INVALID,
-};
-
-template<>
 const utvf_t CULYUV422Codec<CBT709Coefficient>::m_utvfEncoderInput[] = {
 #ifndef __APPLE__
 	UTVF_HDYC,
@@ -76,9 +70,9 @@ const utvf_t CULYUV422Codec<CBT709Coefficient>::m_utvfDecoderOutput[] = {
 	UTVF_INVALID,
 };
 
-template<>
-const utvf_t CULYUV422Codec<CBT709Coefficient>::m_utvfCompressed[] = {
-	UTVF_ULH2,
+template<class C>
+const utvf_t CULYUV422Codec<C>::m_utvfCompressed[] = {
+	m_utvfCodec,
 	UTVF_INVALID,
 };
 

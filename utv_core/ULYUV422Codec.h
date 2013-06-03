@@ -13,6 +13,9 @@ template<class C>
 class CULYUV422Codec :
 	public CUL00Codec
 {
+public:
+	static const utvf_t m_utvfCodec;
+
 private:
 	static const utvf_t m_utvfEncoderInput[];
 	static const utvf_t m_utvfDecoderOutput[];
@@ -40,3 +43,6 @@ protected:
 	virtual void ConvertFromPlanar(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 };
+
+template<> const utvf_t CULYUV422Codec<CBT601Coefficient>::m_utvfCodec = UTVF_ULY2;
+template<> const utvf_t CULYUV422Codec<CBT709Coefficient>::m_utvfCodec = UTVF_ULH2;
