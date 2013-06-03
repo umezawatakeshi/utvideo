@@ -63,14 +63,14 @@ Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 <p>VCM コーデックが正しく登録されないようであれば、最終手段としてインストール先ディレクトリに入っている utvideo.reg をレジストリに結合してください。なお、このファイルは Windows ディレクトリが C:\Windows であることを仮定しています。</p>
 <h2 id="fourcc">FourCC 一覧</h2>
 <table border>
-<tr><th rowspan="2">FourCC</th><th rowspan="2">内部保持形式</th><th colspan="2">対応フォーマット（優先度順）</th></tr>
+<tr><th rowspan="2">FourCC</th><th rowspan="2">コーデック名</th><th rowspan="2">内部保持形式</th><th colspan="2">対応フォーマット（優先度順）</th></tr>
 <tr><th>VCM / DMO / MFT</th><th>QT</th></tr>
-<tr><td>ULRA</td><td>RGBA 4:4:4:4 8bit フルレンジ</td><td><strong>RGBA</strong></td><td><strong>ARGB</strong></td></tr>
-<tr><td>ULRG</td><td>RGB 4:4:4 8bit フルレンジ</td><td><strong>RGB24<br>RGB32</strong></td><td><strong>RGB<br>ARGB</strong></td></tr>
-<tr><td>ULY2</td><td>YCbCr (BT.601) 4:2:2 8bit リミテッド</td><td><strong>YUY2 (YUYV YUNV)</strong><br><strong>UYVY (UYNV)</strong><br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
-<tr><td>ULY0</td><td>YCbCr (BT.601) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>YUY2 (YUYV YUNV)<br>UYVY (UYNV)<br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
-<tr><td>ULH2</td><td>YCbCr (BT.709) 4:2:2 8bit リミテッド</td><td><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV)</strong><br><strong>UYVY (UYNV)</strong><br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
-<tr><td>ULH0</td><td>YCbCr (BT.709) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>HDYC<br>YUY2 (YUYV YUNV)<br>UYVY (UYNV)<br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
+<tr><td>ULRA</td><td>UtVideo RGBA</td><td>RGBA 4:4:4:4 8bit フルレンジ</td><td><strong>RGBA</strong></td><td><strong>ARGB</strong></td></tr>
+<tr><td>ULRG</td><td>UtVideo RGB</td><td>RGB 4:4:4 8bit フルレンジ</td><td><strong>RGB24<br>RGB32</strong></td><td><strong>RGB<br>ARGB</strong></td></tr>
+<tr><td>ULY2</td><td>UtVideo YUV422 BT.601</td><td>YCbCr (BT.601) 4:2:2 8bit リミテッド</td><td><strong>YUY2 (YUYV YUNV)</strong><br><strong>UYVY (UYNV)</strong><br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
+<tr><td>ULY0</td><td>UtVideo YUV420 BT.601</td><td>YCbCr (BT.601) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>YUY2 (YUYV YUNV)<br>UYVY (UYNV)<br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
+<tr><td>ULH2</td><td>UtVideo YUV422 BT.709</td><td>YCbCr (BT.709) 4:2:2 8bit リミテッド</td><td><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV)</strong><br><strong>UYVY (UYNV)</strong><br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
+<tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>HDYC<br>YUY2 (YUYV YUNV)<br>UYVY (UYNV)<br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
 </table>
 <ul>
 <li>RGB 系のフォーマットにおける「8bit フルレンジ」とは、R,G,B=0-255 のものを指します。YUV 系のフォーマットにおける「8bit リミテッド」とは、Y=16-235, U,V=16-240 のものを指します。</li>
