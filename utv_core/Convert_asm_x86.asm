@@ -11,9 +11,9 @@ section .text
 %include "Coefficient_asm_x86x64.mac"
 
 
-%macro CONVERT_ULY2_TO_RGB 3
+%macro CONVERT_ULY2_TO_RGB 4
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, littleendian, %2, rgb32, %3
+	MULTI_CONTEXT_XDEFINE procname, %1, coeffvar, %2, littleendian, %3, rgb32, %4
 
 global %$procname
 %$procname:
@@ -47,19 +47,19 @@ global %$procname
 	psubw		xmm1, [uvoff]			; xmm1 = ---V6 ---U6 ---V4 ---U4 ---V2 ---U2 ---V0 ---U0 (de-offset)
 	punpckldq	xmm1, xmm1				; xmm1 = ---V2 ---U2 ---V2 ---U2 ---V0 ---U0 ---V0 ---U0 (de-offset)
 
-	pmaddwd		xmm0, [bt601coeff + yuvcoeff.y2rgb]
+	pmaddwd		xmm0, [%$coeffvar + yuvcoeff.y2rgb]
 
 	movdqa		xmm3, xmm1
-	pmaddwd		xmm3, [bt601coeff + yuvcoeff.uv2r]
+	pmaddwd		xmm3, [%$coeffvar + yuvcoeff.uv2r]
 	paddd		xmm3, xmm0				; xmm3 = -R3-------- -R2-------- -R1-------- -R0--------
 	psrad		xmm3, 13				; xmm3 = ---------R3 ---------R2 ---------R1 ---------R0
 
 	movdqa		xmm2, xmm1
-	pmaddwd		xmm2, [bt601coeff + yuvcoeff.uv2b]
+	pmaddwd		xmm2, [%$coeffvar + yuvcoeff.uv2b]
 	paddd		xmm2, xmm0				; xmm2 = -B3-------- -B2-------- -B1-------- -B0--------
 	psrad		xmm2, 13				; xmm2 = ---------B3 ---------B2 ---------B1 ---------B0
 
-	pmaddwd		xmm1, [bt601coeff + yuvcoeff.uv2g]
+	pmaddwd		xmm1, [%$coeffvar + yuvcoeff.uv2g]
 	paddd		xmm1, xmm0				; xmm1 = -G3-------- -G2-------- -G1-------- -G0--------
 	psrad		xmm1, 13				; xmm1 = ---------G3 ---------G2 ---------G1 ---------G0
 
@@ -156,15 +156,15 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToBGR,   1, 0
-CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToBGRX,  1, 1
-CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToRGB,   0, 0
-CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToXRGB,  0, 1
+CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToBGR,   bt601coeff, 1, 0
+CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToBGRX,  bt601coeff, 1, 1
+CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToRGB,   bt601coeff, 0, 0
+CONVERT_ULY2_TO_RGB	_sse2_ConvertULY2ToXRGB,  bt601coeff, 0, 1
 
 
-%macro CONVERT_RGB_TO_ULY2 3
+%macro CONVERT_RGB_TO_ULY2 4
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, littleendian, %2, rgb32, %3
+	MULTI_CONTEXT_XDEFINE procname, %1, coeffvar, %2, littleendian, %3, rgb32, %4
 
 global %$procname
 %$procname:
@@ -175,9 +175,9 @@ global %$procname
 	mov			ebx, [esp + %$pUBegin]
 	mov			edx, [esp + %$pVBegin]
 
-	movdqa		xmm4, [bt601coeff + yuvcoeff.b2yuv]
-	movdqa		xmm5, [bt601coeff + yuvcoeff.g2yuv]
-	movdqa		xmm6, [bt601coeff + yuvcoeff.r2yuv]
+	movdqa		xmm4, [%$coeffvar + yuvcoeff.b2yuv]
+	movdqa		xmm5, [%$coeffvar + yuvcoeff.g2yuv]
+	movdqa		xmm6, [%$coeffvar + yuvcoeff.r2yuv]
 	movdqa		xmm7, [yuvoff]
 
 	align	64
@@ -257,10 +257,10 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_RGB_TO_ULY2	_sse2_ConvertBGRToULY2,   1, 0
-CONVERT_RGB_TO_ULY2	_sse2_ConvertBGRXToULY2,  1, 1
-CONVERT_RGB_TO_ULY2	_sse2_ConvertRGBToULY2,   0, 0
-CONVERT_RGB_TO_ULY2	_sse2_ConvertXRGBToULY2,  0, 1
+CONVERT_RGB_TO_ULY2	_sse2_ConvertBGRToULY2,   bt601coeff, 1, 0
+CONVERT_RGB_TO_ULY2	_sse2_ConvertBGRXToULY2,  bt601coeff, 1, 1
+CONVERT_RGB_TO_ULY2	_sse2_ConvertRGBToULY2,   bt601coeff, 0, 0
+CONVERT_RGB_TO_ULY2	_sse2_ConvertXRGBToULY2,  bt601coeff, 0, 1
 
 
 

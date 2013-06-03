@@ -11,9 +11,9 @@ section .text
 %include "Coefficient_asm_x86x64.mac"
 
 
-%macro CONVERT_ULY2_TO_RGB 3
+%macro CONVERT_ULY2_TO_RGB 4
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, littleendian, %2, rgb32, %3
+	MULTI_CONTEXT_XDEFINE procname, %1, coeffvar, %2, littleendian, %3, rgb32, %4
 
 global %$procname
 %$procname:
@@ -35,10 +35,10 @@ global %$procname
 
 	movdqa		xmm8, [yoff]
 	movdqa		xmm9, [uvoff]
-	movdqa		xmm10, [bt601coeff + yuvcoeff.y2rgb]
-	movdqa		xmm11, [bt601coeff + yuvcoeff.uv2r]
-	movdqa		xmm12, [bt601coeff + yuvcoeff.uv2b]
-	movdqa		xmm13, [bt601coeff + yuvcoeff.uv2g]
+	movdqa		xmm10, [%$coeffvar + yuvcoeff.y2rgb]
+	movdqa		xmm11, [%$coeffvar + yuvcoeff.uv2r]
+	movdqa		xmm12, [%$coeffvar + yuvcoeff.uv2b]
+	movdqa		xmm13, [%$coeffvar + yuvcoeff.uv2g]
 
 	align	64
 .label0:
@@ -156,15 +156,15 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGR,   1, 0
-CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGRX,  1, 1
-CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToRGB,   0, 0
-CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToXRGB,  0, 1
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGR,   bt601coeff, 1, 0
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGRX,  bt601coeff, 1, 1
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToRGB,   bt601coeff, 0, 0
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToXRGB,  bt601coeff, 0, 1
 
 
-%macro CONVERT_RGB_TO_ULY2 3
+%macro CONVERT_RGB_TO_ULY2 4
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, littleendian, %2, rgb32, %3
+	MULTI_CONTEXT_XDEFINE procname, %1, coeffvar, %2, littleendian, %3, rgb32, %4
 
 global %$procname
 %$procname:
@@ -180,9 +180,9 @@ global %$procname
 	sub			r11, r10
 	xor			rcx, rcx
 
-	movdqa		xmm4, [bt601coeff + yuvcoeff.b2yuv]
-	movdqa		xmm5, [bt601coeff + yuvcoeff.g2yuv]
-	movdqa		xmm6, [bt601coeff + yuvcoeff.r2yuv]
+	movdqa		xmm4, [%$coeffvar + yuvcoeff.b2yuv]
+	movdqa		xmm5, [%$coeffvar + yuvcoeff.g2yuv]
+	movdqa		xmm6, [%$coeffvar + yuvcoeff.r2yuv]
 	movdqa		xmm7, [yuvoff]
 
 	align	64
@@ -258,10 +258,10 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_RGB_TO_ULY2	sse2_ConvertBGRToULY2,   1, 0
-CONVERT_RGB_TO_ULY2	sse2_ConvertBGRXToULY2,  1, 1
-CONVERT_RGB_TO_ULY2	sse2_ConvertRGBToULY2,   0, 0
-CONVERT_RGB_TO_ULY2	sse2_ConvertXRGBToULY2,  0, 1
+CONVERT_RGB_TO_ULY2	sse2_ConvertBGRToULY2,   bt601coeff, 1, 0
+CONVERT_RGB_TO_ULY2	sse2_ConvertBGRXToULY2,  bt601coeff, 1, 1
+CONVERT_RGB_TO_ULY2	sse2_ConvertRGBToULY2,   bt601coeff, 0, 0
+CONVERT_RGB_TO_ULY2	sse2_ConvertXRGBToULY2,  bt601coeff, 0, 1
 
 
 
