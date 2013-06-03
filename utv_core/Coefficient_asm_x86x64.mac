@@ -88,3 +88,4 @@ yuvoff	dd	RSHLD(16, 14)
 %endmacro
 
 DEFINE_YUVCOEFF	bt601coeff, BT601
+DEFINE_YUVCOEFF	bt709coeff, BT709

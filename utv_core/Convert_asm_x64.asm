@@ -160,6 +160,10 @@ CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGR,   bt601coeff, 1, 0
 CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGRX,  bt601coeff, 1, 1
 CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToRGB,   bt601coeff, 0, 0
 CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToXRGB,  bt601coeff, 0, 1
+CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToBGR,   bt709coeff, 1, 0
+CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToBGRX,  bt709coeff, 1, 1
+CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToRGB,   bt709coeff, 0, 0
+CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToXRGB,  bt709coeff, 0, 1
 
 
 %macro CONVERT_RGB_TO_ULY2 4
@@ -262,6 +266,10 @@ CONVERT_RGB_TO_ULY2	sse2_ConvertBGRToULY2,   bt601coeff, 1, 0
 CONVERT_RGB_TO_ULY2	sse2_ConvertBGRXToULY2,  bt601coeff, 1, 1
 CONVERT_RGB_TO_ULY2	sse2_ConvertRGBToULY2,   bt601coeff, 0, 0
 CONVERT_RGB_TO_ULY2	sse2_ConvertXRGBToULY2,  bt601coeff, 0, 1
+CONVERT_RGB_TO_ULY2	sse2_ConvertBGRToULH2,   bt709coeff, 1, 0
+CONVERT_RGB_TO_ULY2	sse2_ConvertBGRXToULH2,  bt709coeff, 1, 1
+CONVERT_RGB_TO_ULY2	sse2_ConvertRGBToULH2,   bt709coeff, 0, 0
+CONVERT_RGB_TO_ULY2	sse2_ConvertXRGBToULH2,  bt709coeff, 0, 1
 
 
 
