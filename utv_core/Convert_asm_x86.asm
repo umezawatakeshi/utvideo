@@ -47,19 +47,19 @@ global %$procname
 	psubw		xmm1, [uvoff]			; xmm1 = ---V6 ---U6 ---V4 ---U4 ---V2 ---U2 ---V0 ---U0 (de-offset)
 	punpckldq	xmm1, xmm1				; xmm1 = ---V2 ---U2 ---V2 ---U2 ---V0 ---U0 ---V0 ---U0 (de-offset)
 
-	pmaddwd		xmm0, [y2rgb]
+	pmaddwd		xmm0, [bt601coeff + yuvcoeff.y2rgb]
 
 	movdqa		xmm3, xmm1
-	pmaddwd		xmm3, [uv2r]
+	pmaddwd		xmm3, [bt601coeff + yuvcoeff.uv2r]
 	paddd		xmm3, xmm0				; xmm3 = -R3-------- -R2-------- -R1-------- -R0--------
 	psrad		xmm3, 13				; xmm3 = ---------R3 ---------R2 ---------R1 ---------R0
 
 	movdqa		xmm2, xmm1
-	pmaddwd		xmm2, [uv2b]
+	pmaddwd		xmm2, [bt601coeff + yuvcoeff.uv2b]
 	paddd		xmm2, xmm0				; xmm2 = -B3-------- -B2-------- -B1-------- -B0--------
 	psrad		xmm2, 13				; xmm2 = ---------B3 ---------B2 ---------B1 ---------B0
 
-	pmaddwd		xmm1, [uv2g]
+	pmaddwd		xmm1, [bt601coeff + yuvcoeff.uv2g]
 	paddd		xmm1, xmm0				; xmm1 = -G3-------- -G2-------- -G1-------- -G0--------
 	psrad		xmm1, 13				; xmm1 = ---------G3 ---------G2 ---------G1 ---------G0
 
@@ -175,9 +175,9 @@ global %$procname
 	mov			ebx, [esp + %$pUBegin]
 	mov			edx, [esp + %$pVBegin]
 
-	movdqa		xmm4, [b2yuv]
-	movdqa		xmm5, [g2yuv]
-	movdqa		xmm6, [r2yuv]
+	movdqa		xmm4, [bt601coeff + yuvcoeff.b2yuv]
+	movdqa		xmm5, [bt601coeff + yuvcoeff.g2yuv]
+	movdqa		xmm6, [bt601coeff + yuvcoeff.r2yuv]
 	movdqa		xmm7, [yuvoff]
 
 	align	64

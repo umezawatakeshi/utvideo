@@ -14,51 +14,71 @@
 %define RSHLD(x, n) (RSHL((x), (n)) & 0ffffffffh)
 
 
+struc	yuvcoeff
+	.y2rgb:	resw	8
+	.uv2b:	resw	8
+	.uv2g:	resw	8
+	.uv2r:	resw	8
+	.b2yuv:	resw	8
+	.g2yuv:	resw	8
+	.r2yuv:	resw	8
+endstruc
+
+
 	align	64
 yoff	dw	16, 16, 16, 16
 		dw	0, 0, 0, 0
 uvoff	dw	128, 128, 128, 128
 		dw	0, 0, 0, 0
-
-y2rgb	dw	RSHRW(BT601_Y2RGB, 11), 0
-		dw	RSHRW(BT601_Y2RGB, 11), 0
-		dw	RSHRW(BT601_Y2RGB, 11), 0
-		dw	RSHRW(BT601_Y2RGB, 11), 0
-uv2g	dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
-		dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
-		dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
-		dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
-uv2r	dw	0, RSHRW(BT601_V2R, 11)
-		dw	0, RSHRW(BT601_V2R, 11)
-		dw	0, RSHRW(BT601_V2R, 11)
-		dw	0, RSHRW(BT601_V2R, 11)
-uv2b	dw	RSHRW(BT601_U2B, 11), 0
-		dw	RSHRW(BT601_U2B, 11), 0
-		dw	RSHRW(BT601_U2B, 11), 0
-		dw	RSHRW(BT601_U2B, 11), 0
-
-b2yuv	dw	RSHRW(BT601_B2Y, 10)
-		dw	0, 0
-		dw	RSHRW(BT601_B2Y, 10)
-		dw	RSHRW(BT601_B2U, 11)
-		dw	RSHRW(BT601_B2U, 11)
-		dw	RSHRW(BT601_B2V, 11)
-		dw	RSHRW(BT601_B2V, 11)
-g2yuv	dw	RSHRW(BT601_G2Y, 10)
-		dw	0, 0
-		dw	RSHRW(BT601_G2Y, 10)
-		dw	RSHRW(BT601_G2U, 11)
-		dw	RSHRW(BT601_G2U, 11)
-		dw	RSHRW(BT601_G2V, 11)
-		dw	RSHRW(BT601_G2V, 11)
-r2yuv	dw	RSHRW(BT601_R2Y, 10)
-		dw	0, 0
-		dw	RSHRW(BT601_R2Y, 10)
-		dw	RSHRW(BT601_R2U, 11)
-		dw	RSHRW(BT601_R2U, 11)
-		dw	RSHRW(BT601_R2V, 11)
-		dw	RSHRW(BT601_R2V, 11)
 yuvoff	dd	RSHLD(16, 14)
 		dd	RSHLD(16, 14)
 		dd	RSHLD(128, 14)
 		dd	RSHLD(128, 14)
+
+bt601coeff:
+	istruc	yuvcoeff
+		at yuvcoeff.y2rgb
+					dw	RSHRW(BT601_Y2RGB, 11), 0
+					dw	RSHRW(BT601_Y2RGB, 11), 0
+					dw	RSHRW(BT601_Y2RGB, 11), 0
+					dw	RSHRW(BT601_Y2RGB, 11), 0
+		at yuvcoeff.uv2b
+					dw	RSHRW(BT601_U2B, 11), 0
+					dw	RSHRW(BT601_U2B, 11), 0
+					dw	RSHRW(BT601_U2B, 11), 0
+					dw	RSHRW(BT601_U2B, 11), 0
+		at yuvcoeff.uv2g
+					dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
+					dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
+					dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
+					dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
+		at yuvcoeff.uv2r
+					dw	0, RSHRW(BT601_V2R, 11)
+					dw	0, RSHRW(BT601_V2R, 11)
+					dw	0, RSHRW(BT601_V2R, 11)
+					dw	0, RSHRW(BT601_V2R, 11)
+		at yuvcoeff.b2yuv
+					dw	RSHRW(BT601_B2Y, 10)
+					dw	0, 0
+					dw	RSHRW(BT601_B2Y, 10)
+					dw	RSHRW(BT601_B2U, 11)
+					dw	RSHRW(BT601_B2U, 11)
+					dw	RSHRW(BT601_B2V, 11)
+					dw	RSHRW(BT601_B2V, 11)
+		at yuvcoeff.g2yuv
+					dw	RSHRW(BT601_G2Y, 10)
+					dw	0, 0
+					dw	RSHRW(BT601_G2Y, 10)
+					dw	RSHRW(BT601_G2U, 11)
+					dw	RSHRW(BT601_G2U, 11)
+					dw	RSHRW(BT601_G2V, 11)
+					dw	RSHRW(BT601_G2V, 11)
+		at yuvcoeff.r2yuv
+					dw	RSHRW(BT601_R2Y, 10)
+					dw	0, 0
+					dw	RSHRW(BT601_R2Y, 10)
+					dw	RSHRW(BT601_R2U, 11)
+					dw	RSHRW(BT601_R2U, 11)
+					dw	RSHRW(BT601_R2V, 11)
+					dw	RSHRW(BT601_R2V, 11)
+	iend

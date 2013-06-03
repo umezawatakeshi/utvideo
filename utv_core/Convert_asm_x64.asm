@@ -35,10 +35,10 @@ global %$procname
 
 	movdqa		xmm8, [yoff]
 	movdqa		xmm9, [uvoff]
-	movdqa		xmm10, [y2rgb]
-	movdqa		xmm11, [uv2r]
-	movdqa		xmm12, [uv2b]
-	movdqa		xmm13, [uv2g]
+	movdqa		xmm10, [bt601coeff + yuvcoeff.y2rgb]
+	movdqa		xmm11, [bt601coeff + yuvcoeff.uv2r]
+	movdqa		xmm12, [bt601coeff + yuvcoeff.uv2b]
+	movdqa		xmm13, [bt601coeff + yuvcoeff.uv2g]
 
 	align	64
 .label0:
@@ -180,9 +180,9 @@ global %$procname
 	sub			r11, r10
 	xor			rcx, rcx
 
-	movdqa		xmm4, [b2yuv]
-	movdqa		xmm5, [g2yuv]
-	movdqa		xmm6, [r2yuv]
+	movdqa		xmm4, [bt601coeff + yuvcoeff.b2yuv]
+	movdqa		xmm5, [bt601coeff + yuvcoeff.g2yuv]
+	movdqa		xmm6, [bt601coeff + yuvcoeff.r2yuv]
 	movdqa		xmm7, [yuvoff]
 
 	align	64
