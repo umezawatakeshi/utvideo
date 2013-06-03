@@ -4,51 +4,61 @@
 %include "Coefficient_nasm.mac"
 
 
+%define RSHR(x, n) ((((x) >> ((n)-1)) + 1) >> 1)
+%define RSHL(x, n) ((((x) << 1) + 1) << ((n)-1))
+
+%define RSHRW(x, n) (RSHR((x), (n)) & 0ffffh)
+%define RSHLW(x, n) (RSHL((x), (n)) & 0ffffh)
+
+%define RSHRD(x, n) (RSHR((x), (n)) & 0ffffffffh)
+%define RSHLD(x, n) (RSHL((x), (n)) & 0ffffffffh)
+
+
 	align	64
 yoff	dw	16, 16, 16, 16
 		dw	0, 0, 0, 0
 uvoff	dw	128, 128, 128, 128
 		dw	0, 0, 0, 0
 
-y2rgb	dw	(((BT601_Y2RGB >> 10) + 1) >> 1) & 0ffffh, 0
-		dw	(((BT601_Y2RGB >> 10) + 1) >> 1) & 0ffffh, 0
-		dw	(((BT601_Y2RGB >> 10) + 1) >> 1) & 0ffffh, 0
-		dw	(((BT601_Y2RGB >> 10) + 1) >> 1) & 0ffffh, 0
-uv2g	dw	(((BT601_U2G >> 10) + 1) >> 1) & 0ffffh, (((BT601_V2G >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_U2G >> 10) + 1) >> 1) & 0ffffh, (((BT601_V2G >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_U2G >> 10) + 1) >> 1) & 0ffffh, (((BT601_V2G >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_U2G >> 10) + 1) >> 1) & 0ffffh, (((BT601_V2G >> 10) + 1) >> 1) & 0ffffh
-uv2r	dw	0, (((BT601_V2R >> 10) + 1) >> 1) & 0ffffh
-		dw	0, (((BT601_V2R >> 10) + 1) >> 1) & 0ffffh
-		dw	0, (((BT601_V2R >> 10) + 1) >> 1) & 0ffffh
-		dw	0, (((BT601_V2R >> 10) + 1) >> 1) & 0ffffh
-uv2b	dw	(((BT601_U2B >> 10) + 1) >> 1) & 0ffffh, 0
-		dw	(((BT601_U2B >> 10) + 1) >> 1) & 0ffffh, 0
-		dw	(((BT601_U2B >> 10) + 1) >> 1) & 0ffffh, 0
-		dw	(((BT601_U2B >> 10) + 1) >> 1) & 0ffffh, 0
+y2rgb	dw	RSHRW(BT601_Y2RGB, 11), 0
+		dw	RSHRW(BT601_Y2RGB, 11), 0
+		dw	RSHRW(BT601_Y2RGB, 11), 0
+		dw	RSHRW(BT601_Y2RGB, 11), 0
+uv2g	dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
+		dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
+		dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
+		dw	RSHRW(BT601_U2G, 11), RSHRW(BT601_V2G, 11)
+uv2r	dw	0, RSHRW(BT601_V2R, 11)
+		dw	0, RSHRW(BT601_V2R, 11)
+		dw	0, RSHRW(BT601_V2R, 11)
+		dw	0, RSHRW(BT601_V2R, 11)
+uv2b	dw	RSHRW(BT601_U2B, 11), 0
+		dw	RSHRW(BT601_U2B, 11), 0
+		dw	RSHRW(BT601_U2B, 11), 0
+		dw	RSHRW(BT601_U2B, 11), 0
 
-b2yuv	dw	(((BT601_B2Y >> 9) + 1) >> 1) & 0ffffh
+b2yuv	dw	RSHRW(BT601_B2Y, 10)
 		dw	0, 0
-		dw	(((BT601_B2Y >> 9) + 1) >> 1) & 0ffffh
-		dw	(((BT601_B2U >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_B2U >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_B2V >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_B2V >> 10) + 1) >> 1) & 0ffffh
-g2yuv	dw	(((BT601_G2Y >> 9) + 1) >> 1) & 0ffffh
+		dw	RSHRW(BT601_B2Y, 10)
+		dw	RSHRW(BT601_B2U, 11)
+		dw	RSHRW(BT601_B2U, 11)
+		dw	RSHRW(BT601_B2V, 11)
+		dw	RSHRW(BT601_B2V, 11)
+g2yuv	dw	RSHRW(BT601_G2Y, 10)
 		dw	0, 0
-		dw	(((BT601_G2Y >> 9) + 1) >> 1) & 0ffffh
-		dw	(((BT601_G2U >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_G2U >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_G2V >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_G2V >> 10) + 1) >> 1) & 0ffffh
-r2yuv	dw	(((BT601_R2Y >> 9) + 1) >> 1) & 0ffffh
+		dw	RSHRW(BT601_G2Y, 10)
+		dw	RSHRW(BT601_G2U, 11)
+		dw	RSHRW(BT601_G2U, 11)
+		dw	RSHRW(BT601_G2V, 11)
+		dw	RSHRW(BT601_G2V, 11)
+r2yuv	dw	RSHRW(BT601_R2Y, 10)
 		dw	0, 0
-		dw	(((BT601_R2Y >> 9) + 1) >> 1) & 0ffffh
-		dw	(((BT601_R2U >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_R2U >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_R2V >> 10) + 1) >> 1) & 0ffffh
-		dw	(((BT601_R2V >> 10) + 1) >> 1) & 0ffffh
-yuvoff	dd	((16 << 1) + 1) << 13
-		dd	((16 << 1) + 1) << 13
-		dd	((128 << 1) + 1) << 13
-		dd	((128 << 1) + 1) << 13
+		dw	RSHRW(BT601_R2Y, 10)
+		dw	RSHRW(BT601_R2U, 11)
+		dw	RSHRW(BT601_R2U, 11)
+		dw	RSHRW(BT601_R2V, 11)
+		dw	RSHRW(BT601_R2V, 11)
+yuvoff	dd	RSHLD(16, 14)
+		dd	RSHLD(16, 14)
+		dd	RSHLD(128, 14)
+		dd	RSHLD(128, 14)
