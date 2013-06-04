@@ -4,7 +4,7 @@
 [Setup]
 AppName=Ut Video Codec Suite
 AppId=utvideo
-AppVersion=12.2.1
+AppVersion=13.0.0
 AppCopyright=Copyright (c) 2008-2013 UMEZAWA Takeshi
 AppPublisher=UMEZAWA Takeshi
 AppPublisherURL=http://umezawa.dyndns.info/
