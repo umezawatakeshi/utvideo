@@ -9,12 +9,16 @@
 #include "HuffmanCode.h"
 #include "Coefficient.h"
 
+template<class C> class CULYUV420CodecFormat;
+template<> class CULYUV420CodecFormat<CBT601Coefficient> { public: static const utvf_t m_utvf = UTVF_ULY0; };
+template<> class CULYUV420CodecFormat<CBT709Coefficient> { public: static const utvf_t m_utvf = UTVF_ULH0; };
+
 template<class C>
 class CULYUV420Codec :
 	public CUL00Codec
 {
 public:
-	static const utvf_t m_utvfCodec;
+	static const utvf_t m_utvfCodec = CULYUV420CodecFormat<C>::m_utvf;
 
 private:
 	static const utvf_t m_utvfEncoderInput[];
@@ -43,6 +47,3 @@ protected:
 	virtual void ConvertFromPlanar(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 };
-
-template<> const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfCodec = UTVF_ULY0;
-template<> const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfCodec = UTVF_ULH0;
