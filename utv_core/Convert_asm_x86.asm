@@ -293,12 +293,12 @@ _0x80b				dq	8080808080808080h
 					dq	8080808080808080h
 
 %push
-global _avx1_ConvertBGRToULRG
-_avx1_ConvertBGRToULRG:
+global _ssse3_ConvertBGRToULRG
+_ssse3_ConvertBGRToULRG:
 	SIMPLE_PROLOGUE	0, pGBegin, pBBegin, pRBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride
 
-	vmovdqa		xmm7, [bgr2planarpshufb16]
-	vmovdqa		xmm6, [_0x80b]
+	movdqa		xmm7, [bgr2planarpshufb16]
+	movdqa		xmm6, [_0x80b]
 	mov			esi, [esp + %$pSrcBegin]
 	mov			edi, [esp + %$pGBegin]
 	mov			ebx, [esp + %$pBBegin]
@@ -309,32 +309,34 @@ _avx1_ConvertBGRToULRG:
 	add			ecx, [esp + %$cbWidth]
 	sub			ecx, 48 - 3
 .label0:
-	vlddqu		xmm0, [esi   ]			; xmm0 = B5 R4 G4 B4 R3 G3 B3 R2 G2 B2 R1 G1 B1 R0 G0 B0
-	vlddqu		xmm1, [esi+16]			; xmm1 = Ga Ba R9 G9 B9 R8 G8 B8 R7 G7 B7 R6 G6 B6 R5 G5
-	vlddqu		xmm2, [esi+32]			; xmm2 = Rf Gf Bf Re Ge Be Rd Gd Bd Rc Gc Bc Rb Gb Bb Ra
+	lddqu		xmm0, [esi   ]			; xmm0 = B5 R4 G4 B4 R3 G3 B3 R2 G2 B2 R1 G1 B1 R0 G0 B0
+	lddqu		xmm1, [esi+16]			; xmm1 = Ga Ba R9 G9 B9 R8 G8 B8 R7 G7 B7 R6 G6 B6 R5 G5
+	lddqu		xmm2, [esi+32]			; xmm2 = Rf Gf Bf Re Ge Be Rd Gd Bd Rc Gc Bc Rb Gb Bb Ra
 
-	vpshufb		xmm0, xmm0, xmm7		; xmm0 = G4 G3 G2 G1 G0 R4 R3 R2 R1 R0 B5 B4 B3 B2 B1 B0
-	vpshufb		xmm1, xmm1, xmm7		; xmm1 = R9 R8 R7 R6 R5 Ba B9 B8 B7 B6 Ga G9 G8 G7 G6 G5
-	vpshufb		xmm2, xmm2, xmm7		; xmm2 = Bf Be Bd Bc Bb Gf Ge Gd Gc Gb Rf Re Rd Rc Rb Ra
+	pshufb		xmm0, xmm7				; xmm0 = G4 G3 G2 G1 G0 R4 R3 R2 R1 R0 B5 B4 B3 B2 B1 B0
+	pshufb		xmm1, xmm7				; xmm1 = R9 R8 R7 R6 R5 Ba B9 B8 B7 B6 Ga G9 G8 G7 G6 G5
+	pshufb		xmm2, xmm7				; xmm2 = Bf Be Bd Bc Bb Gf Ge Gd Gc Gb Rf Re Rd Rc Rb Ra
 
-	vpalignr	xmm5, xmm2, xmm1, 6		; xmm5 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 Ba B9 B8 B7 B6
-	vpalignr	xmm4, xmm1, xmm0, 6		; xmm4 = Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0 R4 R3 R2 R1 R0
-	vpalignr	xmm3, xmm0, xmm2, 6		; xmm3 = B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb Gf Ge Gd Gc Gb
+	movdqa		xmm5, xmm2
+	palignr		xmm2, xmm1, 6			; xmm5 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 Ba B9 B8 B7 B6
+	palignr		xmm1, xmm0, 6			; xmm4 = Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0 R4 R3 R2 R1 R0
+	palignr		xmm0, xmm5, 6			; xmm3 = B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb Gf Ge Gd Gc Gb
 
-	vpalignr	xmm0, xmm3, xmm4, 5		; xmm0 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
-	vpalignr	xmm1, xmm4, xmm5, 5		; xmm1 = R4 R3 R2 R1 R0 Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5
-	vpalignr	xmm2, xmm5, xmm3, 5		; xmm2 = Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb
+	movdqa		xmm3, xmm0
+	palignr		xmm0, xmm1, 5			; xmm0 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
+	palignr		xmm1, xmm2, 5			; xmm1 = R4 R3 R2 R1 R0 Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5
+	palignr		xmm2, xmm3, 5			; xmm2 = Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb
 
-	vmovdqu		[edi], xmm0
-	vpsubb		xmm0, xmm0, xmm6
+	movdqu		[edi], xmm0
+	psubb		xmm0, xmm6
 
-	vpalignr	xmm1, xmm1, xmm1, 11	; xmm1 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
-	vpalignr	xmm2, xmm2, xmm2, 5		; xmm2 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
+	palignr		xmm1, xmm1, 11			; xmm1 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
+	palignr		xmm2, xmm2, 5			; xmm2 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
 
-	vpsubb		xmm1, xmm1, xmm0
-	vpsubb		xmm2, xmm2, xmm0
-	vmovdqu		[ebx], xmm2
-	vmovdqu		[edx], xmm1
+	psubb		xmm1, xmm0
+	psubb		xmm2, xmm0
+	movdqu		[ebx], xmm2
+	movdqu		[edx], xmm1
 
 	add			edi, 16
 	add			ebx, 16
@@ -398,11 +400,11 @@ global %$procname
 %endif
 
 %if %$bgrx
-	vmovdqa		xmm7, [bgrx2planarpshufb16]
+	movdqa		xmm7, [bgrx2planarpshufb16]
 %else
-	vmovdqa		xmm7, [xrgb2planarpshufb16]
+	movdqa		xmm7, [xrgb2planarpshufb16]
 %endif
-	vmovdqa		xmm6, [_0x80b]
+	movdqa		xmm6, [_0x80b]
 	mov			esi, [esp + %$pSrcBegin]
 	mov			edi, [esp + %$pGBegin]
 	mov			ebx, [esp + %$pBBegin]
@@ -416,38 +418,42 @@ global %$procname
 	add			ecx, [esp + %$cbWidth]
 	sub			ecx, 64 - 4
 .label0:
-	vlddqu		xmm0, [esi   ]		; xmm0 = A3 R3 G3 B3 A2 R2 G2 B2 A1 R1 G1 B1 A0 R0 G0 B0 (bgrx)
-	vlddqu		xmm1, [esi+16]		; xmm1 = A7 R7 G7 B7 A6 R6 G6 B6 A5 R5 G5 B5 A4 R4 G4 B4
-	vlddqu		xmm2, [esi+32]		; xmm2 = Ab Rb Gb Bb Aa Ra Ga Ba A9 R9 G9 B9 A8 R8 G8 B8
-	vlddqu		xmm3, [esi+48]		; xmm3 = Af Rf Gf Bf Ae Re Ge Be Ad Rd Gd Bd Ac Rc Gc Bc
+	lddqu		xmm0, [esi   ]		; xmm0 = A3 R3 G3 B3 A2 R2 G2 B2 A1 R1 G1 B1 A0 R0 G0 B0 (bgrx)
+	lddqu		xmm1, [esi+16]		; xmm1 = A7 R7 G7 B7 A6 R6 G6 B6 A5 R5 G5 B5 A4 R4 G4 B4
+	lddqu		xmm2, [esi+32]		; xmm2 = Ab Rb Gb Bb Aa Ra Ga Ba A9 R9 G9 B9 A8 R8 G8 B8
+	lddqu		xmm3, [esi+48]		; xmm3 = Af Rf Gf Bf Ae Re Ge Be Ad Rd Gd Bd Ac Rc Gc Bc
 
-	vpshufb		xmm0, xmm0, xmm7	; xmm0 = A3 A2 A1 A0 R3 R2 R1 R0 G3 G2 G1 G0 B3 B2 B1 B0
-	vpshufb		xmm1, xmm1, xmm7	; xmm1 = A7 A6 A5 A4 R7 R6 R5 R4 G7 G6 G5 G4 B7 B6 B5 B4
-	vpshufb		xmm2, xmm2, xmm7	; xmm2 = Ab Aa A9 A8 Rb Ra R9 R8 Gb Ga G9 G8 Bb Ba B9 B8
-	vpshufb		xmm3, xmm3, xmm7	; xmm3 = Af Ae Ad Ac Rf Re Rd Rc Gf Ge Gd Gc Bf Be Bd Bc
+	pshufb		xmm0, xmm7			; xmm0 = A3 A2 A1 A0 R3 R2 R1 R0 G3 G2 G1 G0 B3 B2 B1 B0
+	pshufb		xmm1, xmm7			; xmm1 = A7 A6 A5 A4 R7 R6 R5 R4 G7 G6 G5 G4 B7 B6 B5 B4
+	pshufb		xmm2, xmm7			; xmm2 = Ab Aa A9 A8 Rb Ra R9 R8 Gb Ga G9 G8 Bb Ba B9 B8
+	pshufb		xmm3, xmm7			; xmm3 = Af Ae Ad Ac Rf Re Rd Rc Gf Ge Gd Gc Bf Be Bd Bc
 
-	vpunpckldq	xmm4, xmm0, xmm1	; xmm4 = G7 G6 G5 G4 G3 G2 G1 G0 B7 B6 B5 B4 B3 B2 B1 B0
-	vpunpckhdq	xmm0, xmm0, xmm1	; xmm0 = A7 A6 A5 A4 A3 A2 A1 A0 R7 R6 R5 R4 R3 R2 R1 R0
-	vpunpckldq	xmm5, xmm2, xmm3	; xmm6 = Gf Ge Gd Gc Gb Ga G9 G8 Bf Be Bd Bc Bb Ba B9 B8
-	vpunpckhdq	xmm2, xmm2, xmm3	; xmm2 = Af Ae Ad Ac Ab Aa A9 A8 Rf Re Rd Rc Rb Ra R9 R8
+	movdqa		xmm4, xmm0
+	punpckldq	xmm4, xmm1			; xmm4 = G7 G6 G5 G4 G3 G2 G1 G0 B7 B6 B5 B4 B3 B2 B1 B0
+	punpckhdq	xmm0, xmm1			; xmm0 = A7 A6 A5 A4 A3 A2 A1 A0 R7 R6 R5 R4 R3 R2 R1 R0
+	movdqa		xmm5, xmm2
+	punpckldq	xmm5, xmm3			; xmm5 = Gf Ge Gd Gc Gb Ga G9 G8 Bf Be Bd Bc Bb Ba B9 B8
+	punpckhdq	xmm2, xmm3			; xmm2 = Af Ae Ad Ac Ab Aa A9 A8 Rf Re Rd Rc Rb Ra R9 R8
 
-	vpunpcklqdq	xmm1, xmm4, xmm5	; xmm1 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
-	vpunpckhqdq	xmm4, xmm4, xmm5	; xmm4 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
-	vpunpcklqdq	xmm3, xmm0, xmm2	; xmm3 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
+	movdqa		xmm1, xmm4
+	punpcklqdq	xmm1, xmm5			; xmm1 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
+	punpckhqdq	xmm4, xmm5			; xmm4 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
 %if %$havealpha
-	vpunpckhqdq	xmm0, xmm0, xmm2	; xmm0 = Af Ae Ad Ac Ab Aa A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+	movdqa		xmm3, xmm0
+	punpckhqdq	xmm3, xmm2			; xmm3 = Af Ae Ad Ac Ab Aa A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+%endif
+	punpcklqdq	xmm0, xmm2			; xmm0 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
+
+	movdqu		[edi], xmm4
+	psubb		xmm4, xmm6
+%if %$havealpha
+	movdqu		[ebp], xmm3
 %endif
 
-	vmovdqu		[edi], xmm4
-	vpsubb		xmm4, xmm4, xmm6
-%if %$havealpha
-	vmovdqu		[ebp], xmm0
-%endif
-
-	vpsubb		xmm1, xmm1, xmm4
-	vmovdqu		[ebx], xmm1
-	vpsubb		xmm3, xmm3, xmm4
-	vmovdqu		[edx], xmm3
+	psubb		xmm1, xmm4
+	movdqu		[ebx], xmm1
+	psubb		xmm0, xmm4
+	movdqu		[edx], xmm0
 
 	add			edi, 16
 	add			ebx, 16
@@ -516,10 +522,10 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_XRGB_TO_ULRGA	_avx1_ConvertBGRXToULRG, 1, 0
-CONVERT_XRGB_TO_ULRGA	_avx1_ConvertXRGBToULRG, 0, 0
-CONVERT_XRGB_TO_ULRGA	_avx1_ConvertBGRAToULRA, 1, 1
-CONVERT_XRGB_TO_ULRGA	_avx1_ConvertARGBToULRA, 0, 1
+CONVERT_XRGB_TO_ULRGA	_ssse3_ConvertBGRXToULRG, 1, 0
+CONVERT_XRGB_TO_ULRGA	_ssse3_ConvertXRGBToULRG, 0, 0
+CONVERT_XRGB_TO_ULRGA	_ssse3_ConvertBGRAToULRA, 1, 1
+CONVERT_XRGB_TO_ULRGA	_ssse3_ConvertARGBToULRA, 0, 1
 
 
 	align	64
@@ -542,9 +548,9 @@ global %$procname
 	SIMPLE_PROLOGUE 0, pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd
 
 %if %$yuyv
-	vmovdqa		xmm7, [yuyv2planarpshufb16]
+	movdqa		xmm7, [yuyv2planarpshufb16]
 %else
-	vmovdqa		xmm7, [uyvy2planarpshufb16]
+	movdqa		xmm7, [uyvy2planarpshufb16]
 %endif
 	mov			esi, [esp + %$pSrcBegin]
 	mov			edi, [esp + %$pYBegin]
@@ -554,28 +560,31 @@ global %$procname
 	mov			ecx, [esp + %$pSrcEnd]
 	sub			ecx, 64 - 4
 .label0:
-	vlddqu		xmm0, [esi   ]		; xmm0 = V06 Y07 U06 Y06 V04 Y05 U04 Y04 V02 Y03 U02 Y02 V00 Y01 U00 Y00 (yuyv)
-	vlddqu		xmm1, [esi+16]		; xmm1 = V0e Y0f U0e Y0e V0c Y0d U0c Y0c V0a Y0b U0a Y0a V08 Y09 U08 Y08
-	vlddqu		xmm2, [esi+32]		; xmm2 = V16 Y17 U16 Y16 V14 Y15 U14 Y14 V12 Y13 U12 Y12 V10 Y11 U10 Y10
-	vlddqu		xmm3, [esi+48]		; xmm3 = V1e Y1f U1e Y1e V1c Y1d U1c Y1c V1a Y1b U1a Y1a V18 Y19 U18 Y18
+	lddqu		xmm0, [esi   ]		; xmm0 = V06 Y07 U06 Y06 V04 Y05 U04 Y04 V02 Y03 U02 Y02 V00 Y01 U00 Y00 (yuyv)
+	lddqu		xmm1, [esi+16]		; xmm1 = V0e Y0f U0e Y0e V0c Y0d U0c Y0c V0a Y0b U0a Y0a V08 Y09 U08 Y08
+	lddqu		xmm2, [esi+32]		; xmm2 = V16 Y17 U16 Y16 V14 Y15 U14 Y14 V12 Y13 U12 Y12 V10 Y11 U10 Y10
+	lddqu		xmm3, [esi+48]		; xmm3 = V1e Y1f U1e Y1e V1c Y1d U1c Y1c V1a Y1b U1a Y1a V18 Y19 U18 Y18
 
-	vpshufb		xmm0, xmm0, xmm7	; xmm0 = V06 V04 V02 V00 U06 U04 U02 U00 Y07 Y06 Y05 Y04 Y03 Y02 Y01 Y00
-	vpshufb		xmm1, xmm1, xmm7	; xmm1 = V0e V0c V0a V08 U0e U0c U0a U08 Y0f Y0e Y0d Y0c Y0b Y0a Y09 Y08
-	vpshufb		xmm2, xmm2, xmm7	; xmm2 = V16 V14 V12 V10 U16 U14 U12 U10 Y17 Y16 Y15 Y14 Y13 Y12 Y11 Y10
-	vpshufb		xmm3, xmm3, xmm7	; xmm3 = V1e V1c V1a V18 U1e U1c U1a U18 Y1f Y1e Y1d Y1c Y1b Y1a Y19 Y18
+	pshufb		xmm0, xmm7			; xmm0 = V06 V04 V02 V00 U06 U04 U02 U00 Y07 Y06 Y05 Y04 Y03 Y02 Y01 Y00
+	pshufb		xmm1, xmm7			; xmm1 = V0e V0c V0a V08 U0e U0c U0a U08 Y0f Y0e Y0d Y0c Y0b Y0a Y09 Y08
+	pshufb		xmm2, xmm7			; xmm2 = V16 V14 V12 V10 U16 U14 U12 U10 Y17 Y16 Y15 Y14 Y13 Y12 Y11 Y10
+	pshufb		xmm3, xmm7			; xmm3 = V1e V1c V1a V18 U1e U1c U1a U18 Y1f Y1e Y1d Y1c Y1b Y1a Y19 Y18
 
-	vpunpcklqdq	xmm4, xmm0, xmm1	; xmm4 = Y0f Y0e Y0d Y0c Y0b Y0a Y09 Y08 Y07 Y06 Y05 Y04 Y03 Y02 Y01 Y00
-	vpunpcklqdq	xmm5, xmm2, xmm3	; xmm5 = Y1f Y1e Y1d Y1c Y1b Y1a Y19 Y18 Y17 Y16 Y15 Y14 Y13 Y12 Y11 Y10
-	vmovdqu		[edi   ], xmm4
-	vmovdqu		[edi+16], xmm5
+	movdqa		xmm4, xmm0
+	movdqa		xmm5, xmm2
+	punpcklqdq	xmm4, xmm1			; xmm4 = Y0f Y0e Y0d Y0c Y0b Y0a Y09 Y08 Y07 Y06 Y05 Y04 Y03 Y02 Y01 Y00
+	punpcklqdq	xmm5, xmm3			; xmm5 = Y1f Y1e Y1d Y1c Y1b Y1a Y19 Y18 Y17 Y16 Y15 Y14 Y13 Y12 Y11 Y10
+	movdqu		[edi   ], xmm4
+	movdqu		[edi+16], xmm5
 
-	vpunpckhdq	xmm0, xmm0, xmm1	; xmm0 = V0e V0c V0a V08 V06 V04 V02 V00 U0e U0c U0a U08 U06 U04 U02 U00
-	vpunpckhdq	xmm2, xmm2, xmm3	; xmm2 = V1e V1c V1a V18 V16 V14 V12 V10 U1e U1c U1a U18 U16 U14 U12 U10
+	punpckhdq	xmm0, xmm1			; xmm0 = V0e V0c V0a V08 V06 V04 V02 V00 U0e U0c U0a U08 U06 U04 U02 U00
+	punpckhdq	xmm2, xmm3			; xmm2 = V1e V1c V1a V18 V16 V14 V12 V10 U1e U1c U1a U18 U16 U14 U12 U10
 
-	vpunpcklqdq	xmm4, xmm0, xmm2	; xmm4 = U1e U1c U1a U18 U16 U14 U12 U10 U0e U0c U0a U08 U06 U04 U02 U00
-	vpunpckhqdq	xmm5, xmm0, xmm2	; xmm5 = V1e V1c V1a V18 V16 V14 V12 V10 V0e V0c V0a V08 V06 V04 V02 V00
-	vmovdqu		[ebx], xmm4
-	vmovdqu		[edx], xmm5
+	movdqa		xmm1, xmm0
+	punpcklqdq	xmm1, xmm2			; xmm1 = U1e U1c U1a U18 U16 U14 U12 U10 U0e U0c U0a U08 U06 U04 U02 U00
+	punpckhqdq	xmm0, xmm2			; xmm0 = V1e V1c V1a V18 V16 V14 V12 V10 V0e V0c V0a V08 V06 V04 V02 V00
+	movdqu		[ebx], xmm1
+	movdqu		[edx], xmm0
 
 	add			edi, 32
 	add			ebx, 16
@@ -614,8 +623,8 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_YUV422_TO_ULY2	_avx1_ConvertYUYVToULY2, 1
-CONVERT_YUV422_TO_ULY2	_avx1_ConvertUYVYToULY2, 0
+CONVERT_YUV422_TO_ULY2	_ssse3_ConvertYUYVToULY2, 1
+CONVERT_YUV422_TO_ULY2	_ssse3_ConvertUYVYToULY2, 0
 
 
 
@@ -629,12 +638,12 @@ dummya		dq	3736353433323130h
 			dq	3f3e3d3c3b3a3938h
 
 %push
-global _avx1_ConvertULRGToBGR
-_avx1_ConvertULRGToBGR:
+global _ssse3_ConvertULRGToBGR
+_ssse3_ConvertULRGToBGR:
 	SIMPLE_PROLOGUE	0, pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, cbWidth, scbStride
 
-	vmovdqa		xmm7, [planar2bgrpshufb16]
-	vmovdqa		xmm6, [_0x80b]
+	movdqa		xmm7, [planar2bgrpshufb16]
+	movdqa		xmm6, [_0x80b]
 	mov			edi, [esp + %$pDstBegin]
 	mov			esi, [esp + %$pGBegin]
 	mov			ebx, [esp + %$pBBegin]
@@ -645,32 +654,35 @@ _avx1_ConvertULRGToBGR:
 	add			ecx, [esp + %$cbWidth]
 	sub			ecx, 48 - 3
 .label0:
-	vlddqu		xmm0, [esi]				; xmm0 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
-	vlddqu		xmm1, [edx]
-	vlddqu		xmm2, [ebx]
+	lddqu		xmm0, [esi]				; xmm0 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
+	lddqu		xmm1, [edx]
+	lddqu		xmm2, [ebx]
 
-	vpaddb		xmm3, xmm0, xmm6
-	vpaddb		xmm1, xmm1, xmm3		; xmm1 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
-	vpaddb		xmm2, xmm2, xmm3		; xmm2 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
+	movdqa		xmm3, xmm0
+	paddb		xmm3, xmm6
+	paddb		xmm1, xmm3				; xmm1 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
+	paddb		xmm2, xmm3				; xmm2 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
 
-	vpalignr	xmm1, xmm1, xmm1, 5		; xmm1 = R4 R3 R2 R1 R0 Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5
-	vpalignr	xmm2, xmm2, xmm2, 11	; xmm2 = Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb
+	palignr		xmm1, xmm1, 5			; xmm1 = R4 R3 R2 R1 R0 Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5
+	palignr		xmm2, xmm2, 11			; xmm2 = Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb
 
-	vpalignr	xmm5, xmm1, xmm2, 11	; xmm5 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 Ba B9 B8 B7 B6
-	vpalignr	xmm4, xmm0, xmm1, 11	; xmm4 = Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0 R4 R3 R2 R1 R0
-	vpalignr	xmm3, xmm2, xmm0, 11	; xmm3 = B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb Gf Ge Gd Gc Gb
+	movdqa		xmm5, xmm2
+	palignr		xmm2, xmm0, 11			; xmm3 = B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb Gf Ge Gd Gc Gb
+	palignr		xmm0, xmm1, 11			; xmm4 = Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0 R4 R3 R2 R1 R0
+	palignr		xmm1, xmm5, 11			; xmm5 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 Ba B9 B8 B7 B6
 
-	vpalignr	xmm0, xmm4, xmm3, 10	; xmm0 = G4 G3 G2 G1 G0 R4 R3 R2 R1 R0 B5 B4 B3 B2 B1 B0
-	vpalignr	xmm1, xmm5, xmm4, 10	; xmm1 = R9 R8 R7 R6 R5 Ba B9 B8 B7 B6 Ga G9 G8 G7 G6 G5
-	vpalignr	xmm2, xmm3, xmm5, 10	; xmm2 = Bf Be Bd Bc Bb Gf Ge Gd Gc Gb Rf Re Rd Rc Rb Ra
+	movdqa		xmm5, xmm2
+	palignr		xmm2, xmm1, 10			; xmm2 = Bf Be Bd Bc Bb Gf Ge Gd Gc Gb Rf Re Rd Rc Rb Ra
+	palignr		xmm1, xmm0, 10			; xmm1 = R9 R8 R7 R6 R5 Ba B9 B8 B7 B6 Ga G9 G8 G7 G6 G5
+	palignr		xmm0, xmm5, 10			; xmm0 = G4 G3 G2 G1 G0 R4 R3 R2 R1 R0 B5 B4 B3 B2 B1 B0
 
-	vpshufb		xmm0, xmm0, xmm7		; xmm0 = B5 R4 G4 B4 R3 G3 B3 R2 G2 B2 R1 G1 B1 R0 G0 B0
-	vpshufb		xmm1, xmm1, xmm7		; xmm1 = Ga Ba R9 G9 B9 R8 G8 B8 R7 G7 B7 R6 G6 B6 R5 G5
-	vpshufb		xmm2, xmm2, xmm7		; xmm2 = Rf Gf Bf Re Ge Be Rd Gd Bd Rc Gc Bc Rb Gb Bb Ra
+	pshufb		xmm0, xmm7				; xmm0 = B5 R4 G4 B4 R3 G3 B3 R2 G2 B2 R1 G1 B1 R0 G0 B0
+	pshufb		xmm1, xmm7				; xmm1 = Ga Ba R9 G9 B9 R8 G8 B8 R7 G7 B7 R6 G6 B6 R5 G5
+	pshufb		xmm2, xmm7				; xmm2 = Rf Gf Bf Re Ge Be Rd Gd Bd Rc Gc Bc Rb Gb Bb Ra
 
-	vmovdqu		[edi   ], xmm0
-	vmovdqu		[edi+16], xmm1
-	vmovdqu		[edi+32], xmm2
+	movdqu		[edi   ], xmm0
+	movdqu		[edi+16], xmm1
+	movdqu		[edi+32], xmm2
 
 	add			esi, 16
 	add			ebx, 16
@@ -726,13 +738,13 @@ global %$procname
 %endif
 
 %if %$bgrx
-	vmovdqa		xmm7, [planar2bgrxpshufb16]
+	movdqa		xmm7, [planar2bgrxpshufb16]
 %else
-	vmovdqa		xmm7, [planar2xrgbpshufb16]
+	movdqa		xmm7, [planar2xrgbpshufb16]
 %endif
-	vmovdqa		xmm6, [_0x80b]
+	movdqa		xmm6, [_0x80b]
 %if ! %$havealpha
-	vpcmpeqd	xmm3, xmm3, xmm3
+	pcmpeqd		xmm3, xmm3
 %endif
 	mov			edi, [esp + %$pDstBegin]
 	mov			esi, [esp + %$pGBegin]
@@ -747,39 +759,44 @@ global %$procname
 	add			ecx, [esp + %$cbWidth]
 	sub			ecx, 64 - 4
 .label0:
-	vlddqu		xmm0, [esi]			; xmm0 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
-	vlddqu		xmm1, [ebx]
-	vlddqu		xmm2, [edx]
+	lddqu		xmm0, [esi]			; xmm0 = Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
+	lddqu		xmm1, [ebx]
+	lddqu		xmm2, [edx]
 %if %$havealpha
-	vlddqu		xmm3, [ebp]			; xmm3 = Af Ae Ad Ac Ab Aa A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
+	lddqu		xmm3, [ebp]			; xmm3 = Af Ae Ad Ac Ab Aa A9 A8 A7 A6 A5 A4 A3 A2 A1 A0
 %endif
-;	vlddqu		xmm0, [dummyg]
-;	vlddqu		xmm1, [dummyb]
-;	vlddqu		xmm2, [dummyr]
+;	lddqu		xmm0, [dummyg]
+;	lddqu		xmm1, [dummyb]
+;	lddqu		xmm2, [dummyr]
 
-	vpaddb		xmm4, xmm0, xmm6
-	vpaddb		xmm1, xmm1, xmm4	; xmm1 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
-	vpaddb		xmm2, xmm2, xmm4	; xmm2 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
+	movdqa		xmm4, xmm0
+	paddb		xmm4, xmm6
+	paddb		xmm1, xmm4			; xmm1 = Bf Be Bd Bc Bb Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0
+	paddb		xmm2, xmm4			; xmm2 = Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 R4 R3 R2 R1 R0
 
-	vpunpckldq	xmm4, xmm1, xmm0	; xmm4 = G7 G6 G5 G4 B7 B6 B5 B4 G3 G2 G1 G0 B3 B2 B1 B0
-	vpunpckhdq	xmm1, xmm1, xmm0	; xmm1 = Gf Ge Gd Gc Bf Be Bd Bc Gb Ga G9 G8 Bb Ba B9 B8
-	vpunpckldq	xmm5, xmm2, xmm3	; xmm5 = A7 A6 A5 A4 R7 R6 R5 R4 A3 A2 A1 A0 R3 R2 R1 R0
-	vpunpckhdq	xmm2, xmm2, xmm3	; xmm2 = Af Ae Ad Ac Rf Re Rd Rc Ab Aa A9 A8 Rb Ra R9 R8
+	movdqa		xmm4, xmm1
+	punpckldq	xmm4, xmm0			; xmm4 = G7 G6 G5 G4 B7 B6 B5 B4 G3 G2 G1 G0 B3 B2 B1 B0
+	punpckhdq	xmm1, xmm0			; xmm1 = Gf Ge Gd Gc Bf Be Bd Bc Gb Ga G9 G8 Bb Ba B9 B8
+	movdqa		xmm5, xmm2
+	punpckldq	xmm5, xmm3			; xmm5 = A7 A6 A5 A4 R7 R6 R5 R4 A3 A2 A1 A0 R3 R2 R1 R0
+	punpckhdq	xmm2, xmm3			; xmm2 = Af Ae Ad Ac Rf Re Rd Rc Ab Aa A9 A8 Rb Ra R9 R8
 
-	vpunpcklqdq	xmm0, xmm4, xmm5	; xmm0 = A3 A2 A1 A0 R3 R2 R1 R0 G3 G2 G1 G0 B3 B2 B1 B0
-	vpunpckhqdq	xmm4, xmm4, xmm5	; xmm4 = A7 A6 A5 A4 R7 R6 R5 R4 G7 G6 G5 G4 B7 B6 B5 B4
-	vpunpcklqdq	xmm5, xmm1, xmm2	; xmm5 = Ab Aa A9 A8 Rb Ra R9 R8 Gb Ga G9 G8 Bb Ba B9 B8
-	vpunpckhqdq	xmm1, xmm1, xmm2	; xmm1 = Af Ae Ad Ac Rf Re Rd Rc Gf Ge Gd Gc Bf Be Bd Bc
+	movdqa		xmm0, xmm4
+	punpcklqdq	xmm0, xmm5			; xmm0 = A3 A2 A1 A0 R3 R2 R1 R0 G3 G2 G1 G0 B3 B2 B1 B0
+	punpckhqdq	xmm4, xmm5			; xmm4 = A7 A6 A5 A4 R7 R6 R5 R4 G7 G6 G5 G4 B7 B6 B5 B4
+	movdqa		xmm5, xmm1
+	punpcklqdq	xmm5, xmm2			; xmm5 = Ab Aa A9 A8 Rb Ra R9 R8 Gb Ga G9 G8 Bb Ba B9 B8
+	punpckhqdq	xmm1, xmm2			; xmm1 = Af Ae Ad Ac Rf Re Rd Rc Gf Ge Gd Gc Bf Be Bd Bc
 
-	vpshufb		xmm0, xmm0, xmm7	; xmm0 = A3 R3 G3 B3 A2 R2 G2 B2 A1 R1 G1 B1 A0 R0 G0 B0
-	vpshufb		xmm4, xmm4, xmm7	; xmm4 = A7 R7 G7 B7 A6 R6 G6 B6 A5 R5 G5 B5 A4 R4 G4 B4
-	vpshufb		xmm5, xmm5, xmm7	; xmm5 = Ab Rb Gb Bb Aa Ra Ga Ba A9 R9 G9 B9 A8 R8 G8 B8
-	vpshufb		xmm1, xmm1, xmm7	; xmm1 = Af Rf Gf Bf Ae Re Ge Be Ad Rd Gd Bd Ac Rc Gc Bc
+	pshufb		xmm0, xmm7			; xmm0 = A3 R3 G3 B3 A2 R2 G2 B2 A1 R1 G1 B1 A0 R0 G0 B0
+	pshufb		xmm4, xmm7			; xmm4 = A7 R7 G7 B7 A6 R6 G6 B6 A5 R5 G5 B5 A4 R4 G4 B4
+	pshufb		xmm5, xmm7			; xmm5 = Ab Rb Gb Bb Aa Ra Ga Ba A9 R9 G9 B9 A8 R8 G8 B8
+	pshufb		xmm1, xmm7			; xmm1 = Af Rf Gf Bf Ae Re Ge Be Ad Rd Gd Bd Ac Rc Gc Bc
 
-	vmovdqu		[edi   ], xmm0
-	vmovdqu		[edi+16], xmm4
-	vmovdqu		[edi+32], xmm5
-	vmovdqu		[edi+48], xmm1
+	movdqu		[edi   ], xmm0
+	movdqu		[edi+16], xmm4
+	movdqu		[edi+32], xmm5
+	movdqu		[edi+48], xmm1
 
 	add			esi, 16
 	add			ebx, 16
@@ -854,10 +871,10 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_ULRGA_TO_XRGB	_avx1_ConvertULRGToBGRX, 1, 0
-CONVERT_ULRGA_TO_XRGB	_avx1_ConvertULRGToXRGB, 0, 0
-CONVERT_ULRGA_TO_XRGB	_avx1_ConvertULRAToBGRA, 1, 1
-CONVERT_ULRGA_TO_XRGB	_avx1_ConvertULRAToARGB, 0, 1
+CONVERT_ULRGA_TO_XRGB	_ssse3_ConvertULRGToBGRX, 1, 0
+CONVERT_ULRGA_TO_XRGB	_ssse3_ConvertULRGToXRGB, 0, 0
+CONVERT_ULRGA_TO_XRGB	_ssse3_ConvertULRAToBGRA, 1, 1
+CONVERT_ULRGA_TO_XRGB	_ssse3_ConvertULRAToARGB, 0, 1
 
 
 
@@ -870,9 +887,9 @@ global %$procname
 	SIMPLE_PROLOGUE 0, pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin
 
 %if %$yuyv
-	vmovdqa		xmm7, [planar2yuyvpshufb16]
+	movdqa		xmm7, [planar2yuyvpshufb16]
 %else
-	vmovdqa		xmm7, [planar2uyvypshufb16]
+	movdqa		xmm7, [planar2uyvypshufb16]
 %endif
 	mov			edi, [esp + %$pDstBegin]
 	mov			esi, [esp + %$pYBegin]
@@ -882,28 +899,31 @@ global %$procname
 	mov			ecx, [esp + %$pDstEnd]
 	sub			ecx, 64 - 4
 .label0:
-	vlddqu		xmm2, [ebx]			; xmm2 = U1e U1c U1a U18 U16 U14 U12 U10 U0e U0c U0a U08 U06 U04 U02 U00
-	vlddqu		xmm3, [edx]			; xmm3 = V1e V1c V1a V18 V16 V14 V12 V10 V0e V0c V0a V08 V06 V04 V02 V00
-	vlddqu		xmm0, [esi   ]		; xmm0 = Y0f Y0e Y0d Y0c Y0b Y0a Y09 Y08 Y07 Y06 Y05 Y04 Y03 Y02 Y01 Y00
-	vlddqu		xmm1, [esi+16]		; xmm1 = Y1f Y1e Y1d Y1c Y1b Y1a Y19 Y18 Y17 Y16 Y15 Y14 Y13 Y12 Y11 Y10
+	lddqu		xmm2, [ebx]			; xmm2 = U1e U1c U1a U18 U16 U14 U12 U10 U0e U0c U0a U08 U06 U04 U02 U00
+	lddqu		xmm3, [edx]			; xmm3 = V1e V1c V1a V18 V16 V14 V12 V10 V0e V0c V0a V08 V06 V04 V02 V00
+	lddqu		xmm0, [esi   ]		; xmm0 = Y0f Y0e Y0d Y0c Y0b Y0a Y09 Y08 Y07 Y06 Y05 Y04 Y03 Y02 Y01 Y00
+	lddqu		xmm1, [esi+16]		; xmm1 = Y1f Y1e Y1d Y1c Y1b Y1a Y19 Y18 Y17 Y16 Y15 Y14 Y13 Y12 Y11 Y10
 
-	vpunpckldq	xmm4, xmm2, xmm3	; xmm4 = V0e V0c V0a V08 U0e U0c U0a U08 V06 V04 V02 V00 U06 U04 U02 U00
-	vpunpckhdq	xmm2, xmm2, xmm3	; xmm2 = V1e V1c V1a V18 U1e U1c U1a U18 V16 V14 V12 V10 U16 U14 U12 U10
+	movdqa		xmm4, xmm2
+	punpckldq	xmm4, xmm3			; xmm4 = V0e V0c V0a V08 U0e U0c U0a U08 V06 V04 V02 V00 U06 U04 U02 U00
+	punpckhdq	xmm2, xmm3			; xmm2 = V1e V1c V1a V18 U1e U1c U1a U18 V16 V14 V12 V10 U16 U14 U12 U10
 
-	vpunpcklqdq	xmm5, xmm0, xmm4	; xmm5 = V06 V04 V02 V00 U06 U04 U02 U00 Y07 Y06 Y05 Y04 Y03 Y02 Y01 Y00
-	vpunpckhqdq	xmm0, xmm0, xmm4	; xmm0 = V0e V0c V0a V08 U0e U0c U0a U08 Y0f Y0e Y0d Y0c Y0b Y0a Y09 Y08
-	vpunpcklqdq	xmm4, xmm1, xmm2	; xmm4 = V16 V14 V12 V10 U16 U14 U12 U10 Y17 Y16 Y15 Y14 Y13 Y12 Y11 Y10
-	vpunpckhqdq	xmm1, xmm1, xmm2	; xmm1 = V1e V1c V1a V18 U1e U1c U1a U18 Y1f Y1e Y1d Y1c Y1b Y1a Y19 Y18
+	movdqa		xmm5, xmm0
+	punpcklqdq	xmm5, xmm4			; xmm5 = V06 V04 V02 V00 U06 U04 U02 U00 Y07 Y06 Y05 Y04 Y03 Y02 Y01 Y00
+	punpckhqdq	xmm0, xmm4			; xmm0 = V0e V0c V0a V08 U0e U0c U0a U08 Y0f Y0e Y0d Y0c Y0b Y0a Y09 Y08
+	movdqa		xmm4, xmm1
+	punpcklqdq	xmm4, xmm2			; xmm4 = V16 V14 V12 V10 U16 U14 U12 U10 Y17 Y16 Y15 Y14 Y13 Y12 Y11 Y10
+	punpckhqdq	xmm1, xmm2			; xmm1 = V1e V1c V1a V18 U1e U1c U1a U18 Y1f Y1e Y1d Y1c Y1b Y1a Y19 Y18
 
-	vpshufb		xmm5, xmm5, xmm7	; xmm5 = V06 Y07 U06 Y06 V04 Y05 U04 Y04 V02 Y03 U02 Y02 V00 Y01 U00 Y00
-	vpshufb		xmm0, xmm0, xmm7	; xmm0 = V0e Y0f U0e Y0e V0c Y0d U0c Y0c V0a Y0b U0a Y0a V08 Y09 U08 Y08
-	vpshufb		xmm4, xmm4, xmm7	; xmm4 = V16 Y17 U16 Y16 V14 Y15 U14 Y14 V12 Y13 U12 Y12 V10 Y11 U10 Y10
-	vpshufb		xmm1, xmm1, xmm7	; xmm1 = V1e Y1f U1e Y1e V1c Y1d U1c Y1c V1a Y1b U1a Y1a V18 Y19 U18 Y18
+	pshufb		xmm5, xmm7			; xmm5 = V06 Y07 U06 Y06 V04 Y05 U04 Y04 V02 Y03 U02 Y02 V00 Y01 U00 Y00
+	pshufb		xmm0, xmm7			; xmm0 = V0e Y0f U0e Y0e V0c Y0d U0c Y0c V0a Y0b U0a Y0a V08 Y09 U08 Y08
+	pshufb		xmm4, xmm7			; xmm4 = V16 Y17 U16 Y16 V14 Y15 U14 Y14 V12 Y13 U12 Y12 V10 Y11 U10 Y10
+	pshufb		xmm1, xmm7			; xmm1 = V1e Y1f U1e Y1e V1c Y1d U1c Y1c V1a Y1b U1a Y1a V18 Y19 U18 Y18
 
-	vmovdqu		[edi   ], xmm5
-	vmovdqu		[edi+16], xmm0
-	vmovdqu		[edi+32], xmm4
-	vmovdqu		[edi+48], xmm1
+	movdqu		[edi   ], xmm5
+	movdqu		[edi+16], xmm0
+	movdqu		[edi+32], xmm4
+	movdqu		[edi+48], xmm1
 
 	add			esi, 32
 	add			ebx, 16
@@ -942,5 +962,5 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_ULY2_TO_YUV422	_avx1_ConvertULY2ToYUYV, 1
-CONVERT_ULY2_TO_YUV422	_avx1_ConvertULY2ToUYVY, 0
+CONVERT_ULY2_TO_YUV422	_ssse3_ConvertULY2ToYUYV, 1
+CONVERT_ULY2_TO_YUV422	_ssse3_ConvertULY2ToUYVY, 0

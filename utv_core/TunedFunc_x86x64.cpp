@@ -123,13 +123,7 @@ const TUNEDFUNC tfnSSE2 = {
 
 const TUNEDFUNC &tfnSSE3 = tfnSSE2;
 
-const TUNEDFUNC &tfnSSSE3 = tfnSSE2;
-
-const TUNEDFUNC &tfnSSE41 = tfnSSE2;
-
-const TUNEDFUNC &tfnSSE42 = tfnSSE2;
-
-const TUNEDFUNC tfnAVX1 = {
+const TUNEDFUNC tfnSSSE3 = {
 	sse2_PredictWrongMedianAndCount_align16,
 	sse2_PredictWrongMedianAndCount_align1,
 	sse2_PredictLeftAndCount_align1,
@@ -166,24 +160,30 @@ const TUNEDFUNC tfnAVX1 = {
 		sse2_ConvertRGBToULH2,
 		sse2_ConvertXRGBToULH2,
 	},
-	avx1_ConvertBGRToULRG,
-	avx1_ConvertBGRXToULRG,
-	avx1_ConvertXRGBToULRG,
-	avx1_ConvertBGRAToULRA,
-	avx1_ConvertARGBToULRA,
-	avx1_ConvertYUYVToULY2,
-	avx1_ConvertUYVYToULY2,
-	avx1_ConvertULRGToBGR,
-	avx1_ConvertULRGToBGRX,
-	avx1_ConvertULRGToXRGB,
-	avx1_ConvertULRAToBGRA,
-	avx1_ConvertULRAToARGB,
-	avx1_ConvertULY2ToYUYV,
-	avx1_ConvertULY2ToUYVY,
+	ssse3_ConvertBGRToULRG,
+	ssse3_ConvertBGRXToULRG,
+	ssse3_ConvertXRGBToULRG,
+	ssse3_ConvertBGRAToULRA,
+	ssse3_ConvertARGBToULRA,
+	ssse3_ConvertYUYVToULY2,
+	ssse3_ConvertUYVYToULY2,
+	ssse3_ConvertULRGToBGR,
+	ssse3_ConvertULRGToBGRX,
+	ssse3_ConvertULRGToXRGB,
+	ssse3_ConvertULRAToBGRA,
+	ssse3_ConvertULRAToARGB,
+	ssse3_ConvertULY2ToYUYV,
+	ssse3_ConvertULY2ToUYVY,
 	DummyTunedFunc
 };
 
-const TUNEDFUNC &tfnAVX2 = tfnAVX1;
+const TUNEDFUNC &tfnSSE41 = tfnSSSE3;
+
+const TUNEDFUNC &tfnSSE42 = tfnSSSE3;
+
+const TUNEDFUNC tfnAVX1 = tfnSSSE3;
+
+const TUNEDFUNC &tfnAVX2 = tfnSSSE3;
 
 
 class CTunedFuncInitializer
