@@ -206,7 +206,6 @@ global %$procname
 
 	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 00 00 00 00 00 00 XX R1 R0 G1 G0 B1 B0 / B1 B0 G1 G0 R1 R0 XX XX
 													;                                                        / XX XX B1 B0 G1 G0 R1 R0 (rgb24be)
-.label3:
 	pxor		xmm1, xmm1
 	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 XX 00 R1 00 R0 00 G1 00 G0 00 B1 00 B0
 
