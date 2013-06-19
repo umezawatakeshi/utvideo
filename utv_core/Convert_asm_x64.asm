@@ -167,10 +167,8 @@ CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToXRGB,  bt709coeff, 0, 1
 
 
 align	64
-shufdata_le	dq	8005800180048000h
-			dq	8080808080068002h
-shufdata_be	dq	8006800280078003h
-			dq	8080808080058001h
+shufdata32	dq	8005800180048000h
+			dq	8007800380068002h
 shufdata_pack	dq	808080800c080400h
 				dq	8080808080808080h
 
@@ -194,11 +192,7 @@ global %$procname
 
 %if %$use_ssse3
  %if %$rgb32
-  %if %$littleendian
-	movdqa		xmm3, [shufdata_le]
-  %else
-	movdqa		xmm3, [shufdata_be]
-  %endif
+	movdqa		xmm3, [shufdata32]
  %else
 	NOTYET
  %endif
@@ -229,10 +223,13 @@ global %$procname
 													;                                                        / XX XX B1 B0 G1 G0 R1 R0 (rgb24be)
 	pxor		xmm1, xmm1
 	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 XX 00 R1 00 R0 00 G1 00 G0 00 B1 00 B0
+													;        00 B1 00 B0 00 G1 00 G0 00 R1 00 R0 00 XX 00 XX (rgb32be)
+													;        00 00 00 XX 00 B1 00 B0 00 G1 00 G0 00 R1 00 R0 (rgb24be)
 %else
  %if %$rgb32
 	movq		xmm0, [rsi]							; xmm0 = 00 00 00 00 00 00 00 00 XX R1 G1 B1 XX R0 G0 B0 / B1 G1 R1 XX B0 G0 R0 XX
-	pshufb		xmm0, xmm3							; xmm0 = 00 00 00 00 00 R1 00 R0 00 G1 00 G0 00 B1 00 B0
+	pshufb		xmm0, xmm3							; xmm0 = 00 XX 00 XX 00 R1 00 R0 00 G1 00 G0 00 B1 00 B0
+													;        00 B1 00 B0 00 G1 00 G0 00 R1 00 R0 00 XX 00 XX (rgb32be)
  %else
 	NOTYET
  %endif
