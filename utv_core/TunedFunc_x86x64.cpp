@@ -181,7 +181,7 @@ const TUNEDFUNC &tfnSSE41 = tfnSSSE3;
 
 const TUNEDFUNC &tfnSSE42 = tfnSSSE3;
 
-const TUNEDFUNC tfnAVX1 = tfnSSSE3;
+const TUNEDFUNC &tfnAVX1 = tfnSSSE3;
 
 const TUNEDFUNC &tfnAVX2 = tfnSSSE3;
 
