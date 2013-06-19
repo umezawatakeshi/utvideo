@@ -166,9 +166,17 @@ CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToRGB,   bt709coeff, 0, 0
 CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToXRGB,  bt709coeff, 0, 1
 
 
-%macro CONVERT_RGB_TO_ULY2 4
+align	64
+shufdata_le	dq	8005800180048000h
+			dq	8080808080068002h
+shufdata_be	dq	8006800280078003h
+			dq	8080808080058001h
+shufdata_pack	dq	808080800c080400h
+				dq	8080808080808080h
+
+%macro CONVERT_RGB_TO_ULY2 5
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, coeffvar, %2, littleendian, %3, rgb32, %4
+	MULTI_CONTEXT_XDEFINE procname, %1, use_ssse3, %2, coeffvar, %3, littleendian, %4, rgb32, %5
 
 global %$procname
 %$procname:
@@ -184,6 +192,18 @@ global %$procname
 	sub			r11, r10
 	xor			rcx, rcx
 
+%if %$use_ssse3
+ %if %$rgb32
+  %if %$littleendian
+	movdqa		xmm3, [shufdata_le]
+  %else
+	movdqa		xmm3, [shufdata_be]
+  %endif
+ %else
+	NOTYET
+ %endif
+	movdqa		xmm8, [shufdata_pack]
+%endif
 	movdqa		xmm4, [%$coeffvar + yuvcoeff.b2yuv]
 	movdqa		xmm5, [%$coeffvar + yuvcoeff.g2yuv]
 	movdqa		xmm6, [%$coeffvar + yuvcoeff.r2yuv]
@@ -195,19 +215,28 @@ global %$procname
 
 	;align	64
 .label1:
-%if %$rgb32
+%if ! %$use_ssse3
+ %if %$rgb32
 	movd		xmm0, [rsi  ]						; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0 / B0 G0 R0 XX
 	movd		xmm1, [rsi+4]						; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R1 G1 B1 / B1 G1 R1 XX
-%else
+ %else
 	movd		xmm0, [rsi  ]						; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 XX R0 G0 B0 / XX B0 G0 R0
 	movd		xmm1, [rsi+2]						; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 R1 G1 B1 XX / B1 G1 R1 XX
 	psrld		xmm1, 8								; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 00 R1 G1 B1 / 00 B1 G1 R1
-%endif
+ %endif
 
 	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 00 00 00 00 00 00 XX R1 R0 G1 G0 B1 B0 / B1 B0 G1 G0 R1 R0 XX XX
 													;                                                        / XX XX B1 B0 G1 G0 R1 R0 (rgb24be)
 	pxor		xmm1, xmm1
 	punpcklbw	xmm0, xmm1							; xmm0 = 00 00 00 XX 00 R1 00 R0 00 G1 00 G0 00 B1 00 B0
+%else
+ %if %$rgb32
+	movq		xmm0, [rsi]							; xmm0 = 00 00 00 00 00 00 00 00 XX R1 G1 B1 XX R0 G0 B0 / B1 G1 R1 XX B0 G0 R0 XX
+	pshufb		xmm0, xmm3							; xmm0 = 00 00 00 00 00 R1 00 R0 00 G1 00 G0 00 B1 00 B0
+ %else
+	NOTYET
+ %endif
+%endif
 
 %if %$littleendian
 	pshufd		xmm1, xmm0, 055h					; xmm1 = 00 G1 00 G0 00 G1 00 G0 00 G1 00 G0 00 G1 00 G0
@@ -234,8 +263,12 @@ global %$procname
 	paddd		xmm0, xmm2							; xmm0 = -----V----- -----U----- -----Y1---- -----Y0----
 
 	psrld		xmm0, 14							; xmm0 = ---------V0 ---------U0 ---------Y1 ---------Y0
+%if ! %$use_ssse3
 	packssdw	xmm0, xmm0							; xmm0 = XX XX XX XX XX XX XX XX ---V0 ---U0 ---Y1 ---Y0
 	packuswb	xmm0, xmm0							; xmm0 = XX XX XX XX XX XX XX XX XX XX XX XX V0 U0 Y1 Y0
+%else
+	pshufb		xmm0, xmm8							; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 V0 U0 Y1 Y0
+%endif
 	movd		eax, xmm0
 	mov			[rdi+rcx*2], ax
 	shr			eax, 16
@@ -261,14 +294,23 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_RGB_TO_ULY2	sse2_ConvertBGRToULY2,   bt601coeff, 1, 0
-CONVERT_RGB_TO_ULY2	sse2_ConvertBGRXToULY2,  bt601coeff, 1, 1
-CONVERT_RGB_TO_ULY2	sse2_ConvertRGBToULY2,   bt601coeff, 0, 0
-CONVERT_RGB_TO_ULY2	sse2_ConvertXRGBToULY2,  bt601coeff, 0, 1
-CONVERT_RGB_TO_ULY2	sse2_ConvertBGRToULH2,   bt709coeff, 1, 0
-CONVERT_RGB_TO_ULY2	sse2_ConvertBGRXToULH2,  bt709coeff, 1, 1
-CONVERT_RGB_TO_ULY2	sse2_ConvertRGBToULH2,   bt709coeff, 0, 0
-CONVERT_RGB_TO_ULY2	sse2_ConvertXRGBToULH2,  bt709coeff, 0, 1
+CONVERT_RGB_TO_ULY2	sse2_ConvertBGRToULY2,   0, bt601coeff, 1, 0
+CONVERT_RGB_TO_ULY2	sse2_ConvertBGRXToULY2,  0, bt601coeff, 1, 1
+CONVERT_RGB_TO_ULY2	sse2_ConvertRGBToULY2,   0, bt601coeff, 0, 0
+CONVERT_RGB_TO_ULY2	sse2_ConvertXRGBToULY2,  0, bt601coeff, 0, 1
+CONVERT_RGB_TO_ULY2	sse2_ConvertBGRToULH2,   0, bt709coeff, 1, 0
+CONVERT_RGB_TO_ULY2	sse2_ConvertBGRXToULH2,  0, bt709coeff, 1, 1
+CONVERT_RGB_TO_ULY2	sse2_ConvertRGBToULH2,   0, bt709coeff, 0, 0
+CONVERT_RGB_TO_ULY2	sse2_ConvertXRGBToULH2,  0, bt709coeff, 0, 1
+
+;CONVERT_RGB_TO_ULY2	ssse3_ConvertBGRToULY2,  1, bt601coeff, 1, 0
+CONVERT_RGB_TO_ULY2	ssse3_ConvertBGRXToULY2, 1, bt601coeff, 1, 1
+;CONVERT_RGB_TO_ULY2	ssse3_ConvertRGBToULY2,  1, bt601coeff, 0, 0
+CONVERT_RGB_TO_ULY2	ssse3_ConvertXRGBToULY2, 1, bt601coeff, 0, 1
+;CONVERT_RGB_TO_ULY2	ssse3_ConvertBGRToULH2,   1, bt709coeff, 1, 0
+CONVERT_RGB_TO_ULY2	ssse3_ConvertBGRXToULH2,  1, bt709coeff, 1, 1
+;CONVERT_RGB_TO_ULY2	ssse3_ConvertRGBToULH2,   1, bt709coeff, 0, 0
+CONVERT_RGB_TO_ULY2	ssse3_ConvertXRGBToULH2,  1, bt709coeff, 0, 1
 
 
 
