@@ -11,9 +11,17 @@ section .text
 %include "Coefficient_asm_x86x64.mac"
 
 
-%macro CONVERT_ULY2_TO_RGB 4
+align	64
+pshufb16bgrx2bgr	dq	0908060504020100h
+					dq	808080800e0d0c0ah
+pshufb16xrgb2rgb	dq	0a09070605030201h
+					dq	808080800f0e0d0bh
+pshufb16uvxpand		dq	8001800080018000h
+					dq	8003800280038002h
+
+%macro CONVERT_ULY2_TO_RGB 5
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, coeffvar, %2, littleendian, %3, rgb32, %4
+	MULTI_CONTEXT_XDEFINE procname, %1, use_sse41, %2, coeffvar, %3, littleendian, %4, rgb32, %5
 
 global %$procname
 %$procname:
@@ -39,6 +47,14 @@ global %$procname
 	movdqa		xmm11, [%$coeffvar + yuvcoeff.uv2r]
 	movdqa		xmm12, [%$coeffvar + yuvcoeff.uv2b]
 	movdqa		xmm13, [%$coeffvar + yuvcoeff.uv2g]
+%if %$use_sse41
+ %if %$littleendian
+	movdqa		xmm5, [pshufb16bgrx2bgr]
+ %else
+	movdqa		xmm5, [pshufb16xrgb2rgb]
+ %endif
+	movdqa		xmm14, [pshufb16uvxpand]
+%endif
 
 	align	64
 .label0:
@@ -46,17 +62,25 @@ global %$procname
 
 	; align	64	; さすがに入れすぎな気がするのでコメントアウト。
 .label1:
+%if ! %$use_sse41
 	movd		xmm0, [rsi+rcx*2]		; xmm0 = 00 00 00 00 00 00 00 00 00 00 00 00 Y3 Y2 Y1 Y0
 	punpcklbw	xmm0, xmm7				; xmm0 = 00 00 00 00 00 00 00 00 00 Y3 00 Y2 00 Y1 00 Y0
-	psubw		xmm0, xmm8				; xmm0 = 00 00 00 00 00 00 00 00 ---Y3 ---Y2 ---Y1 ---Y0 (de-offset)
-	punpcklwd	xmm0, xmm7				; xmm0 = 00 00 ---Y3 00 00 ---Y2 00 00 ---Y1 00 00 ---Y0 (de-offset)
+	punpcklwd	xmm0, xmm7				; xmm0 = 00 00 00 Y3 00 00 00 Y2 00 00 00 Y1 00 00 00 Y0
+%else
+	pmovzxbd	xmm0, [rsi+rcx*2]		; xmm0 = 00 00 00 Y3 00 00 00 Y2 00 00 00 Y1 00 00 00 Y0
+%endif
+	psubw		xmm0, xmm8				; xmm0 = 00 00 ---Y3 00 00 ---Y2 00 00 ---Y1 00 00 ---Y0 (de-offset)
 
 	movd		xmm1, [rbx+rcx]			; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 U6 U4 U2 U0
 	movd		xmm2, [rdx+rcx]			; xmm1 = 00 00 00 00 00 00 00 00 00 00 00 00 V6 V4 V2 V0
 	punpcklbw	xmm1, xmm2				; xmm1 = 00 00 00 00 00 00 00 00 V6 U6 V4 U4 V2 U2 V0 U0
+%if ! %$use_sse41
 	punpcklbw	xmm1, xmm7				; xmm1 = 00 V6 00 U6 00 V4 00 U4 00 V2 00 U2 00 V0 00 U0
-	psubw		xmm1, xmm9				; xmm1 = ---V6 ---U6 ---V4 ---U4 ---V2 ---U2 ---V0 ---U0 (de-offset)
-	punpckldq	xmm1, xmm1				; xmm1 = ---V2 ---U2 ---V2 ---U2 ---V0 ---U0 ---V0 ---U0 (de-offset)
+	punpckldq	xmm1, xmm1				; xmm1 = 00 V2 00 U2 00 V2 00 U2 00 V0 00 U0 00 V0 00 U0
+%else
+	pshufb		xmm1, xmm14				; xmm1 = 00 V2 00 U2 00 V2 00 U2 00 V0 00 U0 00 V0 00 U0
+%endif
+	psubw		xmm1, xmm9				; xmm1 = ---V2 ---U2 ---V2 ---U2 ---V0 ---U0 ---V0 ---U0 (de-offset)
 
 	pmaddwd		xmm0, xmm10
 
@@ -118,6 +142,7 @@ global %$procname
 	sub			rdi, 8
 	sub			rcx, 1
 %else
+ %if ! %$use_sse41
 	movq		rax, xmm2
 	psrldq		xmm2, 8
 	mov			[rdi], ax
@@ -144,6 +169,26 @@ global %$procname
 	add			rcx, 1
 	cmp			rdi, r8
 	jb			.label1
+ %else
+	pshufb		xmm2, xmm5
+	add			rdi, 12
+	add			rcx, 2
+	cmp			rdi, r8
+	ja			.label2
+	movq		[rdi-12], xmm2
+	psrldq		xmm2, 8
+	movd		[rdi-4], xmm2
+	jne			.label1
+	jmp			.label3
+
+.label2:
+	movd		[rdi-12], xmm2
+	psrldq		xmm2, 4
+	movd		eax, xmm2
+	mov			[rdi-8], ax
+	sub			rdi, 6
+	sub			rcx, 1
+ %endif
 %endif
 
 .label3:
@@ -156,14 +201,23 @@ global %$procname
 %pop
 %endmacro
 
-CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGR,   bt601coeff, 1, 0
-CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGRX,  bt601coeff, 1, 1
-CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToRGB,   bt601coeff, 0, 0
-CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToXRGB,  bt601coeff, 0, 1
-CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToBGR,   bt709coeff, 1, 0
-CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToBGRX,  bt709coeff, 1, 1
-CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToRGB,   bt709coeff, 0, 0
-CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToXRGB,  bt709coeff, 0, 1
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGR,   0, bt601coeff, 1, 0
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToBGRX,  0, bt601coeff, 1, 1
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToRGB,   0, bt601coeff, 0, 0
+CONVERT_ULY2_TO_RGB	sse2_ConvertULY2ToXRGB,  0, bt601coeff, 0, 1
+CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToBGR,   0, bt709coeff, 1, 0
+CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToBGRX,  0, bt709coeff, 1, 1
+CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToRGB,   0, bt709coeff, 0, 0
+CONVERT_ULY2_TO_RGB	sse2_ConvertULH2ToXRGB,  0, bt709coeff, 0, 1
+
+CONVERT_ULY2_TO_RGB	sse41_ConvertULY2ToBGR,   1, bt601coeff, 1, 0
+CONVERT_ULY2_TO_RGB	sse41_ConvertULY2ToBGRX,  1, bt601coeff, 1, 1
+CONVERT_ULY2_TO_RGB	sse41_ConvertULY2ToRGB,   1, bt601coeff, 0, 0
+CONVERT_ULY2_TO_RGB	sse41_ConvertULY2ToXRGB,  1, bt601coeff, 0, 1
+CONVERT_ULY2_TO_RGB	sse41_ConvertULH2ToBGR,   1, bt709coeff, 1, 0
+CONVERT_ULY2_TO_RGB	sse41_ConvertULH2ToBGRX,  1, bt709coeff, 1, 1
+CONVERT_ULY2_TO_RGB	sse41_ConvertULH2ToRGB,   1, bt709coeff, 0, 0
+CONVERT_ULY2_TO_RGB	sse41_ConvertULH2ToXRGB,  1, bt709coeff, 0, 1
 
 
 align	64

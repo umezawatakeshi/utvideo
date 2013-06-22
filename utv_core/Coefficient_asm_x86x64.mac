@@ -26,10 +26,10 @@ endstruc
 
 
 	align	64
-yoff	dw	16, 16, 16, 16
-		dw	0, 0, 0, 0
+yoff	dw	16, 0, 16, 0
+		dw	16, 0, 16, 0
 uvoff	dw	128, 128, 128, 128
-		dw	0, 0, 0, 0
+		dw	128, 128, 128, 128
 yuvoff	dd	RSHLD(16, 14)
 		dd	RSHLD(16, 14)
 		dd	RSHLD(128, 14)

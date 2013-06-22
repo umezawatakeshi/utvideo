@@ -177,13 +177,65 @@ const TUNEDFUNC tfnSSSE3 = {
 	DummyTunedFunc
 };
 
-const TUNEDFUNC &tfnSSE41 = tfnSSSE3;
+const TUNEDFUNC tfnSSE41 = {
+	sse2_PredictWrongMedianAndCount_align16,
+	sse2_PredictWrongMedianAndCount_align1,
+	sse2_PredictLeftAndCount_align1,
+	sse1mmx_RestoreWrongMedian_align1,
+	i686_HuffmanEncode,
+	i686_HuffmanDecode,
+	i686_HuffmanDecodeAndAccum,
+	i686_HuffmanDecodeAndAccumStep2,
+	i686_HuffmanDecodeAndAccumStep3,
+	i686_HuffmanDecodeAndAccumStep4,
+	i686_HuffmanDecodeAndAccumStep3ForBGRBlue,
+	i686_HuffmanDecodeAndAccumStep3ForBGRRed,
+	i686_HuffmanDecodeAndAccumStep4ForBGRXBlue,
+	i686_HuffmanDecodeAndAccumStep4ForBGRXRed,
+	i686_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha,
+	i686_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
+	{
+		sse41_ConvertULY2ToBGR,
+		sse41_ConvertULY2ToBGRX,
+		sse41_ConvertULY2ToRGB,
+		sse41_ConvertULY2ToXRGB,
+		sse2_ConvertBGRToULY2,
+		ssse3_ConvertBGRXToULY2,
+		sse2_ConvertRGBToULY2,
+		ssse3_ConvertXRGBToULY2,
+	},
+	{
+		sse41_ConvertULH2ToBGR,
+		sse41_ConvertULH2ToBGRX,
+		sse41_ConvertULH2ToRGB,
+		sse41_ConvertULH2ToXRGB,
+		sse2_ConvertBGRToULH2,
+		ssse3_ConvertBGRXToULH2,
+		sse2_ConvertRGBToULH2,
+		ssse3_ConvertXRGBToULH2,
+	},
+	ssse3_ConvertBGRToULRG,
+	ssse3_ConvertBGRXToULRG,
+	ssse3_ConvertXRGBToULRG,
+	ssse3_ConvertBGRAToULRA,
+	ssse3_ConvertARGBToULRA,
+	ssse3_ConvertYUYVToULY2,
+	ssse3_ConvertUYVYToULY2,
+	ssse3_ConvertULRGToBGR,
+	ssse3_ConvertULRGToBGRX,
+	ssse3_ConvertULRGToXRGB,
+	ssse3_ConvertULRAToBGRA,
+	ssse3_ConvertULRAToARGB,
+	ssse3_ConvertULY2ToYUYV,
+	ssse3_ConvertULY2ToUYVY,
+	DummyTunedFunc
+};
 
-const TUNEDFUNC &tfnSSE42 = tfnSSSE3;
+const TUNEDFUNC &tfnSSE42 = tfnSSE41;
 
-const TUNEDFUNC &tfnAVX1 = tfnSSSE3;
+const TUNEDFUNC &tfnAVX1 = tfnSSE41;
 
-const TUNEDFUNC &tfnAVX2 = tfnSSSE3;
+const TUNEDFUNC &tfnAVX2 = tfnSSE41;
 
 
 class CTunedFuncInitializer
