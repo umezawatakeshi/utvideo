@@ -2,10 +2,10 @@
 <!-- $Id$ -->
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
-<title>Ut Video Codec Suite 13.0.1 readme (English)</title>
+<title>Ut Video Codec Suite 13.1.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 13.0.1 readme (English)</h1>
+<h1>Ut Video Codec Suite 13.1.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008-2013  UMEZAWA Takeshi</p>
@@ -66,16 +66,23 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <p>Ut Video Codec Suite is a free software. Donations to support development are always welcome. For more information, visit <a href="http://umezawa.dyndns.info/wordpress/?page_id=1577">&quot;About Donations&quot; page</a>.</p>
 <h2 id="devenv">Development Environment</h2>
 <h3>Windows</h3>
+<h4>Main</h4>
 <dl>
 <dt>OS</dt><dd>Windows 7 Ultimate x64 (ja)</dd>
 <dt>CPU</dt><dd>Intel Core i7-2600K</dd>
-<dt>RAM</dt><dd>DDR3-1600 16GB</dd>
+<dt>RAM</dt><dd>DDR3-1600 32GB</dd>
 <dt>Development Tools</dt>
 <dd>Visual Studio 2005 SP1</dd>
 <dd>Windows SDK for Windows Server 2008 and .NET Framework 3.5 (Windows SDK 6.1)</dd>
 <dd>NASM 2.10.07</dd>
 <dd>AMD CodeAnalyst for Windows v3.1</dd>
 <dd>Inno Setup 5.4.2 (ANSI)</dd>
+</dl>
+<h4>Sub</h4>
+<dl>
+<dt>OS</dt><dd>Windows 7 Ultimate x64 (ja)</dd>
+<dt>CPU</dt><dd>Intel Core i3-540</dd>
+<dt>RAM</dt><dd>DDR3-1333 16GB</dd>
 </dl>
 <h3>Mac OS X</h3>
 <dl>
@@ -87,6 +94,15 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <dd>NASM 2.10.07</dd>
 </dl>
 <h2 id="history">Version history</h2>
+<h3>Version 13.1.0</h3>
+<dl>
+<dt>Performance Improvements</dt><dd><ul>
+<li>ULRG,ULRA,ULY2,ULH2: Speed up encoding from native colorspace if SSSE3 instructions are available.</li>
+<li>ULRG,ULRA,ULY2,ULH2: Speed up decoding video that were encoded with "Optimize for compression ratio" option to native colorspace if SSSE3 instructions are available.</li>
+<li>ULY2,ULH2: Speed up encoding video from RGB formats if SSSE3 instructions are available.</li>
+<li>ULY2,ULH2: Speed up decoding video to RGB formats if SSE4.1 instructions are available.</li>
+</ul></dd>
+</dl>
 <h3>Version 13.0.1</h3>
 <dl>
 <dt>Others</dt><dd><ul>
