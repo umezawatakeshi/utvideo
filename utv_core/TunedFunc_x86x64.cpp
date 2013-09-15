@@ -247,6 +247,7 @@ public:
 		cpuid_result cpuid_1   = { 0, 0, 0, 0 };
 		cpuid_result cpuid_7_0 = { 0, 0, 0, 0 };
 		cpuid_result cpuid_ex0 = { 0, 0, 0, 0 };
+		cpuid_result cpuid_ex1 = { 0, 0, 0, 0 };
 		cpuid_result cpuid_ex2 = { 0, 0, 0, 0 };
 		cpuid_result cpuid_ex3 = { 0, 0, 0, 0 };
 		cpuid_result cpuid_ex4 = { 0, 0, 0, 0 };
@@ -264,6 +265,12 @@ public:
 
 		cpuid(&cpuid_ex0, 0x80000000, 0);
 		_RPT4(_CRT_WARN, "CPUID.ex0 EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", cpuid_ex0.eax, cpuid_ex0.ebx, cpuid_ex0.ecx, cpuid_ex0.edx);
+
+		if (cpuid_ex0.eax >= 0x80000001)
+		{
+			cpuid(&cpuid_ex1, 0x80000001, 0);
+			_RPT4(_CRT_WARN, "CPUID.ex1 EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", cpuid_ex1.eax, cpuid_ex1.ebx, cpuid_ex1.ecx, cpuid_ex1.edx);
+		}
 
 		if (cpuid_ex0.eax >= 0x80000004)
 		{
@@ -301,6 +308,20 @@ public:
 			_RPT4(_CRT_WARN, "CPUID.7.0 EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", cpuid_7_0.eax, cpuid_7_0.ebx, cpuid_7_0.ecx, cpuid_7_0.edx);
 		}
 
+		if (cpuid_7_0.ebx & (1 << 3))
+		{
+			_RPT0(_CRT_WARN, "supports BMI1\n");
+		}
+
+		if (cpuid_7_0.ebx & (1 << 8))
+		{
+			_RPT0(_CRT_WARN, "supports BMI2\n");
+		}
+
+		if (cpuid_ex1.ecx & (1 << 5))
+		{
+			_RPT0(_CRT_WARN, "supports LZCNT\n");
+		}
 
 		if (cpuid_1.ecx & (1 << 27))
 		{
