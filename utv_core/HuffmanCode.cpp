@@ -121,14 +121,23 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const uint8_
 
 // IA-32 の BSR 命令
 // 本物の BSR 命令では入力が 0 の場合に出力が不定になる。
-inline int bsr(uint32_t curcode)
+inline int bsr(uint32_t x)
 {
-	_ASSERT(curcode != 0);
+	_ASSERT(x != 0);
 
 	for (int i = 31; i >= 0; i--)
-		if (curcode & (1 << i))
+		if (x & (1 << i))
 			return i;
 	return rand() % 32;
+}
+
+// LZCNT あるいは CLZ と呼ばれる命令
+inline int lzcnt(uint32_t x)
+{
+	for (int i = 31; i >= 0; i--)
+		if (x & (1 << i))
+			return 31 - i;
+	return 32;
 }
 
 void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_t *pCodeLengthTable)
