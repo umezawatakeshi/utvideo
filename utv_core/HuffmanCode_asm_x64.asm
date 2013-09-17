@@ -112,20 +112,22 @@ global %$procname
 	cmp			cl, 32
 	jb			%%label4
 	sub			cl, 32
-	mov			r9d, edx
-	mov			edx, dword [rsi+4+4]
+	shl			rdx, 32
+	mov			r9d, dword [rsi+4+4]
+	or			rdx, r9
 	add			rsi, 4
 
 %%label4:
-	mov			eax, r9d
-	shld		eax, edx, cl
-	shr			eax, 20
+	mov			rax, rdx
+	shl			rax, cl
+	shr			rax, 20+32
 	movzx		eax, word [rbx + rax*2]
 	cmp			ah, 255
 	jne			%%label0
 
-	mov			eax, r9d
-	shld		eax, edx, cl
+	mov			rax, rdx
+	shl			rax, cl
+	shr			rax, 32
 	mov			r15d, ecx
 	or			eax, 1
 	bsr			r10, rax
