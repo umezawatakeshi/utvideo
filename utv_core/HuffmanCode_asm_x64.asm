@@ -127,8 +127,8 @@ global %$procname
 
 	mov			rax, rdx
 	shl			rax, cl
-	shr			rax, 32
 	mov			r15d, ecx
+	shr			rax, 32
 	or			eax, 1
 	bsr			r10, rax
 	mov			cl, byte [rbx + 8192 + r10]					; pDecodeTable->nCodeShift[r10]
