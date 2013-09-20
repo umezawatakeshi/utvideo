@@ -252,7 +252,7 @@ public:
 			sprintf(buf, "7.%d", subleaf);
 		else
 			sprintf(buf, "%d", leaf);
-		_RPT4(_CRT_WARN, "CPUID.%-3s EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", buf,
+		_RPT5(_CRT_WARN, "CPUID.%-3s EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", buf,
 			result->eax, result->ebx, result->ecx, result->edx);
 #endif
 	}
