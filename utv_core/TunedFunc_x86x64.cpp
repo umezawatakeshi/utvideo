@@ -11,68 +11,60 @@
 #include "Coefficient.h"
 #include "CPUID.h"
 
+#define FEATURE0_SSE2     (1 <<  0)
+#define FEATURE0_SSE3     (1 <<  1)
+#define FEATURE0_SSSE3    (1 <<  2)
+#define FEATURE0_SSE41    (1 <<  3)
+#define FEATURE0_SSE42    (1 <<  4)
+#define FEATURE0_AVX1     (1 <<  5)
+#define FEATURE0_AVX2     (1 <<  6)
+#define FEATURE0_FMA3     (1 <<  7) /* 3-operand FMA */
+//#define FEATURE0_AVX512F  (1 <<  8) /* AVX-512 Foundation */
+//#define FEATURE0_AVX512PF (1 <<  9) /* AVX-512 Prefetch */
+//#define FEATURE0_AVX512ER (1 << 10) /* AVX-512 Exponential & Reciprocal */
+//#define FEATURE0_AVX512CD (1 << 11) /* AVX-512 Conflict Detection */
+
+#define FEATURE1_MOVBE    (1 <<  0)
+#define FEATURE1_POPCNT   (1 <<  1)
+#define FEATURE1_LZCNT    (1 <<  2)
+#define FEATURE1_BMI1     (1 <<  3)
+#define FEATURE1_BMI2     (1 <<  4)
+
 #ifdef __i386__
-const TUNEDFUNC tfnI686 = {
+const TUNEDFUNC_PREDICT tfnPredictI686 = {
+	NULL,
+	{ 0, 0 },
 	cpp_PredictWrongMedianAndCount,
 	cpp_PredictWrongMedianAndCount,
 	cpp_PredictLeftAndCount,
 	i686_RestoreWrongMedian_align1,
-	i686_HuffmanEncode,
-	i686_HuffmanDecode,
-	i686_HuffmanDecodeAndAccum,
-	i686_HuffmanDecodeAndAccumStep2,
-	i686_HuffmanDecodeAndAccumStep3,
-	i686_HuffmanDecodeAndAccumStep4,
-	i686_HuffmanDecodeAndAccumStep3ForBGRBlue,
-	i686_HuffmanDecodeAndAccumStep3ForBGRRed,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXBlue,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXRed,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha,
-	i686_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
-	{
-		cpp_ConvertULY2ToRGB<CBT601Coefficient, CBGRColorOrder>,
-		cpp_ConvertULY2ToRGB<CBT601Coefficient, CBGRAColorOrder>,
-		cpp_ConvertULY2ToRGB<CBT601Coefficient, CRGBColorOrder>,
-		cpp_ConvertULY2ToRGB<CBT601Coefficient, CARGBColorOrder>,
-		cpp_ConvertRGBToULY2<CBT601Coefficient, CBGRColorOrder>,
-		cpp_ConvertRGBToULY2<CBT601Coefficient, CBGRAColorOrder>,
-		cpp_ConvertRGBToULY2<CBT601Coefficient, CRGBColorOrder>,
-		cpp_ConvertRGBToULY2<CBT601Coefficient, CARGBColorOrder>,
-	},
-	{
-		cpp_ConvertULY2ToRGB<CBT709Coefficient, CBGRColorOrder>,
-		cpp_ConvertULY2ToRGB<CBT709Coefficient, CBGRAColorOrder>,
-		cpp_ConvertULY2ToRGB<CBT709Coefficient, CRGBColorOrder>,
-		cpp_ConvertULY2ToRGB<CBT709Coefficient, CARGBColorOrder>,
-		cpp_ConvertRGBToULY2<CBT709Coefficient, CBGRColorOrder>,
-		cpp_ConvertRGBToULY2<CBT709Coefficient, CBGRAColorOrder>,
-		cpp_ConvertRGBToULY2<CBT709Coefficient, CRGBColorOrder>,
-		cpp_ConvertRGBToULY2<CBT709Coefficient, CARGBColorOrder>,
-	},
-	cpp_ConvertRGBToULRG<CBGRColorOrder>,
-	cpp_ConvertRGBToULRG<CBGRAColorOrder>,
-	cpp_ConvertRGBToULRG<CARGBColorOrder>,
-	cpp_ConvertARGBToULRA<CBGRAColorOrder>,
-	cpp_ConvertARGBToULRA<CARGBColorOrder>,
-	cpp_ConvertYUV422ToULY2<CYUYVColorOrder>,
-	cpp_ConvertYUV422ToULY2<CUYVYColorOrder>,
-	cpp_ConvertULRGToRGB<CBGRColorOrder>,
-	cpp_ConvertULRGToRGB<CBGRAColorOrder>,
-	cpp_ConvertULRGToRGB<CARGBColorOrder>,
-	cpp_ConvertULRAToARGB<CBGRAColorOrder>,
-	cpp_ConvertULRAToARGB<CARGBColorOrder>,
-	cpp_ConvertULY2ToYUV422<CYUYVColorOrder>,
-	cpp_ConvertULY2ToYUV422<CUYVYColorOrder>,
-	DummyTunedFunc
 };
 #endif
 
-const TUNEDFUNC tfnSSE2 = {
+const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
+#ifdef __i386__
+	&tfnPredictI686,
+#else
+	NULL,
+#endif
+	{ FEATURE0_SSE2, 0 },
 	sse2_PredictWrongMedianAndCount_align16,
 	sse2_PredictWrongMedianAndCount_align1,
 	sse2_PredictLeftAndCount_align1,
 	sse1mmx_RestoreWrongMedian_align1,
+};
+
+
+const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeI686 = {
+	NULL,
+	{ 0, 0 },
 	i686_HuffmanEncode,
+};
+
+
+const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeI686 = {
+	NULL,
+	{ 0, 0 },
 	i686_HuffmanDecode,
 	i686_HuffmanDecodeAndAccum,
 	i686_HuffmanDecodeAndAccumStep2,
@@ -84,6 +76,12 @@ const TUNEDFUNC tfnSSE2 = {
 	i686_HuffmanDecodeAndAccumStep4ForBGRXRed,
 	i686_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha,
 	i686_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
+};
+
+
+const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSE2 = {
+	&tfnConvertYUVRGBCPP,
+	{ 0, 0 },
 	{
 		sse2_ConvertULY2ToBGR,
 		sse2_ConvertULY2ToBGRX,
@@ -104,42 +102,11 @@ const TUNEDFUNC tfnSSE2 = {
 		sse2_ConvertRGBToULH2,
 		sse2_ConvertXRGBToULH2,
 	},
-	cpp_ConvertRGBToULRG<CBGRColorOrder>,
-	cpp_ConvertRGBToULRG<CBGRAColorOrder>,
-	cpp_ConvertRGBToULRG<CARGBColorOrder>,
-	cpp_ConvertARGBToULRA<CBGRAColorOrder>,
-	cpp_ConvertARGBToULRA<CARGBColorOrder>,
-	cpp_ConvertYUV422ToULY2<CYUYVColorOrder>,
-	cpp_ConvertYUV422ToULY2<CUYVYColorOrder>,
-	cpp_ConvertULRGToRGB<CBGRColorOrder>,
-	cpp_ConvertULRGToRGB<CBGRAColorOrder>,
-	cpp_ConvertULRGToRGB<CARGBColorOrder>,
-	cpp_ConvertULRAToARGB<CBGRAColorOrder>,
-	cpp_ConvertULRAToARGB<CARGBColorOrder>,
-	cpp_ConvertULY2ToYUV422<CYUYVColorOrder>,
-	cpp_ConvertULY2ToYUV422<CUYVYColorOrder>,
-	DummyTunedFunc
 };
 
-const TUNEDFUNC &tfnSSE3 = tfnSSE2;
-
-const TUNEDFUNC tfnSSSE3 = {
-	sse2_PredictWrongMedianAndCount_align16,
-	sse2_PredictWrongMedianAndCount_align1,
-	sse2_PredictLeftAndCount_align1,
-	sse1mmx_RestoreWrongMedian_align1,
-	i686_HuffmanEncode,
-	i686_HuffmanDecode,
-	i686_HuffmanDecodeAndAccum,
-	i686_HuffmanDecodeAndAccumStep2,
-	i686_HuffmanDecodeAndAccumStep3,
-	i686_HuffmanDecodeAndAccumStep4,
-	i686_HuffmanDecodeAndAccumStep3ForBGRBlue,
-	i686_HuffmanDecodeAndAccumStep3ForBGRRed,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXBlue,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXRed,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha,
-	i686_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
+const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSSE3 = {
+	&tfnConvertYUVRGBSSE2,
+	{ FEATURE0_SSSE3, 0 },
 	{
 		sse2_ConvertULY2ToBGR,
 		sse2_ConvertULY2ToBGRX,
@@ -160,40 +127,11 @@ const TUNEDFUNC tfnSSSE3 = {
 		ssse3_ConvertRGBToULH2,
 		ssse3_ConvertXRGBToULH2,
 	},
-	ssse3_ConvertBGRToULRG,
-	ssse3_ConvertBGRXToULRG,
-	ssse3_ConvertXRGBToULRG,
-	ssse3_ConvertBGRAToULRA,
-	ssse3_ConvertARGBToULRA,
-	ssse3_ConvertYUYVToULY2,
-	ssse3_ConvertUYVYToULY2,
-	ssse3_ConvertULRGToBGR,
-	ssse3_ConvertULRGToBGRX,
-	ssse3_ConvertULRGToXRGB,
-	ssse3_ConvertULRAToBGRA,
-	ssse3_ConvertULRAToARGB,
-	ssse3_ConvertULY2ToYUYV,
-	ssse3_ConvertULY2ToUYVY,
-	DummyTunedFunc
 };
 
-const TUNEDFUNC tfnSSE41 = {
-	sse2_PredictWrongMedianAndCount_align16,
-	sse2_PredictWrongMedianAndCount_align1,
-	sse2_PredictLeftAndCount_align1,
-	sse1mmx_RestoreWrongMedian_align1,
-	i686_HuffmanEncode,
-	i686_HuffmanDecode,
-	i686_HuffmanDecodeAndAccum,
-	i686_HuffmanDecodeAndAccumStep2,
-	i686_HuffmanDecodeAndAccumStep3,
-	i686_HuffmanDecodeAndAccumStep4,
-	i686_HuffmanDecodeAndAccumStep3ForBGRBlue,
-	i686_HuffmanDecodeAndAccumStep3ForBGRRed,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXBlue,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXRed,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha,
-	i686_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
+const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSE41 = {
+	&tfnConvertYUVRGBSSSE3,
+	{ FEATURE0_SSE41, 0 },
 	{
 		sse41_ConvertULY2ToBGR,
 		sse41_ConvertULY2ToBGRX,
@@ -214,6 +152,12 @@ const TUNEDFUNC tfnSSE41 = {
 		ssse3_ConvertRGBToULH2,
 		ssse3_ConvertXRGBToULH2,
 	},
+};
+
+
+const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleSSSE3 = {
+	&tfnConvertYUVRGBCPP,
+	{ FEATURE0_SSSE3, 0 },
 	ssse3_ConvertBGRToULRG,
 	ssse3_ConvertBGRXToULRG,
 	ssse3_ConvertXRGBToULRG,
@@ -228,14 +172,17 @@ const TUNEDFUNC tfnSSE41 = {
 	ssse3_ConvertULRAToARGB,
 	ssse3_ConvertULY2ToYUYV,
 	ssse3_ConvertULY2ToUYVY,
-	DummyTunedFunc
 };
 
-const TUNEDFUNC &tfnSSE42 = tfnSSE41;
+const TUNEDFUNC tfnRoot = {
+	&tfnPredictSSE2,
+	&tfnHuffmanEncodeI686,
+	&tfnHuffmanDecodeI686,
+	&tfnConvertYUVRGBSSE41,
+	&tfnConvertShuffleSSSE3,
+};
 
-const TUNEDFUNC &tfnAVX1 = tfnSSE41;
-
-const TUNEDFUNC &tfnAVX2 = tfnSSE41;
+uint32_t dwSupportedFeatures[FEATURESIZE];
 
 
 class CTunedFuncInitializer
@@ -278,6 +225,8 @@ public:
 
 		char vendor[16];
 		char procbrand[64];
+
+		memset(dwSupportedFeatures, 0, sizeof(dwSupportedFeatures));
 
 		cpuid(&cpuid_0, 0, 0);
 		*(uint32_t *)(vendor+0) = cpuid_0.ebx;
@@ -324,20 +273,37 @@ public:
 			cpuid(&cpuid_7_0, 7, 0);
 		}
 
+
 		if (cpuid_7_0.ebx & (1 << 3))
 		{
 			_RPT0(_CRT_WARN, "supports BMI1\n");
+			dwSupportedFeatures[1] |= FEATURE1_BMI1;
 		}
 
 		if (cpuid_7_0.ebx & (1 << 8))
 		{
 			_RPT0(_CRT_WARN, "supports BMI2\n");
+			dwSupportedFeatures[1] |= FEATURE1_BMI2;
 		}
 
 		if (cpuid_ex1.ecx & (1 << 5))
 		{
 			_RPT0(_CRT_WARN, "supports LZCNT\n");
+			dwSupportedFeatures[1] |= FEATURE1_LZCNT;
 		}
+
+		if (cpuid_1.ecx & (1 << 23))
+		{
+			_RPT0(_CRT_WARN, "supports POPCNT\n");
+			dwSupportedFeatures[1] |= FEATURE1_POPCNT;
+		}
+
+		if (cpuid_1.ecx & (1 << 22))
+		{
+			_RPT0(_CRT_WARN, "supports MOVBE\n");
+			dwSupportedFeatures[1] |= FEATURE1_MOVBE;
+		}
+
 
 		if (cpuid_1.ecx & (1 << 27))
 		{
@@ -354,15 +320,13 @@ public:
 				if (cpuid_7_0.ebx & (1 << 5))
 				{
 					_RPT0(_CRT_WARN, "supports AVX2\n");
-					tfn = tfnAVX2;
-					return;
+					dwSupportedFeatures[0] |= FEATURE0_AVX2;
 				}
 
 				if (cpuid_1.ecx & (1 << 28))
 				{
 					_RPT0(_CRT_WARN, "supports AVX1\n");
-					tfn = tfnAVX1;
-					return;
+					dwSupportedFeatures[0] |= FEATURE0_AVX1;
 				}
 			}
 			else
@@ -378,45 +342,34 @@ public:
 		if (cpuid_1.ecx & (1 << 20))
 		{
 			_RPT0(_CRT_WARN, "supports SSE4.2\n");
-			tfn = tfnSSE42;
-			return;
+			dwSupportedFeatures[0] |= FEATURE0_SSE42;
 		}
 
 		if (cpuid_1.ecx & (1 << 19))
 		{
 			_RPT0(_CRT_WARN, "supports SSE4.1\n");
-			tfn = tfnSSE41;
-			return;
+			dwSupportedFeatures[0] |= FEATURE0_SSE41;
 		}
 
 		if (cpuid_1.ecx & (1 << 9))
 		{
 			_RPT0(_CRT_WARN, "supports SSSE3\n");
-			tfn = tfnSSSE3;
-			return;
+			dwSupportedFeatures[0] |= FEATURE0_SSSE3;
 		}
 
 		if (cpuid_1.ecx & (1 << 0))
 		{
 			_RPT0(_CRT_WARN, "supports SSE3\n");
-			tfn = tfnSSE3;
-			return;
+			dwSupportedFeatures[0] |= FEATURE0_SSE3;
 		}
 
-#ifdef __i386__
 		if (cpuid_1.edx & (1 << 26))
-#endif
 		{
 			_RPT0(_CRT_WARN, "supports SSE2\n");
-			tfn = tfnSSE2;
-			return;
+			dwSupportedFeatures[0] |= FEATURE0_SSE2;
 		}
 
-#ifdef __i386__
-		{
-			_RPT0(_CRT_WARN, "supports no SSE-integer\n");
-			tfn = tfnI686;
-		}
-#endif
+
+		ResolveTunedFunc(&tfnRoot, dwSupportedFeatures);
 	}
 } tfi;

@@ -10,12 +10,24 @@
 #include "ColorOrder.h"
 #include "Coefficient.h"
 
-const TUNEDFUNC tfnCPP = {
+const TUNEDFUNC_PREDICT tfnPredictCPP = {
+	NULL,
+	{ 0 },
 	cpp_PredictWrongMedianAndCount,
 	cpp_PredictWrongMedianAndCount,
 	cpp_PredictLeftAndCount,
 	cpp_RestoreWrongMedian,
+};
+
+const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeCPP = {
+	NULL,
+	{ 0 },
 	cpp_HuffmanEncode,
+};
+
+const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeCPP = {
+	NULL,
+	{ 0 },
 	cpp_HuffmanDecode,
 	cpp_HuffmanDecodeAndAccum,
 	cpp_HuffmanDecodeAndAccumStep2,
@@ -27,6 +39,11 @@ const TUNEDFUNC tfnCPP = {
 	cpp_HuffmanDecodeAndAccumStep4ForBGRXRed,
 	cpp_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha,
 	cpp_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
+};
+
+const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBCPP = {
+	NULL,
+	{ 0 },
 	{
 		cpp_ConvertULY2ToRGB<CBT601Coefficient, CBGRColorOrder>,
 		cpp_ConvertULY2ToRGB<CBT601Coefficient, CBGRAColorOrder>,
@@ -47,6 +64,11 @@ const TUNEDFUNC tfnCPP = {
 		cpp_ConvertRGBToULY2<CBT709Coefficient, CRGBColorOrder>,
 		cpp_ConvertRGBToULY2<CBT709Coefficient, CARGBColorOrder>,
 	},
+};
+
+const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleCPP = {
+	NULL,
+	{ 0 },
 	cpp_ConvertRGBToULRG<CBGRColorOrder>,
 	cpp_ConvertRGBToULRG<CBGRAColorOrder>,
 	cpp_ConvertRGBToULRG<CARGBColorOrder>,
@@ -61,7 +83,39 @@ const TUNEDFUNC tfnCPP = {
 	cpp_ConvertULRAToARGB<CARGBColorOrder>,
 	cpp_ConvertULY2ToYUV422<CYUYVColorOrder>,
 	cpp_ConvertULY2ToYUV422<CUYVYColorOrder>,
-	DummyTunedFunc
 };
 
-TUNEDFUNC tfn = tfnCPP;
+TUNEDFUNC tfn = {
+	&tfnPredictCPP,
+	&tfnHuffmanEncodeCPP,
+	&tfnHuffmanDecodeCPP,
+	&tfnConvertYUVRGBCPP,
+	&tfnConvertShuffleCPP,
+};
+
+
+void ResolveTunedFunc(const TUNEDFUNC *ptfnRoot, const uint32_t *pdwSupportedFeatures)
+{
+	const TUNEDFUNC_FRAGMENT **pSrc, *pTest;
+	const TUNEDFUNC_FRAGMENT **pDst;
+
+	pSrc = (const TUNEDFUNC_FRAGMENT **)ptfnRoot;
+	pDst = (const TUNEDFUNC_FRAGMENT **)&tfn;
+
+	for (int i = 0; i < (sizeof(TUNEDFUNC) / sizeof(void *)); i++)
+	{
+		for (pTest = pSrc[i]; pTest != NULL; pTest = (const TUNEDFUNC_FRAGMENT *)pTest->pNext)
+		{
+			int j;
+			for (j = 0; j < _countof(pTest->dwRequiredFeatures); j++)
+			{
+				if ((pTest->dwRequiredFeatures[j] & pdwSupportedFeatures[j]) != pTest->dwRequiredFeatures[j])
+					break;
+			}
+			if (j == _countof(pTest->dwRequiredFeatures))
+				break;
+		}
+		if (pTest != NULL)
+			pDst[i] = pTest;
+	}
+}
