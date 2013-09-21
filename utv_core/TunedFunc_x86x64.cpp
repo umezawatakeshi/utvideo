@@ -78,6 +78,24 @@ const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeI686 = {
 	i686_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
 };
 
+#ifdef __x86_64__
+const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeBMI2 = {
+	&tfnHuffmanDecodeI686,
+	{ 0, FEATURE1_BMI2 },
+	bmi2_HuffmanDecode,
+	bmi2_HuffmanDecodeAndAccum,
+	bmi2_HuffmanDecodeAndAccumStep2,
+	bmi2_HuffmanDecodeAndAccumStep3,
+	bmi2_HuffmanDecodeAndAccumStep4,
+	bmi2_HuffmanDecodeAndAccumStep3ForBGRBlue,
+	bmi2_HuffmanDecodeAndAccumStep3ForBGRRed,
+	bmi2_HuffmanDecodeAndAccumStep4ForBGRXBlue,
+	bmi2_HuffmanDecodeAndAccumStep4ForBGRXRed,
+	bmi2_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha,
+	bmi2_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
+};
+#endif
+
 
 const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSE2 = {
 	&tfnConvertYUVRGBCPP,
@@ -177,7 +195,11 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleSSSE3 = {
 const TUNEDFUNC tfnRoot = {
 	&tfnPredictSSE2,
 	&tfnHuffmanEncodeI686,
+#ifdef __x86_64__
+	&tfnHuffmanDecodeBMI2,
+#else
 	&tfnHuffmanDecodeI686,
+#endif
 	&tfnConvertYUVRGBSSE41,
 	&tfnConvertShuffleSSSE3,
 };
