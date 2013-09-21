@@ -59,12 +59,14 @@ class CBT601Coefficient
 {
 public:
 	/*
-	 * Visual C++ (2005-2012) では、以下の宣言は
+	 * 以下のようなの宣言は C++ 仕様上許されず、
 	 * 「スタティック const 整数データ メンバ以外をクラス内で初期化することはできません」
-	 * というエラーになる。
-	 * 次善の策として定数関数として定義する。
+	 * というエラーになる。次善の策として定数関数として定義する。
+	 *
+	 * gcc だとエラーにならないが、これは独自拡張である。
 	 */
 	//static const float R2Y = COEFF_R2Y8(COEFF_BT601_KR, COEFF_BT601_KB);
+
 	static inline float R2Y(void)   { return (float)COEFF_R2Y8(COEFF_BT601_KR, COEFF_BT601_KB); }
 	static inline float G2Y(void)   { return (float)COEFF_G2Y8(COEFF_BT601_KR, COEFF_BT601_KB); }
 	static inline float B2Y(void)   { return (float)COEFF_B2Y8(COEFF_BT601_KR, COEFF_BT601_KB); }
