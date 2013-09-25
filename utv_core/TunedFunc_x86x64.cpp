@@ -174,7 +174,7 @@ const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSE41 = {
 
 
 const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleSSSE3 = {
-	&tfnConvertYUVRGBCPP,
+	&tfnConvertShuffleCPP,
 	{ FEATURE0_SSSE3, 0 },
 	ssse3_ConvertBGRToULRG,
 	ssse3_ConvertBGRXToULRG,
