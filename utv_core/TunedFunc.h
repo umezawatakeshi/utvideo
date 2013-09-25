@@ -6,14 +6,14 @@
 #include "Coefficient.h"
 
 #define FEATURESIZE 2
-#define DECLARE_TUNEDFUNC_FRAGMENT_HEADER \
-	const void /* TUNEDFUNC_FRAGMENT */ *pNext; \
+#define DECLARE_TUNEDFUNC_FRAGMENT_HEADER(T) \
+	const T *pNext; \
 	uint32_t dwRequiredFeatures[FEATURESIZE]
 
 
 struct TUNEDFUNC_FRAGMENT
 {
-	DECLARE_TUNEDFUNC_FRAGMENT_HEADER;
+	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_FRAGMENT);
 };
 
 
@@ -22,7 +22,7 @@ struct HUFFMAN_DECODE_TABLE;
 
 struct TUNEDFUNC_PREDICT
 {
-	DECLARE_TUNEDFUNC_FRAGMENT_HEADER;
+	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_PREDICT);
 	void (*pfnPredictWrongMedianAndCount_align16)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
 	void (*pfnPredictWrongMedianAndCount_align1)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
 	void (*pfnPredictLeftAndCount_align1)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
@@ -31,13 +31,13 @@ struct TUNEDFUNC_PREDICT
 
 struct TUNEDFUNC_HUFFMAN_ENCODE
 {
-	DECLARE_TUNEDFUNC_FRAGMENT_HEADER;
+	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_HUFFMAN_ENCODE);
 	size_t (*pfnHuffmanEncode)(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
 };
 
 struct TUNEDFUNC_HUFFMAN_DECODE
 {
-	DECLARE_TUNEDFUNC_FRAGMENT_HEADER;
+	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_HUFFMAN_DECODE);
 	void (*pfnHuffmanDecode)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 	void (*pfnHuffmanDecodeAndAccum)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 	void (*pfnHuffmanDecodeAndAccumStep2)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
@@ -65,14 +65,14 @@ struct TUNEDFUNC_CONVERT_YUVRGB_COLORSPACE
 
 struct TUNEDFUNC_CONVERT_YUVRGB
 {
-	DECLARE_TUNEDFUNC_FRAGMENT_HEADER;
+	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_CONVERT_YUVRGB);
 	TUNEDFUNC_CONVERT_YUVRGB_COLORSPACE bt601;
 	TUNEDFUNC_CONVERT_YUVRGB_COLORSPACE bt709;
 };
 
 struct TUNEDFUNC_CONVERT_SHUFFLE
 {
-	DECLARE_TUNEDFUNC_FRAGMENT_HEADER;
+	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_CONVERT_SHUFFLE);
 	void (*pfnConvertBGRToULRG)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertBGRXToULRG)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertXRGBToULRG)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
