@@ -352,7 +352,7 @@ public:
 				}
 			}
 		}
-		maname = "Unknwon";
+		maname = "Unknown";
 		ma = MA_UNKNOWN;
 ma_found:
 		_RPT2(_CRT_WARN, "CPUID     march=\"%s\" (ID %08X)\n", maname, ma);
