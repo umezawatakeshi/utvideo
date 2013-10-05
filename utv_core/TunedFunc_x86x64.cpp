@@ -57,7 +57,7 @@ struct MAFM
  * and
  *   - Intel 64 and IA-32 Architectures Optimization Reference Manual, Appendix C
  */
-static struct MAFM mafm[] = {
+static const struct MAFM mafm[] = {
 	{ "Merom",        MA_INTEL_MEROM,        { 0x060f, 0x0616 } },
 	{ "Penryn",       MA_INTEL_PENRYN,       { 0x0617, 0x061d } },
 	{ "Nehalem",      MA_INTEL_NEHALEM,      { 0x061a, 0x061e, 0x061f, 0x062e } },
