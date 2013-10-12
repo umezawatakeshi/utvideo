@@ -458,4 +458,4 @@ ma_found:
 
 		ResolveTunedFunc(&tfnRoot, dwSupportedFeatures);
 	}
-};// tfi;
+} tfi;
