@@ -104,6 +104,7 @@ const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeI686 = {
 	NULL,
 	{ 0, 0 },
 	i686_HuffmanDecode,
+	i686_HuffmanDecodeStep4,
 	i686_HuffmanDecodeAndAccum,
 	i686_HuffmanDecodeAndAccumStep2,
 	i686_HuffmanDecodeAndAccumStep3,
@@ -121,6 +122,7 @@ const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeBMI2 = {
 	&tfnHuffmanDecodeI686,
 	{ 0, FEATURE1_BMI2 },
 	bmi2_HuffmanDecode,
+	bmi2_HuffmanDecodeStep4,
 	bmi2_HuffmanDecodeAndAccum,
 	bmi2_HuffmanDecodeAndAccumStep2,
 	bmi2_HuffmanDecodeAndAccumStep3,
@@ -456,4 +458,4 @@ ma_found:
 
 		ResolveTunedFunc(&tfnRoot, dwSupportedFeatures);
 	}
-} tfi;
+};// tfi;

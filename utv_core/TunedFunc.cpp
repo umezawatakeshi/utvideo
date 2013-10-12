@@ -29,6 +29,7 @@ const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeCPP = {
 	NULL,
 	{ 0 },
 	cpp_HuffmanDecode,
+	cpp_HuffmanDecodeStep4,
 	cpp_HuffmanDecodeAndAccum,
 	cpp_HuffmanDecodeAndAccumStep2,
 	cpp_HuffmanDecodeAndAccumStep3,

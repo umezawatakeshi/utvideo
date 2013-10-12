@@ -39,6 +39,7 @@ struct TUNEDFUNC_HUFFMAN_DECODE
 {
 	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_HUFFMAN_DECODE);
 	void (*pfnHuffmanDecode)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
+	void (*pfnHuffmanDecodeStep4)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 	void (*pfnHuffmanDecodeAndAccum)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 	void (*pfnHuffmanDecodeAndAccumStep2)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 	void (*pfnHuffmanDecodeAndAccumStep3)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
@@ -130,6 +131,7 @@ public:
 
 #define HuffmanEncode tfn.pHuffmanEncode->pfnHuffmanEncode
 #define HuffmanDecode tfn.pHuffmanDecode->pfnHuffmanDecode
+#define HuffmanDecodeStep4 tfn.pHuffmanDecode->pfnHuffmanDecodeStep4
 #define HuffmanDecodeAndAccum tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccum
 #define HuffmanDecodeAndAccumStep2 tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep2
 #define HuffmanDecodeAndAccumStep3 tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep3

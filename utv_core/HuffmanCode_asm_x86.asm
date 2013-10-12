@@ -184,6 +184,7 @@ global %$procname
 %endmacro
 
 HUFFMAN_DECODE	_i686_HuffmanDecode,                                     0, 1,  0,  0
+HUFFMAN_DECODE	_i686_HuffmanDecodeStep4,                                0, 4,  0,  0
 HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccum,                             1, 1,  0,  0
 HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep2,                        1, 2,  0,  0
 HUFFMAN_DECODE	_i686_HuffmanDecodeAndAccumStep3,                        1, 3,  0,  0
