@@ -569,36 +569,21 @@ global %$procname
 .label3:
 	cmp			esi, ecx
 	jae			.label2
-%if %$bgrx
-	mov			al, [esi+1]
-%else
-	mov			al, [esi+2]
-%endif
+
+	mov			al, [esi+2-%$bgrx]
 	mov			[edi], al
 	sub			al, 80h
 
 %if %$havealpha
- %if %$bgrx
-	mov			ah, [esi+3]
- %else
-	mov			ah, [esi  ]
- %endif
+	mov			ah, [esi+%$bgrx*3]
 	mov			[ebp], ah
 %endif
 
-%if %$bgrx
-	mov			ah, [esi  ]
-%else
-	mov			al, [esi+3]
-%endif
+	mov			ah, [esi+3-%$bgrx*3]
 	sub			ah, al
 	mov			[ebx], ah
 
-%if %$bgrx
-	mov			ah, [esi+2]
-%else
-	mov			al, [esi+1]
-%endif
+	mov			ah, [esi+1+%$bgrx]
 	sub			ah, al
 	mov			[edx], ah
 

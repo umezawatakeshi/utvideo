@@ -574,36 +574,21 @@ global %$procname
 .label3:
 	cmp			rsi, r8
 	jae			.label2
-%if %$bgrx
-	mov			al, [rsi+1]
-%else
-	mov			al, [rsi+2]
-%endif
+
+	mov			al, [rsi+2-%$bgrx]
 	mov			[rdi+rcx], al
 	sub			al, 80h
 
 %if %$havealpha
- %if %$bgrx
-	mov			ah, [rsi+3]
- %else
-	mov			ah, [rsi  ]
- %endif
+	mov			ah, [rsi+%$bgrx*3]
 	mov			[rbp+rcx], ah
 %endif
 
-%if %$bgrx
-	mov			ah, [rsi  ]
-%else
-	mov			al, [rsi+3]
-%endif
+	mov			ah, [rsi+3-%$bgrx*3]
 	sub			ah, al
 	mov			[rbx+rcx], ah
 
-%if %$bgrx
-	mov			ah, [rsi+2]
-%else
-	mov			al, [rsi+1]
-%endif
+	mov			ah, [rsi+1+%$bgrx]
 	sub			ah, al
 	mov			[rdx+rcx], ah
 
