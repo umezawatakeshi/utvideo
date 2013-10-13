@@ -76,6 +76,7 @@ const TUNEDFUNC_PREDICT tfnPredictI686 = {
 	cpp_PredictWrongMedianAndCount,
 	cpp_PredictLeftAndCount,
 	i686_RestoreWrongMedian_align1,
+	cpp_RestoreWrongMedianBlock4,
 };
 #endif
 
@@ -90,6 +91,7 @@ const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
 	sse2_PredictWrongMedianAndCount_align1,
 	sse2_PredictLeftAndCount_align1,
 	sse1mmx_RestoreWrongMedian_align1,
+	sse2_RestoreWrongMedianBlock4,
 };
 
 
@@ -232,6 +234,17 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleSSSE3 = {
 	ssse3_ConvertULY2ToUYVY,
 };
 
+
+const TUNEDFUNC_CORRELATE tfnCorrelateSSSE3 = {
+	NULL,
+	{ 0 },
+	ssse3_EncorrelateInplaceBGRX,
+	ssse3_EncorrelateInplaceBGRA,
+	ssse3_EncorrelateInplaceXRGB,
+	ssse3_EncorrelateInplaceARGB,
+};
+
+
 const TUNEDFUNC tfnRoot = {
 	&tfnPredictSSE2,
 	&tfnHuffmanEncodeI686,
@@ -242,6 +255,7 @@ const TUNEDFUNC tfnRoot = {
 #endif
 	&tfnConvertYUVRGBSSE41,
 	&tfnConvertShuffleSSSE3,
+	&tfnCorrelateSSSE3,
 };
 
 uint32_t dwSupportedFeatures[FEATURESIZE];
