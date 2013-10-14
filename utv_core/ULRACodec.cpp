@@ -173,7 +173,7 @@ bool CULRACodec::DecodeDirect(uint32_t nBandIndex)
 			HuffmanDecodeStep4(pDecEnd-m_dwRawGrossWidth+1, pDecBegin-m_dwRawGrossWidth+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 			HuffmanDecodeStep4(pDecEnd-m_dwRawGrossWidth+0, pDecBegin-m_dwRawGrossWidth+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 			HuffmanDecodeStep4(pDecEnd-m_dwRawGrossWidth+2, pDecBegin-m_dwRawGrossWidth+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
-			HuffmanDecodeStep4(pDecEnd-m_dwRawGrossWidth+3, pDecBegin-m_dwRawGrossWidth+3, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
+			HuffmanDecodeStep4(pDecEnd-m_dwRawGrossWidth+3, pDecBegin-m_dwRawGrossWidth+3, m_pDecodeCode[3][nBandIndex], &m_hdt[3], m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 			RestoreWrongMedianBlock4(pDstEnd-m_dwRawGrossWidth, pDecEnd-m_dwRawGrossWidth, pDecBegin-m_dwRawGrossWidth, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 			EncorrelateInplaceBGRA(pDstEnd-m_dwRawGrossWidth, pDstBegin-m_dwRawGrossWidth, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth);
 			return true;
@@ -181,7 +181,7 @@ bool CULRACodec::DecodeDirect(uint32_t nBandIndex)
 			HuffmanDecodeStep4(pDecBegin+1, pDecEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
 			HuffmanDecodeStep4(pDecBegin+0, pDecEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
 			HuffmanDecodeStep4(pDecBegin+2, pDecEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
-			HuffmanDecodeStep4(pDecBegin+3, pDecEnd+3, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
+			HuffmanDecodeStep4(pDecBegin+3, pDecEnd+3, m_pDecodeCode[3][nBandIndex], &m_hdt[3], m_dwRawNetWidth, m_dwRawGrossWidth);
 			RestoreWrongMedianBlock4(pDstBegin, pDecBegin, pDecEnd, m_dwRawNetWidth, m_dwRawGrossWidth);
 			EncorrelateInplaceBGRA(pDstBegin, pDstEnd, m_dwRawNetWidth, m_dwRawGrossWidth);
 			return true;
@@ -189,7 +189,7 @@ bool CULRACodec::DecodeDirect(uint32_t nBandIndex)
 			HuffmanDecodeStep4(pDecBegin+2, pDecEnd+2, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_dwRawNetWidth, m_dwRawGrossWidth);
 			HuffmanDecodeStep4(pDecBegin+3, pDecEnd+3, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_dwRawNetWidth, m_dwRawGrossWidth);
 			HuffmanDecodeStep4(pDecBegin+1, pDecEnd+1, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
-			HuffmanDecodeStep4(pDecBegin+0, pDecEnd+0, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_dwRawNetWidth, m_dwRawGrossWidth);
+			HuffmanDecodeStep4(pDecBegin+0, pDecEnd+0, m_pDecodeCode[3][nBandIndex], &m_hdt[3], m_dwRawNetWidth, m_dwRawGrossWidth);
 			RestoreWrongMedianBlock4(pDstBegin, pDecBegin, pDecEnd, m_dwRawNetWidth, m_dwRawGrossWidth);
 			EncorrelateInplaceARGB(pDstBegin, pDstEnd, m_dwRawNetWidth, m_dwRawGrossWidth);
 			return true;
