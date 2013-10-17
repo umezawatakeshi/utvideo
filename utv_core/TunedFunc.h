@@ -23,10 +23,9 @@ struct HUFFMAN_DECODE_TABLE;
 struct TUNEDFUNC_PREDICT
 {
 	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_PREDICT);
-	void (*pfnPredictWrongMedianAndCount_align16)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
-	void (*pfnPredictWrongMedianAndCount_align1)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
-	void (*pfnPredictLeftAndCount_align1)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
-	void (*pfnRestoreWrongMedian_align1)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
+	void (*pfnPredictWrongMedianAndCount)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
+	void (*pfnPredictLeftAndCount)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
+	void (*pfnRestoreWrongMedian)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
 	void (*pfnRestoreWrongMedianBlock4)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 };
 
@@ -136,10 +135,9 @@ public:
 };
 
 
-#define PredictWrongMedianAndCount_align16 tfn.pPredict->pfnPredictWrongMedianAndCount_align16
-#define PredictWrongMedianAndCount_align1 tfn.pPredict->pfnPredictWrongMedianAndCount_align1
-#define PredictLeftAndCount tfn.pPredict->pfnPredictLeftAndCount_align1
-#define RestoreWrongMedian tfn.pPredict->pfnRestoreWrongMedian_align1
+#define PredictWrongMedianAndCount tfn.pPredict->pfnPredictWrongMedianAndCount
+#define PredictLeftAndCount tfn.pPredict->pfnPredictLeftAndCount
+#define RestoreWrongMedian tfn.pPredict->pfnRestoreWrongMedian
 #define RestoreWrongMedianBlock4 tfn.pPredict->pfnRestoreWrongMedianBlock4
 
 #define HuffmanEncode tfn.pHuffmanEncode->pfnHuffmanEncode

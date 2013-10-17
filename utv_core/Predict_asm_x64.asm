@@ -10,8 +10,8 @@ section .text
 
 %push
 
-global sse2_PredictLeftAndCount_align1
-sse2_PredictLeftAndCount_align1:
+global sse2_PredictLeftAndCount
+sse2_PredictLeftAndCount:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, pCountTable
 
 	mov			eax, 80h
@@ -82,111 +82,13 @@ sse2_PredictLeftAndCount_align1:
 %pop
 
 
-%push
-
-global sse2_PredictWrongMedianAndCount_align16
-sse2_PredictWrongMedianAndCount_align16:
-	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride, pCountTable
-
-	mov			eax, 80h
-	movd		xmm1, eax
-
-	mov			rsi, qword [rsp + %$pSrcBegin]
-	mov			rdi, qword [rsp + %$pDstBegin]
-	mov			rax, rsi
-	mov			rdx, qword [rsp + %$dwStride]
-	add			rax, rdx
-	neg			rdx
-	mov			rbx, qword [rsp + %$pCountTable]
-
-	align		64
-.label1:
-	movdqa		xmm0, oword [rsi]
-	movdqa		xmm2, xmm0
-	pslldq		xmm2, 1
-	por			xmm2, xmm1
-	movdqa		xmm1, xmm0
-	psrldq		xmm1, 15
-
-	psubb		xmm0, xmm2
-	movdqa		oword [rdi], xmm0
-
-%assign pos 0
-%rep 8
-	pextrw		ecx, xmm0, pos
-	movzx		ebp, cl
-	inc			dword [rbx+rbp*4]
-	movzx		ebp, ch
-	inc			dword [rbx+rbp*4]
-%assign pos pos+1
-%endrep
-
-	add			rsi, 16
-	add			rdi, 16
-	cmp			rsi, rax
-	jb			.label1
-
-	mov			rax, qword [rsp + %$pSrcEnd]
-
-	pxor		xmm1, xmm1
-	pxor		xmm5, xmm5
-
-	align		64
-.label2:
-	movdqa		xmm0, oword [rsi]
-	movdqa		xmm2, xmm0
-	pslldq		xmm2, 1
-	por			xmm2, xmm1
-	movdqa		xmm1, xmm0
-	psrldq		xmm1, 15
-
-	movdqa		xmm4, oword [rsi+rdx]
-	movdqa		xmm6, xmm4
-	pslldq		xmm6, 1
-	por			xmm6, xmm5
-	movdqa		xmm5, xmm4
-	psrldq		xmm5, 15
-
-	movdqa		xmm7, xmm2
-	paddb		xmm7, xmm4
-	psubb		xmm7, xmm6
-
-	movdqa		xmm3, xmm2
-	pminub		xmm2, xmm4
-	pmaxub		xmm3, xmm4
-	pmaxub		xmm7, xmm2
-	pminub		xmm7, xmm3	; predicted = min(max(min(left, above), grad), max(left, above))
-
-	psubb		xmm0, xmm7
-	movdqa		oword [rdi], xmm0
-
-%assign pos 0
-%rep 8
-	pextrw		ecx, xmm0, pos
-	movzx		ebp, cl
-	inc			dword [rbx+rbp*4]
-	movzx		ebp, ch
-	inc			dword [rbx+rbp*4]
-%assign pos pos+1
-%endrep
-
-	add			rsi, 16
-	add			rdi, 16
-	cmp			rsi, rax
-	jb			.label2
-
-	SIMPLE_EPILOGUE
-
-%pop
-
-
 ; prediction は前後にマージンを持つ CFrameBuffer 上で行うので、計算結果が変わらない限り、はみ出し読み込みは許容される。
 ; 一方、マルチスレッド動作した時に問題が発生するので、はみ出し書き込みは許容されない。
 
 %push
 
-global sse2_PredictWrongMedianAndCount_align1
-sse2_PredictWrongMedianAndCount_align1:
+global sse2_PredictWrongMedianAndCount
+sse2_PredictWrongMedianAndCount:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride, pCountTable
 
 	mov			eax, 80h
@@ -357,8 +259,8 @@ sse2_PredictWrongMedianAndCount_align1:
 
 %push
 
-global sse1mmx_RestoreWrongMedian_align1
-sse1mmx_RestoreWrongMedian_align1:
+global sse1mmx_RestoreWrongMedian
+sse1mmx_RestoreWrongMedian:
 	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride
 
 	mov			rsi, qword [rsp + %$pSrcBegin]

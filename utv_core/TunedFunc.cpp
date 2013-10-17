@@ -14,7 +14,6 @@ const TUNEDFUNC_PREDICT tfnPredictCPP = {
 	NULL,
 	{ 0 },
 	cpp_PredictWrongMedianAndCount,
-	cpp_PredictWrongMedianAndCount,
 	cpp_PredictLeftAndCount,
 	cpp_RestoreWrongMedian,
 	cpp_RestoreWrongMedianBlock4,

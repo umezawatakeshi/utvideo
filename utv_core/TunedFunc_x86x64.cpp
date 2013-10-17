@@ -73,9 +73,8 @@ const TUNEDFUNC_PREDICT tfnPredictI686 = {
 	NULL,
 	{ 0, 0 },
 	cpp_PredictWrongMedianAndCount,
-	cpp_PredictWrongMedianAndCount,
 	cpp_PredictLeftAndCount,
-	i686_RestoreWrongMedian_align1,
+	i686_RestoreWrongMedian,
 	cpp_RestoreWrongMedianBlock4,
 };
 #endif
@@ -87,10 +86,9 @@ const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
 	NULL,
 #endif
 	{ FEATURE0_SSE2, 0 },
-	sse2_PredictWrongMedianAndCount_align16,
-	sse2_PredictWrongMedianAndCount_align1,
-	sse2_PredictLeftAndCount_align1,
-	sse1mmx_RestoreWrongMedian_align1,
+	sse2_PredictWrongMedianAndCount,
+	sse2_PredictLeftAndCount,
+	sse1mmx_RestoreWrongMedian,
 	sse2_RestoreWrongMedianBlock4,
 };
 
