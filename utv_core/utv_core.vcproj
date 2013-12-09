@@ -780,6 +780,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\ByteOrder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Codec.h"
 				>
 			</File>
