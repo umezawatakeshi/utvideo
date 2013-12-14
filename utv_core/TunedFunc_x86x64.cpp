@@ -235,7 +235,7 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleSSSE3 = {
 
 const TUNEDFUNC_CORRELATE tfnCorrelateSSSE3 = {
 	NULL,
-	{ 0 },
+	{ FEATURE0_SSSE3, 0 },
 	ssse3_EncorrelateInplaceBGRX,
 	ssse3_EncorrelateInplaceBGRA,
 	ssse3_EncorrelateInplaceXRGB,
