@@ -385,7 +385,7 @@ _sse2_RestoreWrongMedianBlock4:
 	neg			eax
 
 	mov			edx, 80808080h
-	vmovd		xmm0, edx
+	movd		xmm0, edx
 
 	lea			edx, [esi+ebx]
 .label0:

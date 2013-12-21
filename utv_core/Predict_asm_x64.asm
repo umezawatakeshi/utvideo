@@ -327,7 +327,7 @@ sse2_RestoreWrongMedianBlock4:
 	neg			rax
 
 	mov			edx, 80808080h
-	vmovd		xmm0, edx
+	movd		xmm0, edx
 
 	lea			rdx, [rsi+rbx]
 .label0:
