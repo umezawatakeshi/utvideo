@@ -25,7 +25,7 @@ public:
 class CThreadManager
 {
 private:
-	static const int MAX_THREAD = 32;
+	static const int MAX_THREAD = 256; /* XXX should be larger than number of bits of DWORD_PTR */
 	static const int MAX_JOB = 256;
 
 private:
