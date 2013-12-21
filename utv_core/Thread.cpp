@@ -161,7 +161,8 @@ CThreadManager::CThreadManager(void)
 	pthread_cond_init(&m_ptcJobCond, NULL);
 
 	m_nNumThreads = sysconf(_SC_NPROCESSORS_ONLN);
-	m_nNumThreads = min(m_nNumThreads, MAX_THREAD);
+	if (m_nNumThreads > MAX_THREAD)
+		m_nNumThreads = MAX_THREAD;
 	for (int i = 0; i < m_nNumThreads; i++)
 	{
 		pthread_create(&m_ptidThread[i], NULL, StaticThreadProc, this);
