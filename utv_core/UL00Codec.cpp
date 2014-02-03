@@ -34,13 +34,10 @@ void CUL00Codec::GetShortFriendlyName(char *pszName, size_t cchName)
 void CUL00Codec::GetShortFriendlyName(wchar_t *pszName, size_t cchName)
 {
 	char buf[16];
-	char *p;
 
-	// 名前には us-ascii な文字しか入らないので、数値代入してしまう。
 	GetShortFriendlyName(buf, min(cchName, _countof(buf)));
-	p = buf;
-	while ((*(pszName++) = *(p++)) != '\0')
-		/* NOTHING */;
+	mbstowcs(pszName, buf, cchName);
+	pszName[cchName - 1] = L'\0';
 }
 
 void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
@@ -58,13 +55,10 @@ void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 void CUL00Codec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
 {
 	char buf[128];
-	char *p;
 
-	// 名前には us-ascii な文字しか入らないので、数値代入してしまう。
 	GetLongFriendlyName(buf, min(cchName, _countof(buf)));
-	p = buf;
-	while ((*(pszName++) = *(p++)) != '\0')
-		/* NOTHING */;
+	mbstowcs(pszName, buf, cchName);
+	pszName[cchName - 1] = L'\0';
 }
 
 int CUL00Codec::LoadConfig(void)
