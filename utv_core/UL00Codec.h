@@ -77,18 +77,18 @@ protected:
 	uint32_t m_dwNumStripes;
 	uint32_t m_dwDivideCount;
 	bool m_bInterlace;
-	uint32_t m_dwRawSize;
-	uint32_t m_dwRawGrossWidth;
-	uint32_t m_dwRawNetWidth;
-	uint32_t m_dwPlaneSize[4];
-	uint32_t m_dwPlaneWidth[4];
-	uint32_t m_dwPlaneStripeSize[4];
-	uint32_t m_dwPlanePredictStride[4];
+	size_t m_cbRawSize;
+	size_t m_cbRawGrossWidth;
+	size_t m_cbRawNetWidth;
+	size_t m_cbRawStripeSize;
+	size_t m_cbPlaneSize[4];
+	size_t m_cbPlaneWidth[4];
+	size_t m_cbPlaneStripeSize[4];
+	size_t m_cbPlanePredictStride[4];
 	uint32_t m_dwPlaneStripeBegin[256];
 	uint32_t m_dwPlaneStripeEnd[256];
 	uint32_t m_dwRawStripeBegin[256];
 	uint32_t m_dwRawStripeEnd[256];
-	uint32_t m_dwRawStripeSize;
 
 	CThreadManager *m_ptm;
 	CFrameBuffer *m_pCurFrame;

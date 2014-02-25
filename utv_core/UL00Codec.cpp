@@ -357,7 +357,7 @@ int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 	switch (rawfmt)
 	{
 	case UTVF_YV12:
-		m_dwRawSize = (width * height * 3) / 2; // XXX ïùÇ‚çÇÇ≥Ç™äÔêîÇÃèÍçáÇÕçló∂ÇµÇƒÇ¢Ç»Ç¢
+		m_cbRawSize = (width * height * 3) / 2; // XXX ïùÇ‚çÇÇ≥Ç™äÔêîÇÃèÍçáÇÕçló∂ÇµÇƒÇ¢Ç»Ç¢
 		break;
 	default:
 		switch (rawfmt)
@@ -365,24 +365,24 @@ int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 		case UTVF_NFCC_BGR_BU:
 			m_bBottomUpFrame = true;
 		case UTVF_NFCC_BGR_TD:
-			m_dwRawNetWidth = width * 3;
-			m_dwRawGrossWidth = ROUNDUP(m_dwRawNetWidth, 4);
+			m_cbRawNetWidth = width * 3;
+			m_cbRawGrossWidth = ROUNDUP(m_cbRawNetWidth, 4);
 			break;
 		case UTVF_NFCC_BGRX_BU:
 		case UTVF_NFCC_BGRA_BU:
 			m_bBottomUpFrame = true;
 		case UTVF_NFCC_BGRX_TD:
 		case UTVF_NFCC_BGRA_TD:
-			m_dwRawNetWidth = width * 4;
-			m_dwRawGrossWidth = m_dwRawNetWidth;
+			m_cbRawNetWidth = width * 4;
+			m_cbRawGrossWidth = m_cbRawNetWidth;
 			break;
 		case UTVF_NFCC_RGB_TD:
-			m_dwRawNetWidth = width * 3;
-			m_dwRawGrossWidth = cbGrossWidth;
+			m_cbRawNetWidth = width * 3;
+			m_cbRawGrossWidth = cbGrossWidth;
 			break;
 		case UTVF_NFCC_ARGB_TD:
-			m_dwRawNetWidth = width * 4;
-			m_dwRawGrossWidth = cbGrossWidth;
+			m_cbRawNetWidth = width * 4;
+			m_cbRawGrossWidth = cbGrossWidth;
 			break;
 		case UTVF_YUY2:
 		case UTVF_YUYV:
@@ -390,17 +390,17 @@ int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 		case UTVF_UYVY:
 		case UTVF_UYNV:
 		case UTVF_HDYC:
-			m_dwRawNetWidth = width * 2;
-			m_dwRawGrossWidth = m_dwRawNetWidth;
+			m_cbRawNetWidth = width * 2;
+			m_cbRawGrossWidth = m_cbRawNetWidth;
 			break;
 		default:
 			return -1;
 		}
-		m_dwRawSize = m_dwRawGrossWidth * height;
+		m_cbRawSize = m_cbRawGrossWidth * height;
 		if (m_bInterlace)
-			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight() * 2;
+			m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight() * 2;
 		else
-			m_dwRawStripeSize = m_dwRawGrossWidth * GetMacroPixelHeight();
+			m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight();
 	}
 
 	return 0;
@@ -419,10 +419,10 @@ int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int 
 
 	if (m_bInterlace)
 	{
-		for (int i = 0; i < _countof(m_dwPlaneWidth); i++)
+		for (int i = 0; i < _countof(m_cbPlaneWidth); i++)
 		{
-			m_dwPlaneStripeSize[i]    *= 2;
-			m_dwPlanePredictStride[i] *= 2;
+			m_cbPlaneStripeSize[i]    *= 2;
+			m_cbPlanePredictStride[i] *= 2;
 		}
 	}
 
@@ -466,11 +466,11 @@ int CUL00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int heigh
 
 	m_pCurFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pCurFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
+		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
 	m_pMedianPredicted = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pMedianPredicted->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
+		m_pMedianPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
 #ifdef _WIN32
 	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
@@ -554,8 +554,8 @@ void CUL00Codec::PredictProc(uint32_t nBandIndex)
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		uint32_t dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
-		uint32_t dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
 		for (int i = 0; i < 256; i++)
 			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
@@ -563,10 +563,10 @@ void CUL00Codec::PredictProc(uint32_t nBandIndex)
 		switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
 		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-			PredictLeftAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			PredictLeftAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-			PredictWrongMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			PredictWrongMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		default:
 			_ASSERT(false);
@@ -578,8 +578,8 @@ void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		uint32_t dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
-		uint32_t dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
 		uint32_t dwDstOffset;
 #ifdef _DEBUG
@@ -595,7 +595,7 @@ void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 		dwDstEnd = ((uint32_t *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex];
 		dwEncodedSize =
 #endif
-		HuffmanEncode(m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwDstOffset, m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pMedianPredicted->GetPlane(nPlaneIndex) + dwPlaneEnd, &m_het[nPlaneIndex]);
+		HuffmanEncode(m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwDstOffset, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, &m_het[nPlaneIndex]);
 		_ASSERT(dwEncodedSize == dwDstEnd - dwDstOffset);
 	}
 }
@@ -640,7 +640,7 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 		m_ptm->SubmitJob(new CDecodeJob(this, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
-	return m_dwRawSize;
+	return m_cbRawSize;
 }
 
 int CUL00Codec::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
@@ -664,11 +664,11 @@ int CUL00Codec::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int heig
 
 	m_pRestoredFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pRestoredFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
+		m_pRestoredFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
 	m_pDecodedFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pDecodedFrame->AddPlane(m_dwPlaneSize[i], m_dwPlaneWidth[i]);
+		m_pDecodedFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
 	m_ptm = new CThreadManager();
 
@@ -693,7 +693,7 @@ size_t CUL00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsign
 	if (ret != 0)
 		return 0;
 
-	return m_dwRawSize;
+	return m_cbRawSize;
 }
 
 int CUL00Codec::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
@@ -733,13 +733,13 @@ void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		uint32_t dwPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[nPlaneIndex];
-		uint32_t dwPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_dwPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
 		if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) == FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
-			HuffmanDecodeAndAccum(m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex], dwPlaneEnd - dwPlaneBegin, dwPlaneEnd - dwPlaneBegin);
+			HuffmanDecodeAndAccum(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex], cbPlaneEnd - cbPlaneBegin, cbPlaneEnd - cbPlaneBegin);
 		else
-			HuffmanDecode(m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex], dwPlaneEnd - dwPlaneBegin, dwPlaneEnd - dwPlaneBegin);
+			HuffmanDecode(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex], cbPlaneEnd - cbPlaneBegin, cbPlaneEnd - cbPlaneBegin);
 
 		switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
@@ -748,7 +748,7 @@ void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 			m_pCurFrame = m_pDecodedFrame;
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-			RestoreWrongMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + dwPlaneEnd, m_dwPlanePredictStride[nPlaneIndex]);
+			RestoreWrongMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
 			m_pCurFrame = m_pRestoredFrame;
 			break;
 		}

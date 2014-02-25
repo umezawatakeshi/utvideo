@@ -105,21 +105,21 @@ const char *CULYUV420Codec<CBT709Coefficient>::GetColorFormatName(void)
 template<class C>
 void CULYUV420Codec<C>::CalcPlaneSizes(unsigned int width, unsigned int height)
 {
-	m_dwPlaneSize[0]          = width * height;
-	m_dwPlaneSize[1]          = width * height / 4;
-	m_dwPlaneSize[2]          = width * height / 4;
+	m_cbPlaneSize[0]          = width * height;
+	m_cbPlaneSize[1]          = width * height / 4;
+	m_cbPlaneSize[2]          = width * height / 4;
 
-	m_dwPlaneWidth[0]         = width;
-	m_dwPlaneWidth[1]         = width / 2;
-	m_dwPlaneWidth[2]         = width / 2;
+	m_cbPlaneWidth[0]         = width;
+	m_cbPlaneWidth[1]         = width / 2;
+	m_cbPlaneWidth[2]         = width / 2;
 
-	m_dwPlaneStripeSize[0]    = width * 2;
-	m_dwPlaneStripeSize[1]    = width / 2;
-	m_dwPlaneStripeSize[2]    = width / 2;
+	m_cbPlaneStripeSize[0]    = width * 2;
+	m_cbPlaneStripeSize[1]    = width / 2;
+	m_cbPlaneStripeSize[2]    = width / 2;
 
-	m_dwPlanePredictStride[0] = width;
-	m_dwPlanePredictStride[1] = width / 2;
-	m_dwPlanePredictStride[2] = width / 2;
+	m_cbPlanePredictStride[0] = width;
+	m_cbPlanePredictStride[1] = width / 2;
+	m_cbPlanePredictStride[2] = width / 2;
 }
 
 template<class C, class T>
@@ -188,9 +188,9 @@ void ConvertYUV422ToULY0(uint8_t *pDstYBegin, uint8_t *pDstUBegin, uint8_t *pDst
 template<class C>
 void CULYUV420Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 {
-	uint8_t *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
-	uint8_t *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
-	uint8_t *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
+	uint8_t *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	uint8_t *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	uint8_t *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
 	switch (m_utvfRaw)
 	{
@@ -202,49 +202,49 @@ void CULYUV420Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 			pSrcVBegin = pSrcYBegin + m_nWidth * m_nHeight;
 			pSrcUBegin = pSrcVBegin + m_nWidth * m_nHeight / 4;
 
-			pSrcYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
-			pSrcVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
-			pSrcUBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
+			pSrcYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+			pSrcUBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
-			memcpy(pDstYBegin, pSrcYBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[0]);
-			memcpy(pDstUBegin, pSrcUBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[1]);
-			memcpy(pDstVBegin, pSrcVBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[2]);
+			memcpy(pDstYBegin, pSrcYBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[0]);
+			memcpy(pDstUBegin, pSrcUBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[1]);
+			memcpy(pDstVBegin, pSrcVBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[2]);
 		}
 		return;
 	}
 
-	const uint8_t *pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	const uint8_t *pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	const uint8_t *pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	const uint8_t *pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		ConvertYUV422ToULY0<CYUYVColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertYUV422ToULY0<CYUYVColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
 	case UTVF_HDYC:
-		ConvertYUV422ToULY0<CUYVYColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertYUV422ToULY0<CUYVYColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGR_BU:
-		ConvertRGBToULY0<C, CBGRColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_dwRawGrossWidth, pSrcBegin - m_dwRawGrossWidth, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertRGBToULY0<C, CBGRColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertRGBToULY0<C, CBGRAColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_dwRawGrossWidth, pSrcBegin - m_dwRawGrossWidth, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertRGBToULY0<C, CBGRAColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGR_TD:
-		ConvertRGBToULY0<C, CBGRColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertRGBToULY0<C, CBGRColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertRGBToULY0<C, CBGRAColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertRGBToULY0<C, CBGRAColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertRGBToULY0<C, CRGBColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertRGBToULY0<C, CRGBColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertRGBToULY0<C, CARGBColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertRGBToULY0<C, CARGBColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	}
 }
@@ -334,9 +334,9 @@ void ConvertULY0ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pS
 template<class C>
 void CULYUV420Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 {
-	const uint8_t *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
-	const uint8_t *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
-	const uint8_t *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
+	const uint8_t *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	const uint8_t *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	const uint8_t *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
 	switch (m_utvfRaw)
 	{
@@ -348,49 +348,49 @@ void CULYUV420Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
 			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight / 4;
 
-			pDstYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
-			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
-			pDstUBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
+			pDstYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+			pDstUBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
-			memcpy(pDstYBegin, pSrcYBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[0]);
-			memcpy(pDstUBegin, pSrcUBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[1]);
-			memcpy(pDstVBegin, pSrcVBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_dwPlaneStripeSize[2]);
+			memcpy(pDstYBegin, pSrcYBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[0]);
+			memcpy(pDstUBegin, pSrcUBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[1]);
+			memcpy(pDstVBegin, pSrcVBegin, (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[2]);
 		}
 		return;
 	}
 
-	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_dwRawStripeSize;
-	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_dwRawStripeSize;
+	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		ConvertULY0ToYUV422<CYUYVColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertULY0ToYUV422<CYUYVColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
 	case UTVF_HDYC:
-		ConvertULY0ToYUV422<CUYVYColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertULY0ToYUV422<CUYVYColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGR_BU:
-		ConvertULY0ToRGB<C, CBGRColorOrder>(pDstEnd - m_dwRawGrossWidth, pDstBegin - m_dwRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertULY0ToRGB<C, CBGRColorOrder>(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULY0ToRGB<C, CBGRAColorOrder>(pDstEnd - m_dwRawGrossWidth, pDstBegin - m_dwRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, -(ssize_t)m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertULY0ToRGB<C, CBGRAColorOrder>(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGR_TD:
-		ConvertULY0ToRGB<C, CBGRColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertULY0ToRGB<C, CBGRColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertULY0ToRGB<C, CBGRAColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertULY0ToRGB<C, CBGRAColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertULY0ToRGB<C, CRGBColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertULY0ToRGB<C, CRGBColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULY0ToRGB<C, CARGBColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_dwRawNetWidth, m_dwRawGrossWidth, m_dwPlanePredictStride[0], m_bInterlace);
+		ConvertULY0ToRGB<C, CARGBColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	}
 }
@@ -411,13 +411,13 @@ bool CULYUV420Codec<C>::DecodeDirect(uint32_t nBandIndex)
 			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
 			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight / 4;
 
-			uint8_t *pDstYEnd = pDstYBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[0];
-			uint8_t *pDstUEnd = pDstUBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[1];
-			uint8_t *pDstVEnd = pDstVBegin + m_dwPlaneStripeEnd[nBandIndex] * m_dwPlaneStripeSize[2];
+			uint8_t *pDstYEnd = pDstYBegin + m_dwPlaneStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
+			uint8_t *pDstUEnd = pDstUBegin + m_dwPlaneStripeEnd[nBandIndex] * m_cbPlaneStripeSize[1];
+			uint8_t *pDstVEnd = pDstVBegin + m_dwPlaneStripeEnd[nBandIndex] * m_cbPlaneStripeSize[2];
 
-			pDstYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[0];
-			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[1];
-			pDstUBegin += m_dwPlaneStripeBegin[nBandIndex] * m_dwPlaneStripeSize[2];
+			pDstYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+			pDstUBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
 			HuffmanDecodeAndAccum(pDstYBegin, pDstYEnd, m_pDecodeCode[0][nBandIndex], &m_hdt[0], pDstYEnd - pDstYBegin, pDstYEnd - pDstYBegin);
 			HuffmanDecodeAndAccum(pDstUBegin, pDstUEnd, m_pDecodeCode[1][nBandIndex], &m_hdt[1], pDstUEnd - pDstUBegin, pDstUEnd - pDstUBegin);
