@@ -7,61 +7,62 @@
 #include "Thread.h"
 #include "HuffmanCode.h"
 
-struct EXTRADATA
-{
-	uint32_t EncoderVersionAndImplementation;
-	uint32_t fccOriginalFormat;
-	uint32_t cbFrameInfo;
-	uint32_t flags0;
-};
-
-#define BIE_FLAGS0_DIVIDE_COUNT_MASK             0xff000000
-#define BIE_FLAGS0_DIVIDE_COUNT_SHIFT            24
-
-#define BIE_FLAGS0_COMPRESS_MASK                 0x00000001
-#define BIE_FLAGS0_COMPRESS_NONE                 0x00000000
-#define BIE_FLAGS0_COMPRESS_HUFFMAN_CODE         0x00000001
-
-#define BIE_FLAGS0_ASSUME_INTERLACE              0x00000800
-
-#define BIE_FLAGS0_RESERVED                      0x00fff7fe
-
-
-struct FRAMEINFO
-{
-	uint32_t dwFlags0;
-};
-
-#define FI_FLAGS0_INTRAFRAME_PREDICT_MASK        0x00000300
-#define FI_FLAGS0_INTRAFRAME_PREDICT_NONE        0x00000000
-#define FI_FLAGS0_INTRAFRAME_PREDICT_LEFT        0x00000100
-#define FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT    0x00000200
-#define FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN      0x00000300
-
-#define FI_FLAGS0_RESERVED                       0xfffffcff
-
-
-struct ENCODERCONF
-{
-	uint32_t dwFlags0;
-};
-
-#define EC_FLAGS0_DIVIDE_COUNT_MASK              0x000000ff
-
-#define EC_FLAGS0_INTRAFRAME_PREDICT_MASK        0x00000300
-#define EC_FLAGS0_INTRAFRAME_PREDICT_RESERVED    0x00000000
-#define EC_FLAGS0_INTRAFRAME_PREDICT_LEFT        0x00000100
-#define EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN      0x00000300
-
-#define EC_FLAGS0_ASSUME_INTERLACE               0x00000800
-#define EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS 0x00001000
-
-#define EC_FLAGS0_RESERVED                       0xffffe400
-
 
 class CUL00Codec :
 	public CCodec
 {
+protected:
+	struct EXTRADATA
+	{
+		uint32_t EncoderVersionAndImplementation;
+		uint32_t fccOriginalFormat;
+		uint32_t cbFrameInfo;
+		uint32_t flags0;
+	};
+
+	static const uint32_t BIE_FLAGS0_DIVIDE_COUNT_MASK     = 0xff000000;
+	static const uint32_t BIE_FLAGS0_DIVIDE_COUNT_SHIFT    = 24;
+
+	static const uint32_t BIE_FLAGS0_COMPRESS_MASK         = 0x00000001;
+	static const uint32_t BIE_FLAGS0_COMPRESS_NONE         = 0x00000000;
+	static const uint32_t BIE_FLAGS0_COMPRESS_HUFFMAN_CODE = 0x00000001;
+
+	static const uint32_t BIE_FLAGS0_ASSUME_INTERLACE      = 0x00000800;
+
+	static const uint32_t BIE_FLAGS0_RESERVED              = 0x00fff7fe;
+
+
+	struct FRAMEINFO
+	{
+		uint32_t dwFlags0;
+	};
+
+	static const uint32_t FI_FLAGS0_INTRAFRAME_PREDICT_MASK         = 0x00000300;
+	static const uint32_t FI_FLAGS0_INTRAFRAME_PREDICT_NONE         = 0x00000000;
+	static const uint32_t FI_FLAGS0_INTRAFRAME_PREDICT_LEFT         = 0x00000100;
+	static const uint32_t FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT     = 0x00000200;
+	static const uint32_t FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN = 0x00000300;
+
+	static const uint32_t FI_FLAGS0_RESERVED                        = 0xfffffcff;
+
+
+	struct ENCODERCONF
+	{
+		uint32_t dwFlags0;
+	};
+
+	static const uint32_t EC_FLAGS0_DIVIDE_COUNT_MASK               = 0x000000ff;
+
+	static const uint32_t EC_FLAGS0_INTRAFRAME_PREDICT_MASK         = 0x00000300;
+	static const uint32_t EC_FLAGS0_INTRAFRAME_PREDICT_RESERVED     = 0x00000000;
+	static const uint32_t EC_FLAGS0_INTRAFRAME_PREDICT_LEFT         = 0x00000100;
+	static const uint32_t EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN = 0x00000300;
+
+	static const uint32_t EC_FLAGS0_ASSUME_INTERLACE                = 0x00000800;
+	static const uint32_t EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS  = 0x00001000;
+
+	static const uint32_t EC_FLAGS0_RESERVED                        = 0xffffe400;
+
 protected:
 	const char *const m_pszTinyName;
 	const char *const m_pszInterfaceName;
