@@ -17,15 +17,6 @@ CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : 
 	LoadConfig();
 }
 
-void CUL00Codec::GetShortFriendlyName(char *pszName, size_t cchName)
-{
-	char buf[16];
-
-	sprintf(buf, "UtVideo (%s)", GetTinyName());
-	strncpy(pszName, buf, cchName);
-	pszName[cchName - 1] = '\0';
-}
-
 void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 {
 	char buf[128];

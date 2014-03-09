@@ -22,7 +22,7 @@ protected:
 
 public:
 	virtual const char *GetTinyName(void);
-	virtual void GetShortFriendlyName(char *pszName, size_t cchName) = 0;
+	virtual void GetShortFriendlyName(char *pszName, size_t cchName);
 	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName) = 0;
 	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName);

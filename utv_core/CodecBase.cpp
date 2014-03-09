@@ -18,6 +18,15 @@ const char *CCodecBase::GetTinyName(void)
 	return m_pszTinyName;
 }
 
+void CCodecBase::GetShortFriendlyName(char *pszName, size_t cchName)
+{
+	char buf[16];
+
+	sprintf(buf, "UtVideo (%s)", m_pszTinyName);
+	strncpy(pszName, buf, cchName);
+	pszName[cchName - 1] = '\0';
+}
+
 void CCodecBase::GetShortFriendlyName(wchar_t *pszName, size_t cchName)
 {
 	char buf[16];

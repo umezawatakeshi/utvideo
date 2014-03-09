@@ -108,7 +108,6 @@ protected:
 	virtual ~CUL00Codec(void) {}
 
 public:
-	virtual void GetShortFriendlyName(char *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName);
 
 	virtual const utvf_t *GetEncoderInputFormat(void) = 0;
