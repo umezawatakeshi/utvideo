@@ -340,26 +340,24 @@ int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 		switch (rawfmt)
 		{
 		case UTVF_NFCC_BGR_BU:
-			m_bBottomUpFrame = true;
-		case UTVF_NFCC_BGR_TD:
-			m_cbRawNetWidth = width * 3;
-			m_cbRawGrossWidth = ROUNDUP(m_cbRawNetWidth, 4);
-			break;
 		case UTVF_NFCC_BGRX_BU:
 		case UTVF_NFCC_BGRA_BU:
 			m_bBottomUpFrame = true;
-		case UTVF_NFCC_BGRX_TD:
-		case UTVF_NFCC_BGRA_TD:
-			m_cbRawNetWidth = width * 4;
-			m_cbRawGrossWidth = m_cbRawNetWidth;
-			break;
+		}
+
+		switch (rawfmt)
+		{
+		case UTVF_NFCC_BGR_BU:
+		case UTVF_NFCC_BGR_TD:
 		case UTVF_NFCC_RGB_TD:
 			m_cbRawNetWidth = width * 3;
-			m_cbRawGrossWidth = cbGrossWidth;
 			break;
+		case UTVF_NFCC_BGRX_BU:
+		case UTVF_NFCC_BGRA_BU:
+		case UTVF_NFCC_BGRX_TD:
+		case UTVF_NFCC_BGRA_TD:
 		case UTVF_NFCC_ARGB_TD:
 			m_cbRawNetWidth = width * 4;
-			m_cbRawGrossWidth = cbGrossWidth;
 			break;
 		case UTVF_YUY2:
 		case UTVF_YUYV:
@@ -368,11 +366,27 @@ int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 		case UTVF_UYNV:
 		case UTVF_HDYC:
 			m_cbRawNetWidth = width * 2;
-			m_cbRawGrossWidth = m_cbRawNetWidth;
 			break;
 		default:
 			return -1;
 		}
+
+		switch (cbGrossWidth)
+		{
+		case CBGROSSWIDTH_NATURAL:
+			m_cbRawGrossWidth = m_cbRawNetWidth;
+			break;
+		case CBGROSSWIDTH_WINDOWS:
+			/*
+			 * BI_RGB の場合は4バイトアライメントであるが、
+			 * その他の場合に4バイトアライメントにすべきかどうかは実は不明確である。
+			 */
+			m_cbRawGrossWidth = ROUNDUP(m_cbRawNetWidth, 4);
+			break;
+		default:
+			m_cbRawGrossWidth = m_cbRawNetWidth;
+		}
+
 		m_cbRawSize = m_cbRawGrossWidth * height;
 		if (m_bInterlace)
 			m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight() * 2;
