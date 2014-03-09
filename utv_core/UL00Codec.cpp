@@ -388,10 +388,6 @@ int CUL00Codec::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 		}
 
 		m_cbRawSize = m_cbRawGrossWidth * height;
-		if (m_bInterlace)
-			m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight() * 2;
-		else
-			m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight();
 	}
 
 	return 0;
@@ -403,10 +399,20 @@ int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int 
 
 	m_dwDivideCount = ((p->flags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 	m_bInterlace = (p->flags0 & BIE_FLAGS0_ASSUME_INTERLACE) != 0;
-	m_dwNumStripes = height / (GetMacroPixelHeight() * (m_bInterlace ? 2 : 1));
 
 	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
 	CalcPlaneSizes(width, height);
+
+	if (m_bInterlace)
+	{
+		m_dwNumStripes = height / (GetMacroPixelHeight() * 2);
+		m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight() * 2;
+	}
+	else
+	{
+		m_dwNumStripes = height / GetMacroPixelHeight();
+		m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight();
+	}
 
 	if (m_bInterlace)
 	{
