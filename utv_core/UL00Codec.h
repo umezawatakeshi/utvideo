@@ -3,13 +3,14 @@
 
 #pragma once
 #include "Codec.h"
+#include "CodecBase.h"
 #include "FrameBuffer.h"
 #include "Thread.h"
 #include "HuffmanCode.h"
 
 
 class CUL00Codec :
-	public CCodec
+	public CCodecBase
 {
 protected:
 	struct EXTRADATA
@@ -64,9 +65,6 @@ protected:
 	static const uint32_t EC_FLAGS0_RESERVED                        = 0xffffe400;
 
 protected:
-	const char *const m_pszTinyName;
-	const char *const m_pszInterfaceName;
-
 	ENCODERCONF m_ec;
 
 	utvf_t m_utvfRaw;
@@ -114,11 +112,9 @@ public:
 	virtual ~CUL00Codec(void) {}
 
 public:
-	virtual const char *GetTinyName(void);
 	virtual void GetShortFriendlyName(char *pszName, size_t cchName);
-	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName);
-	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName);
+
 	virtual const utvf_t *GetEncoderInputFormat(void) = 0;
 	virtual const utvf_t *GetDecoderOutputFormat(void) = 0;
 	virtual const utvf_t *GetCompressedFormat(void) = 0;

@@ -342,6 +342,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CodecBase.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Convert.cpp"
 				>
 			</File>
@@ -785,6 +789,10 @@
 			</File>
 			<File
 				RelativePath=".\Codec.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CodecBase.h"
 				>
 			</File>
 			<File

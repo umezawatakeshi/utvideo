@@ -9,17 +9,12 @@
 #include "TunedFunc.h"
 #include "resource.h"
 
-CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : m_pszTinyName(pszTinyName), m_pszInterfaceName(pszInterfaceName)
+CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : CCodecBase(pszTinyName, pszInterfaceName)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
 
 	LoadConfig();
-}
-
-const char *CUL00Codec::GetTinyName(void)
-{
-	return m_pszTinyName;
 }
 
 void CUL00Codec::GetShortFriendlyName(char *pszName, size_t cchName)
@@ -29,15 +24,6 @@ void CUL00Codec::GetShortFriendlyName(char *pszName, size_t cchName)
 	sprintf(buf, "UtVideo (%s)", GetTinyName());
 	strncpy(pszName, buf, cchName);
 	pszName[cchName - 1] = '\0';
-}
-
-void CUL00Codec::GetShortFriendlyName(wchar_t *pszName, size_t cchName)
-{
-	char buf[16];
-
-	GetShortFriendlyName(buf, min(cchName, _countof(buf)));
-	mbstowcs(pszName, buf, cchName);
-	pszName[cchName - 1] = L'\0';
 }
 
 void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
@@ -50,15 +36,6 @@ void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 		m_pszInterfaceName);
 	strncpy(pszName, buf, cchName);
 	pszName[cchName - 1] = '\0';
-}
-
-void CUL00Codec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
-{
-	char buf[128];
-
-	GetLongFriendlyName(buf, min(cchName, _countof(buf)));
-	mbstowcs(pszName, buf, cchName);
-	pszName[cchName - 1] = L'\0';
 }
 
 int CUL00Codec::LoadConfig(void)
