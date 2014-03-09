@@ -72,13 +72,9 @@ protected:
 	unsigned int m_nHeight;
 	const void *m_pInput;
 	void *m_pOutput;
-	bool m_bBottomUpFrame;
 	uint32_t m_dwNumStripes;
 	uint32_t m_dwDivideCount;
 	bool m_bInterlace;
-	size_t m_cbRawSize;
-	size_t m_cbRawGrossWidth;
-	size_t m_cbRawNetWidth;
 	size_t m_cbRawStripeSize;
 	size_t m_cbPlaneSize[4];
 	size_t m_cbPlaneWidth[4];
@@ -147,7 +143,6 @@ protected:
 	int LoadConfig(void);
 	int SaveConfig(void);
 	int InternalSetState(const void *pState, size_t cb);
-	int CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 
 	virtual const char *GetColorFormatName(void) = 0;
