@@ -30,9 +30,8 @@ void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 {
 	char buf[128];
 
-	sprintf(buf, "UtVideo %s (%s) %s",
+	sprintf(buf, "UtVideo %s %s",
 		GetColorFormatName(),
-		GetTinyName(),
 		m_pszInterfaceName);
 	strncpy(pszName, buf, cchName);
 	pszName[cchName - 1] = '\0';
