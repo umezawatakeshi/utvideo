@@ -107,7 +107,7 @@ protected:
 
 	EXTRADATA m_ed;
 
-public:
+protected:
 	CUL00Codec(const char *pszTinyName, const char *pszInterfaceName);
 	virtual ~CUL00Codec(void) {}
 
