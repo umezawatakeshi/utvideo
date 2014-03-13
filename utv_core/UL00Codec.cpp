@@ -263,7 +263,7 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
 	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-		m_ptm->SubmitJob(new CPredictJob(this, nBandIndex), nBandIndex);
+		m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::PredictProc, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
 	switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
@@ -310,7 +310,7 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	p += sizeof(FRAMEINFO);
 
 	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-		m_ptm->SubmitJob(new CEncodeJob(this, nBandIndex), nBandIndex);
+		m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::EncodeProc, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
 	*pbKeyFrame = true;
@@ -559,7 +559,7 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 	}
 
 	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-		m_ptm->SubmitJob(new CDecodeJob(this, nBandIndex), nBandIndex);
+		m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::DecodeProc, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
 	return m_cbRawSize;

@@ -157,56 +157,30 @@ protected:
 
 private:
 	void PredictProc(uint32_t nBandIndex);
-	class CPredictJob : public CThreadJob
-	{
-	private:
-		uint32_t m_nBandIndex;
-		CUL00Codec *m_pEncoder;
-	public:
-		CPredictJob(CUL00Codec *pEncoder, uint32_t nBandIndex)
-		{
-			m_nBandIndex = nBandIndex;
-			m_pEncoder = pEncoder;
-		}
-		void JobProc(CThreadManager *)
-		{
-			m_pEncoder->PredictProc(m_nBandIndex);
-		}
-	};
-
 	void EncodeProc(uint32_t nBandIndex);
-	class CEncodeJob : public CThreadJob
-	{
-	private:
-		uint32_t m_nBandIndex;
-		CUL00Codec *m_pEncoder;
-	public:
-		CEncodeJob(CUL00Codec *pEncoder, uint32_t nBandIndex)
-		{
-			m_nBandIndex = nBandIndex;
-			m_pEncoder = pEncoder;
-		}
-		void JobProc(CThreadManager *)
-		{
-			m_pEncoder->EncodeProc(m_nBandIndex);
-		}
-	};
-
 	void DecodeProc(uint32_t nBandIndex);
-	class CDecodeJob : public CThreadJob
+
+	class CThreadJob : public ::CThreadJob
 	{
-	private:
-		uint32_t m_nBandIndex;
-		CUL00Codec *m_pDecoder;
 	public:
-		CDecodeJob(CUL00Codec *pDecoder, uint32_t nBandIndex)
+		typedef void (CUL00Codec::*JobProcType)(uint32_t nBandIndex);
+
+	private:
+		CUL00Codec *m_pCodec;
+		JobProcType m_pfnJobProc;
+		uint32_t m_nBandIndex;
+
+	public:
+		CThreadJob(CUL00Codec *pCodec, JobProcType pfnJobProc, uint32_t nBandIndex)
 		{
+			m_pCodec = pCodec;
+			m_pfnJobProc = pfnJobProc;
 			m_nBandIndex = nBandIndex;
-			m_pDecoder = pDecoder;
 		}
+
 		void JobProc(CThreadManager *)
 		{
-			m_pDecoder->DecodeProc(m_nBandIndex);
+			(m_pCodec->*m_pfnJobProc)(m_nBandIndex);
 		}
 	};
 };
