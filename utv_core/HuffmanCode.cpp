@@ -32,21 +32,21 @@ bool generate_code_length(uint8_t *codelen, const struct hufftree *node, uint8_t
 	}
 }
 
-static void GenerateLengthLimitedHuffmanCodeLengthTable(uint8_t *pCodeLengthTable)
+static void GenerateLengthLimitedHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, int nSymbolBits)
 {
 	// Ç∆ÇËÇ†Ç¶Ç∏Ç±ÇÍÇ≈ì¶Ç∞ÇÈÅB
-	memset(pCodeLengthTable, 8, 256);
+	memset(pCodeLengthTable, nSymbolBits, 1 << nSymbolBits);
 }
 
-void GenerateHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, const uint32_t *pCountTable)
+void GenerateHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, const uint32_t *pCountTable, int nSymbolBits)
 {
-	struct hufftree *huffsort[256];
-	struct hufftree huffleaf[256];
-	struct hufftree huffnode[256];
+	struct hufftree **huffsort = (hufftree**)malloc(sizeof(hufftree *) * (size_t)(1 << nSymbolBits));
+	struct hufftree *huffleaf = (hufftree*)malloc(sizeof(hufftree) * (size_t)(1 << nSymbolBits));
+	struct hufftree *huffnode = (hufftree*)malloc(sizeof(hufftree) * (size_t)(1 << nSymbolBits));
 	int nsym;
 
 	nsym = 0;
-	for (int i = 0; i < 256; i++) {
+	for (int i = 0; i < (1 << nSymbolBits); i++) {
 		if (pCountTable[i] != 0) {
 			huffleaf[nsym].left = NULL;
 			huffleaf[nsym].right = NULL;
@@ -73,7 +73,11 @@ void GenerateHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, const uint32_t *p
 	}
 
 	if (generate_code_length(pCodeLengthTable, huffsort[0], 0))
-		GenerateLengthLimitedHuffmanCodeLengthTable(pCodeLengthTable);
+		GenerateLengthLimitedHuffmanCodeLengthTable(pCodeLengthTable, nSymbolBits);
+
+	free(huffsort);
+	free(huffleaf);
+	free(huffnode);
 }
 
 struct CODE_LENGTH_SORT

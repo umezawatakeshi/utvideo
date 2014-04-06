@@ -289,7 +289,7 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 			for (int i = 0; i < 256; i++)
 				count[i] += m_counts[nBandIndex].dwCount[nPlaneIndex][i];
 		m_pCodeLengthTable[nPlaneIndex] = p;
-		GenerateHuffmanCodeLengthTable(m_pCodeLengthTable[nPlaneIndex], count);
+		GenerateHuffmanCodeLengthTable(m_pCodeLengthTable[nPlaneIndex], count, 8);
 		GenerateHuffmanEncodeTable(&m_het[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 		p += 256;
 		dwCurrentOffset = 0;
