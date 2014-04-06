@@ -126,3 +126,22 @@ void cpp_RestoreWrongMedianBlock4(uint8_t *pDst, const uint8_t *pSrcBegin, const
 		}
 	}
 }
+
+
+void PredictCylindricalLeftAndCount10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, uint32_t *pCountTable)
+{
+	const uint16_t *p = pSrcBegin;
+	uint16_t *q = pDst;
+
+	*q = *p;
+	pCountTable[*q]++;
+	p++;
+	q++;
+
+	// 残りのピクセルが predict left の本番
+	for (; p < pSrcEnd; p++, q++)
+	{
+		*q = (*p - *(p-1)) & 0x3ff;
+		pCountTable[*q]++;
+	}
+}
