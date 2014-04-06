@@ -774,6 +774,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\UQ00Codec.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UQY2Codec.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\utv_core.cpp"
 				>
 			</File>
@@ -885,6 +893,14 @@
 			</File>
 			<File
 				RelativePath=".\ULYUV422Codec.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UQ00Codec.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UQY2Codec.h"
 				>
 			</File>
 			<File

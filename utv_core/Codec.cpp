@@ -9,6 +9,7 @@
 #include "ULRGCodec.h"
 #include "ULYUV420Codec.h"
 #include "ULYUV422Codec.h"
+#include "UQY2Codec.h"
 
 CCodec::CCodec(void)
 {
@@ -50,6 +51,7 @@ static const struct CODECLIST codeclist[] = {
 	CODECENTRY(CULYUV422Codec<CBT601Coefficient>), // ULY2
 	CODECENTRY(CULYUV420Codec<CBT709Coefficient>), // ULH0
 	CODECENTRY(CULYUV422Codec<CBT709Coefficient>), // ULH2
+	CODECENTRY(CUQY2Codec),
 };
 
 DLLEXPORT CCodec *CCodec::CreateInstance(utvf_t utvf, const char *pszInterfaceName)

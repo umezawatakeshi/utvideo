@@ -43,6 +43,9 @@ int UtVideoFormatToVCMFormat(DWORD *biCompression, WORD *biBitCount, utvf_t utvf
 	case UTVF_ULH0:
 		*biBitCount = 24;
 		break;
+	case UTVF_UQY2:
+		*biBitCount = 30;
+		break;
 
 	case UTVF_YUY2:
 	case UTVF_YUYV:
