@@ -78,14 +78,16 @@ void GenerateHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, const uint32_t *p
 
 struct CODE_LENGTH_SORT
 {
-	uint8_t symbol;
+	uint32_t symbol;
 	uint8_t codelen;
 };
 
-inline void sort_codelength(struct CODE_LENGTH_SORT *p)
+bool cls_less(const CODE_LENGTH_SORT &a, const CODE_LENGTH_SORT &b)
 {
-	_ASSERT(sizeof(CODE_LENGTH_SORT) == sizeof(uint16_t));
-	sort((uint16_t *)p, (uint16_t *)p+256);
+	if (a.codelen != b.codelen)
+		return a.codelen < b.codelen;
+	else
+		return a.symbol < b.symbol;
 }
 
 void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const uint8_t *pCodeLengthTable)
@@ -99,7 +101,7 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const uint8_
 		cls[i].codelen = pCodeLengthTable[i];
 	}
 
-	sort_codelength(cls);
+	sort(cls, cls + 256, cls_less);
 
 	if (cls[0].codelen == 0)
 	{
@@ -151,7 +153,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_
 		cls[i].codelen = pCodeLengthTable[i];
 	}
 
-	sort_codelength(cls);
+	sort(cls, cls + 256, cls_less);
 
 	// oŒ»‚·‚éƒVƒ“ƒ{ƒ‹‚ª‚PŽí—Þ‚µ‚©‚È‚¢ê‡‚Ìˆ—
 	if (cls[0].codelen == 0)
