@@ -139,7 +139,7 @@ const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeBMI2 = {
 
 const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSE2 = {
 	&tfnConvertYUVRGBCPP,
-	{ 0, 0 },
+	{ FEATURE0_SSE2, 0 },
 	{
 		sse2_ConvertULY2ToBGR,
 		sse2_ConvertULY2ToBGRX,
