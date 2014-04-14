@@ -230,7 +230,7 @@ int CUQ00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, un
 
 	memset(p, 0, cb);
 
-	p->siEncoderVersionAndImplementation = UTVIDEO_VERSION_AND_IMPLEMENTATION;
+	p->siEncoderVersionAndImplementation = htol32(UTVIDEO_VERSION_AND_IMPLEMENTATION);
 	p->siOriginalFormat                  = UNFCC(infmt);
 
 	return 0;
