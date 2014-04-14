@@ -128,12 +128,12 @@ void cpp_RestoreWrongMedianBlock4(uint8_t *pDst, const uint8_t *pSrcBegin, const
 }
 
 
-void PredictCylindricalLeftAndCount10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, uint32_t *pCountTable)
+void PredictCylindricalLeftAndCount10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, uint16_t initial, uint32_t *pCountTable)
 {
 	const uint16_t *p = pSrcBegin;
 	uint16_t *q = pDst;
 
-	*q = *p;
+	*q = (*p - initial) & 0x3ff;
 	pCountTable[*q]++;
 	p++;
 	q++;

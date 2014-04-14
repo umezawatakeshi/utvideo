@@ -578,7 +578,7 @@ inline void DecodeSymbol10(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TAB
 	}
 }
 
-static void cpp_HuffmanDecode_common10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE10 *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos)
+static void cpp_HuffmanDecode_common10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE10 *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos, uint16_t initial)
 {
 	int nBits;
 	uint32_t *pSrc;
@@ -588,8 +588,7 @@ static void cpp_HuffmanDecode_common10(uint16_t *pDstBegin, uint16_t *pDstEnd, c
 
 	nBits = 0;
 	pSrc = (uint32_t *)pSrcBegin;
-//	prevsym = 0x80;
-	prevsym = 0x0;
+	prevsym = initial;
 
 	for (pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; *(uint8_t **)&pStripeBegin += scbStride)
 	{
@@ -660,7 +659,7 @@ void cpp_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha(uint8_t *pDstBegin, u
 }
 
 
-void cpp_HuffmanDecodeAndAccum10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE10 *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccum10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE10 *pDecodeTable, size_t cbWidth, ssize_t scbStride, uint16_t initial)
 {
-	cpp_HuffmanDecode_common10(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 1, cbWidth, scbStride, 0, 0);
+	cpp_HuffmanDecode_common10(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 1, cbWidth, scbStride, 0, 0, initial);
 }

@@ -117,4 +117,4 @@ extern "C" void bmi2_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha(uint8_t *
 size_t cpp_HuffmanEncode10(uint8_t *pDstBegin, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE10 *pEncodeTable);
 #define HuffmanEncode10 cpp_HuffmanEncode10
 
-void cpp_HuffmanDecodeAndAccum10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE10 *pDecodeTable, size_t cbWidth, ssize_t scbStride);
+void cpp_HuffmanDecodeAndAccum10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE10 *pDecodeTable, size_t cbWidth, ssize_t scbStride, uint16_t initial);
