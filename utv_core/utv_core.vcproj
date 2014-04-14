@@ -911,6 +911,10 @@
 				RelativePath=".\utvideo.h"
 				>
 			</File>
+			<File
+				RelativePath=".\version.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="リソース ファイル"

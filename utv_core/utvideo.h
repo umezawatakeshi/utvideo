@@ -24,10 +24,7 @@ typedef ptrdiff_t ssize_t;
 #endif
 #endif
 
-
-#define UTVIDEO_VERSION_MASK                      0xffffff00
-#define UTVIDEO_VERSION                           0x0d030100
-#define UTVIDEO_VERSION_STR                       "13.3.1"
+#include "version.h"
 
 /*
  * NOTE:
