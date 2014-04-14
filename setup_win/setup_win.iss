@@ -1,10 +1,12 @@
 ; ï∂éöÉRÅ[ÉhÇÕÇrÇiÇhÇr â¸çsÉRÅ[ÉhÇÕÇbÇqÇkÇe
 ; $Id$
 
+#include "../utv_core/version.h"
+
 [Setup]
 AppName=Ut Video Codec Suite
 AppId=utvideo
-AppVersion=13.3.1
+AppVersion="{#UTVIDEO_VERSION_MAJOR}.{#UTVIDEO_VERSION_MINOR}.{#UTVIDEO_VERSION_BUGFIX}"
 AppCopyright=Copyright (c) 2008-2014 UMEZAWA Takeshi
 AppPublisher=UMEZAWA Takeshi
 AppPublisherURL=http://umezawa.dyndns.info/
@@ -12,7 +14,7 @@ UninstallDisplayName=Ut Video Codec Suite
 DefaultDirName={pf}\utvideo
 DefaultGroupName=Ut Video Codec Suite
 SolidCompression=yes
-OutputBaseFilename=utvideo-win
+OutputBaseFilename="utvideo-{#UTVIDEO_VERSION_MAJOR}.{#UTVIDEO_VERSION_MINOR}.{#UTVIDEO_VERSION_BUGFIX}-win"
 ArchitecturesInstallIn64BitMode=x64
 LicenseFile=..\gplv2.rtf
 InfoBeforeFile=before.en.rtf
