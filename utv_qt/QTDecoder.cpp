@@ -6,7 +6,7 @@
 #include "utvideo.h"
 #include "QTDecoder.h"
 #include "Codec.h"
-#include "Format.h"
+#include "QuickTimeFormat.h"
 
 extern "C" pascal ComponentResult QTDecoderComponentDispatch(ComponentParameters *params, CQTDecoder *glob);
 
