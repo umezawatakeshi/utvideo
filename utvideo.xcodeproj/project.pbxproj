@@ -28,6 +28,9 @@
 		258DB40F1411F9290059F47E /* utv_core.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3F31411F8600059F47E /* utv_core.cpp */; };
 		25A0B6631605DC4F005B2E55 /* Format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25A0B6611605DC4F005B2E55 /* Format.cpp */; };
 		25A4DCE317241CF300BEE7FB /* CPUID_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 25A4DCE117241CF300BEE7FB /* CPUID_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
+		25CCB6F518FD137F00076B45 /* CodecBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25CCB6EE18FD137F00076B45 /* CodecBase.cpp */; };
+		25CCB6F618FD137F00076B45 /* UQ00Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25CCB6F018FD137F00076B45 /* UQ00Codec.cpp */; };
+		25CCB6F718FD137F00076B45 /* UQY2Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25CCB6F218FD137F00076B45 /* UQY2Codec.cpp */; };
 		25D59BCE14CD624800FDCD1F /* QTCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D59BCC14CD624800FDCD1F /* QTCodec.cpp */; };
 		25D59BE014CD6BA300FDCD1F /* QTEncoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D59BDD14CD6BA300FDCD1F /* QTEncoder.cpp */; };
 		25F09D4314122EC900D214B9 /* QTDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25F09D3E14122EC800D214B9 /* QTDecoder.cpp */; };
@@ -86,6 +89,14 @@
 		25A0B6621605DC4F005B2E55 /* Format.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Format.h; path = utv_qt/Format.h; sourceTree = "<group>"; };
 		25A4DCE117241CF300BEE7FB /* CPUID_asm_x86.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = CPUID_asm_x86.asm; path = utv_core/CPUID_asm_x86.asm; sourceTree = "<group>"; };
 		25A4DCE217241CF300BEE7FB /* CPUID.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = CPUID.h; path = utv_core/CPUID.h; sourceTree = "<group>"; };
+		25CCB6ED18FD137F00076B45 /* ByteOrder.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = ByteOrder.h; path = utv_core/ByteOrder.h; sourceTree = "<group>"; };
+		25CCB6EE18FD137F00076B45 /* CodecBase.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = CodecBase.cpp; path = utv_core/CodecBase.cpp; sourceTree = "<group>"; };
+		25CCB6EF18FD137F00076B45 /* CodecBase.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = CodecBase.h; path = utv_core/CodecBase.h; sourceTree = "<group>"; };
+		25CCB6F018FD137F00076B45 /* UQ00Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = UQ00Codec.cpp; path = utv_core/UQ00Codec.cpp; sourceTree = "<group>"; };
+		25CCB6F118FD137F00076B45 /* UQ00Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = UQ00Codec.h; path = utv_core/UQ00Codec.h; sourceTree = "<group>"; };
+		25CCB6F218FD137F00076B45 /* UQY2Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = UQY2Codec.cpp; path = utv_core/UQY2Codec.cpp; sourceTree = "<group>"; };
+		25CCB6F318FD137F00076B45 /* UQY2Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = UQY2Codec.h; path = utv_core/UQY2Codec.h; sourceTree = "<group>"; };
+		25CCB6F418FD137F00076B45 /* version.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = version.h; path = utv_core/version.h; sourceTree = "<group>"; };
 		25CF5DF9172422DE0089819C /* TunedFunc_x86x64.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = TunedFunc_x86x64.cpp; path = utv_core/TunedFunc_x86x64.cpp; sourceTree = "<group>"; };
 		25D59BCC14CD624800FDCD1F /* QTCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = QTCodec.cpp; path = utv_qt/QTCodec.cpp; sourceTree = "<group>"; };
 		25D59BCD14CD624800FDCD1F /* QTCodec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTCodec.h; path = utv_qt/QTCodec.h; sourceTree = "<group>"; };
@@ -139,8 +150,12 @@
 		25F09D3B14122EA700D214B9 /* utv_core */ = {
 			isa = PBXGroup;
 			children = (
+				25CCB6ED18FD137F00076B45 /* ByteOrder.h */,
+				25CCB6F418FD137F00076B45 /* version.h */,
 				258DB3D41411F8600059F47E /* Codec.cpp */,
 				258DB3D51411F8600059F47E /* Codec.h */,
+				25CCB6EE18FD137F00076B45 /* CodecBase.cpp */,
+				25CCB6EF18FD137F00076B45 /* CodecBase.h */,
 				25817AE4175A052D00888CE2 /* Coefficient.h */,
 				25307212175CC27500FB4793 /* Coefficient_asm_x86x64.mac */,
 				25307213175CC27500FB4793 /* Coefficient_nasm.mac */,
@@ -179,6 +194,10 @@
 				25817AE7175A052D00888CE2 /* ULYUV420Codec.h */,
 				25817AE8175A052D00888CE2 /* ULYUV422Codec.cpp */,
 				25817AE9175A052D00888CE2 /* ULYUV422Codec.h */,
+				25CCB6F018FD137F00076B45 /* UQ00Codec.cpp */,
+				25CCB6F118FD137F00076B45 /* UQ00Codec.h */,
+				25CCB6F218FD137F00076B45 /* UQY2Codec.cpp */,
+				25CCB6F318FD137F00076B45 /* UQY2Codec.h */,
 				258DB3F31411F8600059F47E /* utv_core.cpp */,
 				258DB3F41411F8600059F47E /* utv_core.h */,
 				258DB3F51411F8600059F47E /* utvideo.h */,
@@ -302,6 +321,9 @@
 				25A4DCE317241CF300BEE7FB /* CPUID_asm_x86.asm in Sources */,
 				25817AEA175A052D00888CE2 /* ULYUV420Codec.cpp in Sources */,
 				25817AEB175A052D00888CE2 /* ULYUV422Codec.cpp in Sources */,
+				25CCB6F518FD137F00076B45 /* CodecBase.cpp in Sources */,
+				25CCB6F618FD137F00076B45 /* UQ00Codec.cpp in Sources */,
+				25CCB6F718FD137F00076B45 /* UQY2Codec.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
