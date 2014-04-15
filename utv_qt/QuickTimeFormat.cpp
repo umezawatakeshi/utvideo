@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "utvideo.h"
-#include "Format.h"
+#include "QuickTimeFormat.h"
 
 static inline bool is_fourcc(uint32_t x)
 {

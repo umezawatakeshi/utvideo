@@ -6,7 +6,7 @@
 #include "utvideo.h"
 #include "QTCodec.h"
 #include "Codec.h"
-#include "Format.h"
+#include "QuickTimeFormat.h"
 
 pascal ComponentResult QTCodecOpen(CQTCodec *glob, ComponentInstance self)
 {
