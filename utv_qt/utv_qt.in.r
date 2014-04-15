@@ -1,7 +1,7 @@
 /*  */
 /* $Id$ */
 
-#define SUBTYPE_FMTN "UtVideo " SUBTYPE_INFO " (" SUBTYPE_STR ")"
+#define SUBTYPE_FMTN "UtVideo " SUBTYPE_INFO
 
 resource 'strn' (SUBTYPE_RID) {
 	SUBTYPE_FMTN " QT"

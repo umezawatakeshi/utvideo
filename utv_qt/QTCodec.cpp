@@ -69,7 +69,7 @@ pascal ComponentResult QTCodecGetCodecInfo(CQTCodec *glob, CodecInfo *info)
 	*info = **tempCodecInfo;
 	DisposeHandle((Handle)tempCodecInfo);
 
-	glob->codec->GetShortFriendlyName(name, sizeof(name));
+	glob->codec->GetLongFriendlyName(name, sizeof(name));
 	{
 		char *src;
 		unsigned char *dst;
