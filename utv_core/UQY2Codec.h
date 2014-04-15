@@ -35,7 +35,7 @@ protected:
 	virtual const char *GetColorFormatName(void) { return "YUV422"; }
 	virtual int GetRealBitCount(void) { return 30; }
 	virtual int GetNumPlanes(void) { return 3; }
-	virtual int GetMacroPixelWidth(void) { return 2; }
+	virtual int GetMacroPixelWidth(void) { return /*2*/ 48; }
 	virtual int GetMacroPixelHeight(void) { return 1; }
 
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height);
