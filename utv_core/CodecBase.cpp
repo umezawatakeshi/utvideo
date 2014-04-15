@@ -104,7 +104,7 @@ int CCodecBase::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 			m_cbRawGrossWidth = ROUNDUP(m_cbRawNetWidth, 4);
 			break;
 		default:
-			m_cbRawGrossWidth = m_cbRawNetWidth;
+			m_cbRawGrossWidth = cbGrossWidth;
 		}
 
 		m_cbRawSize = m_cbRawGrossWidth * height;
