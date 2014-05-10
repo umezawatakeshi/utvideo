@@ -17,7 +17,7 @@ struct TUNEDFUNC_FRAGMENT
 };
 
 
-struct HUFFMAN_ENCODE_TABLE;
+template<int B> struct HUFFMAN_ENCODE_TABLE;
 struct HUFFMAN_DECODE_TABLE;
 
 struct TUNEDFUNC_PREDICT
@@ -32,7 +32,7 @@ struct TUNEDFUNC_PREDICT
 struct TUNEDFUNC_HUFFMAN_ENCODE
 {
 	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_HUFFMAN_ENCODE);
-	size_t (*pfnHuffmanEncode)(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
+	size_t (*pfnHuffmanEncode)(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable);
 };
 
 struct TUNEDFUNC_HUFFMAN_DECODE

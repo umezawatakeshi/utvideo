@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "SymbolBits.h"
+
 #if defined(__x86_64__)
 typedef uint64_t uintenc_t;
 #define UINTENC_BITS 64
@@ -15,14 +17,16 @@ typedef uint32_t uintenc_t;
 #define UINTENC_MASK 0xffffff00U
 #endif
 
-struct HUFFMAN_ENCODE_TABLE
+template<int B>
+struct HUFFMAN_CODELEN_TABLE
 {
-	uintenc_t dwTableMux[256];
+	uint8_t codelen[1 << B];
 };
 
-struct HUFFMAN_ENCODE_TABLE10
+template<int B>
+struct HUFFMAN_ENCODE_TABLE
 {
-	uintenc_t dwTableMux[1024];
+	uintenc_t dwTableMux[1 << B];
 };
 
 #define HUFFMAN_DECODE_TABLELOOKUP_BITS 12
@@ -63,13 +67,12 @@ struct HUFFMAN_DECODE_TABLE10
 	} SymbolAndCodeLength[4096*4];
 };
 
-void GenerateHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, const uint32_t *pCountTable, int nSymbolBits);
-void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE *pEncodeTable, const uint8_t *pCodeLengthTable);
-void GenerateHuffmanEncodeTable10(HUFFMAN_ENCODE_TABLE10 *pEncodeTable, const uint8_t *pCodeLengthTable);
-void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const uint8_t *pCodeLengthTable);
-void GenerateHuffmanDecodeTable10(HUFFMAN_DECODE_TABLE10 *pDecodeTable, const uint8_t *pCodeLengthTable);
+template<int B> void GenerateHuffmanCodeLengthTable(HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable, const uint32_t *pCountTable);
+template<int B> void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE<B> *pEncodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable);
+void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const HUFFMAN_CODELEN_TABLE<8> *pCodeLengthTable);
+void GenerateHuffmanDecodeTable10(HUFFMAN_DECODE_TABLE10 *pDecodeTable, const HUFFMAN_CODELEN_TABLE<10> *pCodeLengthTable);
 
-size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
+template<int B> size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const typename CSymbolBits<B>::symbol_t *pSrcBegin, const typename CSymbolBits<B>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<B> *pEncodeTable);
 void cpp_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 void cpp_HuffmanDecodeStep4(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 void cpp_HuffmanDecodeAndAccum(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
@@ -84,7 +87,7 @@ void cpp_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha(uint8_t *pDstBegin, u
 void cpp_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 
 #if defined(__i386__) || defined(__x86_64__)
-extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE *pEncodeTable);
+extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable);
 extern "C" void i686_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 extern "C" void i686_HuffmanDecodeStep4(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
 extern "C" void i686_HuffmanDecodeAndAccum(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride);
@@ -114,7 +117,6 @@ extern "C" void bmi2_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha(uint8_t *
 #endif
 #endif
 
-size_t cpp_HuffmanEncode10(uint8_t *pDstBegin, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE10 *pEncodeTable);
-#define HuffmanEncode10 cpp_HuffmanEncode10
+#define HuffmanEncode10 cpp_HuffmanEncode<10>
 
 void cpp_HuffmanDecodeAndAccum10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE10 *pDecodeTable, size_t cbWidth, ssize_t scbStride, uint16_t initial);

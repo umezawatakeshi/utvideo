@@ -868,6 +868,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SymbolBits.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Thread.h"
 				>
 			</File>

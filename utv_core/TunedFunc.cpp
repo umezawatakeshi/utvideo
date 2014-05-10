@@ -22,7 +22,7 @@ const TUNEDFUNC_PREDICT tfnPredictCPP = {
 const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeCPP = {
 	NULL,
 	{ 0 },
-	cpp_HuffmanEncode,
+	cpp_HuffmanEncode<8>,
 };
 
 const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeCPP = {

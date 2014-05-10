@@ -83,7 +83,7 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 	uint8_t *p;
 	uint32_t count[1024];
-	uint8_t byCodeLengthTable[1024];
+	HUFFMAN_CODELEN_TABLE<10> CodeLengthTable;
 
 	m_pInput = pInput;
 	m_pOutput = pOutput;
@@ -110,8 +110,8 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 			for (int i = 0; i < 1024; i++)
 				count[i] += m_counts[nBandIndex].dwCount[nPlaneIndex][i];
-		GenerateHuffmanCodeLengthTable(byCodeLengthTable, count, 10);
-		GenerateHuffmanEncodeTable10(&m_het[nPlaneIndex], byCodeLengthTable);
+		GenerateHuffmanCodeLengthTable<10>(&CodeLengthTable, count);
+		GenerateHuffmanEncodeTable<10>(&m_het[nPlaneIndex], &CodeLengthTable);
 		m_pdwOffsetTable[nPlaneIndex] = (uint32_t *)p;
 		dwCurrentOffset = 0;
 		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
@@ -119,15 +119,15 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 			uint32_t dwBits;
 			dwBits = 0;
 			for (int i = 0; i < 1024; i++)
-				dwBits += byCodeLengthTable[i] * m_counts[nBandIndex].dwCount[nPlaneIndex][i];
+				dwBits += CodeLengthTable.codelen[i] * m_counts[nBandIndex].dwCount[nPlaneIndex][i];
 			dwCurrentOffset += ROUNDUP(dwBits, 32) / 8;
 			*(uint32_t *)p = htol32(dwCurrentOffset);
 			p += 4;
 		}
 		m_pEncodedBits[nPlaneIndex] = p;
 		p += dwCurrentOffset;
-		m_pCodeLengthTable[nPlaneIndex] = p;
-		memcpy(m_pCodeLengthTable[nPlaneIndex], byCodeLengthTable, 1024);
+		m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<10> *)p;
+		memcpy(m_pCodeLengthTable[nPlaneIndex], &CodeLengthTable, 1024);
 		p += 1024;
 	}
 
@@ -323,7 +323,7 @@ size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 		m_pEncodedBits[nPlaneIndex] = p;
 		p += m_pdwOffsetTable[nPlaneIndex][m_dwDivideCount - 1];
 
-		m_pCodeLengthTable[nPlaneIndex] = p;
+		m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<10> *)p;
 		GenerateHuffmanDecodeTable10(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 		p += 1024;
 	}

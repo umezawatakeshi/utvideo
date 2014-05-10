@@ -92,8 +92,8 @@ protected:
 	{
 		uint32_t dwCount[4][256];
 	} *m_counts;
-	/* const */ uint8_t *m_pCodeLengthTable[4];
-	HUFFMAN_ENCODE_TABLE m_het[4];
+	/* const */ HUFFMAN_CODELEN_TABLE<8> *m_pCodeLengthTable[4];
+	HUFFMAN_ENCODE_TABLE<8> m_het[4];
 
 	CFrameBuffer *m_pRestoredFrame;
 	CFrameBuffer *m_pDecodedFrame;

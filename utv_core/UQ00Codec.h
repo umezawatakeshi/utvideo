@@ -75,8 +75,8 @@ protected:
 	{
 		uint32_t dwCount[4][1024];
 	} *m_counts;
-	/* const */ uint8_t *m_pCodeLengthTable[4];
-	HUFFMAN_ENCODE_TABLE10 m_het[4];
+	/* const */ HUFFMAN_CODELEN_TABLE<10> *m_pCodeLengthTable[4];
+	HUFFMAN_ENCODE_TABLE<10> m_het[4];
 	uint32_t *m_pdwOffsetTable[4];
 	uint8_t *m_pEncodedBits[4];
 	uint16_t m_syInitialPredict[4];

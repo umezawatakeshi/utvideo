@@ -288,8 +288,8 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 			for (int i = 0; i < 256; i++)
 				count[i] += m_counts[nBandIndex].dwCount[nPlaneIndex][i];
-		m_pCodeLengthTable[nPlaneIndex] = p;
-		GenerateHuffmanCodeLengthTable(m_pCodeLengthTable[nPlaneIndex], count, 8);
+		m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<8> *)p;
+		GenerateHuffmanCodeLengthTable<8>(m_pCodeLengthTable[nPlaneIndex], count);
 		GenerateHuffmanEncodeTable(&m_het[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 		p += 256;
 		dwCurrentOffset = 0;
@@ -298,7 +298,7 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 			uint32_t dwBits;
 			dwBits = 0;
 			for (int i = 0; i < 256; i++)
-				dwBits += m_pCodeLengthTable[nPlaneIndex][i] * m_counts[nBandIndex].dwCount[nPlaneIndex][i];
+				dwBits += m_pCodeLengthTable[nPlaneIndex]->codelen[i] * m_counts[nBandIndex].dwCount[nPlaneIndex][i];
 			dwCurrentOffset += ROUNDUP(dwBits, 32) / 8;
 			*(uint32_t *)p = dwCurrentOffset;
 			p += 4;
@@ -512,12 +512,12 @@ void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 		if (nBandIndex == 0)
 			dwDstOffset = 0;
 		else
-			dwDstOffset = ((uint32_t *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
+			dwDstOffset = ((uint32_t *)((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
 #ifdef _DEBUG
-		dwDstEnd = ((uint32_t *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex];
+		dwDstEnd = ((uint32_t *)((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex];
 		dwEncodedSize =
 #endif
-		HuffmanEncode(m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwDstOffset, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, &m_het[nPlaneIndex]);
+		HuffmanEncode((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwDstOffset, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, &m_het[nPlaneIndex]);
 		_ASSERT(dwEncodedSize == dwDstEnd - dwDstOffset);
 	}
 }
@@ -541,10 +541,9 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 	p = (uint8_t *)pInput;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		m_pCodeLengthTable[nPlaneIndex] = p;
+		m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<8> *)p;
 		GenerateHuffmanDecodeTable(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 		p += 256 + sizeof(uint32_t) * m_dwDivideCount;
-		p += ((const uint32_t *)p)[-1];
 		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		{
 			uint32_t dwCodeOffset;
@@ -552,10 +551,11 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 			if (nBandIndex == 0)
 				dwCodeOffset = 0;
 			else
-				dwCodeOffset = ((const uint32_t *)(m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
+				dwCodeOffset = ((const uint32_t *)((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
 
-			m_pDecodeCode[nPlaneIndex][nBandIndex] = m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwCodeOffset;
+			m_pDecodeCode[nPlaneIndex][nBandIndex] = p + dwCodeOffset;
 		}
+		p += ((const uint32_t *)p)[-1];
 	}
 
 	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
