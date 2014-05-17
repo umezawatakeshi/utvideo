@@ -398,42 +398,6 @@ size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const typename CSymbolBits<B>::symb
 template size_t cpp_HuffmanEncode<8>(uint8_t *pDstBegin, const CSymbolBits<8>::symbol_t *pSrcBegin, const CSymbolBits<8>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable);
 template size_t cpp_HuffmanEncode<10>(uint8_t *pDstBegin, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<10> *pEncodeTable);
 
-size_t cpp_HuffmanEncode10(uint8_t *pDstBegin, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<10> *pEncodeTable)
-{
-	int nBits;
-	uintenc_t dwTmpEncoded;
-	uint32_t *pDst;
-	const uint16_t *p;
-
-	if (pEncodeTable->dwTableMux[0] == 0)
-		return 0;
-
-	nBits = 0;
-	dwTmpEncoded = 0;
-	pDst = (uint32_t *)pDstBegin;
-
-	for (p = pSrcBegin; p < pSrcEnd; p++)
-	{
-		_ASSERT(*p < 0x400);
-		int nCurBits = (int)(pEncodeTable->dwTableMux[*p] & 0xff);
-		_ASSERT(nCurBits > 0 && nCurBits != 0xff);
-		uintenc_t dwCurEncoded = pEncodeTable->dwTableMux[*p] & UINTENC_MASK;
-
-		dwTmpEncoded |= dwCurEncoded >> nBits;
-		nBits += nCurBits;
-		if (nBits >= UINTENC_BITS)
-		{
-			FlushEncoded(pDst, dwTmpEncoded, nBits);
-			nBits -= UINTENC_BITS;
-			dwTmpEncoded = dwCurEncoded << (nCurBits - nBits);
-		}
-	}
-
-	FlushEncoded(pDst, dwTmpEncoded, nBits);
-
-	return ((uint8_t *)pDst) - pDstBegin;
-}
-
 inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, uint8_t &byPrevSymbol, uint8_t *pDst, int nCorrPos, int nDummyAlphaPos)
 {
 	uint32_t code;
