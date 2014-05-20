@@ -324,7 +324,7 @@ size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 		p += m_pdwOffsetTable[nPlaneIndex][m_dwDivideCount - 1];
 
 		m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<10> *)p;
-		GenerateHuffmanDecodeTable10(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
+		GenerateHuffmanDecodeTable<10>(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 		p += 1024;
 	}
 

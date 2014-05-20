@@ -98,7 +98,7 @@ protected:
 	CFrameBuffer *m_pRestoredFrame;
 	CFrameBuffer *m_pDecodedFrame;
 	FRAMEINFO m_fi;
-	HUFFMAN_DECODE_TABLE m_hdt[4];
+	HUFFMAN_DECODE_TABLE<8> m_hdt[4];
 	const uint8_t *m_pDecodeCode[4][256];
 
 	EXTRADATA m_ed;

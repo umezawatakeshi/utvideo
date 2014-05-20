@@ -84,7 +84,7 @@ protected:
 	CFrameBuffer *m_pRestoredFrame;
 	CFrameBuffer *m_pDecodedFrame;
 	FRAMEINFO m_fi;
-	HUFFMAN_DECODE_TABLE10 m_hdt[4];
+	HUFFMAN_DECODE_TABLE<10> m_hdt[4];
 
 	STREAMINFO m_si;
 

@@ -150,40 +150,41 @@ inline int lzcnt(uint32_t x)
 	return 32;
 }
 
-void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const HUFFMAN_CODELEN_TABLE<8> *pCodeLengthTable)
+template<int B>
+void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable)
 {
-	struct CODE_LENGTH_SORT cls[256];
+	struct CODE_LENGTH_SORT cls[1 << B];
 	int nLastIndex;
 
-	for (int i = 0; i < 256; i++)
+	for (int i = 0; i < (1 << B); i++)
 	{
 		cls[i].symbol = i;
 		cls[i].codelen = pCodeLengthTable->codelen[i];
 	}
 
-	sort(cls, cls + 256, cls_less);
+	sort(cls, cls + (1 << B), cls_less);
 
 	// 出現するシンボルが１種類しかない場合の処理
 	if (cls[0].codelen == 0)
 	{
-		memset(pDecodeTable, 0, sizeof(HUFFMAN_DECODE_TABLE));
+		memset(pDecodeTable, 0, sizeof(HUFFMAN_DECODE_TABLE<B>));
 		for (int i = 0; i < _countof(pDecodeTable->nCodeShift); i++)
 			pDecodeTable->nCodeShift[i] = 31;
 		for (int i = 0; i < _countof(pDecodeTable->SymbolAndCodeLength); i++)
 		{
-			pDecodeTable->SymbolAndCodeLength[i].nCodeLength = 0;
-			pDecodeTable->SymbolAndCodeLength[i].bySymbol    = cls[0].symbol;
+			pDecodeTable->SymbolAndCodeLength[i].codelen = 0;
+			pDecodeTable->SymbolAndCodeLength[i].symbol  = cls[0].symbol;
 		}
 		for (int i = 0; i < _countof(pDecodeTable->LookupSymbolAndCodeLength); i++)
 		{
-			pDecodeTable->LookupSymbolAndCodeLength[i].nCodeLength = 0;
-			pDecodeTable->LookupSymbolAndCodeLength[i].bySymbol    = cls[0].symbol;
+			pDecodeTable->LookupSymbolAndCodeLength[i].codelen = 0;
+			pDecodeTable->LookupSymbolAndCodeLength[i].symbol  = cls[0].symbol;
 		}
 		return;
 	}
 
 	// 最も長い符号長を持つシンボルの cls 上での位置を求める
-	for (nLastIndex = 255; nLastIndex >= 0; nLastIndex--)
+	for (nLastIndex = (1 << B) - 1; nLastIndex >= 0; nLastIndex--)
 	{
 		if (cls[nLastIndex].codelen != 255)
 			break;
@@ -200,7 +201,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const HUFFMA
 		for (int i = nLastIndex; i >= 0; i--)
 		{
 			// 短い符号語の場合は高速テーブルでデコードされるので、低速テーブルの生成は不要である。
-			if (cls[i].codelen <= HUFFMAN_DECODE_TABLELOOKUP_BITS)
+			if (cls[i].codelen <= HUFFMAN_DECODE_TABLE<B>::LOOKUP_BITS)
 				break;
 
 			int bsrval = bsr(curcode);
@@ -216,8 +217,8 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const HUFFMA
 			int lastfillidx = nextfillidx + (1 << (32 - pDecodeTable->nCodeShift[bsrval] - cls[i].codelen));
 			for (; nextfillidx < lastfillidx; nextfillidx++)
 			{
-				pDecodeTable->SymbolAndCodeLength[nextfillidx].bySymbol    = cls[i].symbol;
-				pDecodeTable->SymbolAndCodeLength[nextfillidx].nCodeLength = cls[i].codelen;
+				pDecodeTable->SymbolAndCodeLength[nextfillidx].symbol  = cls[i].symbol;
+				pDecodeTable->SymbolAndCodeLength[nextfillidx].codelen = cls[i].codelen;
 			}
 			curcode += 0x80000000 >> (cls[i].codelen - 1);
 			prevbsrval = bsrval;
@@ -229,17 +230,17 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const HUFFMA
 		uint32_t curcode = 0;
 
 		for (int i = 0; i < _countof(pDecodeTable->LookupSymbolAndCodeLength); i++)
-			pDecodeTable->LookupSymbolAndCodeLength[i].nCodeLength = 255;
+			pDecodeTable->LookupSymbolAndCodeLength[i].codelen = 255;
 
 		for (int i = nLastIndex; i >= 0; i--)
 		{
-			if (cls[i].codelen <= HUFFMAN_DECODE_TABLELOOKUP_BITS)
+			if (cls[i].codelen <= HUFFMAN_DECODE_TABLE<B>::LOOKUP_BITS)
 			{
-				int idx = curcode >> (32 - HUFFMAN_DECODE_TABLELOOKUP_BITS);
-				for (int j = 0; j < (1 << (HUFFMAN_DECODE_TABLELOOKUP_BITS - cls[i].codelen)); j++)
+				int idx = curcode >> (32 - HUFFMAN_DECODE_TABLE<B>::LOOKUP_BITS);
+				for (int j = 0; j < (1 << (HUFFMAN_DECODE_TABLE<B>::LOOKUP_BITS - cls[i].codelen)); j++)
 				{
-					pDecodeTable->LookupSymbolAndCodeLength[idx+j].nCodeLength = cls[i].codelen;
-					pDecodeTable->LookupSymbolAndCodeLength[idx+j].bySymbol = cls[i].symbol;
+					pDecodeTable->LookupSymbolAndCodeLength[idx+j].codelen = cls[i].codelen;
+					pDecodeTable->LookupSymbolAndCodeLength[idx+j].symbol  = cls[i].symbol;
 				}
 			}
 			curcode += 0x80000000 >> (cls[i].codelen - 1);
@@ -247,102 +248,8 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE *pDecodeTable, const HUFFMA
 	}
 }
 
-void GenerateHuffmanDecodeTable10(HUFFMAN_DECODE_TABLE10 *pDecodeTable, const HUFFMAN_CODELEN_TABLE<10> *pCodeLengthTable)
-{
-	struct CODE_LENGTH_SORT cls[1024];
-	int nLastIndex;
-
-	for (int i = 0; i < 1024; i++)
-	{
-		cls[i].symbol = i;
-		cls[i].codelen = pCodeLengthTable->codelen[i];
-	}
-
-	sort(cls, cls+1024, cls_less);
-
-	// 出現するシンボルが１種類しかない場合の処理
-	if (cls[0].codelen == 0)
-	{
-		memset(pDecodeTable, 0, sizeof(HUFFMAN_DECODE_TABLE10));
-		for (int i = 0; i < _countof(pDecodeTable->nCodeShift); i++)
-			pDecodeTable->nCodeShift[i] = 31;
-		for (int i = 0; i < _countof(pDecodeTable->SymbolAndCodeLength); i++)
-		{
-			pDecodeTable->SymbolAndCodeLength[i].nCodeLength = 0;
-			pDecodeTable->SymbolAndCodeLength[i].bySymbol    = cls[0].symbol;
-		}
-		for (int i = 0; i < _countof(pDecodeTable->LookupSymbolAndCodeLength); i++)
-		{
-			pDecodeTable->LookupSymbolAndCodeLength[i].nCodeLength = 0;
-			pDecodeTable->LookupSymbolAndCodeLength[i].bySymbol    = cls[0].symbol;
-		}
-		return;
-	}
-
-	// 最も長い符号長を持つシンボルの cls 上での位置を求める
-	for (nLastIndex = 1023; nLastIndex >= 0; nLastIndex--)
-	{
-		if (cls[nLastIndex].codelen != 255)
-			break;
-	}
-
-	// 低速テーブルの生成
-	{
-		uint32_t curcode = 1; // bsr 対策で 0 ではなく 1。符号語長は 24 以下なので 1 にしてあっても問題ない。
-		int j = 0;
-		int base = 0;
-		int nextfillidx = 0;
-		int prevbsrval = 0;
-
-		for (int i = nLastIndex; i >= 0; i--)
-		{
-			// 短い符号語の場合は高速テーブルでデコードされるので、低速テーブルの生成は不要である。
-			if (cls[i].codelen <= HUFFMAN_DECODE_TABLELOOKUP_BITS10)
-				break;
-
-			int bsrval = bsr(curcode);
-			if (bsrval != prevbsrval)
-			{
-				base = nextfillidx - (curcode >> (32 - cls[i].codelen));
-			}
-			for (; j <= bsrval; j++)
-			{
-				pDecodeTable->nCodeShift[j] = 32 - cls[i].codelen;
-				pDecodeTable->dwSymbolBase[j] = base;
-			}
-			int lastfillidx = nextfillidx + (1 << (32 - pDecodeTable->nCodeShift[bsrval] - cls[i].codelen));
-			for (; nextfillidx < lastfillidx; nextfillidx++)
-			{
-				pDecodeTable->SymbolAndCodeLength[nextfillidx].bySymbol    = cls[i].symbol;
-				pDecodeTable->SymbolAndCodeLength[nextfillidx].nCodeLength = cls[i].codelen;
-			}
-			curcode += 0x80000000 >> (cls[i].codelen - 1);
-			prevbsrval = bsrval;
-		}
-	}
-
-	// 高速テーブルの生成（テーブル一発参照用）
-	{
-		uint32_t curcode = 0;
-
-		for (int i = 0; i < _countof(pDecodeTable->LookupSymbolAndCodeLength); i++)
-			pDecodeTable->LookupSymbolAndCodeLength[i].nCodeLength = 255;
-
-		for (int i = nLastIndex; i >= 0; i--)
-		{
-			if (cls[i].codelen <= HUFFMAN_DECODE_TABLELOOKUP_BITS10)
-			{
-				int idx = curcode >> (32 - HUFFMAN_DECODE_TABLELOOKUP_BITS10);
-				for (int j = 0; j < (1 << (HUFFMAN_DECODE_TABLELOOKUP_BITS10 - cls[i].codelen)); j++)
-				{
-					pDecodeTable->LookupSymbolAndCodeLength[idx+j].nCodeLength = cls[i].codelen;
-					pDecodeTable->LookupSymbolAndCodeLength[idx+j].bySymbol = cls[i].symbol;
-				}
-			}
-			curcode += 0x80000000 >> (cls[i].codelen - 1);
-		}
-	}
-}
+template void GenerateHuffmanDecodeTable<8>(HUFFMAN_DECODE_TABLE<8> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<8> *pCodeLengthTable);
+template void GenerateHuffmanDecodeTable<10>(HUFFMAN_DECODE_TABLE<10> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<10> *pCodeLengthTable);
 
 inline void FlushEncoded(uint32_t *&pDst, uintenc_t &dwTmpEncoded, int &nBits)
 {
@@ -398,7 +305,7 @@ size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const typename CSymbolBits<B>::symb
 template size_t cpp_HuffmanEncode<8>(uint8_t *pDstBegin, const CSymbolBits<8>::symbol_t *pSrcBegin, const CSymbolBits<8>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable);
 template size_t cpp_HuffmanEncode<10>(uint8_t *pDstBegin, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<10> *pEncodeTable);
 
-inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, uint8_t &byPrevSymbol, uint8_t *pDst, int nCorrPos, int nDummyAlphaPos)
+inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, bool bAccum, uint8_t &byPrevSymbol, uint8_t *pDst, int nCorrPos, int nDummyAlphaPos)
 {
 	uint32_t code;
 	uint8_t symbol;
@@ -409,11 +316,11 @@ inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE
 	else
 		code = ((*pSrc) << nBits) | ((*(pSrc+1)) >> (32 - nBits)) | 0x00000001;
 
-	int tableidx = code >> (32 - HUFFMAN_DECODE_TABLELOOKUP_BITS);
-	if (pDecodeTable->LookupSymbolAndCodeLength[tableidx].nCodeLength != 255)
+	int tableidx = code >> (32 - HUFFMAN_DECODE_TABLE<8>::LOOKUP_BITS);
+	if (pDecodeTable->LookupSymbolAndCodeLength[tableidx].codelen != 255)
 	{
-		symbol = pDecodeTable->LookupSymbolAndCodeLength[tableidx].bySymbol;
-		codelen = pDecodeTable->LookupSymbolAndCodeLength[tableidx].nCodeLength;
+		symbol = pDecodeTable->LookupSymbolAndCodeLength[tableidx].symbol;
+		codelen = pDecodeTable->LookupSymbolAndCodeLength[tableidx].codelen;
 	}
 	else
 	{
@@ -421,8 +328,8 @@ inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE
 		int codeshift = pDecodeTable->nCodeShift[bsrval];
 		code >>= codeshift;
 		tableidx = pDecodeTable->dwSymbolBase[bsrval] + code;
-		symbol = pDecodeTable->SymbolAndCodeLength[tableidx].bySymbol;
-		codelen = pDecodeTable->SymbolAndCodeLength[tableidx].nCodeLength;
+		symbol = pDecodeTable->SymbolAndCodeLength[tableidx].symbol;
+		codelen = pDecodeTable->SymbolAndCodeLength[tableidx].codelen;
 	}
 
 	if (bAccum)
@@ -446,7 +353,7 @@ inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE
 	}
 }
 
-static void cpp_HuffmanDecode_common(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos)
+static void cpp_HuffmanDecode_common(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos)
 {
 	int nBits;
 	uint32_t *pSrc;
@@ -466,7 +373,7 @@ static void cpp_HuffmanDecode_common(uint8_t *pDstBegin, uint8_t *pDstEnd, const
 	}
 }
 
-inline void DecodeSymbol10(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE10 *pDecodeTable, bool bAccum, uint16_t &byPrevSymbol, uint16_t *pDst, int nCorrPos, int nDummyAlphaPos)
+inline void DecodeSymbol10(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE<10> *pDecodeTable, bool bAccum, uint16_t &byPrevSymbol, uint16_t *pDst, int nCorrPos, int nDummyAlphaPos)
 {
 	uint32_t code;
 	uint16_t symbol;
@@ -477,11 +384,11 @@ inline void DecodeSymbol10(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TAB
 	else
 		code = ((*pSrc) << nBits) | ((*(pSrc+1)) >> (32 - nBits)) | 0x00000001;
 
-	int tableidx = code >> (32 - HUFFMAN_DECODE_TABLELOOKUP_BITS10);
-	if (pDecodeTable->LookupSymbolAndCodeLength[tableidx].nCodeLength != 255)
+	int tableidx = code >> (32 - HUFFMAN_DECODE_TABLE<10>::LOOKUP_BITS);
+	if (pDecodeTable->LookupSymbolAndCodeLength[tableidx].codelen != 255)
 	{
-		symbol = pDecodeTable->LookupSymbolAndCodeLength[tableidx].bySymbol;
-		codelen = pDecodeTable->LookupSymbolAndCodeLength[tableidx].nCodeLength;
+		symbol = pDecodeTable->LookupSymbolAndCodeLength[tableidx].symbol;
+		codelen = pDecodeTable->LookupSymbolAndCodeLength[tableidx].codelen;
 	}
 	else
 	{
@@ -489,8 +396,8 @@ inline void DecodeSymbol10(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TAB
 		int codeshift = pDecodeTable->nCodeShift[bsrval];
 		code >>= codeshift;
 		tableidx = pDecodeTable->dwSymbolBase[bsrval] + code;
-		symbol = pDecodeTable->SymbolAndCodeLength[tableidx].bySymbol;
-		codelen = pDecodeTable->SymbolAndCodeLength[tableidx].nCodeLength;
+		symbol = pDecodeTable->SymbolAndCodeLength[tableidx].symbol;
+		codelen = pDecodeTable->SymbolAndCodeLength[tableidx].codelen;
 	}
 
 	_ASSERT(symbol < 0x400);
@@ -516,7 +423,7 @@ inline void DecodeSymbol10(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TAB
 	}
 }
 
-static void cpp_HuffmanDecode_common10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE10 *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos, uint16_t initial)
+static void cpp_HuffmanDecode_common10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<10> *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos, uint16_t initial)
 {
 	int nBits;
 	uint32_t *pSrc;
@@ -536,68 +443,68 @@ static void cpp_HuffmanDecode_common10(uint16_t *pDstBegin, uint16_t *pDstEnd, c
 	}
 }
 
-void cpp_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, false, 1, cbWidth, scbStride, 0, 0);
 }
 
-void cpp_HuffmanDecodeStep4(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeStep4(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, false, 4, cbWidth, scbStride, 0, 0);
 }
 
-void cpp_HuffmanDecodeAndAccum(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccum(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 1, cbWidth, scbStride, 0, 0);
 }
 
-void cpp_HuffmanDecodeAndAccumStep2(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccumStep2(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 2, cbWidth, scbStride, 0, 0);
 }
 
-void cpp_HuffmanDecodeAndAccumStep3(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccumStep3(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, cbWidth, scbStride, 0, 0);
 }
 
-void cpp_HuffmanDecodeAndAccumStep4(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccumStep4(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, 0, 0);
 }
 
-void cpp_HuffmanDecodeAndAccumStep3ForBGRBlue(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccumStep3ForBGRBlue(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, cbWidth, scbStride, +1, 0);
 }
 
-void cpp_HuffmanDecodeAndAccumStep3ForBGRRed(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccumStep3ForBGRRed(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, cbWidth, scbStride, -1, 0);
 }
 
-void cpp_HuffmanDecodeAndAccumStep4ForBGRXBlue(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccumStep4ForBGRXBlue(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, +1, 0);
 }
 
-void cpp_HuffmanDecodeAndAccumStep4ForBGRXRed(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccumStep4ForBGRXRed(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, -1, 0);
 }
 
-void cpp_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, -1, 1);
 }
 
-void cpp_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE *pDecodeTable, size_t cbWidth, ssize_t scbStride)
+void cpp_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
 	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, +1, -1);
 }
 
 
-void cpp_HuffmanDecodeAndAccum10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE10 *pDecodeTable, size_t cbWidth, ssize_t scbStride, uint16_t initial)
+void cpp_HuffmanDecodeAndAccum10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<10> *pDecodeTable, size_t cbWidth, ssize_t scbStride, uint16_t initial)
 {
 	cpp_HuffmanDecode_common10(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 1, cbWidth, scbStride, 0, 0, initial);
 }
