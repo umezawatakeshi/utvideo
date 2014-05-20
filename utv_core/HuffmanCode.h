@@ -18,6 +18,13 @@ typedef uint32_t uintenc_t;
 #endif
 
 template<int B>
+struct SYMBOL_AND_CODELEN
+{
+	typename CSymbolBits<B>::symbol_t symbol;
+	uint8_t codelen;
+};
+
+template<int B>
 struct HUFFMAN_CODELEN_TABLE
 {
 	uint8_t codelen[1 << B];
@@ -34,16 +41,10 @@ struct HUFFMAN_DECODE_TABLE
 {
 	static const int LOOKUP_BITS = (B == 8) ? 12 : 11; /* XXX */
 
-	struct SYMBOL_AND_CODELEN
-	{
-		typename CSymbolBits<B>::symbol_t symbol;
-		uint8_t codelen;
-	};
-
-	SYMBOL_AND_CODELEN LookupSymbolAndCodeLength[1 << LOOKUP_BITS];
+	SYMBOL_AND_CODELEN<B> LookupSymbolAndCodeLength[1 << LOOKUP_BITS];
 	uint8_t nCodeShift[32];
 	uint32_t dwSymbolBase[32];
-	SYMBOL_AND_CODELEN SymbolAndCodeLength[(B == 8) ? 1024 : 4096*4 /* XXX */];
+	SYMBOL_AND_CODELEN<B> SymbolAndCodeLength[(B == 8) ? 1024 : 4096*4 /* XXX */];
 };
 
 template<int B> void GenerateHuffmanCodeLengthTable(HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable, const uint32_t *pCountTable);

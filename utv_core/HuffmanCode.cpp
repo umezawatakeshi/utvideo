@@ -80,13 +80,8 @@ void GenerateHuffmanCodeLengthTable(HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable, 
 template void GenerateHuffmanCodeLengthTable<8>(HUFFMAN_CODELEN_TABLE<8> *pCodeLengthTable, const uint32_t *pCountTable);
 template void GenerateHuffmanCodeLengthTable<10>(HUFFMAN_CODELEN_TABLE<10> *pCodeLengthTable, const uint32_t *pCountTable);
 
-struct CODE_LENGTH_SORT
-{
-	uint32_t symbol;
-	uint8_t codelen;
-};
-
-bool cls_less(const CODE_LENGTH_SORT &a, const CODE_LENGTH_SORT &b)
+template<int B>
+bool cls_less(const SYMBOL_AND_CODELEN<B> &a, const SYMBOL_AND_CODELEN<B> &b)
 {
 	if (a.codelen != b.codelen)
 		return a.codelen < b.codelen;
@@ -97,7 +92,7 @@ bool cls_less(const CODE_LENGTH_SORT &a, const CODE_LENGTH_SORT &b)
 template<int B>
 void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE<B> *pEncodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable)
 {
-	struct CODE_LENGTH_SORT cls[1 << B];
+	struct SYMBOL_AND_CODELEN<B> cls[1 << B];
 	uintenc_t curcode;
 
 	for (int i = 0; i < (1 << B); i++)
@@ -106,7 +101,7 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE<B> *pEncodeTable, const HUF
 		cls[i].codelen = pCodeLengthTable->codelen[i];
 	}
 
-	sort(cls, cls + (1 << B), cls_less);
+	sort(cls, cls + (1 << B), cls_less<B>);
 
 	if (cls[0].codelen == 0)
 	{
@@ -153,7 +148,7 @@ inline int lzcnt(uint32_t x)
 template<int B>
 void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable)
 {
-	struct CODE_LENGTH_SORT cls[1 << B];
+	struct SYMBOL_AND_CODELEN<B> cls[1 << B];
 	int nLastIndex;
 
 	for (int i = 0; i < (1 << B); i++)
@@ -162,7 +157,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUF
 		cls[i].codelen = pCodeLengthTable->codelen[i];
 	}
 
-	sort(cls, cls + (1 << B), cls_less);
+	sort(cls, cls + (1 << B), cls_less<B>);
 
 	// èoåªÇ∑ÇÈÉVÉìÉ{ÉãÇ™ÇPéÌóﬁÇµÇ©Ç»Ç¢èÍçáÇÃèàóù
 	if (cls[0].codelen == 0)
