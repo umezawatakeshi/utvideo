@@ -349,108 +349,89 @@ static inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECOD
 	}
 }
 
-static void cpp_HuffmanDecode_common(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos, uint8_t initial)
+template<int B>
+static void cpp_HuffmanDecode_common(typename CSymbolBits<B>::symbol_t *pDstBegin, typename CSymbolBits<B>::symbol_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<B> *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos, typename CSymbolBits<B>::symbol_t initial)
 {
 	int nBits;
 	uint32_t *pSrc;
-	uint8_t *p;
-	uint8_t prevsym;
+	typename CSymbolBits<B>::symbol_t *p;
+	typename CSymbolBits<B>::symbol_t prevsym;
 	uint8_t *pStripeBegin;
 
 	nBits = 0;
 	pSrc = (uint32_t *)pSrcBegin;
 	prevsym = initial;
 
-	for (pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; pStripeBegin += scbStride)
+	for (pStripeBegin = (uint8_t *)pDstBegin; pStripeBegin != (uint8_t *)pDstEnd; pStripeBegin += scbStride)
 	{
 		uint8_t *pStripeEnd = pStripeBegin + cbWidth;
-		for (p = pStripeBegin; p < pStripeEnd; p += nStep)
-			DecodeSymbol<8>(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos, nDummyAlphaPos);
-	}
-}
-
-static void cpp_HuffmanDecode_common10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<10> *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos, uint16_t initial)
-{
-	int nBits;
-	uint32_t *pSrc;
-	uint16_t *p;
-	uint16_t prevsym;
-	uint16_t *pStripeBegin;
-
-	nBits = 0;
-	pSrc = (uint32_t *)pSrcBegin;
-	prevsym = initial;
-
-	for (pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; *(uint8_t **)&pStripeBegin += scbStride)
-	{
-		uint16_t *pStripeEnd = (uint16_t*)((uint8_t *)pStripeBegin + cbWidth);
-		for (p = pStripeBegin; p < pStripeEnd; p += nStep)
-			DecodeSymbol<10>(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos, nDummyAlphaPos);
+		for (p = (typename CSymbolBits<B>::symbol_t *)pStripeBegin; p < (typename CSymbolBits<B>::symbol_t *)pStripeEnd; p += nStep)
+			DecodeSymbol<B>(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos, nDummyAlphaPos);
 	}
 }
 
 void cpp_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, false, 1, cbWidth, scbStride, 0, 0, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, false, 1, cbWidth, scbStride, 0, 0, 0x80);
 }
 
 void cpp_HuffmanDecodeStep4(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, false, 4, cbWidth, scbStride, 0, 0, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, false, 4, cbWidth, scbStride, 0, 0, 0x80);
 }
 
 void cpp_HuffmanDecodeAndAccum(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 1, cbWidth, scbStride, 0, 0, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 1, cbWidth, scbStride, 0, 0, 0x80);
 }
 
 void cpp_HuffmanDecodeAndAccumStep2(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 2, cbWidth, scbStride, 0, 0, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 2, cbWidth, scbStride, 0, 0, 0x80);
 }
 
 void cpp_HuffmanDecodeAndAccumStep3(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, cbWidth, scbStride, 0, 0, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, cbWidth, scbStride, 0, 0, 0x80);
 }
 
 void cpp_HuffmanDecodeAndAccumStep4(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, 0, 0, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, 0, 0, 0x80);
 }
 
 void cpp_HuffmanDecodeAndAccumStep3ForBGRBlue(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, cbWidth, scbStride, +1, 0, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, cbWidth, scbStride, +1, 0, 0x80);
 }
 
 void cpp_HuffmanDecodeAndAccumStep3ForBGRRed(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, cbWidth, scbStride, -1, 0, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 3, cbWidth, scbStride, -1, 0, 0x80);
 }
 
 void cpp_HuffmanDecodeAndAccumStep4ForBGRXBlue(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, +1, 0, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, +1, 0, 0x80);
 }
 
 void cpp_HuffmanDecodeAndAccumStep4ForBGRXRed(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, -1, 0, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, -1, 0, 0x80);
 }
 
 void cpp_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, -1, 1, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, -1, 1, 0x80);
 }
 
 void cpp_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_HuffmanDecode_common(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, +1, -1, 0x80);
+	cpp_HuffmanDecode_common<8>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 4, cbWidth, scbStride, +1, -1, 0x80);
 }
 
 
 void cpp_HuffmanDecodeAndAccum10(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<10> *pDecodeTable, size_t cbWidth, ssize_t scbStride, uint16_t initial)
 {
-	cpp_HuffmanDecode_common10(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 1, cbWidth, scbStride, 0, 0, initial);
+	cpp_HuffmanDecode_common<10>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, true, 1, cbWidth, scbStride, 0, 0, initial);
 }
