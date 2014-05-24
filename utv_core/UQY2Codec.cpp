@@ -71,24 +71,26 @@ void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 			{
 				const uint32_t *pp = (const uint32_t *)p;
 
-				u[0] = (ltoh32(pp[0])      ) & 0x3ff;
-				y[0] = (ltoh32(pp[0]) >> 10) & 0x3ff;
-				v[0] = (ltoh32(pp[0]) >> 20) & 0x3ff;
-				y[1] = (ltoh32(pp[1])      ) & 0x3ff;
+				*u++ = (ltoh32(pp[0])      ) & 0x3ff;
+				*y++ = (ltoh32(pp[0]) >> 10) & 0x3ff;
+				*v++ = (ltoh32(pp[0]) >> 20) & 0x3ff;
+				*y++ = (ltoh32(pp[1])      ) & 0x3ff;
 
-				u[1] = (ltoh32(pp[1]) >> 10) & 0x3ff;
-				y[2] = (ltoh32(pp[1]) >> 20) & 0x3ff;
-				v[1] = (ltoh32(pp[2])      ) & 0x3ff;
-				y[3] = (ltoh32(pp[2]) >> 10) & 0x3ff;
+				if (x + 2 < m_nWidth)
+				{
+					*u++ = (ltoh32(pp[1]) >> 10) & 0x3ff;
+					*y++ = (ltoh32(pp[1]) >> 20) & 0x3ff;
+					*v++ = (ltoh32(pp[2])      ) & 0x3ff;
+					*y++ = (ltoh32(pp[2]) >> 10) & 0x3ff;
+				}
 
-				u[2] = (ltoh32(pp[2]) >> 20) & 0x3ff;
-				y[4] = (ltoh32(pp[3])      ) & 0x3ff;
-				v[2] = (ltoh32(pp[3]) >> 10) & 0x3ff;
-				y[5] = (ltoh32(pp[3]) >> 20) & 0x3ff;
-
-				y += 6;
-				u += 3;
-				v += 3;
+				if (x + 4 < m_nWidth)
+				{
+					*u++ = (ltoh32(pp[2]) >> 20) & 0x3ff;
+					*y++ = (ltoh32(pp[3])      ) & 0x3ff;
+					*v++ = (ltoh32(pp[3]) >> 10) & 0x3ff;
+					*y++ = (ltoh32(pp[3]) >> 20) & 0x3ff;
+				}
 			}
 		}
 		break;
@@ -115,14 +117,50 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 			for (unsigned int x = 0; x < m_nWidth; x += 6, p += 16)
 			{
 				uint32_t *pp = (uint32_t *)p;
-				pp[0] = htol32((v[0] << 20) | (y[0] << 10) | u[0]);
-				pp[1] = htol32((y[2] << 20) | (u[1] << 10) | y[1]);
-				pp[2] = htol32((u[2] << 20) | (y[3] << 10) | v[1]);
-				pp[3] = htol32((y[5] << 20) | (v[2] << 10) | y[4]);
-				y += 6;
-				u += 3;
-				v += 3;
+
+				uint16_t y0, y1, y2, y3, y4, y5, u0, u1, u2, v0, v1, v2;
+
+				u0 = *u++;
+				y0 = *y++;
+				v0 = *v++;
+				y1 = *y++;
+
+				if (x + 2 < m_nWidth)
+				{
+					u1 = *u++;
+					y2 = *y++;
+					v1 = *v++;
+					y3 = *y++;
+				}
+				else
+				{
+					u1 = 0;
+					y2 = 0;
+					v1 = 0;
+					y3 = 0;
+				}
+
+				if (x + 4 < m_nWidth)
+				{
+					u2 = *u++;
+					y4 = *y++;
+					v2 = *v++;
+					y5 = *y++;
+				}
+				else
+				{
+					u2 = 0;
+					y4 = 0;
+					v2 = 0;
+					y5 = 0;
+				}
+
+				pp[0] = htol32((v0 << 20) | (y0 << 10) | u0);
+				pp[1] = htol32((y2 << 20) | (u1 << 10) | y1);
+				pp[2] = htol32((u2 << 20) | (y3 << 10) | v1);
+				pp[3] = htol32((y5 << 20) | (v2 << 10) | y4);
 			}
+			memset(p, 0, pStripeBegin + m_cbRawNetWidth - p);
 		}
 		break;
 	}
