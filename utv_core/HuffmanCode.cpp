@@ -300,10 +300,11 @@ size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const typename CSymbolBits<B>::symb
 template size_t cpp_HuffmanEncode<8>(uint8_t *pDstBegin, const CSymbolBits<8>::symbol_t *pSrcBegin, const CSymbolBits<8>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable);
 template size_t cpp_HuffmanEncode<10>(uint8_t *pDstBegin, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<10> *pEncodeTable);
 
-inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, bool bAccum, uint8_t &byPrevSymbol, uint8_t *pDst, int nCorrPos, int nDummyAlphaPos)
+template<int B>
+static inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE<B> *pDecodeTable, bool bAccum, typename CSymbolBits<B>::symbol_t &byPrevSymbol, typename CSymbolBits<B>::symbol_t *pDst, int nCorrPos, int nDummyAlphaPos)
 {
 	uint32_t code;
-	uint8_t symbol;
+	typename CSymbolBits<B>::symbol_t symbol;
 	int codelen;
 
 	if (nBits == 0)
@@ -311,7 +312,7 @@ inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE
 	else
 		code = ((*pSrc) << nBits) | ((*(pSrc+1)) >> (32 - nBits)) | 0x00000001;
 
-	int tableidx = code >> (32 - HUFFMAN_DECODE_TABLE<8>::LOOKUP_BITS);
+	int tableidx = code >> (32 - HUFFMAN_DECODE_TABLE<B>::LOOKUP_BITS);
 	if (pDecodeTable->LookupSymbolAndCodeLength[tableidx].codelen != 255)
 	{
 		symbol = pDecodeTable->LookupSymbolAndCodeLength[tableidx].symbol;
@@ -329,16 +330,16 @@ inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE
 
 	if (bAccum)
 	{
-		symbol += byPrevSymbol;
+		symbol = (symbol + byPrevSymbol) & CSymbolBits<B>::maskval;
 		byPrevSymbol = symbol;
 	}
 
 	if (nCorrPos != 0)
-		symbol += *(pDst + nCorrPos) + 0x80;
+		symbol += (*(pDst + nCorrPos) + CSymbolBits<B>::midval) & CSymbolBits<B>::maskval;
 
 	*pDst = symbol;
 	if (nDummyAlphaPos != 0)
-		*(pDst + nDummyAlphaPos) = 0xff;
+		*(pDst + nDummyAlphaPos) = CSymbolBits<B>::maxval;
 	nBits += codelen;
 
 	if (nBits >= 32)
@@ -364,57 +365,7 @@ static void cpp_HuffmanDecode_common(uint8_t *pDstBegin, uint8_t *pDstEnd, const
 	{
 		uint8_t *pStripeEnd = pStripeBegin + cbWidth;
 		for (p = pStripeBegin; p < pStripeEnd; p += nStep)
-			DecodeSymbol(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos, nDummyAlphaPos);
-	}
-}
-
-inline void DecodeSymbol10(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE<10> *pDecodeTable, bool bAccum, uint16_t &byPrevSymbol, uint16_t *pDst, int nCorrPos, int nDummyAlphaPos)
-{
-	uint32_t code;
-	uint16_t symbol;
-	int codelen;
-
-	if (nBits == 0)
-		code = (*pSrc) | 0x00000001;
-	else
-		code = ((*pSrc) << nBits) | ((*(pSrc+1)) >> (32 - nBits)) | 0x00000001;
-
-	int tableidx = code >> (32 - HUFFMAN_DECODE_TABLE<10>::LOOKUP_BITS);
-	if (pDecodeTable->LookupSymbolAndCodeLength[tableidx].codelen != 255)
-	{
-		symbol = pDecodeTable->LookupSymbolAndCodeLength[tableidx].symbol;
-		codelen = pDecodeTable->LookupSymbolAndCodeLength[tableidx].codelen;
-	}
-	else
-	{
-		int bsrval = bsr(code);
-		int codeshift = pDecodeTable->nCodeShift[bsrval];
-		code >>= codeshift;
-		tableidx = pDecodeTable->dwSymbolBase[bsrval] + code;
-		symbol = pDecodeTable->SymbolAndCodeLength[tableidx].symbol;
-		codelen = pDecodeTable->SymbolAndCodeLength[tableidx].codelen;
-	}
-
-	_ASSERT(symbol < 0x400);
-
-	if (bAccum)
-	{
-		symbol = (symbol + byPrevSymbol) & 0x3ff;
-		byPrevSymbol = symbol;
-	}
-
-	if (nCorrPos != 0)
-		symbol += (*(pDst + nCorrPos) + 0x200) & 0x3ff;
-
-	*pDst = symbol;
-	if (nDummyAlphaPos != 0)
-		*(pDst + nDummyAlphaPos) = 0x3ff;
-	nBits += codelen;
-
-	if (nBits >= 32)
-	{
-		nBits -= 32;
-		pSrc++;
+			DecodeSymbol<8>(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos, nDummyAlphaPos);
 	}
 }
 
@@ -434,7 +385,7 @@ static void cpp_HuffmanDecode_common10(uint16_t *pDstBegin, uint16_t *pDstEnd, c
 	{
 		uint16_t *pStripeEnd = (uint16_t*)((uint8_t *)pStripeBegin + cbWidth);
 		for (p = pStripeBegin; p < pStripeEnd; p += nStep)
-			DecodeSymbol10(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos, nDummyAlphaPos);
+			DecodeSymbol<10>(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos, nDummyAlphaPos);
 	}
 }
 
