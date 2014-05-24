@@ -67,27 +67,28 @@ void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 		for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin != pSrcEnd; pStripeBegin += m_cbRawStripeSize)
 		{
 			const uint8_t *pStripeEnd = pStripeBegin + m_cbRawStripeSize;
-			for (const uint8_t *p = pStripeBegin; p != pStripeEnd; p+= 128)
+			for (const uint8_t *p = pStripeBegin; p != pStripeEnd; p += 16)
 			{
-				for (const uint8_t *q = p; q < p + 128; q += 16)
-				{
-					const uint32_t *qq = (const uint32_t *)q;
-					u[0] = (ltoh32(qq[0])      ) & 0x3ff;
-					y[0] = (ltoh32(qq[0]) >> 10) & 0x3ff;
-					v[0] = (ltoh32(qq[0]) >> 20) & 0x3ff;
-					y[1] = (ltoh32(qq[1])      ) & 0x3ff;
-					u[1] = (ltoh32(qq[1]) >> 10) & 0x3ff;
-					y[2] = (ltoh32(qq[1]) >> 20) & 0x3ff;
-					v[1] = (ltoh32(qq[2])      ) & 0x3ff;
-					y[3] = (ltoh32(qq[2]) >> 10) & 0x3ff;
-					u[2] = (ltoh32(qq[2]) >> 20) & 0x3ff;
-					y[4] = (ltoh32(qq[3])      ) & 0x3ff;
-					v[2] = (ltoh32(qq[3]) >> 10) & 0x3ff;
-					y[5] = (ltoh32(qq[3]) >> 20) & 0x3ff;
-					y += 6;
-					u += 3;
-					v += 3;
-				}
+				const uint32_t *pp = (const uint32_t *)p;
+
+				u[0] = (ltoh32(pp[0])      ) & 0x3ff;
+				y[0] = (ltoh32(pp[0]) >> 10) & 0x3ff;
+				v[0] = (ltoh32(pp[0]) >> 20) & 0x3ff;
+				y[1] = (ltoh32(pp[1])      ) & 0x3ff;
+
+				u[1] = (ltoh32(pp[1]) >> 10) & 0x3ff;
+				y[2] = (ltoh32(pp[1]) >> 20) & 0x3ff;
+				v[1] = (ltoh32(pp[2])      ) & 0x3ff;
+				y[3] = (ltoh32(pp[2]) >> 10) & 0x3ff;
+
+				u[2] = (ltoh32(pp[2]) >> 20) & 0x3ff;
+				y[4] = (ltoh32(pp[3])      ) & 0x3ff;
+				v[2] = (ltoh32(pp[3]) >> 10) & 0x3ff;
+				y[5] = (ltoh32(pp[3]) >> 20) & 0x3ff;
+
+				y += 6;
+				u += 3;
+				v += 3;
 			}
 		}
 		break;
@@ -111,19 +112,16 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; pStripeBegin += m_cbRawStripeSize)
 		{
 			uint8_t *pStripeEnd = pStripeBegin + m_cbRawStripeSize;
-			for (uint8_t *p = pStripeBegin; p != pStripeEnd; p+= 128)
+			for (uint8_t *p = pStripeBegin; p != pStripeEnd; p += 16)
 			{
-				for (uint8_t *q = p; q < p + 128; q += 16)
-				{
-					uint32_t *qq = (uint32_t *)q;
-					qq[0] = htol32((v[0] << 20) | (y[0] << 10) | u[0]);
-					qq[1] = htol32((y[2] << 20) | (u[1] << 10) | y[1]);
-					qq[2] = htol32((u[2] << 20) | (y[3] << 10) | v[1]);
-					qq[3] = htol32((y[5] << 20) | (v[2] << 10) | y[4]);
-					y += 6;
-					u += 3;
-					v += 3;
-				}
+				uint32_t *pp = (uint32_t *)p;
+				pp[0] = htol32((v[0] << 20) | (y[0] << 10) | u[0]);
+				pp[1] = htol32((y[2] << 20) | (u[1] << 10) | y[1]);
+				pp[2] = htol32((u[2] << 20) | (y[3] << 10) | v[1]);
+				pp[3] = htol32((y[5] << 20) | (v[2] << 10) | y[4]);
+				y += 6;
+				u += 3;
+				v += 3;
 			}
 		}
 		break;
