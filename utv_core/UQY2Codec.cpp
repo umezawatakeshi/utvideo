@@ -64,10 +64,10 @@ void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 	switch (m_utvfRaw)
 	{
 	case UTVF_v210:
-		for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin != pSrcEnd; pStripeBegin += m_cbRawStripeSize)
+		for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin != pSrcEnd; pStripeBegin += m_cbRawGrossWidth)
 		{
-			const uint8_t *pStripeEnd = pStripeBegin + m_cbRawStripeSize;
-			for (const uint8_t *p = pStripeBegin; p != pStripeEnd; p += 16)
+			const uint8_t *p = pStripeBegin;
+			for (unsigned int x = 0; x < m_nWidth; x += 6, p += 16)
 			{
 				const uint32_t *pp = (const uint32_t *)p;
 
@@ -109,10 +109,10 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 	switch (m_utvfRaw)
 	{
 	case UTVF_v210:
-		for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; pStripeBegin += m_cbRawStripeSize)
+		for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; pStripeBegin += m_cbRawGrossWidth)
 		{
-			uint8_t *pStripeEnd = pStripeBegin + m_cbRawStripeSize;
-			for (uint8_t *p = pStripeBegin; p != pStripeEnd; p += 16)
+			uint8_t *p = pStripeBegin;
+			for (unsigned int x = 0; x < m_nWidth; x += 6, p += 16)
 			{
 				uint32_t *pp = (uint32_t *)p;
 				pp[0] = htol32((v[0] << 20) | (y[0] << 10) | u[0]);
