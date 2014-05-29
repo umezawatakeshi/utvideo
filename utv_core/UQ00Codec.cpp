@@ -63,11 +63,6 @@ int CUQ00Codec::GetState(void *pState, size_t cb)
 	return 0;
 }
 
-int CUQ00Codec::SetState(const void *pState, size_t cb)
-{
-	return 0;
-}
-
 int CUQ00Codec::InternalSetState(const void *pState, size_t cb)
 {
 	return 0;

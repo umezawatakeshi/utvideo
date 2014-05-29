@@ -205,36 +205,6 @@ int CUL00Codec::GetState(void *pState, size_t cb)
 	return 0;
 }
 
-int CUL00Codec::SetState(const void *pState, size_t cb)
-{
-#ifdef _WIN32
-	HKEY hkUtVideo;
-	DWORD dwIgnoreSetConfig;
-	DWORD cbRegData;
-	DWORD dwType;
-
-	if (RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Ut Video Codec Suite", 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hkUtVideo, NULL) != ERROR_SUCCESS)
-		goto doset_noclose;
-
-	cbRegData = sizeof(DWORD);
-	if (RegQueryValueEx(hkUtVideo, "IgnoreSetConfig", NULL, &dwType, (uint8_t *)&dwIgnoreSetConfig, &cbRegData) != ERROR_SUCCESS)
-		goto doset;
-	if (!dwIgnoreSetConfig)
-		goto doset;
-
-	RegCloseKey(hkUtVideo);
-	return 0;
-
-doset:
-	RegCloseKey(hkUtVideo);
-doset_noclose:
-	return InternalSetState(pState, cb);
-#endif
-#if defined(__APPLE__) || defined (__unix__)
-	return InternalSetState(pState, cb);
-#endif
-}
-
 int CUL00Codec::InternalSetState(const void *pState, size_t cb)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));

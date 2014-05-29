@@ -26,7 +26,9 @@ public:
 	virtual void GetShortFriendlyName(wchar_t *pszName, size_t cchName);
 	virtual void GetLongFriendlyName(char *pszName, size_t cchName) = 0;
 	virtual void GetLongFriendlyName(wchar_t *pszName, size_t cchName);
+	virtual int SetState(const void *pState, size_t cb);
 
 protected:
+	virtual int InternalSetState(const void *pState, size_t cb) = 0;
 	int CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 };

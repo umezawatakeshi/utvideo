@@ -107,7 +107,6 @@ public:
 
 	virtual size_t GetStateSize(void);
 	virtual int GetState(void *pState, size_t cb);
-	virtual int SetState(const void *pState, size_t cb);
 
 	virtual int EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	virtual size_t EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput);
@@ -126,7 +125,7 @@ public:
 protected:
 	int LoadConfig(void);
 	int SaveConfig(void);
-	int InternalSetState(const void *pState, size_t cb);
+	virtual int InternalSetState(const void *pState, size_t cb);
 	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 
 	virtual const char *GetColorFormatName(void) = 0;
