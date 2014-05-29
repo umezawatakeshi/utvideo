@@ -29,6 +29,8 @@ public:
 	virtual int SetState(const void *pState, size_t cb);
 
 protected:
+	int LoadConfig(void);
+	int SaveConfig(void);
 	virtual int InternalSetState(const void *pState, size_t cb) = 0;
 	int CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 };

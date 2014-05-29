@@ -28,16 +28,6 @@ void CUQ00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 	pszName[cchName - 1] = '\0';
 }
 
-int CUQ00Codec::LoadConfig(void)
-{
-	return 0;
-}
-
-int CUQ00Codec::SaveConfig(void)
-{
-	return 0;
-}
-
 #ifdef _WIN32
 INT_PTR CUQ00Codec::Configure(HWND hwnd)
 {

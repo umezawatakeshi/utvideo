@@ -138,8 +138,6 @@ public:
 	virtual int DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 
 protected:
-	int LoadConfig(void);
-	int SaveConfig(void);
 	virtual int InternalSetState(const void *pState, size_t cb);
 	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 
