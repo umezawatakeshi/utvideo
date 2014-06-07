@@ -49,6 +49,9 @@ protected:
 
 	static const uint8_t PREDICT_CYLINDRICAL_LEFT   = 1;
 	static const uint8_t PREDICT_CYLINDRICAL_MEDIAN = 3;
+	static const uint8_t PREDICT_ABOVE              = 4;
+	static const uint8_t PREDICT_PLANAR_LEFT        = 5;
+	static const uint8_t PREDICT_PLANAR_MEDIAN      = 7;
 
 protected:
 	ENCODERCONF m_ec;
