@@ -405,6 +405,11 @@ size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 
 	if (fi->fiEncodingMode == 0)
 		p += sizeof(FRAMEINFO_MODE0);
+	else
+		return -1;
+
+	if (fi0->fiPredictionType != PREDICT_CYLINDRICAL_LEFT)
+		return -1;
 
 	m_dwDivideCount = fi0->fiDivideCountMinusOne + 1;
 	CalcStripeMetric();
