@@ -4,6 +4,7 @@
 //
 #define IDD_UL00_CONFIG                 101
 #define IDD_GLOBAL_CONFIG               129
+#define IDD_UQ00_CONFIG                 130
 #define IDC_DIVIDE_COUNT_EDIT           1001
 #define IDC_SAVE_CONFIG_CHECK           1001
 #define IDC_ASSUME_INTERLACE_CHECK      1002

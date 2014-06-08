@@ -31,11 +31,93 @@ void CUQ00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 #ifdef _WIN32
 INT_PTR CUQ00Codec::Configure(HWND hwnd)
 {
-	char buf[128];
-
-	GetLongFriendlyName(buf, sizeof(buf));
-	MessageBox(hwnd, "Configuration is not implemented yet.", buf, MB_OK);
+	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_UQ00_CONFIG), hwnd, DialogProc, (LPARAM)this);
 	return 0;
+}
+
+INT_PTR CALLBACK CUQ00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	CUQ00Codec *pThis = (CUQ00Codec *)GetWindowLongPtr(hwnd, DWLP_USER);
+	char buf[256];
+	int	n;
+
+	switch(uMsg)
+	{
+	case WM_INITDIALOG:
+		SetWindowLongPtr(hwnd, DWLP_USER, lParam);
+		pThis = (CUQ00Codec *)lParam;
+		pThis->GetLongFriendlyName(buf, _countof(buf));
+		SetWindowText(hwnd, buf);
+		wsprintf(buf, "%d", pThis->m_ec.ecDivideCountMinusOne + 1);
+		SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
+#if 0
+		switch (pThis->m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
+		{
+		default:
+			_ASSERT(false);
+			/* FALLTHROUGH */
+		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO, BST_CHECKED);
+			break;
+		case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO, BST_CHECKED);
+			break;
+		}
+#endif
+		if (pThis->m_ec.ecFlags & EC_FLAGS_DIVIDE_COUNT_IS_NUM_PROCESSORS)
+		{
+			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS, BST_CHECKED);
+			EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, FALSE);
+		}
+		return TRUE;
+	case WM_COMMAND:
+		switch(LOWORD(wParam))
+		{
+		case IDOK:
+			memset(&pThis->m_ec, 0, sizeof(ENCODERCONF));
+			if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS))
+			{
+				pThis->m_ec.ecFlags |= EC_FLAGS_DIVIDE_COUNT_IS_NUM_PROCESSORS;
+				pThis->m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
+			}
+			else
+			{
+				GetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf, sizeof(buf));
+				n = atoi(buf);
+				if (n < 1 || n > 256)
+				{
+					MessageBox(hwnd, "1 <= DIVIDE_COUNT <= 256", "ERR", MB_ICONERROR);
+					return TRUE;
+				}
+				pThis->m_ec.ecDivideCountMinusOne = n - 1;
+			}
+#if 0
+			if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO))
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
+			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO))
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
+#endif
+			pThis->SaveConfig();
+			/* FALLTHROUGH */
+		case IDCANCEL:
+			EndDialog(hwnd, 0);
+			return TRUE;
+		case IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS:
+			if (HIWORD(wParam) == BN_CLICKED)
+			{
+				EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, !IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS));
+				if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS))
+				{
+					wsprintf(buf, "%d", CThreadManager::GetNumProcessors());
+					SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
+				}
+			}
+			break;
+		}
+		break;
+	}
+
+	return FALSE;
 }
 #endif
 
@@ -55,6 +137,26 @@ int CUQ00Codec::GetState(void *pState, size_t cb)
 
 int CUQ00Codec::InternalSetState(const void *pState, size_t cb)
 {
+	ENCODERCONF ec;
+
+	memset(&ec, 0, sizeof(ENCODERCONF));
+	memcpy(&ec, pState, min(sizeof(ENCODERCONF), cb));
+
+	if (ec.ecPreferredEncodingMode != 0)
+		return -1;
+	if (ec.ecReserved != 0)
+		return -1;
+	/* ecDivideCountMinusOne は全ての値が有効なのでチェックしない */
+	if ((ec.ecFlags & EC_FLAGS_RESERVED) != 0)
+		return -1;
+
+	memcpy(&m_ec, &ec, sizeof(ENCODERCONF));
+
+	if (m_ec.ecFlags & EC_FLAGS_DIVIDE_COUNT_IS_NUM_PROCESSORS)
+	{
+		m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
+	}
+
 	return 0;
 }
 

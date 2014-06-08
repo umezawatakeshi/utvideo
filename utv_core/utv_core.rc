@@ -82,32 +82,18 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,148,10
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+IDD_UQ00_CONFIG DIALOGEX 0, 0, 186, 90
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    IDD_CONFIG_DIALOG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 179
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 83
-    END
-
-    IDD_GLOBAL_CONFIG_DIALOG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 214
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 86
-    END
+    LTEXT           "フレーム分割数",IDC_STATIC,7,7,50,8
+    EDITTEXT        IDC_DIVIDE_COUNT_EDIT,67,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
+    CONTROL         "論理プロセッサ数と同じにする",IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,20,108,10
+    DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
+    PUSHBUTTON      "キャンセル",IDCANCEL,129,24,50,14
 END
-#endif    // APSTUDIO_INVOKED
 
 #endif    // 日本語 resources
 /////////////////////////////////////////////////////////////////////////////
@@ -159,32 +145,18 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,161,10
 END
 
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO 
+IDD_UQ00_CONFIG DIALOGEX 0, 0, 186, 90
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    IDD_CONFIG_DIALOG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 179
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 83
-    END
-
-    IDD_GLOBAL_CONFIG_DIALOG, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 223
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 86
-    END
+    LTEXT           "Frame divide count",IDC_STATIC,7,7,62,8
+    EDITTEXT        IDC_DIVIDE_COUNT_EDIT,75,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
+    CONTROL         "Same as # of logical processors",IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,20,117,10
+    DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
+    PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
 END
-#endif    // APSTUDIO_INVOKED
 
 #endif    // 英語 (米国) resources
 /////////////////////////////////////////////////////////////////////////////

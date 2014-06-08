@@ -15,8 +15,14 @@ class CUQ00Codec :
 protected:
 	struct ENCODERCONF
 	{
-		uint8_t ecReserved[4];
+		uint8_t ecPreferredEncodingMode; /* == 0 */
+		uint8_t ecReserved; /* == 0 */
+		uint8_t ecDivideCountMinusOne;
+		uint8_t ecFlags;
 	};
+
+	static const uint8_t EC_FLAGS_DIVIDE_COUNT_IS_NUM_PROCESSORS = 0x01;
+	static const uint8_t EC_FLAGS_RESERVED                       = 0xfe;
 
 	struct STREAMINFO
 	{
@@ -48,10 +54,10 @@ protected:
 	};
 
 	static const uint8_t PREDICT_CYLINDRICAL_LEFT   = 1;
-	static const uint8_t PREDICT_CYLINDRICAL_MEDIAN = 3;
-	static const uint8_t PREDICT_ABOVE              = 4;
-	static const uint8_t PREDICT_PLANAR_LEFT        = 5;
-	static const uint8_t PREDICT_PLANAR_MEDIAN      = 7;
+	//static const uint8_t PREDICT_CYLINDRICAL_MEDIAN = 3;
+	//static const uint8_t PREDICT_ABOVE              = 4;
+	//static const uint8_t PREDICT_PLANAR_LEFT        = 5;
+	//static const uint8_t PREDICT_PLANAR_MEDIAN      = 7;
 
 protected:
 	ENCODERCONF m_ec;
