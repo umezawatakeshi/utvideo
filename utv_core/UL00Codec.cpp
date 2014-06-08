@@ -31,7 +31,7 @@ void CUL00Codec::GetLongFriendlyName(char *pszName, size_t cchName)
 #ifdef _WIN32
 INT_PTR CUL00Codec::Configure(HWND hwnd)
 {
-	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_CONFIG_DIALOG), hwnd, DialogProc, (LPARAM)this);
+	DialogBoxParam(hModule, MAKEINTRESOURCE(IDD_UL00_CONFIG), hwnd, DialogProc, (LPARAM)this);
 	return 0;
 }
 

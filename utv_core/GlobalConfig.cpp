@@ -16,7 +16,7 @@ static void OnOK(HWND hWnd);
 
 __declspec(dllexport) INT_PTR GlobalConfigDialog(HWND hWnd)
 {
-	return DialogBox(hModule, MAKEINTRESOURCE(IDD_GLOBAL_CONFIG_DIALOG), hWnd, GlobalConfigDialogProc);
+	return DialogBox(hModule, MAKEINTRESOURCE(IDD_GLOBAL_CONFIG), hWnd, GlobalConfigDialogProc);
 }
 
 INT_PTR CALLBACK GlobalConfigDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
