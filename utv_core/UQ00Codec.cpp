@@ -183,6 +183,7 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 	fi.fiEncodingMode = 0;
 	fi0.fiPredictionType = PREDICT_CYLINDRICAL_LEFT;
+	fi0.fiDivideCountMinusOne = m_ec.ecDivideCountMinusOne;
 
 	p = (uint8_t *)pOutput;
 
@@ -231,21 +232,22 @@ int CUQ00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int 
 {
 	const STREAMINFO *p = (const STREAMINFO *)pExtraData;
 
-	m_dwDivideCount = 1;
-
 	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
 	CalcPlaneSizes(width, height);
 
 	m_dwNumStripes = height / GetMacroPixelHeight();
 	m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight();
 
+	return 0;
+}
+
+void CUQ00Codec::CalcStripeMetric(void)
+{
 	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 	{
 		m_dwStripeBegin[nBandIndex] = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
 		m_dwStripeEnd[nBandIndex]   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
 	}
-
-	return 0;
 }
 
 int CUQ00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
@@ -265,6 +267,8 @@ int CUQ00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int heigh
 	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth, &si, sizeof(si));
 	if (ret != 0)
 		return ret;
+	m_dwDivideCount = m_ec.ecDivideCountMinusOne + 1;
+	CalcStripeMetric();
 
 	m_pCurFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
@@ -401,6 +405,9 @@ size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 
 	if (fi->fiEncodingMode == 0)
 		p += sizeof(FRAMEINFO_MODE0);
+
+	m_dwDivideCount = fi0->fiDivideCountMinusOne + 1;
+	CalcStripeMetric();
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{

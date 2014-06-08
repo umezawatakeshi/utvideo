@@ -134,6 +134,7 @@ public:
 protected:
 	virtual int InternalSetState(const void *pState, size_t cb);
 	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
+	void CalcStripeMetric(void);
 
 	virtual const char *GetColorFormatName(void) = 0;
 	virtual int GetRealBitCount(void) = 0;
