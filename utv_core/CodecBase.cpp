@@ -53,6 +53,7 @@ int CCodecBase::LoadConfig(void)
 	DWORD cb;
 	DWORD dwType;
 	char buf[16];
+	char szValueName[16];
 
 	if (RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Ut Video Codec Suite", 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hkUtVideo, NULL) != ERROR_SUCCESS)
 		return -1;
@@ -63,10 +64,10 @@ int CCodecBase::LoadConfig(void)
 	if (!dwSaveConfig)
 		goto notloaded;
 
-	wsprintf(buf, "Config%s", GetTinyName());
+	wsprintf(szValueName, "Config%s", GetTinyName());
 	cb = (DWORD)GetStateSize();
 	_ASSERT(cb <= sizeof(buf));
-	if (RegQueryValueEx(hkUtVideo, buf, NULL, &dwType, (BYTE *)buf, &cb) != ERROR_SUCCESS)
+	if (RegQueryValueEx(hkUtVideo, szValueName, NULL, &dwType, (BYTE *)buf, &cb) != ERROR_SUCCESS)
 		goto notloaded;
 	InternalSetState(buf, cb);
 
@@ -90,6 +91,7 @@ int CCodecBase::SaveConfig(void)
 	DWORD cb;
 	DWORD dwType;
 	char buf[16];
+	char szValueName[16];
 
 	if (RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Ut Video Codec Suite", 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hkUtVideo, NULL) != ERROR_SUCCESS)
 		return -1;
@@ -100,11 +102,11 @@ int CCodecBase::SaveConfig(void)
 	if (!dwSaveConfig)
 		goto notsaved;
 
-	wsprintf(buf, "Config%s", GetTinyName());
+	wsprintf(szValueName, "Config%s", GetTinyName());
 	cb = (DWORD)GetStateSize();
 	_ASSERT(cb <= sizeof(buf));
 	GetState(buf, cb);
-	if (RegSetValueEx(hkUtVideo, buf, 0, REG_BINARY, (const BYTE *)buf, cb) != ERROR_SUCCESS)
+	if (RegSetValueEx(hkUtVideo, szValueName, 0, REG_BINARY, (const BYTE *)buf, cb) != ERROR_SUCCESS)
 		goto notsaved;
 
 	RegCloseKey(hkUtVideo);
