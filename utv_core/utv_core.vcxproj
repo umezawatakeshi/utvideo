@@ -1,0 +1,271 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F1067D6A-613C-4F1C-B03F-8BAA03AF8E55}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>utv_core</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;UTV_CORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath) C:\WINDOWS\SysWOW64\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;UTV_CORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath) C:\WINDOWS\SysNative\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;UTV_CORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath) C:\WINDOWS\SysWOW64\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;UTV_CORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath) C:\WINDOWS\SysNative\</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="ByteOrder.h" />
+    <ClInclude Include="Codec.h" />
+    <ClInclude Include="CodecBase.h" />
+    <ClInclude Include="Coefficient.h" />
+    <ClInclude Include="ColorOrder.h" />
+    <ClInclude Include="Convert.h" />
+    <ClInclude Include="CPUID.h" />
+    <ClInclude Include="DummyCodec.h" />
+    <ClInclude Include="FrameBuffer.h" />
+    <ClInclude Include="GlobalConfig.h" />
+    <ClInclude Include="HuffmanCode.h" />
+    <ClInclude Include="Predict.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="SymbolBits.h" />
+    <ClInclude Include="Thread.h" />
+    <ClInclude Include="TunedFunc.h" />
+    <ClInclude Include="UL00Codec.h" />
+    <ClInclude Include="ULRACodec.h" />
+    <ClInclude Include="ULRGCodec.h" />
+    <ClInclude Include="ULYUV420Codec.h" />
+    <ClInclude Include="ULYUV422Codec.h" />
+    <ClInclude Include="UQ00Codec.h" />
+    <ClInclude Include="UQY2Codec.h" />
+    <ClInclude Include="utvideo.h" />
+    <ClInclude Include="utv_core.h" />
+    <ClInclude Include="version.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Codec.cpp" />
+    <ClCompile Include="CodecBase.cpp" />
+    <ClCompile Include="Convert.cpp" />
+    <ClCompile Include="DummyCodec.cpp" />
+    <ClCompile Include="FrameBuffer.cpp" />
+    <ClCompile Include="GlobalConfig.cpp" />
+    <ClCompile Include="HuffmanCode.cpp" />
+    <ClCompile Include="Predict.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Thread.cpp" />
+    <ClCompile Include="TunedFunc.cpp" />
+    <ClCompile Include="TunedFunc_x86x64.cpp" />
+    <ClCompile Include="UL00Codec.cpp" />
+    <ClCompile Include="ULRACodec.cpp" />
+    <ClCompile Include="ULRGCodec.cpp" />
+    <ClCompile Include="ULYUV420Codec.cpp" />
+    <ClCompile Include="ULYUV422Codec.cpp" />
+    <ClCompile Include="UQ00Codec.cpp" />
+    <ClCompile Include="UQY2Codec.cpp" />
+    <ClCompile Include="utv_core.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="utv_core.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Coefficient_asm_x86x64.mac" />
+    <None Include="Coefficient_nasm.mac" />
+    <None Include="Common_asm_x64.mac" />
+    <None Include="Common_asm_x86.mac" />
+    <CustomBuild Include="Convert_asm_x64.asm">
+      <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
+      <Command Condition="'$(Platform)'=='x64'">nasm -f win64 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Platform)'=='x64'">$(IntDir)%(Filename).obj</Outputs>
+      <Message Condition="'$(Platform)'=='x64'">%(Identity)</Message>
+    </CustomBuild>
+    <CustomBuild Include="Convert_asm_x86.asm">
+      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
+      <Command Condition="'$(Platform)'=='Win32'">nasm -f win32 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Platform)'=='Win32'">$(IntDir)%(Filename).obj</Outputs>
+      <Message Condition="'$(Platform)'=='Win32'">%(Identity)</Message>
+    </CustomBuild>
+    <CustomBuild Include="CPUID_asm_x64.asm">
+      <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
+      <Command Condition="'$(Platform)'=='x64'">nasm -f win64 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Platform)'=='x64'">$(IntDir)%(Filename).obj</Outputs>
+      <Message Condition="'$(Platform)'=='x64'">%(Identity)</Message>
+    </CustomBuild>
+    <CustomBuild Include="CPUID_asm_x86.asm">
+      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
+      <Command Condition="'$(Platform)'=='Win32'">nasm -f win32 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Platform)'=='Win32'">$(IntDir)%(Filename).obj</Outputs>
+      <Message Condition="'$(Platform)'=='Win32'">%(Identity)</Message>
+    </CustomBuild>
+    <CustomBuild Include="HuffmanCode_asm_x64.asm">
+      <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
+      <Command Condition="'$(Platform)'=='x64'">nasm -f win64 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Platform)'=='x64'">$(IntDir)%(Filename).obj</Outputs>
+      <Message Condition="'$(Platform)'=='x64'">%(Identity)</Message>
+    </CustomBuild>
+    <CustomBuild Include="HuffmanCode_asm_x86.asm">
+      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
+      <Command Condition="'$(Platform)'=='Win32'">nasm -f win32 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Platform)'=='Win32'">$(IntDir)%(Filename).obj</Outputs>
+      <Message Condition="'$(Platform)'=='Win32'">%(Identity)</Message>
+    </CustomBuild>
+    <CustomBuild Include="Predict_asm_x64.asm">
+      <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
+      <Command Condition="'$(Platform)'=='x64'">nasm -f win64 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Platform)'=='x64'">$(IntDir)%(Filename).obj</Outputs>
+      <Message Condition="'$(Platform)'=='x64'">%(Identity)</Message>
+    </CustomBuild>
+    <CustomBuild Include="Predict_asm_x86.asm">
+      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
+      <Command Condition="'$(Platform)'=='Win32'">nasm -f win32 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Platform)'=='Win32'">$(IntDir)%(Filename).obj</Outputs>
+      <Message Condition="'$(Platform)'=='Win32'">%(Identity)</Message>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
