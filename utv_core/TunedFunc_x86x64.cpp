@@ -263,30 +263,6 @@ uint32_t dwSupportedFeatures[FEATURESIZE];
 class CTunedFuncInitializer
 {
 public:
-	static inline void cpuid(cpuid_result *result, uint32_t leaf, uint32_t subleaf)
-	{
-		::cpuid(result, leaf, subleaf);
-#ifdef _DEBUG
-		char buf[16];
-		if (leaf >= 0x80000000)
-			sprintf(buf, "ex%d", leaf - 0x80000000);
-		else if (leaf == 7)
-			sprintf(buf, "7.%d", subleaf);
-		else
-			sprintf(buf, "%d", leaf);
-		_RPT5(_CRT_WARN, "CPUID.%-3s EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", buf,
-			result->eax, result->ebx, result->ecx, result->edx);
-#endif
-	}
-
-	static inline void xgetbv(xgetbv_result *result, uint32_t idx)
-	{
-		::xgetbv(result, idx);
-#ifdef _DEBUG
-		_RPT2(_CRT_WARN, "XGETBV.%-2d EAX=%08X EDX=%08X\n", result->eax, result->edx);
-#endif
-	}
-
 	CTunedFuncInitializer()
 	{
 		cpuid_result cpuid_0   = { 0, 0, 0, 0 };
