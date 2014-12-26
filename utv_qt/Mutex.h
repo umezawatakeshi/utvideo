@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include "pthread.h"
+#include <pthread.h>
 
 class CMutex
 {
