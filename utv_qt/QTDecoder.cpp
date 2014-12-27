@@ -120,8 +120,6 @@ pascal ComponentResult QTDecoderBeginBand(CQTDecoder *glob, CodecDecompressParam
 {
 	CMutexLock lock(glob->mutex);
 
-	int i;
-	long c;
 	Handle imgDescExt;
 	size_t imgDescExtSize;
 	size_t extDataOffset;

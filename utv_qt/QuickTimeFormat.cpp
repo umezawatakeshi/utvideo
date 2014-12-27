@@ -32,8 +32,6 @@ int UtVideoFormatToQuickTimeFormat(OSType *pixelFormat, utvf_t utvf)
 
 int QuickTimeFormatToUtVideoFormat(utvf_t *utvf, OSType pixelFormat)
 {
-	OSType ostypetmp;
-
 	switch (pixelFormat)
 	{
 	case k24RGBPixelFormat:
