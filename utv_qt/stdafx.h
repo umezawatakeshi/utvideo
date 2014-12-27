@@ -1,5 +1,5 @@
 /*  */
 /* $Id$ */
 
-#include <Carbon/Carbon.h>
-#include <QuickTime/QuickTime.h>
+#include <QuickTime/QuickTimeComponents.h>
+#include <QuickTime/ImageCodec.h>

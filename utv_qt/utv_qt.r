@@ -5,8 +5,8 @@
 #define thng_RezTemplateVersion 1
 #define cfrg_RezTemplateVersion 1
 
-#include <Carbon/Carbon.r>
-#include <QuickTime/QuickTime.r>
+#include <QuickTime/QuickTimeComponents.r>
+#include <QuickTime/ImageCodec.r>
 
 resource 'cdci' (256) {
 	"Ut Video Codec Suite",				// Name
