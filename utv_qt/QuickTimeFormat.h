@@ -3,5 +3,5 @@
 
 #pragma once
 
-DLLEXPORT int UtVideoFormatToQuickTimeFormat(OSType *pixelFormat, utvf_t utvf);
-DLLEXPORT int QuickTimeFormatToUtVideoFormat(utvf_t *utvf, OSType pixelFormat);
+int UtVideoFormatToQuickTimeFormat(OSType *pixelFormat, utvf_t utvf);
+int QuickTimeFormatToUtVideoFormat(utvf_t *utvf, OSType pixelFormat);

@@ -10,7 +10,7 @@ static inline bool is_fourcc(uint32_t x)
 	return (x >= '    ' /* four SP */ && x <= 0x7e7e7e7e);
 }
 
-DLLEXPORT int UtVideoFormatToQuickTimeFormat(OSType *pixelFormat, utvf_t utvf)
+int UtVideoFormatToQuickTimeFormat(OSType *pixelFormat, utvf_t utvf)
 {
 	switch (utvf)
 	{
@@ -30,7 +30,7 @@ DLLEXPORT int UtVideoFormatToQuickTimeFormat(OSType *pixelFormat, utvf_t utvf)
 	return 0;
 }
 
-DLLEXPORT int QuickTimeFormatToUtVideoFormat(utvf_t *utvf, OSType pixelFormat)
+int QuickTimeFormatToUtVideoFormat(utvf_t *utvf, OSType pixelFormat)
 {
 	OSType ostypetmp;
 
