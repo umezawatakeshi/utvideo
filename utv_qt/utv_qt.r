@@ -1,7 +1,6 @@
 /*  */
 /* $Id$ */
 
-#define TARGET_REZ_CARBON_MACHO 1
 #define thng_RezTemplateVersion 1
 #define cfrg_RezTemplateVersion 1
 
