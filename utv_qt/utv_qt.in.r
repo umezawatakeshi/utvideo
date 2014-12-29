@@ -1,4 +1,4 @@
-/*  */
+/* 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ */
 /* $Id$ */
 
 #define SUBTYPE_FMTN "UtVideo " SUBTYPE_INFO

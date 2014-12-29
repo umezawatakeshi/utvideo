@@ -1,4 +1,4 @@
-/*  */
+/* 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ */
 /* $Id$ */
 
 ComponentSelectorOffset(8)

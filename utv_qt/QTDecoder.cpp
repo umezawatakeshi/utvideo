@@ -1,6 +1,5 @@
-/*  */
+/* •¶šƒR[ƒh‚Í‚r‚i‚h‚r ‰üsƒR[ƒh‚Í‚b‚q‚k‚e */
 /* $Id$ */
-
 
 #include "stdafx.h"
 #include "utvideo.h"
