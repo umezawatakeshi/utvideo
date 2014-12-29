@@ -12,7 +12,7 @@ resource 'stri' (SUBTYPE_RID) {
 };
 
 resource 'thng' (SUBTYPE_RID) {
-	decompressorComponentType,			// Type                 
+	decompressorComponentType,			// Type
 	SUBTYPE_VAL,						// SubType
 	'Umzw',								// Manufacturer
 	0,									// - use componentHasMultiplePlatforms
@@ -39,7 +39,7 @@ resource 'stri' (SUBTYPE_RID + 256) {
 };
 
 resource 'thng' (SUBTYPE_RID + 256) {
-	compressorComponentType,			// Type                 
+	compressorComponentType,			// Type
 	SUBTYPE_VAL,						// SubType
 	'Umzw',								// Manufacturer
 	0,									// - use componentHasMultiplePlatforms
