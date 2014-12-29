@@ -30,7 +30,7 @@ resource 'thng' (SUBTYPE_RID) {
 		codecInfoDoes32,
 		'dlle',
 		256,
-		platformIA32NativeEntryPoint,
+		platformTarget,
 	};
 };
 
@@ -57,7 +57,7 @@ resource 'thng' (SUBTYPE_RID + 256) {
 		codecInfoDoes32,
 		'dlle',
 		257,
-		platformIA32NativeEntryPoint,
+		platformTarget,
 	};
 };
 

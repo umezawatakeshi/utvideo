@@ -3,6 +3,48 @@
 
 #pragma once
 
+#if defined(_WIN32)
+
+class CMutex
+{
+private:
+	HANDLE m_mutex;
+
+public:
+	CMutex()
+	{
+		m_mutex = CreateMutex(NULL, FALSE, NULL);
+	}
+
+	~CMutex()
+	{
+		CloseHandle(m_mutex);
+	}
+
+	int Lock()
+	{
+		if (WaitForSingleObject(m_mutex, INFINITE) != WAIT_TIMEOUT)
+			return 0;
+		else
+			return -1;
+	}
+
+	int TryLock()
+	{
+		if (WaitForSingleObject(m_mutex, 0) != WAIT_TIMEOUT)
+			return 0;
+		else
+			return -1;
+	}
+
+	int Unlock()
+	{
+		return ReleaseMutex(m_mutex) ? 0 : -1;
+	}
+};
+
+#elif defined(__APPLE__) || defined(__unix__)
+
 #include <pthread.h>
 
 class CMutex
@@ -40,6 +82,8 @@ public:
 		return pthread_mutex_unlock(&m_mutex);
 	}
 };
+
+#endif
 
 class CMutexLock
 {

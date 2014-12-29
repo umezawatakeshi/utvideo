@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EF53FC87-7193-4288-AAD3-5FA2A3BE8E60}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>utv_qt</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;UTV_QT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\utv_core;C:\Program Files %28x86%29\QuickTime SDK\CIncludes;C:\Program Files %28x86%29\QuickTime SDK\ComponentIncludes</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\QuickTime SDK\Libraries</AdditionalLibraryDirectories>
+      <AdditionalDependencies>advapi32.lib;user32.lib;CVClient.lib;QTMLClient.lib</AdditionalDependencies>
+      <ModuleDefinitionFile>utv_qt.def</ModuleDefinitionFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>"C:\Program Files (x86)\QuickTime SDK\Tools\RezWack" -f -d "$(OutDir)\$(TargetName).dll" -r "$(IntDir)\$(TargetName).qtr" -o "$(OutDir)\$(TargetName).qtx"
+if exist "C:\Program Files (x86)\QuickTime" copy "$(OutDir)\$(TargetName).qtx" "C:\Program Files (x86)\QuickTime\QTComponents\"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;UTV_QT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\utv_core;C:\Program Files %28x86%29\QuickTime SDK\CIncludes;C:\Program Files %28x86%29\QuickTime SDK\ComponentIncludes</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\QuickTime SDK\Libraries</AdditionalLibraryDirectories>
+      <AdditionalDependencies>advapi32.lib;user32.lib;CVClient.lib;QTMLClient.lib</AdditionalDependencies>
+      <ModuleDefinitionFile>utv_qt.def</ModuleDefinitionFile>
+    </Link>
+    <PostBuildEvent>
+      <Command>"C:\Program Files (x86)\QuickTime SDK\Tools\RezWack" -f -d "$(OutDir)\$(TargetName).dll" -r "$(IntDir)\$(TargetName).qtr" -o "$(OutDir)\$(TargetName).qtx"
+if exist "C:\Program Files (x86)\QuickTime" copy "$(OutDir)\$(TargetName).qtx" "C:\Program Files (x86)\QuickTime\QTComponents\"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Mutex.h" />
+    <ClInclude Include="QTCodec.h" />
+    <ClInclude Include="QTDecoder.h" />
+    <ClInclude Include="QTDecoderDispatch.h" />
+    <ClInclude Include="QTEncoder.h" />
+    <ClInclude Include="QTEncoderDispatch.h" />
+    <ClInclude Include="QuickTimeFormat.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="QTCodec.cpp" />
+    <ClCompile Include="QTDecoder.cpp" />
+    <ClCompile Include="QTEncoder.cpp" />
+    <ClCompile Include="QuickTimeFormat.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="utv_qt.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\utv_core\utv_core.vcxproj">
+      <Project>{f1067d6a-613c-4f1c-b03f-8baa03af8e55}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="utv_qt.def" />
+    <None Include="utv_qt.in.r" />
+    <CustomBuild Include="utv_qt.r">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"C:\Program Files (x86)\QuickTime SDK\Tools\Rez.exe" -i "C:\Program Files (x86)\QuickTime SDK\RIncludes" -o $(IntDir)%(Filename).qtr %(Identity)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Identity)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).qtr</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">utv_qt.in.r</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"C:\Program Files (x86)\QuickTime SDK\Tools\Rez.exe" -i "C:\Program Files (x86)\QuickTime SDK\RIncludes" -o $(IntDir)%(Filename).qtr %(Identity)</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Identity)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).qtr</Outputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">utv_qt.in.r</AdditionalInputs>
+    </CustomBuild>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

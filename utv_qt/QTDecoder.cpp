@@ -21,9 +21,15 @@ extern "C" pascal ComponentResult QTDecoderComponentDispatch(ComponentParameters
 
 #define GET_DELEGATE_COMPONENT()	(storage->delegateComponent)
 
+#ifdef _WIN32
+#include <Components.k.h>
+#include <ImageCodec.k.h>
+#include <ComponentDispatchHelper.c>
+#else
 #include <CoreServices/Components.k.h>
 #include <QuickTime/ImageCodec.k.h>
 #include <QuickTime/ComponentDispatchHelper.c>
+#endif
 
 pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 {

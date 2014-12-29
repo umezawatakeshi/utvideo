@@ -4,8 +4,17 @@
 #define thng_RezTemplateVersion 1
 #define cfrg_RezTemplateVersion 1
 
+#if (Environ_OS_Mac)
 #include <QuickTime/QuickTimeComponents.r>
 #include <QuickTime/ImageCodec.r>
+#define platformTarget platformIA32NativeEntryPoint
+#elif defined(Environ_OS_Win32)
+#include "QuickTimeComponents.r"
+#include "ImageCodec.r"
+#define platformTarget platformWin32
+#else
+#error
+#endif
 
 resource 'cdci' (256) {
 	"Ut Video Codec Suite",				// Name

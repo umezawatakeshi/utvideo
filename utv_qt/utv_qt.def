@@ -1,0 +1,5 @@
+LIBRARY "utv_qt"
+
+EXPORTS
+	QTDecoderComponentDispatch
+	QTEncoderComponentDispatch

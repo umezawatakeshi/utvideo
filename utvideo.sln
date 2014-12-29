@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_cfg", "utv_cfg\utv_cfg.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_test", "utv_test\utv_test.vcxproj", "{8A1D9926-7EBD-4A5C-9FBD-1BB289796C14}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_qt", "utv_qt\utv_qt.vcxproj", "{EF53FC87-7193-4288-AAD3-5FA2A3BE8E60}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -81,6 +83,12 @@ Global
 		{8A1D9926-7EBD-4A5C-9FBD-1BB289796C14}.Release|Win32.Build.0 = Release|Win32
 		{8A1D9926-7EBD-4A5C-9FBD-1BB289796C14}.Release|x64.ActiveCfg = Release|x64
 		{8A1D9926-7EBD-4A5C-9FBD-1BB289796C14}.Release|x64.Build.0 = Release|x64
+		{EF53FC87-7193-4288-AAD3-5FA2A3BE8E60}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EF53FC87-7193-4288-AAD3-5FA2A3BE8E60}.Debug|Win32.Build.0 = Debug|Win32
+		{EF53FC87-7193-4288-AAD3-5FA2A3BE8E60}.Debug|x64.ActiveCfg = Debug|Win32
+		{EF53FC87-7193-4288-AAD3-5FA2A3BE8E60}.Release|Win32.ActiveCfg = Release|Win32
+		{EF53FC87-7193-4288-AAD3-5FA2A3BE8E60}.Release|Win32.Build.0 = Release|Win32
+		{EF53FC87-7193-4288-AAD3-5FA2A3BE8E60}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
