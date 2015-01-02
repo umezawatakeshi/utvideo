@@ -7,7 +7,7 @@
 AppName=Ut Video Codec Suite
 AppId=utvideo
 AppVersion="{#UTVIDEO_VERSION_MAJOR}.{#UTVIDEO_VERSION_MINOR}.{#UTVIDEO_VERSION_BUGFIX}"
-AppCopyright=Copyright (c) 2008-2014 UMEZAWA Takeshi
+AppCopyright=Copyright (c) 2008-2015 UMEZAWA Takeshi
 AppPublisher=UMEZAWA Takeshi
 AppPublisherURL=http://umezawa.dyndns.info/
 UninstallDisplayName=Ut Video Codec Suite
