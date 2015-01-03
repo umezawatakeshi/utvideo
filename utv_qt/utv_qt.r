@@ -1,7 +1,7 @@
 /* ï∂éöÉRÅ[ÉhÇÕÇrÇiÇhÇr â¸çsÉRÅ[ÉhÇÕÇbÇqÇkÇe */
 /* $Id$ */
 
-#define thng_RezTemplateVersion 1
+#define thng_RezTemplateVersion 2
 #define cfrg_RezTemplateVersion 1
 
 #if (Environ_OS_Mac)
@@ -15,6 +15,9 @@
 #else
 #error
 #endif
+
+#define k32ARGBPixelFormat 32
+#define k24RGBPixelFormat  24
 
 resource 'cdci' (256) {
 	"Ut Video Codec Suite",				// Name
@@ -50,6 +53,8 @@ resource 'dlle' (257) {
 #define SUBTYPE_STR  "ULRA"
 #define SUBTYPE_RID  256
 #define SUBTYPE_INFO "RGBA"
+#define SUBTYPE_ENC  { k32ARGBPixelFormat }
+#define SUBTYPE_DEC  { k32ARGBPixelFormat }
 #include "utv_qt.in.r"
 
 #define SUBTYPE      ULRG
@@ -57,6 +62,8 @@ resource 'dlle' (257) {
 #define SUBTYPE_STR  "ULRG"
 #define SUBTYPE_RID  257
 #define SUBTYPE_INFO "RGB"
+#define SUBTYPE_ENC  { k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { k32ARGBPixelFormat, k24RGBPixelFormat }
 #include "utv_qt.in.r"
 
 #define SUBTYPE      ULY0
@@ -64,6 +71,8 @@ resource 'dlle' (257) {
 #define SUBTYPE_STR  "ULY0"
 #define SUBTYPE_RID  258
 #define SUBTYPE_INFO "YUV420 BT.601"
+#define SUBTYPE_ENC  { 'YV12', 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { 'YV12', 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
 #include "utv_qt.in.r"
 
 #define SUBTYPE      ULY2
@@ -71,6 +80,8 @@ resource 'dlle' (257) {
 #define SUBTYPE_STR  "ULY2"
 #define SUBTYPE_RID  259
 #define SUBTYPE_INFO "YUV422 BT.601"
+#define SUBTYPE_ENC  { 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
 #include "utv_qt.in.r"
 
 #define SUBTYPE      ULH0
@@ -78,6 +89,8 @@ resource 'dlle' (257) {
 #define SUBTYPE_STR  "ULH0"
 #define SUBTYPE_RID  260
 #define SUBTYPE_INFO "YUV420 BT.709"
+#define SUBTYPE_ENC  { 'YV12', 'HDYC', 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { 'YV12', 'HDYC', 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
 #include "utv_qt.in.r"
 
 #define SUBTYPE      ULH2
@@ -85,4 +98,15 @@ resource 'dlle' (257) {
 #define SUBTYPE_STR  "ULH2"
 #define SUBTYPE_RID  261
 #define SUBTYPE_INFO "YUV422 BT.709"
+#define SUBTYPE_ENC  { 'HDYC', 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { 'HDYC', 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
+#include "utv_qt.in.r"
+
+#define SUBTYPE      UQY2
+#define SUBTYPE_VAL  'UQY2'
+#define SUBTYPE_STR  "UQY2"
+#define SUBTYPE_RID  262
+#define SUBTYPE_INFO "Pro YUV422 10bit"
+#define SUBTYPE_ENC  { 'v210' }
+#define SUBTYPE_DEC  { 'v210' }
 #include "utv_qt.in.r"

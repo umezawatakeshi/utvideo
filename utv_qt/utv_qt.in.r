@@ -31,7 +31,19 @@ resource 'thng' (SUBTYPE_RID) {
 		'dlle',
 		256,
 		platformTarget,
-	};
+	},
+	'thnr', SUBTYPE_RID;
+};
+
+resource 'cpix' (SUBTYPE_RID) {
+	SUBTYPE_DEC
+};
+
+resource 'thnr' (SUBTYPE_RID) {
+	{
+		'cpix', 1, 0,
+		'cpix', SUBTYPE_RID, 0,
+	}
 };
 
 resource 'stri' (SUBTYPE_RID + 256) {
@@ -58,9 +70,20 @@ resource 'thng' (SUBTYPE_RID + 256) {
 		'dlle',
 		257,
 		platformTarget,
-	};
+	},
+	'thnr', SUBTYPE_RID + 256;
 };
 
+resource 'cpix' (SUBTYPE_RID + 256) {
+	SUBTYPE_ENC
+};
+
+resource 'thnr' (SUBTYPE_RID + 256) {
+	{
+		'cpix', 1, 0,
+		'cpix', SUBTYPE_RID + 256, 0,
+	}
+};
 
 #undef SUBTYPE_FMTN
 
@@ -68,3 +91,5 @@ resource 'thng' (SUBTYPE_RID + 256) {
 #undef SUBTYPE_VAL
 #undef SUBTYPE_RID
 #undef SUBTYPE_INFO
+#undef SUBTYPE_ENC
+#undef SUBTYPE_DEC
