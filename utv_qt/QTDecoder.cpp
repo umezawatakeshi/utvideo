@@ -32,7 +32,7 @@ extern "C" pascal ComponentResult QTDecoderComponentDispatch(ComponentParameters
 
 pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 {
-	OSErr err;
+	ComponentResult err;
 
 	glob = (CQTDecoder *)NewPtrClear(sizeof(CQTDecoder));
 	if (glob == NULL)

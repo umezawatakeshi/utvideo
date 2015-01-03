@@ -66,7 +66,7 @@ extern "C" pascal ComponentResult QTEncoderComponentDispatchStub(ComponentParame
 
 pascal ComponentResult QTEncoderOpen(CQTEncoder *glob, ComponentInstance self)
 {
-	OSErr err;
+	ComponentResult err;
 	
 	glob = (CQTEncoder *)NewPtrClear(sizeof(CQTEncoder));
 	if (glob == NULL)
