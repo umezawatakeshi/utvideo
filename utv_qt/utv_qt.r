@@ -80,8 +80,8 @@ resource 'dlle' (257) {
 #define SUBTYPE_STR  "ULY2"
 #define SUBTYPE_RID  259
 #define SUBTYPE_INFO "YUV422 BT.601"
-#define SUBTYPE_ENC  { 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
-#define SUBTYPE_DEC  { 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_ENC  { 'yuvs', '2vuy', k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { 'yuvs', '2vuy', k32ARGBPixelFormat, k24RGBPixelFormat }
 #include "utv_qt.in.r"
 
 #define SUBTYPE      ULH0
@@ -98,8 +98,8 @@ resource 'dlle' (257) {
 #define SUBTYPE_STR  "ULH2"
 #define SUBTYPE_RID  261
 #define SUBTYPE_INFO "YUV422 BT.709"
-#define SUBTYPE_ENC  { 'HDYC', 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
-#define SUBTYPE_DEC  { 'HDYC', 'YUY2', 'YUYV', 'YUNV', 'UYVY', 'UYNV', k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_ENC  { 'HDYC', 'yuvs', '2vuy', k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { 'HDYC', 'yuvs', '2vuy', k32ARGBPixelFormat, k24RGBPixelFormat }
 #include "utv_qt.in.r"
 
 #define SUBTYPE      UQY2

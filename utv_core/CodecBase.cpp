@@ -185,8 +185,10 @@ int CCodecBase::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 		case UTVF_YUY2:
 		case UTVF_YUYV:
 		case UTVF_YUNV:
+		case UTVF_yuvs:
 		case UTVF_UYVY:
 		case UTVF_UYNV:
+		case UTVF_2vuy:
 		case UTVF_HDYC:
 			m_cbRawNetWidth = width * 2;
 			break;

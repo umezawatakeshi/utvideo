@@ -134,24 +134,28 @@ template void cpp_ConvertARGBToULRA<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *
 //
 
 template<class T>
-void cpp_ConvertYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd)
+void cpp_ConvertYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
-	const uint8_t *p;
+	const uint8_t *pStrideBegin, *p;
 	uint8_t *y = pYBegin;
 	uint8_t *u = pUBegin;
 	uint8_t *v = pVBegin;
 
-	for (p = pSrcBegin; p < pSrcEnd; p += 4)
+	for (pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += scbStride)
 	{
-		*y++ = *(p+T::Y0);
-		*y++ = *(p+T::Y1);
-		*u++ = *(p+T::U);
-		*v++ = *(p+T::V);
+		const uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (p = pStrideBegin; p < pStrideEnd; p += 4)
+		{
+			*y++ = *(p+T::Y0);
+			*y++ = *(p+T::Y1);
+			*u++ = *(p+T::U);
+			*v++ = *(p+T::V);
+		}
 	}
 }
 
-template void cpp_ConvertYUV422ToULY2<class CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
-template void cpp_ConvertYUV422ToULY2<class CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+template void cpp_ConvertYUV422ToULY2<class CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertYUV422ToULY2<class CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 
 //
 
@@ -213,24 +217,28 @@ template void cpp_ConvertULRAToARGB<CARGBColorOrder>(uint8_t *pDstBegin, uint8_t
 //
 
 template<class T>
-void cpp_ConvertULY2ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin)
+void cpp_ConvertULY2ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
 {
-	uint8_t *p;
+	uint8_t *pStrideBegin, *p;
 	const uint8_t *y = pYBegin;
 	const uint8_t *u = pUBegin;
 	const uint8_t *v = pVBegin;
 
-	for (p = pDstBegin; p < pDstEnd; p += 4)
+	for (pStrideBegin = pDstBegin; pStrideBegin != pDstEnd; pStrideBegin += scbStride)
 	{
-		*(p+T::Y0) = *y++;
-		*(p+T::Y1) = *y++;
-		*(p+T::U)  = *u++;
-		*(p+T::V)  = *v++;
+		uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (p = pStrideBegin; p < pStrideEnd; p += 4)
+		{
+			*(p+T::Y0) = *y++;
+			*(p+T::Y1) = *y++;
+			*(p+T::U)  = *u++;
+			*(p+T::V)  = *v++;
+		}
 	}
 }
 
-template void cpp_ConvertULY2ToYUV422<CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin);
-template void cpp_ConvertULY2ToYUV422<CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin);
+template void cpp_ConvertULY2ToYUV422<CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToYUV422<CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 
 //
 

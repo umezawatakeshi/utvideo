@@ -10,10 +10,8 @@
 
 template<>
 const utvf_t CULYUV422Codec<CBT601Coefficient>::m_utvfEncoderInput[] = {
-#ifndef __APPLE__
-	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
-	UTVF_UYVY, UTVF_UYNV,
-#endif
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
+	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
 	UTVF_NFCC_BGR_TD,
@@ -25,10 +23,8 @@ const utvf_t CULYUV422Codec<CBT601Coefficient>::m_utvfEncoderInput[] = {
 
 template<>
 const utvf_t CULYUV422Codec<CBT601Coefficient>::m_utvfDecoderOutput[] = {
-#ifndef __APPLE__
-	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
-	UTVF_UYVY, UTVF_UYNV,
-#endif
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
+	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
 	UTVF_NFCC_BGR_TD,
@@ -40,11 +36,9 @@ const utvf_t CULYUV422Codec<CBT601Coefficient>::m_utvfDecoderOutput[] = {
 
 template<>
 const utvf_t CULYUV422Codec<CBT709Coefficient>::m_utvfEncoderInput[] = {
-#ifndef __APPLE__
 	UTVF_HDYC,
-	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
-	UTVF_UYVY, UTVF_UYNV,
-#endif
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
+	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
 	UTVF_NFCC_BGR_TD,
@@ -56,11 +50,9 @@ const utvf_t CULYUV422Codec<CBT709Coefficient>::m_utvfEncoderInput[] = {
 
 template<>
 const utvf_t CULYUV422Codec<CBT709Coefficient>::m_utvfDecoderOutput[] = {
-#ifndef __APPLE__
 	UTVF_HDYC,
-	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
-	UTVF_UYVY, UTVF_UYNV,
-#endif
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
+	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
 	UTVF_NFCC_BGR_TD,
@@ -135,12 +127,14 @@ void CULYUV422Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		ConvertYUYVToULY2(y, u, v, pSrcBegin, pSrcEnd);
+	case UTVF_yuvs:
+		ConvertYUYVToULY2(y, u, v, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
+	case UTVF_2vuy:
 	case UTVF_HDYC:
-		ConvertUYVYToULY2(y, u, v, pSrcBegin, pSrcEnd);
+		ConvertUYVYToULY2(y, u, v, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGR_BU:
 		ConvertBGRToULY2(C)(y, u, v, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
@@ -180,12 +174,14 @@ void CULYUV422Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		ConvertULY2ToYUYV(pDstBegin, pDstEnd, y, u, v);
+	case UTVF_yuvs:
+		ConvertULY2ToYUYV(pDstBegin, pDstEnd, y, u, v, m_cbRawNetWidth, m_cbRawGrossWidth);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
+	case UTVF_2vuy:
 	case UTVF_HDYC:
-		ConvertULY2ToUYVY(pDstBegin, pDstEnd, y, u, v);
+		ConvertULY2ToUYVY(pDstBegin, pDstEnd, y, u, v, m_cbRawNetWidth, m_cbRawGrossWidth);
 		break;
 	case UTVF_NFCC_BGR_BU:
 		ConvertULY2ToBGR(C)(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, y, u, v, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
@@ -222,16 +218,18 @@ bool CULYUV422Codec<C>::DecodeDirect(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
-		HuffmanDecodeAndAccumStep2(pDstBegin+0, pDstEnd+0, m_pDecodeCode[0][nBandIndex], &m_hdt[0], pDstEnd - pDstBegin, pDstEnd - pDstBegin);
-		HuffmanDecodeAndAccumStep4(pDstBegin+1, pDstEnd+1, m_pDecodeCode[1][nBandIndex], &m_hdt[1], pDstEnd - pDstBegin, pDstEnd - pDstBegin);
-		HuffmanDecodeAndAccumStep4(pDstBegin+3, pDstEnd+3, m_pDecodeCode[2][nBandIndex], &m_hdt[2], pDstEnd - pDstBegin, pDstEnd - pDstBegin);
+	case UTVF_yuvs:
+		HuffmanDecodeAndAccumStep2(pDstBegin+0, pDstEnd+0, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_cbRawNetWidth, m_cbRawGrossWidth);
+		HuffmanDecodeAndAccumStep4(pDstBegin+1, pDstEnd+1, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_cbRawNetWidth, m_cbRawGrossWidth);
+		HuffmanDecodeAndAccumStep4(pDstBegin+3, pDstEnd+3, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_cbRawNetWidth, m_cbRawGrossWidth);
 		return true;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
+	case UTVF_2vuy:
 	case UTVF_HDYC:
-		HuffmanDecodeAndAccumStep2(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], pDstEnd - pDstBegin, pDstEnd - pDstBegin);
-		HuffmanDecodeAndAccumStep4(pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], pDstEnd - pDstBegin, pDstEnd - pDstBegin);
-		HuffmanDecodeAndAccumStep4(pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], pDstEnd - pDstBegin, pDstEnd - pDstBegin);
+		HuffmanDecodeAndAccumStep2(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_cbRawNetWidth, m_cbRawGrossWidth);
+		HuffmanDecodeAndAccumStep4(pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_cbRawNetWidth, m_cbRawGrossWidth);
+		HuffmanDecodeAndAccumStep4(pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_cbRawNetWidth, m_cbRawGrossWidth);
 		return true;
 	}
 

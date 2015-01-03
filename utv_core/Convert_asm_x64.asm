@@ -628,7 +628,7 @@ planar2uyvypshufb16	dq	030d0209010c0008h
 
 global %$procname
 %$procname:
-	SIMPLE_PROLOGUE 0, pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd
+	SIMPLE_PROLOGUE 0, pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride
 
 %if %$yuyv
 	movdqa		xmm7, [yuyv2planarpshufb16]
@@ -640,10 +640,14 @@ global %$procname
 	mov			rbx, [rsp + %$pUBegin]
 	mov			rdx, [rsp + %$pVBegin]
 	mov			r9,  [rsp + %$pSrcEnd]
+	mov			r10, [rsp + %$cbWidth]
+	mov			r11, [rsp + %$scbStride]
+	sub			r11, r10
+	sub			r10, 64 - 4
 	xor			rcx, rcx
 
-	mov			r8, r9
-	sub			r8, 64 - 4
+.label1:
+	lea			r8, [rsi+r10]
 .label0:
 	lddqu		xmm0, [rsi   ]		; xmm0 = V06 Y07 U06 Y06 V04 Y05 U04 Y04 V02 Y03 U02 Y02 V00 Y01 U00 Y00 (yuyv)
 	lddqu		xmm1, [rsi+16]		; xmm1 = V0e Y0f U0e Y0e V0c Y0d U0c Y0c V0a Y0b U0a Y0a V08 Y09 U08 Y08
@@ -699,6 +703,9 @@ global %$procname
 	jmp			.label3
 
 .label2:
+	add			rsi, r11
+	cmp			rsi, r9
+	jne			.label1
 
 	SIMPLE_EPILOGUE
 %pop
@@ -957,7 +964,7 @@ CONVERT_ULRGA_TO_XRGB	ssse3_ConvertULRAToARGB, 0, 1
 
 global %$procname
 %$procname:
-	SIMPLE_PROLOGUE 0, pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin
+	SIMPLE_PROLOGUE 0, pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride
 
 %if %$yuyv
 	movdqa		xmm7, [planar2yuyvpshufb16]
@@ -969,10 +976,14 @@ global %$procname
 	mov			rbx, [rsp + %$pUBegin]
 	mov			rdx, [rsp + %$pVBegin]
 	mov			r9,  [rsp + %$pDstEnd]
+	mov			r10, [rsp + %$cbWidth]
+	mov			r11, [rsp + %$scbStride]
+	sub			r11, r10
+	sub			r10, 64 - 4
 	xor			rcx, rcx
 
-	mov			r8, r9
-	sub			r8, 64 - 4
+.label1:
+	lea			r8, [rdi+r10]
 .label0:
 	lddqu		xmm2, [rbx+rcx]			; xmm2 = U1e U1c U1a U18 U16 U14 U12 U10 U0e U0c U0a U08 U06 U04 U02 U00
 	lddqu		xmm3, [rdx+rcx]			; xmm3 = V1e V1c V1a V18 V16 V14 V12 V10 V0e V0c V0a V08 V06 V04 V02 V00
@@ -1028,6 +1039,9 @@ global %$procname
 	jmp			.label3
 
 .label2:
+	add			rdi, r11
+	cmp			rdi, r9
+	jne			.label1
 
 	SIMPLE_EPILOGUE
 %pop
