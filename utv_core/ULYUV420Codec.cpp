@@ -10,11 +10,9 @@
 
 template<>
 const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfEncoderInput[] = {
-#ifndef __APPLE__
 	UTVF_YV12,
-	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
-	UTVF_UYVY, UTVF_UYNV,
-#endif
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
+	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
 	UTVF_NFCC_BGR_TD,
@@ -26,11 +24,9 @@ const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfEncoderInput[] = {
 
 template<>
 const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfDecoderOutput[] = {
-#ifndef __APPLE__
 	UTVF_YV12,
-	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
-	UTVF_UYVY, UTVF_UYNV,
-#endif
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
+	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
 	UTVF_NFCC_BGR_TD,
@@ -42,12 +38,10 @@ const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfDecoderOutput[] = {
 
 template<>
 const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfEncoderInput[] = {
-#ifndef __APPLE__
 	UTVF_YV12,
 	UTVF_HDYC,
-	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
-	UTVF_UYVY, UTVF_UYNV,
-#endif
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
+	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
 	UTVF_NFCC_BGR_TD,
@@ -59,12 +53,10 @@ const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfEncoderInput[] = {
 
 template<>
 const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfDecoderOutput[] = {
-#ifndef __APPLE__
 	UTVF_YV12,
 	UTVF_HDYC,
-	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV,
-	UTVF_UYVY, UTVF_UYNV,
-#endif
+	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
+	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
 	UTVF_NFCC_BGR_BU,
 	UTVF_NFCC_BGRX_BU,
 	UTVF_NFCC_BGR_TD,
@@ -221,10 +213,12 @@ void CULYUV420Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
+	case UTVF_yuvs:
 		ConvertYUV422ToULY0<CYUYVColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
+	case UTVF_2vuy:
 	case UTVF_HDYC:
 		ConvertYUV422ToULY0<CUYVYColorOrder>(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
@@ -367,10 +361,12 @@ void CULYUV420Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
+	case UTVF_yuvs:
 		ConvertULY0ToYUV422<CYUYVColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
 	case UTVF_UYVY:
 	case UTVF_UYNV:
+	case UTVF_2vuy:
 	case UTVF_HDYC:
 		ConvertULY0ToYUV422<CUYVYColorOrder>(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlanePredictStride[0], m_bInterlace);
 		break;
