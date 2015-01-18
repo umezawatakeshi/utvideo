@@ -24,11 +24,15 @@ InfoAfterFile=info.en.rtf
 Name: "en"; MessagesFile: "compiler:Default.isl";
 Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"; InfoBeforeFile: "before.ja.rtf"; InfoAfterFile: "info.ja.rtf"
 
-[Types]
+[CustomMessages]
+MainFilesComponents=Main Files
+ja.MainFilesComponents=メインファイル
+QuickTimeComponents=QuickTime Components
+ja.QuickTimeComponents=QuickTimeコンポーネント
 
 [Components]
-Name: "main"; Description: "Main Files";           Types: full compact custom; Flags: fixed;
-Name: "qt";   Description: "QuickTime Components"; Types: full;
+Name: "main"; Description: "{cm:MainFilesComponents}"; Types: full compact custom; Flags: fixed;
+Name: "qt";   Description: "{cm:QuickTimeComponents}"; Types: full;
 
 [Files]
 Source: "..\Release\utv_core.dll";     DestDir: "{sys}"; Flags: ignoreversion 32bit;
