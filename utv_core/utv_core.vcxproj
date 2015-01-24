@@ -89,6 +89,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
+      <ModuleDefinitionFile>utv_core.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
       <Command>copy $(TargetPath) C:\WINDOWS\SysWOW64\</Command>
@@ -105,6 +106,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
+      <ModuleDefinitionFile>utv_core.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
       <Command>copy $(TargetPath) C:\WINDOWS\SysNative\</Command>
@@ -126,6 +128,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
+      <ModuleDefinitionFile>utv_core.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
       <Command>copy $(TargetPath) C:\WINDOWS\SysWOW64\</Command>
@@ -147,6 +150,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
+      <ModuleDefinitionFile>utv_core.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
       <Command>copy $(TargetPath) C:\WINDOWS\SysNative\</Command>
@@ -252,6 +256,7 @@
       <Outputs Condition="'$(Platform)'=='Win32'">$(IntDir)%(Filename).obj</Outputs>
       <Message Condition="'$(Platform)'=='Win32'">%(Identity)</Message>
     </CustomBuild>
+    <None Include="utv_core.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

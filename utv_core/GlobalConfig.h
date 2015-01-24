@@ -4,5 +4,5 @@
 #pragma once
 
 #ifdef _WIN32
-__declspec(dllexport) INT_PTR GlobalConfigDialog(HWND hwnd);
+void CALLBACK GlobalConfigDialog(HWND hWnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow);
 #endif

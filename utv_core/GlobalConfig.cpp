@@ -14,9 +14,9 @@ static INT_PTR CALLBACK GlobalConfigDialogProc(HWND hWnd, UINT uMsg, WPARAM wPar
 static void OnInitDialog(HWND hWnd);
 static void OnOK(HWND hWnd);
 
-__declspec(dllexport) INT_PTR GlobalConfigDialog(HWND hWnd)
+void CALLBACK GlobalConfigDialog(HWND hWnd, HINSTANCE hinst, LPSTR lpszCmdLine, int nCmdShow)
 {
-	return DialogBox(hModule, MAKEINTRESOURCE(IDD_GLOBAL_CONFIG), hWnd, GlobalConfigDialogProc);
+	DialogBox(hModule, MAKEINTRESOURCE(IDD_GLOBAL_CONFIG), hWnd, GlobalConfigDialogProc);
 }
 
 INT_PTR CALLBACK GlobalConfigDialogProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
