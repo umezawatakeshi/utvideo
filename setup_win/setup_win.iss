@@ -44,7 +44,6 @@ Source: "..\x64\Release\utv_core.dll"; DestDir: "{sys}"; Flags: ignoreversion 64
 Source: "..\x64\Release\utv_vcm.dll";  DestDir: "{sys}"; Flags: ignoreversion 64bit;           Check: Is64BitInstallMode
 Source: "..\x64\Release\utv_dmo.dll";  DestDir: "{sys}"; Flags: ignoreversion 64bit regserver; Check: Is64BitInstallMode
 Source: "..\x64\Release\utv_mft.dll";  DestDir: "{sys}"; Flags: ignoreversion 64bit regserver; Check: Is64BitInstallMode; MinVersion: 0, 6.0
-Source: "..\Release\utv_cfg.exe";      DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.rtf";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.txt";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.ja.sjis.txt";        DestDir: "{app}"; Flags: ignoreversion;
@@ -70,7 +69,7 @@ Root: HKLM64; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; 
 Root: HKLM64; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.UQY2"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
 
 [Icons]
-Name: "{group}\Global Configuration";             Filename: "{app}\utv_cfg.exe"
+Name: "{group}\Global Configuration";             Filename: "{syswow64}\rundll32.exe"; Parameters: "{syswow64}\utv_core.dll,GlobalConfigDialog"
 Name: "{group}\License Agreement (English, RTF)"; Filename: "{app}\gplv2.rtf"
 Name: "{group}\License Agreement (English)";      Filename: "{app}\gplv2.txt"
 Name: "{group}\License Agreement (Japanese)";     Filename: "{app}\gplv2.ja.sjis.txt"
