@@ -69,7 +69,7 @@ Root: HKLM64; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; 
 Root: HKLM64; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.UQY2"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
 
 [Icons]
-Name: "{group}\Global Configuration";             Filename: "{syswow64}\rundll32.exe"; Parameters: "{syswow64}\utv_core.dll,GlobalConfigDialog"
+Name: "{group}\Global Configuration";             Filename: "{sys}\rundll32.exe"; Parameters: "{sys}\utv_core.dll,GlobalConfigDialog"
 Name: "{group}\License Agreement (English, RTF)"; Filename: "{app}\gplv2.rtf"
 Name: "{group}\License Agreement (English)";      Filename: "{app}\gplv2.txt"
 Name: "{group}\License Agreement (Japanese)";     Filename: "{app}\gplv2.ja.sjis.txt"
