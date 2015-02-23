@@ -72,6 +72,6 @@ static inline void xgetbv(xgetbv_result *result, uint32_t idx)
 #endif
 
 #ifdef _DEBUG
-	_RPT2(_CRT_WARN, "XGETBV.%-2d EAX=%08X EDX=%08X\n", result->eax, result->edx);
+	_RPT3(_CRT_WARN, "XGETBV.%-2d EAX=%08X EDX=%08X\n", idx, result->eax, result->edx);
 #endif
 }
