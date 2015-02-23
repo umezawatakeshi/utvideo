@@ -13,6 +13,7 @@
 		2564C7BB14823C7E00F1A9EB /* Predict_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B614823C7E00F1A9EB /* Predict_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
 		25817AEA175A052D00888CE2 /* ULYUV420Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25817AE6175A052D00888CE2 /* ULYUV420Codec.cpp */; };
 		25817AEB175A052D00888CE2 /* ULYUV422Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25817AE8175A052D00888CE2 /* ULYUV422Codec.cpp */; };
+		258955261A9B58B100FDE981 /* TunedFunc_x86x64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25CF5DF9172422DE0089819C /* TunedFunc_x86x64.cpp */; };
 		258DB4001411F91A0059F47E /* Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D41411F8600059F47E /* Codec.cpp */; };
 		258DB4011411F9290059F47E /* Convert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D61411F8600059F47E /* Convert.cpp */; };
 		258DB4021411F9290059F47E /* DummyCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D81411F8600059F47E /* DummyCodec.cpp */; };
@@ -320,6 +321,7 @@
 				25CCB6F618FD137F00076B45 /* UQ00Codec.cpp in Sources */,
 				25CCB6F718FD137F00076B45 /* UQY2Codec.cpp in Sources */,
 				25CCB71018FD189300076B45 /* QuickTimeFormat.cpp in Sources */,
+				258955261A9B58B100FDE981 /* TunedFunc_x86x64.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
