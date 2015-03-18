@@ -7,7 +7,7 @@
 
 #ifdef _WIN32
 
-HANDLE hLogPipe;
+HANDLE hLogPipe = INVALID_HANDLE_VALUE;
 
 int InitializeLogWriter(void)
 {
