@@ -13,7 +13,10 @@ int UninitializeLogWriter(void);
 
 extern HANDLE hLogPipe;
 
-#define IsLogWriterInitialized() (::hLogPipe != INVALID_HANDLE_VALUE)
+static inline bool IsLogWriterInitialized()
+{
+	return ::hLogPipe != INVALID_HANDLE_VALUE;
+}
 
 #ifdef _DEBUG
 
