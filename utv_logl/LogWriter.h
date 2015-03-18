@@ -11,10 +11,12 @@ int UninitializeLogWriter(void);
 
 extern HANDLE hLogPipe;
 
+#define IsLogWriterInitialized() (::hLogPipe != INVALID_HANDLE_VALUE)
+
 #define LOGPRINTF(__fmt__, ...) \
 	do \
 	{ \
-		if (::hLogPipe != INVALID_HANDLE_VALUE) \
+		if (IsLogWriterInitialized()) \
 		{ \
 			char __LOGPRINTF_local_buf__[256]; \
 			sprintf(__LOGPRINTF_local_buf__, __fmt__, __VA_ARGS__); \
