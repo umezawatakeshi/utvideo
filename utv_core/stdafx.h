@@ -96,3 +96,5 @@ inline bool IS_ALIGNED(const void *p, uintptr_t a)
 {
 	return IS_ALIGNED((uintptr_t)p, a);
 }
+
+#include <LogWriter.h>
