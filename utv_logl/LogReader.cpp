@@ -51,29 +51,33 @@ static unsigned int __stdcall PipeServerProc(void *arg)
 			if (ReadFile(hPipe, buf + cb, sizeof(buf) - cb - 1, &cbRead, NULL))
 			{
 				cb += cbRead;
-				char *eol = (char *)memchr(buf, '\n', cb);
-				if (eol != NULL)
+				for (;;)
 				{
-					*eol = '\0';
-					if (!idented)
+					char *eol = (char *)memchr(buf, '\n', cb);
+					if (eol != NULL)
 					{
-						strcpy(ident, buf);
-						idented = true;
-						fnOpenProc(id, idx, ident);
+						*eol = '\0';
+						if (!idented)
+						{
+							strcpy(ident, buf);
+							idented = true;
+							fnOpenProc(id, idx, ident);
+						}
+						else
+						{
+							fnReadProc(id, idx, ident, buf);
+						}
+						memmove(buf, eol + 1, cb - (eol + 1 - buf));
+						cb -= (eol + 1 - buf);
 					}
 					else
 					{
-						fnReadProc(id, idx, ident, buf);
-					}
-					memmove(buf, eol + 1, cb - (eol + 1 - buf));
-					cb -= (eol + 1 - buf);
-				}
-				else
-				{
-					if (cb == sizeof(buf) - 1)
-					{
-						if (idented)
-							fnCloseProc(id, idx, ident);
+						if (cb == sizeof(buf) - 1)
+						{
+							if (idented)
+								fnCloseProc(id, idx, ident);
+							goto disconnect;
+						}
 						break;
 					}
 				}
@@ -82,10 +86,11 @@ static unsigned int __stdcall PipeServerProc(void *arg)
 			{
 				if (idented)
 					fnCloseProc(id, idx, ident);
-				break;
+				goto disconnect;
 			}
 		}
 
+	disconnect:
 		DisconnectNamedPipe(hPipe);
 	}
 }
