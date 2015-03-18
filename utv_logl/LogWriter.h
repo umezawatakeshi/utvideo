@@ -20,6 +20,11 @@ static inline bool IsLogWriterInitialized()
 
 #ifdef _DEBUG
 
+static inline bool IsLogWriterInitializedOrDebugBuild()
+{
+	return true;
+}
+
 #define LOGPRINTF(__fmt__, ...) \
 	do \
 	{ \
@@ -33,7 +38,21 @@ static inline bool IsLogWriterInitialized()
 		OutputDebugString(__LOGPRINTF_local_buf__); \
 	} while (false)
 
+#define DBGPRINTF(__fmt__, ...) \
+	do \
+	{ \
+		char __LOGPRINTF_local_buf__[256]; \
+		sprintf(__LOGPRINTF_local_buf__, __fmt__, __VA_ARGS__); \
+		strcat(__LOGPRINTF_local_buf__, "\n"); \
+		OutputDebugString(__LOGPRINTF_local_buf__); \
+	} while (false)
+
 #else
+
+static inline bool IsLogWriterInitializedOrDebugBuild()
+{
+	return IsLogWriterInitialized();
+}
 
 #define LOGPRINTF(__fmt__, ...) \
 	do \
@@ -44,6 +63,11 @@ static inline bool IsLogWriterInitialized()
 			sprintf(__LOGPRINTF_local_buf__, __fmt__, __VA_ARGS__); \
 			WriteLog(__LOGPRINTF_local_buf__); \
 		} \
+	} while (false)
+
+#define DBGPRINTF(__fmt__, ...) \
+	do \
+	{ \
 	} while (false)
 
 #endif
