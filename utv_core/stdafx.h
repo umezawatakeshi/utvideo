@@ -108,6 +108,7 @@ inline bool IS_ALIGNED(const void *p, uintptr_t a)
 #else
 #error
 #endif
+#define PRIdSZT PRISZT_PREFIX "d"
 #define PRIuSZT PRISZT_PREFIX "u"
 #define PRIoSZT PRISZT_PREFIX "o"
 #define PRIxSZT PRISZT_PREFIX "x"
