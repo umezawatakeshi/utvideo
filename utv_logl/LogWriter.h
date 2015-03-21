@@ -27,24 +27,28 @@ static inline bool IsLogWriterInitializedOrDebugBuild()
 
 #define LOGPRINTF(__fmt__, ...) \
 	do \
-	{ \
-		char __LOGPRINTF_local_buf__[256]; \
-		sprintf(__LOGPRINTF_local_buf__, __fmt__, __VA_ARGS__); \
+		{ \
+		char __LOGPRINTF_local_buf1__[256]; \
+		char __LOGPRINTF_local_buf2__[256]; \
+		sprintf(__LOGPRINTF_local_buf1__, __fmt__, __VA_ARGS__); \
+		sprintf(__LOGPRINTF_local_buf2__, "<%s> %s", LOG_MODULE_NAME, __LOGPRINTF_local_buf1__); \
 		if (IsLogWriterInitialized()) \
 		{ \
-			WriteLog(__LOGPRINTF_local_buf__); \
+			WriteLog(__LOGPRINTF_local_buf2__); \
 		} \
-		strcat(__LOGPRINTF_local_buf__, "\n"); \
-		OutputDebugString(__LOGPRINTF_local_buf__); \
+		strcat(__LOGPRINTF_local_buf2__, "\n"); \
+		OutputDebugString(__LOGPRINTF_local_buf2__); \
 	} while (false)
 
 #define DBGPRINTF(__fmt__, ...) \
 	do \
 	{ \
-		char __LOGPRINTF_local_buf__[256]; \
-		sprintf(__LOGPRINTF_local_buf__, __fmt__, __VA_ARGS__); \
-		strcat(__LOGPRINTF_local_buf__, "\n"); \
-		OutputDebugString(__LOGPRINTF_local_buf__); \
+		char __LOGPRINTF_local_buf1__[256]; \
+		char __LOGPRINTF_local_buf2__[256]; \
+		sprintf(__LOGPRINTF_local_buf1__, __fmt__, __VA_ARGS__); \
+		sprintf(__LOGPRINTF_local_buf2__, "<%s> %s", LOG_MODULE_NAME, __LOGPRINTF_local_buf1__); \
+		strcat(__LOGPRINTF_local_buf2__, "\n"); \
+		OutputDebugString(__LOGPRINTF_local_buf2__); \
 	} while (false)
 
 #else
@@ -59,9 +63,11 @@ static inline bool IsLogWriterInitializedOrDebugBuild()
 	{ \
 		if (IsLogWriterInitialized()) \
 		{ \
-			char __LOGPRINTF_local_buf__[256]; \
-			sprintf(__LOGPRINTF_local_buf__, __fmt__, __VA_ARGS__); \
-			WriteLog(__LOGPRINTF_local_buf__); \
+			char __LOGPRINTF_local_buf1__[256]; \
+			char __LOGPRINTF_local_buf2__[256]; \
+			sprintf(__LOGPRINTF_local_buf1__, __fmt__, __VA_ARGS__); \
+			sprintf(__LOGPRINTF_local_buf2__, "<%s> %s", LOG_MODULE_NAME, __LOGPRINTF_local_buf1__); \
+			WriteLog(__LOGPRINTF_local_buf2__); \
 		} \
 	} while (false)
 

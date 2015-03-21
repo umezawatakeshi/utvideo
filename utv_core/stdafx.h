@@ -97,6 +97,8 @@ inline bool IS_ALIGNED(const void *p, uintptr_t a)
 	return IS_ALIGNED((uintptr_t)p, a);
 }
 
+#define LOG_MODULE_NAME "utv_core"
+
 #include <LogWriter.h>
 
 #if defined(_MSC_VER)
