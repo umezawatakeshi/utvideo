@@ -128,12 +128,14 @@
   <ItemGroup>
     <ClInclude Include="LogPath.h" />
     <ClInclude Include="LogReader.h" />
+    <ClInclude Include="LogUtil.h" />
     <ClInclude Include="LogWriter.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LogPath.cpp" />
     <ClCompile Include="LogReader.cpp" />
+    <ClCompile Include="LogUtil.cpp" />
     <ClCompile Include="LogWriter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
