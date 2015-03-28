@@ -9,8 +9,6 @@ int UninitializeLogWriter(void);
 
 #ifdef _WIN32
 
-#include <crtdbg.h>
-
 extern HANDLE hLogPipe;
 
 static inline bool IsLogWriterInitialized()
