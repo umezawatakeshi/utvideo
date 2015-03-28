@@ -27,7 +27,7 @@ static inline bool IsLogWriterInitializedOrDebugBuild()
 
 #define LOGPRINTF(__fmt__, ...) \
 	do \
-		{ \
+	{ \
 		char __LOGPRINTF_local_buf1__[256]; \
 		char __LOGPRINTF_local_buf2__[256]; \
 		sprintf(__LOGPRINTF_local_buf1__, __fmt__, __VA_ARGS__); \
