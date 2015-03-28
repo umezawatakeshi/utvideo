@@ -37,7 +37,7 @@ static inline bool IsLogWriterInitializedOrDebugBuild()
 			WriteLog(__LOGPRINTF_local_buf2__); \
 		} \
 		strcat(__LOGPRINTF_local_buf2__, "\n"); \
-		OutputDebugString(__LOGPRINTF_local_buf2__); \
+		OutputDebugStringA(__LOGPRINTF_local_buf2__); \
 	} while (false)
 
 #define DBGPRINTF(__fmt__, ...) \
@@ -48,7 +48,7 @@ static inline bool IsLogWriterInitializedOrDebugBuild()
 		sprintf(__LOGPRINTF_local_buf1__, __fmt__, __VA_ARGS__); \
 		sprintf(__LOGPRINTF_local_buf2__, "<%s> %s", LOG_MODULE_NAME, __LOGPRINTF_local_buf1__); \
 		strcat(__LOGPRINTF_local_buf2__, "\n"); \
-		OutputDebugString(__LOGPRINTF_local_buf2__); \
+		OutputDebugStringA(__LOGPRINTF_local_buf2__); \
 	} while (false)
 
 #else
