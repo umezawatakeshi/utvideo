@@ -8,6 +8,8 @@
 
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS 1
+
 // 下で指定された定義の前に対象プラットフォームを指定しなければならない場合、以下の定義を変更してください。
 // 異なるプラットフォームに対応する値に関する最新情報については、MSDN を参照してください。
 #ifndef WINVER				// Windows XP 以降のバージョンに固有の機能の使用を許可します。
@@ -43,3 +45,10 @@
 using namespace std;
 
 #include <stdint.h>
+
+#define LOG_MODULE_NAME "utv_vcm "
+
+#include <LogWriter.h>
+#include <LogUtil.h>
+
+#include <myinttypes.h>
