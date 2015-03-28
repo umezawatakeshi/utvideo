@@ -267,7 +267,7 @@ int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int 
 	return 0;
 }
 
-int CUL00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CUL00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
 	int ret;
 	EXTRADATA ed;
@@ -305,7 +305,7 @@ int CUL00Codec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int heigh
 	return 0;
 }
 
-int CUL00Codec::EncodeEnd(void)
+int CUL00Codec::InternalEncodeEnd(void)
 {
 	delete m_pCurFrame;
 	delete m_pMedianPredicted;
@@ -352,7 +352,7 @@ size_t CUL00Codec::EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigne
 	return ROUNDUP(width, 4) * ROUNDUP(height, 2) * GetRealBitCount() / 8 + 4096; // +4096 ÇÕÇ«ÇÒÇ‘ÇËä®íËÅB
 }
 
-int CUL00Codec::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CUL00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
 	if (width % GetMacroPixelWidth() != 0 || height % GetMacroPixelHeight() != 0)
 		return -1;
@@ -464,7 +464,7 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 	return m_cbRawSize;
 }
 
-int CUL00Codec::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CUL00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
 	int ret;
 
@@ -496,7 +496,7 @@ int CUL00Codec::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int heig
 	return 0;
 }
 
-int CUL00Codec::DecodeEnd(void)
+int CUL00Codec::InternalDecodeEnd(void)
 {
 	delete m_pRestoredFrame;
 	delete m_pDecodedFrame;
@@ -517,7 +517,7 @@ size_t CUL00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsign
 	return m_cbRawSize;
 }
 
-int CUL00Codec::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CUL00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
 	const EXTRADATA *p = (const EXTRADATA *)pExtraData;
 
