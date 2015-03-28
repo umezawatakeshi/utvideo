@@ -46,7 +46,7 @@ static inline void cpuid(cpuid_result *result, uint32_t leaf, uint32_t subleaf)
 		sprintf(buf, "7.%d", subleaf);
 	else
 		sprintf(buf, "%d", leaf);
-	_RPT5(_CRT_WARN, "CPUID.%-3s EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", buf,
+	DBGPRINTF("CPUID.%-3s EAX=%08X EBX=%08X ECX=%08X EDX=%08X\n", buf,
 		result->eax, result->ebx, result->ecx, result->edx);
 #endif
 }
@@ -71,7 +71,5 @@ static inline void xgetbv(xgetbv_result *result, uint32_t idx)
 #error
 #endif
 
-#ifdef _DEBUG
-	_RPT3(_CRT_WARN, "XGETBV.%-2d EAX=%08X EDX=%08X\n", idx, result->eax, result->edx);
-#endif
+	DBGPRINTF("XGETBV.%-2d EAX=%08X EDX=%08X\n", idx, result->eax, result->edx);
 }

@@ -100,6 +100,7 @@ inline bool IS_ALIGNED(const void *p, uintptr_t a)
 #define LOG_MODULE_NAME "utv_core"
 
 #include <LogWriter.h>
+#include <LogUtil.h>
 
 #if defined(_MSC_VER)
 #define PRISZT_PREFIX "I"

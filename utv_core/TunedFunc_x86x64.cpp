@@ -10,6 +10,7 @@
 #include "ColorOrder.h"
 #include "Coefficient.h"
 #include "CPUID.h"
+#include "Log.h"
 
 #define FEATURE0_SSE2     (1 <<  0)
 #define FEATURE0_SSE3     (1 <<  1)
@@ -265,6 +266,8 @@ class CTunedFuncInitializer
 public:
 	CTunedFuncInitializer()
 	{
+		CLogInitializer::Initialize();
+
 		cpuid_result cpuid_0   = { 0, 0, 0, 0 };
 		cpuid_result cpuid_1   = { 0, 0, 0, 0 };
 		cpuid_result cpuid_7_0 = { 0, 0, 0, 0 };
@@ -287,7 +290,7 @@ public:
 		*(uint32_t *)(vendor+4) = cpuid_0.edx;
 		*(uint32_t *)(vendor+8) = cpuid_0.ecx;
 		vendor[12] = '\0';
-		_RPT1(_CRT_WARN, "CPUID     vendor=\"%s\"\n", vendor);
+		LOGPRINTF("CPUID     vendor=\"%s\"", vendor);
 
 		cpuid(&cpuid_ex0, 0x80000000, 0);
 
@@ -314,7 +317,7 @@ public:
 			*(uint32_t *)(procbrand+40) = cpuid_ex4.ecx;
 			*(uint32_t *)(procbrand+44) = cpuid_ex4.edx;
 			procbrand[48] = '\0';
-			_RPT1(_CRT_WARN, "CPUID     procbrand=\"%s\"\n", procbrand);
+			LOGPRINTF("CPUID     procbrand=\"%s\"", procbrand);
 		}
 
 		if (cpuid_0.eax >= 1)
@@ -330,7 +333,7 @@ public:
 
 		family = ((cpuid_1.eax >> 20) & 0xff) + ((cpuid_1.eax >> 8) & 0xf);
 		model  = ((cpuid_1.eax >> 12) & 0xf0) | ((cpuid_1.eax >> 4) & 0xf);
-		_RPT2(_CRT_WARN, "CPUID     family=%02XH model=%02XH\n", family, model);
+		LOGPRINTF("CPUID     family=%02XH model=%02XH", family, model);
 		for (int i = 0; i < _countof(mafm); i++)
 		{
 			for (int j = 0; j < _countof(mafm[i].fm); j++)
@@ -346,43 +349,43 @@ public:
 		maname = "Unknown";
 		ma = MA_UNKNOWN;
 ma_found:
-		_RPT2(_CRT_WARN, "CPUID     march=\"%s\" (ID %08X)\n", maname, ma);
+		LOGPRINTF("CPUID     march=\"%s\" (ID %08X)", maname, ma);
 
 
 		if (cpuid_7_0.ebx & (1 << 3))
 		{
-			_RPT0(_CRT_WARN, "supports BMI1\n");
+			LOGPRINTF("supports BMI1");
 			dwSupportedFeatures[1] |= FEATURE1_BMI1;
 		}
 
 		if (cpuid_7_0.ebx & (1 << 8))
 		{
-			_RPT0(_CRT_WARN, "supports BMI2\n");
+			LOGPRINTF("supports BMI2");
 			dwSupportedFeatures[1] |= FEATURE1_BMI2;
 		}
 
 		if (cpuid_ex1.ecx & (1 << 5))
 		{
-			_RPT0(_CRT_WARN, "supports LZCNT\n");
+			LOGPRINTF("supports LZCNT");
 			dwSupportedFeatures[1] |= FEATURE1_LZCNT;
 		}
 
 		if (cpuid_1.ecx & (1 << 23))
 		{
-			_RPT0(_CRT_WARN, "supports POPCNT\n");
+			LOGPRINTF("supports POPCNT");
 			dwSupportedFeatures[1] |= FEATURE1_POPCNT;
 		}
 
 		if (cpuid_1.ecx & (1 << 22))
 		{
-			_RPT0(_CRT_WARN, "supports MOVBE\n");
+			LOGPRINTF("supports MOVBE");
 			dwSupportedFeatures[1] |= FEATURE1_MOVBE;
 		}
 
 
 		if (cpuid_1.ecx & (1 << 27))
 		{
-			_RPT0(_CRT_WARN, "supports OSXSAVE\n");
+			LOGPRINTF("supports OSXSAVE");
 
 			xgetbv_result xgetbv_0 = { 0, 0 };
 
@@ -390,60 +393,59 @@ ma_found:
 
 			if ((xgetbv_0.eax & 6) == 6)
 			{
-				_RPT0(_CRT_WARN, "supports XMM/YMM state by OS\n");
+				LOGPRINTF("supports XMM/YMM state by OS");
 
 				if (cpuid_7_0.ebx & (1 << 5))
 				{
-					_RPT0(_CRT_WARN, "supports AVX2\n");
+					LOGPRINTF("supports AVX2");
 					dwSupportedFeatures[0] |= FEATURE0_AVX2;
 				}
 
 				if (cpuid_1.ecx & (1 << 28))
 				{
-					_RPT0(_CRT_WARN, "supports AVX1\n");
+					LOGPRINTF("supports AVX1");
 					dwSupportedFeatures[0] |= FEATURE0_AVX1;
 				}
 			}
 			else
 			{
-				_RPT0(_CRT_WARN, "does not support XMM/YMM state by OS\n");
+				LOGPRINTF("does not support XMM/YMM state by OS");
 			}
 		}
 		else
 		{
-			_RPT0(_CRT_WARN, "does not support OSXSAVE\n");
+			LOGPRINTF("does not support OSXSAVE");
 		}
 
 		if (cpuid_1.ecx & (1 << 20))
 		{
-			_RPT0(_CRT_WARN, "supports SSE4.2\n");
+			LOGPRINTF("supports SSE4.2");
 			dwSupportedFeatures[0] |= FEATURE0_SSE42;
 		}
 
 		if (cpuid_1.ecx & (1 << 19))
 		{
-			_RPT0(_CRT_WARN, "supports SSE4.1\n");
+			LOGPRINTF("supports SSE4.1");
 			dwSupportedFeatures[0] |= FEATURE0_SSE41;
 		}
 
 		if (cpuid_1.ecx & (1 << 9))
 		{
-			_RPT0(_CRT_WARN, "supports SSSE3\n");
+			LOGPRINTF("supports SSSE3");
 			dwSupportedFeatures[0] |= FEATURE0_SSSE3;
 		}
 
 		if (cpuid_1.ecx & (1 << 0))
 		{
-			_RPT0(_CRT_WARN, "supports SSE3\n");
+			LOGPRINTF("supports SSE3");
 			dwSupportedFeatures[0] |= FEATURE0_SSE3;
 		}
 
 		if (cpuid_1.edx & (1 << 26))
 		{
-			_RPT0(_CRT_WARN, "supports SSE2\n");
+			LOGPRINTF("supports SSE2");
 			dwSupportedFeatures[0] |= FEATURE0_SSE2;
 		}
-
 
 		ResolveTunedFunc(&tfnRoot, dwSupportedFeatures);
 	}
