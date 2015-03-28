@@ -7,6 +7,8 @@
 
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS 1
+
 #ifndef STRICT
 #define STRICT
 #endif
@@ -45,3 +47,9 @@
 using namespace ATL;
 
 #include <stdint.h>
+#include <myinttypes.h>
+
+#define LOG_MODULE_NAME "utv_mft "
+
+#include <LogWriter.h>
+#include <LogUtil.h>

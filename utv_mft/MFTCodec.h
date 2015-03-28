@@ -76,6 +76,13 @@ public:
 	CMFTCodec(DWORD fcc, REFCLSID clsid) :
 		m_fcc(fcc), m_clsid(clsid)
 	{
+		if (IsLogWriterInitializedOrDebugBuild())
+		{
+			OLECHAR szClsId[48];
+			StringFromGUID2(clsid, szClsId, _countof(szClsId));
+			LOGPRINTF("%" PRIp " CMFTCodec::CMFTCodec(fcc=%08X, clsid=%S)", this, fcc, szClsId);
+		}
+
 		utvf_t utvf;
 
 		VCMFormatToUtVideoFormat(&utvf, fcc, 0);
@@ -86,10 +93,14 @@ public:
 		m_pInputUserData = NULL;
 		m_pOutputUserData = NULL;
 		m_bStreamBegin = false;
+
+		LOGPRINTF("%" PRIp "  m_pCodec=%" PRIp ", TinyName=\"%s\"", this, m_pCodec, m_pCodec->GetTinyName());
 	}
 
 	virtual ~CMFTCodec()
 	{
+		LOGPRINTF("%" PRIp " CMFTCodec::~CMFTCodec()", this);
+
 		EndStream();
 
 		if (m_pInputSample != NULL)
@@ -107,6 +118,13 @@ public:
 
 	static HRESULT WINAPI UpdateRegistry(DWORD fcc, REFCLSID clsid, BOOL bRegister)
 	{
+		if (IsLogWriterInitializedOrDebugBuild())
+		{
+			OLECHAR szClsId[48];
+			StringFromGUID2(clsid, szClsId, _countof(szClsId));
+			LOGPRINTF("CMFTCodec::UpdateRegistry(fcc=%08X, clsid=%S, bRegister=%s)", fcc, szClsId, bRegister ? "true" : "false");
+		}
+
 		HRESULT hr;
 		OLECHAR szFcc[5];
 		OLECHAR szClsID[64];
@@ -249,7 +267,7 @@ public:
 
 	HRESULT STDMETHODCALLTYPE GetInputAvailableType(DWORD dwInputStreamID, DWORD dwTypeIndex, IMFMediaType **ppType)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::GetInputAvailableType()\n");
+		LOGPRINTF("%" PRIp " CMFTCodec::GetInputAvailableType(dwInputStreamID=%d, dwTypeIndex=%d, ppType=%" PRIp ")", this, dwInputStreamID, dwTypeIndex, ppType);
 
 		LockIt lck(static_cast<T *>(this));
 
@@ -286,7 +304,7 @@ public:
 
 	HRESULT STDMETHODCALLTYPE GetOutputAvailableType(DWORD dwOutputStreamID, DWORD dwTypeIndex, IMFMediaType **ppType)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::GetOutputAvailableType()\n");
+		LOGPRINTF("%" PRIp " CMFTCodec::GetOutputAvailableType(dwOutputStreamID=%d, dwTypeIndex=%d, ppType=%" PRIp ")", this, dwOutputStreamID, dwTypeIndex, ppType);
 
 		LockIt lck(static_cast<T *>(this));
 
@@ -342,7 +360,7 @@ public:
 
 	HRESULT STDMETHODCALLTYPE SetInputType(DWORD dwInputStreamID, IMFMediaType *pType, DWORD dwFlags)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::SetInputType()\n");
+		LOGPRINTF("%" PRIp " CMFTCodec::SetInputType(dwInputStreamID=%d, pType=%" PRIp ", dwFlags=0x%08X)", this, dwInputStreamID, pType, dwFlags);
 
 		LockIt lck(static_cast<T *>(this));
 
@@ -433,7 +451,7 @@ public:
 
 	HRESULT STDMETHODCALLTYPE SetOutputType(DWORD dwOutputStreamID, IMFMediaType *pType, DWORD dwFlags)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::SetOutputType()\n");
+		LOGPRINTF("%" PRIp " CMFTCodec::SetOutputType(dwOutputStreamID=%d, pType=%" PRIp ", dwFlags=0x%08X)", this, dwOutputStreamID, pType, dwFlags);
 
 		LockIt lck(static_cast<T *>(this));
 
@@ -527,8 +545,6 @@ public:
 
 	HRESULT STDMETHODCALLTYPE GetInputCurrentType(DWORD dwInputStreamID, IMFMediaType **ppType)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::GetInputCurrentType()\n");
-
 		LockIt lck(static_cast<T *>(this));
 
 		HRESULT hr;
@@ -554,8 +570,6 @@ public:
 
 	HRESULT STDMETHODCALLTYPE GetOutputCurrentType(DWORD dwOutputStreamID, IMFMediaType **ppType)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::GetOutputCurrentType()\n");
-
 		LockIt lck(static_cast<T *>(this));
 
 		HRESULT hr;
@@ -581,8 +595,6 @@ public:
 
 	HRESULT STDMETHODCALLTYPE GetInputStatus(DWORD dwInputStreamID, DWORD *pdwFlags)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::GetInputStatus()\n");
-
 		LockIt lck(static_cast<T *>(this));
 
 		if (dwInputStreamID != 0)
@@ -595,8 +607,6 @@ public:
 
 	HRESULT STDMETHODCALLTYPE GetOutputStatus(DWORD *pdwFlags)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::GetOutputStatus()\n");
-
 		LockIt lck(static_cast<T *>(this));
 
 		*pdwFlags = m_pInputSample == NULL ? 0 : MFT_OUTPUT_STATUS_SAMPLE_READY;
@@ -616,8 +626,6 @@ public:
 
 	HRESULT STDMETHODCALLTYPE ProcessMessage(MFT_MESSAGE_TYPE eMessage, ULONG_PTR ulParam)
 	{
-		_RPT1(_CRT_WARN, "CMFTCodec::ProcessMessage() eMessage=%08x\n", eMessage);
-
 		switch (eMessage)
 		{
 		case MFT_MESSAGE_COMMAND_FLUSH:
@@ -633,8 +641,6 @@ public:
 
 	HRESULT STDMETHODCALLTYPE ProcessInput(DWORD dwInputStreamID, IMFSample *pSample, DWORD dwFlags)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::ProcessInput()\n");
-
 		LockIt lck(static_cast<T *>(this));
 
 		BeginStream();
@@ -653,8 +659,6 @@ public:
 
 	HRESULT STDMETHODCALLTYPE ProcessOutput(DWORD dwFlags, DWORD cOutputBufferCount, MFT_OUTPUT_DATA_BUFFER *pOutputSamples, DWORD *pdwStatus)
 	{
-		_RPT0(_CRT_WARN, "CMFTCodec::ProcessOutput()\n");
-
 		LockIt lck(static_cast<T *>(this));
 
 		HRESULT hr;
@@ -699,6 +703,8 @@ public:
 
 	HRESULT BeginStream(void)
 	{
+		// ‰½ŒÌ‚©Ä¶’†‚Í BeginStream() ‚ªŒÄ‚Î‚ê‘±‚¯‚é‚Ì‚ÅƒƒO‚ðo‚¹‚È‚¢B
+
 		HRESULT hr;
 
 		if (m_bStreamBegin)
@@ -729,6 +735,8 @@ public:
 
 	HRESULT Flush(void)
 	{
+		LOGPRINTF("%" PRIp " CMFTCodec::Flush()", this);
+
 		if (m_pInputSample != NULL)
 		{
 			m_pInputSample->Release();
