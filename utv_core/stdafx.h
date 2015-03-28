@@ -65,6 +65,7 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 using namespace std;
 
 #include <stdint.h>
+#include <myinttypes.h>
 
 inline uint32_t ROUNDUP(uint32_t a, uint32_t b)
 {
@@ -101,22 +102,3 @@ inline bool IS_ALIGNED(const void *p, uintptr_t a)
 #define LOGWRITER_OWNER 1
 #include <LogWriter.h>
 #include <LogUtil.h>
-
-#if defined(_MSC_VER)
-#define PRISZT_PREFIX "I"
-#elif defined(__GNUC__)
-#define PRISZT_PREFIX "z"
-#else
-#error
-#endif
-#define PRIdSZT PRISZT_PREFIX "d"
-#define PRIuSZT PRISZT_PREFIX "u"
-#define PRIoSZT PRISZT_PREFIX "o"
-#define PRIxSZT PRISZT_PREFIX "x"
-#define PRIXSZT PRISZT_PREFIX "X"
-
-#if SIZE_MAX == 4294967295U
-#define PRIp "08" PRIXSZT
-#else
-#define PRIp "016" PRIXSZT
-#endif
