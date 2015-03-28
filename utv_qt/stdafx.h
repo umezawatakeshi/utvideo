@@ -13,10 +13,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _MSC_VER
-#include <crtdbg.h>
-#endif
-
 #ifdef _WIN32
 #include <windows.h>
 #endif

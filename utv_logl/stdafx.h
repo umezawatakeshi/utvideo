@@ -18,7 +18,6 @@
 #define WIN32_LEAN_AND_MEAN		// Windows ヘッダーから使用されていない部分を除外します。
 #include <windows.h>
 #include <sddl.h>
-#include <crtdbg.h> // XXX
 #include <process.h>
 #endif
 

@@ -51,13 +51,6 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 #ifndef _MSC_VER // XXX
 #define _countof(x) (sizeof(x) / sizeof((x)[0]))
 #define _ASSERT(x) do {} while(/*CONSTCOND*/0)
-#define _RPT(...) do {} while(/*CONSTCOND*/0)
-#define _RPT0 _RPT
-#define _RPT1 _RPT
-#define _RPT2 _RPT
-#define _RPT3 _RPT
-#define _RPT4 _RPT
-#define _RPT5 _RPT
 #endif
 
 #include <queue>
