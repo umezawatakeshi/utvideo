@@ -12,6 +12,8 @@
 #include "Codec.h"
 #include "ClsID.h"
 #include <Format.h>
+#include <LogWriter.h>
+#include <LogUtil.h>
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "DCOM の完全サポートを含んでいない Windows Mobile プラットフォームのような Windows CE プラットフォームでは、単一スレッド COM オブジェクトは正しくサポートされていません。ATL が単一スレッド COM オブジェクトの作成をサポートすること、およびその単一スレッド COM オブジェクトの実装の使用を許可することを強制するには、_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA を定義してください。ご使用の rgs ファイルのスレッド モデルは 'Free' に設定されており、DCOM Windows CE 以外のプラットフォームでサポートされる唯一のスレッド モデルと設定されていました。"
@@ -42,15 +44,26 @@ public:
 	CDMOCodec(DWORD fcc, REFCLSID clsid) :
 		m_fcc(fcc), m_clsid(clsid)
 	{
+		if (IsLogWriterInitializedOrDebugBuild())
+		{
+			OLECHAR szClsId[48];
+			StringFromGUID2(clsid, szClsId, _countof(szClsId));
+			LOGPRINTF("%" PRIp " CDMOCodec::CDMOCodec(fcc=%08X, clsid=%S)", this, fcc, szClsId);
+		}
+
 		utvf_t utvf;
 
 		VCMFormatToUtVideoFormat(&utvf, fcc, 0);
 		m_pCodec = CCodec::CreateInstance(utvf, "DMO");
 		m_pInputBuffer = NULL;
+
+		LOGPRINTF("%" PRIp "  m_pCodec=%" PRIp ", TinyName=\"%s\"", this, m_pCodec, m_pCodec->GetTinyName());
 	}
 
 	virtual ~CDMOCodec()
 	{
+		LOGPRINTF("%" PRIp " CDMOCodec::~CDMOCodec()", this);
+
 		FreeStreamingResources();
 
 		if (m_pInputBuffer != NULL)
@@ -60,6 +73,13 @@ public:
 
 	static HRESULT WINAPI UpdateRegistry(DWORD fcc, REFCLSID clsid, BOOL bRegister)
 	{
+		if (IsLogWriterInitializedOrDebugBuild())
+		{
+			OLECHAR szClsId[48];
+			StringFromGUID2(clsid, szClsId, _countof(szClsId));
+			LOGPRINTF("CDMOCodec::UpdateRegistry(fcc=%08X, clsid=%S, bRegister=%s)", fcc, szClsId, bRegister ? "true" : "false");
+		}
+
 		HRESULT hr;
 		OLECHAR szFcc[5];
 		OLECHAR szClsID[64];
@@ -139,9 +159,37 @@ public:
 		return S_OK;
 	}
 
+#define LOGPRINT_BIH_THIS(_this, prefix, pbih) \
+	LOGPRINTF("%" PRIp " %s: biSize=%d, biWidth=%d, biHeight=%d, biPlanes=%d, biBitCount=%d, biCompression=%08X, biSizeImage=%d", \
+		(_this), (prefix), (pbih)->biSize, (pbih)->biWidth, (pbih)->biHeight, (pbih)->biPlanes, (pbih)->biBitCount, (pbih)->biCompression, (pbih)->biSizeImage);
+#define LOGPRINT_DMT_THIS(_this, prefix, pmt) \
+	do \
+	{ \
+		OLECHAR szMajorType[48]; \
+		OLECHAR szSubType[48]; \
+		OLECHAR szFormatType[48]; \
+		StringFromGUID2((pmt)->majortype, szMajorType, _countof(szMajorType)); \
+		StringFromGUID2((pmt)->subtype, szSubType, _countof(szSubType)); \
+		StringFromGUID2((pmt)->formattype, szFormatType, _countof(szFormatType)); \
+		LOGPRINTF("%" PRIp " %s: majortype=%S, subtype=%S, formattype=%S, pbFormat=%" PRIp, \
+			(_this), (prefix), szMajorType, szSubType, szFormatType, (pmt)->pbFormat); \
+	} while (false)
+
 	HRESULT InternalCheckInputType(DWORD dwInputStreamIndex, const DMO_MEDIA_TYPE *pmt)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalCheckInputType()\n");
+		if (IsLogWriterInitializedOrDebugBuild())
+		{
+			LOGPRINTF("%" PRIp " CDMOCodec::InternalCheckInputType(dwInputStreamIndex=%d, pmt=%" PRIp ")", this, dwInputStreamIndex, pmt);
+			if (pmt != NULL)
+			{
+				LOGPRINT_DMT_THIS(this, " pmt", pmt);
+				if (IsEqualGUID(pmt->majortype, MEDIATYPE_Video) && IsEqualGUID(pmt->formattype, FORMAT_VideoInfo))
+				{
+					const VIDEOINFOHEADER *pvih = (const VIDEOINFOHEADER *)pmt->pbFormat;
+					LOGPRINT_BIH_THIS(this, " pmt->pbFormat", &pvih->bmiHeader);
+				}
+			}
+		}
 
 		const VIDEOINFOHEADER *pvih;
 		utvf_t infmt;
@@ -172,7 +220,19 @@ public:
 
 	HRESULT InternalCheckOutputType(DWORD dwOutputStreamIndex, const DMO_MEDIA_TYPE *pmt)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalCheckOutputType()\n");
+		if (IsLogWriterInitializedOrDebugBuild())
+		{
+			LOGPRINTF("%" PRIp " CDMOCodec::InternalCheckOutputType(dwOutputStreamIndex=%d, pmt=%" PRIp ")", this, dwOutputStreamIndex, pmt);
+			if (pmt != NULL)
+			{
+				LOGPRINT_DMT_THIS(this, " pmt", pmt);
+				if (IsEqualGUID(pmt->majortype, MEDIATYPE_Video) && IsEqualGUID(pmt->formattype, FORMAT_VideoInfo))
+				{
+					const VIDEOINFOHEADER *pvih = (const VIDEOINFOHEADER *)pmt->pbFormat;
+					LOGPRINT_BIH_THIS(this, " pmt->pbFormat", &pvih->bmiHeader);
+				}
+			}
+		}
 
 		const DMO_MEDIA_TYPE *pmtIn;
 		const VIDEOINFOHEADER *pvih;
@@ -213,7 +273,7 @@ public:
 
 	HRESULT InternalGetInputType(DWORD dwInputStreamIndex, DWORD dwTypeIndex, DMO_MEDIA_TYPE *pmt)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalGetInputType()\n");
+		LOGPRINTF("%" PRIp " CDMOCodec::InternalGetInputType(dwInputStreamIndex=%d, dwTypeIndex=%d, pmt=%" PRIp ")", this, dwInputStreamIndex, dwTypeIndex, pmt);
 
 		const utvf_t *putvf = T::GetInputFormatInfo(m_pCodec);
 		GUID subtype;
@@ -243,7 +303,7 @@ public:
 
 	HRESULT InternalGetOutputType(DWORD dwOutputStreamIndex, DWORD dwTypeIndex, DMO_MEDIA_TYPE *pmt)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalGetOutputType()\n");
+		LOGPRINTF("%" PRIp " CDMOCodec::InternalGetOutputType(dwOutputStreamIndex=%d, dwTypeIndex=%d, pmt=%" PRIp ")", this, dwOutputStreamIndex, dwTypeIndex, pmt);
 
 		const utvf_t *putvf = T::GetOutputFormatInfo(m_pCodec);
 		GUID subtype;
@@ -295,7 +355,7 @@ public:
 
 	HRESULT InternalGetInputSizeInfo(DWORD dwInputStreamIndex, DWORD *pcbSize, DWORD *pcbMaxLookahead, DWORD *pcbAlignment)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalGetInputSizeInfo()\n");
+		LOGPRINTF("%" PRIp " CDMOCodec::InternalGetOutputSizeInfo(dwInputStreamIndex=%d, pcbSize=%" PRIp ", pcbMaxLookahead=%" PRIp ", pcbAlignment=%" PRIp ")", this, dwInputStreamIndex, pcbSize, pcbMaxLookahead, pcbAlignment);
 
 		*pcbSize = 0;
 		*pcbMaxLookahead = 0;
@@ -306,7 +366,7 @@ public:
 
 	HRESULT InternalGetOutputSizeInfo(DWORD dwOutputStreamIndex, DWORD *pcbSize, DWORD *pcbAlignment)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalGetOutputSizeInfo()\n");
+		LOGPRINTF("%" PRIp " CDMOCodec::InternalGetOutputSizeInfo(dwOutputStreamIndex=%d, pcbSize=%" PRIp ", pcbAlignment=%" PRIp ")", this, dwOutputStreamIndex, pcbSize, pcbAlignment);
 
 		const DMO_MEDIA_TYPE *pmtIn  = InputType(0);
 		const DMO_MEDIA_TYPE *pmtOut = OutputType(0);
@@ -328,21 +388,17 @@ public:
 
 	HRESULT InternalGetInputMaxLatency(DWORD dwInputStreamIndex, REFERENCE_TIME *prtMaxLatency)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalGetInputMaxLatency()\n");
-
 		return E_NOTIMPL;
 	}
 
 	HRESULT InternalSetInputMaxLatency(DWORD dwInputStreamIndex, REFERENCE_TIME rtMaxLatency)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalSetInputMaxLatency()\n");
-
 		return E_NOTIMPL;
 	}
 
 	HRESULT InternalFlush()
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalFlush()\n");
+		LOGPRINTF("%" PRIp " CDMOCodec::InternalFlush()", this);
 
 		if (m_pInputBuffer != NULL)
 		{
@@ -355,7 +411,7 @@ public:
 
 	HRESULT InternalDiscontinuity(DWORD dwInputStreamIndex)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalDiscontinuity()\n");
+		LOGPRINTF("%" PRIp " CDMOCodec::InternalDiscontinuity(dwInputStreamIndex=%d)", this, dwInputStreamIndex);
 
 		return S_OK;
 	}
@@ -366,8 +422,6 @@ public:
 
 	HRESULT InternalProcessInput(DWORD dwInputStreamIndex, IMediaBuffer *pBuffer, DWORD dwFlags, REFERENCE_TIME rtTimestamp, REFERENCE_TIME rtTimelength)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalProcessInput()\n");
-
 		m_pInputBuffer = pBuffer;
 		m_pInputBuffer->AddRef();
 		m_bInputKeyFrame = dwFlags & DMO_INPUT_DATA_BUFFERF_SYNCPOINT;
@@ -383,8 +437,6 @@ public:
 
 	HRESULT InternalAcceptingInput(DWORD dwInputStreamIndex)
 	{
-		_RPT0(_CRT_WARN, "CDMOCodec::InternalAcceptingInput()\n");
-
 		if (m_pInputBuffer == NULL)
 			return S_OK;
 		else
