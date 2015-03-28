@@ -4,12 +4,17 @@
 #pragma once
 
 int InitializeLogWriter(void);
-int WriteLog(const char *p);
+int __declspec(dllexport) WriteLog(const char *p);
 int UninitializeLogWriter(void);
 
 #ifdef _WIN32
 
-extern HANDLE hLogPipe;
+// 関数の場合はインポートする側も dllexport で動いてしまうが、変数の場合はそうはいかない。
+#ifdef LOGWRITER_OWNER
+extern __declspec(dllexport) HANDLE hLogPipe;
+#else
+extern __declspec(dllimport) HANDLE hLogPipe;
+#endif
 
 static inline bool IsLogWriterInitialized()
 {

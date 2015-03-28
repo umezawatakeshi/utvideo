@@ -7,7 +7,7 @@
 
 #ifdef _WIN32
 
-HANDLE hLogPipe = INVALID_HANDLE_VALUE;
+HANDLE __declspec(dllexport) hLogPipe = INVALID_HANDLE_VALUE;
 
 int InitializeLogWriter(void)
 {
@@ -55,7 +55,7 @@ int UninitializeLogWriter(void)
 	return 0;
 }
 
-int WriteLog(const char *p)
+int __declspec(dllexport) WriteLog(const char *p)
 {
 	DWORD cbWritten;
 

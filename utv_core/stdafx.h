@@ -98,7 +98,7 @@ inline bool IS_ALIGNED(const void *p, uintptr_t a)
 }
 
 #define LOG_MODULE_NAME "utv_core"
-
+#define LOGWRITER_OWNER 1
 #include <LogWriter.h>
 #include <LogUtil.h>
 

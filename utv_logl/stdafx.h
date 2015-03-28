@@ -21,3 +21,5 @@
 #include <crtdbg.h> // XXX
 #include <process.h>
 #endif
+
+#define LOGWRITER_OWNER 1
