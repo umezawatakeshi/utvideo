@@ -28,7 +28,6 @@ CThreadManager::CThreadManager(void)
 	DWORD_PTR dwpProcessAffinityMask;
 	DWORD_PTR dwpSystemAffinityMask;
 
-	_RPT1(_CRT_WARN, "enter CThreadManager::CThreadManager() this=%p\n", this);
 	m_nNumThreads = 0;
 	m_nNumJobs = 0;
 	for (int i = 0; i < MAX_THREAD; i++)
@@ -53,13 +52,11 @@ CThreadManager::CThreadManager(void)
 
 	for (int i = 0; i < m_nNumThreads; i++)
 		ResumeThread(m_hThread[i]);
-	_RPT1(_CRT_WARN, "leave CThreadManager::CThreadManager() this=%p\n", this);
 }
 
 CThreadManager::~CThreadManager(void)
 {
 	_ASSERT(m_nNumJobs == 0);
-	_RPT1(_CRT_WARN, "enter CThreadManager::~CThreadManager() this=%p\n", this);
 	EnterCriticalSection(&m_csJob);
 	for (int i = 0; i < m_nNumThreads; i++)
 	{
@@ -75,7 +72,6 @@ CThreadManager::~CThreadManager(void)
 		CloseHandle(m_hThreadSemaphore[i]);
 	}
 	DeleteCriticalSection(&m_csJob);
-	_RPT1(_CRT_WARN, "leave CThreadManager::~CThreadManager() this=%p\n", this);
 }
 
 DWORD WINAPI CThreadManager::StaticThreadProc(LPVOID lpParameter)
@@ -94,7 +90,6 @@ DWORD WINAPI CThreadManager::StaticThreadProc(LPVOID lpParameter)
 
 DWORD CThreadManager::ThreadProc(int nThreadIndex)
 {
-	_RPT3(_CRT_WARN, "enter CThreadManager::ThreadProc() this=%p index=%d ID=%08X\n", this, nThreadIndex, GetCurrentThreadId());
 	for (;;)
 	{
 		CThreadJob *pJob;
@@ -110,7 +105,6 @@ DWORD CThreadManager::ThreadProc(int nThreadIndex)
 		SetEvent(pJob->m_hCompletionEvent);
 		delete pJob;
 	}
-	_RPT3(_CRT_WARN, "leave CThreadManager::ThreadProc() this=%p index=%d ID=%08X\n", this, nThreadIndex, GetCurrentThreadId());
 	return 0;
 }
 
