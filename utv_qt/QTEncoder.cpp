@@ -224,7 +224,7 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 	err = glob->codec->EncodeBegin(utvf, width, height, rowBytes);
 
 //	fprintf(fp, "a %ld\n", err);
-	err = ICMEncodedFrameCreateMutable(glob->session, sourceFrame, glob->codec->EncodeGetOutputSize(utvf, width, height, rowBytes), &encoded);
+	err = ICMEncodedFrameCreateMutable(glob->session, sourceFrame, glob->codec->EncodeGetOutputSize(utvf, width, height), &encoded);
 //	fprintf(fp, "b %ld\n", err);
 	dstPtr = ICMEncodedFrameGetDataPtr(encoded);
 	srcPtr = CVPixelBufferGetBaseAddress(sourcePixelBuffer);

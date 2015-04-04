@@ -57,7 +57,7 @@ public:
 
 	size_t GetSize(utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height)
 	{
-		return m_pCodec->EncodeGetOutputSize(infmt, width, height, CBGROSSWIDTH_WINDOWS);
+		return m_pCodec->EncodeGetOutputSize(infmt, width, height);
 	}
 
 	int Query(utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height, const void *pOutExtraData, size_t cbOutExtraData, const void *pInExtraData, size_t cbInExtraData)

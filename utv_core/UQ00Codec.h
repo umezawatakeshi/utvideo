@@ -122,7 +122,7 @@ public:
 	virtual int InternalEncodeEnd(void);
 	virtual size_t EncodeGetExtraDataSize(void);
 	virtual int EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height);
-	virtual size_t EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
+	virtual size_t EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height);
 	virtual int InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height);
 
 	virtual int InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);

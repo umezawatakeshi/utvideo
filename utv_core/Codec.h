@@ -41,7 +41,7 @@ public:
 	virtual int EncodeEnd(void) = 0;
 	virtual size_t EncodeGetExtraDataSize(void) = 0;
 	virtual int EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height) = 0;
-	virtual size_t EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth) = 0;
+	virtual size_t EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height) = 0;
 	virtual int EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height) = 0;
 
 	virtual int DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData) = 0;
