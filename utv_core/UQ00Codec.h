@@ -127,6 +127,7 @@ public:
 
 	virtual int InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual size_t DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame);
+	virtual int DecodeGetFrameType(bool *pbKeyFrame, const void *pInput);
 	virtual int InternalDecodeEnd(void);
 	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	virtual int InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);

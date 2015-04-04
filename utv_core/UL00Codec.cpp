@@ -464,6 +464,12 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame
 	return m_cbRawSize;
 }
 
+int CUL00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
+{
+	*pbKeyFrame = true;
+	return 0;
+}
+
 int CUL00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
 	int ret;

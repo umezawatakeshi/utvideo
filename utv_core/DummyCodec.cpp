@@ -127,6 +127,12 @@ size_t CDummyCodec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFram
 	return 0;
 }
 
+int CDummyCodec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
+{
+	*pbKeyFrame = true;
+	return 0;
+}
+
 int CDummyCodec::DecodeEnd(void)
 {
 	return 0;
