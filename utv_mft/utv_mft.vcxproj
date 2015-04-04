@@ -140,9 +140,11 @@
       <SubSystem>Windows</SubSystem>
       <ModuleDefinitionFile>.\utv_mft.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>mfplat.lib;mfuuid.lib</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>%WINDIR%\sysnative\regsvr32 /s $(TargetPath)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -214,10 +216,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <RegisterOutput>true</RegisterOutput>
       <AdditionalDependencies>mfplat.lib;mfuuid.lib</AdditionalDependencies>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
+    <PostBuildEvent>
+      <Command>%WINDIR%\sysnative\regsvr32 /s $(TargetPath)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ClsID.cpp" />
