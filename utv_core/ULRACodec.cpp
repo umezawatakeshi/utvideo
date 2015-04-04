@@ -166,6 +166,8 @@ bool CULRACodec::DecodeDirect(uint32_t nBandIndex)
 		}
 		break;
 	case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		if (m_bInterlace)
+			return false;
 		switch (m_utvfRaw)
 		{
 		case UTVF_NFCC_BGRA_BU:
