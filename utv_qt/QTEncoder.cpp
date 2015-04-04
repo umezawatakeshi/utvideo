@@ -144,7 +144,7 @@ pascal ComponentResult QTEncoderPrepareToCompressFrames(CQTEncoder *glob, ICMCom
 
 	imgDescExtSize = glob->codec->EncodeGetExtraDataSize();
 	imgDescExt = NewHandle(imgDescExtSize);
-	glob->codec->EncodeGetExtraData(*imgDescExt, imgDescExtSize, /* XXX */ UTVF_INVALID, (*imageDescription)->width, (*imageDescription)->height, /* XXX */ CBGROSSWIDTH_NATURAL);
+	glob->codec->EncodeGetExtraData(*imgDescExt, imgDescExtSize, /* XXX */ UTVF_INVALID, (*imageDescription)->width, (*imageDescription)->height);
 	AddImageDescriptionExtension(imageDescription, imgDescExt, 'glbl');
 	DisposeHandle(imgDescExt);
 

@@ -57,7 +57,7 @@ public:
 
 	int GetExtraData(void *pExtraData, size_t cbExtraData, utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height)
 	{
-		return m_pCodec->EncodeGetExtraData(pExtraData, cbExtraData, infmt, width, height, CBGROSSWIDTH_WINDOWS);
+		return m_pCodec->EncodeGetExtraData(pExtraData, cbExtraData, infmt, width, height);
 	}
 
 	size_t GetSize(utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height)

@@ -101,7 +101,7 @@ size_t CDummyCodec::EncodeGetExtraDataSize(void)
 	return 0;
 }
 
-int CDummyCodec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CDummyCodec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height)
 {
 	return -1;
 }

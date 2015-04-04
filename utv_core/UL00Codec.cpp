@@ -280,7 +280,7 @@ int CUL00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	m_nWidth = width;
 	m_nHeight = height;
 
-	EncodeGetExtraData(&ed, sizeof(ed), infmt, width, height, cbGrossWidth);
+	EncodeGetExtraData(&ed, sizeof(ed), infmt, width, height);
 	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth, &ed, sizeof(ed));
 	if (ret != 0)
 		return ret;
@@ -327,7 +327,7 @@ size_t CUL00Codec::EncodeGetExtraDataSize(void)
 	return sizeof(EXTRADATA);
 }
 
-int CUL00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CUL00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height)
 {
 	EXTRADATA *p = (EXTRADATA *)pExtraData;
 	unsigned int nDivideCount;

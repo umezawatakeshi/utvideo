@@ -121,7 +121,7 @@ public:
 	virtual size_t EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput);
 	virtual int InternalEncodeEnd(void);
 	virtual size_t EncodeGetExtraDataSize(void);
-	virtual int EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
+	virtual int EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height);
 	virtual size_t EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	virtual int InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 

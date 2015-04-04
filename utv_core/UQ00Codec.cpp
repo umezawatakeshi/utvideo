@@ -263,7 +263,7 @@ int CUQ00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	m_nWidth = width;
 	m_nHeight = height;
 
-	EncodeGetExtraData(&si, sizeof(si), infmt, width, height, cbGrossWidth);
+	EncodeGetExtraData(&si, sizeof(si), infmt, width, height);
 	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth, &si, sizeof(si));
 	if (ret != 0)
 		return ret;
@@ -312,7 +312,7 @@ size_t CUQ00Codec::EncodeGetExtraDataSize(void)
 	return sizeof(STREAMINFO);
 }
 
-int CUQ00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CUQ00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height)
 {
 	STREAMINFO *p = (STREAMINFO *)pExtraData;
 
