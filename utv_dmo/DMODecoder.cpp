@@ -52,7 +52,7 @@ HRESULT CDMODecoder::InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCou
 	pOutputBuffers->pBuffer->GetBufferAndLength(&pOutput, NULL);
 	m_pInputBuffer->GetBufferAndLength(&pInput, NULL);
 
-	cbOutput = m_pCodec->DecodeFrame(pOutput, pInput, m_bInputKeyFrame != 0);
+	cbOutput = m_pCodec->DecodeFrame(pOutput, pInput);
 
 	pOutputBuffers->dwStatus = 0;
 	pOutputBuffers->dwStatus |= DMO_OUTPUT_DATA_BUFFERF_SYNCPOINT;

@@ -226,7 +226,7 @@ LRESULT CVCMCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
 	size_t cbFrame;
 
-	cbFrame = m_pCodec->DecodeFrame(icd->lpOutput, icd->lpInput, !(icd->dwFlags & ICDECOMPRESS_NOTKEYFRAME));
+	cbFrame = m_pCodec->DecodeFrame(icd->lpOutput, icd->lpInput);
 	icd->lpbiOutput->biSizeImage = (DWORD)cbFrame;
 	return ICERR_OK;
 }

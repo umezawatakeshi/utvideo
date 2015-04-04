@@ -421,7 +421,7 @@ void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 	}
 }
 
-size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame)
+size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput)
 {
 	/* const */ uint8_t *p;
 

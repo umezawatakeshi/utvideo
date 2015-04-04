@@ -165,7 +165,7 @@ pascal ComponentResult QTDecoderDrawBand(CQTDecoder *glob, ImageSubCodecDecompre
 {
 	CMutexLock lock(glob->mutex);
 
-	glob->codec->DecodeFrame(drp->baseAddr, drp->codecData, true /* XXX */);
+	glob->codec->DecodeFrame(drp->baseAddr, drp->codecData);
 
 	return noErr;
 }

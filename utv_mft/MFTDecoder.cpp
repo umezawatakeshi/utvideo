@@ -45,7 +45,7 @@ HRESULT CMFTDecoder::InternalProcessOutput(IMFSample *pOutputSample, IMFSample *
 	pOutputSample->GetBufferByIndex(0, &pOutputBuffer);
 	pInputBuffer->Lock(&pInputByteBuffer, NULL, NULL);
 	pOutputBuffer->Lock(&pOutputByteBuffer, NULL, NULL);
-	cbOutput = m_pCodec->DecodeFrame(pOutputByteBuffer, pInputByteBuffer, (bKeyFrame != FALSE) /* convert to bool */);
+	cbOutput = m_pCodec->DecodeFrame(pOutputByteBuffer, pInputByteBuffer);
 	pInputBuffer->Unlock();
 	pOutputBuffer->Unlock();
 	pOutputBuffer->SetCurrentLength((DWORD)cbOutput);

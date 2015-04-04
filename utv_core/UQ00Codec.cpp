@@ -388,7 +388,7 @@ void CUQ00Codec::EncodeProc(uint32_t nBandIndex)
 	}
 }
 
-size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame)
+size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput)
 {
 	/* const */ uint8_t *p;
 	union

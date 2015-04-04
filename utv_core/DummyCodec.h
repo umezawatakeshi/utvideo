@@ -43,7 +43,7 @@ public:
 	virtual int EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 
 	virtual int DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
-	virtual size_t DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame);
+	virtual size_t DecodeFrame(void *pOutput, const void *pInput);
 	virtual int DecodeGetFrameType(bool *pbKeyFrame, const void *pInput);
 	virtual int DecodeEnd(void);
 	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);

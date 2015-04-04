@@ -122,7 +122,7 @@ int CDummyCodec::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int hei
 	return -1;
 }
 
-size_t CDummyCodec::DecodeFrame(void *pOutput, const void *pInput, bool bKeyFrame)
+size_t CDummyCodec::DecodeFrame(void *pOutput, const void *pInput)
 {
 	return 0;
 }
