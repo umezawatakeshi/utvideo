@@ -219,7 +219,7 @@ LRESULT CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINF
 	if (pbihOut != NULL && (pbihOut->biWidth != pbihIn->biWidth || pbihOut->biHeight != pbihIn->biHeight))
 		return ICERR_BADFORMAT;
 
-	return m_pCodec->EncodeQuery(infmt, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS) == 0 ? ICERR_OK : ICERR_BADFORMAT;
+	return m_pCodec->EncodeQuery(infmt, pbihIn->biWidth, pbihIn->biHeight) == 0 ? ICERR_OK : ICERR_BADFORMAT;
 }
 
 LRESULT CVCMCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
@@ -325,7 +325,7 @@ LRESULT CVCMCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPI
 	{
 		if (utvf != *putvf)
 			continue;
-		if (m_pCodec->DecodeQuery(*putvf, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS, ((BYTE *)pbihIn) + sizeof(BITMAPINFOHEADER), pbihIn->biSize - sizeof(BITMAPINFOHEADER)) == 0)
+		if (m_pCodec->DecodeQuery(*putvf, pbihIn->biWidth, pbihIn->biHeight, ((BYTE *)pbihIn) + sizeof(BITMAPINFOHEADER), pbihIn->biSize - sizeof(BITMAPINFOHEADER)) == 0)
 			return ICERR_OK;
 	}
 

@@ -62,7 +62,7 @@ public:
 
 	int Query(utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height, const void *pOutExtraData, size_t cbOutExtraData, const void *pInExtraData, size_t cbInExtraData)
 	{
-		return m_pCodec->DecodeQuery(outfmt, width, height, CBGROSSWIDTH_WINDOWS, pInExtraData, cbInExtraData);
+		return m_pCodec->DecodeQuery(outfmt, width, height, pInExtraData, cbInExtraData);
 	}
 
 public:

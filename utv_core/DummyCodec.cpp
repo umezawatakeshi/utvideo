@@ -111,7 +111,7 @@ size_t CDummyCodec::EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsign
 	return 0;
 }
 
-int CDummyCodec::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CDummyCodec::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height)
 {
 	return -1;
 }
@@ -143,7 +143,7 @@ size_t CDummyCodec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsig
 	return 0;
 }
 
-int CDummyCodec::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CDummyCodec::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
 {
 	return -1;
 }

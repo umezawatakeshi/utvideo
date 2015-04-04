@@ -255,7 +255,7 @@ int CUQ00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	int ret;
 	STREAMINFO si;
 
-	ret = EncodeQuery(infmt, width, height, cbGrossWidth);
+	ret = EncodeQuery(infmt, width, height);
 	if (ret != 0)
 		return ret;
 
@@ -332,7 +332,7 @@ size_t CUQ00Codec::EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigne
 	return ROUNDUP(width, 4) * ROUNDUP(height, 2) * GetRealBitCount() / 8 + 4096; // +4096 ÇÕÇ«ÇÒÇ‘ÇËä®íËÅB
 }
 
-int CUQ00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CUQ00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height)
 {
 	if (width % GetMacroPixelWidth() != 0 || height % GetMacroPixelHeight() != 0)
 		return -1;
@@ -444,7 +444,7 @@ int CUQ00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 {
 	int ret;
 
-	ret = DecodeQuery(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	ret = DecodeQuery(outfmt, width, height, pExtraData, cbExtraData);
 	if (ret != 0)
 		return ret;
 
@@ -490,7 +490,7 @@ size_t CUQ00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsign
 	return m_cbRawSize;
 }
 
-int CUQ00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CUQ00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
 {
 	if (width % GetMacroPixelWidth() != 0 || height % GetMacroPixelHeight() != 0)
 		return -1;

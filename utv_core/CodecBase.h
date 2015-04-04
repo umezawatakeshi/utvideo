@@ -30,10 +30,10 @@ public:
 
 	virtual int EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	virtual int EncodeEnd(void);
-	virtual int EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
+	virtual int EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height);
 	virtual int DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual int DecodeEnd(void);
-	virtual int DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
+	virtual int DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData);
 
 protected:
 	int LoadConfig(void);
@@ -45,8 +45,8 @@ protected:
 
 	virtual int InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth) = 0;
 	virtual int InternalEncodeEnd(void) = 0;
-	virtual int InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth) = 0;
+	virtual int InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height) = 0;
 	virtual int InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData) = 0;
 	virtual int InternalDecodeEnd(void) = 0;
-	virtual int InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData) = 0;
+	virtual int InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData) = 0;
 };

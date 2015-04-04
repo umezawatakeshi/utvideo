@@ -183,11 +183,11 @@ int CCodecBase::EncodeEnd(void)
 	return InternalEncodeEnd();
 }
 
-int CCodecBase::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CCodecBase::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height)
 {
-	LOGPRINTF("%" PRIp " CCodecBase::EncodeQuery(infmt=%08X, width=%u, height=%u, cbGrossWidth=%" PRIdSZT, this, infmt, width, height, cbGrossWidth);
+	LOGPRINTF("%" PRIp " CCodecBase::EncodeQuery(infmt=%08X, width=%u, height=%u", this, infmt, width, height);
 
-	int ret = InternalEncodeQuery(infmt, width, height, cbGrossWidth);
+	int ret = InternalEncodeQuery(infmt, width, height);
 	LOGPRINTF("%" PRIp " CCodecBase::EncodeQuery return %d", this, ret);
 	return ret;
 }
@@ -213,16 +213,16 @@ int CCodecBase::DecodeEnd(void)
 	return InternalDecodeEnd();
 }
 
-int CCodecBase::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CCodecBase::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
 {
 	if (IsLogWriterInitializedOrDebugBuild())
 	{
 		char buf[256];
 		FormatBinary(buf, pExtraData, cbExtraData, EncodeGetExtraDataSize());
-		LOGPRINTF("%" PRIp " CCodecBase::DecodeQuery(outfmt=%08X, width=%u, height=%u, cbGrossWidth=%" PRIdSZT ", pExtraData=%s, cbExtraData=%" PRIuSZT ")", this, outfmt, width, height, cbGrossWidth, buf, cbExtraData);
+		LOGPRINTF("%" PRIp " CCodecBase::DecodeQuery(outfmt=%08X, width=%u, height=%u, pExtraData=%s, cbExtraData=%" PRIuSZT ")", this, outfmt, width, height, buf, cbExtraData);
 	}
 
-	int ret = InternalDecodeQuery(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	int ret = InternalDecodeQuery(outfmt, width, height, pExtraData, cbExtraData);
 	LOGPRINTF("%" PRIp " CCodecBase::DecodeQuery return %d", this, ret);
 	return ret;
 }

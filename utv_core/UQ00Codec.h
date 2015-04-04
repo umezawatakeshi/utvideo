@@ -123,14 +123,14 @@ public:
 	virtual size_t EncodeGetExtraDataSize(void);
 	virtual int EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height);
 	virtual size_t EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
-	virtual int InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
+	virtual int InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height);
 
 	virtual int InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual size_t DecodeFrame(void *pOutput, const void *pInput);
 	virtual int DecodeGetFrameType(bool *pbKeyFrame, const void *pInput);
 	virtual int InternalDecodeEnd(void);
 	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
-	virtual int InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
+	virtual int InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData);
 
 protected:
 	virtual int InternalSetState(const void *pState, size_t cb);
