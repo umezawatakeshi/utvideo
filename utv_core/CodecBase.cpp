@@ -169,7 +169,7 @@ int CCodecBase::InternalSetStateWrapper(const void *pState, size_t cb)
 
 int CCodecBase::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
-	LOGPRINTF("%" PRIp " CCodecBase::EncodeBegin(infmt=%08X, width=%u, height=%u, cbGrossWidth=%" PRIdSZT, this, infmt, width, height, cbGrossWidth);
+	LOGPRINTF("%" PRIp " CCodecBase::EncodeBegin(infmt=%08X, width=%u, height=%u, cbGrossWidth=%" PRIdSZT ")", this, infmt, width, height, cbGrossWidth);
 
 	int ret = InternalEncodeBegin(infmt, width, height, cbGrossWidth);
 	LOGPRINTF("%" PRIp " CCodecBase::EncodeBegin return %d", this, ret);
@@ -185,7 +185,7 @@ int CCodecBase::EncodeEnd(void)
 
 int CCodecBase::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height)
 {
-	LOGPRINTF("%" PRIp " CCodecBase::EncodeQuery(infmt=%08X, width=%u, height=%u", this, infmt, width, height);
+	LOGPRINTF("%" PRIp " CCodecBase::EncodeQuery(infmt=%08X, width=%u, height=%u)", this, infmt, width, height);
 
 	int ret = InternalEncodeQuery(infmt, width, height);
 	LOGPRINTF("%" PRIp " CCodecBase::EncodeQuery return %d", this, ret);
