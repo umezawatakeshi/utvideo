@@ -24,10 +24,18 @@ CUtVideoMFTModule _AtlModule;
 #endif
 
 // DLL エントリ ポイント
-extern "C" BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
+extern "C" BOOL WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, LPVOID lpReserved)
 {
-	hInstance;
-    return _AtlModule.DllMain(dwReason, lpReserved); 
+	if (dwReason == DLL_PROCESS_ATTACH)
+	{
+		LOGPRINTF("DllMain(hModule=%" PRIp ", dwReason=DLL_PROCESS_ATTACH lpReserved=%" PRIp, hModule, lpReserved);
+	}
+	else if (dwReason == DLL_PROCESS_DETACH)
+	{
+		LOGPRINTF("DllMain(hModule=%" PRIp ", dwReason=DLL_PROCESS_DETACH lpReserved=%" PRIp, hModule, lpReserved);
+	}
+
+	return _AtlModule.DllMain(dwReason, lpReserved);
 }
 
 #ifdef _MANAGED
