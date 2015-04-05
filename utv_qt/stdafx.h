@@ -8,10 +8,14 @@
 
 #pragma once
 
+#define _CRT_SECURE_NO_WARNINGS 1
+
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <myinttypes.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -50,3 +54,8 @@
 #include <QuickTime/QuickTimeComponents.h>
 #include <QuickTime/ImageCodec.h>
 #endif
+
+#define LOG_MODULE_NAME "utv_qt  "
+
+#include <LogWriter.h>
+#include <LogUtil.h>

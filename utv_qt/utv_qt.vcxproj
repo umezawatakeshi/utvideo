@@ -51,7 +51,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;UTV_QT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\utv_core;C:\Program Files %28x86%29\QuickTime SDK\CIncludes;C:\Program Files %28x86%29\QuickTime SDK\ComponentIncludes</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\utv_core;..\utv_logl;C:\Program Files %28x86%29\QuickTime SDK\CIncludes;C:\Program Files %28x86%29\QuickTime SDK\ComponentIncludes</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -73,7 +73,7 @@ if exist "C:\Program Files (x86)\QuickTime" copy "$(OutDir)\$(TargetName).qtx" "
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;UTV_QT_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\utv_core;C:\Program Files %28x86%29\QuickTime SDK\CIncludes;C:\Program Files %28x86%29\QuickTime SDK\ComponentIncludes</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\utv_core;..\utv_logl;C:\Program Files %28x86%29\QuickTime SDK\CIncludes;C:\Program Files %28x86%29\QuickTime SDK\ComponentIncludes</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
