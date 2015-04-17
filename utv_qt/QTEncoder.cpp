@@ -71,7 +71,9 @@ pascal ComponentResult QTEncoderOpen(CQTEncoder *glob, ComponentInstance self)
 	glob = (CQTEncoder *)NewPtrClear(sizeof(CQTEncoder));
 	if (glob == NULL)
 		return memFullErr;
-	
+
+	LOGPRINTF("QTEncoderOpen(glob=%" PRIp ", self=%" PRIp ")", glob, self);
+
 	err = QTCodecOpen(glob, self);
 	if (err != noErr)
 	{
@@ -84,6 +86,8 @@ pascal ComponentResult QTEncoderOpen(CQTEncoder *glob, ComponentInstance self)
 
 pascal ComponentResult QTEncoderClose(CQTEncoder *glob, ComponentInstance self)
 {
+	LOGPRINTF("QTEncoderClose(glob=%" PRIp ", self=%" PRIp ")", glob, self);
+
 	if (glob != NULL)
 	{
 		QTCodecClose(glob, self);
