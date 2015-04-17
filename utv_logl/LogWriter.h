@@ -3,8 +3,16 @@
 
 #pragma once
 
+#ifndef DLLEXPORT
+#ifdef _WIN32
+#define DLLEXPORT __declspec(dllexport)
+#else
+#define DLLEXPORT
+#endif
+#endif
+
 int InitializeLogWriter(void);
-int __declspec(dllexport) WriteLog(const char *p);
+int DLLEXPORT WriteLog(const char *p);
 int UninitializeLogWriter(void);
 
 #ifdef _WIN32
