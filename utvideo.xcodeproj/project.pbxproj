@@ -83,8 +83,7 @@
 		258DB3F31411F8600059F47E /* utv_core.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = utv_core.cpp; path = utv_core/utv_core.cpp; sourceTree = "<group>"; };
 		258DB3F41411F8600059F47E /* utv_core.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = utv_core.h; path = utv_core/utv_core.h; sourceTree = "<group>"; };
 		258DB3F51411F8600059F47E /* utvideo.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = utvideo.h; path = utv_core/utvideo.h; sourceTree = "<group>"; };
-		258DB3FA1411F8C80059F47E /* utvideo.component */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = utvideo.component; sourceTree = BUILT_PRODUCTS_DIR; };
-		258DB3FC1411F8C80059F47E /* utvideo-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "utvideo-Info.plist"; sourceTree = "<group>"; };
+		258DB3FA1411F8C80059F47E /* utv_qt.component */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = utv_qt.component; sourceTree = BUILT_PRODUCTS_DIR; };
 		25A4DCE217241CF300BEE7FB /* CPUID.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = CPUID.h; path = utv_core/CPUID.h; sourceTree = "<group>"; };
 		25CCB6ED18FD137F00076B45 /* ByteOrder.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = ByteOrder.h; path = utv_core/ByteOrder.h; sourceTree = "<group>"; };
 		25CCB6EE18FD137F00076B45 /* CodecBase.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = CodecBase.cpp; path = utv_core/CodecBase.cpp; sourceTree = "<group>"; };
@@ -96,6 +95,7 @@
 		25CCB6F418FD137F00076B45 /* version.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = version.h; path = utv_core/version.h; sourceTree = "<group>"; };
 		25CCB70E18FD189300076B45 /* QuickTimeFormat.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = QuickTimeFormat.cpp; path = utv_qt/QuickTimeFormat.cpp; sourceTree = "<group>"; };
 		25CCB70F18FD189300076B45 /* QuickTimeFormat.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QuickTimeFormat.h; path = utv_qt/QuickTimeFormat.h; sourceTree = "<group>"; };
+		25CE613C1AE13A0B005C05F8 /* utv_qt-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "utv_qt-Info.plist"; sourceTree = "<group>"; };
 		25CF5DF9172422DE0089819C /* TunedFunc_x86x64.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = TunedFunc_x86x64.cpp; path = utv_core/TunedFunc_x86x64.cpp; sourceTree = "<group>"; };
 		25D59BCC14CD624800FDCD1F /* QTCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = QTCodec.cpp; path = utv_qt/QTCodec.cpp; sourceTree = "<group>"; };
 		25D59BCD14CD624800FDCD1F /* QTCodec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTCodec.h; path = utv_qt/QTCodec.h; sourceTree = "<group>"; };
@@ -128,10 +128,10 @@
 		258DB3C31411F4BA0059F47E = {
 			isa = PBXGroup;
 			children = (
+				25CE613C1AE13A0B005C05F8 /* utv_qt-Info.plist */,
 				25F09D3B14122EA700D214B9 /* utv_core */,
 				25F09D3D14122EB200D214B9 /* utv_qt */,
 				258DB3FB1411F8C80059F47E /* Products */,
-				258DB3FC1411F8C80059F47E /* utvideo-Info.plist */,
 				25F09D5414122FB800D214B9 /* Carbon.framework */,
 				2529170014D02DCB00A3813C /* CoreVideo.framework */,
 				25F09D5B14122FCF00D214B9 /* QuickTime.framework */,
@@ -141,7 +141,7 @@
 		258DB3FB1411F8C80059F47E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				258DB3FA1411F8C80059F47E /* utvideo.component */,
+				258DB3FA1411F8C80059F47E /* utv_qt.component */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -242,7 +242,7 @@
 			);
 			name = utv_qt;
 			productName = utvideo;
-			productReference = 258DB3FA1411F8C80059F47E /* utvideo.component */;
+			productReference = 258DB3FA1411F8C80059F47E /* utv_qt.component */;
 			productType = "com.apple.product-type.bundle";
 		};
 /* End PBXNativeTarget section */
@@ -353,14 +353,14 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = "utvideo-Info.plist";
+				INFOPLIST_FILE = "utv_qt-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				OTHER_LDFLAGS = (
 					"-read_only_relocs",
 					suppress,
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = utvideo;
+				PRODUCT_NAME = utv_qt;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				WRAPPER_EXTENSION = component;
 			};
@@ -377,14 +377,14 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = "utvideo-Info.plist";
+				INFOPLIST_FILE = "utv_qt-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				OTHER_LDFLAGS = (
 					"-read_only_relocs",
 					suppress,
 				);
 				PREBINDING = NO;
-				PRODUCT_NAME = utvideo;
+				PRODUCT_NAME = utv_qt;
 				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
 				WRAPPER_EXTENSION = component;
 				ZERO_LINK = NO;
