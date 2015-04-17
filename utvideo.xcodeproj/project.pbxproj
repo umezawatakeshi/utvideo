@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		2529170114D02DCB00A3813C /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2529170014D02DCB00A3813C /* CoreVideo.framework */; };
+		255FB93B1AE13DC2009B2DC4 /* LogPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255FB9311AE13DC2009B2DC4 /* LogPath.cpp */; };
+		255FB93D1AE13DC2009B2DC4 /* LogUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255FB9351AE13DC2009B2DC4 /* LogUtil.cpp */; };
+		255FB93E1AE13DC2009B2DC4 /* LogWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255FB9371AE13DC2009B2DC4 /* LogWriter.cpp */; };
+		255FB94D1AE13F67009B2DC4 /* Log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255FB94A1AE13F67009B2DC4 /* Log.cpp */; };
 		2564C7B914823C7E00F1A9EB /* Convert_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B414823C7E00F1A9EB /* Convert_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
 		2564C7BA14823C7E00F1A9EB /* HuffmanCode_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B514823C7E00F1A9EB /* HuffmanCode_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
 		2564C7BB14823C7E00F1A9EB /* Predict_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B614823C7E00F1A9EB /* Predict_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
@@ -45,6 +49,19 @@
 		2529170014D02DCB00A3813C /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		25307212175CC27500FB4793 /* Coefficient_asm_x86x64.mac */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Coefficient_asm_x86x64.mac; path = utv_core/Coefficient_asm_x86x64.mac; sourceTree = "<group>"; };
 		25307213175CC27500FB4793 /* Coefficient_nasm.mac */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Coefficient_nasm.mac; path = utv_core/Coefficient_nasm.mac; sourceTree = "<group>"; };
+		255FB9311AE13DC2009B2DC4 /* LogPath.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = LogPath.cpp; path = utv_logl/LogPath.cpp; sourceTree = "<group>"; };
+		255FB9321AE13DC2009B2DC4 /* LogPath.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = LogPath.h; path = utv_logl/LogPath.h; sourceTree = "<group>"; };
+		255FB9331AE13DC2009B2DC4 /* LogReader.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = LogReader.cpp; path = utv_logl/LogReader.cpp; sourceTree = "<group>"; };
+		255FB9341AE13DC2009B2DC4 /* LogReader.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = LogReader.h; path = utv_logl/LogReader.h; sourceTree = "<group>"; };
+		255FB9351AE13DC2009B2DC4 /* LogUtil.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = LogUtil.cpp; path = utv_logl/LogUtil.cpp; sourceTree = "<group>"; };
+		255FB9361AE13DC2009B2DC4 /* LogUtil.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = LogUtil.h; path = utv_logl/LogUtil.h; sourceTree = "<group>"; };
+		255FB9371AE13DC2009B2DC4 /* LogWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = LogWriter.cpp; path = utv_logl/LogWriter.cpp; sourceTree = "<group>"; };
+		255FB9381AE13DC2009B2DC4 /* LogWriter.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = LogWriter.h; path = utv_logl/LogWriter.h; sourceTree = "<group>"; };
+		255FB93A1AE13DC2009B2DC4 /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = utv_logl/stdafx.h; sourceTree = "<group>"; };
+		255FB9431AE13E03009B2DC4 /* myinttypes.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = myinttypes.h; path = include/myinttypes.h; sourceTree = "<group>"; };
+		255FB94A1AE13F67009B2DC4 /* Log.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Log.cpp; path = utv_core/Log.cpp; sourceTree = "<group>"; };
+		255FB94B1AE13F67009B2DC4 /* Log.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Log.h; path = utv_core/Log.h; sourceTree = "<group>"; };
+		255FB94C1AE13F67009B2DC4 /* SymbolBits.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = SymbolBits.h; path = utv_core/SymbolBits.h; sourceTree = "<group>"; };
 		2564C7B314823C7D00F1A9EB /* Common_asm_x86.mac */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Common_asm_x86.mac; path = utv_core/Common_asm_x86.mac; sourceTree = "<group>"; };
 		2564C7B414823C7E00F1A9EB /* Convert_asm_x86.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Convert_asm_x86.asm; path = utv_core/Convert_asm_x86.asm; sourceTree = "<group>"; };
 		2564C7B514823C7E00F1A9EB /* HuffmanCode_asm_x86.asm */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = HuffmanCode_asm_x86.asm; path = utv_core/HuffmanCode_asm_x86.asm; sourceTree = "<group>"; };
@@ -125,11 +142,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		255FB92F1AE13D7A009B2DC4 /* utv_logl */ = {
+			isa = PBXGroup;
+			children = (
+				255FB9311AE13DC2009B2DC4 /* LogPath.cpp */,
+				255FB9321AE13DC2009B2DC4 /* LogPath.h */,
+				255FB9331AE13DC2009B2DC4 /* LogReader.cpp */,
+				255FB9341AE13DC2009B2DC4 /* LogReader.h */,
+				255FB9351AE13DC2009B2DC4 /* LogUtil.cpp */,
+				255FB9361AE13DC2009B2DC4 /* LogUtil.h */,
+				255FB9371AE13DC2009B2DC4 /* LogWriter.cpp */,
+				255FB9381AE13DC2009B2DC4 /* LogWriter.h */,
+				255FB93A1AE13DC2009B2DC4 /* stdafx.h */,
+			);
+			name = utv_logl;
+			sourceTree = "<group>";
+		};
+		255FB9421AE13DF3009B2DC4 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				255FB9431AE13E03009B2DC4 /* myinttypes.h */,
+			);
+			name = include;
+			sourceTree = "<group>";
+		};
 		258DB3C31411F4BA0059F47E = {
 			isa = PBXGroup;
 			children = (
 				25CE613C1AE13A0B005C05F8 /* utv_qt-Info.plist */,
+				255FB9421AE13DF3009B2DC4 /* include */,
 				25F09D3B14122EA700D214B9 /* utv_core */,
+				255FB92F1AE13D7A009B2DC4 /* utv_logl */,
 				25F09D3D14122EB200D214B9 /* utv_qt */,
 				258DB3FB1411F8C80059F47E /* Products */,
 				25F09D5414122FB800D214B9 /* Carbon.framework */,
@@ -150,7 +193,6 @@
 			isa = PBXGroup;
 			children = (
 				25CCB6ED18FD137F00076B45 /* ByteOrder.h */,
-				25CCB6F418FD137F00076B45 /* version.h */,
 				258DB3D41411F8600059F47E /* Codec.cpp */,
 				258DB3D51411F8600059F47E /* Codec.h */,
 				25CCB6EE18FD137F00076B45 /* CodecBase.cpp */,
@@ -173,10 +215,13 @@
 				258DB3E01411F8600059F47E /* HuffmanCode.cpp */,
 				258DB3E11411F8600059F47E /* HuffmanCode.h */,
 				2564C7B514823C7E00F1A9EB /* HuffmanCode_asm_x86.asm */,
+				255FB94A1AE13F67009B2DC4 /* Log.cpp */,
+				255FB94B1AE13F67009B2DC4 /* Log.h */,
 				258DB3E21411F8600059F47E /* Predict.cpp */,
 				258DB3E31411F8600059F47E /* Predict.h */,
 				2564C7B614823C7E00F1A9EB /* Predict_asm_x86.asm */,
 				258DB3E41411F8600059F47E /* stdafx.h */,
+				255FB94C1AE13F67009B2DC4 /* SymbolBits.h */,
 				258DB3E51411F8600059F47E /* Thread.cpp */,
 				258DB3E61411F8600059F47E /* Thread.h */,
 				258DB3E71411F8600059F47E /* TunedFunc.cpp */,
@@ -199,6 +244,7 @@
 				258DB3F31411F8600059F47E /* utv_core.cpp */,
 				258DB3F41411F8600059F47E /* utv_core.h */,
 				258DB3F51411F8600059F47E /* utvideo.h */,
+				25CCB6F418FD137F00076B45 /* version.h */,
 			);
 			name = utv_core;
 			sourceTree = "<group>";
@@ -241,7 +287,7 @@
 			dependencies = (
 			);
 			name = utv_qt;
-			productName = utvideo;
+			productName = utv_qt;
 			productReference = 258DB3FA1411F8C80059F47E /* utv_qt.component */;
 			productType = "com.apple.product-type.bundle";
 		};
@@ -322,6 +368,10 @@
 				25CCB6F718FD137F00076B45 /* UQY2Codec.cpp in Sources */,
 				25CCB71018FD189300076B45 /* QuickTimeFormat.cpp in Sources */,
 				258955261A9B58B100FDE981 /* TunedFunc_x86x64.cpp in Sources */,
+				255FB93B1AE13DC2009B2DC4 /* LogPath.cpp in Sources */,
+				255FB93D1AE13DC2009B2DC4 /* LogUtil.cpp in Sources */,
+				255FB93E1AE13DC2009B2DC4 /* LogWriter.cpp in Sources */,
+				255FB94D1AE13F67009B2DC4 /* Log.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,6 +403,10 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/include",
+					"$(SRCROOT)/utv_logl",
+				);
 				INFOPLIST_FILE = "utv_qt-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				OTHER_LDFLAGS = (
@@ -377,6 +431,10 @@
 				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/include",
+					"$(SRCROOT)/utv_logl",
+				);
 				INFOPLIST_FILE = "utv_qt-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
 				OTHER_LDFLAGS = (

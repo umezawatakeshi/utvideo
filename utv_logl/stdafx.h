@@ -15,11 +15,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef _WIN32
+#if defined(_WIN32)
+
 #define WIN32_LEAN_AND_MEAN		// Windows ヘッダーから使用されていない部分を除外します。
 #include <windows.h>
 #include <sddl.h>
 #include <process.h>
+
+#elif defined(__APPLE__) || defined(__unix__)
+
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
+
 #endif
 
 #define LOGWRITER_OWNER 1

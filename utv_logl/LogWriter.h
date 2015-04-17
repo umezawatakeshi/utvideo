@@ -15,7 +15,8 @@ int InitializeLogWriter(void);
 int DLLEXPORT WriteLog(const char *p);
 int UninitializeLogWriter(void);
 
-#ifdef _WIN32
+
+#if defined(_WIN32)
 
 // 関数の場合はインポートする側も dllexport で動いてしまうが、変数の場合はそうはいかない。
 #ifdef LOGWRITER_OWNER
@@ -28,6 +29,28 @@ static inline bool IsLogWriterInitialized()
 {
 	return ::hLogPipe != INVALID_HANDLE_VALUE;
 }
+
+static inline void OutputDebugLog(const char *str)
+{
+	OutputDebugStringA(str);
+}
+
+#elif defined(__APPLE__) || defined(__unix__)
+
+extern int fdLogSock;
+
+static inline bool IsLogWriterInitialized()
+{
+	return ::fdLogSock != -1;
+}
+
+static inline void OutputDebugLog(const char *str)
+{
+	fprintf(stderr, "%s", str); // XXX
+}
+
+#endif
+
 
 #ifdef _DEBUG
 
@@ -48,7 +71,7 @@ static inline bool IsLogWriterInitializedOrDebugBuild()
 			WriteLog(__LOGPRINTF_local_buf2__); \
 		} \
 		strcat(__LOGPRINTF_local_buf2__, "\n"); \
-		OutputDebugStringA(__LOGPRINTF_local_buf2__); \
+		OutputDebugLog(__LOGPRINTF_local_buf2__); \
 	} while (false)
 
 #define DBGPRINTF(...) \
@@ -59,7 +82,7 @@ static inline bool IsLogWriterInitializedOrDebugBuild()
 		sprintf(__LOGPRINTF_local_buf1__, __VA_ARGS__); \
 		sprintf(__LOGPRINTF_local_buf2__, "<%s> %s", LOG_MODULE_NAME, __LOGPRINTF_local_buf1__); \
 		strcat(__LOGPRINTF_local_buf2__, "\n"); \
-		OutputDebugStringA(__LOGPRINTF_local_buf2__); \
+		OutputDebugLog(__LOGPRINTF_local_buf2__); \
 	} while (false)
 
 #else
@@ -86,7 +109,5 @@ static inline bool IsLogWriterInitializedOrDebugBuild()
 	do \
 	{ \
 	} while (false)
-
-#endif
 
 #endif

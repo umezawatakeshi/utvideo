@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "LogPath.h"
 
-#ifdef _WIN32
+#if defined(_WIN32)
 
 int GetLogSocketPath(char *pszPath, size_t cchPath)
 {
@@ -37,6 +37,14 @@ int GetLogSocketPath(char *pszPath, size_t cchPath)
 
 	LocalFree(pszSid);
 	CloseHandle(hToken);
+	return 0;
+}
+
+#elif defined(__APPLE__) || defined(__unix__)
+
+int GetLogSocketPath(char *pszPath, size_t cchPath)
+{
+	sprintf(pszPath, "/tmp/utvideo-log-%d", getuid());
 	return 0;
 }
 
