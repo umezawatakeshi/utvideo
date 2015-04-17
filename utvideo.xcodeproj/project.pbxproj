@@ -227,9 +227,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		258DB3F91411F8C80059F47E /* utvideo */ = {
+		258DB3F91411F8C80059F47E /* utv_qt */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 258DB3FF1411F8C90059F47E /* Build configuration list for PBXNativeTarget "utvideo" */;
+			buildConfigurationList = 258DB3FF1411F8C90059F47E /* Build configuration list for PBXNativeTarget "utv_qt" */;
 			buildPhases = (
 				258DB3F61411F8C80059F47E /* Resources */,
 				258DB3F71411F8C80059F47E /* Sources */,
@@ -240,7 +240,7 @@
 			);
 			dependencies = (
 			);
-			name = utvideo;
+			name = utv_qt;
 			productName = utvideo;
 			productReference = 258DB3FA1411F8C80059F47E /* utvideo.component */;
 			productType = "com.apple.product-type.bundle";
@@ -265,7 +265,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				258DB3F91411F8C80059F47E /* utvideo */,
+				258DB3F91411F8C80059F47E /* utv_qt */,
 			);
 		};
 /* End PBXProject section */
@@ -403,7 +403,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		258DB3FF1411F8C90059F47E /* Build configuration list for PBXNativeTarget "utvideo" */ = {
+		258DB3FF1411F8C90059F47E /* Build configuration list for PBXNativeTarget "utv_qt" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				258DB3FD1411F8C90059F47E /* Debug */,
