@@ -81,6 +81,17 @@ int __declspec(dllexport) WriteLog(const char *p)
 
 int fdLogSock = -1;
 
+static int writeLog(const char *buf, size_t len)
+{
+	return send(fdLogSock, buf, len,
+#ifdef MSG_NOSIGNAL
+		MSG_NOSIGNAL
+#else
+		0
+#endif
+	);
+}
+
 int InitializeLogWriter(void)
 {
 	char buf[256];
@@ -94,6 +105,10 @@ int InitializeLogWriter(void)
 	fdLogSock = socket(AF_UNIX, SOCK_STREAM, 0);
 	if (fdLogSock == -1)
 		return -1;
+#ifdef SO_NOSIGPIPE
+	const int on = 1;
+	setsockopt(fdLogSock, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(int));
+#endif
 	if (connect(fdLogSock, (sockaddr *)&sun, sizeof(sun)) != 0)
 	{
 		close(fdLogSock);
@@ -102,7 +117,7 @@ int InitializeLogWriter(void)
 	}
 
 	sprintf(buf, "%s[%d]\n", getprogname(), getpid()); // XXX getprogname: only BSD family and MacOS
-	if (write(fdLogSock, buf, strlen(buf)) != strlen(buf))
+	if (writeLog(buf, strlen(buf)) != strlen(buf))
 	{
 		close(fdLogSock);
 		fdLogSock = -1;
@@ -123,12 +138,12 @@ int UninitializeLogWriter(void)
 
 int WriteLog(const char *p)
 {
-	if (write(fdLogSock, p, strlen(p)) != strlen(p))
+	if (writeLog(p, strlen(p)) != strlen(p))
 	{
 		UninitializeLogWriter();
 		return -1;
 	}
-	if (write(fdLogSock, "\n", 1) != 1)
+	if (writeLog("\n", 1) != 1)
 	{
 		UninitializeLogWriter();
 		return -1;
