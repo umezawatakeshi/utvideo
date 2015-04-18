@@ -133,8 +133,6 @@ int InitializeLogReader(LogReaderOpenProc fnOpenProc, LogReaderReadProc fnReadPr
 		hThreads[i] = (HANDLE)_beginthreadex(NULL, 0, PipeServerProc, (void *)(intptr_t)(i), 0, NULL);
 	}
 
-	WaitForMultipleObjects(NCLIENTS, hThreads, TRUE, INFINITE);
-
 	if (bLoop)
 	{
 		WaitForMultipleObjects(NCLIENTS, hThreads, TRUE, INFINITE);
