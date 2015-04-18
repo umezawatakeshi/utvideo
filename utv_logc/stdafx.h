@@ -14,7 +14,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _WIN32
+#if defined(_WIN32)
+
 #define WIN32_LEAN_AND_MEAN		// Windows ヘッダーから使用されていない部分を除外します。
 #include <windows.h>
+
+#elif defined(__APPLE__) || defined(__unix__)
+
+#include <errno.h>
+#include <string.h>
+
 #endif

@@ -13,7 +13,11 @@ void CloseProc(int id, int idx, const char *ident);
 int main(int argc, char **argv)
 {
 	InitializeLogReader(OpenProc, ReadProc, CloseProc, true);
+#if defined(_WIN32)
 	printf("%d\n", GetLastError());
+#elif defined(__APPLE__) || defined(__unix__)
+	printf("%s (%d)\n", strerror(errno), errno);
+#endif
 	return 0;
 }
 

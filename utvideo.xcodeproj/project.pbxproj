@@ -17,6 +17,10 @@
 		2564C7BB14823C7E00F1A9EB /* Predict_asm_x86.asm in Sources */ = {isa = PBXBuildFile; fileRef = 2564C7B614823C7E00F1A9EB /* Predict_asm_x86.asm */; settings = {COMPILER_FLAGS = "-i utv_core/"; }; };
 		25817AEA175A052D00888CE2 /* ULYUV420Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25817AE6175A052D00888CE2 /* ULYUV420Codec.cpp */; };
 		25817AEB175A052D00888CE2 /* ULYUV422Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25817AE8175A052D00888CE2 /* ULYUV422Codec.cpp */; };
+		2582390A1AE25036003BA1AD /* LogPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255FB9311AE13DC2009B2DC4 /* LogPath.cpp */; };
+		2582390B1AE25036003BA1AD /* LogReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255FB9331AE13DC2009B2DC4 /* LogReader.cpp */; };
+		258239121AE250C4003BA1AD /* utv_logc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258239111AE250C4003BA1AD /* utv_logc.cpp */; };
+		2582392E1AE264C7003BA1AD /* libpthread.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2582392D1AE264C7003BA1AD /* libpthread.dylib */; };
 		258955261A9B58B100FDE981 /* TunedFunc_x86x64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25CF5DF9172422DE0089819C /* TunedFunc_x86x64.cpp */; };
 		258DB4001411F91A0059F47E /* Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D41411F8600059F47E /* Codec.cpp */; };
 		258DB4011411F9290059F47E /* Convert.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D61411F8600059F47E /* Convert.cpp */; };
@@ -72,6 +76,10 @@
 		25817AE7175A052D00888CE2 /* ULYUV420Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = ULYUV420Codec.h; path = utv_core/ULYUV420Codec.h; sourceTree = "<group>"; };
 		25817AE8175A052D00888CE2 /* ULYUV422Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = ULYUV422Codec.cpp; path = utv_core/ULYUV422Codec.cpp; sourceTree = "<group>"; };
 		25817AE9175A052D00888CE2 /* ULYUV422Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = ULYUV422Codec.h; path = utv_core/ULYUV422Codec.h; sourceTree = "<group>"; };
+		258239061AE25010003BA1AD /* utv_logc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = utv_logc; sourceTree = BUILT_PRODUCTS_DIR; };
+		258239101AE250C4003BA1AD /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = utv_logc/stdafx.h; sourceTree = "<group>"; };
+		258239111AE250C4003BA1AD /* utv_logc.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = utv_logc.cpp; path = utv_logc/utv_logc.cpp; sourceTree = "<group>"; };
+		2582392D1AE264C7003BA1AD /* libpthread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpthread.dylib; path = /usr/lib/libpthread.dylib; sourceTree = "<absolute>"; };
 		258DB3D41411F8600059F47E /* Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Codec.cpp; path = utv_core/Codec.cpp; sourceTree = "<group>"; };
 		258DB3D51411F8600059F47E /* Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Codec.h; path = utv_core/Codec.h; sourceTree = "<group>"; };
 		258DB3D61411F8600059F47E /* Convert.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Convert.cpp; path = utv_core/Convert.cpp; sourceTree = "<group>"; };
@@ -129,6 +137,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		258239041AE25010003BA1AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2582392E1AE264C7003BA1AD /* libpthread.dylib in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		258DB3F81411F8C80059F47E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -166,18 +182,29 @@
 			name = include;
 			sourceTree = "<group>";
 		};
+		2582390F1AE2509F003BA1AD /* utv_logc */ = {
+			isa = PBXGroup;
+			children = (
+				258239101AE250C4003BA1AD /* stdafx.h */,
+				258239111AE250C4003BA1AD /* utv_logc.cpp */,
+			);
+			name = utv_logc;
+			sourceTree = "<group>";
+		};
 		258DB3C31411F4BA0059F47E = {
 			isa = PBXGroup;
 			children = (
 				25CE613C1AE13A0B005C05F8 /* utv_qt-Info.plist */,
 				255FB9421AE13DF3009B2DC4 /* include */,
 				25F09D3B14122EA700D214B9 /* utv_core */,
+				2582390F1AE2509F003BA1AD /* utv_logc */,
 				255FB92F1AE13D7A009B2DC4 /* utv_logl */,
 				25F09D3D14122EB200D214B9 /* utv_qt */,
 				258DB3FB1411F8C80059F47E /* Products */,
 				25F09D5414122FB800D214B9 /* Carbon.framework */,
 				2529170014D02DCB00A3813C /* CoreVideo.framework */,
 				25F09D5B14122FCF00D214B9 /* QuickTime.framework */,
+				2582392D1AE264C7003BA1AD /* libpthread.dylib */,
 			);
 			sourceTree = "<group>";
 		};
@@ -185,6 +212,7 @@
 			isa = PBXGroup;
 			children = (
 				258DB3FA1411F8C80059F47E /* utv_qt.component */,
+				258239061AE25010003BA1AD /* utv_logc */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -273,6 +301,22 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		258239051AE25010003BA1AD /* utv_logc */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2582390C1AE25054003BA1AD /* Build configuration list for PBXNativeTarget "utv_logc" */;
+			buildPhases = (
+				258239031AE25010003BA1AD /* Sources */,
+				258239041AE25010003BA1AD /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = utv_logc;
+			productName = utv_logc;
+			productReference = 258239061AE25010003BA1AD /* utv_logc */;
+			productType = "com.apple.product-type.tool";
+		};
 		258DB3F91411F8C80059F47E /* utv_qt */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 258DB3FF1411F8C90059F47E /* Build configuration list for PBXNativeTarget "utv_qt" */;
@@ -312,6 +356,7 @@
 			projectRoot = "";
 			targets = (
 				258DB3F91411F8C80059F47E /* utv_qt */,
+				258239051AE25010003BA1AD /* utv_logc */,
 			);
 		};
 /* End PBXProject section */
@@ -338,6 +383,16 @@
 /* End PBXRezBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		258239031AE25010003BA1AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2582390A1AE25036003BA1AD /* LogPath.cpp in Sources */,
+				2582390B1AE25036003BA1AD /* LogReader.cpp in Sources */,
+				258239121AE250C4003BA1AD /* utv_logc.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		258DB3F71411F8C80059F47E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -378,6 +433,44 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		258239081AE25011003BA1AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/include",
+					"$(SRCROOT)/utv_logl",
+				);
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = utv_logc;
+			};
+			name = Debug;
+		};
+		258239091AE25011003BA1AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_MODEL_TUNING = G5;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/include",
+					"$(SRCROOT)/utv_logl",
+				);
+				INSTALL_PATH = /usr/local/bin;
+				PREBINDING = NO;
+				PRODUCT_NAME = utv_logc;
+				ZERO_LINK = NO;
+			};
+			name = Release;
+		};
 		258DB3C61411F4BA0059F47E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -452,6 +545,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		2582390C1AE25054003BA1AD /* Build configuration list for PBXNativeTarget "utv_logc" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				258239081AE25011003BA1AD /* Debug */,
+				258239091AE25011003BA1AD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		258DB3C81411F4BA0059F47E /* Build configuration list for PBXProject "utvideo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
