@@ -38,7 +38,7 @@ pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 	if (glob == NULL)
 		return memFullErr;
 
-	LOGPRINTF("QTDecoderOpen(glob=%" PRIp ", self=%" PRIp ")", glob, self);
+	LOGPRINTF("QTDecoderOpen(glob=%p, self=%p)", glob, self);
 
 	err = QTCodecOpen(glob, self);
 	if (err != noErr)
@@ -77,7 +77,7 @@ pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 
 pascal ComponentResult QTDecoderClose(CQTDecoder *glob, ComponentInstance self)
 {
-	LOGPRINTF("QTDecoderClose(glob=%" PRIp ", self=%" PRIp ")", glob, self);
+	LOGPRINTF("QTDecoderClose(glob=%p, self=%p)", glob, self);
 
 	if (glob != NULL)
 	{

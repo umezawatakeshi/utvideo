@@ -7,12 +7,12 @@
 
 CCodecBase::CCodecBase(const char *pszTinyName, const char *pszInterfaceName) : m_pszTinyName(pszTinyName), m_pszInterfaceName(pszInterfaceName)
 {
-	LOGPRINTF("%" PRIp " CCodecBase::CCodecBase(pszTinyName=\"%s\", pszInterfaceName=\"%s\")", this, pszTinyName, pszInterfaceName);
+	LOGPRINTF("%p CCodecBase::CCodecBase(pszTinyName=\"%s\", pszInterfaceName=\"%s\")", this, pszTinyName, pszInterfaceName);
 }
 
 CCodecBase::~CCodecBase(void)
 {
-	LOGPRINTF("%" PRIp " CCodecBase::~CCodecBase()", this);
+	LOGPRINTF("%p CCodecBase::~CCodecBase()", this);
 }
 
 const char *CCodecBase::GetTinyName(void)
@@ -159,36 +159,36 @@ int CCodecBase::InternalSetStateWrapper(const void *pState, size_t cb)
 	{
 		char buf[256];
 		FormatBinary(buf, pState, cb, GetStateSize());
-		LOGPRINTF("%" PRIp " CCodecBase::InternalSetStateWrapper(pState=%s, cb=%" PRIuSZT ")", this, buf, cb);
+		LOGPRINTF("%p CCodecBase::InternalSetStateWrapper(pState=%s, cb=%" PRIuSZT ")", this, buf, cb);
 	}
 
 	int ret = InternalSetState(pState, cb);
-	LOGPRINTF("%" PRIp " CCodecBase::InternalSetStateWrapper return %d", this, ret);
+	LOGPRINTF("%p CCodecBase::InternalSetStateWrapper return %d", this, ret);
 	return ret;
 }
 
 int CCodecBase::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
-	LOGPRINTF("%" PRIp " CCodecBase::EncodeBegin(infmt=%08X, width=%u, height=%u, cbGrossWidth=%" PRIdSZT ")", this, infmt, width, height, cbGrossWidth);
+	LOGPRINTF("%p CCodecBase::EncodeBegin(infmt=%08X, width=%u, height=%u, cbGrossWidth=%" PRIdSZT ")", this, infmt, width, height, cbGrossWidth);
 
 	int ret = InternalEncodeBegin(infmt, width, height, cbGrossWidth);
-	LOGPRINTF("%" PRIp " CCodecBase::EncodeBegin return %d", this, ret);
+	LOGPRINTF("%p CCodecBase::EncodeBegin return %d", this, ret);
 	return ret;
 }
 
 int CCodecBase::EncodeEnd(void)
 {
-	LOGPRINTF("%" PRIp " CCodecBase::EncodeEnd()", this);
+	LOGPRINTF("%p CCodecBase::EncodeEnd()", this);
 
 	return InternalEncodeEnd();
 }
 
 int CCodecBase::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height)
 {
-	LOGPRINTF("%" PRIp " CCodecBase::EncodeQuery(infmt=%08X, width=%u, height=%u)", this, infmt, width, height);
+	LOGPRINTF("%p CCodecBase::EncodeQuery(infmt=%08X, width=%u, height=%u)", this, infmt, width, height);
 
 	int ret = InternalEncodeQuery(infmt, width, height);
-	LOGPRINTF("%" PRIp " CCodecBase::EncodeQuery return %d", this, ret);
+	LOGPRINTF("%p CCodecBase::EncodeQuery return %d", this, ret);
 	return ret;
 }
 
@@ -198,17 +198,17 @@ int CCodecBase::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int heig
 	{
 		char buf[256];
 		FormatBinary(buf, pExtraData, cbExtraData, EncodeGetExtraDataSize());
-		LOGPRINTF("%" PRIp " CCodecBase::DecodeBegin(outfmt=%08X, width=%u, height=%u, cbGrossWidth=%" PRIdSZT ", pExtraData=%s, cbExtraData=%" PRIuSZT ")", this, outfmt, width, height, cbGrossWidth, buf, cbExtraData);
+		LOGPRINTF("%p CCodecBase::DecodeBegin(outfmt=%08X, width=%u, height=%u, cbGrossWidth=%" PRIdSZT ", pExtraData=%s, cbExtraData=%" PRIuSZT ")", this, outfmt, width, height, cbGrossWidth, buf, cbExtraData);
 	}
 
 	int ret = InternalDecodeBegin(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
-	LOGPRINTF("%" PRIp " CCodecBase::DecodeBegin return %d", this, ret);
+	LOGPRINTF("%p CCodecBase::DecodeBegin return %d", this, ret);
 	return ret;
 }
 
 int CCodecBase::DecodeEnd(void)
 {
-	LOGPRINTF("%" PRIp " CCodecBase::DecodeEnd()", this);
+	LOGPRINTF("%p CCodecBase::DecodeEnd()", this);
 
 	return InternalDecodeEnd();
 }
@@ -219,11 +219,11 @@ int CCodecBase::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int heig
 	{
 		char buf[256];
 		FormatBinary(buf, pExtraData, cbExtraData, EncodeGetExtraDataSize());
-		LOGPRINTF("%" PRIp " CCodecBase::DecodeQuery(outfmt=%08X, width=%u, height=%u, pExtraData=%s, cbExtraData=%" PRIuSZT ")", this, outfmt, width, height, buf, cbExtraData);
+		LOGPRINTF("%p CCodecBase::DecodeQuery(outfmt=%08X, width=%u, height=%u, pExtraData=%s, cbExtraData=%" PRIuSZT ")", this, outfmt, width, height, buf, cbExtraData);
 	}
 
 	int ret = InternalDecodeQuery(outfmt, width, height, pExtraData, cbExtraData);
-	LOGPRINTF("%" PRIp " CCodecBase::DecodeQuery return %d", this, ret);
+	LOGPRINTF("%p CCodecBase::DecodeQuery return %d", this, ret);
 	return ret;
 }
 

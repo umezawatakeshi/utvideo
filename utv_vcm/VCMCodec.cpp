@@ -10,19 +10,19 @@ CVCMCodec::CVCMCodec(DWORD fccHandler) : m_fcc(fccHandler)
 {
 	utvf_t utvf;
 
-	LOGPRINTF("%" PRIp " CVCMCodec::CVCMCodec(fccHandler=%08X)", this, fccHandler);
+	LOGPRINTF("%p CVCMCodec::CVCMCodec(fccHandler=%08X)", this, fccHandler);
 
 	if (VCMFormatToUtVideoFormat(&utvf, fccHandler, 0) != 0)
 		utvf = UTVF_INVALID;
 
 	m_pCodec = CCodec::CreateInstance(utvf, "VCM");
 
-	LOGPRINTF("%" PRIp "  m_pCodec=%" PRIp ", TinyName=\"%s\"", this, m_pCodec, m_pCodec->GetTinyName());
+	LOGPRINTF("%p  m_pCodec=%p, TinyName=\"%s\"", this, m_pCodec, m_pCodec->GetTinyName());
 }
 
 CVCMCodec::~CVCMCodec(void)
 {
-	LOGPRINTF("%" PRIp " CVCMCodec::~CVCMCodec()", this);
+	LOGPRINTF("%p CVCMCodec::~CVCMCodec()", this);
 
 	CCodec::DeleteInstance(m_pCodec);
 }
@@ -32,7 +32,7 @@ CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)
 	if (IsLogWriterInitializedOrDebugBuild())
 	{
 		if (icopen != NULL)
-			LOGPRINTF("CVCMCodec::Open(icopen=%" PRIp ", icopen->fccType=%08X, icopen->fccHandler=%08X)", icopen, icopen->fccType, icopen->fccHandler);
+			LOGPRINTF("CVCMCodec::Open(icopen=%p, icopen->fccType=%08X, icopen->fccHandler=%08X)", icopen, icopen->fccType, icopen->fccHandler);
 		else
 			LOGPRINTF("CVCMCodec::Open(icopen=NULL)");
 	}
@@ -128,14 +128,14 @@ LRESULT CVCMCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 }
 
 #define LOGPRINT_BIH_THIS(_this, prefix, pbih) \
-	LOGPRINTF("%" PRIp " %s: biSize=%d, biWidth=%d, biHeight=%d, biPlanes=%d, biBitCount=%d, biCompression=%08X, biSizeImage=%d", \
+	LOGPRINTF("%p %s: biSize=%d, biWidth=%d, biHeight=%d, biPlanes=%d, biBitCount=%d, biCompression=%08X, biSizeImage=%d", \
 		_this, prefix, pbih->biSize, pbih->biWidth, pbih->biHeight, pbih->biPlanes, pbih->biBitCount, pbih->biCompression, pbih->biSizeImage);
 
 LRESULT CVCMCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
 	if (IsLogWriterInitializedOrDebugBuild())
 	{
-		LOGPRINTF("%" PRIp " CVCMCodec::CompressBegin(pbihIn=%" PRIp ", pbihOut=%" PRIp ")", this, pbihIn, pbihOut);
+		LOGPRINTF("%p CVCMCodec::CompressBegin(pbihIn=%p, pbihOut=%p)", this, pbihIn, pbihOut);
 		if (pbihIn != NULL)
 			LOGPRINT_BIH_THIS(this, " pbihIn ", pbihIn);
 		if (pbihOut != NULL)
@@ -157,7 +157,7 @@ LRESULT CVCMCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINF
 
 LRESULT CVCMCodec::CompressEnd(void)
 {
-	LOGPRINTF("%" PRIp " CVCMCodec::CompressEnd()", this);
+	LOGPRINTF("%p CVCMCodec::CompressEnd()", this);
 
 	return m_pCodec->EncodeEnd();
 }
@@ -166,7 +166,7 @@ LRESULT CVCMCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOH
 {
 	if (IsLogWriterInitializedOrDebugBuild())
 	{
-		LOGPRINTF("%" PRIp " CVCMCodec::CompressGetFormat(pbihIn=%" PRIp ", pbihOut=%" PRIp ")", this, pbihIn, pbihOut);
+		LOGPRINTF("%p CVCMCodec::CompressGetFormat(pbihIn=%p, pbihOut=%p)", this, pbihIn, pbihOut);
 		if (pbihIn != NULL)
 			LOGPRINT_BIH_THIS(this, " pbihIn ", pbihIn);
 	}
@@ -201,7 +201,7 @@ LRESULT CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINF
 {
 	if (IsLogWriterInitializedOrDebugBuild())
 	{
-		LOGPRINTF("%" PRIp " CVCMCodec::CompressQuery(pbihIn=%" PRIp ", pbihOut=%" PRIp ")", this, pbihIn, pbihOut);
+		LOGPRINTF("%p CVCMCodec::CompressQuery(pbihIn=%p, pbihOut=%p)", this, pbihIn, pbihOut);
 		if (pbihIn != NULL)
 			LOGPRINT_BIH_THIS(this, " pbihIn ", pbihIn);
 		if (pbihOut != NULL)
@@ -235,7 +235,7 @@ LRESULT CVCMCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPI
 {
 	if (IsLogWriterInitializedOrDebugBuild())
 	{
-		LOGPRINTF("%" PRIp " CVCMCodec::DecompressBegin(pbihIn=%" PRIp ", pbihOut=%" PRIp ")", this, pbihIn, pbihOut);
+		LOGPRINTF("%p CVCMCodec::DecompressBegin(pbihIn=%p, pbihOut=%p)", this, pbihIn, pbihOut);
 		if (pbihIn != NULL)
 			LOGPRINT_BIH_THIS(this, " pbihIn ", pbihIn);
 		if (pbihOut != NULL)
@@ -257,7 +257,7 @@ LRESULT CVCMCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPI
 
 LRESULT CVCMCodec::DecompressEnd(void)
 {
-	LOGPRINTF("%" PRIp " CVCMCodec::DecompressEnd()", this);
+	LOGPRINTF("%p CVCMCodec::DecompressEnd()", this);
 
 	return m_pCodec->DecodeEnd();
 }
@@ -266,7 +266,7 @@ LRESULT CVCMCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINF
 {
 	if (IsLogWriterInitializedOrDebugBuild())
 	{
-		LOGPRINTF("%" PRIp " CVCMCodec::DecompressGetFormat(pbihIn=%" PRIp ", pbihOut=%" PRIp ")", this, pbihIn, pbihOut);
+		LOGPRINTF("%p CVCMCodec::DecompressGetFormat(pbihIn=%p, pbihOut=%p)", this, pbihIn, pbihOut);
 		if (pbihIn != NULL)
 			LOGPRINT_BIH_THIS(this, " pbihIn ", pbihIn);
 	}
@@ -295,7 +295,7 @@ LRESULT CVCMCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPI
 {
 	if (IsLogWriterInitializedOrDebugBuild())
 	{
-		LOGPRINTF("%" PRIp " CVCMCodec::DecompressQuery(pbihIn=%" PRIp ", pbihOut=%" PRIp ")", this, pbihIn, pbihOut);
+		LOGPRINTF("%p CVCMCodec::DecompressQuery(pbihIn=%p, pbihOut=%p)", this, pbihIn, pbihOut);
 		if (pbihIn != NULL)
 			LOGPRINT_BIH_THIS(this, " pbihIn ", pbihIn);
 		if (pbihOut != NULL)

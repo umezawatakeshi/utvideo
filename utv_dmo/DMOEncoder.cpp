@@ -13,7 +13,7 @@ const GUID &CDMOEncoder::DMOCATEGORY = DMOCATEGORY_VIDEO_ENCODER;
 
 HRESULT CDMOEncoder::InternalAllocateStreamingResources()
 {
-	LOGPRINTF("%" PRIp " CDMOEncoder::InternalAllocateStreamingResources()", this);
+	LOGPRINTF("%p CDMOEncoder::InternalAllocateStreamingResources()", this);
 
 	const DMO_MEDIA_TYPE *pmtIn  = InputType(0);
 	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
@@ -30,7 +30,7 @@ HRESULT CDMOEncoder::InternalAllocateStreamingResources()
 
 HRESULT CDMOEncoder::InternalFreeStreamingResources()
 {
-	LOGPRINTF("%" PRIp " CDMOEncoder::InternalFreeStreamingResources()", this);
+	LOGPRINTF("%p CDMOEncoder::InternalFreeStreamingResources()", this);
 
 	m_pCodec->EncodeEnd();
 

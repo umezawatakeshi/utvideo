@@ -19,9 +19,3 @@
 #define PRIoSZT PRISZT_PREFIX "o"
 #define PRIxSZT PRISZT_PREFIX "x"
 #define PRIXSZT PRISZT_PREFIX "X"
-
-#if SIZE_MAX == 4294967295U
-#define PRIp "08" PRIXSZT
-#else
-#define PRIp "016" PRIXSZT
-#endif

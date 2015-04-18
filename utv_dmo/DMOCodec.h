@@ -48,7 +48,7 @@ public:
 		{
 			OLECHAR szClsId[48];
 			StringFromGUID2(clsid, szClsId, _countof(szClsId));
-			LOGPRINTF("%" PRIp " CDMOCodec::CDMOCodec(fcc=%08X, clsid=%S)", this, fcc, szClsId);
+			LOGPRINTF("%p CDMOCodec::CDMOCodec(fcc=%08X, clsid=%S)", this, fcc, szClsId);
 		}
 
 		utvf_t utvf;
@@ -57,12 +57,12 @@ public:
 		m_pCodec = CCodec::CreateInstance(utvf, "DMO");
 		m_pInputBuffer = NULL;
 
-		LOGPRINTF("%" PRIp "  m_pCodec=%" PRIp ", TinyName=\"%s\"", this, m_pCodec, m_pCodec->GetTinyName());
+		LOGPRINTF("%p  m_pCodec=%p, TinyName=\"%s\"", this, m_pCodec, m_pCodec->GetTinyName());
 	}
 
 	virtual ~CDMOCodec()
 	{
-		LOGPRINTF("%" PRIp " CDMOCodec::~CDMOCodec()", this);
+		LOGPRINTF("%p CDMOCodec::~CDMOCodec()", this);
 
 		FreeStreamingResources();
 
@@ -160,7 +160,7 @@ public:
 	}
 
 #define LOGPRINT_BIH_THIS(_this, prefix, pbih) \
-	LOGPRINTF("%" PRIp " %s: biSize=%d, biWidth=%d, biHeight=%d, biPlanes=%d, biBitCount=%d, biCompression=%08X, biSizeImage=%d", \
+	LOGPRINTF("%p %s: biSize=%d, biWidth=%d, biHeight=%d, biPlanes=%d, biBitCount=%d, biCompression=%08X, biSizeImage=%d", \
 		(_this), (prefix), (pbih)->biSize, (pbih)->biWidth, (pbih)->biHeight, (pbih)->biPlanes, (pbih)->biBitCount, (pbih)->biCompression, (pbih)->biSizeImage);
 #define LOGPRINT_DMT_THIS(_this, prefix, pmt) \
 	do \
@@ -171,7 +171,7 @@ public:
 		StringFromGUID2((pmt)->majortype, szMajorType, _countof(szMajorType)); \
 		StringFromGUID2((pmt)->subtype, szSubType, _countof(szSubType)); \
 		StringFromGUID2((pmt)->formattype, szFormatType, _countof(szFormatType)); \
-		LOGPRINTF("%" PRIp " %s: majortype=%S, subtype=%S, formattype=%S, pbFormat=%" PRIp, \
+		LOGPRINTF("%p %s: majortype=%S, subtype=%S, formattype=%S, pbFormat=%p", \
 			(_this), (prefix), szMajorType, szSubType, szFormatType, (pmt)->pbFormat); \
 	} while (false)
 
@@ -179,7 +179,7 @@ public:
 	{
 		if (IsLogWriterInitializedOrDebugBuild())
 		{
-			LOGPRINTF("%" PRIp " CDMOCodec::InternalCheckInputType(dwInputStreamIndex=%d, pmt=%" PRIp ")", this, dwInputStreamIndex, pmt);
+			LOGPRINTF("%p CDMOCodec::InternalCheckInputType(dwInputStreamIndex=%d, pmt=%p)", this, dwInputStreamIndex, pmt);
 			if (pmt != NULL)
 			{
 				LOGPRINT_DMT_THIS(this, " pmt", pmt);
@@ -222,7 +222,7 @@ public:
 	{
 		if (IsLogWriterInitializedOrDebugBuild())
 		{
-			LOGPRINTF("%" PRIp " CDMOCodec::InternalCheckOutputType(dwOutputStreamIndex=%d, pmt=%" PRIp ")", this, dwOutputStreamIndex, pmt);
+			LOGPRINTF("%p CDMOCodec::InternalCheckOutputType(dwOutputStreamIndex=%d, pmt=%p)", this, dwOutputStreamIndex, pmt);
 			if (pmt != NULL)
 			{
 				LOGPRINT_DMT_THIS(this, " pmt", pmt);
@@ -273,7 +273,7 @@ public:
 
 	HRESULT InternalGetInputType(DWORD dwInputStreamIndex, DWORD dwTypeIndex, DMO_MEDIA_TYPE *pmt)
 	{
-		LOGPRINTF("%" PRIp " CDMOCodec::InternalGetInputType(dwInputStreamIndex=%d, dwTypeIndex=%d, pmt=%" PRIp ")", this, dwInputStreamIndex, dwTypeIndex, pmt);
+		LOGPRINTF("%p CDMOCodec::InternalGetInputType(dwInputStreamIndex=%d, dwTypeIndex=%d, pmt=%p)", this, dwInputStreamIndex, dwTypeIndex, pmt);
 
 		const utvf_t *putvf = T::GetInputFormatInfo(m_pCodec);
 		GUID subtype;
@@ -303,7 +303,7 @@ public:
 
 	HRESULT InternalGetOutputType(DWORD dwOutputStreamIndex, DWORD dwTypeIndex, DMO_MEDIA_TYPE *pmt)
 	{
-		LOGPRINTF("%" PRIp " CDMOCodec::InternalGetOutputType(dwOutputStreamIndex=%d, dwTypeIndex=%d, pmt=%" PRIp ")", this, dwOutputStreamIndex, dwTypeIndex, pmt);
+		LOGPRINTF("%p CDMOCodec::InternalGetOutputType(dwOutputStreamIndex=%d, dwTypeIndex=%d, pmt=%p)", this, dwOutputStreamIndex, dwTypeIndex, pmt);
 
 		const utvf_t *putvf = T::GetOutputFormatInfo(m_pCodec);
 		GUID subtype;
@@ -355,7 +355,7 @@ public:
 
 	HRESULT InternalGetInputSizeInfo(DWORD dwInputStreamIndex, DWORD *pcbSize, DWORD *pcbMaxLookahead, DWORD *pcbAlignment)
 	{
-		LOGPRINTF("%" PRIp " CDMOCodec::InternalGetOutputSizeInfo(dwInputStreamIndex=%d, pcbSize=%" PRIp ", pcbMaxLookahead=%" PRIp ", pcbAlignment=%" PRIp ")", this, dwInputStreamIndex, pcbSize, pcbMaxLookahead, pcbAlignment);
+		LOGPRINTF("%p CDMOCodec::InternalGetOutputSizeInfo(dwInputStreamIndex=%d, pcbSize=%p, pcbMaxLookahead=%p, pcbAlignment=%p)", this, dwInputStreamIndex, pcbSize, pcbMaxLookahead, pcbAlignment);
 
 		*pcbSize = 0;
 		*pcbMaxLookahead = 0;
@@ -366,7 +366,7 @@ public:
 
 	HRESULT InternalGetOutputSizeInfo(DWORD dwOutputStreamIndex, DWORD *pcbSize, DWORD *pcbAlignment)
 	{
-		LOGPRINTF("%" PRIp " CDMOCodec::InternalGetOutputSizeInfo(dwOutputStreamIndex=%d, pcbSize=%" PRIp ", pcbAlignment=%" PRIp ")", this, dwOutputStreamIndex, pcbSize, pcbAlignment);
+		LOGPRINTF("%p CDMOCodec::InternalGetOutputSizeInfo(dwOutputStreamIndex=%d, pcbSize=%p, pcbAlignment=%p)", this, dwOutputStreamIndex, pcbSize, pcbAlignment);
 
 		const DMO_MEDIA_TYPE *pmtIn  = InputType(0);
 		const DMO_MEDIA_TYPE *pmtOut = OutputType(0);
@@ -398,7 +398,7 @@ public:
 
 	HRESULT InternalFlush()
 	{
-		LOGPRINTF("%" PRIp " CDMOCodec::InternalFlush()", this);
+		LOGPRINTF("%p CDMOCodec::InternalFlush()", this);
 
 		if (m_pInputBuffer != NULL)
 		{
@@ -411,7 +411,7 @@ public:
 
 	HRESULT InternalDiscontinuity(DWORD dwInputStreamIndex)
 	{
-		LOGPRINTF("%" PRIp " CDMOCodec::InternalDiscontinuity(dwInputStreamIndex=%d)", this, dwInputStreamIndex);
+		LOGPRINTF("%p CDMOCodec::InternalDiscontinuity(dwInputStreamIndex=%d)", this, dwInputStreamIndex);
 
 		return S_OK;
 	}

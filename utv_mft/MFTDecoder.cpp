@@ -13,7 +13,7 @@ const GUID &CMFTDecoder::MFTCATEGORY = MFT_CATEGORY_VIDEO_DECODER;
 
 HRESULT CMFTDecoder::InternalBeginStream(void)
 {
-	LOGPRINTF("%" PRIp " CMFTDecoder::InternalBeginStream()", this);
+	LOGPRINTF("%p CMFTDecoder::InternalBeginStream()", this);
 
 	if (m_pCodec->DecodeBegin(m_outfmt, m_nFrameWidth, m_nFrameHeight, CBGROSSWIDTH_WINDOWS, m_pInputUserData, m_cbInputUserData) == 0)
 		return S_OK;
@@ -23,7 +23,7 @@ HRESULT CMFTDecoder::InternalBeginStream(void)
 
 HRESULT CMFTDecoder::InternalEndStream(void)
 {
-	LOGPRINTF("%" PRIp " CMFTDecoder::InternalEndStream()", this);
+	LOGPRINTF("%p CMFTDecoder::InternalEndStream()", this);
 
 	m_pCodec->DecodeEnd();
 

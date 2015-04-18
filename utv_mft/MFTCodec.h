@@ -80,7 +80,7 @@ public:
 		{
 			OLECHAR szClsId[48];
 			StringFromGUID2(clsid, szClsId, _countof(szClsId));
-			LOGPRINTF("%" PRIp " CMFTCodec::CMFTCodec(fcc=%08X, clsid=%S)", this, fcc, szClsId);
+			LOGPRINTF("%p CMFTCodec::CMFTCodec(fcc=%08X, clsid=%S)", this, fcc, szClsId);
 		}
 
 		utvf_t utvf;
@@ -94,12 +94,12 @@ public:
 		m_pOutputUserData = NULL;
 		m_bStreamBegin = false;
 
-		LOGPRINTF("%" PRIp "  m_pCodec=%" PRIp ", TinyName=\"%s\"", this, m_pCodec, m_pCodec->GetTinyName());
+		LOGPRINTF("%p  m_pCodec=%p, TinyName=\"%s\"", this, m_pCodec, m_pCodec->GetTinyName());
 	}
 
 	virtual ~CMFTCodec()
 	{
-		LOGPRINTF("%" PRIp " CMFTCodec::~CMFTCodec()", this);
+		LOGPRINTF("%p CMFTCodec::~CMFTCodec()", this);
 
 		EndStream();
 
@@ -267,7 +267,7 @@ public:
 
 	HRESULT STDMETHODCALLTYPE GetInputAvailableType(DWORD dwInputStreamID, DWORD dwTypeIndex, IMFMediaType **ppType)
 	{
-		LOGPRINTF("%" PRIp " CMFTCodec::GetInputAvailableType(dwInputStreamID=%d, dwTypeIndex=%d, ppType=%" PRIp ")", this, dwInputStreamID, dwTypeIndex, ppType);
+		LOGPRINTF("%p CMFTCodec::GetInputAvailableType(dwInputStreamID=%d, dwTypeIndex=%d, ppType=%p)", this, dwInputStreamID, dwTypeIndex, ppType);
 
 		LockIt lck(static_cast<T *>(this));
 
@@ -304,7 +304,7 @@ public:
 
 	HRESULT STDMETHODCALLTYPE GetOutputAvailableType(DWORD dwOutputStreamID, DWORD dwTypeIndex, IMFMediaType **ppType)
 	{
-		LOGPRINTF("%" PRIp " CMFTCodec::GetOutputAvailableType(dwOutputStreamID=%d, dwTypeIndex=%d, ppType=%" PRIp ")", this, dwOutputStreamID, dwTypeIndex, ppType);
+		LOGPRINTF("%p CMFTCodec::GetOutputAvailableType(dwOutputStreamID=%d, dwTypeIndex=%d, ppType=%p)", this, dwOutputStreamID, dwTypeIndex, ppType);
 
 		LockIt lck(static_cast<T *>(this));
 
@@ -360,7 +360,7 @@ public:
 
 	HRESULT STDMETHODCALLTYPE SetInputType(DWORD dwInputStreamID, IMFMediaType *pType, DWORD dwFlags)
 	{
-		LOGPRINTF("%" PRIp " CMFTCodec::SetInputType(dwInputStreamID=%d, pType=%" PRIp ", dwFlags=0x%08X)", this, dwInputStreamID, pType, dwFlags);
+		LOGPRINTF("%p CMFTCodec::SetInputType(dwInputStreamID=%d, pType=%p, dwFlags=0x%08X)", this, dwInputStreamID, pType, dwFlags);
 
 		LockIt lck(static_cast<T *>(this));
 
@@ -451,7 +451,7 @@ public:
 
 	HRESULT STDMETHODCALLTYPE SetOutputType(DWORD dwOutputStreamID, IMFMediaType *pType, DWORD dwFlags)
 	{
-		LOGPRINTF("%" PRIp " CMFTCodec::SetOutputType(dwOutputStreamID=%d, pType=%" PRIp ", dwFlags=0x%08X)", this, dwOutputStreamID, pType, dwFlags);
+		LOGPRINTF("%p CMFTCodec::SetOutputType(dwOutputStreamID=%d, pType=%p, dwFlags=0x%08X)", this, dwOutputStreamID, pType, dwFlags);
 
 		LockIt lck(static_cast<T *>(this));
 
@@ -735,7 +735,7 @@ public:
 
 	HRESULT Flush(void)
 	{
-		LOGPRINTF("%" PRIp " CMFTCodec::Flush()", this);
+		LOGPRINTF("%p CMFTCodec::Flush()", this);
 
 		if (m_pInputSample != NULL)
 		{
