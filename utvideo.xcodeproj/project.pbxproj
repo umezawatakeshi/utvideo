@@ -340,6 +340,8 @@
 /* Begin PBXProject section */
 		258DB3C51411F4BA0059F47E /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = 258DB3C81411F4BA0059F47E /* Build configuration list for PBXProject "utvideo" */;
 			compatibilityVersion = "Xcode 2.4";
 			developmentRegion = English;
@@ -489,6 +491,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
@@ -508,7 +511,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = utv_qt;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = macosx10.5;
 				WRAPPER_EXTENSION = component;
 			};
 			name = Debug;
@@ -517,6 +520,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -536,7 +540,7 @@
 				);
 				PREBINDING = NO;
 				PRODUCT_NAME = utv_qt;
-				SDKROOT = /Developer/SDKs/MacOSX10.5.sdk;
+				SDKROOT = macosx10.5;
 				WRAPPER_EXTENSION = component;
 				ZERO_LINK = NO;
 			};
