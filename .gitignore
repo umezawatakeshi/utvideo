@@ -1,0 +1,13 @@
+[Dd]ebug
+[Rr]elease
+x64
+ipch
+/*.opensdf
+/*.sdf
+/*.suo
+/CodeAnalyst
+/setup_win/Output
+/utv_dmo/utv_dmo.h
+/utv_dmo/utv_dmo_i.c
+/utv_mft/utv_mft.h
+/utv_mft/utv_mft_i.c
