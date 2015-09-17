@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_core", "utv_core\utv_core.vcxproj", "{F1067D6A-613C-4F1C-B03F-8BAA03AF8E55}"
 EndProject
@@ -10,8 +10,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_wfmt", "utv_wfmt\utv_wfmt.vcxproj", "{AE805175-5F44-4675-B725-E09DB3479653}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_dmo", "utv_dmo\utv_dmo.vcxproj", "{7019A21F-92B5-4D63-B9ED-4DB1836A87E4}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_mft", "utv_mft\utv_mft.vcxproj", "{B489D833-9B22-4DA2-8024-598434A2B1BC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_test", "utv_test\utv_test.vcxproj", "{8A1D9926-7EBD-4A5C-9FBD-1BB289796C14}"
 EndProject
@@ -61,14 +59,6 @@ Global
 		{7019A21F-92B5-4D63-B9ED-4DB1836A87E4}.Release|Win32.Build.0 = Release|Win32
 		{7019A21F-92B5-4D63-B9ED-4DB1836A87E4}.Release|x64.ActiveCfg = Release|x64
 		{7019A21F-92B5-4D63-B9ED-4DB1836A87E4}.Release|x64.Build.0 = Release|x64
-		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Debug|Win32.ActiveCfg = Debug|Win32
-		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Debug|Win32.Build.0 = Debug|Win32
-		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Debug|x64.ActiveCfg = Debug|x64
-		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Debug|x64.Build.0 = Debug|x64
-		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Release|Win32.ActiveCfg = Release|Win32
-		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Release|Win32.Build.0 = Release|Win32
-		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Release|x64.ActiveCfg = Release|x64
-		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Release|x64.Build.0 = Release|x64
 		{8A1D9926-7EBD-4A5C-9FBD-1BB289796C14}.Debug|Win32.ActiveCfg = Debug|Win32
 		{8A1D9926-7EBD-4A5C-9FBD-1BB289796C14}.Debug|Win32.Build.0 = Debug|Win32
 		{8A1D9926-7EBD-4A5C-9FBD-1BB289796C14}.Debug|x64.ActiveCfg = Debug|x64
