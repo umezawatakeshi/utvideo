@@ -82,6 +82,8 @@ Name: "{group}\Readme (Japanese)";                Filename: "{app}\readme.ja.htm
 Filename: "{app}\readme.en.html"; Description: "View readme";   Flags: postinstall shellexec skipifsilent; Languages: en
 Filename: "{app}\readme.ja.html"; Description: "readme の表示"; Flags: postinstall shellexec skipifsilent; Languages: ja
 
+Filename: "http://seiga.nicovideo.jp/seiga/im1922939"; Description: "niconico のコンテンツツリー親作品指定用の作品ページの表示"; Flags: postinstall shellexec skipifsilent; Languages: ja
+
 ; 以前のバージョンでインストールした MFT 版を unregister する。DLL の削除は（めんどくさいので）あきらめた。
 Filename: "{sys}\regsvr32.exe"; Parameters: "/u /s {sys}\utv_mft.dll"; Flags: runascurrentuser 32bit;                            MinVersion: 0, 6.0
 Filename: "{sys}\regsvr32.exe"; Parameters: "/u /s {sys}\utv_mft.dll"; Flags: runascurrentuser 64bit; Check: Is64BitInstallMode; MinVersion: 0, 6.0
