@@ -38,13 +38,11 @@ Name: "qt";   Description: "{cm:QuickTimeComponents}"; Types: full;
 Source: "..\Release\utv_core.dll";     DestDir: "{sys}"; Flags: ignoreversion 32bit;
 Source: "..\Release\utv_vcm.dll";      DestDir: "{sys}"; Flags: ignoreversion 32bit;
 Source: "..\Release\utv_dmo.dll";      DestDir: "{sys}"; Flags: ignoreversion 32bit regserver;
-Source: "..\Release\utv_mft.dll";      DestDir: "{sys}"; Flags: ignoreversion 32bit regserver;                            MinVersion: 0, 6.0
 Source: "..\Release\utv_qt.qtx";       DestDir: "{pf32}\QuickTime\QTComponents"; Flags: ignoreversion 32bit; Components: qt;
 Source: "..\Release\utv_logc.exe";     DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\x64\Release\utv_core.dll"; DestDir: "{sys}"; Flags: ignoreversion 64bit;           Check: Is64BitInstallMode
 Source: "..\x64\Release\utv_vcm.dll";  DestDir: "{sys}"; Flags: ignoreversion 64bit;           Check: Is64BitInstallMode
 Source: "..\x64\Release\utv_dmo.dll";  DestDir: "{sys}"; Flags: ignoreversion 64bit regserver; Check: Is64BitInstallMode
-Source: "..\x64\Release\utv_mft.dll";  DestDir: "{sys}"; Flags: ignoreversion 64bit regserver; Check: Is64BitInstallMode; MinVersion: 0, 6.0
 Source: "..\gplv2.rtf";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.txt";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.ja.sjis.txt";        DestDir: "{app}"; Flags: ignoreversion;
@@ -80,3 +78,7 @@ Name: "{group}\Readme (Japanese)";                Filename: "{app}\readme.ja.htm
 [Run]
 Filename: "{app}\readme.en.html"; Description: "View readme";   Flags: postinstall shellexec skipifsilent; Languages: en
 Filename: "{app}\readme.ja.html"; Description: "readme の表示"; Flags: postinstall shellexec skipifsilent; Languages: ja
+
+; 以前のバージョンでインストールした MFT 版を unregister する。DLL の削除は（めんどくさいので）あきらめた。
+Filename: "{sys}\regsvr32.exe"; Parameters: "/u /s {sys}\utv_mft.dll"; Flags: runascurrentuser 32bit;                            MinVersion: 0, 6.0
+Filename: "{sys}\regsvr32.exe"; Parameters: "/u /s {sys}\utv_mft.dll"; Flags: runascurrentuser 64bit; Check: Is64BitInstallMode; MinVersion: 0, 6.0
