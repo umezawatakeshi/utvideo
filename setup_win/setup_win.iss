@@ -51,6 +51,9 @@ Source: "..\readme.ja.html";           DestDir: "{app}"; Flags: ignoreversion;
 Source: "utvideo-x86.reg";             DestDir: "{app}"; Flags: ignoreversion 32bit; DestName: "utvideo.reg"; Check: not Is64BitInstallMode
 Source: "utvideo-x64.reg";             DestDir: "{app}"; Flags: ignoreversion 64bit; DestName: "utvideo.reg"; Check:     Is64BitInstallMode
 
+[InstallDelete]
+Name: "{app}\utv_cfg.exe"; Type: files
+
 [Registry]
 Root: HKLM32; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULRA"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
 Root: HKLM32; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULRG"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue
