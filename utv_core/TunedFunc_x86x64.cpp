@@ -43,7 +43,7 @@
 #define MA_INTEL_IVY_BRIDGE   0x00010005
 #define MA_INTEL_HASWELL      0x00010006
 #define MA_INTEL_BROADWELL    0x00010007
-//#define MA_INTEL_SKYLAKE      0x00010008
+#define MA_INTEL_SKYLAKE      0x00010008
 
 struct MAFM
 {
@@ -66,7 +66,9 @@ static const struct MAFM mafm[] = {
 	{ "Sandy Bridge", MA_INTEL_SANDY_BRIDGE, { 0x062a, 0x062d } },
 	{ "Ivy Bridge",   MA_INTEL_IVY_BRIDGE,   { 0x063a, 0x063e } },
 	{ "Haswell",      MA_INTEL_HASWELL,      { 0x063c, 0x0645, 0x0646, 0x063f } },
-	{ "Broadwell",    MA_INTEL_BROADWELL,    { 0x063d } },
+	{ "Broadwell",    MA_INTEL_BROADWELL,    { 0x063d, 0x0647, 0x0656 } },
+	{ "Skylake",      MA_INTEL_SKYLAKE,      { 0x064e, 0x065e } },
+//	{ "", MA_, { 0x0600 } },
 };
 
 
