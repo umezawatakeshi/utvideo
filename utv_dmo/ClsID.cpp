@@ -5,4 +5,5 @@
 #define INITGUID
 #include "guiddef.h"
 #include "utvideo.h"
+#include "Format.h"
 #include "ClsID.h"

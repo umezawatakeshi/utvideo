@@ -3,20 +3,6 @@
 
 #pragma once
 
-#ifndef FCC
-#define FCC(fcc) ( \
-	(((uint32_t)(fcc) & 0x000000ff) << 24) | \
-	(((uint32_t)(fcc) & 0x0000ff00) <<  8) | \
-	(((uint32_t)(fcc) & 0x00ff0000) >>  8) | \
-	(((uint32_t)(fcc) & 0xff000000) >> 24))
-#endif
-
-#define UNFCC(fcc) ( \
-	(((uint32_t)(fcc) & 0x000000ff) << 24) | \
-	(((uint32_t)(fcc) & 0x0000ff00) <<  8) | \
-	(((uint32_t)(fcc) & 0x00ff0000) >>  8) | \
-	(((uint32_t)(fcc) & 0xff000000) >> 24))
-
 #ifdef _MSC_VER
 #ifndef _SSIZE_T_DEFINED
 typedef ptrdiff_t ssize_t;

@@ -8,6 +8,7 @@
 #include "Predict.h"
 #include "TunedFunc.h"
 #include "resource.h"
+#include "ByteOrder.h"
 
 CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : CCodecBase(pszTinyName, pszInterfaceName)
 {
@@ -340,7 +341,7 @@ int CUL00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, un
 	nDivideCount = min(ROUNDUP(height, 2) / 2, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
 
 	p->EncoderVersionAndImplementation = UTVIDEO_VERSION_AND_IMPLEMENTATION;
-	p->fccOriginalFormat               = UNFCC(infmt);
+	p->fccOriginalFormat               = htob32(infmt);
 	p->cbFrameInfo                     = sizeof(FRAMEINFO);
 	p->flags0                          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | ((nDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT) | (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE ? BIE_FLAGS0_ASSUME_INTERLACE : 0);
 
