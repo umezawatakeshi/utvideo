@@ -5,7 +5,6 @@
 
 #include "QTCodec.h"
 #include "Codec.h"
-#include "Mutex.h"
 
 struct CQTEncoder : public CQTCodec
 {

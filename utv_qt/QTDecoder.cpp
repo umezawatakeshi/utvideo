@@ -109,8 +109,6 @@ pascal ComponentResult QTDecoderGetCodecInfo(CQTDecoder *glob, CodecInfo *info)
 
 pascal ComponentResult QTDecoderPreflight(CQTDecoder *glob, CodecDecompressParams *param)
 {
-	CMutexLock lock(glob->mutex);
-
 	param->wantedDestinationPixelTypes = glob->wantedDestinationPixelTypes;
 
 	return noErr;
@@ -118,8 +116,6 @@ pascal ComponentResult QTDecoderPreflight(CQTDecoder *glob, CodecDecompressParam
 
 pascal ComponentResult QTDecoderInitialize(CQTDecoder *glob, ImageSubCodecDecompressCapabilities *cap)
 {
-	CMutexLock lock(glob->mutex);
-
 	cap->decompressRecordSize = sizeof(bool);
 
 	return noErr;
@@ -127,8 +123,6 @@ pascal ComponentResult QTDecoderInitialize(CQTDecoder *glob, ImageSubCodecDecomp
 
 pascal ComponentResult QTDecoderBeginBand(CQTDecoder *glob, CodecDecompressParams *param, ImageSubCodecDecompressRecord *drp, long flags)
 {
-	CMutexLock lock(glob->mutex);
-
 	Handle imgDescExt;
 	size_t imgDescExtSize;
 	size_t extDataOffset;
@@ -167,8 +161,6 @@ pascal ComponentResult QTDecoderBeginBand(CQTDecoder *glob, CodecDecompressParam
 
 pascal ComponentResult QTDecoderDrawBand(CQTDecoder *glob, ImageSubCodecDecompressRecord *drp)
 {
-	CMutexLock lock(glob->mutex);
-
 	glob->codec->DecodeFrame(drp->baseAddr, drp->codecData);
 
 	return noErr;
@@ -176,8 +168,6 @@ pascal ComponentResult QTDecoderDrawBand(CQTDecoder *glob, ImageSubCodecDecompre
 
 pascal ComponentResult QTDecoderEndBand(CQTDecoder *glob, ImageSubCodecDecompressRecord *drp, OSErr result, long flags)
 {
-	CMutexLock lock(glob->mutex);
-
 	if (*(bool *)drp->userDecompressRecord)
 		return noErr;
 

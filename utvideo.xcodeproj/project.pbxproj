@@ -48,7 +48,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2510B6B41417BCB100EA5F2F /* Mutex.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Mutex.h; path = utv_qt/Mutex.h; sourceTree = "<group>"; };
 		2510B6C31417BDDE00EA5F2F /* utv_qt.in.r */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.rez; name = utv_qt.in.r; path = utv_qt/utv_qt.in.r; sourceTree = "<group>"; };
 		2529170014D02DCB00A3813C /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		25307212175CC27500FB4793 /* Coefficient_asm_x86x64.mac */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Coefficient_asm_x86x64.mac; path = utv_core/Coefficient_asm_x86x64.mac; sourceTree = "<group>"; };
@@ -280,7 +279,6 @@
 		25F09D3D14122EB200D214B9 /* utv_qt */ = {
 			isa = PBXGroup;
 			children = (
-				2510B6B41417BCB100EA5F2F /* Mutex.h */,
 				25D59BCC14CD624800FDCD1F /* QTCodec.cpp */,
 				25D59BCD14CD624800FDCD1F /* QTCodec.h */,
 				25F09D3E14122EC800D214B9 /* QTDecoder.cpp */,

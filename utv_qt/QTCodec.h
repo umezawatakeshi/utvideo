@@ -4,7 +4,6 @@
 #pragma once
 
 #include "Codec.h"
-#include "Mutex.h"
 
 struct CQTCodec
 {
@@ -13,7 +12,6 @@ struct CQTCodec
 	ComponentInstance target;
 	OSType componentSubType;
 	CCodec *codec;
-	CMutex *mutex;
 };
 
 pascal ComponentResult QTCodecOpen(CQTCodec *glob, ComponentInstance self);
