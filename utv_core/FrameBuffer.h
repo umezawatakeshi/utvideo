@@ -13,6 +13,8 @@ private:
 	uint8_t *m_pAllocatedAddr[MAX_PLANE];
 	uint8_t *m_pBufferAddr[MAX_PLANE];
 	size_t m_cbAllocated[MAX_PLANE];
+	size_t m_cbBuffer[MAX_PLANE];
+	size_t m_cbMargin[MAX_PLANE];
 
 public:
 	CFrameBuffer(void);
@@ -20,6 +22,11 @@ public:
 
 public:
 	void AddPlane(size_t cbBuffer, size_t cbMargin);
+	void ModifyPlane(int idx, size_t cbBuffer, size_t cbMargin);
+	void ReleasePlane(int idx);
+
+private:
+	void SetPlane(int idx, size_t cbBuffer, size_t cbMargin);
 
 public:
 	inline uint8_t *GetPlane(int n)

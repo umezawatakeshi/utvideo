@@ -473,11 +473,18 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, utvf_t outfmt,
 		p += ((const uint32_t *)p)[-1];
 	}
 
+	InternalPreDecodeFrame();
+
 	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::DecodeProc, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
 	return m_cbRawSize;
+}
+
+int CUL00Codec::InternalPreDecodeFrame(void)
+{
+	return 0;
 }
 
 int CUL00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)

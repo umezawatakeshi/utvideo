@@ -153,6 +153,7 @@ protected:
 	virtual void ConvertToPlanar(uint32_t nBandIndex) = 0;
 	virtual void ConvertFromPlanar(uint32_t nBandIndex) = 0;
 	virtual bool DecodeDirect(uint32_t nBandIndex);
+	virtual int InternalPreDecodeFrame(void);
 
 private:
 	void PredictProc(uint32_t nBandIndex);

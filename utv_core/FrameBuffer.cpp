@@ -19,20 +19,27 @@ CFrameBuffer::~CFrameBuffer(void)
 {
 	for (int i = 0; i < MAX_PLANE; i++)
 	{
-		if (m_pAllocatedAddr[i] != NULL)
-		{
-#ifdef _WIN32
-			VirtualFree(m_pAllocatedAddr[i], 0, MEM_RELEASE);
-#endif
-#if defined(__APPLE__) || defined(__unix__)
-			munmap(m_pAllocatedAddr[i], m_cbAllocated[i]);
-#endif
-		}
+		ReleasePlane(i);
 	}
 }
 
 void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 {
+	SetPlane(m_nPlanes++, cbBuffer, cbMargin);
+}
+
+void CFrameBuffer::ModifyPlane(int idx, size_t cbBuffer, size_t cbMargin)
+{
+	if (m_nPlanes < idx + 1)
+		m_nPlanes = idx + 1;
+	SetPlane(idx, cbBuffer, cbMargin);
+}
+
+void CFrameBuffer::SetPlane(int idx, size_t cbBuffer, size_t cbMargin)
+{
+	if (m_pAllocatedAddr[idx] != NULL && m_cbBuffer[idx] >= cbBuffer && m_cbMargin[idx] >= cbMargin)
+		return;
+
 #ifdef _WIN32
 	SYSTEM_INFO si;
 #endif
@@ -46,7 +53,7 @@ void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 	 *   - キャッシュサイズより十分小さい
 	 * を満たす必要がある。
 	 */
-	size_t cbOffset = m_nPlanes * 256;
+	size_t cbOffset = idx * 256;
 
 #ifdef _WIN32
 	GetSystemInfo(&si);
@@ -69,11 +76,26 @@ void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 		return;
 #endif
 
-	m_pAllocatedAddr[m_nPlanes] = pAllocatedAddr;
-	m_cbAllocated[m_nPlanes] = cbAllocated;
-	m_pBufferAddr[m_nPlanes] = pAllocatedAddr + cbMargin + cbOffset;
-
-	m_nPlanes++;
+	ReleasePlane(idx);
+	m_pAllocatedAddr[idx] = pAllocatedAddr;
+	m_cbAllocated[idx] = cbAllocated;
+	m_pBufferAddr[idx] = pAllocatedAddr + cbMargin + cbOffset;
+	m_cbBuffer[idx] = cbBuffer;
+	m_cbMargin[idx] = cbMargin;
 
 	return;
+}
+
+void CFrameBuffer::ReleasePlane(int idx)
+{
+	if (m_pAllocatedAddr[idx] != NULL)
+	{
+#ifdef _WIN32
+		VirtualFree(m_pAllocatedAddr[idx], 0, MEM_RELEASE);
+#endif
+#if defined(__APPLE__) || defined(__unix__)
+		munmap(m_pAllocatedAddr[idx], m_cbAllocated[idx]);
+#endif
+		m_pAllocatedAddr[idx] = NULL;
+	}
 }

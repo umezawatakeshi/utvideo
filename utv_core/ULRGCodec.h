@@ -29,6 +29,7 @@ public:
 
 	virtual int InternalDecodeBegin(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData);
 	virtual int InternalDecodeEnd(void);
+	virtual int InternalPreDecodeFrame(void);
 
 public:
 	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }

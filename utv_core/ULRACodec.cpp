@@ -119,7 +119,13 @@ int CULRACodec::InternalDecodeBegin(unsigned int width, unsigned int height, con
 		return ret;
 
 	m_pRawDecoded = new CFrameBuffer();
-	m_pRawDecoded->AddPlane(m_cbRawSize, 0);
+
+	return 0;
+}
+
+int CULRACodec::InternalPreDecodeFrame(void)
+{
+	m_pRawDecoded->ModifyPlane(0, m_cbRawSize, 0);
 
 	return 0;
 }
