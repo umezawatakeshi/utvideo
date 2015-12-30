@@ -451,6 +451,7 @@
 				INSTALL_PATH = /usr/local/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = utv_logc;
+				SDKROOT = macosx10.5;
 			};
 			name = Debug;
 		};
@@ -469,6 +470,7 @@
 				INSTALL_PATH = /usr/local/bin;
 				PREBINDING = NO;
 				PRODUCT_NAME = utv_logc;
+				SDKROOT = macosx10.5;
 				ZERO_LINK = NO;
 			};
 			name = Release;
