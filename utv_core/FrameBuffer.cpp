@@ -39,6 +39,14 @@ void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 	size_t cbAllocateUnit;
 	size_t cbAllocated;
 	uint8_t *pAllocatedAddr;
+	/*
+	 * プレーンごとに開始アドレスを少しずつずらし、キャッシュのスラッシングを回避する。
+	 * 256 はマジックナンバーであるが、
+	 *   - キャッシュラインサイズ（最近の多くのプロセッサでは 64 バイト）の整数倍
+	 *   - キャッシュサイズより十分小さい
+	 * を満たす必要がある。
+	 */
+	size_t cbOffset = m_nPlanes * 256;
 
 #ifdef _WIN32
 	GetSystemInfo(&si);
@@ -48,7 +56,7 @@ void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 	cbAllocateUnit = getpagesize();
 #endif
 	cbMargin = ROUNDUP(cbMargin, cbAllocateUnit);
-	cbAllocated = cbMargin + ROUNDUP(cbBuffer + cbMargin, cbAllocateUnit);
+	cbAllocated = cbMargin + ROUNDUP(cbBuffer + cbMargin + cbOffset, cbAllocateUnit);
 
 #ifdef _WIN32
 	pAllocatedAddr = (uint8_t *)VirtualAlloc(NULL, cbAllocated, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
@@ -63,14 +71,7 @@ void CFrameBuffer::AddPlane(size_t cbBuffer, size_t cbMargin)
 
 	m_pAllocatedAddr[m_nPlanes] = pAllocatedAddr;
 	m_cbAllocated[m_nPlanes] = cbAllocated;
-	/*
-	 * プレーンごとに開始アドレスを少しずつずらし、キャッシュのスラッシングを回避する。
-	 * 256 はマジックナンバーであるが、
-	 *   - キャッシュラインサイズ（最近の多くのプロセッサでは 64 バイト）の整数倍
-	 *   - キャッシュサイズより十分小さい
-	 * を満たす必要がある。
-	 */
-	m_pBufferAddr[m_nPlanes] = pAllocatedAddr + cbMargin + m_nPlanes * 256;
+	m_pBufferAddr[m_nPlanes] = pAllocatedAddr + cbMargin + cbOffset;
 
 	m_nPlanes++;
 
