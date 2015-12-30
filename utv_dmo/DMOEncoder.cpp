@@ -17,12 +17,8 @@ HRESULT CDMOEncoder::InternalAllocateStreamingResources()
 
 	const DMO_MEDIA_TYPE *pmtIn  = InputType(0);
 	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
-	utvf_t infmt;
 
-	if (DirectShowFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
-		return DMO_E_INVALIDTYPE;
-
-	if (m_pCodec->EncodeBegin(infmt, pvihIn->bmiHeader.biWidth, pvihIn->bmiHeader.biHeight, CBGROSSWIDTH_WINDOWS) == 0)
+	if (m_pCodec->EncodeBegin(pvihIn->bmiHeader.biWidth, pvihIn->bmiHeader.biHeight) == 0)
 		return S_OK;
 	else
 		return E_FAIL;
@@ -50,7 +46,14 @@ HRESULT CDMOEncoder::InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCou
 	pOutputBuffers->pBuffer->GetBufferAndLength(&pOutput, NULL);
 	m_pInputBuffer->GetBufferAndLength(&pInput, NULL);
 
-	cbOutput = m_pCodec->EncodeFrame(pOutput, &bKeyFrame, pInput);
+	const DMO_MEDIA_TYPE *pmtIn = InputType(0);
+	const VIDEOINFOHEADER *pvihIn = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
+	utvf_t infmt;
+
+	if (DirectShowFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
+		return DMO_E_INVALIDTYPE;
+
+	cbOutput = m_pCodec->EncodeFrame(pOutput, &bKeyFrame, pInput, infmt, CBGROSSWIDTH_WINDOWS);
 
 	pOutputBuffers->dwStatus = 0;
 	if (bKeyFrame)

@@ -81,12 +81,12 @@ int CDummyCodec::SetState(const void *pState, size_t cb)
 }
 
 
-int CDummyCodec::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CDummyCodec::EncodeBegin(unsigned int width, unsigned int height)
 {
 	return -1;
 }
 
-size_t CDummyCodec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput)
+size_t CDummyCodec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput, utvf_t infmt, size_t cbGrossWidth)
 {
 	return 0;
 }
@@ -101,7 +101,7 @@ size_t CDummyCodec::EncodeGetExtraDataSize(void)
 	return 0;
 }
 
-int CDummyCodec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height)
+int CDummyCodec::EncodeGetExtraData(void *pExtraData, size_t cb, unsigned int width, unsigned int height)
 {
 	return -1;
 }
@@ -117,12 +117,12 @@ int CDummyCodec::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int heig
 }
 
 
-int CDummyCodec::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CDummyCodec::DecodeBegin(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
 {
 	return -1;
 }
 
-size_t CDummyCodec::DecodeFrame(void *pOutput, const void *pInput)
+size_t CDummyCodec::DecodeFrame(void *pOutput, const void *pInput, utvf_t outfmt, size_t cbGrossWidth)
 {
 	return 0;
 }

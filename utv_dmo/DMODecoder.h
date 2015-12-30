@@ -50,7 +50,7 @@ public:
 		return 0;
 	}
 
-	int GetExtraData(void *pExtraData, size_t cbExtraData, utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height)
+	int GetExtraData(void *pExtraData, size_t cbExtraData, unsigned int width, unsigned int height)
 	{
 		return 0;
 	}

@@ -117,16 +117,16 @@ public:
 	virtual size_t GetStateSize(void);
 	virtual int GetState(void *pState, size_t cb);
 
-	virtual int InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
-	virtual size_t EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput);
+	virtual int InternalEncodeBegin(unsigned int width, unsigned int height);
+	virtual size_t EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput, utvf_t infmt, size_t cbGrossWidth);
 	virtual int InternalEncodeEnd(void);
 	virtual size_t EncodeGetExtraDataSize(void);
-	virtual int EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height);
+	virtual int EncodeGetExtraData(void *pExtraData, size_t cb, unsigned int width, unsigned int height);
 	virtual size_t EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height);
 	virtual int InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height);
 
-	virtual int InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
-	virtual size_t DecodeFrame(void *pOutput, const void *pInput);
+	virtual int InternalDecodeBegin(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData);
+	virtual size_t DecodeFrame(void *pOutput, const void *pInput, utvf_t outfmt, size_t cbGrossWidth);
 	virtual int DecodeGetFrameType(bool *pbKeyFrame, const void *pInput);
 	virtual int InternalDecodeEnd(void);
 	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
@@ -134,7 +134,7 @@ public:
 
 protected:
 	virtual int InternalSetState(const void *pState, size_t cb);
-	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
+	int CalcFrameMetric(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData);
 	void CalcStripeMetric(void);
 
 	virtual const char *GetColorFormatName(void) = 0;

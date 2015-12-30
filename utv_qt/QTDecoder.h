@@ -9,5 +9,6 @@
 struct CQTDecoder : public CQTCodec
 {
 	OSType **wantedDestinationPixelTypes;
-	int beginBandDone;
+	int preflightDone;
+	utvf_t outfmt;
 };

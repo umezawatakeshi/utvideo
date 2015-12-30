@@ -110,11 +110,11 @@ void CULRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 	}
 }
 
-int CULRACodec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CULRACodec::InternalDecodeBegin(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
 {
 	int ret;
 
-	ret = CUL00Codec::InternalDecodeBegin(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	ret = CUL00Codec::InternalDecodeBegin(width, height, pExtraData, cbExtraData);
 	if (ret != 0)
 		return ret;
 

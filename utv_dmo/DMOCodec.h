@@ -347,7 +347,7 @@ public:
 			UtVideoFormatToVCMFormat(&pvih->bmiHeader.biCompression, &pvih->bmiHeader.biBitCount, *putvf);
 			pvih->bmiHeader.biSizeImage = (DWORD)((T *)this)->GetSize(outfmt, infmt, pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight);
 			pvih->bmiHeader.biSize = (DWORD)(sizeof(BITMAPINFOHEADER) + cbExtraData);
-			((T *)this)->GetExtraData(((BYTE *)&pvih->bmiHeader) + sizeof(BITMAPINFOHEADER), cbExtraData, outfmt, infmt, pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight);
+			((T *)this)->GetExtraData(((BYTE *)&pvih->bmiHeader) + sizeof(BITMAPINFOHEADER), cbExtraData, pvih->bmiHeader.biWidth, pvih->bmiHeader.biHeight);
 		}
 
 		return S_OK;

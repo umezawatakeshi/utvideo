@@ -160,7 +160,7 @@ int CUQ00Codec::InternalSetState(const void *pState, size_t cb)
 	return 0;
 }
 
-size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput)
+size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput, utvf_t infmt, size_t cbGrossWidth)
 {
 	union
 	{
@@ -174,6 +174,9 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 	m_pInput = pInput;
 	m_pOutput = pOutput;
+	m_utvfRaw = infmt;
+
+	CalcRawFrameMetric(infmt, m_nWidth, m_nHeight, cbGrossWidth);
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
@@ -228,21 +231,18 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	return p - ((uint8_t *)pOutput);
 }
 
-int CUQ00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CUQ00Codec::CalcFrameMetric(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
 {
-	const STREAMINFO *p = (const STREAMINFO *)pExtraData;
-
-	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
 	CalcPlaneSizes(width, height);
-
-	m_dwNumStripes = height / GetMacroPixelHeight();
-	m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight();
 
 	return 0;
 }
 
 void CUQ00Codec::CalcStripeMetric(void)
 {
+	m_dwNumStripes = m_nHeight / GetMacroPixelHeight();
+	m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight();
+
 	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 	{
 		m_dwStripeBegin[nBandIndex] = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
@@ -250,21 +250,20 @@ void CUQ00Codec::CalcStripeMetric(void)
 	}
 }
 
-int CUQ00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CUQ00Codec::InternalEncodeBegin(unsigned int width, unsigned int height)
 {
 	int ret;
 	STREAMINFO si;
 
-	ret = EncodeQuery(infmt, width, height);
+	ret = EncodeQuery(UTVF_INVALID, width, height);
 	if (ret != 0)
 		return ret;
 
-	m_utvfRaw = infmt;
 	m_nWidth = width;
 	m_nHeight = height;
 
-	EncodeGetExtraData(&si, sizeof(si), infmt, width, height);
-	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth, &si, sizeof(si));
+	EncodeGetExtraData(&si, sizeof(si), width, height);
+	ret = CalcFrameMetric(width, height, &si, sizeof(si));
 	if (ret != 0)
 		return ret;
 	m_dwDivideCount = m_ec.ecDivideCountMinusOne + 1;
@@ -312,7 +311,7 @@ size_t CUQ00Codec::EncodeGetExtraDataSize(void)
 	return sizeof(STREAMINFO);
 }
 
-int CUQ00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height)
+int CUQ00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, unsigned int width, unsigned int height)
 {
 	STREAMINFO *p = (STREAMINFO *)pExtraData;
 
@@ -322,7 +321,7 @@ int CUQ00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, un
 	memset(p, 0, cb);
 
 	p->siEncoderVersionAndImplementation = htol32(UTVIDEO_VERSION_AND_IMPLEMENTATION);
-	p->siOriginalFormat                  = htob32(infmt);
+	p->siOriginalFormat                  = 0; //htob32(infmt);
 
 	return 0;
 }
@@ -336,6 +335,9 @@ int CUQ00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned i
 {
 	if (width % GetMacroPixelWidth() != 0 || height % GetMacroPixelHeight() != 0)
 		return -1;
+
+	if (!infmt)
+		return 0;
 
 	for (const utvf_t *utvf = GetEncoderInputFormat(); *utvf; utvf++)
 	{
@@ -388,7 +390,7 @@ void CUQ00Codec::EncodeProc(uint32_t nBandIndex)
 	}
 }
 
-size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput)
+size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput, utvf_t outfmt, size_t cbGrossWidth)
 {
 	/* const */ uint8_t *p;
 	union
@@ -399,6 +401,9 @@ size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput)
 
 	m_pInput = pInput;
 	m_pOutput = pOutput;
+	m_utvfRaw = outfmt;
+
+	CalcRawFrameMetric(outfmt, m_nWidth, m_nHeight, cbGrossWidth);
 
 	p = (uint8_t *)pInput;
 	fi = (FRAMEINFO *)p;
@@ -440,19 +445,18 @@ int CUQ00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
 	return 0;
 }
 
-int CUQ00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CUQ00Codec::InternalDecodeBegin(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
 {
 	int ret;
 
-	ret = DecodeQuery(outfmt, width, height, pExtraData, cbExtraData);
+	ret = DecodeQuery(UTVF_INVALID, width, height, pExtraData, cbExtraData);
 	if (ret != 0)
 		return ret;
 
-	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	ret = CalcFrameMetric(width, height, pExtraData, cbExtraData);
 	if (ret != 0)
 		return ret;
 
-	m_utvfRaw = outfmt;
 	m_nWidth = width;
 	m_nHeight = height;
 

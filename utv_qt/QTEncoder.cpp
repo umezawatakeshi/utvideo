@@ -148,7 +148,7 @@ pascal ComponentResult QTEncoderPrepareToCompressFrames(CQTEncoder *glob, ICMCom
 
 	imgDescExtSize = glob->codec->EncodeGetExtraDataSize();
 	imgDescExt = NewHandle(imgDescExtSize);
-	glob->codec->EncodeGetExtraData(*imgDescExt, imgDescExtSize, /* XXX */ UTVF_INVALID, (*imageDescription)->width, (*imageDescription)->height);
+	glob->codec->EncodeGetExtraData(*imgDescExt, imgDescExtSize, (*imageDescription)->width, (*imageDescription)->height);
 	AddImageDescriptionExtension(imageDescription, imgDescExt, 'glbl');
 	DisposeHandle(imgDescExt);
 
@@ -191,6 +191,9 @@ pascal ComponentResult QTEncoderPrepareToCompressFrames(CQTEncoder *glob, ICMCom
 
 	(*imageDescription)->cType = glob->componentSubType;
 
+	if (glob->codec->EncodeBegin((*imageDescription)->width, (*imageDescription)->height) != 0)
+		return paramErr;
+
 	return noErr;
 }
 
@@ -225,7 +228,8 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 	width = (unsigned int)CVPixelBufferGetWidth(sourcePixelBuffer);
 	height = (unsigned int)CVPixelBufferGetHeight(sourcePixelBuffer);
 	rowBytes = CVPixelBufferGetBytesPerRow(sourcePixelBuffer);
-	err = glob->codec->EncodeBegin(utvf, width, height, rowBytes);
+	if (glob->codec->EncodeQuery(utvf, width, height) != 0)
+		return paramErr;
 
 //	fprintf(fp, "a %ld\n", err);
 	err = ICMEncodedFrameCreateMutable(glob->session, sourceFrame, glob->codec->EncodeGetOutputSize(utvf, width, height), &encoded);
@@ -233,7 +237,7 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 	dstPtr = ICMEncodedFrameGetDataPtr(encoded);
 	srcPtr = CVPixelBufferGetBaseAddress(sourcePixelBuffer);
 //	fprintf(fp, "src=%p dst=%p\n", srcPtr, dstPtr);
-	encodedSize = glob->codec->EncodeFrame(dstPtr, &keyFrame, srcPtr);
+	encodedSize = glob->codec->EncodeFrame(dstPtr, &keyFrame, srcPtr, utvf, rowBytes);
 //	fprintf(fp, "b1 encodedSize=%zu\n", encodedSize);
 	err = ICMEncodedFrameSetDataSize(encoded, encodedSize);
 //	fprintf(fp, "c %ld\n", err);
