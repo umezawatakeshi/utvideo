@@ -10,4 +10,5 @@ struct CQTEncoder : public CQTCodec
 {
 	ICMCompressorSessionRef session;
 	ICMCompressionSessionOptionsRef sessionOptions;
+    bool encodeBegun;
 };

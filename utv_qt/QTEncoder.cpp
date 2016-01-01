@@ -90,6 +90,9 @@ pascal ComponentResult QTEncoderClose(CQTEncoder *glob, ComponentInstance self)
 
 	if (glob != NULL)
 	{
+        if (glob->encodeBegun)
+            glob->codec->EncodeEnd();
+
 		QTCodecClose(glob, self);
 
 		ICMCompressionSessionOptionsRelease(glob->sessionOptions);
@@ -193,6 +196,7 @@ pascal ComponentResult QTEncoderPrepareToCompressFrames(CQTEncoder *glob, ICMCom
 
 	if (glob->codec->EncodeBegin((*imageDescription)->width, (*imageDescription)->height) != 0)
 		return paramErr;
+    glob->encodeBegun = true;
 
 	return noErr;
 }
@@ -251,7 +255,6 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 //	fprintf(fp, "e %ld\n", err);
 
 	CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
-	glob->codec->EncodeEnd();
 	ICMEncodedFrameRelease(encoded);
 	return noErr;
 }

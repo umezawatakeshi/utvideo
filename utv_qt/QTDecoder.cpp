@@ -47,8 +47,6 @@ pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 		return err;
 	}
 
-	glob->preflightDone = false;
-
 	{
 		const utvf_t *p;
 		OSType *post;
@@ -81,7 +79,7 @@ pascal ComponentResult QTDecoderClose(CQTDecoder *glob, ComponentInstance self)
 
 	if (glob != NULL)
 	{
-		if (glob->preflightDone)
+		if (glob->decodeBegun)
 			glob->codec->DecodeEnd();
 
 		if (glob->wantedDestinationPixelTypes != NULL)
@@ -116,10 +114,10 @@ pascal ComponentResult QTDecoderPreflight(CQTDecoder *glob, CodecDecompressParam
 	size_t imgDescExtSize;
 	size_t extDataOffset;
 
-	if (glob->preflightDone)
+	if (glob->decodeBegun)
 		return noErr;
 
-	glob->preflightDone = true;
+	glob->decodeBegun = true;
 
 	param->wantedDestinationPixelTypes = glob->wantedDestinationPixelTypes;
 
