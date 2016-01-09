@@ -7,6 +7,8 @@ ipch
 /*.suo
 /CodeAnalyst
 /setup_win/Output
+/utv_core/Coefficient.exe
+/utv_core/Coefficient.obj
 /utv_dmo/utv_dmo.h
 /utv_dmo/utv_dmo_i.c
 .DS_Store
