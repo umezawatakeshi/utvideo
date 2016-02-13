@@ -25,11 +25,3 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD dwReason, LPVOID lpReserved)
 }
 
 #endif
-
-#ifdef _DEBUG
-
-DLLEXPORT void UnitTest_core(void)
-{
-}
-
-#endif

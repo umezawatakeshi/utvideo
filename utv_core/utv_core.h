@@ -6,7 +6,3 @@
 #ifdef _WIN32
 extern HINSTANCE hModule;
 #endif
-
-#ifdef _DEBUG
-DLLEXPORT void UnitTest_core(void);
-#endif
