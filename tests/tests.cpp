@@ -1,11 +1,7 @@
-// tests.cpp : コンソール アプリケーションのエントリ ポイントを定義します。
-//
+/* 文字コードはＳＪＩＳ 改行コードはＣＲＬＦ */
+/* $Id$ */
 
 #include "stdafx.h"
 
-
-int _tmain(int argc, _TCHAR* argv[])
-{
-	return 0;
-}
-
+#define BOOST_TEST_MODULE tests
+#include <boost/test/unit_test.hpp> 
