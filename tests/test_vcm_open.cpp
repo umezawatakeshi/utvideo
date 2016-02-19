@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "test_win_fmt.h"
 
-BOOST_DATA_TEST_CASE(vcm_open_enc, data::make(fccSupported), fcc)
+BOOST_DATA_TEST_CASE(vcm_open_enc, data::make(vecCodecFourcc), fcc)
 {
 	HIC hic;
 	LRESULT lr;
@@ -16,7 +16,7 @@ BOOST_DATA_TEST_CASE(vcm_open_enc, data::make(fccSupported), fcc)
 	BOOST_CHECK(lr == ICERR_OK);
 }
 
-BOOST_DATA_TEST_CASE(vcm_open_dec, data::make(fccSupported), fcc)
+BOOST_DATA_TEST_CASE(vcm_open_dec, data::make(vecCodecFourcc), fcc)
 {
 	HIC hic;
 	LRESULT lr;

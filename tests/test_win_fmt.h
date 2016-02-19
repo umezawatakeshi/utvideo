@@ -3,4 +3,4 @@
 
 #pragma once
 
-extern DWORD fccSupported[7];
+extern vector<FOURCC> vecCodecFourcc;
