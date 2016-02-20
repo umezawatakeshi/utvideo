@@ -17,7 +17,7 @@ struct print_log_value<DWORD>
 		};
 		dw = fcc;
 
-		if (isprint(buf[0]) && isprint(buf[1]) && isprint(buf[2]) && isprint(buf[3]))
+		if (isprint((unsigned char)buf[0]) && isprint((unsigned char)buf[1]) && isprint((unsigned char)buf[2]) && isprint((unsigned char)buf[3]))
 			buf[4] = '\0';
 		else
 			sprintf(buf, "0x%08x", dw);
