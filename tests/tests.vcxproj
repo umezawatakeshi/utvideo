@@ -172,6 +172,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="test_vcm_enum.cpp" />
+    <ClCompile Include="test_vcm_info.cpp" />
     <ClCompile Include="test_vcm_open.cpp" />
     <ClCompile Include="test_win_fmt.cpp" />
   </ItemGroup>

@@ -13,6 +13,7 @@
 #include <tchar.h>
 
 #include <vector>
+#include <string>
 
 #include <boost/test/unit_test.hpp> 
 #include <boost/test/data/test_case.hpp>

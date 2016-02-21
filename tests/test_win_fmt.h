@@ -3,6 +3,12 @@
 
 #pragma once
 
+struct CODECNAME
+{
+	wstring wstrShortName;
+	wstring wstrLongName;
+};
+
 namespace boost { namespace test_tools { namespace tt_detail {
 
 template<>
@@ -26,6 +32,33 @@ struct print_log_value<DWORD>
 	}
 };
 
+template<>
+struct print_log_value<wstring>
+{
+	void operator()(ostream &os, const wstring &wstr)
+	{
+		char buf[256]; /* サイズは適当 */
+		wcstombs(buf, wstr.c_str(), sizeof(buf));
+
+		os << "\"" << buf << "\"";
+	}
+};
+
+template<>
+struct print_log_value<CODECNAME>
+{
+	void operator()(ostream& os, const CODECNAME& p)
+	{
+		print_log_value<wstring> plvwstr;
+		os << "(";
+		plvwstr(os, p.wstrShortName);
+		os << ", ";
+		plvwstr(os, p.wstrLongName);
+		os << ")";
+	}
+};
+
 }}}
 
 extern vector<FOURCC> vecCodecFourcc;
+extern vector<CODECNAME> vecCodecName;
