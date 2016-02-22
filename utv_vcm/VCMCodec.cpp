@@ -180,7 +180,13 @@ LRESULT CVCMCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOH
 	memcpy(pbihOut, pbihIn, sizeof(BITMAPINFOHEADER));
 	pbihOut->biSize = (DWORD)(sizeof(BITMAPINFOHEADER) + m_pCodec->EncodeGetExtraDataSize());
 
+	if (pbihIn->biWidth <= 0 || pbihIn->biHeight <= 0)
+		return ICERR_BADFORMAT;
+
 	if (VCMFormatToUtVideoFormat(&infmt, pbihIn->biCompression, pbihIn->biBitCount) != 0)
+		return ICERR_BADFORMAT;
+
+	if (m_pCodec->EncodeQuery(infmt, pbihIn->biWidth, pbihIn->biHeight) != 0)
 		return ICERR_BADFORMAT;
 
 	UtVideoFormatToVCMFormat(&pbihOut->biCompression, &pbihOut->biBitCount, *m_pCodec->GetCompressedFormat());
