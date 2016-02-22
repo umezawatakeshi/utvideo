@@ -9,6 +9,14 @@ struct CODECNAME
 	wstring wstrLongName;
 };
 
+struct CODECRAWFORMAT
+{
+	DWORD fccCodec;
+	DWORD fccRaw;
+	typedef DWORD first_type;
+	typedef DWORD second_type;
+};
+
 namespace boost { namespace test_tools { namespace tt_detail {
 
 template<>
@@ -58,7 +66,62 @@ struct print_log_value<CODECNAME>
 	}
 };
 
+template<>
+struct print_log_value<CODECRAWFORMAT>
+{
+	void operator()(ostream& os, const CODECRAWFORMAT& p)
+	{
+		print_log_value<DWORD> plvdw;
+		os << "(";
+		plvdw(os, p.fccCodec);
+		os << ", ";
+		plvdw(os, p.fccRaw);
+		os << ")";
+	}
+};
+
 }}}
 
 extern vector<FOURCC> vecCodecFourcc;
 extern vector<CODECNAME> vecCodecName;
+extern vector<CODECRAWFORMAT> vecSupportedInputFormatPair;
+extern vector<CODECRAWFORMAT> vecSupportedOutputFormatPair;
+extern vector<CODECRAWFORMAT> vecUnsupportedInputFormatPair;
+extern vector<CODECRAWFORMAT> vecUnsupportedOutputFormatPair;
+
+static inline bool IsFourccRGB(DWORD dw)
+{
+	return dw <= 0xff || dw >= (DWORD)-0xff;
+}
+
+static inline DWORD FCC2Compression(DWORD dw)
+{
+	if (IsFourccRGB(dw))
+		return BI_RGB;
+	else
+
+		return dw;
+}
+
+static inline WORD FCC2BitCount(DWORD dw)
+{
+	if (IsFourccRGB(dw))
+		return (WORD)abs((int)dw);
+	else
+		return 0; // Ut Video Codec Suite ‚Í BI_RGB ‚ÌŽžˆÈŠO biBitCount ‚ð–³Ž‹‚·‚é
+}
+
+static inline int FCC2HeightSign(DWORD dw)
+{
+	if (IsFourccRGB(dw))
+	{
+		if ((int)dw > 0)
+			return 1;
+		else if ((int)dw < 0)
+			return -1;
+		else
+			return 0;
+	}
+	else
+		return 1;
+}
