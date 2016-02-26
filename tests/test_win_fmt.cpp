@@ -54,6 +54,56 @@ vector<vector<DWORD> > vecUnsupportedInputFormat = {
 
 vector<vector<DWORD> > vecUnsupportedOutputFormat = vecUnsupportedInputFormat;
 
+vector<vector<LONG>> vecSupportedWidth = {
+	{ 1920, 1921, 1922, 1923, 1924, 1925, 1926, 1927 },
+	{ 1920, 1921, 1922, 1923, 1924, 1925, 1926, 1927 },
+	{ 1920, 1922, 1924, 1926 },
+	{ 1920, 1922, 1924, 1926 },
+	{ 1920, 1922, 1924, 1926 },
+	{ 1920, 1922, 1924, 1926 },
+	{ 1920, 1922, 1924, 1926 },
+};
+
+vector<vector<LONG>> vecSupportedHeight = {
+	{ 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087 },
+	{ 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087 },
+	{ 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087 },
+	{ 1080, 1082, 1084, 1086 },
+	{ 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087 },
+	{ 1080, 1082, 1084, 1086 },
+	{ 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087 },
+};
+
+vector<vector<LONG>> vecUnsupportedWidth = {
+	{},
+	{},
+	{ 1921, 1923, 1925, 1927 },
+	{ 1921, 1923, 1925, 1927 },
+	{ 1921, 1923, 1925, 1927 },
+	{ 1921, 1923, 1925, 1927 },
+	{ 1921, 1923, 1925, 1927 },
+};
+
+vector<vector<LONG>> vecUnsupportedHeight = {
+	{},
+	{},
+	{},
+	{ 1081, 1083, 1085, 1087 },
+	{},
+	{ 1081, 1083, 1085, 1087 },
+	{},
+};
+
+vector<pair<DWORD, DWORD> > vecTopPriorityRawFormat = {
+	{ FCC('ULRG'), BI_RGB_BU(24) },
+	{ FCC('ULRA'), BI_RGB_BU(32) },
+	{ FCC('ULY2'), FCC('YUY2') },
+	{ FCC('ULY0'), FCC('YV12') },
+	{ FCC('ULH2'), FCC('HDYC') },
+	{ FCC('ULH0'), FCC('YV12') },
+	{ FCC('UQY2'), FCC('v210') },
+};
+
 template<class T>
 vector<T> ExpandPair(const vector<typename T::first_type> &c1, const vector<vector<typename T::second_type> >& c2)
 {
@@ -77,6 +127,10 @@ vector<CODECRAWFORMAT> vecSupportedOutputFormatPair = ExpandPair<CODECRAWFORMAT>
 vector<CODECRAWFORMAT> vecUnsupportedInputFormatPair = ExpandPair<CODECRAWFORMAT>(vecCodecFourcc, vecUnsupportedInputFormat);
 vector<CODECRAWFORMAT> vecUnsupportedOutputFormatPair = ExpandPair<CODECRAWFORMAT>(vecCodecFourcc, vecUnsupportedOutputFormat);
 
+vector<pair<pair<DWORD, DWORD>, LONG> > vecSupportedWidthPair = ExpandPair<pair<pair<DWORD, DWORD>, LONG> >(vecTopPriorityRawFormat, vecSupportedWidth);
+vector<pair<pair<DWORD, DWORD>, LONG> > vecSupportedHeightPair = ExpandPair<pair<pair<DWORD, DWORD>, LONG> >(vecTopPriorityRawFormat, vecSupportedHeight);
+vector<pair<pair<DWORD, DWORD>, LONG> > vecUnsupportedWidthPair = ExpandPair<pair<pair<DWORD, DWORD>, LONG> >(vecTopPriorityRawFormat, vecUnsupportedWidth);
+vector<pair<pair<DWORD, DWORD>, LONG> > vecUnsupportedHeightPair = ExpandPair<pair<pair<DWORD, DWORD>, LONG> >(vecTopPriorityRawFormat, vecUnsupportedHeight);
 
 // テストケース自体のテスト
 BOOST_AUTO_TEST_CASE(vcm_fmt)

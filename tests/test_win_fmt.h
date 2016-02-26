@@ -80,6 +80,23 @@ struct print_log_value<CODECRAWFORMAT>
 	}
 };
 
+template<>
+struct print_log_value<pair<pair<DWORD, DWORD>, LONG> >
+{
+	void operator()(ostream& os, const pair<pair<DWORD, DWORD>, LONG>& p)
+	{
+		print_log_value<DWORD> plvdw;
+		print_log_value<LONG> plvl;
+		os << "(";
+		plvdw(os, p.first.first);
+		os << ", ";
+		plvdw(os, p.first.second);
+		os << ", ";
+		plvl(os, p.second);
+		os << ")";
+	}
+};
+
 }}}
 
 extern vector<FOURCC> vecCodecFourcc;
@@ -88,6 +105,10 @@ extern vector<CODECRAWFORMAT> vecSupportedInputFormatPair;
 extern vector<CODECRAWFORMAT> vecSupportedOutputFormatPair;
 extern vector<CODECRAWFORMAT> vecUnsupportedInputFormatPair;
 extern vector<CODECRAWFORMAT> vecUnsupportedOutputFormatPair;
+extern vector<pair<pair<DWORD, DWORD>, LONG> > vecSupportedWidthPair;
+extern vector<pair<pair<DWORD, DWORD>, LONG> > vecSupportedHeightPair;
+extern vector<pair<pair<DWORD, DWORD>, LONG> > vecUnsupportedWidthPair;
+extern vector<pair<pair<DWORD, DWORD>, LONG> > vecUnsupportedHeightPair;
 
 static inline bool IsFourccRGB(DWORD dw)
 {
