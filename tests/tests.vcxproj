@@ -171,10 +171,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="test_vcm_enum.cpp" />
-    <ClCompile Include="test_vcm_fmt.cpp" />
-    <ClCompile Include="test_vcm_info.cpp" />
-    <ClCompile Include="test_vcm_open.cpp" />
+    <ClCompile Include="test_vcm_ICInfo.cpp" />
+    <ClCompile Include="test_vcm_ICCompressGetFormat.cpp" />
+    <ClCompile Include="test_vcm_ICGetInfo.cpp" />
+    <ClCompile Include="test_vcm_ICOpen.cpp" />
     <ClCompile Include="test_win_fmt.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
