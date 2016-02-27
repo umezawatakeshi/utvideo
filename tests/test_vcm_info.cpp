@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "test_win_fmt.h"
 
-BOOST_DATA_TEST_CASE(vcm_info, data::make(vecCodecFourcc) ^ data::make(vecCodecName), fcc, cn)
+BOOST_DATA_TEST_CASE(vcm_ICGetInfo, data::make(vecCodecFourcc) ^ data::make(vecCodecName), fcc, cn)
 {
 	const wstring& wstrShortName = cn.wstrShortName;
 	const wstring& wstrLongName = cn.wstrLongName;

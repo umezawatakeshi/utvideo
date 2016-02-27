@@ -93,38 +93,38 @@ void vcm_ICCompressGetFormat_ng(DWORD fccCodec, DWORD fccRaw, LONG width, LONG h
 	BOOST_CHECK(lr == ICERR_OK);
 }
 
-BOOST_TEST_DECORATOR(*depends_on("vcm_open_enc"))
-BOOST_DATA_TEST_CASE(vcm_enc_fmt_ok, data::make(vecSupportedInputFormatPair), crf)
+BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder"))
+BOOST_DATA_TEST_CASE(vcm_ICCompressGetFormat_biCompression_ok, data::make(vecSupportedInputFormatPair), crf)
 {
 	vcm_ICCompressGetFormat_ok(crf.fccCodec, crf.fccRaw, TEST_WIDTH, TEST_HEIGHT);
 }
 
-BOOST_TEST_DECORATOR(*depends_on("vcm_open_enc"))
-BOOST_DATA_TEST_CASE(vcm_enc_fmt_ng, data::make(vecUnsupportedInputFormatPair), crf)
+BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder"))
+BOOST_DATA_TEST_CASE(vcm_ICCompressGetFormat_biCompression_ng, data::make(vecUnsupportedInputFormatPair), crf)
 {
 	vcm_ICCompressGetFormat_ng(crf.fccCodec, crf.fccRaw, TEST_WIDTH, TEST_HEIGHT);
 }
 
-BOOST_TEST_DECORATOR(*depends_on("vcm_open_enc"))
-BOOST_DATA_TEST_CASE(vcm_enc_fmt_width_ok, data::make(vecSupportedWidthPair), swp)
+BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder"))
+BOOST_DATA_TEST_CASE(vcm_ICCompressGetFormat_biWidth_ok, data::make(vecSupportedWidthPair), swp)
 {
 	vcm_ICCompressGetFormat_ok(swp.first.first, swp.first.second, swp.second, TEST_HEIGHT);
 }
 
-BOOST_TEST_DECORATOR(*depends_on("vcm_open_enc"))
-BOOST_DATA_TEST_CASE(vcm_enc_fmt_width_ng, data::make(vecUnsupportedWidthPair), swp)
+BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder"))
+BOOST_DATA_TEST_CASE(vcm_ICCompressGetFormat_biWidth_ng, data::make(vecUnsupportedWidthPair), swp)
 {
 	vcm_ICCompressGetFormat_ng(swp.first.first, swp.first.second, swp.second, TEST_HEIGHT);
 }
 
-BOOST_TEST_DECORATOR(*depends_on("vcm_open_enc"))
-BOOST_DATA_TEST_CASE(vcm_enc_fmt_height_ok, data::make(vecSupportedHeightPair), swp)
+BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder"))
+BOOST_DATA_TEST_CASE(vcm_ICCompressGetFormat_biHeight_ok, data::make(vecSupportedHeightPair), swp)
 {
 	vcm_ICCompressGetFormat_ok(swp.first.first, swp.first.second, TEST_WIDTH, swp.second);
 }
 
-BOOST_TEST_DECORATOR(*depends_on("vcm_open_enc"))
-BOOST_DATA_TEST_CASE(vcm_enc_fmt_height_ng, data::make(vecUnsupportedHeightPair), swp)
+BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder"))
+BOOST_DATA_TEST_CASE(vcm_ICCompressGetFormat_biHeight_ng, data::make(vecUnsupportedHeightPair), swp)
 {
 	vcm_ICCompressGetFormat_ng(swp.first.first, swp.first.second, TEST_WIDTH, swp.second);
 }
