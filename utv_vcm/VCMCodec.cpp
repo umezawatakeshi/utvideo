@@ -284,6 +284,12 @@ LRESULT CVCMCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINF
 	if (pbihOut == NULL)
 		return sizeof(BITMAPINFOHEADER);
 
+	if (pbihIn->biWidth <= 0 || pbihIn->biHeight <= 0)
+		return ICERR_BADFORMAT;
+
+	if (m_pCodec->DecodeQuery(UTVF_INVALID, pbihIn->biWidth, pbihIn->biHeight, ((BYTE *)pbihIn) + sizeof(BITMAPINFOHEADER), pbihIn->biSize - sizeof(BITMAPINFOHEADER)) != 0)
+		return ICERR_BADFORMAT;
+
 	memcpy(pbihOut, pbihIn, sizeof(BITMAPINFOHEADER));
 	pbihOut->biSize = sizeof(BITMAPINFOHEADER);
 
