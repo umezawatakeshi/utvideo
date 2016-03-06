@@ -220,7 +220,7 @@ LRESULT CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINF
 	if (VCMFormatToUtVideoFormat(&infmt, pbihIn->biCompression, pbihIn->biBitCount) != 0)
 		return ICERR_BADFORMAT;
 
-	if (pbihIn->biHeight < 0)
+	if (pbihIn->biWidth <= 0 || pbihIn->biHeight <= 0)
 		return ICERR_BADFORMAT;
 
 	if (pbihOut != NULL && (pbihOut->biWidth != pbihIn->biWidth || pbihOut->biHeight != pbihIn->biHeight))
