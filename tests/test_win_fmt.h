@@ -128,8 +128,25 @@ static inline WORD FCC2BitCount(DWORD dw)
 {
 	if (IsFourccRGB(dw))
 		return (WORD)abs((int)dw);
-	else
-		return 0; // Ut Video Codec Suite ‚Í BI_RGB ‚ÌŽžˆÈŠO biBitCount ‚ð–³Ž‹‚·‚é
+
+	switch (dw)
+	{
+	case FCC('YUY2'):
+	case FCC('YUYV'):
+	case FCC('YUNV'):
+	case FCC('UYVY'):
+	case FCC('UYNV'):
+	case FCC('yuvs'):
+	case FCC('2vuy'):
+	case FCC('HDYC'):
+		return 16;
+	case FCC('YV12'):
+		return 12;
+	case FCC('v210'):
+		return 20;
+	default:
+		return 0; // XXX
+	}
 }
 
 static inline int FCC2HeightSign(DWORD dw)
