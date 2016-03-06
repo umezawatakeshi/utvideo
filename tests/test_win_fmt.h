@@ -81,6 +81,20 @@ struct print_log_value<CODECRAWFORMAT>
 };
 
 template<>
+struct print_log_value<pair<DWORD, DWORD> >
+{
+	void operator()(ostream& os, const pair<DWORD, DWORD>& p)
+	{
+		print_log_value<DWORD> plvdw;
+		os << "(";
+		plvdw(os, p.first);
+		os << ", ";
+		plvdw(os, p.second);
+		os << ")";
+	}
+};
+
+template<>
 struct print_log_value<pair<pair<DWORD, DWORD>, LONG> >
 {
 	void operator()(ostream& os, const pair<pair<DWORD, DWORD>, LONG>& p)
@@ -101,6 +115,7 @@ struct print_log_value<pair<pair<DWORD, DWORD>, LONG> >
 
 extern vector<FOURCC> vecCodecFourcc;
 extern vector<CODECNAME> vecCodecName;
+extern vector<pair<DWORD, DWORD> > vecTopPriorityRawFormat;
 extern vector<CODECRAWFORMAT> vecSupportedInputFormatPair;
 extern vector<CODECRAWFORMAT> vecSupportedOutputFormatPair;
 extern vector<CODECRAWFORMAT> vecUnsupportedInputFormatPair;

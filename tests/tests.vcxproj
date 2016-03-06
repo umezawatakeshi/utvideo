@@ -172,6 +172,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="test_vcm_ICCompressQuery.cpp" />
+    <ClCompile Include="test_vcm_ICDecompressGetFormat.cpp" />
     <ClCompile Include="test_vcm_ICInfo.cpp" />
     <ClCompile Include="test_vcm_ICCompressGetFormat.cpp" />
     <ClCompile Include="test_vcm_ICGetInfo.cpp" />
