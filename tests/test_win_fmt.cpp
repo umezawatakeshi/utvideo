@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 
+#pragma warning(disable:4073)
 #pragma init_seg(lib)
 
 #include "test_win_fmt.h"
