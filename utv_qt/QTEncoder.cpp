@@ -203,11 +203,8 @@ pascal ComponentResult QTEncoderPrepareToCompressFrames(CQTEncoder *glob, ICMCom
 
 pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourceFrameRef sourceFrame, UInt32 flags)
 {
-//	fprintf(fp, "QTEncoderEncodeFrame(glob=%p, sourceFrame=%p, flags=%lu)\n", glob, sourceFrame, flags);
-
 	ICMMutableEncodedFrameRef encoded = NULL;
 	MediaSampleFlags mediaSampleFlags;
-	ComponentResult err;
 	CVPixelBufferRef sourcePixelBuffer = NULL;
 	size_t encodedSize;
 	bool keyFrame;
@@ -221,38 +218,28 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 	sourcePixelBuffer = ICMCompressorSourceFrameGetPixelBuffer(sourceFrame);
 	CVPixelBufferLockBaseAddress(sourcePixelBuffer, 0);
 	srcType = CVPixelBufferGetPixelFormatType(sourcePixelBuffer);
-//	fprintf(fp, "srctype=%08lx\n", srcType);
 	if (QuickTimeFormatToUtVideoFormat(&utvf, srcType) != 0)
 	{
 		CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
 		return paramErr;
 	}
-//	fprintf(fp, "utvf=%08x\n", utvf);
-//	fprintf(fp, "width=%zu height=%zu row=%zu\n",CVPixelBufferGetWidth(sourcePixelBuffer), CVPixelBufferGetHeight(sourcePixelBuffer), CVPixelBufferGetBytesPerRow(sourcePixelBuffer));
 	width = (unsigned int)CVPixelBufferGetWidth(sourcePixelBuffer);
 	height = (unsigned int)CVPixelBufferGetHeight(sourcePixelBuffer);
 	rowBytes = CVPixelBufferGetBytesPerRow(sourcePixelBuffer);
 	if (glob->codec->EncodeQuery(utvf, width, height) != 0)
 		return paramErr;
 
-//	fprintf(fp, "a %ld\n", err);
-	err = ICMEncodedFrameCreateMutable(glob->session, sourceFrame, glob->codec->EncodeGetOutputSize(utvf, width, height), &encoded);
-//	fprintf(fp, "b %ld\n", err);
+	ICMEncodedFrameCreateMutable(glob->session, sourceFrame, glob->codec->EncodeGetOutputSize(utvf, width, height), &encoded);
 	dstPtr = ICMEncodedFrameGetDataPtr(encoded);
 	srcPtr = CVPixelBufferGetBaseAddress(sourcePixelBuffer);
-//	fprintf(fp, "src=%p dst=%p\n", srcPtr, dstPtr);
 	encodedSize = glob->codec->EncodeFrame(dstPtr, &keyFrame, srcPtr, utvf, rowBytes);
-//	fprintf(fp, "b1 encodedSize=%zu\n", encodedSize);
-	err = ICMEncodedFrameSetDataSize(encoded, encodedSize);
-//	fprintf(fp, "c %ld\n", err);
+	ICMEncodedFrameSetDataSize(encoded, encodedSize);
 	mediaSampleFlags = 0;
 	if (!keyFrame)
 		mediaSampleFlags |= mediaSampleNotSync;
 
-	err = ICMEncodedFrameSetMediaSampleFlags(encoded, mediaSampleFlags);
-//	fprintf(fp, "d %ld\n", err);
-	err = ICMCompressorSessionEmitEncodedFrame(glob->session, encoded, 1, &sourceFrame);
-//	fprintf(fp, "e %ld\n", err);
+	ICMEncodedFrameSetMediaSampleFlags(encoded, mediaSampleFlags);
+	ICMCompressorSessionEmitEncodedFrame(glob->session, encoded, 1, &sourceFrame);
 
 	CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
 	ICMEncodedFrameRelease(encoded);
