@@ -49,6 +49,10 @@ void OnInitDialog(HWND hWnd)
 	DWORD cb;
 	DWORD dwType;
 
+	SendMessage(GetDlgItem(hWnd, IDC_WORKER_THREAD_PRIORITY_SLIDER), TBM_SETRANGEMIN, FALSE, -2);
+	SendMessage(GetDlgItem(hWnd, IDC_WORKER_THREAD_PRIORITY_SLIDER), TBM_SETRANGEMAX, TRUE,  +2);
+	SendMessage(GetDlgItem(hWnd, IDC_WORKER_THREAD_PRIORITY_SLIDER), TBM_SETTICFREQ, 1, 0);
+
 	if (RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Ut Video Codec Suite", 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hkUtVideo, NULL) != ERROR_SUCCESS)
 		return;
 
@@ -59,6 +63,16 @@ void OnInitDialog(HWND hWnd)
 	cb = sizeof(DWORD);
 	if (RegQueryValueEx(hkUtVideo, "IgnoreSetConfig", NULL, &dwType, (BYTE *)&dwValue, &cb) == ERROR_SUCCESS)
 		CheckDlgButton(hWnd, IDC_IGNORE_SET_CONFIG_CHECK, dwValue);
+
+	cb = sizeof(DWORD);
+	if (RegQueryValueEx(hkUtVideo, "WorkerThreadPriority", NULL, &dwType, (BYTE *)&dwValue, &cb) == ERROR_SUCCESS)
+	{
+		if ((LONG)dwValue > +2)
+			dwValue = +2;
+		if ((LONG)dwValue < -2)
+			dwValue = -2;
+		SendMessage(GetDlgItem(hWnd, IDC_WORKER_THREAD_PRIORITY_SLIDER), TBM_SETPOS, TRUE, dwValue);
+	}
 
 	RegCloseKey(hkUtVideo);
 }
@@ -76,6 +90,9 @@ void OnOK(HWND hWnd)
 
 	dwValue = IsDlgButtonChecked(hWnd, IDC_IGNORE_SET_CONFIG_CHECK);
 	RegSetValueEx(hkUtVideo, "IgnoreSetConfig", 0, REG_DWORD, (const BYTE *)&dwValue, sizeof(DWORD));
+
+	dwValue = SendMessage(GetDlgItem(hWnd, IDC_WORKER_THREAD_PRIORITY_SLIDER), TBM_GETPOS, 0, 0);
+	RegSetValueEx(hkUtVideo, "WorkerThreadPriority", 0, REG_DWORD, (const BYTE *)&dwValue, sizeof(DWORD));
 
 	RegCloseKey(hkUtVideo);
 }

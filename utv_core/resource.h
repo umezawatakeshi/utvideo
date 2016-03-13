@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by utv_core.rc
+// Microsoft Visual C++ で生成されたインクルード ファイル。
+// utv_core.rc で使用
 //
 #define IDD_UL00_CONFIG                 101
 #define IDD_GLOBAL_CONFIG               129
@@ -12,6 +12,7 @@
 #define IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO 1003
 #define IDC_INTRAFRAME_PREDICT_LEFT_RADIO 1004
 #define IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS 1005
+#define IDC_WORKER_THREAD_PRIORITY_SLIDER 1006
 
 // Next default values for new objects
 // 
@@ -19,7 +20,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        102
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1006
+#define _APS_NEXT_CONTROL_VALUE         1007
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

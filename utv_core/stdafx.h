@@ -28,6 +28,7 @@
 
 // Windows ヘッダー ファイル:
 #include <windows.h>
+#include <commctrl.h>
 
 inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 {

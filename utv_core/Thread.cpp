@@ -27,6 +27,8 @@ CThreadManager::CThreadManager(void)
 {
 	DWORD_PTR dwpProcessAffinityMask;
 	DWORD_PTR dwpSystemAffinityMask;
+	HKEY hkUtVideo;
+	int nThreadPriority = 0;
 
 	m_nNumThreads = 0;
 	m_nNumJobs = 0;
@@ -36,6 +38,25 @@ CThreadManager::CThreadManager(void)
 		m_hThreadSemaphore[i] = NULL;
 	}
 
+	if (RegCreateKeyEx(HKEY_CURRENT_USER, "Software\\Ut Video Codec Suite", 0, NULL, 0, KEY_ALL_ACCESS, NULL, &hkUtVideo, NULL) == ERROR_SUCCESS)
+	{
+		DWORD cb;
+		DWORD dwType;
+		DWORD dwValue;
+
+		dwType = REG_DWORD;
+		cb = sizeof(DWORD);
+		if (RegQueryValueEx(hkUtVideo, "WorkerThreadPriority", NULL, &dwType, (BYTE *)&dwValue, &cb) == ERROR_SUCCESS)
+		{
+			if ((LONG)dwValue > +2)
+				dwValue = +2;
+			if ((LONG)dwValue < -2)
+				dwValue = -2;
+			nThreadPriority = (LONG)dwValue;
+		}
+		RegCloseKey(hkUtVideo);
+	}
+
 	GetProcessAffinityMask(GetCurrentProcess(), &dwpProcessAffinityMask, &dwpSystemAffinityMask);
 	for (DWORD_PTR dwpThreadAffinityMask = 1; dwpThreadAffinityMask != 0; dwpThreadAffinityMask <<= 1)
 	{
@@ -43,6 +64,7 @@ CThreadManager::CThreadManager(void)
 		{
 			m_hThread[m_nNumThreads] = CreateThread(NULL, 0, StaticThreadProc, this, CREATE_SUSPENDED, &m_dwThreadId[m_nNumThreads]);
 			SetThreadAffinityMask(m_hThread[m_nNumThreads], dwpThreadAffinityMask);
+			SetThreadPriority(m_hThread[m_nNumThreads], nThreadPriority);
 			m_hThreadSemaphore[m_nNumThreads] = CreateSemaphore(NULL, 0, 0x7fffffff, NULL);
 			m_nNumThreads++;
 		}

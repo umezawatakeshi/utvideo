@@ -13,13 +13,11 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 日本語 resources
+// 日本語 (日本) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_JPN)
-#ifdef _WIN32
 LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 #pragma code_page(932)
-#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -80,6 +78,10 @@ BEGIN
     CONTROL         "コーデック側で設定をグローバルに保持する",IDC_SAVE_CONFIG_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,148,10
     CONTROL         "コーデッククライアントからの設定を無視する",IDC_IGNORE_SET_CONFIG_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,148,10
+    LTEXT           "ワーカースレッドの優先度",IDC_STATIC,7,48,80,8
+    CONTROL         "",IDC_WORKER_THREAD_PRIORITY_SLIDER,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,108,46,100,19
+    LTEXT           "低",IDC_STATIC,99,48,9,8
+    LTEXT           "高",IDC_STATIC,209,48,9,8
 END
 
 IDD_UQ00_CONFIG DIALOGEX 0, 0, 186, 90
@@ -95,7 +97,24 @@ BEGIN
     PUSHBUTTON      "キャンセル",IDCANCEL,129,24,50,14
 END
 
-#endif    // 日本語 resources
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_GLOBAL_CONFIG, DIALOG
+    BEGIN
+        VERTGUIDE, 7
+        HORZGUIDE, 52
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // 日本語 (日本) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -103,10 +122,8 @@ END
 // 英語 (米国) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-#ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -143,6 +160,10 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,150,10
     CONTROL         "Ignore setting configuration from codec client",IDC_IGNORE_SET_CONFIG_CHECK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,161,10
+    LTEXT           "Priority of worker threads",IDC_STATIC,7,48,83,8
+    CONTROL         "",IDC_WORKER_THREAD_PRIORITY_SLIDER,"msctls_trackbar32",TBS_AUTOTICKS | WS_TABSTOP,108,46,100,19
+    LTEXT           "Low",IDC_STATIC,95,48,14,8
+    LTEXT           "High",IDC_STATIC,209,48,15,8
 END
 
 IDD_UQ00_CONFIG DIALOGEX 0, 0, 186, 90
@@ -157,6 +178,21 @@ BEGIN
     DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
     PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_GLOBAL_CONFIG, DIALOG
+    BEGIN
+    END
+END
+#endif    // APSTUDIO_INVOKED
 
 #endif    // 英語 (米国) resources
 /////////////////////////////////////////////////////////////////////////////
