@@ -91,7 +91,6 @@ if exist "C:\Program Files (x86)\QuickTime" copy "$(OutDir)\$(TargetName).qtx" "
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Mutex.h" />
     <ClInclude Include="QTCodec.h" />
     <ClInclude Include="QTDecoder.h" />
     <ClInclude Include="QTDecoderDispatch.h" />
