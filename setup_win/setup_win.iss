@@ -82,6 +82,9 @@ Name: "{group}\Readme (Japanese)";                Filename: "{app}\readme.ja.htm
 Filename: "{app}\readme.en.html"; Description: "View readme";   Flags: postinstall shellexec skipifsilent; Languages: en
 Filename: "{app}\readme.ja.html"; Description: "readme の表示"; Flags: postinstall shellexec skipifsilent; Languages: ja
 
+Filename: "http://umezawa.dyndns.info/wordpress/?page_id=1577"; Description: "View ""About Donations"" page"; Flags: postinstall shellexec skipifsilent; Languages: en
+Filename: "http://umezawa.dyndns.info/wordpress/?page_id=1565"; Description: "「寄付について」ページの表示";  Flags: postinstall shellexec skipifsilent; Languages: ja
+
 Filename: "http://seiga.nicovideo.jp/seiga/im1922939"; Description: "niconico のコンテンツツリー親作品指定用の作品ページの表示"; Flags: postinstall shellexec skipifsilent; Languages: ja
 
 ; 以前のバージョンでインストールした MFT 版を unregister する。DLL の削除は（めんどくさいので）あきらめた。
