@@ -11,7 +11,6 @@ void vcm_ICCompressGetFormat_ok(DWORD fccCodec, DWORD fccRaw, LONG width, LONG h
 {
 	HIC hic;
 	LRESULT lr;
-	DWORD dw;
 	DWORD gfret;
 
 	BITMAPINFOHEADER bihIn;
@@ -37,8 +36,8 @@ void vcm_ICCompressGetFormat_ok(DWORD fccCodec, DWORD fccRaw, LONG width, LONG h
 	BOOST_TEST_REQUIRE(gfret >= sizeof(BITMAPINFOHEADER));
 	BOOST_TEST_REQUIRE(gfret <= sizeof(bihOutBuf));
 
-	dw = ICCompressGetFormat(hic, &bihIn, &bihOut);
-	BOOST_REQUIRE(dw == ICERR_OK);
+	lr = ICCompressGetFormat(hic, &bihIn, &bihOut);
+	BOOST_REQUIRE(lr == ICERR_OK);
 
 	BOOST_TEST_CHECK(bihOut.biSize == gfret);
 	BOOST_TEST_CHECK(bihOut.biWidth == width);
@@ -55,7 +54,6 @@ void vcm_ICCompressGetFormat_ng(DWORD fccCodec, DWORD fccRaw, LONG width, LONG h
 {
 	HIC hic;
 	LRESULT lr;
-	DWORD dw;
 	DWORD gfret;
 
 	BITMAPINFOHEADER bihIn;
@@ -86,8 +84,8 @@ void vcm_ICCompressGetFormat_ng(DWORD fccCodec, DWORD fccRaw, LONG width, LONG h
 	BOOST_TEST_REQUIRE(gfret >= sizeof(BITMAPINFOHEADER));
 	BOOST_TEST_REQUIRE(gfret <= sizeof(bihOutBuf));
 
-	dw = ICCompressGetFormat(hic, &bihIn, &bihOut);
-	BOOST_CHECK(dw != ICERR_OK);
+	lr = ICCompressGetFormat(hic, &bihIn, &bihOut);
+	BOOST_CHECK(lr != ICERR_OK);
 
 	lr = ICClose(hic);
 	BOOST_CHECK(lr == ICERR_OK);

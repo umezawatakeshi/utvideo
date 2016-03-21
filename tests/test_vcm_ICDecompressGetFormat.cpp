@@ -11,7 +11,6 @@ void vcm_ICDecompressGetFormat_ok(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 {
 	HIC hic;
 	LRESULT lr;
-	DWORD dw;
 	DWORD gfret;
 
 	BITMAPINFOHEADER bihEncoderIn;
@@ -34,8 +33,8 @@ void vcm_ICDecompressGetFormat_ok(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 	bihEncoderIn.biCompression = FCC2Compression(fccPrimary);
 	bihEncoderIn.biSizeImage = 10000000;
 
-	dw = ICCompressGetFormat(hic, &bihEncoderIn, &bihCompressed);
-	BOOST_REQUIRE(dw == ICERR_OK);
+	lr = ICCompressGetFormat(hic, &bihEncoderIn, &bihCompressed);
+	BOOST_REQUIRE(lr == ICERR_OK);
 
 	lr = ICClose(hic);
 	BOOST_CHECK(lr == ICERR_OK);
@@ -47,8 +46,8 @@ void vcm_ICDecompressGetFormat_ok(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 	gfret = ICDecompressGetFormatSize(hic, &bihCompressed);
 	BOOST_REQUIRE(gfret == sizeof(BITMAPINFOHEADER));
 
-	dw = ICDecompressGetFormat(hic, &bihCompressed, &bihDecoderOut);
-	BOOST_REQUIRE(dw == ICERR_OK);
+	lr = ICDecompressGetFormat(hic, &bihCompressed, &bihDecoderOut);
+	BOOST_REQUIRE(lr == ICERR_OK);
 	BOOST_TEST_CHECK(bihDecoderOut.biSize == sizeof(BITMAPINFOHEADER));
 	BOOST_TEST_CHECK(bihDecoderOut.biWidth == width);
 	BOOST_TEST_CHECK(bihDecoderOut.biHeight == height * FCC2HeightSign(fccPrimary));
@@ -64,7 +63,6 @@ void vcm_ICDecompressGetFormat_ng(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 {
 	HIC hic;
 	LRESULT lr;
-	DWORD dw;
 	DWORD gfret;
 
 	BITMAPINFOHEADER bihEncoderIn;
@@ -87,8 +85,8 @@ void vcm_ICDecompressGetFormat_ng(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 	bihEncoderIn.biCompression = FCC2Compression(fccPrimary);
 	bihEncoderIn.biSizeImage = 10000000;
 
-	dw = ICCompressGetFormat(hic, &bihEncoderIn, &bihCompressed);
-	BOOST_REQUIRE(dw == ICERR_OK);
+	lr = ICCompressGetFormat(hic, &bihEncoderIn, &bihCompressed);
+	BOOST_REQUIRE(lr == ICERR_OK);
 
 	lr = ICClose(hic);
 	BOOST_CHECK(lr == ICERR_OK);
@@ -110,8 +108,8 @@ void vcm_ICDecompressGetFormat_ng(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 	gfret = ICDecompressGetFormatSize(hic, &bihCompressed);
 	BOOST_REQUIRE(gfret == sizeof(BITMAPINFOHEADER));
 
-	dw = ICDecompressGetFormat(hic, &bihCompressed, &bihDecoderOut);
-	BOOST_CHECK(dw != ICERR_OK);
+	lr = ICDecompressGetFormat(hic, &bihCompressed, &bihDecoderOut);
+	BOOST_CHECK(lr != ICERR_OK);
 
 	lr = ICClose(hic);
 	BOOST_CHECK(lr == ICERR_OK);

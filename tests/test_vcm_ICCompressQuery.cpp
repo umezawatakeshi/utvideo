@@ -11,7 +11,6 @@ void vcm_ICCompressQuery_anyout_ok(DWORD fccCodec, DWORD fccRaw, LONG width, LON
 {
 	HIC hic;
 	LRESULT lr;
-	DWORD dw;
 
 	BITMAPINFOHEADER bihIn;
 
@@ -27,8 +26,8 @@ void vcm_ICCompressQuery_anyout_ok(DWORD fccCodec, DWORD fccRaw, LONG width, LON
 	bihIn.biCompression = FCC2Compression(fccRaw);
 	bihIn.biSizeImage = 10000000;
 
-	dw = ICCompressQuery(hic, &bihIn, NULL);
-	BOOST_CHECK(dw == ICERR_OK);
+	lr = ICCompressQuery(hic, &bihIn, NULL);
+	BOOST_CHECK(lr == ICERR_OK);
 
 	lr = ICClose(hic);
 	BOOST_CHECK(lr == ICERR_OK);
@@ -38,7 +37,6 @@ void vcm_ICCompressQuery_anyout_ng(DWORD fccCodec, DWORD fccRaw, LONG width, LON
 {
 	HIC hic;
 	LRESULT lr;
-	DWORD dw;
 
 	BITMAPINFOHEADER bihIn;
 
@@ -54,8 +52,8 @@ void vcm_ICCompressQuery_anyout_ng(DWORD fccCodec, DWORD fccRaw, LONG width, LON
 	bihIn.biCompression = FCC2Compression(fccRaw);
 	bihIn.biSizeImage = 10000000;
 
-	dw = ICCompressQuery(hic, &bihIn, NULL);
-	BOOST_CHECK(dw != ICERR_OK);
+	lr = ICCompressQuery(hic, &bihIn, NULL);
+	BOOST_CHECK(lr != ICERR_OK);
 
 	lr = ICClose(hic);
 	BOOST_CHECK(lr == ICERR_OK);
