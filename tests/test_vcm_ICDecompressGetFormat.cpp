@@ -3,9 +3,7 @@
 
 #include "stdafx.h"
 #include "test_win_fmt.h"
-
-#define TEST_WIDTH 1920
-#define TEST_HEIGHT 1080
+#include "expand.h"
 
 void vcm_ICDecompressGetFormat_ok(DWORD fccCodec, DWORD fccPrimary, LONG width, LONG height)
 {
@@ -116,31 +114,31 @@ void vcm_ICDecompressGetFormat_ng(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 }
 
 BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder")*depends_on("vcm_ICOpen_decoder")*depends_on("vcm_ICCompressGetFormat_biCompression_ok"))
-BOOST_DATA_TEST_CASE(vcm_ICDecompressGetFormat_biCompression_ok, data::make(vecTopPriorityRawFormat), crf)
+BOOST_DATA_TEST_CASE(vcm_ICDecompressGetFormat_biCompression_ok, data::make(vecCodecFourcc) ^ data::make(vecTopPriorityRawFormat), fccCodec, fccRaw)
 {
-	vcm_ICDecompressGetFormat_ok(crf.first, crf.second, TEST_WIDTH, TEST_HEIGHT);
+	vcm_ICDecompressGetFormat_ok(fccCodec, fccRaw, TEST_WIDTH, TEST_HEIGHT);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder")*depends_on("vcm_ICOpen_decoder")*depends_on("vcm_ICCompressGetFormat_biCompression_ok"))
-BOOST_DATA_TEST_CASE(vcm_ICDecompressGetFormat_biWidth_ok, data::make(vecSupportedWidthPair), crf)
+BOOST_DATA_TEST_CASE(vcm_ICDecompressGetFormat_biWidth_ok, expand(data::make(vecCodecFourcc) ^ data::make(vecTopPriorityRawFormat) ^ data::make(vecSupportedWidth)), fccCodec, fccRaw, width)
 {
-	vcm_ICDecompressGetFormat_ok(crf.first.first, crf.first.second, crf.second, TEST_HEIGHT);
+	vcm_ICDecompressGetFormat_ok(fccCodec, fccRaw, width, TEST_HEIGHT);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder")*depends_on("vcm_ICOpen_decoder")*depends_on("vcm_ICCompressGetFormat_biCompression_ok"))
-BOOST_DATA_TEST_CASE(vcm_ICDecompressGetFormat_biHeight_ok, data::make(vecSupportedHeightPair), crf)
+BOOST_DATA_TEST_CASE(vcm_ICDecompressGetFormat_biHeight_ok, expand(data::make(vecCodecFourcc) ^ data::make(vecTopPriorityRawFormat) ^ data::make(vecSupportedHeight)), fccCodec, fccRaw, height)
 {
-	vcm_ICDecompressGetFormat_ok(crf.first.first, crf.first.second, TEST_WIDTH, crf.second);
+	vcm_ICDecompressGetFormat_ok(fccCodec, fccRaw, TEST_WIDTH, height);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder")*depends_on("vcm_ICOpen_decoder")*depends_on("vcm_ICCompressGetFormat_biCompression_ok"))
-BOOST_DATA_TEST_CASE(vcm_ICDecompressGetFormat_biWidth_ng, data::make(vecUnsupportedWidthPair), crf)
+BOOST_DATA_TEST_CASE(vcm_ICDecompressGetFormat_biWidth_ng, expand(data::make(vecCodecFourcc) ^ data::make(vecTopPriorityRawFormat) ^ data::make(vecUnsupportedWidth)), fccCodec, fccRaw, width)
 {
-	vcm_ICDecompressGetFormat_ng(crf.first.first, crf.first.second, crf.second, TEST_HEIGHT);
+	vcm_ICDecompressGetFormat_ng(fccCodec, fccRaw, width, TEST_HEIGHT);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder")*depends_on("vcm_ICOpen_decoder")*depends_on("vcm_ICCompressGetFormat_biCompression_ok"))
-BOOST_DATA_TEST_CASE(vcm_ICDecompressGetFormat_biHeight_ng, data::make(vecUnsupportedHeightPair), crf)
+BOOST_DATA_TEST_CASE(vcm_ICDecompressGetFormat_biHeight_ng, expand(data::make(vecCodecFourcc) ^ data::make(vecTopPriorityRawFormat) ^ data::make(vecUnsupportedHeight)), fccCodec, fccRaw, height)
 {
-	vcm_ICDecompressGetFormat_ng(crf.first.first, crf.first.second, TEST_WIDTH, crf.second);
+	vcm_ICDecompressGetFormat_ng(fccCodec, fccRaw, TEST_WIDTH, height);
 }

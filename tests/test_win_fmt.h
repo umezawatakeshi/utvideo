@@ -3,20 +3,6 @@
 
 #pragma once
 
-struct CODECNAME
-{
-	wstring wstrShortName;
-	wstring wstrLongName;
-};
-
-struct CODECRAWFORMAT
-{
-	DWORD fccCodec;
-	DWORD fccRaw;
-	typedef DWORD first_type;
-	typedef DWORD second_type;
-};
-
 namespace boost { namespace test_tools { namespace tt_detail {
 
 template<>
@@ -52,78 +38,23 @@ struct print_log_value<wstring>
 	}
 };
 
-template<>
-struct print_log_value<CODECNAME>
-{
-	void operator()(ostream& os, const CODECNAME& p)
-	{
-		print_log_value<wstring> plvwstr;
-		os << "(";
-		plvwstr(os, p.wstrShortName);
-		os << ", ";
-		plvwstr(os, p.wstrLongName);
-		os << ")";
-	}
-};
-
-template<>
-struct print_log_value<CODECRAWFORMAT>
-{
-	void operator()(ostream& os, const CODECRAWFORMAT& p)
-	{
-		print_log_value<DWORD> plvdw;
-		os << "(";
-		plvdw(os, p.fccCodec);
-		os << ", ";
-		plvdw(os, p.fccRaw);
-		os << ")";
-	}
-};
-
-template<>
-struct print_log_value<pair<DWORD, DWORD> >
-{
-	void operator()(ostream& os, const pair<DWORD, DWORD>& p)
-	{
-		print_log_value<DWORD> plvdw;
-		os << "(";
-		plvdw(os, p.first);
-		os << ", ";
-		plvdw(os, p.second);
-		os << ")";
-	}
-};
-
-template<>
-struct print_log_value<pair<pair<DWORD, DWORD>, LONG> >
-{
-	void operator()(ostream& os, const pair<pair<DWORD, DWORD>, LONG>& p)
-	{
-		print_log_value<DWORD> plvdw;
-		print_log_value<LONG> plvl;
-		os << "(";
-		plvdw(os, p.first.first);
-		os << ", ";
-		plvdw(os, p.first.second);
-		os << ", ";
-		plvl(os, p.second);
-		os << ")";
-	}
-};
-
 }}}
 
 extern vector<FOURCC> vecCodecFourcc;
-extern vector<CODECNAME> vecCodecName;
-extern vector<pair<DWORD, DWORD> > vecTopPriorityRawFormat;
-extern vector<CODECRAWFORMAT> vecSupportedInputFormatPair;
-extern vector<CODECRAWFORMAT> vecSupportedOutputFormatPair;
-extern vector<CODECRAWFORMAT> vecUnsupportedInputFormatPair;
-extern vector<CODECRAWFORMAT> vecUnsupportedOutputFormatPair;
-extern vector<pair<pair<DWORD, DWORD>, LONG> > vecSupportedWidthPair;
-extern vector<pair<pair<DWORD, DWORD>, LONG> > vecSupportedHeightPair;
-extern vector<pair<pair<DWORD, DWORD>, LONG> > vecUnsupportedWidthPair;
-extern vector<pair<pair<DWORD, DWORD>, LONG> > vecUnsupportedHeightPair;
+extern vector<wstring> vecCodecShortName;
+extern vector<wstring> vecCodecLongName;
+extern vector<DWORD> vecTopPriorityRawFormat;
+extern vector<vector<DWORD>> vecSupportedInputFormat;
+extern vector<vector<DWORD>> vecSupportedOutputFormat;
+extern vector<vector<DWORD>> vecUnsupportedInputFormat;
+extern vector<vector<DWORD>> vecUnsupportedOutputFormat;
+extern vector<vector<LONG>> vecSupportedWidth;
+extern vector<vector<LONG>> vecSupportedHeight;
+extern vector<vector<LONG>> vecUnsupportedWidth;
+extern vector<vector<LONG>> vecUnsupportedHeight;
+
+#define TEST_WIDTH ((LONG)1920)
+#define TEST_HEIGHT ((LONG)1080)
 
 static inline bool IsFourccRGB(DWORD dw)
 {
