@@ -92,7 +92,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(BOOST_LIB_X86)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vfw32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -109,7 +109,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(BOOST_LIB_X64)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vfw32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -130,7 +130,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(BOOST_LIB_X86)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vfw32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -151,12 +151,13 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(BOOST_LIB_X64)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vfw32.lib</AdditionalDependencies>
+      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="expand.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="test_dmo_fmt.h" />
     <ClInclude Include="test_win_fmt.h" />
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +173,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="test_dmo_DMOEnum.cpp" />
+    <ClCompile Include="test_dmo_fmt.cpp" />
     <ClCompile Include="test_vcm_ICCompressQuery.cpp" />
     <ClCompile Include="test_vcm_ICDecompressGetFormat.cpp" />
     <ClCompile Include="test_vcm_ICInfo.cpp" />

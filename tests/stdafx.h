@@ -9,6 +9,8 @@
 #include <vfw.h>
 #include <aviriff.h>
 
+#include <dmo.h>
+
 #include <stdio.h>
 #include <tchar.h>
 
