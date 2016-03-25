@@ -39,12 +39,12 @@ void dmo_DMOEnum(REFGUID category, REFGUID clsidCodec, wstring wstrName)
 
 BOOST_DATA_TEST_CASE(dmo_DMOEnum_encoder, data::make(vecCodecFourcc) ^ data::make(vecEncoderName), fcc, wstrName)
 {
-	GUID guid = { fcc, 0xE991, 0x460D, 0x84, 0x0B, 0xC1, 0xC6, 0x49, 0x74, 0x57, 0xEF };
+	DMOEncoderCLSID guid(fcc);
 	dmo_DMOEnum(DMOCATEGORY_VIDEO_ENCODER, guid, wstrName);
 }
 
 BOOST_DATA_TEST_CASE(dmo_DMOEnum_decoder, data::make(vecCodecFourcc) ^ data::make(vecDecoderName), fcc, wstrName)
 {
-	GUID guid = { fcc, 0xD991, 0x460D, 0x84, 0x0B, 0xC1, 0xC6, 0x49, 0x74, 0x57, 0xEF };
+	DMODecoderCLSID guid(fcc);
 	dmo_DMOEnum(DMOCATEGORY_VIDEO_DECODER, guid, wstrName);
 }
