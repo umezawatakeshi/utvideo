@@ -10,6 +10,7 @@
 #include <aviriff.h>
 
 #include <dmo.h>
+#include <uuids.h>
 
 #include <stdio.h>
 #include <tchar.h>
