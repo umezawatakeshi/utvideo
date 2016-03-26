@@ -49,4 +49,7 @@ vector<vector<GUID>> vecSupportedEncoderInputTypes = {
 
 vector<vector<GUID>> vecSupportedDecoderOutputTypes = vecSupportedEncoderInputTypes;
 
+vector<IID> vecSupportedEncoderInterfaces = { IID_IMediaObject, IID_IPersistStream, IID_IAMVfwCompressDialogs };
+vector<IID> vecSupportedDecoderInterfaces = { IID_IMediaObject };
+
 HRESULT hrCoInit = CoInitializeEx(NULL, COINIT_MULTITHREADED);

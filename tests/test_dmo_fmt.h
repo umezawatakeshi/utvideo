@@ -50,6 +50,8 @@ extern vector<wstring> vecEncoderName;
 extern vector<wstring> vecDecoderName;
 extern vector<vector<GUID>> vecSupportedEncoderInputTypes;
 extern vector<vector<GUID>> vecSupportedDecoderOutputTypes;
+extern vector<IID> vecSupportedEncoderInterfaces;
+extern vector<IID> vecSupportedDecoderInterfaces;
 
 class DMOEncoderCLSID : public GUID
 {

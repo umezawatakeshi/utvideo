@@ -11,6 +11,7 @@
 
 #include <dmo.h>
 #include <uuids.h>
+#include <dshow.h>
 
 #include <stdio.h>
 #include <tchar.h>
