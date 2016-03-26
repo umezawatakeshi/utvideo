@@ -24,12 +24,14 @@ void dmo_GetStreamCount(REFGUID clsidCodec)
 	pObj->Release();
 }
 
+BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
 BOOST_DATA_TEST_CASE(dmo_GetStreamCount_encoder, data::make(vecCodecFourcc), fcc)
 {
 	DMOEncoderCLSID guid(fcc);
 	dmo_GetStreamCount(guid);
 }
 
+BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_decoder")*depends_on("dmo_QueryInterface_decoder"))
 BOOST_DATA_TEST_CASE(dmo_GetStreamCount_decoder, data::make(vecCodecFourcc), fcc)
 {
 	DMODecoderCLSID guid(fcc);
