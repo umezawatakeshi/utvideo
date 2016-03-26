@@ -48,3 +48,5 @@ vector<vector<GUID>> vecSupportedEncoderInputTypes = {
 };
 
 vector<vector<GUID>> vecSupportedDecoderOutputTypes = vecSupportedEncoderInputTypes;
+
+HRESULT hrCoInit = CoInitializeEx(NULL, COINIT_MULTITHREADED);
