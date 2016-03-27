@@ -180,6 +180,7 @@
     <ClCompile Include="test_dmo_fmt.cpp" />
     <ClCompile Include="test_dmo_GetStreamCount.cpp" />
     <ClCompile Include="test_dmo_GetStreamInfo.cpp" />
+    <ClCompile Include="test_dmo_NotImpl.cpp" />
     <ClCompile Include="test_dmo_QueryInterface.cpp" />
     <ClCompile Include="test_vcm_ICCompressQuery.cpp" />
     <ClCompile Include="test_vcm_ICDecompressGetFormat.cpp" />
