@@ -114,3 +114,13 @@ vector<DWORD> vecTopPriorityRawFormat = {
 	FCC('YV12'),
 	FCC('v210'),
 };
+
+vector<bool> vecSupportTemporalCompression = {
+	false,
+	false,
+	false,
+	false,
+	false,
+	false,
+	false,
+};

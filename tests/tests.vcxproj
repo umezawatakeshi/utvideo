@@ -178,6 +178,7 @@
     <ClCompile Include="test_dmo_DMOGetName.cpp" />
     <ClCompile Include="test_dmo_DMOGetTypes.cpp" />
     <ClCompile Include="test_dmo_fmt.cpp" />
+    <ClCompile Include="test_dmo_GetInputType.cpp" />
     <ClCompile Include="test_dmo_GetStreamCount.cpp" />
     <ClCompile Include="test_dmo_GetStreamInfo.cpp" />
     <ClCompile Include="test_dmo_NotImpl.cpp" />
