@@ -27,26 +27,26 @@ void dmo_NotImpl(REFGUID clsidCodec)
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
 BOOST_DATA_TEST_CASE(dmo_NotImpl_encoder, data::make(vecCodecFourcc), fcc)
 {
-	DMOEncoderCLSID guid(fcc);
-	dmo_NotImpl(guid);
+	DMOEncoderCLSID clsid(fcc);
+	dmo_NotImpl(clsid);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_decoder")*depends_on("dmo_QueryInterface_decoder"))
 BOOST_DATA_TEST_CASE(dmo_NotImpl_decoder, data::make(vecCodecFourcc), fcc)
 {
-	DMODecoderCLSID guid(fcc);
-	dmo_NotImpl(guid);
+	DMODecoderCLSID clsid(fcc);
+	dmo_NotImpl(clsid);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
 BOOST_DATA_TEST_CASE(dmo_NotImpl_encoder_IAMVfwCompressDialogs, data::make(vecCodecFourcc), fcc)
 {
-	DMOEncoderCLSID guid(fcc);
+	DMOEncoderCLSID clsid(fcc);
 
 	HRESULT hr;
 	IAMVfwCompressDialogs *pDlg;
 
-	hr = CoCreateInstance(guid, NULL, CLSCTX_INPROC_SERVER, IID_IAMVfwCompressDialogs, (LPVOID*)&pDlg);
+	hr = CoCreateInstance(clsid, NULL, CLSCTX_INPROC_SERVER, IID_IAMVfwCompressDialogs, (LPVOID*)&pDlg);
 	BOOST_REQUIRE(hr == S_OK);
 	BOOST_REQUIRE(pDlg != NULL);
 

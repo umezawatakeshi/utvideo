@@ -30,13 +30,13 @@ void dmo_QueryInterface(REFGUID clsidCodec, REFIID iid)
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder"))
 BOOST_DATA_TEST_CASE(dmo_QueryInterface_encoder, data::make(vecCodecFourcc) * data::make(vecSupportedEncoderInterfaces), fcc, iid)
 {
-	DMOEncoderCLSID guid(fcc);
-	dmo_QueryInterface(guid, iid);
+	DMOEncoderCLSID clsid(fcc);
+	dmo_QueryInterface(clsid, iid);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_decoder"))
 BOOST_DATA_TEST_CASE(dmo_QueryInterface_decoder, data::make(vecCodecFourcc) * data::make(vecSupportedDecoderInterfaces), fcc, iid)
 {
-	DMODecoderCLSID guid(fcc);
-	dmo_QueryInterface(guid, iid);
+	DMODecoderCLSID clsid(fcc);
+	dmo_QueryInterface(clsid, iid);
 }

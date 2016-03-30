@@ -19,12 +19,12 @@ void dmo_CoCreateInstance(REFGUID clsidCodec)
 
 BOOST_DATA_TEST_CASE(dmo_CoCreateInstance_encoder, data::make(vecCodecFourcc), fcc)
 {
-	DMOEncoderCLSID guid(fcc);
-	dmo_CoCreateInstance(guid);
+	DMOEncoderCLSID clsid(fcc);
+	dmo_CoCreateInstance(clsid);
 }
 
 BOOST_DATA_TEST_CASE(dmo_CoCreateInstance_decoder, data::make(vecCodecFourcc), fcc)
 {
-	DMODecoderCLSID guid(fcc);
-	dmo_CoCreateInstance(guid);
+	DMODecoderCLSID clsid(fcc);
+	dmo_CoCreateInstance(clsid);
 }

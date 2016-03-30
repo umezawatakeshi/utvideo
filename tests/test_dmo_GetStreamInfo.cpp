@@ -29,8 +29,8 @@ void dmo_GetStreamInfo(REFGUID clsidCodec, DWORD dwInputFlags, DWORD dwOutputFla
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
 BOOST_DATA_TEST_CASE(dmo_GetStreamInfo_encoder, data::make(vecCodecFourcc), fcc)
 {
-	DMOEncoderCLSID guid(fcc);
-	dmo_GetStreamInfo(guid,
+	DMOEncoderCLSID clsid(fcc);
+	dmo_GetStreamInfo(clsid,
 		DMO_INPUT_STREAMF_WHOLE_SAMPLES | DMO_INPUT_STREAMF_SINGLE_SAMPLE_PER_BUFFER | DMO_INPUT_STREAMF_FIXED_SAMPLE_SIZE,
 		DMO_INPUT_STREAMF_WHOLE_SAMPLES | DMO_INPUT_STREAMF_SINGLE_SAMPLE_PER_BUFFER);
 }
@@ -38,8 +38,8 @@ BOOST_DATA_TEST_CASE(dmo_GetStreamInfo_encoder, data::make(vecCodecFourcc), fcc)
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_decoder")*depends_on("dmo_QueryInterface_decoder"))
 BOOST_DATA_TEST_CASE(dmo_GetStreamInfo_decoder, data::make(vecCodecFourcc), fcc)
 {
-	DMODecoderCLSID guid(fcc);
-	dmo_GetStreamInfo(guid,
+	DMODecoderCLSID clsid(fcc);
+	dmo_GetStreamInfo(clsid,
 		DMO_INPUT_STREAMF_WHOLE_SAMPLES | DMO_INPUT_STREAMF_SINGLE_SAMPLE_PER_BUFFER,
 		DMO_INPUT_STREAMF_WHOLE_SAMPLES | DMO_INPUT_STREAMF_SINGLE_SAMPLE_PER_BUFFER | DMO_INPUT_STREAMF_FIXED_SAMPLE_SIZE);
 }

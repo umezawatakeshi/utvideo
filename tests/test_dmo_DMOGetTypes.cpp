@@ -38,18 +38,18 @@ void dmo_DMOGetTypes(REFGUID clsidCodec, const vector<GUID> &guidIn, const vecto
 
 BOOST_DATA_TEST_CASE(dmo_DMOGetTypes_encoder, data::make(vecCodecFourcc) ^ data::make(vecSupportedEncoderInputTypes), fcc, guids)
 {
-	DMOEncoderCLSID guid(fcc);
+	DMOEncoderCLSID clsid(fcc);
 	vector<GUID> codecType;
 
 	codecType.push_back(FourCCGUID(fcc));
-	dmo_DMOGetTypes(guid, guids, codecType);
+	dmo_DMOGetTypes(clsid, guids, codecType);
 }
 
 BOOST_DATA_TEST_CASE(dmo_DMOGetTypes_decoder, data::make(vecCodecFourcc) ^ data::make(vecSupportedDecoderOutputTypes), fcc, guids)
 {
-	DMODecoderCLSID guid(fcc);
+	DMODecoderCLSID clsid(fcc);
 	vector<GUID> codecType;
 
 	codecType.push_back(FourCCGUID(fcc));
-	dmo_DMOGetTypes(guid, codecType, guids);
+	dmo_DMOGetTypes(clsid, codecType, guids);
 }
