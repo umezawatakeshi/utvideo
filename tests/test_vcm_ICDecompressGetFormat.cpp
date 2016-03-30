@@ -25,7 +25,7 @@ void vcm_ICDecompressGetFormat_ok(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 	memset(&bihEncoderIn, 0, sizeof(BITMAPINFOHEADER));
 	bihEncoderIn.biSize = sizeof(BITMAPINFOHEADER);
 	bihEncoderIn.biWidth = width;
-	bihEncoderIn.biHeight = height * FCC2HeightSign(fccPrimary);
+	bihEncoderIn.biHeight = height;
 	bihEncoderIn.biPlanes = 1;
 	bihEncoderIn.biBitCount = FCC2BitCount(fccPrimary);
 	bihEncoderIn.biCompression = FCC2Compression(fccPrimary);
@@ -48,7 +48,7 @@ void vcm_ICDecompressGetFormat_ok(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 	BOOST_REQUIRE(lr == ICERR_OK);
 	BOOST_TEST_CHECK(bihDecoderOut.biSize == sizeof(BITMAPINFOHEADER));
 	BOOST_TEST_CHECK(bihDecoderOut.biWidth == width);
-	BOOST_TEST_CHECK(bihDecoderOut.biHeight == height * FCC2HeightSign(fccPrimary));
+	BOOST_TEST_CHECK(bihDecoderOut.biHeight == height);
 	BOOST_TEST_CHECK(bihDecoderOut.biPlanes == 1);
 	BOOST_TEST_CHECK(bihDecoderOut.biBitCount == FCC2BitCount(fccPrimary));
 	BOOST_TEST_CHECK(bihDecoderOut.biCompression == FCC2Compression(fccPrimary););
@@ -77,7 +77,7 @@ void vcm_ICDecompressGetFormat_ng(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 	memset(&bihEncoderIn, 0, sizeof(BITMAPINFOHEADER));
 	bihEncoderIn.biSize = sizeof(BITMAPINFOHEADER);
 	bihEncoderIn.biWidth = TEST_HEIGHT;
-	bihEncoderIn.biHeight = TEST_WIDTH * FCC2HeightSign(fccPrimary);
+	bihEncoderIn.biHeight = TEST_WIDTH;
 	bihEncoderIn.biPlanes = 1;
 	bihEncoderIn.biBitCount = FCC2BitCount(fccPrimary);
 	bihEncoderIn.biCompression = FCC2Compression(fccPrimary);

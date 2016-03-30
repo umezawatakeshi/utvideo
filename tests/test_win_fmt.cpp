@@ -38,29 +38,26 @@ vector<wstring> vecCodecLongName = {
 	L"UtVideo Pro YUV422 10bit VCM",
 };
 
-#define BI_RGB_BU(bc) (bc)
-#define BI_RGB_TD(bc) ((DWORD)-bc)
-
 vector<vector<DWORD> > vecSupportedInputFormat = {
-	{ BI_RGB_BU(32), BI_RGB_BU(24) },
-	{ BI_RGB_BU(32) },
-	{ BI_RGB_BU(32), BI_RGB_BU(24), FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV') },
-	{ BI_RGB_BU(32), BI_RGB_BU(24), FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV'), FCC('YV12') },
-	{ BI_RGB_BU(32), BI_RGB_BU(24), FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV'), FCC('HDYC') },
-	{ BI_RGB_BU(32), BI_RGB_BU(24), FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV'), FCC('HDYC'), FCC('YV12') },
+	{ 32, 24 },
+	{ 32 },
+	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV') },
+	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV'), FCC('YV12') },
+	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV'), FCC('HDYC') },
+	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV'), FCC('HDYC'), FCC('YV12') },
 	{ FCC('v210') },
 };
 
 vector<vector<DWORD> > vecSupportedOutputFormat = vecSupportedInputFormat;
 
 vector<vector<DWORD> > vecUnsupportedInputFormat = {
-	{ BI_RGB_BU(15), BI_RGB_BU(16), BI_RGB_TD(24), BI_RGB_TD(32) },
-	{ BI_RGB_BU(15), BI_RGB_BU(16), BI_RGB_TD(24), BI_RGB_TD(32), BI_RGB_BU(24) },
-	{ BI_RGB_BU(15), BI_RGB_BU(16), BI_RGB_TD(24), BI_RGB_TD(32), FCC('YVYU'), FCC('VYUY'), FCC('YV12'), FCC('HDYC') },
-	{ BI_RGB_BU(15), BI_RGB_BU(16), BI_RGB_TD(24), BI_RGB_TD(32), FCC('YVYU'), FCC('VYUY'), FCC('HDYC') },
-	{ BI_RGB_BU(15), BI_RGB_BU(16), BI_RGB_TD(24), BI_RGB_TD(32), FCC('YVYU'), FCC('VYUY'), FCC('YV12') },
-	{ BI_RGB_BU(15), BI_RGB_BU(16), BI_RGB_TD(24), BI_RGB_TD(32), FCC('YVYU'), FCC('VYUY') },
-	{ BI_RGB_BU(15), BI_RGB_BU(16), BI_RGB_TD(24), BI_RGB_TD(32), BI_RGB_BU(24), BI_RGB_BU(32), FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12') },
+	{ 15, 16 },
+	{ 15, 16, 24 },
+	{ 15, 16, FCC('YVYU'), FCC('VYUY'), FCC('YV12'), FCC('HDYC') },
+	{ 15, 16, FCC('YVYU'), FCC('VYUY'), FCC('HDYC') },
+	{ 15, 16, FCC('YVYU'), FCC('VYUY'), FCC('YV12') },
+	{ 15, 16, FCC('YVYU'), FCC('VYUY') },
+	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12') },
 };
 
 vector<vector<DWORD> > vecUnsupportedOutputFormat = vecUnsupportedInputFormat;
@@ -96,18 +93,18 @@ vector<vector<LONG>> vecUnsupportedWidth = {
 };
 
 vector<vector<LONG>> vecUnsupportedHeight = {
-	{ 0 },
-	{ 0 },
-	{ 0 },
-	{ 0, 1081, 1083, 1085, 1087 },
-	{ 0 },
-	{ 0, 1081, 1083, 1085, 1087 },
-	{ 0 },
+	{ -1080, 0 },
+	{ -1080, 0 },
+	{ -1080, 0 },
+	{ -1080, 0, 1081, 1083, 1085, 1087 },
+	{ -1080, 0 },
+	{ -1080, 0, 1081, 1083, 1085, 1087 },
+	{ -1080, 0 },
 };
 
 vector<DWORD> vecTopPriorityRawFormat = {
-	BI_RGB_BU(24),
-	BI_RGB_BU(32),
+	24,
+	32,
 	FCC('YUY2'),
 	FCC('YV12'),
 	FCC('HDYC'),

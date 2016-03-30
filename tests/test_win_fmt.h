@@ -59,7 +59,7 @@ extern vector<bool> vecSupportTemporalCompression;
 
 static inline bool IsFourccRGB(DWORD dw)
 {
-	return dw <= 0xff || dw >= (DWORD)-0xff;
+	return dw <= 0xff;
 }
 
 static inline DWORD FCC2Compression(DWORD dw)
@@ -105,19 +105,4 @@ static inline WORD FCC2BitCount(DWORD dw)
 	default:
 		return 0; // XXX
 	}
-}
-
-static inline int FCC2HeightSign(DWORD dw)
-{
-	if (IsFourccRGB(dw))
-	{
-		if ((int)dw > 0)
-			return 1;
-		else if ((int)dw < 0)
-			return -1;
-		else
-			return 0;
-	}
-	else
-		return 1;
 }

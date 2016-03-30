@@ -24,7 +24,7 @@ void vcm_ICCompressGetFormat_ok(DWORD fccCodec, DWORD fccRaw, LONG width, LONG h
 	memset(&bihIn, 0, sizeof(BITMAPINFOHEADER));
 	bihIn.biSize = sizeof(BITMAPINFOHEADER);
 	bihIn.biWidth = width;
-	bihIn.biHeight = height * FCC2HeightSign(fccRaw);
+	bihIn.biHeight = height;
 	bihIn.biPlanes = 1;
 	bihIn.biBitCount = FCC2BitCount(fccRaw);
 	bihIn.biCompression = FCC2Compression(fccRaw);
@@ -67,7 +67,7 @@ void vcm_ICCompressGetFormat_ng(DWORD fccCodec, DWORD fccRaw, LONG width, LONG h
 	memset(&bihIn, 0, sizeof(BITMAPINFOHEADER));
 	bihIn.biSize = sizeof(BITMAPINFOHEADER);
 	bihIn.biWidth = width;
-	bihIn.biHeight = height * FCC2HeightSign(fccRaw);
+	bihIn.biHeight = height;
 	bihIn.biPlanes = 1;
 	bihIn.biBitCount = FCC2BitCount(fccRaw);
 	bihIn.biCompression = FCC2Compression(fccRaw);
