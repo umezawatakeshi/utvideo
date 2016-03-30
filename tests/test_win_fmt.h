@@ -78,6 +78,17 @@ static inline WORD FCC2BitCount(DWORD dw)
 
 	switch (dw)
 	{
+	case FCC('ULRA'):
+		return 32;
+	case FCC('ULRG'):
+	case FCC('ULY2'):
+	case FCC('ULY0'):
+	case FCC('ULH2'):
+	case FCC('ULH0'):
+		return 24;
+	case FCC('UQY2'):
+		return 30;
+
 	case FCC('YUY2'):
 	case FCC('YUYV'):
 	case FCC('YUNV'):
