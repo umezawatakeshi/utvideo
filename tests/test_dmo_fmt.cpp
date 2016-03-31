@@ -67,6 +67,7 @@ DWORD DirectShowFormatToVCMFormat(REFGUID subtype)
 		return subtype.Data1;
 
 	BOOST_CHECK(false);
+	return -1;
 }
 
 HRESULT hrCoInit = CoInitializeEx(NULL, COINIT_MULTITHREADED);
