@@ -41,10 +41,10 @@ vector<wstring> vecCodecLongName = {
 vector<vector<DWORD> > vecSupportedInputFormat = {
 	{ 32, 24 },
 	{ 32 },
-	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV') },
-	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV'), FCC('YV12') },
-	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV'), FCC('HDYC') },
-	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('UYVY'), FCC('UYNV'), FCC('HDYC'), FCC('YV12') },
+	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy') },
+	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy'), FCC('YV12') },
+	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy'), FCC('HDYC') },
+	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy'), FCC('HDYC'), FCC('YV12') },
 	{ FCC('v210') },
 };
 
