@@ -70,3 +70,5 @@ class FourCCGUID : public GUID
 public:
 	FourCCGUID(DWORD fcc) : GUID({ fcc, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 }) {}
 };
+
+DWORD DirectShowFormatToVCMFormat(REFGUID subtype);

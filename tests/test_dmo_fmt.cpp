@@ -52,4 +52,21 @@ vector<vector<GUID>> vecSupportedDecoderOutputTypes = vecSupportedEncoderInputTy
 vector<IID> vecSupportedEncoderInterfaces = { IID_IMediaObject, IID_IPersistStream, IID_IAMVfwCompressDialogs };
 vector<IID> vecSupportedDecoderInterfaces = { IID_IMediaObject };
 
+DWORD DirectShowFormatToVCMFormat(REFGUID subtype)
+{
+	if (IsEqualGUID(subtype, MEDIASUBTYPE_RGB24))
+		return 24;
+	else if (IsEqualGUID(subtype, MEDIASUBTYPE_RGB32))
+		return 32;
+	else if (IsEqualGUID(subtype, MEDIASUBTYPE_ARGB32))
+		return 32;
+
+	GUID tmp = subtype;
+	tmp.Data1 = FCC('YUY2');
+	if (IsEqualGUID(tmp, MEDIASUBTYPE_YUY2))
+		return subtype.Data1;
+
+	BOOST_CHECK(false);
+}
+
 HRESULT hrCoInit = CoInitializeEx(NULL, COINIT_MULTITHREADED);
