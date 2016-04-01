@@ -49,6 +49,28 @@ vector<vector<GUID>> vecSupportedEncoderInputTypes = {
 
 vector<vector<GUID>> vecSupportedDecoderOutputTypes = vecSupportedEncoderInputTypes;
 
+vector<vector<GUID>> vecUnsupportedEncoderInputTypes = {
+	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565 },
+	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_RGB24 },
+	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_YVYU, MEDIASUBTYPE_YV12, MEDIASUBTYPE_HDYC },
+	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_YVYU, MEDIASUBTYPE_HDYC },
+	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_YVYU, MEDIASUBTYPE_YV12 },
+	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_YVYU },
+	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_RGB24, MEDIASUBTYPE_RGB32, MEDIASUBTYPE_ARGB32, MEDIASUBTYPE_YVYU, MEDIASUBTYPE_YV12, MEDIASUBTYPE_HDYC },
+};
+
+vector<vector<GUID>> vecUnsupportedDecoderOutputTypes = vecUnsupportedEncoderInputTypes;
+
+vector<GUID> vecTopPriorityEncoderInputType = {
+	MEDIASUBTYPE_RGB24,
+	MEDIASUBTYPE_ARGB32,
+	MEDIASUBTYPE_YUY2,
+	MEDIASUBTYPE_YV12,
+	MEDIASUBTYPE_HDYC,
+	MEDIASUBTYPE_YV12,
+	MEDIASUBTYPE_v210,
+};
+
 vector<IID> vecSupportedEncoderInterfaces = { IID_IMediaObject, IID_IPersistStream, IID_IAMVfwCompressDialogs };
 vector<IID> vecSupportedDecoderInterfaces = { IID_IMediaObject };
 
@@ -60,6 +82,10 @@ DWORD DirectShowFormatToVCMFormat(REFGUID subtype)
 		return 32;
 	else if (IsEqualGUID(subtype, MEDIASUBTYPE_ARGB32))
 		return 32;
+	else if (IsEqualCLSID(subtype, MEDIASUBTYPE_RGB555))
+		return 15;
+	else if (IsEqualCLSID(subtype, MEDIASUBTYPE_RGB565))
+		return 16;
 
 	GUID tmp = subtype;
 	tmp.Data1 = FCC('YUY2');
