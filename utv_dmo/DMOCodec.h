@@ -204,7 +204,9 @@ public:
 		if (DirectShowFormatToUtVideoFormat(&infmt, pvih->bmiHeader.biCompression, pvih->bmiHeader.biBitCount, pmt->subtype) != 0)
 			return DMO_E_INVALIDTYPE;
 
-		if (pvih->bmiHeader.biHeight < 0)
+		if (pvih->bmiHeader.biWidth <= 0)
+			return DMO_E_INVALIDTYPE;
+		if (pvih->bmiHeader.biHeight <= 0)
 			return DMO_E_INVALIDTYPE;
 
 		if (((T *)this)->Query(UTVF_INVALID, infmt,
