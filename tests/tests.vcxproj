@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="expand.h" />
+    <ClInclude Include="print_log_value.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="test_dmo_fmt.h" />
     <ClInclude Include="test_win_fmt.h" />

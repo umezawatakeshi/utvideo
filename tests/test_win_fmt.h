@@ -3,42 +3,7 @@
 
 #pragma once
 
-namespace boost { namespace test_tools { namespace tt_detail {
-
-template<>
-struct print_log_value<DWORD>
-{
-	void operator()(ostream& os, const DWORD& fcc)
-	{
-		union
-		{
-			DWORD dw;
-			char buf[16];
-		};
-		dw = fcc;
-
-		if (isprint((unsigned char)buf[0]) && isprint((unsigned char)buf[1]) && isprint((unsigned char)buf[2]) && isprint((unsigned char)buf[3]))
-			buf[4] = '\0';
-		else
-			sprintf(buf, "0x%08x", dw);
-
-		os << buf;
-	}
-};
-
-template<>
-struct print_log_value<wstring>
-{
-	void operator()(ostream &os, const wstring &wstr)
-	{
-		char buf[256]; /* サイズは適当 */
-		wcstombs(buf, wstr.c_str(), sizeof(buf));
-
-		os << "\"" << buf << "\"";
-	}
-};
-
-}}}
+#include "print_log_value.h"
 
 extern vector<FOURCC> vecCodecFourcc;
 extern vector<wstring> vecCodecShortName;

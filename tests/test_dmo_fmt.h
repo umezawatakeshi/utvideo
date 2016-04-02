@@ -3,48 +3,7 @@
 
 #pragma once
 
-
-namespace boost { namespace test_tools { namespace tt_detail {
-
-template<>
-struct print_log_value<GUID>
-{
-	void operator()(ostream& os, const GUID& guid)
-	{
-		RPC_CSTR psz;
-
-		UuidToString(&guid, &psz);
-		os << (char *)psz;
-		RpcStringFree(&psz);
-	}
-};
-
-template<typename T>
-struct print_log_value<vector<T>>
-{
-	void operator()(ostream& os, const vector<T>& vec)
-	{
-		print_log_value<T> ple;
-
-		if (vec.empty())
-		{
-			os << "{}";
-		}
-		else
-		{
-			os << "{ ";
-			ple(os, vec.front());
-			for (auto it = vec.begin() + 1, end = vec.end(); it != end; ++it)
-			{
-				os << ", ";
-				ple(os, *it);
-			}
-			os << " }";
-		}
-	}
-};
-
-}}}
+#include "print_log_value.h"
 
 extern vector<wstring> vecEncoderName;
 extern vector<wstring> vecDecoderName;
