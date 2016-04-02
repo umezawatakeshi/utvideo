@@ -33,14 +33,14 @@ void dmo_GetInputType(REFGUID clsidCodec, const vector<GUID> &guidIn, BOOL bFixe
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
-BOOST_DATA_TEST_CASE(dmo_GetInputType_encoder, data::make(vecCodecFourcc) ^ data::make(vecSupportedEncoderInputTypes), fcc, guids)
+BOOST_DATA_TEST_CASE(dmo_GetInputType_encoder, data::make(vecCodecFcc) ^ data::make(vecSupportedEncoderInputSubtypes), fcc, guids)
 {
 	DMOEncoderCLSID clsid(fcc);
 	dmo_GetInputType(clsid, guids, TRUE, FALSE);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_decoder")*depends_on("dmo_QueryInterface_decoder"))
-BOOST_DATA_TEST_CASE(dmo_GetInputType_decoder, data::make(vecCodecFourcc), fcc)
+BOOST_DATA_TEST_CASE(dmo_GetInputType_decoder, data::make(vecCodecFcc), fcc)
 {
 	DMODecoderCLSID clsid(fcc);
 	vector<GUID> codecType;

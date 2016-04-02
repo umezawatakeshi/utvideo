@@ -8,7 +8,7 @@
 
 #include "test_win_fmt.h"
 
-vector<DWORD> vecCodecFourcc = {
+vector<DWORD> vecCodecFcc = {
 	FCC('ULRG'),
 	FCC('ULRA'),
 	FCC('ULY2'),
@@ -38,7 +38,7 @@ vector<wstring> vecCodecLongName = {
 	L"UtVideo Pro YUV422 10bit VCM",
 };
 
-vector<vector<DWORD> > vecSupportedInputFormat = {
+vector<vector<DWORD> > vecSupportedInputFccs = {
 	{ 32, 24 },
 	{ 32 },
 	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy') },
@@ -48,9 +48,9 @@ vector<vector<DWORD> > vecSupportedInputFormat = {
 	{ FCC('v210') },
 };
 
-vector<vector<DWORD> > vecSupportedOutputFormat = vecSupportedInputFormat;
+vector<vector<DWORD> > vecSupportedOutputFccs = vecSupportedInputFccs;
 
-vector<vector<DWORD> > vecUnsupportedInputFormat = {
+vector<vector<DWORD> > vecUnsupportedInputFccs = {
 	{ 15, 16 },
 	{ 15, 16, 24 },
 	{ 15, 16, FCC('YVYU'), FCC('VYUY'), FCC('YV12'), FCC('HDYC') },
@@ -60,7 +60,7 @@ vector<vector<DWORD> > vecUnsupportedInputFormat = {
 	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12') },
 };
 
-vector<vector<DWORD> > vecUnsupportedOutputFormat = vecUnsupportedInputFormat;
+vector<vector<DWORD> > vecUnsupportedOutputFccs = vecUnsupportedInputFccs;
 
 vector<vector<LONG>> vecSupportedWidth = {
 	{ 1920, 1921, 1922, 1923, 1924, 1925, 1926, 1927 },
@@ -102,7 +102,7 @@ vector<vector<LONG>> vecUnsupportedHeight = {
 	{ -1080, 0 },
 };
 
-vector<DWORD> vecTopPriorityRawFormat = {
+vector<DWORD> vecTopPriorityRawFcc = {
 	24,
 	32,
 	FCC('YUY2'),

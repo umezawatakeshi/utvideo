@@ -5,14 +5,14 @@
 
 #include "print_log_value.h"
 
-extern vector<FOURCC> vecCodecFourcc;
+extern vector<FOURCC> vecCodecFcc;
 extern vector<wstring> vecCodecShortName;
 extern vector<wstring> vecCodecLongName;
-extern vector<DWORD> vecTopPriorityRawFormat;
-extern vector<vector<DWORD>> vecSupportedInputFormat;
-extern vector<vector<DWORD>> vecSupportedOutputFormat;
-extern vector<vector<DWORD>> vecUnsupportedInputFormat;
-extern vector<vector<DWORD>> vecUnsupportedOutputFormat;
+extern vector<DWORD> vecTopPriorityRawFcc;
+extern vector<vector<DWORD>> vecSupportedInputFccs;
+extern vector<vector<DWORD>> vecSupportedOutputFccs;
+extern vector<vector<DWORD>> vecUnsupportedInputFccs;
+extern vector<vector<DWORD>> vecUnsupportedOutputFccs;
 extern vector<vector<LONG>> vecSupportedWidth;
 extern vector<vector<LONG>> vecSupportedHeight;
 extern vector<vector<LONG>> vecUnsupportedWidth;

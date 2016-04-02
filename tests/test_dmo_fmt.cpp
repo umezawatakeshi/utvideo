@@ -37,7 +37,7 @@ DEFINE_FOURCC_GUID(UYNV, FCC('UYNV'));
 DEFINE_FOURCC_GUID(2vuy, FCC('2vuy'));
 DEFINE_FOURCC_GUID(v210, FCC('v210'));
 
-vector<vector<GUID>> vecSupportedEncoderInputTypes = {
+vector<vector<GUID>> vecSupportedEncoderInputSubtypes = {
 	{ MEDIASUBTYPE_RGB24, MEDIASUBTYPE_RGB32, },
 	{ MEDIASUBTYPE_ARGB32, MEDIASUBTYPE_RGB32, },
 	{ MEDIASUBTYPE_YUY2, MEDIASUBTYPE_YUYV, MEDIASUBTYPE_YUNV, MEDIASUBTYPE_yuvs, MEDIASUBTYPE_UYVY, MEDIASUBTYPE_UYNV, MEDIASUBTYPE_2vuy, MEDIASUBTYPE_RGB24, MEDIASUBTYPE_RGB32, },
@@ -47,9 +47,9 @@ vector<vector<GUID>> vecSupportedEncoderInputTypes = {
 	{ MEDIASUBTYPE_v210, },
 };
 
-vector<vector<GUID>> vecSupportedDecoderOutputTypes = vecSupportedEncoderInputTypes;
+vector<vector<GUID>> vecSupportedDecoderOutputSubtypes = vecSupportedEncoderInputSubtypes;
 
-vector<vector<GUID>> vecUnsupportedEncoderInputTypes = {
+vector<vector<GUID>> vecUnsupportedEncoderInputSubtypes = {
 	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565 },
 	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_RGB24 },
 	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_YVYU, MEDIASUBTYPE_YV12, MEDIASUBTYPE_HDYC },
@@ -59,9 +59,9 @@ vector<vector<GUID>> vecUnsupportedEncoderInputTypes = {
 	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_RGB24, MEDIASUBTYPE_RGB32, MEDIASUBTYPE_ARGB32, MEDIASUBTYPE_YVYU, MEDIASUBTYPE_YV12, MEDIASUBTYPE_HDYC },
 };
 
-vector<vector<GUID>> vecUnsupportedDecoderOutputTypes = vecUnsupportedEncoderInputTypes;
+vector<vector<GUID>> vecUnsupportedDecoderOutputSubtypes = vecUnsupportedEncoderInputSubtypes;
 
-vector<GUID> vecTopPriorityEncoderInputType = {
+vector<GUID> vecTopPriorityEncoderInputSubtype = {
 	MEDIASUBTYPE_RGB24,
 	MEDIASUBTYPE_ARGB32,
 	MEDIASUBTYPE_YUY2,

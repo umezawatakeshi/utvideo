@@ -7,11 +7,11 @@
 
 extern vector<wstring> vecEncoderName;
 extern vector<wstring> vecDecoderName;
-extern vector<vector<GUID>> vecSupportedEncoderInputTypes;
-extern vector<vector<GUID>> vecSupportedDecoderOutputTypes;
-extern vector<vector<GUID>> vecUnsupportedEncoderInputTypes;
-extern vector<vector<GUID>> vecUnsupportedDecoderOutputTypes;
-extern vector<GUID> vecTopPriorityEncoderInputType;
+extern vector<vector<GUID>> vecSupportedEncoderInputSubtypes;
+extern vector<vector<GUID>> vecSupportedDecoderOutputSubtypes;
+extern vector<vector<GUID>> vecUnsupportedEncoderInputSubtypes;
+extern vector<vector<GUID>> vecUnsupportedDecoderOutputSubtypes;
+extern vector<GUID> vecTopPriorityEncoderInputSubtype;
 extern vector<IID> vecSupportedEncoderInterfaces;
 extern vector<IID> vecSupportedDecoderInterfaces;
 

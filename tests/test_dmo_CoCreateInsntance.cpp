@@ -17,13 +17,13 @@ void dmo_CoCreateInstance(REFGUID clsidCodec)
 	pUnk->Release();
 }
 
-BOOST_DATA_TEST_CASE(dmo_CoCreateInstance_encoder, data::make(vecCodecFourcc), fcc)
+BOOST_DATA_TEST_CASE(dmo_CoCreateInstance_encoder, data::make(vecCodecFcc), fcc)
 {
 	DMOEncoderCLSID clsid(fcc);
 	dmo_CoCreateInstance(clsid);
 }
 
-BOOST_DATA_TEST_CASE(dmo_CoCreateInstance_decoder, data::make(vecCodecFourcc), fcc)
+BOOST_DATA_TEST_CASE(dmo_CoCreateInstance_decoder, data::make(vecCodecFcc), fcc)
 {
 	DMODecoderCLSID clsid(fcc);
 	dmo_CoCreateInstance(clsid);

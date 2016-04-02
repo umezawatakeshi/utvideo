@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "test_win_fmt.h"
 
-BOOST_DATA_TEST_CASE(vcm_ICInfo_enum, data::make(vecCodecFourcc), fcc)
+BOOST_DATA_TEST_CASE(vcm_ICInfo_enum, data::make(vecCodecFcc), fcc)
 {
 	ICINFO info;
 	bool found = false;
@@ -28,7 +28,7 @@ BOOST_DATA_TEST_CASE(vcm_ICInfo_enum, data::make(vecCodecFourcc), fcc)
 	BOOST_CHECK(found);
 }
 
-BOOST_DATA_TEST_CASE(vcm_ICInfo_get, data::make(vecCodecFourcc), fcc)
+BOOST_DATA_TEST_CASE(vcm_ICInfo_get, data::make(vecCodecFcc), fcc)
 {
 	ICINFO info;
 	BOOL b;

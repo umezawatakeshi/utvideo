@@ -33,7 +33,7 @@ void dmo_GetOutputType(REFGUID clsidCodec, const vector<GUID> &guidOut, BOOL bFi
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
-BOOST_DATA_TEST_CASE(dmo_GetOutputType_encoder, data::make(vecCodecFourcc), fcc)
+BOOST_DATA_TEST_CASE(dmo_GetOutputType_encoder, data::make(vecCodecFcc), fcc)
 {
 	DMOEncoderCLSID clsid(fcc);
 	vector<GUID> codecType;
@@ -43,7 +43,7 @@ BOOST_DATA_TEST_CASE(dmo_GetOutputType_encoder, data::make(vecCodecFourcc), fcc)
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_decoder")*depends_on("dmo_QueryInterface_decoder"))
-BOOST_DATA_TEST_CASE(dmo_GetOutputType_decoder, data::make(vecCodecFourcc) ^ data::make(vecSupportedDecoderOutputTypes), fcc, guids)
+BOOST_DATA_TEST_CASE(dmo_GetOutputType_decoder, data::make(vecCodecFcc) ^ data::make(vecSupportedDecoderOutputSubtypes), fcc, guids)
 {
 	DMODecoderCLSID clsid(fcc);
 	dmo_GetOutputType(clsid, guids, TRUE, FALSE);

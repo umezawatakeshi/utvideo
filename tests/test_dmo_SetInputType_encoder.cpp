@@ -51,21 +51,21 @@ void dmo_SetInputType_encoder(REFGUID clsidCodec, REFGUID guidIn, BOOL bFixedSiz
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
-BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_subtype_ok, expand(data::make(vecCodecFourcc) ^ data::make(vecSupportedEncoderInputTypes)), fcc, guid)
+BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_subtype_ok, expand(data::make(vecCodecFcc) ^ data::make(vecSupportedEncoderInputSubtypes)), fcc, guid)
 {
 	DMOEncoderCLSID clsid(fcc);
 	dmo_SetInputType_encoder(clsid, guid, TRUE, FALSE, TEST_WIDTH, TEST_HEIGHT, true);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
-BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_width_ok, expand(data::make(vecCodecFourcc) ^ data::make(vecTopPriorityEncoderInputType) ^ data::make(vecSupportedWidth)), fcc, guid, width)
+BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_width_ok, expand(data::make(vecCodecFcc) ^ data::make(vecTopPriorityEncoderInputSubtype) ^ data::make(vecSupportedWidth)), fcc, guid, width)
 {
 	DMOEncoderCLSID clsid(fcc);
 	dmo_SetInputType_encoder(clsid, guid, TRUE, FALSE, width, TEST_HEIGHT, true);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
-BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_height_ok, expand(data::make(vecCodecFourcc) ^ data::make(vecTopPriorityEncoderInputType) ^ data::make(vecSupportedHeight)), fcc, guid, height)
+BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_height_ok, expand(data::make(vecCodecFcc) ^ data::make(vecTopPriorityEncoderInputSubtype) ^ data::make(vecSupportedHeight)), fcc, guid, height)
 {
 	DMOEncoderCLSID clsid(fcc);
 	dmo_SetInputType_encoder(clsid, guid, TRUE, FALSE, TEST_WIDTH, height, true);
@@ -73,21 +73,21 @@ BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_height_ok, expand(data::make(vecCo
 
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
-BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_subtype_ng, expand(data::make(vecCodecFourcc) ^ data::make(vecUnsupportedEncoderInputTypes)), fcc, guid)
+BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_subtype_ng, expand(data::make(vecCodecFcc) ^ data::make(vecUnsupportedEncoderInputSubtypes)), fcc, guid)
 {
 	DMOEncoderCLSID clsid(fcc);
 	dmo_SetInputType_encoder(clsid, guid, TRUE, FALSE, TEST_WIDTH, TEST_HEIGHT, false);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
-BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_width_ng, expand(data::make(vecCodecFourcc) ^ data::make(vecTopPriorityEncoderInputType) ^ data::make(vecUnsupportedWidth)), fcc, guid, width)
+BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_width_ng, expand(data::make(vecCodecFcc) ^ data::make(vecTopPriorityEncoderInputSubtype) ^ data::make(vecUnsupportedWidth)), fcc, guid, width)
 {
 	DMOEncoderCLSID clsid(fcc);
 	dmo_SetInputType_encoder(clsid, guid, TRUE, FALSE, width, TEST_HEIGHT, false);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
-BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_height_ng, expand(data::make(vecCodecFourcc) ^ data::make(vecTopPriorityEncoderInputType) ^ data::make(vecUnsupportedHeight)), fcc, guid, height)
+BOOST_DATA_TEST_CASE(dmo_SetInputType_encoder_height_ng, expand(data::make(vecCodecFcc) ^ data::make(vecTopPriorityEncoderInputSubtype) ^ data::make(vecUnsupportedHeight)), fcc, guid, height)
 {
 	DMOEncoderCLSID clsid(fcc);
 	dmo_SetInputType_encoder(clsid, guid, TRUE, FALSE, TEST_WIDTH, height, false);

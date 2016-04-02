@@ -25,21 +25,21 @@ void dmo_NotImpl(REFGUID clsidCodec)
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
-BOOST_DATA_TEST_CASE(dmo_NotImpl_encoder, data::make(vecCodecFourcc), fcc)
+BOOST_DATA_TEST_CASE(dmo_NotImpl_encoder, data::make(vecCodecFcc), fcc)
 {
 	DMOEncoderCLSID clsid(fcc);
 	dmo_NotImpl(clsid);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_decoder")*depends_on("dmo_QueryInterface_decoder"))
-BOOST_DATA_TEST_CASE(dmo_NotImpl_decoder, data::make(vecCodecFourcc), fcc)
+BOOST_DATA_TEST_CASE(dmo_NotImpl_decoder, data::make(vecCodecFcc), fcc)
 {
 	DMODecoderCLSID clsid(fcc);
 	dmo_NotImpl(clsid);
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder"))
-BOOST_DATA_TEST_CASE(dmo_NotImpl_encoder_IAMVfwCompressDialogs, data::make(vecCodecFourcc), fcc)
+BOOST_DATA_TEST_CASE(dmo_NotImpl_encoder_IAMVfwCompressDialogs, data::make(vecCodecFcc), fcc)
 {
 	DMOEncoderCLSID clsid(fcc);
 

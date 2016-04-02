@@ -15,13 +15,13 @@ void dmo_DMOGetName(REFGUID clsidCodec, wstring wstrName)
 	BOOST_CHECK_EQUAL(wstring(name), wstrName);
 }
 
-BOOST_DATA_TEST_CASE(dmo_DMOGetName_encoder, data::make(vecCodecFourcc) ^ data::make(vecEncoderName), fcc, wstrName)
+BOOST_DATA_TEST_CASE(dmo_DMOGetName_encoder, data::make(vecCodecFcc) ^ data::make(vecEncoderName), fcc, wstrName)
 {
 	DMOEncoderCLSID clsid(fcc);
 	dmo_DMOGetName(clsid, wstrName);
 }
 
-BOOST_DATA_TEST_CASE(dmo_DMOGetName_decoder, data::make(vecCodecFourcc) ^ data::make(vecDecoderName), fcc, wstrName)
+BOOST_DATA_TEST_CASE(dmo_DMOGetName_decoder, data::make(vecCodecFcc) ^ data::make(vecDecoderName), fcc, wstrName)
 {
 	DMODecoderCLSID clsid(fcc);
 	dmo_DMOGetName(clsid, wstrName);

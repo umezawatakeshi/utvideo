@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "test_win_fmt.h"
 
-BOOST_DATA_TEST_CASE(vcm_ICGetInfo, data::make(vecCodecFourcc) ^ data::make(vecCodecShortName) ^ data::make(vecCodecLongName), fcc, wstrShortName, wstrLongName)
+BOOST_DATA_TEST_CASE(vcm_ICGetInfo, data::make(vecCodecFcc) ^ data::make(vecCodecShortName) ^ data::make(vecCodecLongName), fcc, wstrShortName, wstrLongName)
 {
 	HIC hic;
 	LRESULT lr;
