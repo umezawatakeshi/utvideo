@@ -181,6 +181,7 @@
     <ClCompile Include="test_dmo_fmt.cpp" />
     <ClCompile Include="test_dmo_GetInputType.cpp" />
     <ClCompile Include="test_dmo_GetOutputType.cpp" />
+    <ClCompile Include="test_dmo_GetOutputType_decoder_inset.cpp" />
     <ClCompile Include="test_dmo_GetOutputType_encoder_inset.cpp" />
     <ClCompile Include="test_dmo_GetStreamCount.cpp" />
     <ClCompile Include="test_dmo_GetStreamInfo.cpp" />
