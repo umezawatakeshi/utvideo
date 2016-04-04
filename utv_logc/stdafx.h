@@ -21,7 +21,9 @@
 
 #elif defined(__APPLE__) || defined(__unix__)
 
+#include <sys/time.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 
 #endif
