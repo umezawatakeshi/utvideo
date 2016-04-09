@@ -186,6 +186,8 @@
     <ClInclude Include="ULYUV420Codec.h" />
     <ClInclude Include="ULYUV422Codec.h" />
     <ClInclude Include="UQ00Codec.h" />
+    <ClInclude Include="UQRACodec.h" />
+    <ClInclude Include="UQRGCodec.h" />
     <ClInclude Include="UQY2Codec.h" />
     <ClInclude Include="utvideo.h" />
     <ClInclude Include="utv_core.h" />
@@ -216,6 +218,8 @@
     <ClCompile Include="ULYUV420Codec.cpp" />
     <ClCompile Include="ULYUV422Codec.cpp" />
     <ClCompile Include="UQ00Codec.cpp" />
+    <ClCompile Include="UQRACodec.cpp" />
+    <ClCompile Include="UQRGCodec.cpp" />
     <ClCompile Include="UQY2Codec.cpp" />
     <ClCompile Include="utv_core.cpp" />
   </ItemGroup>

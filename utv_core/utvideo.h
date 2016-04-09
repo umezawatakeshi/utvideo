@@ -99,6 +99,8 @@ typedef uint32_t utvf_t;
 #define UTVF_ULY0 ((utvf_t)'ULY0')
 #define UTVF_ULH2 ((utvf_t)'ULH2')
 #define UTVF_ULH0 ((utvf_t)'ULH0')
+#define UTVF_UQRA ((utvf_t)'UQRA')
+#define UTVF_UQRG ((utvf_t)'UQRG')
 #define UTVF_UQY2 ((utvf_t)'UQY2')
 
 #define UTVF_YUY2 ((utvf_t)'YUY2')
@@ -111,3 +113,5 @@ typedef uint32_t utvf_t;
 #define UTVF_HDYC ((utvf_t)'HDYC')
 #define UTVF_YV12 ((utvf_t)'YV12')
 #define UTVF_v210 ((utvf_t)'v210')
+#define UTVF_b64a ((utvf_t)'b64a')
+#define UTVF_b48r ((utvf_t)'b48r')

@@ -110,3 +110,21 @@ resource 'dlle' (257) {
 #define SUBTYPE_ENC  { 'v210' }
 #define SUBTYPE_DEC  { 'v210' }
 #include "utv_qt.in.r"
+
+#define SUBTYPE      UQRG
+#define SUBTYPE_VAL  'UQRG'
+#define SUBTYPE_STR  "UQRG"
+#define SUBTYPE_RID  263
+#define SUBTYPE_INFO "Pro RGB 10bit"
+#define SUBTYPE_ENC  { 'b48r', 'b64a' }
+#define SUBTYPE_DEC  { 'b48r', 'b64a' }
+#include "utv_qt.in.r"
+
+#define SUBTYPE      UQRA
+#define SUBTYPE_VAL  'UQRA'
+#define SUBTYPE_STR  "UQRA"
+#define SUBTYPE_RID  264
+#define SUBTYPE_INFO "Pro RGBA 10bit"
+#define SUBTYPE_ENC  { 'b64a' }
+#define SUBTYPE_DEC  { 'b64a' }
+#include "utv_qt.in.r"
