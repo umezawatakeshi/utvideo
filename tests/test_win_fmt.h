@@ -51,7 +51,10 @@ static inline WORD FCC2BitCount(DWORD dw)
 	case FCC('ULH0'):
 		return 24;
 	case FCC('UQY2'):
+	case FCC('UQRG'):
 		return 30;
+	case FCC('UQRA'):
+		return 40;
 
 	case FCC('YUY2'):
 	case FCC('YUYV'):
@@ -66,6 +69,10 @@ static inline WORD FCC2BitCount(DWORD dw)
 		return 12;
 	case FCC('v210'):
 		return 20;
+	case FCC('b48r'):
+		return 48;
+	case FCC('b64a'):
+		return 64;
 	default:
 		return 0; // XXX
 	}
