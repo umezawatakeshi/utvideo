@@ -177,6 +177,7 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	m_utvfRaw = infmt;
 
 	CalcRawFrameMetric(infmt, m_nWidth, m_nHeight, cbGrossWidth);
+	CalcStripeMetric();
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
@@ -267,7 +268,6 @@ int CUQ00Codec::InternalEncodeBegin(unsigned int width, unsigned int height)
 	if (ret != 0)
 		return ret;
 	m_dwDivideCount = m_ec.ecDivideCountMinusOne + 1;
-	CalcStripeMetric();
 
 	m_pCurFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
