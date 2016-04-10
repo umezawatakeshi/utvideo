@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2500E14E1CBA4BC300B79A76 /* UQRACodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2500E14A1CBA4BC300B79A76 /* UQRACodec.cpp */; };
+		2500E14F1CBA4BC300B79A76 /* UQRGCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2500E14C1CBA4BC300B79A76 /* UQRGCodec.cpp */; };
 		2529170114D02DCB00A3813C /* CoreVideo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2529170014D02DCB00A3813C /* CoreVideo.framework */; };
 		255FB93B1AE13DC2009B2DC4 /* LogPath.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255FB9311AE13DC2009B2DC4 /* LogPath.cpp */; };
 		255FB93D1AE13DC2009B2DC4 /* LogUtil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255FB9351AE13DC2009B2DC4 /* LogUtil.cpp */; };
@@ -48,6 +50,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2500E14A1CBA4BC300B79A76 /* UQRACodec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = UQRACodec.cpp; path = utv_core/UQRACodec.cpp; sourceTree = "<group>"; };
+		2500E14B1CBA4BC300B79A76 /* UQRACodec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = UQRACodec.h; path = utv_core/UQRACodec.h; sourceTree = "<group>"; };
+		2500E14C1CBA4BC300B79A76 /* UQRGCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = UQRGCodec.cpp; path = utv_core/UQRGCodec.cpp; sourceTree = "<group>"; };
+		2500E14D1CBA4BC300B79A76 /* UQRGCodec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = UQRGCodec.h; path = utv_core/UQRGCodec.h; sourceTree = "<group>"; };
 		2510B6C31417BDDE00EA5F2F /* utv_qt.in.r */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.rez; name = utv_qt.in.r; path = utv_qt/utv_qt.in.r; sourceTree = "<group>"; };
 		2529170014D02DCB00A3813C /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
 		25307212175CC27500FB4793 /* Coefficient_asm_x86x64.mac */ = {isa = PBXFileReference; explicitFileType = sourcecode.nasm; fileEncoding = 8; name = Coefficient_asm_x86x64.mac; path = utv_core/Coefficient_asm_x86x64.mac; sourceTree = "<group>"; };
@@ -266,6 +272,10 @@
 				25817AE9175A052D00888CE2 /* ULYUV422Codec.h */,
 				25CCB6F018FD137F00076B45 /* UQ00Codec.cpp */,
 				25CCB6F118FD137F00076B45 /* UQ00Codec.h */,
+				2500E14A1CBA4BC300B79A76 /* UQRACodec.cpp */,
+				2500E14B1CBA4BC300B79A76 /* UQRACodec.h */,
+				2500E14C1CBA4BC300B79A76 /* UQRGCodec.cpp */,
+				2500E14D1CBA4BC300B79A76 /* UQRGCodec.h */,
 				25CCB6F218FD137F00076B45 /* UQY2Codec.cpp */,
 				25CCB6F318FD137F00076B45 /* UQY2Codec.h */,
 				258DB3F31411F8600059F47E /* utv_core.cpp */,
@@ -424,9 +434,11 @@
 				25CCB71018FD189300076B45 /* QuickTimeFormat.cpp in Sources */,
 				258955261A9B58B100FDE981 /* TunedFunc_x86x64.cpp in Sources */,
 				255FB93B1AE13DC2009B2DC4 /* LogPath.cpp in Sources */,
+				2500E14F1CBA4BC300B79A76 /* UQRGCodec.cpp in Sources */,
 				255FB93D1AE13DC2009B2DC4 /* LogUtil.cpp in Sources */,
 				255FB93E1AE13DC2009B2DC4 /* LogWriter.cpp in Sources */,
 				255FB94D1AE13F67009B2DC4 /* Log.cpp in Sources */,
+				2500E14E1CBA4BC300B79A76 /* UQRACodec.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
