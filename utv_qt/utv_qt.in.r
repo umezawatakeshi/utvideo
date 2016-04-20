@@ -47,7 +47,7 @@ resource 'thnr' (SUBTYPE_RID) {
 };
 
 resource 'stri' (SUBTYPE_RID + 256) {
-	"Decompresses video stored in " SUBTYPE_FMTN " format."
+	"Compresses video stored in " SUBTYPE_FMTN " format."
 };
 
 resource 'thng' (SUBTYPE_RID + 256) {
