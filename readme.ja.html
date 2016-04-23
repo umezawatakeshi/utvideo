@@ -9,10 +9,10 @@ td, th {
 	padding: 0.5ex 0.75ex;
 }
 --></style>
-<title>Ut Video Codec Suite 15.5.0 readme （日本語）</title>
+<title>Ut Video Codec Suite 16.0.0 readme （日本語）</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 15.5.0 readme （日本語）</h1>
+<h1>Ut Video Codec Suite 16.0.0 readme （日本語）</h1>
 <hr>
 <h2 id="copyright_notice">著作権表示</h2>
 <h3>英語</h3>
@@ -79,6 +79,8 @@ GNU 一般公衆利用許諾契約書の複製物を一部受け取ったはずです。
 <tr><td>ULY0</td><td>UtVideo YUV420 BT.601</td><td>YCbCr (BT.601) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>RGB24<br>RGB32</td><td>yuvs<br>2vuy<br>RGB<br>ARGB</td></tr>
 <tr><td>ULH2</td><td>UtVideo YUV422 BT.709</td><td>YCbCr (BT.709) 4:2:2 8bit リミテッド</td><td><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br>RGB24<br>RGB32</td><td><strong>HDYC</strong><br><strong>yuvs</strong><br><strong>2vuy</strong><br>RGB<br>ARGB</td></tr>
 <tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>HDYC<br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>RGB24<br>RGB32</td><td>HDYC<br>yuvs<br>2vuy<br>RGB<br>ARGB</td></tr>
+<tr><td>UQRA</td><td>UtVideo Pro RGBA 10bit</td><td>RGBA 4:4:4 10bit</td><td>b64a</td><td>b64a</td></tr>
+<tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit</td><td>b48r<br>b64a</td><td>b48r<br>b64a</td></tr>
 <tr><td>UQY2</td><td>UtVideo Pro YUV422 10bit</td><td>YCbCr 4:2:2 10bit</td><td><strong>v210</strong></td><td><strong>v210</strong></td></tr>
 </table>
 <ul>
@@ -137,6 +139,16 @@ GNU 一般公衆利用許諾契約書の複製物を一部受け取ったはずです。
 <dt>RAM</dt><dd>DDR3-1333 8GB</dd>
 </dl>
 <h2 id="history">改版履歴</h2>
+<h3>バージョン 16.0.0</h3>
+<dl>
+<dt>機能追加</dt><dd><ul>
+<li>内部保持形式が RGB 10bit および RGBA 10bit のコーデック (FourCC: UQRG, UQRA) を追加した。とても遅い。</li>
+</ul></dd>
+<dt>バグ修正</dt><dd><ul>
+<li>DMO コーデックで、一部の対応しない入力フォーマットに対して、出力フォーマットを提示していた。</li>
+<li>VCM および DMO コーデックで、一部の対応しているべき入力フォーマットに対して、対応していないと返していた。</li>
+</ul></dd>
+</dl>
 <h3>バージョン 15.5.0</h3>
 <dl>
 <dt>機能追加</dt><dd><ul>
