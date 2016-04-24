@@ -37,7 +37,7 @@ pascal ComponentResult QTCodecClose(CQTCodec *glob, ComponentInstance self)
 
 pascal ComponentResult QTCodecVersion(CQTCodec *glob)
 {
-	return 0x1000000;
+	return 0x00040001;
 }
 
 pascal ComponentResult QTCodecTarget(CQTCodec *glob, ComponentInstance target)

@@ -22,7 +22,7 @@ resource 'thng' (SUBTYPE_RID) {
 	'strn', SUBTYPE_RID,				// Name Type & ID
 	'stri', SUBTYPE_RID,				// Info Type & ID
 	0, 0,								// Icon Type & ID
-	0x1000000,							// Version
+	0x00040001,							// Version
 	componentHasMultiplePlatforms +		// Registration Flags 
 	componentDoAutoVersion,				// Registration Flags
 	0,									// Resource ID of Icon Family
@@ -61,7 +61,7 @@ resource 'thng' (SUBTYPE_RID + 256) {
 	'strn', SUBTYPE_RID,				// Name Type & ID
 	'stri', SUBTYPE_RID + 256,			// Info Type & ID
 	0, 0,								// Icon Type & ID
-	0x1000000,							// Version
+	0x00040001,							// Version
 	componentHasMultiplePlatforms +		// Registration Flags 
 	componentDoAutoVersion,				// Registration Flags
 	0,									// Resource ID of Icon Family
