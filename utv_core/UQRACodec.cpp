@@ -117,7 +117,7 @@ void CUQRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 				pp[3] = htob16(Convert10To16Fullrange(*b + *g - 0x200));
 				pp[1] = htob16(Convert10To16Fullrange(*r + *g - 0x200));
 				pp[0] = htob16(Convert10To16Fullrange(*a));
-				g++; b++; r++; *a++;
+				g++; b++; r++; a++;
 			}
 		}
 		break;
