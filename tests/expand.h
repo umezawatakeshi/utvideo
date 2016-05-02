@@ -8,7 +8,13 @@ template<size_t I, typename... Ts>
 class expand_tuplewise_grid_helper
 {
 public:
-	static auto expand(const tuple<Ts...>& t) -> decltype(expand_tuplewise_grid_helper<I - 1, Ts...>::expand(t) * data::make(std::get<I - 1>(t)))
+	/*
+	 * VC2015u2 で C++17 の std::data が実装されたらしく、
+	 * ここの decltype の中の data::make はそのままでは曖昧であるため、
+	 * 省略せずに boost::unit_test::data::make と書かないといけない。
+	 * 関数の中身の data::make はそのままでいいらしい（なんで？）
+	 */
+	static auto expand(const tuple<Ts...>& t) -> decltype(expand_tuplewise_grid_helper<I - 1, Ts...>::expand(t) * boost::unit_test::data::make(std::get<I - 1>(t)))
 	{
 		return expand_tuplewise_grid_helper<I - 1, Ts...>::expand(t) * data::make(std::get<I - 1>(t));
 	}
@@ -18,7 +24,7 @@ template<typename... Ts>
 class expand_tuplewise_grid_helper<(size_t)1, Ts...>
 {
 public:
-	static auto expand(const tuple<Ts...>& t) -> decltype(data::make(std::get<0>(t)))
+	static auto expand(const tuple<Ts...>& t) -> decltype(boost::unit_test::data::make(std::get<0>(t)))
 	{
 		return data::make(std::get<0>(t));
 	}
