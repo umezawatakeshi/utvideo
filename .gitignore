@@ -18,4 +18,5 @@ utvideo.xcodeproj/xcuserdata
 /utvideo-*-src.zip
 *.aps
 /*.opendb
+/*.db
 /.vs
