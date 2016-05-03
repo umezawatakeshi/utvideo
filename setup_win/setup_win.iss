@@ -46,8 +46,11 @@ Source: "..\x64\Release\utv_dmo.dll";  DestDir: "{sys}"; Flags: ignoreversion 64
 Source: "..\gplv2.rtf";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.txt";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\gplv2.ja.sjis.txt";        DestDir: "{app}"; Flags: ignoreversion;
+Source: "..\style.css";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\readme.en.html";           DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\readme.ja.html";           DestDir: "{app}"; Flags: ignoreversion;
+Source: "..\readme-adobe.en.html";     DestDir: "{app}"; Flags: ignoreversion;
+Source: "..\readme-adobe.ja.html";     DestDir: "{app}"; Flags: ignoreversion;
 Source: "utvideo-x86.reg";             DestDir: "{app}"; Flags: ignoreversion 32bit; DestName: "utvideo.reg"; Check: not Is64BitInstallMode
 Source: "utvideo-x64.reg";             DestDir: "{app}"; Flags: ignoreversion 64bit; DestName: "utvideo.reg"; Check:     Is64BitInstallMode
 
@@ -75,16 +78,21 @@ Root: HKLM64; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; 
 Root: HKLM64; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.UQRA"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue; Check: Is64BitInstallMode
 
 [Icons]
-Name: "{group}\Global Configuration";             Filename: "{sys}\rundll32.exe"; Parameters: "{sys}\utv_core.dll,GlobalConfigDialog"
-Name: "{group}\License Agreement (English, RTF)"; Filename: "{app}\gplv2.rtf"
-Name: "{group}\License Agreement (English)";      Filename: "{app}\gplv2.txt"
-Name: "{group}\License Agreement (Japanese)";     Filename: "{app}\gplv2.ja.sjis.txt"
-Name: "{group}\Readme (English)";                 Filename: "{app}\readme.en.html"
-Name: "{group}\Readme (Japanese)";                Filename: "{app}\readme.ja.html"
+Name: "{group}\Global Configuration";              Filename: "{sys}\rundll32.exe"; Parameters: "{sys}\utv_core.dll,GlobalConfigDialog"
+Name: "{group}\License Agreement (English, RTF)";  Filename: "{app}\gplv2.rtf"
+Name: "{group}\License Agreement (English)";       Filename: "{app}\gplv2.txt"
+Name: "{group}\License Agreement (Japanese)";      Filename: "{app}\gplv2.ja.sjis.txt"
+Name: "{group}\Readme (English)";                  Filename: "{app}\readme.en.html"
+Name: "{group}\Readme (Japanese)";                 Filename: "{app}\readme.ja.html"
+Name: "{group}\Readme for Adobe Users (English)";  Filename: "{app}\readme-adobe.en.html"
+Name: "{group}\Readme for Adobe Users (Japanese)"; Filename: "{app}\readme-adobe.ja.html"
 
 [Run]
 Filename: "{app}\readme.en.html"; Description: "View readme";   Flags: postinstall shellexec skipifsilent; Languages: en
 Filename: "{app}\readme.ja.html"; Description: "readme の表示"; Flags: postinstall shellexec skipifsilent; Languages: ja
+
+Filename: "{app}\readme-adobe.en.html"; Description: "View readme for Adobe users";      Flags: postinstall shellexec skipifsilent; Languages: en
+Filename: "{app}\readme-adobe.ja.html"; Description: "Adobe ユーザ向けの readme の表示"; Flags: postinstall shellexec skipifsilent; Languages: ja
 
 Filename: "http://umezawa.dyndns.info/wordpress/?page_id=1577"; Description: "View ""About Donations"" page"; Flags: postinstall shellexec skipifsilent; Languages: en
 Filename: "http://umezawa.dyndns.info/wordpress/?page_id=1565"; Description: "「寄付について」ページの表示";  Flags: postinstall shellexec skipifsilent; Languages: ja
