@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="ja">
+<!-- $Id$ -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" type="text/css" href="style.css">
+<title>Ut Video Codec Suite 16.0.0 - Adobe ソフトウェアへの登録方法 （日本語）</title>
+</head>
+<body>
+<h1>Ut Video Codec Suite 16.0.0 - Adobe ソフトウェアへの登録方法 （日本語）</h1>
+<hr>
+<h2 id="overview">概要</h2>
+<p>Adobe ソフトウェア、具体的には Premiere Pro, After Effects, Media Encoder では、利用可能なコーデックのリストを独自に持っています。単に QuickTime コーデックコンポーネントをインストールするだけでは、コーデックを適切に使うことができません。具体的には、適切なフォーマットでコーデックとやり取りできなくなります。特に、8bit を超えるフォーマットでコーデックとやり取りするには、前述のリストにコーデックを追加する必要があります。</p>
+<p>なお、このリストを記述するファイルは、同一のコンピュータであっても「Adobe ソフトウェアのバージョンごと」かつ「ユーザーごと」に存在します。たとえば、同じユーザーであっても CC 2014 と CC 2015 では別のファイルですし、同じ CC 2015 でもユーザーAとユーザーBでも別のファイルです。</p>
+<h2 id="tool-assisted-registration">登録ツールを使用した登録方法</h2>
+<p>登録ツールは用意できていません。Ut Video Codec Suite の近い将来のバージョンで提供される予定です。</p>
+<h2 id="manual-registration">手動での登録方法</h2>
+<p>コーデックのリストを記述するファイルを開きます。</p>
+<dl>
+<dt>Windows の場合</dt>
+<dd><code><i>&lt;ユーザのプロファイルディレクトリ&gt;</i>\AppData\Roaming\Adobe\Common\MediaCoreQTCodecRules<i>&lt;Adobeソフトウェアのバージョン&gt;</i>.xml</code></dd>
+<dt>Mac の場合</dt>
+<dd><code><i>&lt;ユーザのホームディレクトリ&gt;</i>/Library/Application Support/Adobe/Common/MediaCoreQTCodecRules<i>&lt;Adobeソフトウェアのバージョン&gt;</i>.xml</code></dd>
+</dl>
+<p>たとえば、ユーザ名が umezawa、Adobeソフトウェアのバージョンが CC 2015 の場合、一般的には、Windows では <code>C:\Users\umezawa\AppData\Roaming\Adobe\Common\MediaCoreQTCodecRulesCC 2015.xml</code>、Mac では <code>/Users/umezawa/Library/Application Support/Adobe/Common/MediaCoreQTCodecRulesCC 2015.xml</code> になります。</p>
+<p>ファイルの末尾の <code>&lt;/MediaCoreQTCodecRules&gt;</code> の前に、以下の行を追加します。</p>
+<blockquote><pre>&lt;QTCodec codec='ULRG' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULRG' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULRA' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULRA' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULY2' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULY2' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULY0' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULY0' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULH2' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULH2' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULH0' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULH0' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='UQRG' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='b64a' decodefourcc='b64a' /&gt;
+&lt;QTCodec codec='UQRG' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='b64a' decodefourcc='b64a' /&gt;
+&lt;QTCodec codec='UQRA' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='b64a' decodefourcc='b64a' /&gt;
+&lt;QTCodec codec='UQRA' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='b64a' decodefourcc='b64a' /&gt;
+&lt;QTCodec codec='UQY2' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='v210' decodefourcc='v210' /&gt;
+&lt;QTCodec codec='UQY2' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='v210' decodefourcc='v210' /&gt;
+
+&lt;QTCodec codec='ULRG' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULRG' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULRA' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULRA' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULY2' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULY2' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULY0' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULY0' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULH2' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULH2' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULH0' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULH0' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='UQRG' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='b64a' decodefourcc='b64a' /&gt;
+&lt;QTCodec codec='UQRG' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='b64a' decodefourcc='b64a' /&gt;
+&lt;QTCodec codec='UQRA' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='b64a' decodefourcc='b64a' /&gt;
+&lt;QTCodec codec='UQRA' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='b64a' decodefourcc='b64a' /&gt;
+&lt;QTCodec codec='UQY2' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='v210' decodefourcc='v210' /&gt;
+&lt;QTCodec codec='UQY2' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' deepdecodefourcc='v210' decodefourcc='v210' /&gt;
+</pre></blockquote>
+<p>これにより、Adobe ソフトウェアの次の起動から設定が反映されます。</p>
+<hr>
+<address><a href="http://umezawa.dyndns.info/">製作者のサイト</a></address>
+</body>
+</html>
