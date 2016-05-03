@@ -1,0 +1,25 @@
+table {
+	border-collapse: collapse;
+}
+
+td, th {
+	padding: 0.5ex 0.75ex;
+}
+
+table, th, td {
+	border: black solid 1px;
+}
+
+code {
+	background-color: #eee;
+	white-space: nowrap;
+}
+
+blockquote {
+	background-color: #eee;
+}
+
+blockquote pre {
+	font-size: small;
+	overflow-x: auto;
+}
