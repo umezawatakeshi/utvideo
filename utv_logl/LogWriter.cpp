@@ -12,6 +12,7 @@ HANDLE __declspec(dllexport) hLogPipe = INVALID_HANDLE_VALUE;
 int InitializeLogWriter(void)
 {
 	char szPipeName[256];
+	char szModuleFileName[256];
 	char buf[256];
 	DWORD cbWritten;
 
@@ -23,18 +24,13 @@ int InitializeLogWriter(void)
 	if (hLogPipe == INVALID_HANDLE_VALUE)
 		return -1;
 
-	GetModuleFileName(NULL, buf, sizeof(buf));
-	char *p = strrchr(buf, '\\');
+	GetModuleFileName(NULL, szModuleFileName, sizeof(szModuleFileName));
+	char *p = strrchr(szModuleFileName, '\\');
 	if (p != NULL)
 		p++;
 	else
-		p = buf;
-	if (!WriteFile(hLogPipe, p, strlen(p), &cbWritten, NULL) || cbWritten != strlen(p))
-	{
-		CloseHandle(hLogPipe);
-		return -1;
-	}
-	sprintf(buf, "[%d]\n", GetCurrentProcessId());
+		p = szModuleFileName;
+	sprintf(buf, "%s[%d]\n", p, GetCurrentProcessId());
 	if (!WriteFile(hLogPipe, buf, strlen(buf), &cbWritten, NULL) || cbWritten != strlen(buf))
 	{
 		CloseHandle(hLogPipe);
@@ -60,11 +56,6 @@ int __declspec(dllexport) WriteLog(const char *p)
 	DWORD cbWritten;
 
 	if (!WriteFile(hLogPipe, p, strlen(p), &cbWritten, NULL) || cbWritten != strlen(p))
-	{
-		UninitializeLogWriter();
-		return -1;
-	}
-	if (!WriteFile(hLogPipe, "\n", 1, &cbWritten, NULL) || cbWritten != 1)
 	{
 		UninitializeLogWriter();
 		return -1;
@@ -139,11 +130,6 @@ int UninitializeLogWriter(void)
 int WriteLog(const char *p)
 {
 	if (writeLog(p, strlen(p)) != strlen(p))
-	{
-		UninitializeLogWriter();
-		return -1;
-	}
-	if (writeLog("\n", 1) != 1)
 	{
 		UninitializeLogWriter();
 		return -1;
