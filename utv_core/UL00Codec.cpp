@@ -416,7 +416,7 @@ void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 		uint32_t dwDstOffset;
 #ifdef _DEBUG
 		uint32_t dwDstEnd;
-		uint32_t dwEncodedSize;
+		size_t dwEncodedSize;
 #endif
 
 		if (nBandIndex == 0)

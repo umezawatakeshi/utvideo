@@ -61,18 +61,14 @@ static int LogReaderProc(int idx)
 
 		char ident[256];
 		char buf[256];
-#if defined(_WIN32)
-		DWORD cb = 0;
-#elif defined(__APPLE__) || defined(__unix__)
 		size_t cb = 0;
-#endif
 		bool idented = false;
 
 		for (;;)
 		{
 #if defined(_WIN32)
 			DWORD cbRead;
-			if (ReadFile(hPipe, buf + cb, sizeof(buf) - cb - 1, &cbRead, NULL))
+			if (ReadFile(hPipe, buf + cb, (DWORD)(sizeof(buf) - cb - 1), &cbRead, NULL))
 #elif defined(__APPLE__) || defined(__unix__)
 			ssize_t cbRead;
 			if ((cbRead = read(s, buf + cb, sizeof(buf) - cb - 1)) > 0)

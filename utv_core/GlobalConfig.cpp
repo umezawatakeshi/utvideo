@@ -91,7 +91,7 @@ void OnOK(HWND hWnd)
 	dwValue = IsDlgButtonChecked(hWnd, IDC_IGNORE_SET_CONFIG_CHECK);
 	RegSetValueEx(hkUtVideo, "IgnoreSetConfig", 0, REG_DWORD, (const BYTE *)&dwValue, sizeof(DWORD));
 
-	dwValue = SendMessage(GetDlgItem(hWnd, IDC_WORKER_THREAD_PRIORITY_SLIDER), TBM_GETPOS, 0, 0);
+	dwValue = (DWORD)SendMessage(GetDlgItem(hWnd, IDC_WORKER_THREAD_PRIORITY_SLIDER), TBM_GETPOS, 0, 0);
 	RegSetValueEx(hkUtVideo, "WorkerThreadPriority", 0, REG_DWORD, (const BYTE *)&dwValue, sizeof(DWORD));
 
 	RegCloseKey(hkUtVideo);

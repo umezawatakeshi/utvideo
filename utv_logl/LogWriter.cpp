@@ -31,7 +31,7 @@ int InitializeLogWriter(void)
 	else
 		p = szModuleFileName;
 	sprintf(buf, "%s[%d]\n", p, GetCurrentProcessId());
-	if (!WriteFile(hLogPipe, buf, strlen(buf), &cbWritten, NULL) || cbWritten != strlen(buf))
+	if (!WriteFile(hLogPipe, buf, (DWORD)strlen(buf), &cbWritten, NULL) || cbWritten != strlen(buf))
 	{
 		CloseHandle(hLogPipe);
 		return -1;
@@ -55,7 +55,7 @@ int __declspec(dllexport) WriteLog(const char *p)
 {
 	DWORD cbWritten;
 
-	if (!WriteFile(hLogPipe, p, strlen(p), &cbWritten, NULL) || cbWritten != strlen(p))
+	if (!WriteFile(hLogPipe, p, (DWORD)strlen(p), &cbWritten, NULL) || cbWritten != strlen(p))
 	{
 		UninitializeLogWriter();
 		return -1;

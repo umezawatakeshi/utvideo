@@ -35,7 +35,7 @@ bool generate_code_length(uint8_t *codelen, const struct hufftree *node, uint8_t
 static void GenerateLengthLimitedHuffmanCodeLengthTable(uint8_t *pCodeLengthTable, int nSymbolBits)
 {
 	// Ç∆ÇËÇ†Ç¶Ç∏Ç±ÇÍÇ≈ì¶Ç∞ÇÈÅB
-	memset(pCodeLengthTable, nSymbolBits, 1 << nSymbolBits);
+	memset(pCodeLengthTable, nSymbolBits, (size_t)1 << nSymbolBits);
 }
 
 template<int B>
