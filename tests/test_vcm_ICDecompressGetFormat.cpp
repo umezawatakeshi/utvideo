@@ -51,7 +51,7 @@ void vcm_ICDecompressGetFormat_ok(DWORD fccCodec, DWORD fccPrimary, LONG width, 
 	BOOST_TEST_CHECK(bihDecoderOut.biHeight == height);
 	BOOST_TEST_CHECK(bihDecoderOut.biPlanes == 1);
 	BOOST_TEST_CHECK(bihDecoderOut.biBitCount == FCC2BitCount(fccPrimary));
-	BOOST_TEST_CHECK(bihDecoderOut.biCompression == FCC2Compression(fccPrimary););
+	BOOST_TEST_CHECK(bihDecoderOut.biCompression == FCC2Compression(fccPrimary));
 
 	lr = ICClose(hic);
 	BOOST_CHECK(lr == ICERR_OK);
