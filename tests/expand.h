@@ -39,12 +39,13 @@ auto expand_tuplewise_grid(const tuple<Ts...>& t) -> decltype(expand_tuplewise_g
 template<typename T>
 struct decontainer
 {
+	typedef typename std::remove_reference<T>::type TT;
 	struct value_type_helper
 	{
-		typedef typename std::remove_extent<T>::type value_type;
+		typedef typename std::remove_extent<TT>::type value_type;
 	};
 
-	typedef typename std::add_lvalue_reference<typename std::add_const<typename std::conditional<boost::unit_test::is_forward_iterable<T>::value, T, value_type_helper>::type::value_type>::type>::type type;
+	typedef typename std::add_lvalue_reference<typename std::add_const<typename std::conditional<boost::unit_test::is_forward_iterable<TT>::value, TT, value_type_helper>::type::value_type>::type>::type type;
 };
 
 template<typename T>
@@ -74,7 +75,7 @@ class expander
 	*/
 public:
 	typedef typename tuple_expand<typename ds_decay::sample>::type sample;
-	typedef typename vector<sample>::const_iterator iterator;
+	typedef typename vector<sample>::const_iterator container_iterator;
 
 	explicit expander(DS&& ds) : m_src(std::forward<DS>(ds))
 	{
@@ -97,8 +98,20 @@ public:
 
 	enum { arity = ds_decay::arity };
 
+	class iterator
+	{
+	public:
+		explicit iterator(container_iterator itr) : m_itr(itr) {}
+
+		void operator++() { ++m_itr; }
+		sample operator*() const { return *m_itr; }
+
+	private:
+		container_iterator m_itr;
+	};
+
 	data::size_t size() const { return m_dst.size(); }
-	iterator begin() const { return m_dst.begin(); }
+	iterator begin() const { return iterator(m_dst.begin()); }
 
 private:
 	DS m_src;
