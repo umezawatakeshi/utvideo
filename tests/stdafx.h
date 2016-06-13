@@ -23,5 +23,9 @@
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
-using namespace std;
-using namespace boost::unit_test;
+using std::vector;
+using std::wstring;
+using std::ostream;
+
+namespace data = boost::unit_test::data;
+using boost::unit_test::depends_on;
