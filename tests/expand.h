@@ -8,7 +8,7 @@ template<size_t I, typename... Ts>
 class expand_tuplewise_grid_helper
 {
 public:
-	static auto expand(const std::tuple<Ts...>& t) -> decltype(expand_tuplewise_grid_helper<I - 1, Ts...>::expand(t) * data::make(std::get<I - 1>(t)))
+	static auto expand(const std::tuple<Ts...>& t)
 	{
 		return expand_tuplewise_grid_helper<I - 1, Ts...>::expand(t) * data::make(std::get<I - 1>(t));
 	}
@@ -18,14 +18,14 @@ template<typename... Ts>
 class expand_tuplewise_grid_helper<(size_t)1, Ts...>
 {
 public:
-	static auto expand(const std::tuple<Ts...>& t) -> decltype(data::make(std::get<0>(t)))
+	static auto expand(const std::tuple<Ts...>& t)
 	{
 		return data::make(std::get<0>(t));
 	}
 };
 
 template<typename... Ts>
-auto expand_tuplewise_grid(const std::tuple<Ts...>& t) -> decltype(expand_tuplewise_grid_helper<sizeof...(Ts), Ts...>::expand(t))
+auto expand_tuplewise_grid(const std::tuple<Ts...>& t)
 {
 	return expand_tuplewise_grid_helper<sizeof...(Ts), Ts...>::expand(t);
 }
