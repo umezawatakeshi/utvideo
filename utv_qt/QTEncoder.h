@@ -10,4 +10,6 @@ struct CQTEncoder : public CQTCodec
 {
 	ICMCompressorSessionRef session;
 	ICMCompressionSessionOptionsRef sessionOptions;
+	OSType sourcePixelType;
+	size_t outputSize;
 };

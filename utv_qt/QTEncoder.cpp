@@ -90,6 +90,9 @@ pascal ComponentResult QTEncoderClose(CQTEncoder *glob, ComponentInstance self)
 
 	if (glob != NULL)
 	{
+		if (glob->sourcePixelType != 0)
+			glob->codec->EncodeEnd();
+
 		QTCodecClose(glob, self);
 
 		ICMCompressionSessionOptionsRelease(glob->sessionOptions);
@@ -205,23 +208,42 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 	void *dstPtr;
 	OSType srcType;
 	utvf_t utvf;
-	size_t rowBytes;
-	unsigned int width, height;
 
 	sourcePixelBuffer = ICMCompressorSourceFrameGetPixelBuffer(sourceFrame);
 	CVPixelBufferLockBaseAddress(sourcePixelBuffer, 0);
 	srcType = CVPixelBufferGetPixelFormatType(sourcePixelBuffer);
-	if (QuickTimeFormatToUtVideoFormat(&utvf, srcType) != 0)
-	{
-		CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
-		return paramErr;
-	}
-	width = (unsigned int)CVPixelBufferGetWidth(sourcePixelBuffer);
-	height = (unsigned int)CVPixelBufferGetHeight(sourcePixelBuffer);
-	rowBytes = CVPixelBufferGetBytesPerRow(sourcePixelBuffer);
-	glob->codec->EncodeBegin(utvf, width, height, rowBytes);
 
-	ICMEncodedFrameCreateMutable(glob->session, sourceFrame, glob->codec->EncodeGetOutputSize(utvf, width, height), &encoded);
+	if (glob->sourcePixelType == 0)
+	{
+		unsigned int width, height;
+		size_t rowBytes;
+
+		if (QuickTimeFormatToUtVideoFormat(&utvf, srcType) != 0)
+		{
+			CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
+			return paramErr;
+		}
+		width = (unsigned int)CVPixelBufferGetWidth(sourcePixelBuffer);
+		height = (unsigned int)CVPixelBufferGetHeight(sourcePixelBuffer);
+		rowBytes = CVPixelBufferGetBytesPerRow(sourcePixelBuffer);
+		if (glob->codec->EncodeBegin(utvf, width, height, rowBytes) != 0)
+		{
+			CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
+			return paramErr;
+		}
+		glob->outputSize = glob->codec->EncodeGetOutputSize(utvf, width, height);
+		glob->sourcePixelType = srcType;
+	}
+	else
+	{
+		if (srcType != glob->sourcePixelType)
+		{
+			CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
+			return paramErr;
+		}
+	}
+
+	ICMEncodedFrameCreateMutable(glob->session, sourceFrame, glob->outputSize, &encoded);
 	dstPtr = ICMEncodedFrameGetDataPtr(encoded);
 	srcPtr = CVPixelBufferGetBaseAddress(sourcePixelBuffer);
 	encodedSize = glob->codec->EncodeFrame(dstPtr, &keyFrame, srcPtr);
@@ -232,9 +254,10 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 	ICMEncodedFrameSetMediaSampleFlags(encoded, mediaSampleFlags);
 	ICMCompressorSessionEmitEncodedFrame(glob->session, encoded, 1, &sourceFrame);
 
-	CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
-	glob->codec->EncodeEnd();
 	ICMEncodedFrameRelease(encoded);
+
+	CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
+
 	return noErr;
 }
 

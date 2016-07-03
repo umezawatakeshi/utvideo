@@ -47,8 +47,6 @@ pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 		return err;
 	}
 
-	glob->beginBandDone = false;
-
 	{
 		const utvf_t *p;
 		OSType *post;
@@ -81,6 +79,9 @@ pascal ComponentResult QTDecoderClose(CQTDecoder *glob, ComponentInstance self)
 
 	if (glob != NULL)
 	{
+		if (glob->destinationPixelType != 0)
+			glob->codec->DecodeEnd();
+
 		if (glob->wantedDestinationPixelTypes != NULL)
 			DisposeHandle((Handle)glob->wantedDestinationPixelTypes);
 
@@ -116,8 +117,6 @@ pascal ComponentResult QTDecoderPreflight(CQTDecoder *glob, CodecDecompressParam
 
 pascal ComponentResult QTDecoderInitialize(CQTDecoder *glob, ImageSubCodecDecompressCapabilities *cap)
 {
-	cap->decompressRecordSize = sizeof(bool);
-
 	return noErr;
 }
 
@@ -128,33 +127,39 @@ pascal ComponentResult QTDecoderBeginBand(CQTDecoder *glob, CodecDecompressParam
 	size_t extDataOffset;
 	utvf_t outfmt;
 
-	if (glob->beginBandDone)
+	if (glob->destinationPixelType == 0)
 	{
-		*(bool *)drp->userDecompressRecord = true;
-		return paramErr;
-	}
-	glob->beginBandDone = true;
-	*(bool *)drp->userDecompressRecord = false;
+		if (QuickTimeFormatToUtVideoFormat(&outfmt, param->dstPixMap.pixelFormat) != 0)
+			return paramErr;
 
-	if (QuickTimeFormatToUtVideoFormat(&outfmt, param->dstPixMap.pixelFormat) != 0)
-		return paramErr;
-
-	imgDescExt = NULL;
-	if (GetImageDescriptionExtension(param->imageDescription, &imgDescExt, 'strf', 1) == noErr) // AVI file
-		extDataOffset = 40; // sizeof(BITMAPINFOHEADER)
-	else if (GetImageDescriptionExtension(param->imageDescription, &imgDescExt, 'glbl', 1) == noErr) // MOV file (converted by ffmpeg/avconv)
-		extDataOffset = 0;
-	else
-		return paramErr;
-	imgDescExtSize = GetHandleSize(imgDescExt);
-	if (imgDescExtSize < extDataOffset)
-	{
+		imgDescExt = NULL;
+		if (GetImageDescriptionExtension(param->imageDescription, &imgDescExt, 'strf', 1) == noErr) // AVI file
+			extDataOffset = 40; // sizeof(BITMAPINFOHEADER)
+		else if (GetImageDescriptionExtension(param->imageDescription, &imgDescExt, 'glbl', 1) == noErr) // MOV file (converted by ffmpeg/avconv)
+			extDataOffset = 0;
+		else
+			return paramErr;
+		imgDescExtSize = GetHandleSize(imgDescExt);
+		if (imgDescExtSize < extDataOffset)
+		{
+			DisposeHandle(imgDescExt);
+			return paramErr;
+		}
+		if (glob->codec->DecodeBegin(outfmt, (*param->imageDescription)->width, (*param->imageDescription)->height, drp->rowBytes,
+			((char *)(*imgDescExt)) + extDataOffset, imgDescExtSize - extDataOffset) != 0)
+		{
+			DisposeHandle(imgDescExt);
+			return paramErr;
+		}
 		DisposeHandle(imgDescExt);
-		return paramErr;
+
+		glob->destinationPixelType = param->dstPixMap.pixelFormat;
 	}
-	glob->codec->DecodeBegin(outfmt, (*param->imageDescription)->width, (*param->imageDescription)->height, drp->rowBytes,
-							 ((char *)(*imgDescExt)) + extDataOffset, imgDescExtSize - extDataOffset);
-	DisposeHandle(imgDescExt);
+	else
+	{
+		if (param->dstPixMap.pixelFormat != glob->destinationPixelType)
+			return paramErr;
+	}
 
 	return noErr;
 }
@@ -170,9 +175,6 @@ pascal ComponentResult QTDecoderEndBand(CQTDecoder *glob, ImageSubCodecDecompres
 {
 	if (*(bool *)drp->userDecompressRecord)
 		return noErr;
-
-	glob->codec->DecodeEnd();
-	glob->beginBandDone = false;
 
 	return noErr;
 }
