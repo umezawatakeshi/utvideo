@@ -119,12 +119,7 @@ LRESULT CVCMCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 	bool bKeyFrame;
 	size_t cbFrame;
 
-	utvf_t infmt;
-
-	if (VCMFormatToUtVideoFormat(&infmt, icc->lpbiInput->biCompression, icc->lpbiInput->biBitCount) != 0)
-		return ICERR_BADFORMAT;
-
-	cbFrame = m_pCodec->EncodeFrame(icc->lpOutput, &bKeyFrame, icc->lpInput, infmt, CBGROSSWIDTH_WINDOWS);
+	cbFrame = m_pCodec->EncodeFrame(icc->lpOutput, &bKeyFrame, icc->lpInput);
 	if (icc->lpckid != NULL)
 		*icc->lpckid = FCC('dcdc');
 	icc->lpbiOutput->biSizeImage = (DWORD)cbFrame;
@@ -147,13 +142,17 @@ LRESULT CVCMCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINF
 			LOGPRINT_BIH_THIS(this, " pbihOut", pbihOut);
 	}
 
+	utvf_t infmt;
 	LRESULT ret;
 
 	ret = CompressQuery(pbihIn, pbihOut);
 	if (ret != ICERR_OK)
 		return ret;
 
-	return m_pCodec->EncodeBegin(pbihIn->biWidth, pbihIn->biHeight) == 0 ? ICERR_OK : ICERR_INTERNAL;
+	if (VCMFormatToUtVideoFormat(&infmt, pbihIn->biCompression, pbihIn->biBitCount) != 0)
+		return ICERR_BADFORMAT;
+
+	return m_pCodec->EncodeBegin(infmt, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS) == 0 ? ICERR_OK : ICERR_INTERNAL;
 }
 
 LRESULT CVCMCodec::CompressEnd(void)
@@ -191,7 +190,7 @@ LRESULT CVCMCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOH
 
 	UtVideoFormatToVCMFormat(&pbihOut->biCompression, &pbihOut->biBitCount, *m_pCodec->GetCompressedFormat());
 	pbihOut->biSizeImage = (DWORD)m_pCodec->EncodeGetOutputSize(infmt, pbihIn->biWidth, pbihIn->biHeight);
-	return m_pCodec->EncodeGetExtraData(((BYTE *)pbihOut) + sizeof(BITMAPINFOHEADER), m_pCodec->EncodeGetExtraDataSize(), pbihIn->biWidth, pbihIn->biHeight) == 0 ? ICERR_OK : ICERR_BADFORMAT;
+	return m_pCodec->EncodeGetExtraData(((BYTE *)pbihOut) + sizeof(BITMAPINFOHEADER), m_pCodec->EncodeGetExtraDataSize(), infmt, pbihIn->biWidth, pbihIn->biHeight) == 0 ? ICERR_OK : ICERR_BADFORMAT;
 }
 
 LRESULT CVCMCodec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
@@ -233,12 +232,7 @@ LRESULT CVCMCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
 	size_t cbFrame;
 
-	utvf_t outfmt;
-
-	if (VCMFormatToUtVideoFormat(&outfmt, icd->lpbiOutput->biCompression, icd->lpbiOutput->biBitCount) != 0)
-		return ICERR_BADFORMAT;
-
-	cbFrame = m_pCodec->DecodeFrame(icd->lpOutput, icd->lpInput, outfmt, CBGROSSWIDTH_WINDOWS);
+	cbFrame = m_pCodec->DecodeFrame(icd->lpOutput, icd->lpInput);
 	icd->lpbiOutput->biSizeImage = (DWORD)cbFrame;
 	return ICERR_OK;
 }
@@ -254,13 +248,17 @@ LRESULT CVCMCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPI
 			LOGPRINT_BIH_THIS(this, " pbihOut", pbihOut);
 	}
 
+	utvf_t utvf;
 	LRESULT ret;
 
 	ret = DecompressQuery(pbihIn, pbihOut);
 	if (ret != ICERR_OK)
 		return ret;
 
-	return m_pCodec->DecodeBegin(pbihIn->biWidth, pbihIn->biHeight, ((BYTE *)pbihIn) + sizeof(BITMAPINFOHEADER), pbihIn->biSize - sizeof(BITMAPINFOHEADER)) == 0 ? ICERR_OK : ICERR_BADFORMAT;
+	if (VCMFormatToUtVideoFormat(&utvf, pbihOut->biCompression, pbihOut->biBitCount) != 0)
+		return ICERR_BADFORMAT;
+
+	return m_pCodec->DecodeBegin(utvf, pbihIn->biWidth, pbihIn->biHeight, CBGROSSWIDTH_WINDOWS, ((BYTE *)pbihIn) + sizeof(BITMAPINFOHEADER), pbihIn->biSize - sizeof(BITMAPINFOHEADER)) == 0 ? ICERR_OK : ICERR_BADFORMAT;
 }
 
 LRESULT CVCMCodec::DecompressEnd(void)

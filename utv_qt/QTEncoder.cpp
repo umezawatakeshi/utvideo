@@ -90,9 +90,6 @@ pascal ComponentResult QTEncoderClose(CQTEncoder *glob, ComponentInstance self)
 
 	if (glob != NULL)
 	{
-        if (glob->encodeBegun)
-            glob->codec->EncodeEnd();
-
 		QTCodecClose(glob, self);
 
 		ICMCompressionSessionOptionsRelease(glob->sessionOptions);
@@ -151,7 +148,7 @@ pascal ComponentResult QTEncoderPrepareToCompressFrames(CQTEncoder *glob, ICMCom
 
 	imgDescExtSize = glob->codec->EncodeGetExtraDataSize();
 	imgDescExt = NewHandle(imgDescExtSize);
-	glob->codec->EncodeGetExtraData(*imgDescExt, imgDescExtSize, (*imageDescription)->width, (*imageDescription)->height);
+	glob->codec->EncodeGetExtraData(*imgDescExt, imgDescExtSize, /* XXX */ UTVF_INVALID, (*imageDescription)->width, (*imageDescription)->height);
 	AddImageDescriptionExtension(imageDescription, imgDescExt, 'glbl');
 	DisposeHandle(imgDescExt);
 
@@ -194,10 +191,6 @@ pascal ComponentResult QTEncoderPrepareToCompressFrames(CQTEncoder *glob, ICMCom
 
 	(*imageDescription)->cType = glob->componentSubType;
 
-	if (glob->codec->EncodeBegin((*imageDescription)->width, (*imageDescription)->height) != 0)
-		return paramErr;
-    glob->encodeBegun = true;
-
 	return noErr;
 }
 
@@ -226,15 +219,13 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 	width = (unsigned int)CVPixelBufferGetWidth(sourcePixelBuffer);
 	height = (unsigned int)CVPixelBufferGetHeight(sourcePixelBuffer);
 	rowBytes = CVPixelBufferGetBytesPerRow(sourcePixelBuffer);
-	if (glob->codec->EncodeQuery(utvf, width, height) != 0)
-		return paramErr;
+	glob->codec->EncodeBegin(utvf, width, height, rowBytes);
 
 	ICMEncodedFrameCreateMutable(glob->session, sourceFrame, glob->codec->EncodeGetOutputSize(utvf, width, height), &encoded);
 	dstPtr = ICMEncodedFrameGetDataPtr(encoded);
 	srcPtr = CVPixelBufferGetBaseAddress(sourcePixelBuffer);
-	encodedSize = glob->codec->EncodeFrame(dstPtr, &keyFrame, srcPtr, utvf, rowBytes);
+	encodedSize = glob->codec->EncodeFrame(dstPtr, &keyFrame, srcPtr);
 	ICMEncodedFrameSetDataSize(encoded, encodedSize);
-	mediaSampleFlags = 0;
 	if (!keyFrame)
 		mediaSampleFlags |= mediaSampleNotSync;
 
@@ -242,6 +233,7 @@ pascal ComponentResult QTEncoderEncodeFrame(CQTEncoder *glob, ICMCompressorSourc
 	ICMCompressorSessionEmitEncodedFrame(glob->session, encoded, 1, &sourceFrame);
 
 	CVPixelBufferUnlockBaseAddress(sourcePixelBuffer, 0);
+	glob->codec->EncodeEnd();
 	ICMEncodedFrameRelease(encoded);
 	return noErr;
 }

@@ -124,22 +124,16 @@ void CULRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 	}
 }
 
-int CULRGCodec::InternalDecodeBegin(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
+int CULRGCodec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
 	int ret;
 
-	ret = CUL00Codec::InternalDecodeBegin(width, height, pExtraData, cbExtraData);
+	ret = CUL00Codec::InternalDecodeBegin(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
 	if (ret != 0)
 		return ret;
 
 	m_pRawDecoded = new CFrameBuffer();
-
-	return 0;
-}
-
-int CULRGCodec::InternalPreDecodeFrame(void)
-{
-	m_pRawDecoded->ModifyPlane(0, m_cbRawSize, 0);
+	m_pRawDecoded->AddPlane(m_cbRawSize, 0);
 
 	return 0;
 }

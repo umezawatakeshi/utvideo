@@ -47,6 +47,8 @@ pascal ComponentResult QTDecoderOpen(CQTDecoder *glob, ComponentInstance self)
 		return err;
 	}
 
+	glob->beginBandDone = false;
+
 	{
 		const utvf_t *p;
 		OSType *post;
@@ -79,9 +81,6 @@ pascal ComponentResult QTDecoderClose(CQTDecoder *glob, ComponentInstance self)
 
 	if (glob != NULL)
 	{
-		if (glob->decodeBegun)
-			glob->codec->DecodeEnd();
-
 		if (glob->wantedDestinationPixelTypes != NULL)
 			DisposeHandle((Handle)glob->wantedDestinationPixelTypes);
 
@@ -110,16 +109,35 @@ pascal ComponentResult QTDecoderGetCodecInfo(CQTDecoder *glob, CodecInfo *info)
 
 pascal ComponentResult QTDecoderPreflight(CQTDecoder *glob, CodecDecompressParams *param)
 {
+	param->wantedDestinationPixelTypes = glob->wantedDestinationPixelTypes;
+
+	return noErr;
+}
+
+pascal ComponentResult QTDecoderInitialize(CQTDecoder *glob, ImageSubCodecDecompressCapabilities *cap)
+{
+	cap->decompressRecordSize = sizeof(bool);
+
+	return noErr;
+}
+
+pascal ComponentResult QTDecoderBeginBand(CQTDecoder *glob, CodecDecompressParams *param, ImageSubCodecDecompressRecord *drp, long flags)
+{
 	Handle imgDescExt;
 	size_t imgDescExtSize;
 	size_t extDataOffset;
+	utvf_t outfmt;
 
-	if (glob->decodeBegun)
-		return noErr;
+	if (glob->beginBandDone)
+	{
+		*(bool *)drp->userDecompressRecord = true;
+		return paramErr;
+	}
+	glob->beginBandDone = true;
+	*(bool *)drp->userDecompressRecord = false;
 
-	glob->decodeBegun = true;
-
-	param->wantedDestinationPixelTypes = glob->wantedDestinationPixelTypes;
+	if (QuickTimeFormatToUtVideoFormat(&outfmt, param->dstPixMap.pixelFormat) != 0)
+		return paramErr;
 
 	imgDescExt = NULL;
 	if (GetImageDescriptionExtension(param->imageDescription, &imgDescExt, 'strf', 1) == noErr) // AVI file
@@ -134,35 +152,28 @@ pascal ComponentResult QTDecoderPreflight(CQTDecoder *glob, CodecDecompressParam
 		DisposeHandle(imgDescExt);
 		return paramErr;
 	}
-	glob->codec->DecodeBegin((*param->imageDescription)->width, (*param->imageDescription)->height,
-		((char *)(*imgDescExt)) + extDataOffset, imgDescExtSize - extDataOffset);
+	glob->codec->DecodeBegin(outfmt, (*param->imageDescription)->width, (*param->imageDescription)->height, drp->rowBytes,
+							 ((char *)(*imgDescExt)) + extDataOffset, imgDescExtSize - extDataOffset);
 	DisposeHandle(imgDescExt);
-
-	return noErr;
-}
-
-pascal ComponentResult QTDecoderInitialize(CQTDecoder *glob, ImageSubCodecDecompressCapabilities *cap)
-{
-	return noErr;
-}
-
-pascal ComponentResult QTDecoderBeginBand(CQTDecoder *glob, CodecDecompressParams *param, ImageSubCodecDecompressRecord *drp, long flags)
-{
-	if (QuickTimeFormatToUtVideoFormat(&glob->outfmt, param->dstPixMap.pixelFormat) != 0)
-		return paramErr;
 
 	return noErr;
 }
 
 pascal ComponentResult QTDecoderDrawBand(CQTDecoder *glob, ImageSubCodecDecompressRecord *drp)
 {
-	glob->codec->DecodeFrame(drp->baseAddr, drp->codecData, glob->outfmt, drp->rowBytes);
+	glob->codec->DecodeFrame(drp->baseAddr, drp->codecData);
 
 	return noErr;
 }
 
 pascal ComponentResult QTDecoderEndBand(CQTDecoder *glob, ImageSubCodecDecompressRecord *drp, OSErr result, long flags)
 {
+	if (*(bool *)drp->userDecompressRecord)
+		return noErr;
+
+	glob->codec->DecodeEnd();
+	glob->beginBandDone = false;
+
 	return noErr;
 }
 

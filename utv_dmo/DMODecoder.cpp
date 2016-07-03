@@ -19,8 +19,12 @@ HRESULT CDMODecoder::InternalAllocateStreamingResources()
 	const DMO_MEDIA_TYPE *pmtOut = OutputType(0);
 	const VIDEOINFOHEADER *pvihIn  = (const VIDEOINFOHEADER *)pmtIn->pbFormat;
 	const VIDEOINFOHEADER *pvihOut = (const VIDEOINFOHEADER *)pmtOut->pbFormat;
+	utvf_t outfmt;
 
-	if (m_pCodec->DecodeBegin(pvihOut->bmiHeader.biWidth, pvihOut->bmiHeader.biHeight,
+	if (DirectShowFormatToUtVideoFormat(&outfmt, pvihOut->bmiHeader.biCompression, pvihOut->bmiHeader.biBitCount, pmtOut->subtype) != 0)
+		return DMO_E_INVALIDTYPE;
+
+	if (m_pCodec->DecodeBegin(outfmt, pvihOut->bmiHeader.biWidth, pvihOut->bmiHeader.biHeight, CBGROSSWIDTH_WINDOWS,
 			((BYTE *)&pvihIn->bmiHeader) + sizeof(BITMAPINFOHEADER), pvihIn->bmiHeader.biSize - sizeof(BITMAPINFOHEADER)) == 0)
 		return S_OK;
 	else
@@ -48,14 +52,7 @@ HRESULT CDMODecoder::InternalProcessOutput(DWORD dwFlags, DWORD cOutputBufferCou
 	pOutputBuffers->pBuffer->GetBufferAndLength(&pOutput, NULL);
 	m_pInputBuffer->GetBufferAndLength(&pInput, NULL);
 
-	const DMO_MEDIA_TYPE *pmtOut = OutputType(0);
-	const VIDEOINFOHEADER *pvihOut = (const VIDEOINFOHEADER *)pmtOut->pbFormat;
-	utvf_t outfmt;
-
-	if (DirectShowFormatToUtVideoFormat(&outfmt, pvihOut->bmiHeader.biCompression, pvihOut->bmiHeader.biBitCount, pmtOut->subtype) != 0)
-		return DMO_E_INVALIDTYPE;
-
-	cbOutput = m_pCodec->DecodeFrame(pOutput, pInput, outfmt, CBGROSSWIDTH_WINDOWS);
+	cbOutput = m_pCodec->DecodeFrame(pOutput, pInput);
 
 	pOutputBuffers->dwStatus = 0;
 	pOutputBuffers->dwStatus |= DMO_OUTPUT_DATA_BUFFERF_SYNCPOINT;

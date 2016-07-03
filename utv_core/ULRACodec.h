@@ -27,9 +27,8 @@ public:
 	virtual ~CULRACodec(void) {}
 	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CULRACodec(pszInterfaceName); }
 
-	virtual int InternalDecodeBegin(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData);
+	virtual int InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual int InternalDecodeEnd(void);
-	virtual int InternalPreDecodeFrame(void);
 
 public:
 	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }

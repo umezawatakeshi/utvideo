@@ -151,7 +151,7 @@ int CUL00Codec::InternalSetState(const void *pState, size_t cb)
 	return 0;
 }
 
-size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput, utvf_t infmt, size_t cbGrossWidth)
+size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput)
 {
 	FRAMEINFO fi;
 	uint8_t *p;
@@ -159,10 +159,6 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 	m_pInput = pInput;
 	m_pOutput = pOutput;
-	m_utvfRaw = infmt;
-
-	CalcRawFrameMetric(infmt, m_nWidth, m_nHeight, cbGrossWidth);
-	CalcStripeMetric();
 
 	memset(&fi, 0, sizeof(FRAMEINFO));
 
@@ -222,28 +218,24 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	return p - ((uint8_t *)pOutput);
 }
 
-int CUL00Codec::CalcFrameMetric(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
+int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
 	const EXTRADATA *p = (const EXTRADATA *)pExtraData;
 
 	m_dwDivideCount = ((p->flags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 	m_bInterlace = (p->flags0 & BIE_FLAGS0_ASSUME_INTERLACE) != 0;
 
+	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
 	CalcPlaneSizes(width, height);
 
-	return 0;
-}
-
-int CUL00Codec::CalcStripeMetric(void)
-{
 	if (m_bInterlace)
 	{
-		m_dwNumStripes = m_nHeight / (GetMacroPixelHeight() * 2);
+		m_dwNumStripes = height / (GetMacroPixelHeight() * 2);
 		m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight() * 2;
 	}
 	else
 	{
-		m_dwNumStripes = m_nHeight / GetMacroPixelHeight();
+		m_dwNumStripes = height / GetMacroPixelHeight();
 		m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight();
 	}
 
@@ -276,20 +268,21 @@ int CUL00Codec::CalcStripeMetric(void)
 	return 0;
 }
 
-int CUL00Codec::InternalEncodeBegin(unsigned int width, unsigned int height)
+int CUL00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
 {
 	int ret;
 	EXTRADATA ed;
 
-	ret = EncodeQuery(UTVF_INVALID, width, height);
+	ret = EncodeQuery(infmt, width, height);
 	if (ret != 0)
 		return ret;
 
+	m_utvfRaw = infmt;
 	m_nWidth = width;
 	m_nHeight = height;
 
-	EncodeGetExtraData(&ed, sizeof(ed), width, height);
-	ret = CalcFrameMetric(width, height, &ed, sizeof(ed));
+	EncodeGetExtraData(&ed, sizeof(ed), infmt, width, height);
+	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth, &ed, sizeof(ed));
 	if (ret != 0)
 		return ret;
 
@@ -335,7 +328,7 @@ size_t CUL00Codec::EncodeGetExtraDataSize(void)
 	return sizeof(EXTRADATA);
 }
 
-int CUL00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, unsigned int width, unsigned int height)
+int CUL00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, unsigned int width, unsigned int height)
 {
 	EXTRADATA *p = (EXTRADATA *)pExtraData;
 	unsigned int nDivideCount;
@@ -348,7 +341,7 @@ int CUL00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, unsigned int wid
 	nDivideCount = min(ROUNDUP(height, 2) / 2, (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
 
 	p->EncoderVersionAndImplementation = UTVIDEO_VERSION_AND_IMPLEMENTATION;
-	p->fccOriginalFormat               = 0; // htob32(infmt);
+	p->fccOriginalFormat               = htob32(infmt);
 	p->cbFrameInfo                     = sizeof(FRAMEINFO);
 	p->flags0                          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | ((nDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT) | (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE ? BIE_FLAGS0_ASSUME_INTERLACE : 0);
 
@@ -367,9 +360,6 @@ int CUL00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned i
 
 	if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE && height % (GetMacroPixelHeight() * 2) != 0)
 		return -1;
-
-	if (!infmt)
-		return 0;
 
 	for (const utvf_t *utvf = GetEncoderInputFormat(); *utvf; utvf++)
 	{
@@ -432,17 +422,12 @@ void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 	}
 }
 
-size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, utvf_t outfmt, size_t cbGrossWidth)
+size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput)
 {
 	/* const */ uint8_t *p;
 
 	m_pInput = pInput;
 	m_pOutput = pOutput;
-	m_utvfRaw = outfmt;
-
-	CalcRawFrameMetric(outfmt, m_nWidth, m_nHeight, cbGrossWidth);
-	CalcPlaneSizes(m_nWidth, m_nHeight); // CUL00Codec::CalcStripeMetric() が残念ながら冪等でない（毎フレーム呼ぶと m_cbPlaneStripeSize が増え続ける）ので、とりあえずここで CalcPlaneSizes を呼んで誤魔化す
-	CalcStripeMetric();
 
 	p = (uint8_t *)pInput;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
@@ -473,18 +458,11 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput, utvf_t outfmt,
 		p += ((const uint32_t *)p)[-1];
 	}
 
-	InternalPreDecodeFrame();
-
 	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::DecodeProc, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
 	return m_cbRawSize;
-}
-
-int CUL00Codec::InternalPreDecodeFrame(void)
-{
-	return 0;
 }
 
 int CUL00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
@@ -493,21 +471,22 @@ int CUL00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
 	return 0;
 }
 
-int CUL00Codec::InternalDecodeBegin(unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
+int CUL00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
 	int ret;
 
-	ret = DecodeQuery(UTVF_INVALID, width, height, pExtraData, cbExtraData);
+	ret = DecodeQuery(outfmt, width, height, pExtraData, cbExtraData);
 	if (ret != 0)
 		return ret;
 
-	ret = CalcFrameMetric(width, height, pExtraData, cbExtraData);
+	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
 	if (ret != 0)
 		return ret;
 
 	memset(&m_ed, 0, sizeof(m_ed));
 	memcpy(&m_ed, pExtraData, min(sizeof(m_ed), cbExtraData));
 
+	m_utvfRaw = outfmt;
 	m_nWidth = width;
 	m_nHeight = height;
 
