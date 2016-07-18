@@ -16,16 +16,25 @@
 #include <stdio.h>
 #include <tchar.h>
 
+#include <utility>
+#include <tuple>
 #include <vector>
 #include <string>
+#include <iostream>
 
 #include <boost/test/unit_test.hpp> 
 #include <boost/test/data/test_case.hpp>
 #include <boost/test/data/monomorphic.hpp>
 
+using std::pair;
+using std::tuple;
+using std::make_tuple;
 using std::vector;
+using std::string;
 using std::wstring;
 using std::ostream;
+using std::cerr;
+using std::endl;
 
 namespace data = boost::unit_test::data;
 using boost::unit_test::depends_on;
