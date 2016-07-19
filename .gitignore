@@ -21,3 +21,4 @@ utvideo.xcodeproj/xcuserdata
 /*.db
 /.vs
 /testclip
+/test*.xml
