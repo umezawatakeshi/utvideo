@@ -52,7 +52,21 @@ VideoClip::~VideoClip()
 
 DWORD VideoClip::GetFourCC() const
 {
-	return m_pCodecParam->codec_tag;
+	switch (m_pCodecParam->codec_tag)
+	{
+	case BI_RGB:
+		switch (m_pCodecParam->format)
+		{
+		case AV_PIX_FMT_BGR24:
+			return 24;
+		case AV_PIX_FMT_BGRA:
+			return 32;
+		default:
+			return 0; // XXX
+		}
+	default:
+		return m_pCodecParam->codec_tag;
+	}
 }
 
 unsigned int VideoClip::GetWidth() const
