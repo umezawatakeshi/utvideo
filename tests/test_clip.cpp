@@ -9,7 +9,12 @@
 #include "test_clip.h"
 
 static vector<pair<string, vector<pair<string, unsigned int>>>> vecDecodeClipsSource = {
-	{ "a.avi", { { "b.avi", 0 }, } },
+	{ "clip000-ulrg-progressive-left-div8-384x256.avi",{ { "clip000-raw-rgb24-384x256.avi", 0 },{ "clip000-raw-rgb32-384x256.avi", 0 }, } },
+	{ "clip000-ulra-progressive-left-div8-384x256.avi",{ { "clip000-raw-rgba-384x256.avi", 0 }, } },
+	{ "clip000-uly2-progressive-left-div8-384x256.avi",{ { "clip000-raw-yuy2-384x256.avi", 0 },{ "clip000-raw-uyvy-384x256.avi", 0 }, } },
+	{ "clip000-uly0-progressive-left-div8-384x256.avi",{ { "clip000-raw-yv12-384x256.avi", 0 },{ "clip000-raw-yuy2-384x256.avi", 0 },{ "clip000-raw-uyvy-384x256.avi", 0 }, } },
+	{ "clip000-ulh2-progressive-left-div8-384x256.avi",{ { "clip000-raw-yuy2-384x256.avi", 0 },{ "clip000-raw-uyvy-384x256.avi", 0 }, } },
+	{ "clip000-ulh0-progressive-left-div8-384x256.avi",{ { "clip000-raw-yv12-384x256.avi", 0 },{ "clip000-raw-yuy2-384x256.avi", 0 },{ "clip000-raw-uyvy-384x256.avi", 0 }, } },
 };
 
 vector<tuple<string, string, unsigned int>> conv(const vector<pair<string, vector<pair<string, unsigned int>>>> &v)
