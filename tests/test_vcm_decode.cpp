@@ -8,6 +8,32 @@
 #include "tuple_container.h"
 #include "VideoClip.h"
 
+int CompareFrame(const void *frame1, const void *frame2, unsigned int width, size_t size, DWORD format, int tolerance)
+{
+	(void)tolerance; // XXX
+
+	switch (format)
+	{
+	case 24:
+		{
+			const char *begin1 = (const char *)frame1;
+			const char *begin2 = (const char *)frame2;
+			const char *end1 = begin1 + size;
+			size_t net = width * (size_t)3;
+			size_t stride = (net + 3) & ~(size_t)3;
+			for (auto p = begin1, q = begin2; p < end1; p += stride, q += stride)
+			{
+				int r = memcmp(p, q, net);
+				if (r != 0)
+					return r;
+			}
+			return 0;
+		}
+	}
+
+	return memcmp(frame1, frame2, size);
+}
+
 BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_decoder"))
 BOOST_DATA_TEST_CASE(vcm_decode, make_data_from_tuple_container(vecDecodeClips), compressed, decoded, tolerance)
 {
@@ -76,7 +102,7 @@ BOOST_DATA_TEST_CASE(vcm_decode, make_data_from_tuple_container(vecDecodeClips),
 		BOOST_REQUIRE(lr == ICERR_OK);
 
 		BOOST_CHECK(bihDecoderOut.biSizeImage == cbDecodedData);
-		BOOST_CHECK(memcmp(pDecodedData, pDecoderOut, cbDecodedData) == 0); // XXX: use tolerance
+		BOOST_CHECK(CompareFrame(pDecodedData, pDecoderOut, nWidth, cbDecodedData, fccDecoded, tolerance) == 0);
 	}
 
 	BOOST_CHECK(retCompressed != 0 && retDecoded != 0);
