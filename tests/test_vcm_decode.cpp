@@ -109,6 +109,9 @@ BOOST_DATA_TEST_CASE(vcm_decode, make_data_from_tuple_container(vecDecodeClips),
 	if (pDecoderOut != NULL)
 		free(pDecoderOut);
 
+	lr = ICDecompressEnd(hic);
+	BOOST_CHECK(lr == ICERR_OK);
+
 	lr = ICClose(hic);
 	BOOST_CHECK(lr == ICERR_OK);
 }
