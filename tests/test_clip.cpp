@@ -28,6 +28,8 @@ static string preds[] = { "left", "median" };
 
 vector<tuple<string, string, unsigned int>> conv(const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> &v)
 {
+	static pair<int, int> sizes[] = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
+
 	vector<tuple<string, string, unsigned int>> r;
 
 	for (auto& i : v)
@@ -43,25 +45,17 @@ vector<tuple<string, string, unsigned int>> conv(const vector<tuple<string, int,
 			{
 				for (auto& pred : preds)
 				{
-					char comp[256], raw[256];
-
-					sprintf(comp, "%s-%s-div%d-384x512.avi", compbase.c_str(), pred.c_str(), div);
-					sprintf(raw, "%s-384x512.avi", rawbase.c_str());
-					r.push_back(make_tuple(comp, raw, tolerance));
-
-					for (int width = 384; width > 380; width -= widthstep)
+					for (auto& size : sizes)
 					{
-						sprintf(comp, "%s-%s-div%d-%dx256.avi", compbase.c_str(), pred.c_str(), div, width);
-						sprintf(raw, "%s-%dx256.avi", rawbase.c_str(), width);
-						r.push_back(make_tuple(comp, raw, tolerance));
-					}
-
-					for (int height = 256; height > 252; height -= heightstep)
-					{
-						if (height == 256)
+						auto width = size.first;
+						auto height = size.second;
+						if (width % widthstep != 0 || height % heightstep != 0)
 							continue;
-						sprintf(comp, "%s-%s-div%d-384x%d.avi", compbase.c_str(), pred.c_str(), div, height);
-						sprintf(raw, "%s-384x%d.avi", rawbase.c_str(), height);
+
+						char comp[256], raw[256];
+
+						sprintf(comp, "%s-%s-div%d-%dx%d.avi", compbase.c_str(), pred.c_str(), div, width, height);
+						sprintf(raw, "%s-%dx%d.avi", rawbase.c_str(), width, height);
 						r.push_back(make_tuple(comp, raw, tolerance));
 					}
 				}
