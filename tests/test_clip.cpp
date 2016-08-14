@@ -75,47 +75,19 @@ vector<tuple<string, string, unsigned int>> conv_clip000(const vector<tuple<stri
 	return r;
 }
 
-static vector<tuple<string, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip001 = {
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-ulrg-progressive", { { "clip001-raw-rgb24", 0 },{ "clip001-raw-rgb32", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-ulra-progressive", { { "clip001-raw-rgba", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-uly2-progressive", { { "clip001-raw-yuy2", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-uly0-progressive", { { "clip001-raw-yv12", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-ulh2-progressive", { { "clip001-raw-yuy2", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-ulh0-progressive", { { "clip001-raw-yv12", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-ulrg-interlace",{ { "clip001-raw-rgb24", 0 },{ "clip001-raw-rgb32", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-ulra-interlace",{ { "clip001-raw-rgba", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-uly2-interlace",{ { "clip001-raw-yuy2", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-uly0-interlace",{ { "clip001-raw-yv12", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-ulh2-interlace",{ { "clip001-raw-yuy2", 0 }, }),
-	make_tuple<string, vector<pair<string, unsigned int>>>("clip001-ulh0-interlace",{ { "clip001-raw-yv12", 0 }, }),
+static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip001 = {
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-ulrg-progressive", 1, 1,{ { "clip000-raw-rgb24", 0 },{ "clip000-raw-rgb32", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-ulra-progressive", 1, 1,{ { "clip000-raw-rgba", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-uly2-progressive", 2, 1,{ { "clip000-raw-yuy2", 0 },{ "clip000-raw-uyvy", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-uly0-progressive", 2, 2,{ { "clip000-raw-yv12", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-ulh2-progressive", 2, 1,{ { "clip000-raw-yuy2", 0 },{ "clip000-raw-uyvy", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-ulh0-progressive", 2, 2,{ { "clip000-raw-yv12", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-ulrg-interlace", 1, 2,{ { "clip000-raw-rgb24", 0 },{ "clip000-raw-rgb32", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-ulra-interlace", 1, 2,{ { "clip000-raw-rgba", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-uly2-interlace", 2, 2,{ { "clip000-raw-yuy2", 0 },{ "clip000-raw-uyvy", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-uly0-interlace", 2, 4,{ { "clip000-raw-yv12", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-ulh2-interlace", 2, 2,{ { "clip000-raw-yuy2", 0 },{ "clip000-raw-uyvy", 0 }, }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip000-ulh0-interlace", 2, 4,{ { "clip000-raw-yv12", 0 }, }),
 };
 
-vector<tuple<string, string, unsigned int>> conv_clip001(const vector<tuple<string, vector<pair<string, unsigned int>>>> &v)
-{
-	vector<tuple<string, string, unsigned int>> r;
-
-	for (auto& i : v)
-	{
-		auto& compbase = std::get<0>(i);
-		for (auto& j : std::get<1>(i))
-		{
-			auto& rawbase = j.first;
-			auto& tolerance = j.second;
-			for (auto div : divs)
-			{
-				for (auto& pred : preds)
-				{
-					char comp[256], raw[256];
-
-					sprintf(comp, "%s-%s-div%d-384x256.avi", compbase.c_str(), pred.c_str(), div);
-					sprintf(raw, "%s-384x256.avi", rawbase.c_str());
-					r.push_back(make_tuple(comp, raw, tolerance));
-				}
-			}
-		}
-	}
-
-	return r;
-}
-
-vector<tuple<string, string, unsigned int>> vecDecodeClips = conv_clip000(vecDecodeClipsSource_clip000) + conv_clip001(vecDecodeClipsSource_clip001);
+vector<tuple<string, string, unsigned int>> vecDecodeClips = conv_clip000(vecDecodeClipsSource_clip000) + conv_clip000(vecDecodeClipsSource_clip001);
