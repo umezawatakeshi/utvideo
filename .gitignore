@@ -22,3 +22,4 @@ utvideo.xcodeproj/xcuserdata
 /.vs
 /testclip
 /test*.xml
+*.vcxproj.user
