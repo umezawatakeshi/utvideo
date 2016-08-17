@@ -232,6 +232,9 @@ int CCodecBase::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 	m_bBottomUpFrame = false;
 	switch (rawfmt)
 	{
+	case UTVF_YV24:
+		m_cbRawSize = (width * height * 3);
+		break;
 	case UTVF_YV12:
 		m_cbRawSize = (width * height * 3) / 2; // XXX •‚â‚‚³‚ªŠï”‚Ìê‡‚Íl—¶‚µ‚Ä‚¢‚È‚¢
 		break;

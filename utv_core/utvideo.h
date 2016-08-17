@@ -95,14 +95,17 @@ typedef uint32_t utvf_t;
 // FourCC formats
 #define UTVF_ULRA ((utvf_t)'ULRA')
 #define UTVF_ULRG ((utvf_t)'ULRG')
+#define UTVF_ULY4 ((utvf_t)'ULY4')
 #define UTVF_ULY2 ((utvf_t)'ULY2')
 #define UTVF_ULY0 ((utvf_t)'ULY0')
+#define UTVF_ULH4 ((utvf_t)'ULH4')
 #define UTVF_ULH2 ((utvf_t)'ULH2')
 #define UTVF_ULH0 ((utvf_t)'ULH0')
 #define UTVF_UQRA ((utvf_t)'UQRA')
 #define UTVF_UQRG ((utvf_t)'UQRG')
 #define UTVF_UQY2 ((utvf_t)'UQY2')
 
+#define UTVF_YV24 ((utvf_t)'YV24')
 #define UTVF_YUY2 ((utvf_t)'YUY2')
 #define UTVF_YUYV ((utvf_t)'YUYV')
 #define UTVF_YUNV ((utvf_t)'YUNV')

@@ -185,6 +185,7 @@
     <ClInclude Include="ULRGCodec.h" />
     <ClInclude Include="ULYUV420Codec.h" />
     <ClInclude Include="ULYUV422Codec.h" />
+    <ClInclude Include="ULYUV444Codec.h" />
     <ClInclude Include="UQ00Codec.h" />
     <ClInclude Include="UQRACodec.h" />
     <ClInclude Include="UQRGCodec.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="ULRGCodec.cpp" />
     <ClCompile Include="ULYUV420Codec.cpp" />
     <ClCompile Include="ULYUV422Codec.cpp" />
+    <ClCompile Include="ULYUV444Codec.cpp" />
     <ClCompile Include="UQ00Codec.cpp" />
     <ClCompile Include="UQRACodec.cpp" />
     <ClCompile Include="UQRGCodec.cpp" />
