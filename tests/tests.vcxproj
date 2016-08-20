@@ -194,6 +194,7 @@
     <ClCompile Include="test_dmo_SetInputType_decoder.cpp" />
     <ClCompile Include="test_dmo_SetInputType_encoder.cpp" />
     <ClCompile Include="test_vcm_decode.cpp" />
+    <ClCompile Include="test_vcm_encode.cpp" />
     <ClCompile Include="test_vcm_ICCompressQuery.cpp" />
     <ClCompile Include="test_vcm_ICDecompressGetFormat.cpp" />
     <ClCompile Include="test_vcm_ICInfo.cpp" />
