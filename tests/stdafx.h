@@ -4,6 +4,7 @@
 #pragma once
 
 #define _CRT_SECURE_NO_WARNINGS 1
+#define NOMINMAX 1
 
 #include <windows.h>
 #include <vfw.h>
