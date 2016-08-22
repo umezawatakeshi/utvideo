@@ -128,3 +128,21 @@ resource 'dlle' (257) {
 #define SUBTYPE_ENC  { 'b64a' }
 #define SUBTYPE_DEC  { 'b64a' }
 #include "utv_qt.in.r"
+
+#define SUBTYPE      ULY4
+#define SUBTYPE_VAL  'ULY4'
+#define SUBTYPE_STR  "ULY4"
+#define SUBTYPE_RID  265
+#define SUBTYPE_INFO "YUV444 BT.601"
+#define SUBTYPE_ENC  { /*'YV24',*/ k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { /*'YV24',*/ k32ARGBPixelFormat, k24RGBPixelFormat }
+#include "utv_qt.in.r"
+
+#define SUBTYPE      ULH4
+#define SUBTYPE_VAL  'ULH4'
+#define SUBTYPE_STR  "ULH4"
+#define SUBTYPE_RID  266
+#define SUBTYPE_INFO "YUV444 BT.709"
+#define SUBTYPE_ENC  { /*'YV24',*/ k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { /*'YV24',*/ k32ARGBPixelFormat, k24RGBPixelFormat }
+#include "utv_qt.in.r"

@@ -47,6 +47,7 @@
 		25F09D4414122EC900D214B9 /* utv_qt.r in Rez */ = {isa = PBXBuildFile; fileRef = 25F09D4214122EC900D214B9 /* utv_qt.r */; };
 		25F09D5514122FB800D214B9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25F09D5414122FB800D214B9 /* Carbon.framework */; };
 		25F09D5C14122FCF00D214B9 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25F09D5B14122FCF00D214B9 /* QuickTime.framework */; };
+		25F161BF1D6AB9B4003C2B42 /* ULYUV444Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25F161BD1D6AB9B4003C2B42 /* ULYUV444Codec.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -139,6 +140,8 @@
 		25F09D4214122EC900D214B9 /* utv_qt.r */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.rez; name = utv_qt.r; path = utv_qt/utv_qt.r; sourceTree = "<group>"; };
 		25F09D5414122FB800D214B9 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
 		25F09D5B14122FCF00D214B9 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
+		25F161BD1D6AB9B4003C2B42 /* ULYUV444Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = ULYUV444Codec.cpp; path = utv_core/ULYUV444Codec.cpp; sourceTree = "<group>"; };
+		25F161BE1D6AB9B4003C2B42 /* ULYUV444Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = ULYUV444Codec.h; path = utv_core/ULYUV444Codec.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -270,6 +273,8 @@
 				25817AE7175A052D00888CE2 /* ULYUV420Codec.h */,
 				25817AE8175A052D00888CE2 /* ULYUV422Codec.cpp */,
 				25817AE9175A052D00888CE2 /* ULYUV422Codec.h */,
+				25F161BD1D6AB9B4003C2B42 /* ULYUV444Codec.cpp */,
+				25F161BE1D6AB9B4003C2B42 /* ULYUV444Codec.h */,
 				25CCB6F018FD137F00076B45 /* UQ00Codec.cpp */,
 				25CCB6F118FD137F00076B45 /* UQ00Codec.h */,
 				2500E14A1CBA4BC300B79A76 /* UQRACodec.cpp */,
@@ -421,6 +426,7 @@
 				258DB4091411F9290059F47E /* TunedFunc.cpp in Sources */,
 				258DB40A1411F9290059F47E /* UL00Codec.cpp in Sources */,
 				258DB40B1411F9290059F47E /* ULRACodec.cpp in Sources */,
+				25F161BF1D6AB9B4003C2B42 /* ULYUV444Codec.cpp in Sources */,
 				258DB40C1411F9290059F47E /* ULRGCodec.cpp in Sources */,
 				258DB40F1411F9290059F47E /* utv_core.cpp in Sources */,
 				25F09D4314122EC900D214B9 /* QTDecoder.cpp in Sources */,
