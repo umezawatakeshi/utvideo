@@ -67,13 +67,13 @@ static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDe
 	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip001-ulh0-interlace", 2, 4,{ { "clip001-raw-yv12", 0 }, }),
 };
 
+static const vector<pair<int, int>> sizes_clip000 = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
+
 static int divs[] = { 1, 8, 11 };
 static string preds[] = { "left", "median" };
 
-vector<tuple<string, string, unsigned int>> conv_clip000(const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> &v)
+vector<tuple<string, string, unsigned int>> conv_clip000(const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> &v, const vector<pair<int, int>>& sz)
 {
-	static pair<int, int> sizes[] = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
-
 	vector<tuple<string, string, unsigned int>> r;
 
 	for (auto& i : v)
@@ -89,7 +89,7 @@ vector<tuple<string, string, unsigned int>> conv_clip000(const vector<tuple<stri
 			{
 				for (auto& pred : preds)
 				{
-					for (auto& size : sizes)
+					for (auto& size : sz)
 					{
 						auto width = size.first;
 						auto height = size.second;
@@ -110,7 +110,7 @@ vector<tuple<string, string, unsigned int>> conv_clip000(const vector<tuple<stri
 	return r;
 }
 
-vector<tuple<string, string, unsigned int>> vecDecodeClips = conv_clip000(vecDecodeClipsSource_clip000);
+vector<tuple<string, string, unsigned int>> vecDecodeClips = conv_clip000(vecDecodeClipsSource_clip000, sizes_clip000);
 
 /****************************************************************************/
 
@@ -165,7 +165,7 @@ static const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> ve
 };
 
 
-vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000(const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> &v)
+vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000(const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> &v, const vector<pair<int, int>>& sz)
 {
 	static pair<int, int> sizes[] = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
 
@@ -183,7 +183,7 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 			{
 				for (auto& predpair : preds_ulxx)
 				{
-					for (auto& size : sizes)
+					for (auto& size : sz)
 					{
 						auto width = size.first;
 						auto height = size.second;
@@ -204,4 +204,4 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 	return r;
 }
 
-vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> vecEncodeClips = conv_enc_clip000(vecEncodeClipsSource_clip000);
+vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> vecEncodeClips = conv_enc_clip000(vecEncodeClipsSource_clip000, sizes_clip000);
