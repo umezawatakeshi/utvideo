@@ -13,6 +13,7 @@ vector<T, A> operator+(const vector<T, A> &a, const vector<T, A> &b)
 {
 	vector<T, A> ret;
 
+	ret.reserve(a.size() + b.size());
 	ret = a;
 	ret.insert(ret.end(), b.begin(), b.end());
 	return ret;
