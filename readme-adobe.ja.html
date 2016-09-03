@@ -5,16 +5,16 @@
 <meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" type="text/css" href="style.css">
-<title>Ut Video Codec Suite 16.1.0 - Adobe ソフトウェアへの登録方法 （日本語）</title>
+<title>Ut Video Codec Suite 17.0.0 - Adobe ソフトウェアへの登録方法 （日本語）</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 16.1.0 - Adobe ソフトウェアへの登録方法 （日本語）</h1>
+<h1>Ut Video Codec Suite 17.0.0 - Adobe ソフトウェアへの登録方法 （日本語）</h1>
 <hr>
 <h2 id="overview">概要</h2>
 <p>Adobe ソフトウェア、具体的には Premiere Pro, After Effects, Media Encoder では、利用可能なコーデックのリストを独自に持っています。単に QuickTime コーデックコンポーネントをインストールするだけでは、コーデックを適切に使うことができません。具体的には、適切なフォーマットでコーデックとやり取りできなくなります。特に、8bit を超えるフォーマットでコーデックとやり取りするには、前述のリストにコーデックを追加する必要があります。</p>
 <p>なお、このリストを記述するファイルは、同一のコンピュータであっても「Adobe ソフトウェアのバージョンごと」かつ「ユーザーごと」に存在します。たとえば、同じユーザーであっても CC 2014 と CC 2015 では別のファイルですし、同じ CC 2015 でもユーザーAとユーザーBでも別のファイルです。</p>
 <h2 id="tool-assisted-registration">登録ツールを使用した登録方法</h2>
-<p>登録ツールは用意できていません。Ut Video Codec Suite の近い将来のバージョンで提供される予定です。</p>
+<p>登録ツールは用意できていません。Ut Video Codec Suite の将来のバージョンで提供される予定です。</p>
 <h2 id="manual-registration">手動での登録方法</h2>
 <p>コーデックのリストを記述するファイルを開きます。</p>
 <dl>
@@ -29,10 +29,14 @@
 &lt;QTCodec codec='ULRG' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
 &lt;QTCodec codec='ULRA' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
 &lt;QTCodec codec='ULRA' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULY4' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULY4' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
 &lt;QTCodec codec='ULY2' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
 &lt;QTCodec codec='ULY2' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
 &lt;QTCodec codec='ULY0' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
 &lt;QTCodec codec='ULY0' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULH4' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULH4' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
 &lt;QTCodec codec='ULH2' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
 &lt;QTCodec codec='ULH2' vendor='****' platform='windows' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
 &lt;QTCodec codec='ULH0' vendor='****' platform='windows' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
@@ -48,10 +52,14 @@
 &lt;QTCodec codec='ULRG' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
 &lt;QTCodec codec='ULRA' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
 &lt;QTCodec codec='ULRA' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULY4' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULY4' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
 &lt;QTCodec codec='ULY2' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
 &lt;QTCodec codec='ULY2' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
 &lt;QTCodec codec='ULY0' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
 &lt;QTCodec codec='ULY0' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
+&lt;QTCodec codec='ULH4' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
+&lt;QTCodec codec='ULH4' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='argb' /&gt;
 &lt;QTCodec codec='ULH2' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
 &lt;QTCodec codec='ULH2' vendor='****' platform='mactel' direction='decode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
 &lt;QTCodec codec='ULH0' vendor='****' platform='mactel' direction='encode' versionlow='0x00000' versionhigh='*' gammatag='false' cvbuffertag='2.2' decodefourcc='2yuv' /&gt;
