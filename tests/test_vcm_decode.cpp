@@ -7,6 +7,7 @@
 #include "expand.h"
 #include "tuple_container.h"
 #include "VideoClip.h"
+#include "ICCloser.h"
 
 int CompareFrame(const void *frame1, const void *frame2, unsigned int width, size_t size, DWORD format, int tolerance)
 {
@@ -66,6 +67,7 @@ BOOST_DATA_TEST_CASE(vcm_decode, make_data_from_tuple_container(vecDecodeClips),
 
 	hic = ICOpen(ICTYPE_VIDEO, fccCodec, ICMODE_DECOMPRESS);
 	BOOST_REQUIRE(hic != NULL);
+	ICCloser iccloser(hic);
 
 	cbExtraData = comClip.GetExtraData(&bihCompressed + 1, sizeof(bihCompressedBuf) - sizeof(bihCompressed));
 

@@ -7,6 +7,7 @@
 #include "expand.h"
 #include "tuple_container.h"
 #include "VideoClip.h"
+#include "ICCloser.h"
 
 int CompareExtraDataWithMask(const void *p, size_t szp, const void *q, size_t szq, const void *m, size_t szm)
 {
@@ -59,6 +60,7 @@ BOOST_DATA_TEST_CASE(vcm_encode, make_data_from_tuple_container(vecEncodeClips),
 
 	hic = ICOpen(ICTYPE_VIDEO, fccCodec, ICMODE_COMPRESS);
 	BOOST_REQUIRE(hic != NULL);
+	ICCloser iccloser(hic);
 
 	lr = ICSetState(hic, &config.front(), config.size());
 	BOOST_REQUIRE(lr == config.size());
