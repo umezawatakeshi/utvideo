@@ -32,7 +32,7 @@ private:
 	int m_nNumThreads;
 	int m_nNumJobs;
 #ifdef _WIN32
-	queue<CThreadJob *> m_queueJob[MAX_THREAD];
+	std::queue<CThreadJob *> m_queueJob[MAX_THREAD];
 	HANDLE m_hThread[MAX_THREAD];
 	DWORD m_dwThreadId[MAX_THREAD];
 	HANDLE m_hThreadSemaphore[MAX_THREAD];
@@ -40,7 +40,7 @@ private:
 	HANDLE m_hCompletionEvent[MAX_JOB];
 #endif
 #if defined(__APPLE__) || defined(__unix__)
-	queue<CThreadJob *> m_queueJob;
+	std::queue<CThreadJob *> m_queueJob;
 	pthread_t m_ptidThread[MAX_THREAD];
 	pthread_mutex_t m_ptmJobMutex;
 	pthread_cond_t m_ptcJobCond;

@@ -60,13 +60,13 @@ void GenerateHuffmanCodeLengthTable(HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable, 
 			pCodeLengthTable->codelen[i] = 255;
 	}
 
-	sort(huffsort, huffsort+nsym, hufftree_gt);
+	std::sort(huffsort, huffsort+nsym, hufftree_gt);
 	for (int i = nsym - 2; i >= 0; i--) {
 		huffnode[i].left = huffsort[i];
 		huffnode[i].right = huffsort[i+1];
 		huffnode[i].count = huffsort[i]->count + huffsort[i+1]->count;
 
-		struct hufftree **insptr = upper_bound(huffsort, huffsort+i, &huffnode[i], hufftree_gt);
+		struct hufftree **insptr = std::upper_bound(huffsort, huffsort+i, &huffnode[i], hufftree_gt);
 		struct hufftree **movptr;
 		for (movptr = huffsort+i-1; movptr >= insptr; movptr--)
 			*(movptr+1) = *movptr;
@@ -101,7 +101,7 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE<B> *pEncodeTable, const HUF
 		cls[i].codelen = pCodeLengthTable->codelen[i];
 	}
 
-	sort(cls, cls + (1 << B), cls_less<B>);
+	std::sort(cls, cls + (1 << B), cls_less<B>);
 
 	if (cls[0].codelen == 0)
 	{
@@ -157,7 +157,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUF
 		cls[i].codelen = pCodeLengthTable->codelen[i];
 	}
 
-	sort(cls, cls + (1 << B), cls_less<B>);
+	std::sort(cls, cls + (1 << B), cls_less<B>);
 
 	// oŒ»‚·‚éƒVƒ“ƒ{ƒ‹‚ª‚Pí—Ş‚µ‚©‚È‚¢ê‡‚Ìˆ—
 	if (cls[0].codelen == 0)

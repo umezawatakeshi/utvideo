@@ -56,7 +56,6 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 
 #include <queue>
 #include <algorithm>
-using namespace std;
 
 #include <stdint.h>
 #include <myinttypes.h>
