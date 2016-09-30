@@ -36,14 +36,9 @@
 #pragma warning(disable:4819)
 #include <vfw.h>
 #pragma warning(pop)
-#include <msi.h>
-
-#include <uuids.h> // for MEDIATYPE_* and MEDIASUBTYPE_*
-
-#include <queue>
-#include <algorithm>
 
 #include <stdint.h>
+#include <stdio.h>
 
 #define LOG_MODULE_NAME "utv_vcm "
 
