@@ -23,3 +23,13 @@ extern vector<tuple<string, string, unsigned int>> vecDecodeClips;
  * 出力クリップのストリームヘッダの extradata の比較マスク
  */
 extern vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> vecEncodeClips;
+
+/*
+ * エンコードデコードテスト
+ * 入力クリップ（入力フォーマットも決まる）
+ * 出力クリップ（出力フォーマットも決まる）
+ * コーデックの FourCC
+ * エンコーダのコンフィギュレーションデータ
+ * 許容誤差
+ */
+extern vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> vecEncDecClips;

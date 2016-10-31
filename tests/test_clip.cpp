@@ -260,3 +260,72 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> vecEncodeClips =
 	conv_enc_clip000(vecEncodeClipsSource_clip000, sizes_clip000, false) +
 	conv_enc_clip000(vecEncodeClipsSource_clip002, sizes_clip000, true);
+
+/****************************************************************************/
+
+static const vector<tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>> vecEncDecClipsSource_clip200 = {
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yuy2-bt601" }, 'ULY2', vector<uint8_t>(ulxx_config_progressive), 2, 1, 1),
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yuy2-bt601" }, 'ULY2', vector<uint8_t>(ulxx_config_interlace), 2, 2, 1),
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yuy2-bt709" }, 'ULH2', vector<uint8_t>(ulxx_config_progressive), 2, 1, 1),
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yuy2-bt709" }, 'ULH2', vector<uint8_t>(ulxx_config_interlace), 2, 2, 1),
+
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yv24-bt601" }, 'ULY4', vector<uint8_t>(ulxx_config_progressive), 1, 1, 1),
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yv24-bt601" }, 'ULY4', vector<uint8_t>(ulxx_config_interlace), 1, 2, 1),
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yv24-bt709" }, 'ULH4', vector<uint8_t>(ulxx_config_progressive), 1, 1, 1),
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yv24-bt709" }, 'ULH4', vector<uint8_t>(ulxx_config_interlace), 1, 2, 1),
+
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yv12-bt601-progressive" }, 'ULY0', vector<uint8_t>(ulxx_config_progressive), 2, 2, 1),
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yv12-bt601-interlace" }, 'ULY0', vector<uint8_t>(ulxx_config_interlace), 2, 4, 1),
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yv12-bt709-progressive" }, 'ULH0', vector<uint8_t>(ulxx_config_progressive), 2, 2, 1),
+	make_tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>({ "clip200-raw-rgb24", "clip200-raw-rgb32" },{ "clip200-raw-yv12-bt709-interlace" }, 'ULH0', vector<uint8_t>(ulxx_config_interlace), 2, 4, 1),
+};
+
+vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> conv_encdec_clip000(const vector<tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>> &v, const vector<pair<int, int>>& sz, bool srcprop, bool dstprop)
+{
+	vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> r;
+
+	for (auto& i : v)
+	{
+		auto codecfmt = std::get<2>(i);
+		auto& confbase = std::get<3>(i);
+		auto widthstep = std::get<4>(i);
+		auto heightstep = std::get<5>(i);
+		auto tolerance = std::get<6>(i);
+		for (auto& srcbase : std::get<0>(i))
+		{
+			for (auto& dstbase : std::get<1>(i))
+			{
+				for (auto divpair : divs_ulxx)
+				{
+					for (auto& predpair : preds_ulxx)
+					{
+						for (auto& size : sz)
+						{
+							auto width = size.first;
+							auto height = size.second;
+							if (width % widthstep != 0 || height % heightstep != 0)
+								continue;
+
+							char src[256], dst[256];
+
+							if (srcprop)
+								sprintf(src, "%s-%s-%s-%dx%d.avi", srcbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+							else
+								sprintf(src, "%s-%dx%d.avi", srcbase.c_str(), width, height);
+							if (dstprop)
+								sprintf(dst, "%s-%s-%s-%dx%d.avi", dstbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+							else
+								sprintf(dst, "%s-%dx%d.avi", dstbase.c_str(), width, height);
+							r.push_back(make_tuple(src, dst, codecfmt, confbase | divpair.second | predpair.second, tolerance));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return r;
+}
+
+vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> vecEncDecClips =
+	conv_encdec_clip000(vecEncDecClipsSource_clip200, sizes_clip000, false, false);
