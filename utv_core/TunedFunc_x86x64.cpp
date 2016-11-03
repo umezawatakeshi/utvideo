@@ -4,9 +4,11 @@
 #include "stdafx.h"
 #include "utvideo.h"
 #include "TunedFunc.h"
+#include "TunedFunc_x86x64.h"
 #include "Predict.h"
 #include "HuffmanCode.h"
 #include "Convert.h"
+#include "Convert_x86x64.h"
 #include "ColorOrder.h"
 #include "Coefficient.h"
 #include "CPUID.h"
@@ -158,9 +160,9 @@ const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSE2 = {
 		cpp_ConvertULY4ToRGB<CBT601Coefficient, CRGBColorOrder>,
 		cpp_ConvertULY4ToRGB<CBT601Coefficient, CARGBColorOrder>,
 		cpp_ConvertRGBToULY4<CBT601Coefficient, CBGRColorOrder>,
-		cpp_ConvertRGBToULY4<CBT601Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSE2, CBT601Coefficient, CBGRAColorOrder>,
 		cpp_ConvertRGBToULY4<CBT601Coefficient, CRGBColorOrder>,
-		cpp_ConvertRGBToULY4<CBT601Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSE2, CBT601Coefficient, CARGBColorOrder>,
 	},
 	{
 		sse2_ConvertULH2ToBGR,
@@ -176,9 +178,9 @@ const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSE2 = {
 		cpp_ConvertULY4ToRGB<CBT709Coefficient, CRGBColorOrder>,
 		cpp_ConvertULY4ToRGB<CBT709Coefficient, CARGBColorOrder>,
 		cpp_ConvertRGBToULY4<CBT709Coefficient, CBGRColorOrder>,
-		cpp_ConvertRGBToULY4<CBT709Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSE2, CBT709Coefficient, CBGRAColorOrder>,
 		cpp_ConvertRGBToULY4<CBT709Coefficient, CRGBColorOrder>,
-		cpp_ConvertRGBToULY4<CBT709Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSE2, CBT709Coefficient, CARGBColorOrder>,
 	},
 };
 
@@ -198,10 +200,10 @@ const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSSE3 = {
 		cpp_ConvertULY4ToRGB<CBT601Coefficient, CBGRAColorOrder>,
 		cpp_ConvertULY4ToRGB<CBT601Coefficient, CRGBColorOrder>,
 		cpp_ConvertULY4ToRGB<CBT601Coefficient, CARGBColorOrder>,
-		cpp_ConvertRGBToULY4<CBT601Coefficient, CBGRColorOrder>,
-		cpp_ConvertRGBToULY4<CBT601Coefficient, CBGRAColorOrder>,
-		cpp_ConvertRGBToULY4<CBT601Coefficient, CRGBColorOrder>,
-		cpp_ConvertRGBToULY4<CBT601Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT601Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT601Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT601Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT601Coefficient, CARGBColorOrder>,
 	},
 	{
 		sse2_ConvertULH2ToBGR,
@@ -216,10 +218,10 @@ const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSSE3 = {
 		cpp_ConvertULY4ToRGB<CBT709Coefficient, CBGRAColorOrder>,
 		cpp_ConvertULY4ToRGB<CBT709Coefficient, CRGBColorOrder>,
 		cpp_ConvertULY4ToRGB<CBT709Coefficient, CARGBColorOrder>,
-		cpp_ConvertRGBToULY4<CBT709Coefficient, CBGRColorOrder>,
-		cpp_ConvertRGBToULY4<CBT709Coefficient, CBGRAColorOrder>,
-		cpp_ConvertRGBToULY4<CBT709Coefficient, CRGBColorOrder>,
-		cpp_ConvertRGBToULY4<CBT709Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT709Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT709Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT709Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT709Coefficient, CARGBColorOrder>,
 	},
 };
 
@@ -239,10 +241,10 @@ const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSE41 = {
 		cpp_ConvertULY4ToRGB<CBT601Coefficient, CBGRAColorOrder>,
 		cpp_ConvertULY4ToRGB<CBT601Coefficient, CRGBColorOrder>,
 		cpp_ConvertULY4ToRGB<CBT601Coefficient, CARGBColorOrder>,
-		cpp_ConvertRGBToULY4<CBT601Coefficient, CBGRColorOrder>,
-		cpp_ConvertRGBToULY4<CBT601Coefficient, CBGRAColorOrder>,
-		cpp_ConvertRGBToULY4<CBT601Coefficient, CRGBColorOrder>,
-		cpp_ConvertRGBToULY4<CBT601Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT601Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT601Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT601Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT601Coefficient, CARGBColorOrder>,
 	},
 	{
 		sse41_ConvertULH2ToBGR,
@@ -257,10 +259,51 @@ const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBSSE41 = {
 		cpp_ConvertULY4ToRGB<CBT709Coefficient, CBGRAColorOrder>,
 		cpp_ConvertULY4ToRGB<CBT709Coefficient, CRGBColorOrder>,
 		cpp_ConvertULY4ToRGB<CBT709Coefficient, CARGBColorOrder>,
-		cpp_ConvertRGBToULY4<CBT709Coefficient, CBGRColorOrder>,
-		cpp_ConvertRGBToULY4<CBT709Coefficient, CBGRAColorOrder>,
-		cpp_ConvertRGBToULY4<CBT709Coefficient, CRGBColorOrder>,
-		cpp_ConvertRGBToULY4<CBT709Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT709Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT709Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT709Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_SSSE3, CBT709Coefficient, CARGBColorOrder>,
+	},
+};
+
+const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBAVX1 = {
+	&tfnConvertYUVRGBSSE41,
+	{ FEATURE0_AVX1, 0 },
+	{
+		sse41_ConvertULY2ToBGR,
+		sse41_ConvertULY2ToBGRX,
+		sse41_ConvertULY2ToRGB,
+		sse41_ConvertULY2ToXRGB,
+		ssse3_ConvertBGRToULY2,
+		ssse3_ConvertBGRXToULY2,
+		ssse3_ConvertRGBToULY2,
+		ssse3_ConvertXRGBToULY2,
+		cpp_ConvertULY4ToRGB<CBT601Coefficient, CBGRColorOrder>,
+		cpp_ConvertULY4ToRGB<CBT601Coefficient, CBGRAColorOrder>,
+		cpp_ConvertULY4ToRGB<CBT601Coefficient, CRGBColorOrder>,
+		cpp_ConvertULY4ToRGB<CBT601Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX1, CBT601Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX1, CBT601Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX1, CBT601Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX1, CBT601Coefficient, CARGBColorOrder>,
+	},
+	{
+		sse41_ConvertULH2ToBGR,
+		sse41_ConvertULH2ToBGRX,
+		sse41_ConvertULH2ToRGB,
+		sse41_ConvertULH2ToXRGB,
+		ssse3_ConvertBGRToULH2,
+		ssse3_ConvertBGRXToULH2,
+		ssse3_ConvertRGBToULH2,
+		ssse3_ConvertXRGBToULH2,
+		cpp_ConvertULY4ToRGB<CBT709Coefficient, CBGRColorOrder>,
+		cpp_ConvertULY4ToRGB<CBT709Coefficient, CBGRAColorOrder>,
+		cpp_ConvertULY4ToRGB<CBT709Coefficient, CRGBColorOrder>,
+		cpp_ConvertULY4ToRGB<CBT709Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX1, CBT709Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX1, CBT709Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX1, CBT709Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX1, CBT709Coefficient, CARGBColorOrder>,
 	},
 };
 
@@ -303,7 +346,7 @@ const TUNEDFUNC tfnRoot = {
 #else
 	&tfnHuffmanDecodeI686,
 #endif
-	&tfnConvertYUVRGBSSE41,
+	&tfnConvertYUVRGBAVX1,
 	&tfnConvertShuffleSSSE3,
 	&tfnCorrelateSSSE3,
 };
