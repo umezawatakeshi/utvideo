@@ -21,25 +21,27 @@ static inline __m128i _mm_set2_epi16_shift(double a, double b, int shift)
 template<int F, class C, class T>
 void tuned_ConvertRGBToULY4(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
+	const int shift = 14;
+
 	__m128i rb2y, xg2y, rb2u, xg2u, rb2v, xg2v;
 
 	if (std::is_same<T, CBGRAColorOrder>::value || std::is_same<T, CBGRColorOrder>::value)
 	{
-		rb2y = _mm_set2_epi16_shift(C::R2Y, C::B2Y, 14);
-		xg2y = _mm_set2_epi16_shift(16.5 / 0xff, C::G2Y, 14);
-		rb2u = _mm_set2_epi16_shift(C::R2U, C::B2U, 14);
-		xg2u = _mm_set2_epi16_shift(128.5 / 0xff, C::G2U, 14);
-		rb2v = _mm_set2_epi16_shift(C::R2V, C::B2V, 14);
-		xg2v = _mm_set2_epi16_shift(128.5 / 0xff, C::G2V, 14);
+		rb2y = _mm_set2_epi16_shift(C::R2Y, C::B2Y, shift);
+		xg2y = _mm_set2_epi16_shift(16.5 / 0xff, C::G2Y, shift);
+		rb2u = _mm_set2_epi16_shift(C::R2U, C::B2U, shift);
+		xg2u = _mm_set2_epi16_shift(128.5 / 0xff, C::G2U, shift);
+		rb2v = _mm_set2_epi16_shift(C::R2V, C::B2V, shift);
+		xg2v = _mm_set2_epi16_shift(128.5 / 0xff, C::G2V, shift);
 	}
 	else
 	{
-		rb2y = _mm_set2_epi16_shift(C::B2Y, C::R2Y, 14);
-		xg2y = _mm_set2_epi16_shift(C::G2Y, 16.5 / 0xff, 14);
-		rb2u = _mm_set2_epi16_shift(C::B2U, C::R2U, 14);
-		xg2u = _mm_set2_epi16_shift(C::G2U, 128.5 / 0xff, 14);
-		rb2v = _mm_set2_epi16_shift(C::B2V, C::R2V, 14);
-		xg2v = _mm_set2_epi16_shift(C::G2V, 128.5 / 0xff, 14);
+		rb2y = _mm_set2_epi16_shift(C::B2Y, C::R2Y, shift);
+		xg2y = _mm_set2_epi16_shift(C::G2Y, 16.5 / 0xff, shift);
+		rb2u = _mm_set2_epi16_shift(C::B2U, C::R2U, shift);
+		xg2u = _mm_set2_epi16_shift(C::G2U, 128.5 / 0xff, shift);
+		rb2v = _mm_set2_epi16_shift(C::B2V, C::R2V, shift);
+		xg2v = _mm_set2_epi16_shift(C::G2V, 128.5 / 0xff, shift);
 	}
 
 	auto y = pYBegin;
@@ -83,9 +85,9 @@ void tuned_ConvertRGBToULY4(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 			}
 #endif
 
-			auto xrgb2yuv = [rb,xg](__m128i rb2yuv, __m128i xg2yuv) -> uint32_t {
+			auto xrgb2yuv = [rb, xg, shift](__m128i rb2yuv, __m128i xg2yuv) -> uint32_t {
 				__m128i yuv = _mm_add_epi32(_mm_madd_epi16(rb, rb2yuv), _mm_madd_epi16(xg, xg2yuv));
-				yuv = _mm_srli_epi32(yuv, 14);
+				yuv = _mm_srli_epi32(yuv, shift);
 #ifdef __SSSE3__
 				if (F >= CODEFEATURE_SSSE3)
 				{
@@ -139,9 +141,9 @@ void tuned_ConvertRGBToULY4(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 				xg = _mm_or_si128(_mm_and_si128(m, _mm_set1_epi32(0x00ff0000)), _mm_set1_epi32(0x000000ff)); // 00 XX 00 ff 00 XX 00 ff 00 XX 00 ff 00 G0 00 ff
 			}
 
-			auto xrgb2yuv = [rb, xg](__m128i rb2yuv, __m128i xg2yuv) -> uint8_t {
+			auto xrgb2yuv = [rb, xg, shift](__m128i rb2yuv, __m128i xg2yuv) -> uint8_t {
 				__m128i yuv = _mm_add_epi32(_mm_madd_epi16(rb, rb2yuv), _mm_madd_epi16(xg, xg2yuv));
-				yuv = _mm_srli_epi32(yuv, 14);
+				yuv = _mm_srli_epi32(yuv, shift);
 				return (uint8_t)_mm_cvtsi128_si32(yuv);
 			};
 			*y = xrgb2yuv(rb2y, xg2y);
