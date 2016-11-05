@@ -92,7 +92,6 @@ void cpp_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *p
 		uint8_t *pStrideEnd = pStrideBegin + cbWidth;
 		for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += T::BYPP)
 		{
-			uint8_t *q = p + T::BYPP;
 			*(p + T::G) = min(max(int((*y - 16)*C::Y2RGB + (*u - 128)*C::U2G + (*v - 128)*C::V2G), 0), 255);
 			*(p + T::B) = min(max(int((*y - 16)*C::Y2RGB + (*u - 128)*C::U2B                    ), 0), 255);
 			*(p + T::R) = min(max(int((*y - 16)*C::Y2RGB                     + (*v - 128)*C::V2R), 0), 255);
