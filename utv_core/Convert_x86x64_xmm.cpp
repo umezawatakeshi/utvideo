@@ -121,18 +121,12 @@ void tuned_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 				__m128i bgrx = _mm_unpacklo_epi16(_mm_unpacklo_epi8(bb, gg), _mm_unpacklo_epi8(rr, _mm_setone_si128()));
 				*(uint32_t *)pp = _mm_cvtsi128_si32(bgrx);
 			}
-			else if (std::is_same<T, CBGRColorOrder>::value)
-			{
-				*(pp + T::B) = (uint8_t)_mm_cvtsi128_si32(bb);
-				*(pp + T::G) = (uint8_t)_mm_cvtsi128_si32(gg);
-				*(pp + T::R) = (uint8_t)_mm_cvtsi128_si32(rr);
-			}
 			else if (std::is_same<T, CARGBColorOrder>::value)
 			{
 				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rr, rr), _mm_unpacklo_epi8(gg, bb));
 				*(uint32_t *)pp = _mm_cvtsi128_si32(xrgb);
 			}
-			else if (std::is_same<T, CRGBColorOrder>::value)
+			else if (std::is_same<T, CBGRColorOrder>::value || std::is_same<T, CRGBColorOrder>::value)
 			{
 				*(pp + T::B) = (uint8_t)_mm_cvtsi128_si32(bb);
 				*(pp + T::G) = (uint8_t)_mm_cvtsi128_si32(gg);
