@@ -8,6 +8,10 @@
 #include "ColorOrder.h"
 #include "Coefficient.h"
 
+#if !defined(GENERATE_SSE2) && !defined(GENERATE_SSSE3) && !defined(GENERATE_AVX1)
+#error
+#endif
+
 static inline __m128i _mm_setone_si128()
 {
 	/*
