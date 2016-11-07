@@ -5,6 +5,8 @@
 
 #ifdef _WIN32
 
+#define NOMINMAX 1
+
 // 下で指定された定義の前に対象プラットフォームを指定しなければならない場合、以下の定義を変更してください。
 // 異なるプラットフォームに対応する値に関する最新情報については、MSDN を参照してください。
 #ifndef WINVER				// Windows XP 以降のバージョンに固有の機能の使用を許可します。
@@ -95,3 +97,7 @@ inline bool IS_ALIGNED(const void *p, uintptr_t a)
 #define LOGWRITER_OWNER 1
 #include <LogWriter.h>
 #include <LogUtil.h>
+
+
+using std::max;
+using std::min;
