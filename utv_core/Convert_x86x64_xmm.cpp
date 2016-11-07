@@ -10,7 +10,12 @@
 
 static inline __m128i _mm_setone_si128()
 {
-	__m128i x = _mm_undefined_si128();
+	/*
+	 * Clang には _mm_undefined_si128 は無いらしい。
+	 * Visual C++ では _mm_setzero_si128 に置き換えられる。
+	 * どうせ処理の他の部分で all 0 を使うので、この処理でも問題なかろう。
+	 */
+	__m128i x = _mm_setzero_si128(); // _mm_undefined_si128();
 	return _mm_cmpeq_epi32(x, x);
 }
 
