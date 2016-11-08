@@ -1,12 +1,13 @@
 /* •¶šƒR[ƒh‚Í‚r‚i‚h‚r ‰üsƒR[ƒh‚Í‚b‚q‚k‚e */
 /* $Id$ */
 
-#include "stdafx.h"
-#include "utvideo.h"
-#include "TunedFunc_x86x64.h"
-#include "Convert_x86x64.h"
-#include "ColorOrder.h"
-#include "Coefficient.h"
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif
+
+#ifdef __GNUC__
+#include <x86intrin.h>
+#endif
 
 #if !defined(GENERATE_SSE2) && !defined(GENERATE_SSSE3) && !defined(GENERATE_AVX1)
 #error
