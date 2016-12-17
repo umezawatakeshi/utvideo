@@ -161,6 +161,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\myintrin_x86x64.h" />
     <ClInclude Include="..\include\myinttypes.h" />
     <ClInclude Include="ByteOrder.h" />
     <ClInclude Include="Codec.h" />
