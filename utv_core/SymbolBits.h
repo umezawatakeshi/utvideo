@@ -29,3 +29,6 @@ public:
 	static const symbol_t maxval  = 0x3ff;
 	static const symbol_t midval  = 0x200;
 };
+
+template<int B>
+using symbol_t = typename CSymbolBits<B>::symbol_t;

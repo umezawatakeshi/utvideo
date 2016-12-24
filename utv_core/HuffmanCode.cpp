@@ -260,12 +260,12 @@ inline void FlushEncoded(uint32_t *&pDst, uintenc_t &dwTmpEncoded, int &nBits)
 }
 
 template<int B>
-size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const typename CSymbolBits<B>::symbol_t *pSrcBegin, const typename CSymbolBits<B>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<B> *pEncodeTable)
+size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, const HUFFMAN_ENCODE_TABLE<B> *pEncodeTable)
 {
 	int nBits;
 	uintenc_t dwTmpEncoded;
 	uint32_t *pDst;
-	const typename CSymbolBits<B>::symbol_t *p;
+	const symbol_t<B> *p;
 
 	if (pEncodeTable->dwTableMux[0] == 0)
 		return 0;
@@ -301,10 +301,10 @@ template size_t cpp_HuffmanEncode<8>(uint8_t *pDstBegin, const CSymbolBits<8>::s
 template size_t cpp_HuffmanEncode<10>(uint8_t *pDstBegin, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<10> *pEncodeTable);
 
 template<int B>
-static inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE<B> *pDecodeTable, bool bAccum, typename CSymbolBits<B>::symbol_t &byPrevSymbol, typename CSymbolBits<B>::symbol_t *pDst, int nCorrPos, int nDummyAlphaPos)
+static inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECODE_TABLE<B> *pDecodeTable, bool bAccum, symbol_t<B> &byPrevSymbol, symbol_t<B> *pDst, int nCorrPos, int nDummyAlphaPos)
 {
 	uint32_t code;
-	typename CSymbolBits<B>::symbol_t symbol;
+	symbol_t<B> symbol;
 	int codelen;
 
 	if (nBits == 0)
@@ -350,12 +350,12 @@ static inline void DecodeSymbol(uint32_t *&pSrc, int &nBits, const HUFFMAN_DECOD
 }
 
 template<int B>
-static void cpp_HuffmanDecode_common(typename CSymbolBits<B>::symbol_t *pDstBegin, typename CSymbolBits<B>::symbol_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<B> *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos, typename CSymbolBits<B>::symbol_t initial)
+static void cpp_HuffmanDecode_common(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<B> *pDecodeTable, bool bAccum, int nStep, size_t cbWidth, ssize_t scbStride, int nCorrPos, int nDummyAlphaPos, symbol_t<B> initial)
 {
 	int nBits;
 	uint32_t *pSrc;
-	typename CSymbolBits<B>::symbol_t *p;
-	typename CSymbolBits<B>::symbol_t prevsym;
+	symbol_t<B> *p;
+	symbol_t<B> prevsym;
 	uint8_t *pStripeBegin;
 
 	nBits = 0;
@@ -365,7 +365,7 @@ static void cpp_HuffmanDecode_common(typename CSymbolBits<B>::symbol_t *pDstBegi
 	for (pStripeBegin = (uint8_t *)pDstBegin; pStripeBegin != (uint8_t *)pDstEnd; pStripeBegin += scbStride)
 	{
 		uint8_t *pStripeEnd = pStripeBegin + cbWidth;
-		for (p = (typename CSymbolBits<B>::symbol_t *)pStripeBegin; p < (typename CSymbolBits<B>::symbol_t *)pStripeEnd; p += nStep)
+		for (p = (symbol_t<B> *)pStripeBegin; p < (symbol_t<B> *)pStripeEnd; p += nStep)
 			DecodeSymbol<B>(pSrc, nBits, pDecodeTable, bAccum, prevsym, p, nCorrPos, nDummyAlphaPos);
 	}
 }

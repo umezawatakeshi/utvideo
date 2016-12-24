@@ -19,6 +19,6 @@ extern "C" void sse1mmx_RestoreWrongMedian(uint8_t *pDst, const uint8_t *pSrcBeg
 extern "C" void sse2_RestoreWrongMedianBlock4(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 #endif
 
-template<int B> void cpp_PredictCylindricalLeftAndCount(typename CSymbolBits<B>::symbol_t *pDst, const typename CSymbolBits<B>::symbol_t *pSrcBegin, const typename CSymbolBits<B>::symbol_t *pSrcEnd, typename CSymbolBits<B>::symbol_t initial, uint32_t *pCountTable);
+template<int B> void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, symbol_t<B> initial, uint32_t *pCountTable);
 
 #define PredictCylindricalLeftAndCount10 cpp_PredictCylindricalLeftAndCount<10>

@@ -129,10 +129,10 @@ void cpp_RestoreWrongMedianBlock4(uint8_t *pDst, const uint8_t *pSrcBegin, const
 
 
 template<int B>
-void cpp_PredictCylindricalLeftAndCount(typename CSymbolBits<B>::symbol_t *pDst, const typename CSymbolBits<B>::symbol_t *pSrcBegin, const typename CSymbolBits<B>::symbol_t *pSrcEnd, typename CSymbolBits<B>::symbol_t initial, uint32_t *pCountTable)
+void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, symbol_t<B> initial, uint32_t *pCountTable)
 {
-	const typename CSymbolBits<B>::symbol_t *p = pSrcBegin;
-	typename CSymbolBits<B>::symbol_t *q = pDst;
+	const symbol_t<B> *p = pSrcBegin;
+	symbol_t<B> *q = pDst;
 
 	*q = (*p - initial) & CSymbolBits<B>::maskval;
 	pCountTable[*q]++;
