@@ -98,6 +98,7 @@ const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
 	sse1mmx_RestoreWrongMedian,
 	sse2_RestoreWrongMedianBlock4,
 	cpp_RestoreLeft,
+	cpp_RestoreCylindricalLeft<10>,
 };
 
 const TUNEDFUNC_PREDICT tfnPredictSSSE3 = {
@@ -107,7 +108,8 @@ const TUNEDFUNC_PREDICT tfnPredictSSSE3 = {
 	sse2_PredictLeftAndCount,
 	sse1mmx_RestoreWrongMedian,
 	sse2_RestoreWrongMedianBlock4,
-	tuned_RestoreLeft<CODEFEATURE_SSSE3>,
+	tuned_RestoreLeft8<CODEFEATURE_SSSE3>,
+	tuned_RestoreLeft10<CODEFEATURE_SSSE3>,
 };
 
 const TUNEDFUNC_PREDICT tfnPredictAVX1 = {
@@ -117,7 +119,8 @@ const TUNEDFUNC_PREDICT tfnPredictAVX1 = {
 	sse2_PredictLeftAndCount,
 	sse1mmx_RestoreWrongMedian,
 	sse2_RestoreWrongMedianBlock4,
-	tuned_RestoreLeft<CODEFEATURE_AVX1>,
+	tuned_RestoreLeft8<CODEFEATURE_AVX1>,
+	tuned_RestoreLeft10<CODEFEATURE_AVX1>,
 };
 
 

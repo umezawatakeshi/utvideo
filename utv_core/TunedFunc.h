@@ -27,7 +27,8 @@ struct TUNEDFUNC_PREDICT
 	void (*pfnPredictLeftAndCount)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
 	void (*pfnRestoreWrongMedian)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
 	void (*pfnRestoreWrongMedianBlock4)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
-	void(*pfnRestoreLeft)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+	void(*pfnRestoreLeft8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+	void(*pfnRestoreCylindricalLeft10)(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);
 };
 
 struct TUNEDFUNC_HUFFMAN_ENCODE
@@ -137,7 +138,8 @@ public:
 #define PredictLeftAndCount tfn.pPredict->pfnPredictLeftAndCount
 #define RestoreWrongMedian tfn.pPredict->pfnRestoreWrongMedian
 #define RestoreWrongMedianBlock4 tfn.pPredict->pfnRestoreWrongMedianBlock4
-#define RestoreLeft tfn.pPredict->pfnRestoreLeft
+#define RestoreLeft8 tfn.pPredict->pfnRestoreLeft8
+#define RestoreCylindricalLeft10 tfn.pPredict->pfnRestoreCylindricalLeft10
 
 #define HuffmanEncode8 tfn.pHuffmanEncode->pfnHuffmanEncode8
 #define HuffmanDecode8 tfn.pHuffmanDecode->pfnHuffmanDecode8

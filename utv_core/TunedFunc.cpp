@@ -18,6 +18,7 @@ const TUNEDFUNC_PREDICT tfnPredictCPP = {
 	cpp_RestoreWrongMedian,
 	cpp_RestoreWrongMedianBlock4,
 	cpp_RestoreLeft,
+	cpp_RestoreCylindricalLeft<10>,
 };
 
 const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeCPP = {

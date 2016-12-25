@@ -575,7 +575,7 @@ void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 		{
 		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
 		case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-			RestoreLeft(m_pRestoredFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd);
+			RestoreLeft8(m_pRestoredFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd);
 			m_pCurFrame = m_pRestoredFrame;
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:

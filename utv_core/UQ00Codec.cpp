@@ -525,7 +525,7 @@ void CUQ00Codec::DecodeProc(uint32_t nBandIndex)
 			dwOffset = m_pdwOffsetTable[nPlaneIndex][nBandIndex - 1];
 
 		HuffmanDecode<10>((uint16_t *)(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd), m_pEncodedBits[nPlaneIndex] + dwOffset, &m_hdt[nPlaneIndex]);
-		cpp_RestoreCylindricalLeft<10>((uint16_t *)(m_pRestoredFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd));
+		RestoreCylindricalLeft10((uint16_t *)(m_pRestoredFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd));
 		m_pCurFrame = m_pDecodedFrame;
 		m_pCurFrame = m_pRestoredFrame;
 	}
