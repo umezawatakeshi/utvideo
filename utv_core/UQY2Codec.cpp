@@ -26,9 +26,6 @@ const utvf_t CUQY2Codec::m_utvfCompressed[] = {
 
 CUQY2Codec::CUQY2Codec(const char *pszInterfaceName) : CUQ00Codec("UQY2", pszInterfaceName)
 {
-	m_syInitialPredict[0] = 0x200;
-	m_syInitialPredict[1] = 0x200;
-	m_syInitialPredict[2] = 0x200;
 }
 
 void CUQY2Codec::CalcPlaneSizes(unsigned int width, unsigned int height)

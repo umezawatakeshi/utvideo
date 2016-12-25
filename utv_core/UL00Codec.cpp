@@ -417,7 +417,7 @@ void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 		dwDstEnd = ((uint32_t *)((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex];
 		dwEncodedSize =
 #endif
-		HuffmanEncode((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwDstOffset, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, &m_het[nPlaneIndex]);
+		HuffmanEncode8((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwDstOffset, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, &m_het[nPlaneIndex]);
 		_ASSERT(dwEncodedSize == dwDstEnd - dwDstOffset);
 	}
 }
@@ -564,16 +564,19 @@ void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
-		if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) == FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
-			HuffmanDecodeAndAccum(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex], cbPlaneEnd - cbPlaneBegin, cbPlaneEnd - cbPlaneBegin);
-		else
-			HuffmanDecode(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex], cbPlaneEnd - cbPlaneBegin, cbPlaneEnd - cbPlaneBegin);
+#ifdef _DEBUG
+		uint8_t *pRetExpected = m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd;
+		uint8_t *pRetActual =
+#endif
+		HuffmanDecode<8>(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
+		_ASSERT(pRetActual == pRetExpected);
 
 		switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
 		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
 		case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-			m_pCurFrame = m_pDecodedFrame;
+			RestoreLeft(m_pRestoredFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd);
+			m_pCurFrame = m_pRestoredFrame;
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
 			RestoreWrongMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);

@@ -177,6 +177,7 @@
     <ClInclude Include="HuffmanCode.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Predict.h" />
+    <ClInclude Include="Predict_x86x64.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SymbolBits.h" />
@@ -213,6 +214,12 @@
     <ClCompile Include="HuffmanCode.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Predict.cpp" />
+    <ClCompile Include="Predict_x86x64_xmm.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -66,49 +66,34 @@ i686_HuffmanEncode:
 %pop
 
 
-%macro HUFFMAN_DECODE 6
+%macro HUFFMAN_DECODE 2
 %push
-	MULTI_CONTEXT_XDEFINE procname, %1, accum, %2, step, %3, corrpos, %4, dummyalphapos, %5, bmi2, %6
+	MULTI_CONTEXT_XDEFINE procname, %1, bmi2, %2
 
 global %$procname
 %$procname:
-	SIMPLE_PROLOGUE 0, pDstBegin, pDstEnd, pSrcBegin, pDecodeTable, cbWidth, scbStride
+	SIMPLE_PROLOGUE 0, pDstBegin, pDstEnd, pSrcBegin, pDecodeTable
 
 	mov			rsi, qword [rsp + %$pSrcBegin]
 	mov			rbx, qword [rsp + %$pDecodeTable]
 
 	mov			rdi, qword [rsp + %$pDstBegin]
-	mov			r8,  rdi
-	add			r8,  qword [rsp + %$cbWidth]
-	mov			r12, qword [rsp + %$scbStride]
-	sub			r12, qword [rsp + %$cbWidth]
+	mov			r8,  qword [rsp + %$pDstEnd]
+	sub			r8, 4
 
-%macro DO_OUTPUT_%$procname 1
-%push
-	MULTI_CONTEXT_XDEFINE dohuffman, %1
-
-%if %$$accum
- %if %$$corrpos != 0
-	mov			r11b, 00h
- %else
-	mov			r11b, 80h
- %endif
-%endif
-
-%if %$dohuffman
 	mov			cl, 32
 	mov			edx, dword [rsi]
 	sub			rsi, 4
-%else
-	mov			ah, byte [rbx]
-%endif
+
+%macro DO_OUTPUT_%$procname 1
+%push
+	MULTI_CONTEXT_XDEFINE perbyte, %1
 
 	align		64
 %%label1:
 	cmp			rdi, r8
-	jae			%%label2
+	jae			%%label3
 
-%if %$dohuffman
 	cmp			cl, 32
 	jb			%%label4
 	sub			cl, 32
@@ -125,7 +110,8 @@ global %$procname
 	shl			rax, cl
 %endif
 	shr			rax, 20+32
-	movzx		eax, word [rbx + rax*2]
+	mov			r11d, dword [rbx + 8192 + rax*4]					; pDecodeTable->MultiSpeedTable_sym[rax]
+	movzx		eax, word [rbx + rax*2]							; pDecodeTable->MultiSpeedTable_cs[rax]
 	cmp			ah, 255
 	jne			%%label0
 
@@ -140,81 +126,51 @@ global %$procname
 	or			eax, 1
 	bsr			r10, rax
 %if %$$bmi2
-	movzx		r13d, byte [rbx + 8192 + r10]				; pDecodeTable->nCodeShift[r10]
+	movzx		r13d, byte [rbx + 8192 + 16384 + r10]				; pDecodeTable->nCodeShift[r10]
 	shrx		eax, eax, r13d
 %else
-	mov			cl, byte [rbx + 8192 + r10]					; pDecodeTable->nCodeShift[r10]
+	mov			cl, byte [rbx + 8192 + 16384 + r10]					; pDecodeTable->nCodeShift[r10]
 	shr			eax, cl
 	mov			ecx, r15d
 %endif
-	mov			r10d, dword [rbx + 8192+32 + r10*4]			; pDecodeTable->dwSymbolBase[r10]
+	mov			r10d, dword [rbx + 8192 + 16384 + 32 + r10*4]			; pDecodeTable->dwSymbolBase[r10]
 	add			r10, rax
-	mov			eax, dword [rbx + 8192+32+4*32 + r10*2]		; pDecodeTable->SymbolAndCodeLength[r10]
+	mov			eax, dword [rbx + 8192 + 16384 + 32+4*32 + r10*2]		; pDecodeTable->SymbolAndCodeLength[r10]
+	mov			r11d, eax
+	mov			al, 1
 
 %%label0:
 	add			cl, ah
+
+%if !%$perbyte
+	mov			dword [rdi], r11d
+	movzx		rax, al
+	add			rdi, rax
+	jmp			%%label1
 %else
-	mov			al, ah
+%%label5:
+	mov			byte [rdi], r11b
+	shr			r11d, 8
+	add			rdi, 1
+	cmp			rdi, r8
+	jae			%%label3
+	sub			al, 1
+	ja			%%label5
+	jmp			%%label1
 %endif
 
-%if %$$accum
-	add			al, r11b
-	mov			r11b, al
-%endif
-%if %$$corrpos != 0
-	add			al, byte [rdi + %$$corrpos]
-%endif
-	mov			byte [rdi], al
-%if %$$dummyalphapos != 0
-	mov			byte [rdi + %$$dummyalphapos], 0ffh
-%endif
-	add			rdi, %$$step
-	jmp			%%label1
-
-%%label2:
-	add			rdi, r12
-	cmp			rdi, qword [rsp + %$$pDstEnd]
-	je			%%label3
-	add			r8, qword [rsp + %$$scbStride]
-	jmp			%%label1
 %%label3:
 %pop
 %endmacro
 
-	cmp			byte [rbx + 1], 0
-	je			.solidframe
-	DO_OUTPUT_%$procname	1
-	jmp			.funcend
-.solidframe:
 	DO_OUTPUT_%$procname	0
-.funcend:
+	add			r8, 4
+	DO_OUTPUT_%$procname	1
+	mov			rax, rdi
 	SIMPLE_EPILOGUE
 
 %pop
 %endmacro
 
-HUFFMAN_DECODE	i686_HuffmanDecode,                                     0, 1,  0,  0, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeStep4,                                0, 4,  0,  0, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeAndAccum,                             1, 1,  0,  0, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep2,                        1, 2,  0,  0, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep3,                        1, 3,  0,  0, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4,                        1, 4,  0,  0, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep3ForBGRBlue,              1, 3, +1,  0, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep3ForBGRRed,               1, 3, -1,  0, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForBGRXBlue,             1, 4, +1,  0, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForBGRXRed,              1, 4, -1,  0, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha, 1, 4, -1, +1, 0
-HUFFMAN_DECODE	i686_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha, 1, 4, +1, -1, 0
-
-HUFFMAN_DECODE	bmi2_HuffmanDecode,                                     0, 1,  0,  0, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeStep4,                                0, 4,  0,  0, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeAndAccum,                             1, 1,  0,  0, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeAndAccumStep2,                        1, 2,  0,  0, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeAndAccumStep3,                        1, 3,  0,  0, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeAndAccumStep4,                        1, 4,  0,  0, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeAndAccumStep3ForBGRBlue,              1, 3, +1,  0, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeAndAccumStep3ForBGRRed,               1, 3, -1,  0, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeAndAccumStep4ForBGRXBlue,             1, 4, +1,  0, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeAndAccumStep4ForBGRXRed,              1, 4, -1,  0, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha, 1, 4, -1, +1, 1
-HUFFMAN_DECODE	bmi2_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha, 1, 4, +1, -1, 1
+HUFFMAN_DECODE	i686_HuffmanDecode, 0
+HUFFMAN_DECODE	bmi2_HuffmanDecode, 1

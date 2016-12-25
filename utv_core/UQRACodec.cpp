@@ -26,10 +26,6 @@ const utvf_t CUQRACodec::m_utvfCompressed[] = {
 
 CUQRACodec::CUQRACodec(const char *pszInterfaceName) : CUQ00Codec("UQRA", pszInterfaceName)
 {
-	m_syInitialPredict[0] = 0x200;
-	m_syInitialPredict[1] = 0x200;
-	m_syInitialPredict[2] = 0x200;
-	m_syInitialPredict[3] = 0x200;
 }
 
 void CUQRACodec::CalcPlaneSizes(unsigned int width, unsigned int height)

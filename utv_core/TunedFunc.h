@@ -27,29 +27,19 @@ struct TUNEDFUNC_PREDICT
 	void (*pfnPredictLeftAndCount)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
 	void (*pfnRestoreWrongMedian)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
 	void (*pfnRestoreWrongMedianBlock4)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	void(*pfnRestoreLeft)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
 };
 
 struct TUNEDFUNC_HUFFMAN_ENCODE
 {
 	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_HUFFMAN_ENCODE);
-	size_t (*pfnHuffmanEncode)(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable);
+	size_t (*pfnHuffmanEncode8)(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable);
 };
 
 struct TUNEDFUNC_HUFFMAN_DECODE
 {
 	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_HUFFMAN_DECODE);
-	void (*pfnHuffmanDecode)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeStep4)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeAndAccum)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeAndAccumStep2)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeAndAccumStep3)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeAndAccumStep4)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeAndAccumStep3ForBGRBlue)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeAndAccumStep3ForBGRRed)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeAndAccumStep4ForBGRXBlue)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeAndAccumStep4ForBGRXRed)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
-	void (*pfnHuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable, size_t cbWidth, ssize_t scbStride);
+	uint8_t* (*pfnHuffmanDecode8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable);
 };
 
 struct TUNEDFUNC_CONVERT_YUVRGB_COLORSPACE
@@ -147,24 +137,10 @@ public:
 #define PredictLeftAndCount tfn.pPredict->pfnPredictLeftAndCount
 #define RestoreWrongMedian tfn.pPredict->pfnRestoreWrongMedian
 #define RestoreWrongMedianBlock4 tfn.pPredict->pfnRestoreWrongMedianBlock4
+#define RestoreLeft tfn.pPredict->pfnRestoreLeft
 
-#define HuffmanEncode tfn.pHuffmanEncode->pfnHuffmanEncode
-#define HuffmanDecode tfn.pHuffmanDecode->pfnHuffmanDecode
-#define HuffmanDecodeStep4 tfn.pHuffmanDecode->pfnHuffmanDecodeStep4
-#define HuffmanDecodeAndAccum tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccum
-#define HuffmanDecodeAndAccumStep2 tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep2
-#define HuffmanDecodeAndAccumStep3 tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep3
-#define HuffmanDecodeAndAccumStep4 tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep4
-#define HuffmanDecodeAndAccumStep3ForBGRBlue tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep3ForBGRBlue
-#define HuffmanDecodeAndAccumStep3ForBGRRed tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep3ForBGRRed
-#define HuffmanDecodeAndAccumStep4ForBGRXBlue tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep4ForBGRXBlue
-#define HuffmanDecodeAndAccumStep4ForBGRXRed tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep4ForBGRXRed
-#define HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha
-#define HuffmanDecodeAndAccumStep3ForRGBBlue HuffmanDecodeAndAccumStep3ForBGRRed
-#define HuffmanDecodeAndAccumStep3ForRGBRed HuffmanDecodeAndAccumStep3ForBGRBlue
-#define HuffmanDecodeAndAccumStep4ForXRGBBlue HuffmanDecodeAndAccumStep4ForBGRXRed
-#define HuffmanDecodeAndAccumStep4ForXRGBRed HuffmanDecodeAndAccumStep4ForBGRXBlue
-#define HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha tfn.pHuffmanDecode->pfnHuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha
+#define HuffmanEncode8 tfn.pHuffmanEncode->pfnHuffmanEncode8
+#define HuffmanDecode8 tfn.pHuffmanDecode->pfnHuffmanDecode8
 
 #define ConvertULY2ToBGR(C) CYUVTunedFunc<C>::tf().pfnConvertULY2ToBGR
 #define ConvertULY2ToBGRX(C) CYUVTunedFunc<C>::tf().pfnConvertULY2ToBGRX

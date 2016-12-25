@@ -207,31 +207,5 @@ void CULYUV422Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 template<class C>
 bool CULYUV422Codec<C>::DecodeDirect(uint32_t nBandIndex)
 {
-	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
-		return false;
-
-	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-
-	switch (m_utvfRaw)
-	{
-	case UTVF_YUY2:
-	case UTVF_YUYV:
-	case UTVF_YUNV:
-	case UTVF_yuvs:
-		HuffmanDecodeAndAccumStep2(pDstBegin+0, pDstEnd+0, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_cbRawNetWidth, m_cbRawGrossWidth);
-		HuffmanDecodeAndAccumStep4(pDstBegin+1, pDstEnd+1, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_cbRawNetWidth, m_cbRawGrossWidth);
-		HuffmanDecodeAndAccumStep4(pDstBegin+3, pDstEnd+3, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_cbRawNetWidth, m_cbRawGrossWidth);
-		return true;
-	case UTVF_UYVY:
-	case UTVF_UYNV:
-	case UTVF_2vuy:
-	case UTVF_HDYC:
-		HuffmanDecodeAndAccumStep2(pDstBegin+1, pDstEnd+1, m_pDecodeCode[0][nBandIndex], &m_hdt[0], m_cbRawNetWidth, m_cbRawGrossWidth);
-		HuffmanDecodeAndAccumStep4(pDstBegin+0, pDstEnd+0, m_pDecodeCode[1][nBandIndex], &m_hdt[1], m_cbRawNetWidth, m_cbRawGrossWidth);
-		HuffmanDecodeAndAccumStep4(pDstBegin+2, pDstEnd+2, m_pDecodeCode[2][nBandIndex], &m_hdt[2], m_cbRawNetWidth, m_cbRawGrossWidth);
-		return true;
-	}
-
 	return false;
 }

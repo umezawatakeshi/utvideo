@@ -127,14 +127,31 @@ void cpp_RestoreWrongMedianBlock4(uint8_t *pDst, const uint8_t *pSrcBegin, const
 	}
 }
 
+void cpp_RestoreLeft(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd)
+{
+	const uint8_t *p = pSrcBegin;
+	uint8_t *q = pDst;
+
+	// 最初のラインの最初のピクセルは 0x80 を予測しておく。
+	*q = *p + 0x80;
+	p++;
+	q++;
+
+	// 残りのピクセルが predict left の本番
+	for (; p < pSrcEnd; p++, q++)
+	{
+		*q = *(q - 1) + *p;
+	}
+}
+
 
 template<int B>
-void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, symbol_t<B> initial, uint32_t *pCountTable)
+void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, uint32_t *pCountTable)
 {
 	const symbol_t<B> *p = pSrcBegin;
 	symbol_t<B> *q = pDst;
 
-	*q = (*p - initial) & CSymbolBits<B>::maskval;
+	*q = (*p - CSymbolBits<B>::midval) & CSymbolBits<B>::maskval;
 	pCountTable[*q]++;
 	p++;
 	q++;
@@ -147,4 +164,24 @@ void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pS
 	}
 }
 
-template void cpp_PredictCylindricalLeftAndCount<10>(CSymbolBits<10>::symbol_t *pDst, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd, CSymbolBits<10>::symbol_t initial, uint32_t *pCountTable);
+template void cpp_PredictCylindricalLeftAndCount<10>(CSymbolBits<10>::symbol_t *pDst, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd, uint32_t *pCountTable);
+
+
+template<int B>
+void cpp_RestoreCylindricalLeft(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd)
+{
+	const symbol_t<B> *p = pSrcBegin;
+	symbol_t<B> *q = pDst;
+
+	*q = (*p + CSymbolBits<B>::midval) & CSymbolBits<B>::maskval;
+	p++;
+	q++;
+
+	// 残りのピクセルが predict left の本番
+	for (; p < pSrcEnd; p++, q++)
+	{
+		*q = (*(q - 1) + *p) & CSymbolBits<B>::maskval;
+	}
+}
+
+template void cpp_RestoreCylindricalLeft<10>(CSymbolBits<10>::symbol_t *pDst, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd);

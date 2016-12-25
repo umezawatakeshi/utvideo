@@ -88,7 +88,6 @@ protected:
 	HUFFMAN_ENCODE_TABLE<10> m_het[4];
 	uint32_t *m_pdwOffsetTable[4];
 	uint8_t *m_pEncodedBits[4];
-	uint16_t m_syInitialPredict[4];
 
 	CFrameBuffer *m_pRestoredFrame;
 	CFrameBuffer *m_pDecodedFrame;

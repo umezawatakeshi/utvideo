@@ -17,6 +17,7 @@ const TUNEDFUNC_PREDICT tfnPredictCPP = {
 	cpp_PredictLeftAndCount,
 	cpp_RestoreWrongMedian,
 	cpp_RestoreWrongMedianBlock4,
+	cpp_RestoreLeft,
 };
 
 const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeCPP = {
@@ -29,17 +30,6 @@ const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeCPP = {
 	NULL,
 	{ 0 },
 	cpp_HuffmanDecode,
-	cpp_HuffmanDecodeStep4,
-	cpp_HuffmanDecodeAndAccum,
-	cpp_HuffmanDecodeAndAccumStep2,
-	cpp_HuffmanDecodeAndAccumStep3,
-	cpp_HuffmanDecodeAndAccumStep4,
-	cpp_HuffmanDecodeAndAccumStep3ForBGRBlue,
-	cpp_HuffmanDecodeAndAccumStep3ForBGRRed,
-	cpp_HuffmanDecodeAndAccumStep4ForBGRXBlue,
-	cpp_HuffmanDecodeAndAccumStep4ForBGRXRed,
-	cpp_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha,
-	cpp_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
 };
 
 const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBCPP = {

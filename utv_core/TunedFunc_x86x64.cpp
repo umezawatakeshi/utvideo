@@ -6,6 +6,7 @@
 #include "TunedFunc.h"
 #include "TunedFunc_x86x64.h"
 #include "Predict.h"
+#include "Predict_x86x64.h"
 #include "HuffmanCode.h"
 #include "Convert.h"
 #include "Convert_x86x64.h"
@@ -96,6 +97,27 @@ const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
 	sse2_PredictLeftAndCount,
 	sse1mmx_RestoreWrongMedian,
 	sse2_RestoreWrongMedianBlock4,
+	cpp_RestoreLeft,
+};
+
+const TUNEDFUNC_PREDICT tfnPredictSSSE3 = {
+	&tfnPredictSSE2,
+	{ FEATURE0_SSSE3, 0 },
+	sse2_PredictWrongMedianAndCount,
+	sse2_PredictLeftAndCount,
+	sse1mmx_RestoreWrongMedian,
+	sse2_RestoreWrongMedianBlock4,
+	tuned_RestoreLeft<CODEFEATURE_SSSE3>,
+};
+
+const TUNEDFUNC_PREDICT tfnPredictAVX1 = {
+	&tfnPredictSSSE3,
+	{ FEATURE0_AVX1, 0 },
+	sse2_PredictWrongMedianAndCount,
+	sse2_PredictLeftAndCount,
+	sse1mmx_RestoreWrongMedian,
+	sse2_RestoreWrongMedianBlock4,
+	tuned_RestoreLeft<CODEFEATURE_AVX1>,
 };
 
 
@@ -110,17 +132,6 @@ const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeI686 = {
 	NULL,
 	{ 0, 0 },
 	i686_HuffmanDecode,
-	i686_HuffmanDecodeStep4,
-	i686_HuffmanDecodeAndAccum,
-	i686_HuffmanDecodeAndAccumStep2,
-	i686_HuffmanDecodeAndAccumStep3,
-	i686_HuffmanDecodeAndAccumStep4,
-	i686_HuffmanDecodeAndAccumStep3ForBGRBlue,
-	i686_HuffmanDecodeAndAccumStep3ForBGRRed,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXBlue,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXRed,
-	i686_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha,
-	i686_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
 };
 
 #ifdef __x86_64__
@@ -128,17 +139,6 @@ const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeBMI2 = {
 	&tfnHuffmanDecodeI686,
 	{ 0, FEATURE1_BMI2 },
 	bmi2_HuffmanDecode,
-	bmi2_HuffmanDecodeStep4,
-	bmi2_HuffmanDecodeAndAccum,
-	bmi2_HuffmanDecodeAndAccumStep2,
-	bmi2_HuffmanDecodeAndAccumStep3,
-	bmi2_HuffmanDecodeAndAccumStep4,
-	bmi2_HuffmanDecodeAndAccumStep3ForBGRBlue,
-	bmi2_HuffmanDecodeAndAccumStep3ForBGRRed,
-	bmi2_HuffmanDecodeAndAccumStep4ForBGRXBlue,
-	bmi2_HuffmanDecodeAndAccumStep4ForBGRXRed,
-	bmi2_HuffmanDecodeAndAccumStep4ForBGRXRedAndDummyAlpha,
-	bmi2_HuffmanDecodeAndAccumStep4ForXRGBRedAndDummyAlpha,
 };
 #endif
 
@@ -339,7 +339,7 @@ const TUNEDFUNC_CORRELATE tfnCorrelateSSSE3 = {
 
 
 const TUNEDFUNC tfnRoot = {
-	&tfnPredictSSE2,
+	&tfnPredictAVX1,
 	&tfnHuffmanEncodeI686,
 #ifdef __x86_64__
 	&tfnHuffmanDecodeBMI2,

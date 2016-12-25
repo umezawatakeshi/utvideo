@@ -28,9 +28,6 @@ const utvf_t CUQRGCodec::m_utvfCompressed[] = {
 
 CUQRGCodec::CUQRGCodec(const char *pszInterfaceName) : CUQ00Codec("UQRG", pszInterfaceName)
 {
-	m_syInitialPredict[0] = 0x200;
-	m_syInitialPredict[1] = 0x200;
-	m_syInitialPredict[2] = 0x200;
 }
 
 void CUQRGCodec::CalcPlaneSizes(unsigned int width, unsigned int height)

@@ -215,33 +215,5 @@ void CULYUV444Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 template<class C>
 bool CULYUV444Codec<C>::DecodeDirect(uint32_t nBandIndex)
 {
-	if ((m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK) != FI_FLAGS0_INTRAFRAME_PREDICT_LEFT)
-		return false;
-
-	switch (m_utvfRaw)
-	{
-	case UTVF_YV24:
-		{
-			uint8_t *pDstYBegin, *pDstVBegin, *pDstUBegin;
-
-			pDstYBegin = ((uint8_t *)m_pOutput);
-			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
-			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight;
-
-			uint8_t *pDstYEnd = pDstYBegin + m_dwPlaneStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
-			uint8_t *pDstUEnd = pDstUBegin + m_dwPlaneStripeEnd[nBandIndex] * m_cbPlaneStripeSize[1];
-			uint8_t *pDstVEnd = pDstVBegin + m_dwPlaneStripeEnd[nBandIndex] * m_cbPlaneStripeSize[2];
-
-			pDstYBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-			pDstUBegin += m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-
-			HuffmanDecodeAndAccum(pDstYBegin, pDstYEnd, m_pDecodeCode[0][nBandIndex], &m_hdt[0], pDstYEnd - pDstYBegin, pDstYEnd - pDstYBegin);
-			HuffmanDecodeAndAccum(pDstUBegin, pDstUEnd, m_pDecodeCode[1][nBandIndex], &m_hdt[1], pDstUEnd - pDstUBegin, pDstUEnd - pDstUBegin);
-			HuffmanDecodeAndAccum(pDstVBegin, pDstVEnd, m_pDecodeCode[2][nBandIndex], &m_hdt[2], pDstVEnd - pDstVBegin, pDstVEnd - pDstVBegin);
-		}
-		return true;
-	}
-
 	return false;
 }
