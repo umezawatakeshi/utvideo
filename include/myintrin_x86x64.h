@@ -22,6 +22,16 @@ static inline __m128i _mm_setone_si128()
 	return _mm_cmpeq_epi32(x, x);
 }
 
+static inline __m128i _mm_set2_epi8(char a, char b)
+{
+	return _mm_set_epi8(a, b, a, b, a, b, a, b, a, b, a, b, a, b, a, b);
+}
+
+static inline __m128i _mm_set2_epi16(short a, short b)
+{
+	return _mm_set_epi16(a, b, a, b, a, b, a, b);
+}
+
 static inline __m128i _mm_set2_epi16_shift(double a, double b, int shift)
 {
 	short aa = short(a * (1 << shift));
