@@ -48,8 +48,8 @@ struct HUFFMAN_DECODE_TABLE
 	} MultiSpeedTable_cs[1 << LOOKUP_BITS];
 	union
 	{
-		symbol_t<B> symbols8[1];
 		uint32_t symbols32;
+		symbol_t<B> symbols8[sizeof(symbols32) / sizeof(symbol_t<B>)];
 	} MultiSpeedTable_sym[1 << LOOKUP_BITS];
 
 	uint8_t nCodeShift[32];
