@@ -151,6 +151,8 @@
 		25F09D5B14122FCF00D214B9 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = /System/Library/Frameworks/QuickTime.framework; sourceTree = "<absolute>"; };
 		25F161BD1D6AB9B4003C2B42 /* ULYUV444Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = ULYUV444Codec.cpp; path = utv_core/ULYUV444Codec.cpp; sourceTree = "<group>"; };
 		25F161BE1D6AB9B4003C2B42 /* ULYUV444Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = ULYUV444Codec.h; path = utv_core/ULYUV444Codec.h; sourceTree = "<group>"; };
+		25F2F9B21E154BBC0095F415 /* Predict_x86x64_xmm.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Predict_x86x64_xmm.cpp; path = utv_core/Predict_x86x64_xmm.cpp; sourceTree = "<group>"; };
+		25F2F9B31E154BBC0095F415 /* Predict_x86x64.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Predict_x86x64.h; path = utv_core/Predict_x86x64.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -266,6 +268,8 @@
 				255FB94B1AE13F67009B2DC4 /* Log.h */,
 				258DB3E21411F8600059F47E /* Predict.cpp */,
 				258DB3E31411F8600059F47E /* Predict.h */,
+				25F2F9B21E154BBC0095F415 /* Predict_x86x64_xmm.cpp */,
+				25F2F9B31E154BBC0095F415 /* Predict_x86x64.h */,
 				2564C7B614823C7E00F1A9EB /* Predict_asm_x86.asm */,
 				258DB3E41411F8600059F47E /* stdafx.h */,
 				255FB94C1AE13F67009B2DC4 /* SymbolBits.h */,
