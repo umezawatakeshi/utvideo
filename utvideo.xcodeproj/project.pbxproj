@@ -226,6 +226,7 @@
 				2582392D1AE264C7003BA1AD /* libpthread.dylib */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 1;
 		};
 		258DB3FB1411F8C80059F47E /* Products */ = {
 			isa = PBXGroup;
