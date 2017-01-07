@@ -49,25 +49,6 @@ void cpp_PredictWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, con
 	}
 }
 
-void cpp_PredictLeftAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable)
-{
-	const uint8_t *p = pSrcBegin;
-	uint8_t *q = pDst;
-
-	// 最初のラインの最初のピクセルは 0x80 を予測しておく。
-	*q = *p - 0x80;
-	pCountTable[*q]++;
-	p++;
-	q++;
-
-	// 残りのピクセルが predict left の本番
-	for (; p < pSrcEnd; p++, q++)
-	{
-		*q = *p - *(p-1);
-		pCountTable[*q]++;
-	}
-}
-
 void cpp_RestoreWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride)
 {
 	const uint8_t *p = pSrcBegin;
@@ -127,23 +108,6 @@ void cpp_RestoreWrongMedianBlock4(uint8_t *pDst, const uint8_t *pSrcBegin, const
 	}
 }
 
-void cpp_RestoreLeft(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd)
-{
-	const uint8_t *p = pSrcBegin;
-	uint8_t *q = pDst;
-
-	// 最初のラインの最初のピクセルは 0x80 を予測しておく。
-	*q = *p + 0x80;
-	p++;
-	q++;
-
-	// 残りのピクセルが predict left の本番
-	for (; p < pSrcEnd; p++, q++)
-	{
-		*q = *(q - 1) + *p;
-	}
-}
-
 
 template<int B>
 void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, uint32_t *pCountTable)
@@ -164,6 +128,7 @@ void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pS
 	}
 }
 
+template void cpp_PredictCylindricalLeftAndCount<8>(CSymbolBits<8>::symbol_t *pDst, const CSymbolBits<8>::symbol_t *pSrcBegin, const CSymbolBits<8>::symbol_t *pSrcEnd, uint32_t *pCountTable);
 template void cpp_PredictCylindricalLeftAndCount<10>(CSymbolBits<10>::symbol_t *pDst, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd, uint32_t *pCountTable);
 
 
@@ -184,4 +149,5 @@ void cpp_RestoreCylindricalLeft(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin,
 	}
 }
 
+template void cpp_RestoreCylindricalLeft<8>(CSymbolBits<8>::symbol_t *pDst, const CSymbolBits<8>::symbol_t *pSrcBegin, const CSymbolBits<8>::symbol_t *pSrcEnd);
 template void cpp_RestoreCylindricalLeft<10>(CSymbolBits<10>::symbol_t *pDst, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd);
