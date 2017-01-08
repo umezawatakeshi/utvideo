@@ -139,6 +139,7 @@ global %$procname
 	DO_OUTPUT_%$procname	0
 	add			dword [esp + %$pDstEnd], 4
 	DO_OUTPUT_%$procname	1
+	mov			eax, edi
 	SIMPLE_EPILOGUE
 
 %pop
