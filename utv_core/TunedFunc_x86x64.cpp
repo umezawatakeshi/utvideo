@@ -83,6 +83,8 @@ const TUNEDFUNC_PREDICT tfnPredictI686 = {
 	cpp_PredictCylindricalLeftAndCount<8>,
 	i686_RestoreWrongMedian,
 	cpp_RestoreWrongMedianBlock4,
+	cpp_RestoreCylindricalLeft<8>,
+	cpp_RestoreCylindricalLeft<10>,
 };
 #endif
 
