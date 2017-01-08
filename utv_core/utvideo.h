@@ -114,6 +114,7 @@ typedef uint32_t utvf_t;
 #define UTVF_UYNV ((utvf_t)'UYNV')
 #define UTVF_2vuy ((utvf_t)'2vuy')
 #define UTVF_HDYC ((utvf_t)'HDYC')
+#define UTVF_YV16 ((utvf_t)'YV16')
 #define UTVF_YV12 ((utvf_t)'YV12')
 #define UTVF_v210 ((utvf_t)'v210')
 #define UTVF_b64a ((utvf_t)'b64a')

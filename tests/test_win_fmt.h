@@ -69,6 +69,7 @@ static inline WORD FCC2BitCount(DWORD dw)
 	case FCC('yuvs'):
 	case FCC('2vuy'):
 	case FCC('HDYC'):
+	case FCC('YV16'):
 		return 16;
 	case FCC('YV12'):
 		return 12;
