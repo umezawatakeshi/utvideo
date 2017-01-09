@@ -79,10 +79,10 @@ static const struct MAFM mafm[] = {
 const TUNEDFUNC_PREDICT tfnPredictI686 = {
 	NULL,
 	{ 0, 0 },
-	cpp_PredictWrongMedianAndCount,
+	cpp_PredictCylindricalWrongMedianAndCount,
 	cpp_PredictCylindricalLeftAndCount<8>,
 	i686_RestoreWrongMedian,
-	cpp_RestoreWrongMedianBlock4,
+	cpp_RestoreCylindricalWrongMedianBlock4,
 	cpp_RestoreCylindricalLeft<8>,
 	cpp_RestoreCylindricalLeft<10>,
 };
@@ -110,8 +110,8 @@ const TUNEDFUNC_PREDICT tfnPredictSSSE3 = {
 	sse2_PredictLeftAndCount,
 	sse1mmx_RestoreWrongMedian,
 	sse2_RestoreWrongMedianBlock4,
-	tuned_RestoreLeft8<CODEFEATURE_SSSE3>,
-	tuned_RestoreLeft10<CODEFEATURE_SSSE3>,
+	tuned_RestoreCylindricalLeft8<CODEFEATURE_SSSE3>,
+	tuned_RestoreCylindricalLeft10<CODEFEATURE_SSSE3>,
 };
 
 const TUNEDFUNC_PREDICT tfnPredictAVX1 = {
@@ -121,8 +121,8 @@ const TUNEDFUNC_PREDICT tfnPredictAVX1 = {
 	sse2_PredictLeftAndCount,
 	sse1mmx_RestoreWrongMedian,
 	sse2_RestoreWrongMedianBlock4,
-	tuned_RestoreLeft8<CODEFEATURE_AVX1>,
-	tuned_RestoreLeft10<CODEFEATURE_AVX1>,
+	tuned_RestoreCylindricalLeft8<CODEFEATURE_AVX1>,
+	tuned_RestoreCylindricalLeft10<CODEFEATURE_AVX1>,
 };
 
 

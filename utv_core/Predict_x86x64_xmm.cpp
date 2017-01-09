@@ -8,7 +8,7 @@
 #endif
 
 template<int F>
-void tuned_RestoreLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd)
+void tuned_RestoreCylindricalLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd)
 {
 	auto p = pSrcBegin;
 	auto q = pDst;
@@ -43,16 +43,16 @@ void tuned_RestoreLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *
 }
 
 #ifdef GENERATE_SSSE3
-template void tuned_RestoreLeft8<CODEFEATURE_SSSE3>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+template void tuned_RestoreCylindricalLeft8<CODEFEATURE_SSSE3>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
 #endif
 
 #ifdef GENERATE_AVX1
-template void tuned_RestoreLeft8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+template void tuned_RestoreCylindricalLeft8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
 #endif
 
 
 template<int F>
-void tuned_RestoreLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd)
+void tuned_RestoreCylindricalLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd)
 {
 	auto p = pSrcBegin;
 	auto q = pDst;
@@ -87,9 +87,9 @@ void tuned_RestoreLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16
 }
 
 #ifdef GENERATE_SSSE3
-template void tuned_RestoreLeft10<CODEFEATURE_SSSE3>(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);
+template void tuned_RestoreCylindricalLeft10<CODEFEATURE_SSSE3>(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);
 #endif
 
 #ifdef GENERATE_AVX1
-template void tuned_RestoreLeft10<CODEFEATURE_AVX1>(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);
+template void tuned_RestoreCylindricalLeft10<CODEFEATURE_AVX1>(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);
 #endif

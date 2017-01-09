@@ -3,5 +3,5 @@
 
 #pragma once
 
-template<int F> void tuned_RestoreLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
-template<int F> void tuned_RestoreLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);
+template<int F> void tuned_RestoreCylindricalLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+template<int F> void tuned_RestoreCylindricalLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);

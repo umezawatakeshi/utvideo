@@ -13,10 +13,10 @@
 const TUNEDFUNC_PREDICT tfnPredictCPP = {
 	NULL,
 	{ 0 },
-	cpp_PredictWrongMedianAndCount,
+	cpp_PredictCylindricalWrongMedianAndCount,
 	cpp_PredictCylindricalLeftAndCount<8>,
-	cpp_RestoreWrongMedian,
-	cpp_RestoreWrongMedianBlock4,
+	cpp_RestoreCylindricalWrongMedian,
+	cpp_RestoreCylindricalWrongMedianBlock4,
 	cpp_RestoreCylindricalLeft<8>,
 	cpp_RestoreCylindricalLeft<10>,
 };

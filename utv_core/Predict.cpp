@@ -12,7 +12,7 @@ inline T median(T a, T b, T c)
 	return max(min(max(a,b),c),min(a,b));
 }
 
-void cpp_PredictWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
+void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
@@ -49,7 +49,7 @@ void cpp_PredictWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, con
 	}
 }
 
-void cpp_RestoreWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride)
+void cpp_RestoreCylindricalWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride)
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
@@ -74,7 +74,7 @@ void cpp_RestoreWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8
 	}
 }
 
-void cpp_RestoreWrongMedianBlock4(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+void cpp_RestoreCylindricalWrongMedianBlock4(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
 	const uint8_t *pSrcStripeBegin;
 	uint8_t *pDstStripeBegin;
