@@ -66,10 +66,10 @@ static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDe
 	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip001-ulh4-interlace", 1, 2,{ { "clip001-raw-yv24", 0 }, }),
 	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip001-ulh2-interlace", 2, 2,{ { "clip001-raw-yuy2", 0 },{ "clip001-raw-uyvy", 0 },{ "clip001-raw-yv16", 0 }, }),
 	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip001-ulh0-interlace", 2, 4,{ { "clip001-raw-yv12", 0 }, }),
-	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip100-uly0-progressive", 2, 2,{ { "clip100-raw-yuy2-yv12-progressive", 0 } }),
-	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip100-ulh0-progressive", 2, 2,{ { "clip100-raw-yuy2-yv12-progressive", 0 } }),
-	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip100-uly0-interlace", 2, 4,{ { "clip100-raw-yuy2-yv12-interlace", 0 } }),
-	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip100-ulh0-interlace", 2, 4,{ { "clip100-raw-yuy2-yv12-interlace", 0 } }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip100-uly0-progressive", 2, 2,{ { "clip100-raw-yuy2-yv12-yuy2-progressive", 0 } }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip100-ulh0-progressive", 2, 2,{ { "clip100-raw-yuy2-yv12-yuy2-progressive", 0 } }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip100-uly0-interlace", 2, 4,{ { "clip100-raw-yuy2-yv12-yuy2-interlace", 0 } }),
+	make_tuple<string, int, int, vector<pair<string, unsigned int>>>("clip100-ulh0-interlace", 2, 4,{ { "clip100-raw-yuy2-yv12-yuy2-interlace", 0 } }),
 };
 
 static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip002 = {
@@ -191,10 +191,10 @@ static const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> ve
 	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip001-ulh4-interlace", vector<uint8_t>(ulxx_config_interlace), 1, 2,{ "clip001-raw-yv24", }),
 	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip001-ulh2-interlace", vector<uint8_t>(ulxx_config_interlace), 2, 2,{ "clip001-raw-yuy2", "clip001-raw-uyvy", "clip001-raw-yv16", }),
 	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip001-ulh0-interlace", vector<uint8_t>(ulxx_config_interlace), 2, 4,{ "clip001-raw-yv12", }),
-	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip100-uly0-progressive", vector<uint8_t>(ulxx_config_progressive), 2, 2,{ { "clip100-raw-yuy2-yv12-progressive" } }),
-	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip100-ulh0-progressive", vector<uint8_t>(ulxx_config_progressive), 2, 2,{ { "clip100-raw-yuy2-yv12-progressive" } }),
-	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip100-uly0-interlace", vector<uint8_t>(ulxx_config_interlace), 2, 4,{ { "clip100-raw-yuy2-yv12-interlace" } }),
-	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip100-ulh0-interlace", vector<uint8_t>(ulxx_config_interlace), 2, 4,{ { "clip100-raw-yuy2-yv12-interlace" } }),
+	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip100-uly0-progressive", vector<uint8_t>(ulxx_config_progressive), 2, 2,{ { "clip100-raw-yuy2" } }),
+	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip100-ulh0-progressive", vector<uint8_t>(ulxx_config_progressive), 2, 2,{ { "clip100-raw-yuy2" } }),
+	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip100-uly0-interlace", vector<uint8_t>(ulxx_config_interlace), 2, 4,{ { "clip100-raw-yuy2" } }),
+	make_tuple<string, vector<uint8_t>, int, int, vector<string>>("clip100-ulh0-interlace", vector<uint8_t>(ulxx_config_interlace), 2, 4,{ { "clip100-raw-yuy2" } }),
 };
 
 static const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> vecEncodeClipsSource_clip002 = {
