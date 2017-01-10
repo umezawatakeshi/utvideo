@@ -7,7 +7,7 @@
 #include "TunedFunc.h"
 
 template<class T>
-inline T median(T a, T b, T c)
+static inline T median(T a, T b, T c)
 {
 	return max(min(max(a,b),c),min(a,b));
 }
