@@ -8,64 +8,6 @@
 section .text
 
 
-%push
-
-global _i686_RestoreWrongMedian
-_i686_RestoreWrongMedian:
-	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride
-
-	mov			esi, dword [esp + %$pSrcBegin]
-	mov			edi, dword [esp + %$pDstBegin]
-	mov			eax, esi
-	mov			ebp, dword [esp + %$dwStride]
-	add			eax, ebp
-	neg			ebp
-
-	mov			edx, 80h
-
-	align		64
-.label1:
-	add			dl, byte [esi]
-	mov			byte [edi], dl
-	add 		esi, 1
-	add			edi, 1
-	cmp			esi, eax
-	jb			.label1
-
-	xor			ecx, ecx
-	xor			edx, edx
-
-	align		64
-.label2:
-	mov			ebx, edx
-	sub			ebx, ecx
-	movzx		ecx, byte [edi+ebp]
-	add			ebx, ecx	; bl = grad
-
-	mov			eax, edx
-	cmp			dl, cl
-	cmovae		edx, ecx	; dl = min(dl,cl)
-	cmovb		eax, ecx	; al = max(dl,cl)
-
-	cmp			dl, bl
-	cmovb		edx, ebx	; dl = max(dl,bl)
-	cmp			dl, al
-	cmovae		edx, eax	; dl = min(dl,al)
-
-	movzx		ebx, byte [esi]
-	add			edx, ebx
-	mov			byte [edi], dl
-
-	add			esi, 1
-	add			edi, 1
-	cmp			esi, dword [esp + %$pSrcEnd]	; pSrcEnd
-	jb			.label2
-
-	SIMPLE_EPILOGUE
-
-%pop
-
-
 ; p{min,max}ub ÇÕ SSE1 Ç≈í«â¡Ç≥ÇÍÇΩ MMX ñΩóﬂÅiÇ¢ÇÌÇ‰ÇÈ MMX2 ñΩóﬂÅjÇ≈Ç†ÇÈÅB
 
 %push

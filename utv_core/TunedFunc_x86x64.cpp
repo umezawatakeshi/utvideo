@@ -75,25 +75,8 @@ static const struct MAFM mafm[] = {
 };
 
 
-#ifdef __i386__
-const TUNEDFUNC_PREDICT tfnPredictI686 = {
-	NULL,
-	{ 0, 0 },
-	cpp_PredictCylindricalWrongMedianAndCount,
-	cpp_PredictCylindricalLeftAndCount<8>,
-	i686_RestoreWrongMedian,
-	cpp_RestoreCylindricalWrongMedianBlock4,
-	cpp_RestoreCylindricalLeft<8>,
-	cpp_RestoreCylindricalLeft<10>,
-};
-#endif
-
 const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
-#ifdef __i386__
-	&tfnPredictI686,
-#else
 	NULL,
-#endif
 	{ FEATURE0_SSE2, 0 },
 	cpp_PredictCylindricalWrongMedianAndCount,
 	cpp_PredictCylindricalLeftAndCount<8>,
