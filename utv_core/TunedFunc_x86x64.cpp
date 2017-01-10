@@ -95,8 +95,8 @@ const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
 	NULL,
 #endif
 	{ FEATURE0_SSE2, 0 },
-	sse2_PredictWrongMedianAndCount,
-	sse2_PredictLeftAndCount,
+	cpp_PredictCylindricalWrongMedianAndCount,
+	cpp_PredictCylindricalLeftAndCount<8>,
 	sse1mmx_RestoreWrongMedian,
 	sse2_RestoreWrongMedianBlock4,
 	cpp_RestoreCylindricalLeft<8>,
@@ -106,8 +106,19 @@ const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
 const TUNEDFUNC_PREDICT tfnPredictSSSE3 = {
 	&tfnPredictSSE2,
 	{ FEATURE0_SSSE3, 0 },
-	sse2_PredictWrongMedianAndCount,
-	sse2_PredictLeftAndCount,
+	cpp_PredictCylindricalWrongMedianAndCount,
+	cpp_PredictCylindricalLeftAndCount<8>,
+	sse1mmx_RestoreWrongMedian,
+	sse2_RestoreWrongMedianBlock4,
+	tuned_RestoreCylindricalLeft8<CODEFEATURE_SSSE3>,
+	tuned_RestoreCylindricalLeft10<CODEFEATURE_SSSE3>,
+};
+
+const TUNEDFUNC_PREDICT tfnPredictSSE41 = {
+	&tfnPredictSSSE3,
+	{ FEATURE0_SSE41, 0 },
+	tuned_PredictCylindricalWrongMedianAndCount8<CODEFEATURE_SSE41>,
+	tuned_PredictCylindricalLeftAndCount8<CODEFEATURE_SSE41>,
 	sse1mmx_RestoreWrongMedian,
 	sse2_RestoreWrongMedianBlock4,
 	tuned_RestoreCylindricalLeft8<CODEFEATURE_SSSE3>,
@@ -115,10 +126,10 @@ const TUNEDFUNC_PREDICT tfnPredictSSSE3 = {
 };
 
 const TUNEDFUNC_PREDICT tfnPredictAVX1 = {
-	&tfnPredictSSSE3,
+	&tfnPredictSSE41,
 	{ FEATURE0_AVX1, 0 },
-	sse2_PredictWrongMedianAndCount,
-	sse2_PredictLeftAndCount,
+	tuned_PredictCylindricalWrongMedianAndCount8<CODEFEATURE_AVX1>,
+	tuned_PredictCylindricalLeftAndCount8<CODEFEATURE_AVX1>,
 	sse1mmx_RestoreWrongMedian,
 	sse2_RestoreWrongMedianBlock4,
 	tuned_RestoreCylindricalLeft8<CODEFEATURE_AVX1>,
