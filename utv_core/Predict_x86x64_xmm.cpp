@@ -122,14 +122,14 @@ void tuned_RestoreCylindricalLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, cons
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
 		__m128i s1 = _mm_loadu_si128((const __m128i *)(p+16));
 
-		s0 = _mm_add_epi8(s0, _mm_shuffle_epi8(s0, _mm_set_epi8(14, -1, 12, -1, 10, -1, 8, -1, 6, -1, 4, -1, 2, -1, 0, -1)));
-		s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s1, _mm_set_epi8(14, -1, 12, -1, 10, -1, 8, -1, 6, -1, 4, -1, 2, -1, 0, -1)));
-		s0 = _mm_add_epi8(s0, _mm_shuffle_epi8(s0, _mm_set_epi8(13, 13, -1, -1, 9, 9, -1, -1, 5, 5, -1, -1, 1, 1, -1, -1)));
-		s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s1, _mm_set_epi8(13, 13, -1, -1, 9, 9, -1, -1, 5, 5, -1, -1, 1, 1, -1, -1)));
-		s0 = _mm_add_epi8(s0, _mm_shuffle_epi8(s0, _mm_set_epi8(11, 11, 11, 11, -1, -1, -1, -1, 3, 3, 3, 3, -1, -1, -1, -1)));
-		s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s1, _mm_set_epi8(11, 11, 11, 11, -1, -1, -1, -1, 3, 3, 3, 3, -1, -1, -1, -1)));
-		s0 = _mm_add_epi8(s0, _mm_shuffle_epi8(s0, _mm_set_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1)));
-		s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s1, _mm_set_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1)));
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 1));
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 2));
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 4));
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 8));
 		s0 = _mm_add_epi8(s0, prev);
 		s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)));
 		_mm_storeu_si128((__m128i *)q, s0);
@@ -166,12 +166,12 @@ void tuned_RestoreCylindricalLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, c
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
 		__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 8));
 
-		s0 = _mm_add_epi16(s0, _mm_shuffle_epi8(s0, _mm_set_epi8(13, 12, -1, -1, 9, 8, -1, -1, 5, 4, -1, -1, 1, 0, -1, -1)));
-		s1 = _mm_add_epi16(s1, _mm_shuffle_epi8(s1, _mm_set_epi8(13, 12, -1, -1, 9, 8, -1, -1, 5, 4, -1, -1, 1, 0, -1, -1)));
-		s0 = _mm_add_epi16(s0, _mm_shuffle_epi8(s0, _mm_set_epi8(11, 10, 11, 10, -1, -1, -1, -1, 3, 2, 3, 2, -1, -1, -1, -1)));
-		s1 = _mm_add_epi16(s1, _mm_shuffle_epi8(s1, _mm_set_epi8(11, 10, 11, 10, -1, -1, -1, -1, 3, 2, 3, 2, -1, -1, -1, -1)));
-		s0 = _mm_add_epi16(s0, _mm_shuffle_epi8(s0, _mm_set_epi8(7, 6, 7, 6, 7, 6, 7, 6, -1, -1, -1, -1, -1, -1, -1, -1)));
-		s1 = _mm_add_epi16(s1, _mm_shuffle_epi8(s1, _mm_set_epi8(7, 6, 7, 6, 7, 6, 7, 6, -1, -1, -1, -1, -1, -1, -1, -1)));
+		s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 2));
+		s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 2));
+		s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 4));
+		s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 4));
+		s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 8));
+		s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 8));
 		s0 = _mm_add_epi16(s0, prev);
 		s1 = _mm_add_epi16(s1, _mm_shuffle_epi8(s0, _mm_set2_epi8(15, 14)));
 		s0 = _mm_and_si128(s0, _mm_set1_epi16(CSymbolBits<10>::maskval));
