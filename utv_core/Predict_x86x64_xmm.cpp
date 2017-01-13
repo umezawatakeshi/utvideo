@@ -259,3 +259,61 @@ template void tuned_PredictCylindricalWrongMedianAndCount8<CODEFEATURE_SSE41>(ui
 #ifdef GENERATE_AVX1
 template void tuned_PredictCylindricalWrongMedianAndCount8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
 #endif
+
+
+template<int F>
+void tuned_RestoreCylindricalWrongMedian8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride)
+{
+	auto p = pSrcBegin;
+	auto q = pDst;
+
+	__m128i prev = _mm_set1_epi8((char)0x80);
+
+#ifdef __SSSE3__
+	for (; p <= pSrcBegin + dwStride - 32; p += 32, q += 32)
+	{
+		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
+		__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 16));
+
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 1));
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 2));
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 4));
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 8));
+		s0 = _mm_add_epi8(s0, prev);
+		s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)));
+		_mm_storeu_si128((__m128i *)q, s0);
+		_mm_storeu_si128((__m128i *)(q + 16), s1);
+		prev = _mm_shuffle_epi8(s1, _mm_set1_epi8(15));
+	}
+#endif
+	for (; p < pSrcBegin + dwStride; p++, q++)
+	{
+		*q = *(q - 1) + *p;
+	}
+
+	__m128i left = _mm_setzero_si128();
+	__m128i topleft = _mm_setzero_si128();
+
+	for (; p < pSrcEnd; p++, q++)
+	{
+		__m128i top = _mm_cvtsi32_si128(*(const uint32_t *)(q - dwStride));
+		__m128i grad = _mm_add_epi8(left, _mm_sub_epi8(top, topleft));
+		__m128i pred = _mm_max_epu8(_mm_min_epu8(_mm_max_epu8(left, top), grad), _mm_min_epu8(left, top));
+		__m128i value = _mm_add_epi8(pred, _mm_cvtsi32_si128(*(const uint32_t *)p));
+		*q = _mm_cvtsi128_si32(value);
+		left = value;
+		topleft = top;
+	}
+}
+
+#ifdef GENERATE_SSSE3
+template void tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_SSSE3>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
+#endif

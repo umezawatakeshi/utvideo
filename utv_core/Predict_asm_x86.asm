@@ -8,63 +8,6 @@
 section .text
 
 
-; p{min,max}ub は SSE1 で追加された MMX 命令（いわゆる MMX2 命令）である。
-
-%push
-
-global _sse1mmx_RestoreWrongMedian
-_sse1mmx_RestoreWrongMedian:
-	SIMPLE_PROLOGUE 0, pDstBegin, pSrcBegin, pSrcEnd, dwStride
-
-	mov			esi, dword [esp + %$pSrcBegin]
-	mov			edi, dword [esp + %$pDstBegin]
-	mov			eax, esi
-	mov			ebp, dword [esp + %$dwStride]
-	add			eax, ebp
-	neg			ebp
-
-	mov			edx, 80h
-
-	align		64
-.label1:
-	add			dl, byte [esi]
-	mov			byte [edi], dl
-	add 		esi, 1
-	add			edi, 1
-	cmp			esi, eax
-	jb			.label1
-
-	pxor		mm4, mm4
-	pxor		mm2, mm2
-
-	align		64
-.label2:
-	movq		mm6, mm2
-	movq		mm7, mm2
-	psubb		mm6, mm4
-	movd		mm4, dword [edi+ebp]		; mm4 = above
-	paddb		mm6, mm4					; mm6 = grad
-
-	pminub		mm2, mm6
-	pmaxub		mm6, mm7
-	pmaxub		mm2, mm4
-	pminub		mm2, mm6					; mm2 = median
-
-	paddb		mm2, qword [esi]			; アライメントがずれていても xmm レジスタの場合と違って一般保護例外にはならない
-	movd		eax, mm2
-	mov			byte [edi], al
-
-	add			esi, 1
-	add			edi, 1
-	cmp			esi, dword [esp + %$pSrcEnd]
-	jb			.label2
-
-	emms
-	SIMPLE_EPILOGUE
-
-%pop
-
-
 %push
 global _sse2_RestoreWrongMedianBlock4
 _sse2_RestoreWrongMedianBlock4:
