@@ -151,6 +151,7 @@ protected:
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height) = 0;
 	virtual void ConvertToPlanar(uint32_t nBandIndex) = 0;
 	virtual void ConvertFromPlanar(uint32_t nBandIndex) = 0;
+	virtual bool PredictDirect(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 
 private:

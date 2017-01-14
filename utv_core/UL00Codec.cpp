@@ -372,6 +372,9 @@ int CUL00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned i
 
 void CUL00Codec::PredictProc(uint32_t nBandIndex)
 {
+	if (PredictDirect(nBandIndex))
+		return;
+
 	ConvertToPlanar(nBandIndex);
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
@@ -394,6 +397,11 @@ void CUL00Codec::PredictProc(uint32_t nBandIndex)
 			_ASSERT(false);
 		}
 	}
+}
+
+bool CUL00Codec::PredictDirect(uint32_t nBandIndex)
+{
+	return false;
 }
 
 void CUL00Codec::EncodeProc(uint32_t nBandIndex)
