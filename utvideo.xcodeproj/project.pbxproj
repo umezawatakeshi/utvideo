@@ -46,6 +46,7 @@
 		25CCB71018FD189300076B45 /* QuickTimeFormat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25CCB70E18FD189300076B45 /* QuickTimeFormat.cpp */; };
 		25D59BCE14CD624800FDCD1F /* QTCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D59BCC14CD624800FDCD1F /* QTCodec.cpp */; };
 		25D59BE014CD6BA300FDCD1F /* QTEncoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25D59BDD14CD6BA300FDCD1F /* QTEncoder.cpp */; };
+		25EF212B1E2B879A00CBF2ED /* TunedFunc_x86x64_sse41.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25EF212A1E2B879A00CBF2ED /* TunedFunc_x86x64_sse41.cpp */; settings = {COMPILER_FLAGS = "-msse4.1"; }; };
 		25F09D4314122EC900D214B9 /* QTDecoder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25F09D3E14122EC800D214B9 /* QTDecoder.cpp */; };
 		25F09D4414122EC900D214B9 /* utv_qt.r in Rez */ = {isa = PBXBuildFile; fileRef = 25F09D4214122EC900D214B9 /* utv_qt.r */; };
 		25F09D5514122FB800D214B9 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 25F09D5414122FB800D214B9 /* Carbon.framework */; };
@@ -142,6 +143,7 @@
 		25D59BDD14CD6BA300FDCD1F /* QTEncoder.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = QTEncoder.cpp; path = utv_qt/QTEncoder.cpp; sourceTree = "<group>"; };
 		25D59BDE14CD6BA300FDCD1F /* QTEncoder.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTEncoder.h; path = utv_qt/QTEncoder.h; sourceTree = "<group>"; };
 		25D59BDF14CD6BA300FDCD1F /* QTEncoderDispatch.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTEncoderDispatch.h; path = utv_qt/QTEncoderDispatch.h; sourceTree = "<group>"; };
+		25EF212A1E2B879A00CBF2ED /* TunedFunc_x86x64_sse41.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = TunedFunc_x86x64_sse41.cpp; path = utv_core/TunedFunc_x86x64_sse41.cpp; sourceTree = "<group>"; };
 		25F09D3E14122EC800D214B9 /* QTDecoder.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = QTDecoder.cpp; path = utv_qt/QTDecoder.cpp; sourceTree = "<group>"; };
 		25F09D3F14122EC800D214B9 /* QTDecoder.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTDecoder.h; path = utv_qt/QTDecoder.h; sourceTree = "<group>"; };
 		25F09D4014122EC800D214B9 /* QTDecoderDispatch.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = QTDecoderDispatch.h; path = utv_qt/QTDecoderDispatch.h; sourceTree = "<group>"; };
@@ -281,6 +283,7 @@
 				25CF5DF9172422DE0089819C /* TunedFunc_x86x64.cpp */,
 				25B2570C1DD0D73C00D2013A /* TunedFunc_x86x64_avx1.cpp */,
 				25B2570D1DD0D73C00D2013A /* TunedFunc_x86x64_sse2.cpp */,
+				25EF212A1E2B879A00CBF2ED /* TunedFunc_x86x64_sse41.cpp */,
 				25B2570E1DD0D73C00D2013A /* TunedFunc_x86x64_ssse3.cpp */,
 				25B2570F1DD0D73C00D2013A /* TunedFunc_x86x64.h */,
 				258DB3E91411F8600059F47E /* UL00Codec.cpp */,
@@ -452,6 +455,7 @@
 				25B257131DD0D73C00D2013A /* TunedFunc_x86x64_ssse3.cpp in Sources */,
 				258DB40F1411F9290059F47E /* utv_core.cpp in Sources */,
 				25F09D4314122EC900D214B9 /* QTDecoder.cpp in Sources */,
+				25EF212B1E2B879A00CBF2ED /* TunedFunc_x86x64_sse41.cpp in Sources */,
 				25D59BCE14CD624800FDCD1F /* QTCodec.cpp in Sources */,
 				25D59BE014CD6BA300FDCD1F /* QTEncoder.cpp in Sources */,
 				25817AEA175A052D00888CE2 /* ULYUV420Codec.cpp in Sources */,
