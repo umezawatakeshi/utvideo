@@ -352,8 +352,8 @@ size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const symbol_t<B> *pSrcBegin, const
 	return ((uint8_t *)pDst) - pDstBegin;
 }
 
-template size_t cpp_HuffmanEncode<8>(uint8_t *pDstBegin, const CSymbolBits<8>::symbol_t *pSrcBegin, const CSymbolBits<8>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable);
-template size_t cpp_HuffmanEncode<10>(uint8_t *pDstBegin, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<10> *pEncodeTable);
+template size_t cpp_HuffmanEncode<8>(uint8_t *pDstBegin, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable);
+template size_t cpp_HuffmanEncode<10>(uint8_t *pDstBegin, const symbol_t<10> *pSrcBegin, const symbol_t<10> *pSrcEnd, const HUFFMAN_ENCODE_TABLE<10> *pEncodeTable);
 
 
 template<int B>

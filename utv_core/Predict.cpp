@@ -128,8 +128,8 @@ void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pS
 	}
 }
 
-template void cpp_PredictCylindricalLeftAndCount<8>(CSymbolBits<8>::symbol_t *pDst, const CSymbolBits<8>::symbol_t *pSrcBegin, const CSymbolBits<8>::symbol_t *pSrcEnd, uint32_t *pCountTable);
-template void cpp_PredictCylindricalLeftAndCount<10>(CSymbolBits<10>::symbol_t *pDst, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd, uint32_t *pCountTable);
+template void cpp_PredictCylindricalLeftAndCount<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, uint32_t *pCountTable);
+template void cpp_PredictCylindricalLeftAndCount<10>(symbol_t<10> *pDst, const symbol_t<10> *pSrcBegin, const symbol_t<10> *pSrcEnd, uint32_t *pCountTable);
 
 
 template<int B>
@@ -149,5 +149,5 @@ void cpp_RestoreCylindricalLeft(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin,
 	}
 }
 
-template void cpp_RestoreCylindricalLeft<8>(CSymbolBits<8>::symbol_t *pDst, const CSymbolBits<8>::symbol_t *pSrcBegin, const CSymbolBits<8>::symbol_t *pSrcEnd);
-template void cpp_RestoreCylindricalLeft<10>(CSymbolBits<10>::symbol_t *pDst, const CSymbolBits<10>::symbol_t *pSrcBegin, const CSymbolBits<10>::symbol_t *pSrcEnd);
+template void cpp_RestoreCylindricalLeft<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd);
+template void cpp_RestoreCylindricalLeft<10>(symbol_t<10> *pDst, const symbol_t<10> *pSrcBegin, const symbol_t<10> *pSrcEnd);
