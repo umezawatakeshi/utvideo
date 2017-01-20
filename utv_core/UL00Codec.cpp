@@ -450,7 +450,7 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput)
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<8> *)p;
-		GenerateHuffmanDecodeTable(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
+		m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::GenerateDecodeTableProc, nPlaneIndex), nPlaneIndex);
 		p += 256 + sizeof(uint32_t) * m_dwDivideCount;
 		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		{
@@ -465,12 +465,18 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput)
 		}
 		p += ((const uint32_t *)p)[-1];
 	}
+	m_ptm->WaitForJobCompletion();
 
 	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::DecodeProc, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
 	return m_cbRawSize;
+}
+
+void CUL00Codec::GenerateDecodeTableProc(uint32_t nPlaneIndex)
+{
+	GenerateHuffmanDecodeTable(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 }
 
 int CUL00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)

@@ -157,6 +157,7 @@ protected:
 private:
 	void PredictProc(uint32_t nBandIndex);
 	void EncodeProc(uint32_t nBandIndex);
+	void GenerateDecodeTableProc(uint32_t nPlaneIndex);
 	void DecodeProc(uint32_t nBandIndex);
 
 	class CThreadJob : public ::CThreadJob
