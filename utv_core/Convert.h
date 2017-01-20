@@ -26,8 +26,6 @@ template<class T> void cpp_ConvertULRGToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd
 template<class T> void cpp_ConvertULRAToARGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 template<class T> void cpp_ConvertULY2ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 
-template<class T, bool A> void cpp_EncorrelateInplaceXRGB(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-
 #if defined(__i386__) || defined(__x86_64__)
 extern "C" void sse2_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 extern "C" void sse2_ConvertULY2ToXRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
@@ -78,10 +76,4 @@ extern "C" void ssse3_ConvertULRAToBGRA(uint8_t *pDstBegin, uint8_t *pDstEnd, co
 extern "C" void ssse3_ConvertULRAToARGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 extern "C" void ssse3_ConvertULY2ToYUYV(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 extern "C" void ssse3_ConvertULY2ToUYVY(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
-
-
-extern "C" void ssse3_EncorrelateInplaceBGRX(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-extern "C" void ssse3_EncorrelateInplaceBGRA(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-extern "C" void ssse3_EncorrelateInplaceXRGB(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-extern "C" void ssse3_EncorrelateInplaceARGB(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
 #endif

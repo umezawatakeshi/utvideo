@@ -74,40 +74,6 @@ void cpp_RestoreCylindricalWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, 
 	}
 }
 
-void cpp_RestoreCylindricalWrongMedianBlock4(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
-{
-	const uint8_t *pSrcStripeBegin;
-	uint8_t *pDstStripeBegin;
-	const uint8_t *p;
-	uint8_t *q;
-	uint8_t left[4] = { 0, 0, 0, 0 };
-	uint8_t topleft[4] = { 0, 0, 0, 0 };
-
-	pDst[0] = pSrcBegin[0] + 0x80;
-	pDst[1] = pSrcBegin[1] + 0x80;
-	pDst[2] = pSrcBegin[2] + 0x80;
-	pDst[3] = pSrcBegin[3] + 0x80;
-
-	for (p = pSrcBegin + 4, q = pDst + 4; p < pSrcBegin + cbWidth; p += 4, q += 4)
-	{
-		q[0] = p[0] + q[-4];
-		q[1] = p[1] + q[-3];
-		q[2] = p[2] + q[-2];
-		q[3] = p[3] + q[-1];
-	}
-
-	for (pSrcStripeBegin = pSrcBegin + scbStride, pDstStripeBegin = pDst + scbStride; pSrcStripeBegin != pSrcEnd; pSrcStripeBegin += scbStride, pDstStripeBegin += scbStride)
-	{
-		for (p = pSrcStripeBegin, q = pDstStripeBegin; p < pSrcStripeBegin + cbWidth; p += 4, q += 4)
-		{
-			q[0] = p[0] + median<uint8_t>(q[0-scbStride], left[0], q[0-scbStride] + left[0] - topleft[0]); left[0] = q[0]; topleft[0] = q[0-scbStride];
-			q[1] = p[1] + median<uint8_t>(q[1-scbStride], left[1], q[1-scbStride] + left[1] - topleft[1]); left[1] = q[1]; topleft[1] = q[1-scbStride];
-			q[2] = p[2] + median<uint8_t>(q[2-scbStride], left[2], q[2-scbStride] + left[2] - topleft[2]); left[2] = q[2]; topleft[2] = q[2-scbStride];
-			q[3] = p[3] + median<uint8_t>(q[3-scbStride], left[3], q[3-scbStride] + left[3] - topleft[3]); left[3] = q[3]; topleft[3] = q[3-scbStride];
-		}
-	}
-}
-
 
 template<int B>
 void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, uint32_t *pCountTable)

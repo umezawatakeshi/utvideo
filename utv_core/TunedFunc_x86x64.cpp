@@ -81,7 +81,6 @@ const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
 	cpp_PredictCylindricalWrongMedianAndCount,
 	cpp_PredictCylindricalLeftAndCount<8>,
 	cpp_RestoreCylindricalWrongMedian,
-	sse2_RestoreWrongMedianBlock4,
 	cpp_RestoreCylindricalLeft<8>,
 	cpp_RestoreCylindricalLeft<10>,
 };
@@ -92,7 +91,6 @@ const TUNEDFUNC_PREDICT tfnPredictSSSE3 = {
 	cpp_PredictCylindricalWrongMedianAndCount,
 	cpp_PredictCylindricalLeftAndCount<8>,
 	tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_SSSE3>,
-	sse2_RestoreWrongMedianBlock4,
 	tuned_RestoreCylindricalLeft8<CODEFEATURE_SSSE3>,
 	tuned_RestoreCylindricalLeft10<CODEFEATURE_SSSE3>,
 };
@@ -103,7 +101,6 @@ const TUNEDFUNC_PREDICT tfnPredictSSE41 = {
 	tuned_PredictCylindricalWrongMedianAndCount8<CODEFEATURE_SSE41>,
 	tuned_PredictCylindricalLeftAndCount8<CODEFEATURE_SSE41>,
 	tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_SSSE3>,
-	sse2_RestoreWrongMedianBlock4,
 	tuned_RestoreCylindricalLeft8<CODEFEATURE_SSSE3>,
 	tuned_RestoreCylindricalLeft10<CODEFEATURE_SSSE3>,
 };
@@ -114,7 +111,6 @@ const TUNEDFUNC_PREDICT tfnPredictAVX1 = {
 	tuned_PredictCylindricalWrongMedianAndCount8<CODEFEATURE_AVX1>,
 	tuned_PredictCylindricalLeftAndCount8<CODEFEATURE_AVX1>,
 	tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_AVX1>,
-	sse2_RestoreWrongMedianBlock4,
 	tuned_RestoreCylindricalLeft8<CODEFEATURE_AVX1>,
 	tuned_RestoreCylindricalLeft10<CODEFEATURE_AVX1>,
 };
@@ -327,16 +323,6 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleSSSE3 = {
 };
 
 
-const TUNEDFUNC_CORRELATE tfnCorrelateSSSE3 = {
-	NULL,
-	{ FEATURE0_SSSE3, 0 },
-	ssse3_EncorrelateInplaceBGRX,
-	ssse3_EncorrelateInplaceBGRA,
-	ssse3_EncorrelateInplaceXRGB,
-	ssse3_EncorrelateInplaceARGB,
-};
-
-
 const TUNEDFUNC tfnRoot = {
 	&tfnPredictAVX1,
 	&tfnHuffmanEncodeI686,
@@ -347,7 +333,6 @@ const TUNEDFUNC tfnRoot = {
 #endif
 	&tfnConvertYUVRGBAVX1,
 	&tfnConvertShuffleSSSE3,
-	&tfnCorrelateSSSE3,
 };
 
 uint32_t dwSupportedFeatures[FEATURESIZE];

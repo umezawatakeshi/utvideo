@@ -303,25 +303,3 @@ void cpp_ConvertULY2ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 
 template void cpp_ConvertULY2ToYUV422<CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULY2ToYUV422<CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
-
-//
-
-template<class T, bool A>
-void cpp_EncorrelateInplaceXRGB(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride)
-{
-	for (uint8_t *pStripeBegin = pBegin; pStripeBegin != pEnd; pStripeBegin += scbStride)
-	{
-		for (uint8_t *p = pStripeBegin; p < pStripeBegin + cbWidth; p += 4)
-		{
-			p[T::B] += p[T::G] + 0x80;
-			p[T::R] += p[T::G] + 0x80;
-			if (!A)
-				p[T::A] = 0xff;
-		}
-	}
-}
-
-template void cpp_EncorrelateInplaceXRGB<CBGRAColorOrder, false>(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-template void cpp_EncorrelateInplaceXRGB<CBGRAColorOrder, true >(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-template void cpp_EncorrelateInplaceXRGB<CARGBColorOrder, false>(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-template void cpp_EncorrelateInplaceXRGB<CARGBColorOrder, true >(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);

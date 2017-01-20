@@ -16,7 +16,6 @@ const TUNEDFUNC_PREDICT tfnPredictCPP = {
 	cpp_PredictCylindricalWrongMedianAndCount,
 	cpp_PredictCylindricalLeftAndCount<8>,
 	cpp_RestoreCylindricalWrongMedian,
-	cpp_RestoreCylindricalWrongMedianBlock4,
 	cpp_RestoreCylindricalLeft<8>,
 	cpp_RestoreCylindricalLeft<10>,
 };
@@ -93,22 +92,12 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleCPP = {
 	cpp_ConvertULY2ToYUV422<CUYVYColorOrder>,
 };
 
-const TUNEDFUNC_CORRELATE tfnCorrelateCPP = {
-	NULL,
-	{ 0 },
-	cpp_EncorrelateInplaceXRGB<CBGRAColorOrder, false>,
-	cpp_EncorrelateInplaceXRGB<CBGRAColorOrder, true>,
-	cpp_EncorrelateInplaceXRGB<CARGBColorOrder, false>,
-	cpp_EncorrelateInplaceXRGB<CARGBColorOrder, true>,
-};
-
 TUNEDFUNC tfn = {
 	&tfnPredictCPP,
 	&tfnHuffmanEncodeCPP,
 	&tfnHuffmanDecodeCPP,
 	&tfnConvertYUVRGBCPP,
 	&tfnConvertShuffleCPP,
-	&tfnCorrelateCPP,
 };
 
 

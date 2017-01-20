@@ -26,7 +26,6 @@ struct TUNEDFUNC_PREDICT
 	void (*pfnPredictWrongMedianAndCount)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
 	void (*pfnPredictLeftAndCount)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
 	void (*pfnRestoreWrongMedian)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
-	void (*pfnRestoreWrongMedianBlock4)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 	void(*pfnRestoreLeft8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
 	void(*pfnRestoreCylindricalLeft10)(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);
 };
@@ -89,15 +88,6 @@ struct TUNEDFUNC_CONVERT_SHUFFLE
 	void (*pfnConvertULY2ToUYVY)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 };
 
-struct TUNEDFUNC_CORRELATE
-{
-	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_CORRELATE);
-	void (*pfnEncorrelateInplaceBGRX)(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-	void (*pfnEncorrelateInplaceBGRA)(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-	void (*pfnEncorrelateInplaceXRGB)(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-	void (*pfnEncorrelateInplaceARGB)(uint8_t *pBegin, uint8_t *pEnd, size_t cbWidth, ssize_t scbStride);
-};
-
 struct TUNEDFUNC
 {
 	const TUNEDFUNC_PREDICT *pPredict;
@@ -105,7 +95,6 @@ struct TUNEDFUNC
 	const TUNEDFUNC_HUFFMAN_DECODE *pHuffmanDecode;
 	const TUNEDFUNC_CONVERT_YUVRGB *pConvertYUVRGB;
 	const TUNEDFUNC_CONVERT_SHUFFLE *pConvertShuffle;
-	const TUNEDFUNC_CORRELATE *pCorrelate;
 };
 
 extern TUNEDFUNC tfn;
@@ -114,7 +103,6 @@ extern const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeCPP;
 extern const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeCPP;
 extern const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBCPP;
 extern const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleCPP;
-extern const TUNEDFUNC_CORRELATE tfnCorrelateCPP;
 
 void ResolveTunedFunc(const TUNEDFUNC *ptfnRoot, const uint32_t *pdwSupportedFeatures);
 
@@ -137,7 +125,6 @@ public:
 #define PredictWrongMedianAndCount tfn.pPredict->pfnPredictWrongMedianAndCount
 #define PredictLeftAndCount tfn.pPredict->pfnPredictLeftAndCount
 #define RestoreWrongMedian tfn.pPredict->pfnRestoreWrongMedian
-#define RestoreWrongMedianBlock4 tfn.pPredict->pfnRestoreWrongMedianBlock4
 #define RestoreLeft8 tfn.pPredict->pfnRestoreLeft8
 #define RestoreCylindricalLeft10 tfn.pPredict->pfnRestoreCylindricalLeft10
 
@@ -178,8 +165,3 @@ public:
 #define ConvertULRAToARGB tfn.pConvertShuffle->pfnConvertULRAToARGB
 #define ConvertULY2ToYUYV tfn.pConvertShuffle->pfnConvertULY2ToYUYV
 #define ConvertULY2ToUYVY tfn.pConvertShuffle->pfnConvertULY2ToUYVY
-
-#define EncorrelateInplaceBGRX tfn.pCorrelate->pfnEncorrelateInplaceBGRX
-#define EncorrelateInplaceBGRA tfn.pCorrelate->pfnEncorrelateInplaceBGRA
-#define EncorrelateInplaceXRGB tfn.pCorrelate->pfnEncorrelateInplaceXRGB
-#define EncorrelateInplaceARGB tfn.pCorrelate->pfnEncorrelateInplaceARGB
