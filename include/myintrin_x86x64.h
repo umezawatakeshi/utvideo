@@ -32,9 +32,23 @@ static inline __m128i _mm_set2_epi16(short a, short b)
 	return _mm_set_epi16(a, b, a, b, a, b, a, b);
 }
 
+static inline __m128i _mm_set4_epi16(short a, short b, short c, short d)
+{
+	return _mm_set_epi16(a, b, c, d, a, b, c, d);
+}
+
 static inline __m128i _mm_set2_epi16_shift(double a, double b, int shift)
 {
 	short aa = short(a * (1 << shift));
 	short bb = short(b * (1 << shift));
-	return _mm_set_epi16(aa, bb, aa, bb, aa, bb, aa, bb);
+	return _mm_set2_epi16(aa, bb);
+}
+
+static inline __m128i _mm_set4_epi16_shift(double a, double b, double c, double d, int shift)
+{
+	short aa = short(a * (1 << shift));
+	short bb = short(b * (1 << shift));
+	short cc = short(c * (1 << shift));
+	short dd = short(d * (1 << shift));
+	return _mm_set4_epi16(aa, bb, cc, dd);
 }
