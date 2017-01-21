@@ -154,6 +154,9 @@ protected:
 	virtual bool PredictDirect(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 
+	void PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin);
+	void DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
+
 private:
 	void PredictProc(uint32_t nBandIndex);
 	void EncodeProc(uint32_t nBandIndex);

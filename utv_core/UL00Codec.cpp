@@ -377,6 +377,14 @@ void CUL00Codec::PredictProc(uint32_t nBandIndex)
 
 	ConvertToPlanar(nBandIndex);
 
+	const uint8_t* pSrcBegin[4];
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+		pSrcBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
+	PredictFromPlanar(nBandIndex, pSrcBegin);
+}
+
+void CUL00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin)
+{
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
@@ -388,10 +396,10 @@ void CUL00Codec::PredictProc(uint32_t nBandIndex)
 		switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
 		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-			PredictLeftAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			PredictLeftAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-			PredictWrongMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			PredictWrongMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		default:
 			_ASSERT(false);
@@ -573,6 +581,16 @@ void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 	if (DecodeDirect(nBandIndex))
 		return;
 
+	uint8_t* pDstBegin[4];
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+		pDstBegin[nPlaneIndex] = m_pRestoredFrame->GetPlane(nPlaneIndex);
+	DecodeToPlanar(nBandIndex, pDstBegin);
+
+	ConvertFromPlanar(nBandIndex);
+}
+
+void CUL00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
+{
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
@@ -589,17 +607,15 @@ void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 		{
 		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
 		case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-			RestoreLeft8(m_pRestoredFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd);
+			RestoreLeft8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd);
 			m_pCurFrame = m_pRestoredFrame;
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-			RestoreWrongMedian(m_pRestoredFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
+			RestoreWrongMedian(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
 			m_pCurFrame = m_pRestoredFrame;
 			break;
 		}
 	}
-
-	ConvertFromPlanar(nBandIndex);
 }
 
 bool CUL00Codec::DecodeDirect(uint32_t nBandIndex)

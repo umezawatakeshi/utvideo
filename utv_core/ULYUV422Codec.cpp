@@ -257,26 +257,8 @@ bool CULYUV422Codec<C>::PredictDirect(uint32_t nBandIndex)
 		pSrcBegin[2] = pSrcBegin[0] + m_nWidth * m_nHeight;
 		pSrcBegin[1] = pSrcBegin[2] + m_nWidth * m_nHeight / 2;
 
-		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
-		{
-			size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-			size_t cbPlaneEnd = m_dwPlaneStripeEnd[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		PredictFromPlanar(nBandIndex, pSrcBegin);
 
-			for (int i = 0; i < 256; i++)
-				m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
-
-			switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
-			{
-			case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-				PredictLeftAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
-				break;
-			case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-				PredictWrongMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
-				break;
-			default:
-				_ASSERT(false);
-			}
-		}
 		return true;
 	}
 
@@ -294,29 +276,8 @@ bool CULYUV422Codec<C>::DecodeDirect(uint32_t nBandIndex)
 		pDstBegin[2] = pDstBegin[0] + m_nWidth * m_nHeight;
 		pDstBegin[1] = pDstBegin[2] + m_nWidth * m_nHeight / 2;
 
-		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
-		{
-			size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-			size_t cbPlaneEnd = m_dwPlaneStripeEnd[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		DecodeToPlanar(nBandIndex, pDstBegin);
 
-#ifdef _DEBUG
-			uint8_t *pRetExpected = m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd;
-			uint8_t *pRetActual =
-#endif
-			HuffmanDecode<8>(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
-			_ASSERT(pRetActual == pRetExpected);
-
-			switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
-			{
-			case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
-			case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-				RestoreLeft8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd);
-				break;
-			case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-				RestoreWrongMedian(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
-				break;
-			}
-		}
 		return true;
 	}
 
