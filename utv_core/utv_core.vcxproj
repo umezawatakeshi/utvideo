@@ -303,8 +303,6 @@
     <ResourceCompile Include="utv_core.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Coefficient_asm_x86x64.mac" />
-    <None Include="Coefficient_nasm.mac" />
     <None Include="Common_asm_x64.mac" />
     <None Include="Common_asm_x86.mac" />
     <CustomBuild Include="Convert_asm_x64.asm">
