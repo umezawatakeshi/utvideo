@@ -682,3 +682,136 @@ template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX1, CBT709Coefficient, CBGRAC
 template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX1, CBT709Coefficient, CRGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX1, CBT709Coefficient, CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 #endif
+
+
+template<int F, class T>
+void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	__m128i ctl;
+#ifdef __SSSE3__
+	if (std::is_same<T, CYUYVColorOrder>::value)
+		ctl = _mm_set_epi8(15, 11, 7, 3, 13, 9, 5, 1, 14, 12, 10, 8, 6, 4, 2, 0);
+	else
+		ctl = _mm_set_epi8(14, 10, 6, 2, 12, 8, 4, 0, 15, 13, 11, 9, 7, 5, 3, 1);
+#endif
+
+	auto y = pYBegin;
+	auto u = pUBegin;
+	auto v = pVBegin;
+
+	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp <= p + cbWidth - 64; pp += 64)
+		{
+			__m128i m0 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)pp), ctl);
+			__m128i m1 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), ctl);
+			__m128i m2 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), ctl);
+			__m128i m3 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), ctl);
+
+			__m128i yy0 = _mm_unpacklo_epi64(m0, m1);
+			__m128i yy1 = _mm_unpacklo_epi64(m2, m3);
+			__m128i uv0 = _mm_unpackhi_epi32(m0, m1);
+			__m128i uv1 = _mm_unpackhi_epi32(m2, m3);
+
+			__m128i uu = _mm_unpacklo_epi64(uv0, uv1);
+			__m128i vv = _mm_unpackhi_epi64(uv0, uv1);
+
+			_mm_storeu_si128((__m128i *)y, yy0);
+			_mm_storeu_si128((__m128i *)(y + 16), yy1);
+			_mm_storeu_si128((__m128i *)u, uu);
+			_mm_storeu_si128((__m128i *)v, vv);
+
+			y += 32;
+			u += 16;
+			v += 16;
+		}
+
+		for (; pp < p + cbWidth; pp += 4)
+		{
+			y[0] = pp[T::Y0];
+			y[1] = pp[T::Y1];
+			u[0] = pp[T::U];
+			v[0] = pp[T::V];
+
+			y += 2;
+			u += 1;
+			v += 1;
+		}
+	}
+}
+
+#ifdef GENERATE_SSSE3
+template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_SSSE3, CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_SSSE3, CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX1, CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX1, CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+#endif
+
+
+template<int F, class T>
+void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	__m128i ctl;
+#ifdef __SSSE3__
+	if (std::is_same<T, CYUYVColorOrder>::value)
+		ctl = _mm_set_epi8(15, 7, 11, 6, 14, 5, 10, 4, 13, 3, 9, 2, 12, 1, 8, 0);
+	else
+		ctl = _mm_set_epi8(7, 15, 6, 11, 5, 14, 4, 10, 3, 13, 2, 9, 1, 12, 0, 8);
+#endif
+
+	auto y = pYBegin;
+	auto u = pUBegin;
+	auto v = pVBegin;
+
+	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp <= p + cbWidth - 64; pp += 64)
+		{
+			__m128i yy0 = _mm_loadu_si128((const __m128i *)y);
+			__m128i yy1 = _mm_loadu_si128((const __m128i *)(y + 16));
+			__m128i uu = _mm_loadu_si128((const __m128i *)u);
+			__m128i vv = _mm_loadu_si128((const __m128i *)v);
+
+			__m128i uv0 = _mm_unpacklo_epi32(uu, vv);
+			__m128i uv1 = _mm_unpackhi_epi32(uu, vv);
+
+			_mm_storeu_si128((__m128i *)pp, _mm_shuffle_epi8(_mm_unpacklo_epi64(yy0, uv0), ctl));
+			_mm_storeu_si128((__m128i *)(pp + 16), _mm_shuffle_epi8(_mm_unpackhi_epi64(yy0, uv0), ctl));
+			_mm_storeu_si128((__m128i *)(pp + 32), _mm_shuffle_epi8(_mm_unpacklo_epi64(yy1, uv1), ctl));
+			_mm_storeu_si128((__m128i *)(pp + 48), _mm_shuffle_epi8(_mm_unpackhi_epi64(yy1, uv1), ctl));
+
+			y += 32;
+			u += 16;
+			v += 16;
+		}
+
+		for (; pp < p + cbWidth; pp += 4)
+		{
+			pp[T::Y0] = y[0];
+			pp[T::Y1] = y[1];
+			pp[T::U] = u[0];
+			pp[T::V] = v[0];
+
+			y += 2;
+			u += 1;
+			v += 1;
+		}
+	}
+}
+
+#ifdef GENERATE_SSSE3
+template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_SSSE3, CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_SSSE3, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX1, CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX1, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+#endif

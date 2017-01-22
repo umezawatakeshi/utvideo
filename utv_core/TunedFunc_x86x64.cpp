@@ -270,15 +270,34 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleSSSE3 = {
 	ssse3_ConvertXRGBToULRG,
 	ssse3_ConvertBGRAToULRA,
 	ssse3_ConvertARGBToULRA,
-	ssse3_ConvertYUYVToULY2,
-	ssse3_ConvertUYVYToULY2,
+	tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_SSSE3, CYUYVColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_SSSE3, CUYVYColorOrder>,
 	ssse3_ConvertULRGToBGR,
 	ssse3_ConvertULRGToBGRX,
 	ssse3_ConvertULRGToXRGB,
 	ssse3_ConvertULRAToBGRA,
 	ssse3_ConvertULRAToARGB,
-	ssse3_ConvertULY2ToYUYV,
-	ssse3_ConvertULY2ToUYVY,
+	tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_SSSE3, CYUYVColorOrder>,
+	tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_SSSE3, CUYVYColorOrder>,
+};
+
+const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX1 = {
+	&tfnConvertShuffleSSSE3,
+	{ FEATURE0_AVX1, 0 },
+	ssse3_ConvertBGRToULRG,
+	ssse3_ConvertBGRXToULRG,
+	ssse3_ConvertXRGBToULRG,
+	ssse3_ConvertBGRAToULRA,
+	ssse3_ConvertARGBToULRA,
+	tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX1, CYUYVColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX1, CUYVYColorOrder>,
+	ssse3_ConvertULRGToBGR,
+	ssse3_ConvertULRGToBGRX,
+	ssse3_ConvertULRGToXRGB,
+	ssse3_ConvertULRAToBGRA,
+	ssse3_ConvertULRAToARGB,
+	tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX1, CYUYVColorOrder>,
+	tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX1, CUYVYColorOrder>,
 };
 
 
@@ -291,7 +310,7 @@ const TUNEDFUNC tfnRoot = {
 	&tfnHuffmanDecodeI686,
 #endif
 	&tfnConvertYUVRGBAVX1,
-	&tfnConvertShuffleSSSE3,
+	&tfnConvertShuffleAVX1,
 };
 
 uint32_t dwSupportedFeatures[FEATURESIZE];
