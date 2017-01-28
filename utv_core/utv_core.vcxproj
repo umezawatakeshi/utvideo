@@ -305,18 +305,6 @@
   <ItemGroup>
     <None Include="Common_asm_x64.mac" />
     <None Include="Common_asm_x86.mac" />
-    <CustomBuild Include="Convert_asm_x64.asm">
-      <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
-      <Command Condition="'$(Platform)'=='x64'">nasm -f win64 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
-      <Outputs Condition="'$(Platform)'=='x64'">$(IntDir)%(Filename).obj</Outputs>
-      <Message Condition="'$(Platform)'=='x64'">%(Identity)</Message>
-    </CustomBuild>
-    <CustomBuild Include="Convert_asm_x86.asm">
-      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
-      <Command Condition="'$(Platform)'=='Win32'">nasm -f win32 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
-      <Outputs Condition="'$(Platform)'=='Win32'">$(IntDir)%(Filename).obj</Outputs>
-      <Message Condition="'$(Platform)'=='Win32'">%(Identity)</Message>
-    </CustomBuild>
     <CustomBuild Include="HuffmanCode_asm_x64.asm">
       <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
       <Command Condition="'$(Platform)'=='x64'">nasm -f win64 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
