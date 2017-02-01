@@ -17,6 +17,7 @@ const TUNEDFUNC_PREDICT tfnPredictCPP = {
 	cpp_PredictCylindricalLeftAndCount<8>,
 	cpp_RestoreCylindricalWrongMedian,
 	cpp_RestoreCylindricalLeft<8>,
+	cpp_PredictCylindricalLeftAndCount<10>,
 	cpp_RestoreCylindricalLeft<10>,
 };
 

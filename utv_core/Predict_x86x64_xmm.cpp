@@ -69,6 +69,46 @@ static inline void IncrementCounters8(__m128i xmm, uint32_t* pCountTable)
 #endif
 }
 
+template<int F>
+static inline void IncrementCounters16(__m128i xmm, uint32_t* pCountTable)
+{
+#ifdef __SSE4_1__
+#if defined(__i386__)
+	uint32_t x;
+
+	x = _mm_cvtsi128_si32(xmm);
+	++pCountTable[x & 0xffff];
+	++pCountTable[(x >> 16) & 0xffff];
+
+	x = _mm_extract_epi32(xmm, 1);
+	++pCountTable[x & 0xffff];
+	++pCountTable[(x >> 16) & 0xffff];
+
+	x = _mm_extract_epi32(xmm, 2);
+	++pCountTable[x & 0xffff];
+	++pCountTable[(x >> 16) & 0xffff];
+
+	x = _mm_extract_epi32(xmm, 3);
+	++pCountTable[x & 0xffff];
+	++pCountTable[(x >> 16) & 0xffff];
+#elif defined(__x86_64__)
+	uint64_t x;
+
+	x = _mm_cvtsi128_si64(xmm);
+	++pCountTable[x & 0xffff];
+	++pCountTable[(x >> 16) & 0xffff];
+	++pCountTable[(x >> 32) & 0xffff];
+	++pCountTable[(x >> 48) & 0xffff];
+
+	x = _mm_extract_epi64(xmm, 1);
+	++pCountTable[x & 0xffff];
+	++pCountTable[(x >> 16) & 0xffff];
+	++pCountTable[(x >> 32) & 0xffff];
+	++pCountTable[(x >> 48) & 0xffff];
+#endif
+#endif
+}
+
 
 template<int F>
 void tuned_PredictCylindricalLeftAndCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable)
@@ -149,6 +189,43 @@ template void tuned_RestoreCylindricalLeft8<CODEFEATURE_SSSE3>(uint8_t *pDst, co
 
 #ifdef GENERATE_AVX1
 template void tuned_RestoreCylindricalLeft8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+#endif
+
+
+template<int F>
+void tuned_PredictCylindricalLeftAndCount10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, uint32_t *pCountTable)
+{
+	auto p = pSrcBegin;
+	auto q = pDst;
+
+	__m128i prev = _mm_set1_epi16(CSymbolBits<10>::midval);
+
+#ifdef __SSSE3__
+	for (; p <= pSrcEnd - 8; p += 8, q += 8)
+	{
+		__m128i value = _mm_loadu_si128((const __m128i *)p);
+		__m128i left = _mm_alignr_epi8(value, prev, 14);
+
+		__m128i error = _mm_and_si128(_mm_sub_epi16(value, left), _mm_set1_epi16(CSymbolBits<10>::maskval));
+		_mm_storeu_si128((__m128i *)q, error);
+		prev = value;
+
+		IncrementCounters16<F>(error, pCountTable);
+	}
+#endif
+	for (; p < pSrcEnd; p++, q++)
+	{
+		*q = *p - *(p - 1);
+		++pCountTable[*q];
+	}
+}
+
+#ifdef GENERATE_SSE41
+template void tuned_PredictCylindricalLeftAndCount10<CODEFEATURE_SSE41>(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, uint32_t *pCountTable);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_PredictCylindricalLeftAndCount10<CODEFEATURE_AVX1>(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, uint32_t *pCountTable);
 #endif
 
 
