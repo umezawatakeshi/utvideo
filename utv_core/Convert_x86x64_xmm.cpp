@@ -688,12 +688,10 @@ template<int F, class T>
 void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
 	__m128i ctl;
-#ifdef __SSSE3__
 	if (std::is_same<T, CYUYVColorOrder>::value)
 		ctl = _mm_set_epi8(15, 11, 7, 3, 13, 9, 5, 1, 14, 12, 10, 8, 6, 4, 2, 0);
 	else
 		ctl = _mm_set_epi8(14, 10, 6, 2, 12, 8, 4, 0, 15, 13, 11, 9, 7, 5, 3, 1);
-#endif
 
 	auto y = pYBegin;
 	auto u = pUBegin;
@@ -703,6 +701,7 @@ void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t
 	{
 		auto pp = p;
 
+#ifdef __SSSE3__
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
 			__m128i m0 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)pp), ctl);
@@ -727,6 +726,7 @@ void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t
 			u += 16;
 			v += 16;
 		}
+#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -757,12 +757,10 @@ template<int F, class T>
 void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
 {
 	__m128i ctl;
-#ifdef __SSSE3__
 	if (std::is_same<T, CYUYVColorOrder>::value)
 		ctl = _mm_set_epi8(15, 7, 11, 6, 14, 5, 10, 4, 13, 3, 9, 2, 12, 1, 8, 0);
 	else
 		ctl = _mm_set_epi8(7, 15, 6, 11, 5, 14, 4, 10, 3, 13, 2, 9, 1, 12, 0, 8);
-#endif
 
 	auto y = pYBegin;
 	auto u = pUBegin;
@@ -772,6 +770,7 @@ void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const
 	{
 		auto pp = p;
 
+#ifdef __SSSE3__
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
 			__m128i yy0 = _mm_loadu_si128((const __m128i *)y);
@@ -791,6 +790,7 @@ void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const
 			u += 16;
 			v += 16;
 		}
+#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -880,12 +880,10 @@ template<int F, class T, bool A>
 static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
 	__m128i ctl;
-#ifdef __SSSE3__
 	if (std::is_same<T, CBGRAColorOrder>::value)
 		ctl = _mm_set_epi8(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0);
 	else
 		ctl = _mm_set_epi8(12, 8, 4, 0, 13, 9, 5, 1, 14, 10, 6, 2, 15, 11, 7, 3);
-#endif
 
 	auto r = pRBegin;
 	auto g = pGBegin;
@@ -896,6 +894,7 @@ static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 	{
 		auto pp = p;
 
+#ifdef __SSSE3__
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
 			__m128i m0 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)pp), ctl); // A3 A2 A1 A0 R3 R2 R1 R0 G3 G2 G1 G0 B3 B2 B1 B0
@@ -925,6 +924,7 @@ static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 			if (A)
 				a += 16;
 		}
+#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -1038,12 +1038,10 @@ template<int F, class T, bool A>
 void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
 	__m128i ctl;
-#ifdef __SSSE3__
 	if (std::is_same<T, CBGRAColorOrder>::value)
 		ctl = _mm_set_epi8(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0);
 	else
 		ctl = _mm_set_epi8(3, 7, 11, 15, 2, 6, 10, 14, 1, 5, 9, 13, 0, 4, 8, 12);
-#endif
 
 	auto r = pRBegin;
 	auto g = pGBegin;
@@ -1056,6 +1054,7 @@ void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 	{
 		auto pp = p;
 
+#ifdef __SSSE3__
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
 			__m128i gg = _mm_loadu_si128((const __m128i *)g);
@@ -1091,6 +1090,7 @@ void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 			if (A)
 				a += 16;
 		}
+#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
