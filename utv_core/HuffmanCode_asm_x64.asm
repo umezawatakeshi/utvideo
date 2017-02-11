@@ -83,7 +83,7 @@ global %$procname
 
 	mov			cl, 32
 	mov			edx, dword [rsi]
-	sub			rsi, 4
+	add			rsi, 4
 
 %macro DO_OUTPUT_%$procname 1
 %push
@@ -98,7 +98,7 @@ global %$procname
 	jb			%%label4
 	sub			cl, 32
 	shl			rdx, 32
-	mov			r9d, dword [rsi+4+4]
+	mov			r9d, dword [rsi]
 	or			rdx, r9
 	add			rsi, 4
 
