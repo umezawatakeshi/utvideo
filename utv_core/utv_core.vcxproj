@@ -132,6 +132,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
       <ModuleDefinitionFile>utv_core.def</ModuleDefinitionFile>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
     <PostBuildEvent>
       <Command>copy $(TargetPath) C:\WINDOWS\SysWOW64\</Command>
@@ -212,6 +213,46 @@
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="GlobalConfig.cpp" />
     <ClCompile Include="HuffmanCode.cpp" />
+    <CustomBuild Include="HuffmanCode_x64.cpp">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">c:\cygwin\bin\env PATH=/bin c:\cygwin\bin\x86_64-pc-cygwin-g++ -std=c++11 -O2 -masm=intel -c -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">c:\cygwin\bin\env PATH=/bin c:\cygwin\bin\x86_64-pc-cygwin-g++ -std=c++11 -O2 -masm=intel -c -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">c:\cygwin\bin\env PATH=/bin c:\cygwin\bin\x86_64-pc-cygwin-g++ -std=c++11 -O2 -masm=intel -c -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">c:\cygwin\bin\env PATH=/bin c:\cygwin\bin\x86_64-pc-cygwin-g++ -std=c++11 -O2 -masm=intel -c -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj;%(Outputs)</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Identity)</Message>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HuffmanCode.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HuffmanCode.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HuffmanCode.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HuffmanCode.h</AdditionalInputs>
+    </CustomBuild>
+    <CustomBuild Include="HuffmanCode_x86.cpp">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">c:\cygwin\bin\env PATH=/bin c:\cygwin\bin\g++ -std=c++11 -O2 -masm=intel -c -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename).obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">c:\cygwin\bin\env PATH=/bin c:\cygwin\bin\g++ -std=c++11 -O2 -masm=intel -c -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename).obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">c:\cygwin\bin\env PATH=/bin c:\cygwin\bin\g++ -std=c++11 -O2 -masm=intel -c -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename).obj</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">c:\cygwin\bin\env PATH=/bin c:\cygwin\bin\g++ -std=c++11 -O2 -masm=intel -c -o $(IntDir)%(Filename).obj %(Identity)</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename).obj</Outputs>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Identity)</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Identity)</Message>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HuffmanCode.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HuffmanCode.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HuffmanCode.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HuffmanCode.h</AdditionalInputs>
+    </CustomBuild>
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Predict.cpp" />
     <ClCompile Include="Predict_x86x64_xmm.cpp">
@@ -303,20 +344,6 @@
     <ResourceCompile Include="utv_core.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Common_asm_x64.mac" />
-    <None Include="Common_asm_x86.mac" />
-    <CustomBuild Include="HuffmanCode_asm_x64.asm">
-      <ExcludedFromBuild Condition="'$(Platform)'=='Win32'">true</ExcludedFromBuild>
-      <Command Condition="'$(Platform)'=='x64'">nasm -f win64 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
-      <Outputs Condition="'$(Platform)'=='x64'">$(IntDir)%(Filename).obj</Outputs>
-      <Message Condition="'$(Platform)'=='x64'">%(Identity)</Message>
-    </CustomBuild>
-    <CustomBuild Include="HuffmanCode_asm_x86.asm">
-      <ExcludedFromBuild Condition="'$(Platform)'=='x64'">true</ExcludedFromBuild>
-      <Command Condition="'$(Platform)'=='Win32'">nasm -f win32 -g -Xvc -o $(IntDir)%(Filename).obj %(Identity)</Command>
-      <Outputs Condition="'$(Platform)'=='Win32'">$(IntDir)%(Filename).obj</Outputs>
-      <Message Condition="'$(Platform)'=='Win32'">%(Identity)</Message>
-    </CustomBuild>
     <None Include="utv_core.def" />
   </ItemGroup>
   <ItemGroup>
