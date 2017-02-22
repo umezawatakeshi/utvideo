@@ -8,15 +8,19 @@
 extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable)
 {
 	size_t ret;
+	void* clobber;
 #ifdef __GNUC__
 	asm volatile (
 	R"(
 	.intel_syntax noprefix
 
-	mov			rsi, %[pSrcBegin]
-	mov			rdi, %[pDstBegin]
-	mov			r8,  %[pSrcEnd]
-	mov			rdx, %[pEncodeTable]
+	# rdi = pDstBegin
+	# rsi = pSrcBegin
+	# rax = pSrcEnd
+	# rdx = pEncodeTable
+
+	mov			r8, rax
+	mov			r15, rdi
 	cmp			qword ptr [rdx], 0
 	je			3f
 
@@ -58,21 +62,28 @@ extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegi
 	add			rdi, 4
 3:
 	mov			rax, rdi
-	sub			rax, %[pDstBegin]
+	sub			rax, r15
 	)"
-		: "=a"(ret)
-		: [pDstBegin]"m"(pDstBegin), [pSrcBegin]"m"(pSrcBegin), [pSrcEnd]"m"(pSrcEnd), [pEncodeTable]"m"(pEncodeTable)
-		: "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15");
+		: "=a"(ret), "=D"(clobber), "=S"(clobber), "=d"(clobber)
+		: "D"(pDstBegin), "S"(pSrcBegin), "a"(pSrcEnd), "d"(pEncodeTable)
+		: "rbx", "rcx", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15");
 #endif
 	return ret;
 }
 
 #ifdef __GNUC__
-	asm volatile (
+	asm (
 	R"(
 	.intel_syntax noprefix
 
 .macro HUFFMAN_DECODE_8 procname, bmi2
+
+	# rdi = pDstBegin
+	# rax = pDstEnd
+	# rsi = pSrcBegin
+	# rbx = pDecodeTable
+
+	mov			r8, rax
 	sub			r8, 4
 
 	mov			cl, 32
@@ -164,21 +175,16 @@ extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegi
 extern "C" uint8_t *i686_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable)
 {
 	uint8_t *ret;
+	void* clobber;
 #ifdef __GNUC__
 	asm volatile (
 	R"(
 	.intel_syntax noprefix
-
-	mov			rsi, %[pSrcBegin]
-	mov			rbx, %[pDecodeTable]
-
-	mov			rdi, %[pDstBegin]
-	mov			r8,  %[pDstEnd]
 	HUFFMAN_DECODE_8 i686_HuffmanDecode, 0
 	)"
-		: "=a"(ret)
-		: [pDstBegin]"m"(pDstBegin), [pDstEnd]"m"(pDstEnd), [pSrcBegin]"m"(pSrcBegin), [pDecodeTable]"m"(pDecodeTable)
-		: "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15");
+		: "=a"(ret), "=D"(clobber), "=S"(clobber), "=b"(clobber)
+		: "D"(pDstBegin), "a"(pDstEnd), "S"(pSrcBegin), "b"(pDecodeTable)
+		: "rcx", "rdx", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15");
 #endif
 	return ret;
 }
@@ -186,21 +192,16 @@ extern "C" uint8_t *i686_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, con
 extern "C" uint8_t *bmi2_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable)
 {
 	uint8_t *ret;
+	void* clobber;
 #ifdef __GNUC__
 	asm volatile (
 	R"(
 	.intel_syntax noprefix
-
-	mov			rsi, %[pSrcBegin]
-	mov			rbx, %[pDecodeTable]
-
-	mov			rdi, %[pDstBegin]
-	mov			r8,  %[pDstEnd]
 	HUFFMAN_DECODE_8 bmi2_HuffmanDecode, 1
 	)"
-		: "=a"(ret)
-		: [pDstBegin]"m"(pDstBegin), [pDstEnd]"m"(pDstEnd), [pSrcBegin]"m"(pSrcBegin), [pDecodeTable]"m"(pDecodeTable)
-		: "rbx", "rcx", "rdx", "rsi", "rdi", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15");
+		: "=a"(ret), "=D"(clobber), "=S"(clobber), "=b"(clobber)
+		: "D"(pDstBegin), "a"(pDstEnd), "S"(pSrcBegin), "b"(pDecodeTable)
+		: "rcx", "rdx", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15");
 #endif
 	return ret;
 }

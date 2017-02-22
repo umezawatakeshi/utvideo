@@ -8,15 +8,19 @@
 extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable)
 {
 	size_t ret;
+	void* clobber;
 #ifdef __GNUC__
 	asm volatile (
 	R"(
 	.intel_syntax noprefix
 
-	mov			esi, %[pSrcBegin]
-	mov			edi, %[pDstBegin]
-	mov			ebp, %[pSrcEnd]
-	mov			edx, %[pEncodeTable]
+	# edi = pDstBegin
+	# esi = pSrcBegin
+	# eax = pSrcEnd
+	# edx = pEncodeTable
+
+	push		edi
+	mov			ebp, eax
 	cmp			dword ptr [edx], 0
 	je			3f
 
@@ -51,11 +55,12 @@ extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegi
 	add			edi, 4
 3:
 	mov			eax, edi
-	sub			eax, %[pDstBegin]
+	pop			edi
+	sub			eax, edi
 	)"
-		: "=a"(ret)
-		: [pDstBegin]"m"(pDstBegin), [pSrcBegin]"m"(pSrcBegin), [pSrcEnd]"m"(pSrcEnd), [pEncodeTable]"m"(pEncodeTable)
-		: "ebx", "ecx", "edx", "esi", "edi", "ebp");
+		: "=a"(ret), "=D"(clobber), "=S"(clobber), "=d"(clobber)
+		: "D"(pDstBegin), "S"(pSrcBegin), "a"(pSrcEnd), "d"(pEncodeTable)
+		: "ebx", "ecx", "ebp");
 #endif
 	return ret;
 }
@@ -63,16 +68,19 @@ extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegi
 extern "C" uint8_t *i686_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable)
 {
 	uint8_t *ret;
+	void* clobber;
 #ifdef __GNUC__
 	asm volatile (
 	R"(
 	.intel_syntax noprefix
 
-	mov			esi, %[pSrcBegin]
-	mov			ebx, %[pDecodeTable]
+	# edi = pDstBegin
+	# eax = pDstEnd
+	# esi = pSrcBegin
+	# ebx = pDecodeTable
 
-	mov			edi, %[pDstBegin]
-	sub			%[pDstEnd], 4
+	push		eax
+	sub			dword ptr [esp], 4
 
 	mov			cl, 32
 	sub			esi, 4
@@ -81,7 +89,7 @@ extern "C" uint8_t *i686_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, con
 
 	.align		64
 1:
-	cmp			edi, %[pDstEnd]
+	cmp			edi, dword ptr [esp]
 	jae			3f
 
 	cmp			cl, 32
@@ -125,7 +133,7 @@ extern "C" uint8_t *i686_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, con
 	mov			byte ptr [edi], dl
 	shr			edx, 8
 	add			edi, 1
-	cmp			edi, %[pDstEnd]
+	cmp			edi, dword ptr [esp]
 	jae			3f
 	sub			al, 1
 	ja			5b
@@ -135,13 +143,14 @@ extern "C" uint8_t *i686_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, con
 .endm
 
 	DO_OUTPUT	0
-	add			%[pDstEnd], 4
+	add			dword ptr [esp], 4
 	DO_OUTPUT	1
+	pop			eax
 	mov			eax, edi
 	)"
-		: "=a"(ret)
-		: [pDstBegin]"m"(pDstBegin), [pDstEnd]"m"(pDstEnd), [pSrcBegin]"m"(pSrcBegin), [pDecodeTable]"m"(pDecodeTable)
-		: "ebx", "ecx", "edx", "esi", "edi", "ebp");
+		: "=a"(ret), "=D"(clobber), "=S"(clobber), "=b"(clobber)
+		: "D"(pDstBegin), "a"(pDstEnd), "S"(pSrcBegin), "b"(pDecodeTable)
+		: "ecx", "edx", "ebp");
 #endif
 	return ret;
 }
