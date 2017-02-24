@@ -27,7 +27,7 @@ extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegi
 	mov			bl, -64
 	mov			cl, 0
 
-	.align		64
+	.balign		64
 1:
 	shld		rax, rcx, cl
 	cmp			rsi, r8
@@ -91,7 +91,7 @@ extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegi
 	add			rsi, 4
 
 .macro DO_OUTPUT_\procname perbyte
-	.align		64
+	.balign		64
 1:
 	cmp			rdi, r8
 	jae			3f

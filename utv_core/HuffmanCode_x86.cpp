@@ -27,7 +27,7 @@ extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegi
 	mov			bl, -32
 	mov			cl, 0
 
-	.align		64
+	.balign		64
 1:
 	shld		eax, ecx, cl
 	cmp			esi, ebp
@@ -87,7 +87,7 @@ extern "C" uint8_t *i686_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, con
 
 .macro DO_OUTPUT perbyte
 
-	.align		64
+	.balign		64
 1:
 	cmp			edi, dword ptr [esp]
 	jae			3f
