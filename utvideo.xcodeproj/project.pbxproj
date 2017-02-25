@@ -468,16 +468,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/include",
 					"$(SRCROOT)/utv_logl",
 				);
 				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = utv_logc;
 			};
 			name = Debug;
@@ -488,15 +485,12 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/include",
 					"$(SRCROOT)/utv_logl",
 				);
 				INSTALL_PATH = /usr/local/bin;
-				PREBINDING = NO;
 				PRODUCT_NAME = utv_logc;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -527,9 +521,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
@@ -539,11 +531,6 @@
 				);
 				INFOPLIST_FILE = "utv_qt-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
-				OTHER_LDFLAGS = (
-					"-read_only_relocs",
-					suppress,
-				);
-				PREBINDING = NO;
 				PRODUCT_NAME = utv_qt;
 				WRAPPER_EXTENSION = component;
 			};
@@ -555,9 +542,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				HEADER_SEARCH_PATHS = (
@@ -566,14 +551,8 @@
 				);
 				INFOPLIST_FILE = "utv_qt-Info.plist";
 				INSTALL_PATH = "$(HOME)/Library/Bundles";
-				OTHER_LDFLAGS = (
-					"-read_only_relocs",
-					suppress,
-				);
-				PREBINDING = NO;
 				PRODUCT_NAME = utv_qt;
 				WRAPPER_EXTENSION = component;
-				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
