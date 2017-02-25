@@ -80,12 +80,16 @@ extern "C" uint8_t *i686_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, con
 	# ebx = pDecodeTable
 
 	push		eax
-	sub			dword ptr [esp], 4
 
 	mov			cl, 32
 	sub			esi, 4
 
-.macro DO_OUTPUT perbyte
+.irp perbyte, 0, 1
+.if !\perbyte
+	sub			dword ptr [esp], 4
+.else
+	add			dword ptr [esp], 4
+.endif
 
 	.balign		64
 1:
@@ -140,11 +144,8 @@ extern "C" uint8_t *i686_HuffmanDecode(uint8_t *pDstBegin, uint8_t *pDstEnd, con
 	jmp			1b
 .endif
 3:
-.endm
+.endr
 
-	DO_OUTPUT	0
-	add			dword ptr [esp], 4
-	DO_OUTPUT	1
 	pop			eax
 	mov			eax, edi
 	)"

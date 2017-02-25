@@ -84,13 +84,18 @@ extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegi
 	# rbx = pDecodeTable
 
 	mov			r8, rax
-	sub			r8, 4
 
 	mov			cl, 32
 	mov			edx, dword ptr [rsi]
 	add			rsi, 4
 
-.macro DO_OUTPUT_\procname perbyte
+.irp perbyte, 0, 1
+.if !\perbyte
+	sub			r8, 4
+.else
+	add			r8, 4
+.endif
+
 	.balign		64
 1:
 	cmp			rdi, r8
@@ -162,11 +167,8 @@ extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegi
 .endif
 
 3:
-.endm
+.endr
 
-	DO_OUTPUT_\procname	0
-	add			r8, 4
-	DO_OUTPUT_\procname	1
 	mov			rax, rdi
 .endm
 	)");
