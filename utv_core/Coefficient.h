@@ -60,53 +60,40 @@
 class CBT601KrKb
 {
 public:
-	static inline float KR(void) { return (float)COEFF_BT601_KR; }
-	static inline float KB(void) { return (float)COEFF_BT601_KB; }
+	static constexpr double KR = COEFF_BT601_KR;
+	static constexpr double KB = COEFF_BT601_KB;
 };
 
 class CBT709KrKb
 {
 public:
-	static inline float KR(void) { return (float)COEFF_BT709_KR; }
-	static inline float KB(void) { return (float)COEFF_BT709_KB; }
+	static constexpr double KR = COEFF_BT709_KR;
+	static constexpr double KB = COEFF_BT709_KB;
 };
 
 template<class KRKB>
 class CCoefficient
 {
 public:
-	static inline float R2Y(void)   { return (float)COEFF_R2Y8(KRKB::KR(), KRKB::KB()); }
-	static inline float G2Y(void)   { return (float)COEFF_G2Y8(KRKB::KR(), KRKB::KB()); }
-	static inline float B2Y(void)   { return (float)COEFF_B2Y8(KRKB::KR(), KRKB::KB()); }
-	static inline float R2U(void)   { return (float)COEFF_R2U8(KRKB::KR(), KRKB::KB()); }
-	static inline float G2U(void)   { return (float)COEFF_G2U8(KRKB::KR(), KRKB::KB()); }
-	static inline float B2U(void)   { return (float)COEFF_B2U8(KRKB::KR(), KRKB::KB()); }
-	static inline float R2V(void)   { return (float)COEFF_R2V8(KRKB::KR(), KRKB::KB()); }
-	static inline float G2V(void)   { return (float)COEFF_G2V8(KRKB::KR(), KRKB::KB()); }
-	static inline float B2V(void)   { return (float)COEFF_B2V8(KRKB::KR(), KRKB::KB()); }
+	static constexpr double KR    = KRKB::KR;
+	static constexpr double KB    = KRKB::KB;
 
-	static inline float Y2RGB(void) { return (float)COEFF_Y2RGB8; }
-	static inline float U2B(void)   { return (float)COEFF_U2B8(KRKB::KR(), KRKB::KB()); }
-	static inline float V2R(void)   { return (float)COEFF_V2R8(KRKB::KR(), KRKB::KB()); }
-	static inline float U2G(void)   { return (float)COEFF_U2G8(KRKB::KR(), KRKB::KB()); }
-	static inline float V2G(void)   { return (float)COEFF_V2G8(KRKB::KR(), KRKB::KB()); }
+	static constexpr double R2Y   = COEFF_R2Y8(KR, KB);
+	static constexpr double G2Y   = COEFF_G2Y8(KR, KB);
+	static constexpr double B2Y   = COEFF_B2Y8(KR, KB);
+	static constexpr double R2U   = COEFF_R2U8(KR, KB);
+	static constexpr double G2U   = COEFF_G2U8(KR, KB);
+	static constexpr double B2U   = COEFF_B2U8(KR, KB);
+	static constexpr double R2V   = COEFF_R2V8(KR, KB);
+	static constexpr double G2V   = COEFF_G2V8(KR, KB);
+	static constexpr double B2V   = COEFF_B2V8(KR, KB);
+
+	static constexpr double Y2RGB = COEFF_Y2RGB8;
+	static constexpr double U2B   = COEFF_U2B8(KR, KB);
+	static constexpr double V2R   = COEFF_V2R8(KR, KB);
+	static constexpr double U2G   = COEFF_U2G8(KR, KB);
+	static constexpr double V2G   = COEFF_V2G8(KR, KB);
 };
 
 typedef CCoefficient<CBT601KrKb> CBT601Coefficient;
 typedef CCoefficient<CBT709KrKb> CBT709Coefficient;
-
-
-#define R2Y   R2Y()
-#define G2Y   G2Y()
-#define B2Y   B2Y()
-#define R2U   R2U()
-#define G2U   G2U()
-#define B2U   B2U()
-#define R2V   R2V()
-#define G2V   G2V()
-#define B2V   B2V()
-#define Y2RGB Y2RGB()
-#define U2B   U2B()
-#define V2R   V2R()
-#define U2G   U2G()
-#define V2G   V2G()
