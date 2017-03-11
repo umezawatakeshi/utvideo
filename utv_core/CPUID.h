@@ -3,6 +3,10 @@
 
 #pragma once
 
+#if defined(_MSC_VER)
+#include <intrin.h>
+#endif
+
 struct cpuid_result
 {
 	uint32_t eax;
