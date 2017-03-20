@@ -23,10 +23,10 @@ template<int B> struct HUFFMAN_DECODE_TABLE;
 struct TUNEDFUNC_PREDICT
 {
 	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_PREDICT);
-	void (*pfnPredictWrongMedianAndCount)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
-	void (*pfnPredictLeftAndCount)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
-	void (*pfnRestoreWrongMedian)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
-	void(*pfnRestoreLeft8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+	void (*pfnPredictCylindricalWrongMedianAndCount8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
+	void (*pfnPredictCylindricalLeftAndCount8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable);
+	void (*pfnRestoreCylindricalWrongMedian8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
+	void(*pfnRestoreCylindricalLeft8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
 	void(*pfnPredictCylindricalLeftAndCount10)(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, uint32_t *pCountTable);
 	void(*pfnRestoreCylindricalLeft10)(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);
 	void(*pfnPredictPlanarGradientAndCount8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
@@ -125,10 +125,10 @@ public:
 };
 
 
-#define PredictWrongMedianAndCount tfn.pPredict->pfnPredictWrongMedianAndCount
-#define PredictLeftAndCount tfn.pPredict->pfnPredictLeftAndCount
-#define RestoreWrongMedian tfn.pPredict->pfnRestoreWrongMedian
-#define RestoreLeft8 tfn.pPredict->pfnRestoreLeft8
+#define PredictCylindricalWrongMedianAndCount8 tfn.pPredict->pfnPredictCylindricalWrongMedianAndCount8
+#define PredictCylindricalLeftAndCount8 tfn.pPredict->pfnPredictCylindricalLeftAndCount8
+#define RestoreCylindricalWrongMedian8 tfn.pPredict->pfnRestoreCylindricalWrongMedian8
+#define RestoreCylindricalLeft8 tfn.pPredict->pfnRestoreCylindricalLeft8
 #define PredictCylindricalLeftAndCount10 tfn.pPredict->pfnPredictCylindricalLeftAndCount10
 #define RestoreCylindricalLeft10 tfn.pPredict->pfnRestoreCylindricalLeft10
 #define PredictPlanarGradientAndCount8 tfn.pPredict->pfnPredictPlanarGradientAndCount8
