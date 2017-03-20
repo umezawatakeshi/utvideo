@@ -57,6 +57,7 @@ protected:
 	static const uint32_t EC_FLAGS0_INTRAFRAME_PREDICT_MASK         = 0x00000300;
 	static const uint32_t EC_FLAGS0_INTRAFRAME_PREDICT_RESERVED     = 0x00000000;
 	static const uint32_t EC_FLAGS0_INTRAFRAME_PREDICT_LEFT         = 0x00000100;
+	static const uint32_t EC_FLAGS0_INTRAFRAME_PREDICT_GRADIENT     = 0x00000200;
 	static const uint32_t EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN = 0x00000300;
 
 	static const uint32_t EC_FLAGS0_ASSUME_INTERLACE                = 0x00000800;

@@ -59,6 +59,9 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
 			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO, BST_CHECKED);
 			break;
+		case EC_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO, BST_CHECKED);
+			break;
 		case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
 			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO, BST_CHECKED);
 			break;
@@ -93,6 +96,8 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			}
 			if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO))
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
+			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO))
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_GRADIENT;
 			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO))
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
 			if (IsDlgButtonChecked(hwnd, IDC_ASSUME_INTERLACE_CHECK))
@@ -170,6 +175,9 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	{
 	case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
 		fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_LEFT;
+		break;
+	case EC_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+		fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT;
 		break;
 	case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
 		fi.dwFlags0 |= FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
@@ -398,6 +406,9 @@ void CUL00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
 			PredictLeftAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
+		case EC_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+			PredictPlanarGradientAndCount8(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			break;
 		case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
 			PredictWrongMedianAndCount(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
@@ -608,6 +619,10 @@ void CUL00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
 		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
 		case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
 			RestoreLeft8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd);
+			m_pCurFrame = m_pRestoredFrame;
+			break;
+		case FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+			RestorePlanarGradient8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
 			m_pCurFrame = m_pRestoredFrame;
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:

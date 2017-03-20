@@ -19,6 +19,8 @@ const TUNEDFUNC_PREDICT tfnPredictCPP = {
 	cpp_RestoreCylindricalLeft<8>,
 	cpp_PredictCylindricalLeftAndCount<10>,
 	cpp_RestoreCylindricalLeft<10>,
+	cpp_PredictPlanarGradientAndCount<8>,
+	cpp_RestorePlanarGradient<8>,
 };
 
 const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeCPP = {

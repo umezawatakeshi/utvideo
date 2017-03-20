@@ -94,7 +94,7 @@ static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDe
 static const vector<pair<int, int>> sizes_clip000 = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
 
 static int divs[] = { 1, 8, 11 };
-static string preds[] = { "left", "median" };
+static string preds[] = { "left", "gradient", "median" };
 
 vector<tuple<string, string, unsigned int>> conv_clip000(const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> &v, const vector<pair<int, int>>& sz, bool rawprop)
 {
@@ -148,8 +148,9 @@ static vector<uint8_t> ulxx_config_progressive = { 0x00, 0x00, 0x00, 0x00, };
 static vector<uint8_t> ulxx_config_interlace   = { 0x00, 0x08, 0x00, 0x00, };
 
 static vector<pair<string, vector<uint8_t>>> preds_ulxx = {
-	{ "left",  { 0x00, 0x01, 0x00, 0x00, } },
-	{ "median",{ 0x00, 0x03, 0x00, 0x00, } },
+	{ "left",     { 0x00, 0x01, 0x00, 0x00, } },
+	{ "gradient", { 0x00, 0x02, 0x00, 0x00, } },
+	{ "median",   { 0x00, 0x03, 0x00, 0x00, } },
 };
 
 static vector<pair<string, vector<uint8_t>>> divs_ulxx = {

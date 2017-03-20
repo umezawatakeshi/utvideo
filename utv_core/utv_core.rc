@@ -50,7 +50,7 @@ END
 // Dialog
 //
 
-IDD_UL00_CONFIG DIALOGEX 0, 0, 186, 90
+IDD_UL00_CONFIG DIALOGEX 0, 0, 187, 105
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -59,11 +59,13 @@ BEGIN
     EDITTEXT        IDC_DIVIDE_COUNT_EDIT,67,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
     CONTROL         "論理プロセッサ数と同じにする",IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,20,108,10
-    CONTROL         "圧縮率優先 (Predict median)",IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,7,35,110,10
-    CONTROL         "デコード速度優先 (Predict left)",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,7,53,115,10
-    CONTROL         "インターレース映像としてエンコード",IDC_ASSUME_INTERLACE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,70,122,10
+    GROUPBOX        "フレーム内予測方式",IDC_STATIC,7,34,100,50
+    CONTROL         "Predict Median",IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,14,44,63,10
+    CONTROL         "Predict Gradient",IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,14,56,67,10
+    CONTROL         "Predict Left",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,"Button",BS_AUTORADIOBUTTON,14,68,53,10
+    CONTROL         "インターレース映像としてエンコード",IDC_ASSUME_INTERLACE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,122,10
     DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
     PUSHBUTTON      "キャンセル",IDCANCEL,129,24,50,14
 END
@@ -106,6 +108,17 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
+    IDD_UL00_CONFIG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 186
+        VERTGUIDE, 7
+        VERTGUIDE, 14
+        BOTTOMMARGIN, 98
+        HORZGUIDE, 51
+        HORZGUIDE, 64
+        HORZGUIDE, 76
+    END
+
     IDD_GLOBAL_CONFIG, DIALOG
     BEGIN
         VERTGUIDE, 7
@@ -113,6 +126,17 @@ BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_UL00_CONFIG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 #endif    // 日本語 (日本) resources
 /////////////////////////////////////////////////////////////////////////////
@@ -130,7 +154,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-IDD_UL00_CONFIG DIALOGEX 0, 0, 186, 90
+IDD_UL00_CONFIG DIALOGEX 0, 0, 187, 105
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -139,12 +163,14 @@ BEGIN
     EDITTEXT        IDC_DIVIDE_COUNT_EDIT,75,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
     CONTROL         "Same as # of logical processors",IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,20,117,10
-    CONTROL         "Optimize for compression ratio (Predict median)",IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,7,43,167,10
-    CONTROL         "Optimize for decoding speed (Predict left)",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,7,58,149,10
+    GROUPBOX        "Intra-frame prediction type",IDC_STATIC,7,34,100,50
+    CONTROL         "Predict Median",IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,14,44,63,10
+    CONTROL         "Predict Gradient",IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO,
+                    "Button",BS_AUTORADIOBUTTON,14,56,67,10
+    CONTROL         "Predict Left",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,"Button",BS_AUTORADIOBUTTON,14,68,53,10
     CONTROL         "Assume interlace video",IDC_ASSUME_INTERLACE_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,73,89,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,89,10
     DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
     PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
 END
@@ -188,11 +214,28 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
+    IDD_UL00_CONFIG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 186
+        VERTGUIDE, 7
+    END
+
     IDD_GLOBAL_CONFIG, DIALOG
     BEGIN
     END
 END
 #endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_UL00_CONFIG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
 
 #endif    // 英語 (米国) resources
 /////////////////////////////////////////////////////////////////////////////

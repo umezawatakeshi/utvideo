@@ -394,3 +394,145 @@ template void tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_SSSE3>(uint8_t *p
 #ifdef GENERATE_AVX1
 template void tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
 #endif
+
+
+template<int F>
+void tuned_PredictPlanarGradientAndCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
+{
+	auto p = pSrcBegin;
+	auto q = pDst;
+
+	__m128i prev = _mm_set1_epi8((char)0x80);
+	__m128i topprev;
+
+#ifdef __SSSE3__
+	for (; p <= pSrcBegin + dwStride - 16; p += 16, q += 16)
+	{
+		__m128i value = _mm_loadu_si128((const __m128i *)p);
+		__m128i left = _mm_alignr_epi8(value, prev, 15);
+
+		__m128i error = _mm_sub_epi8(value, left);
+		_mm_storeu_si128((__m128i *)q, error);
+		prev = value;
+
+		IncrementCounters8<F>(error, pCountTable);
+	}
+#endif
+	for (; p < pSrcBegin + dwStride; p++, q++)
+	{
+		*q = *p - *(p - 1);
+		++pCountTable[*q];
+	}
+
+	for (auto pp = pSrcBegin + dwStride; pp != pSrcEnd; pp += dwStride)
+	{
+		prev = _mm_set1_epi8((char)0x80);
+		topprev = _mm_set1_epi8((char)0x80);
+
+#ifdef __SSSE3__
+		for (; p <= pp + dwStride - 16; p += 16, q += 16)
+		{
+			__m128i value = _mm_loadu_si128((const __m128i *)p);
+			__m128i top = _mm_loadu_si128((const __m128i *)(p - dwStride));
+			__m128i left = _mm_alignr_epi8(value, prev, 15);
+			__m128i topleft = _mm_alignr_epi8(top, topprev, 15);
+			__m128i pred = _mm_sub_epi8(_mm_add_epi8(left, top), topleft);
+
+			__m128i error = _mm_sub_epi8(value, pred);
+			_mm_storeu_si128((__m128i *)q, error);
+			prev = value;
+			topprev = top;
+
+			IncrementCounters8<F>(error, pCountTable);
+		}
+#endif
+		for (; p < pp + dwStride; p++, q++)
+		{
+			*q = *p - (*(p - 1) + *(p - dwStride) - *(p - dwStride - 1));
+			++pCountTable[*q];
+		}
+	}
+}
+
+#ifdef GENERATE_SSE41
+template void tuned_PredictPlanarGradientAndCount8<CODEFEATURE_SSE41>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_PredictPlanarGradientAndCount8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
+#endif
+
+
+template<int F>
+void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride)
+{
+	auto p = pSrcBegin;
+	auto q = pDst;
+
+	__m128i prev = _mm_set1_epi8((char)0x80);
+
+#ifdef __SSSE3__
+	for (; p <= pSrcBegin + dwStride - 32; p += 32, q += 32)
+	{
+		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
+		__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 16));
+
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 1));
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 2));
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 4));
+		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
+		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 8));
+		s0 = _mm_add_epi8(s0, prev);
+		s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)));
+		_mm_storeu_si128((__m128i *)q, s0);
+		_mm_storeu_si128((__m128i *)(q + 16), s1);
+		prev = _mm_shuffle_epi8(s1, _mm_set1_epi8(15));
+	}
+#endif
+	for (; p < pSrcBegin + dwStride; p++, q++)
+	{
+		*q = *(q - 1) + *p;
+	}
+
+	for (auto pp = pSrcBegin + dwStride; pp != pSrcEnd; pp += dwStride)
+	{
+		prev = _mm_set1_epi8((char)0);
+
+#ifdef __SSSE3__
+		for (; p <= pp + dwStride - 32; p += 32, q += 32)
+		{
+			__m128i s0 = _mm_loadu_si128((const __m128i *)p);
+			__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 16));
+
+			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
+			s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 1));
+			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
+			s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 2));
+			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
+			s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 4));
+			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
+			s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 8));
+			s0 = _mm_add_epi8(s0, prev);
+			s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)));
+			_mm_storeu_si128((__m128i *)q, _mm_add_epi8(s0, _mm_loadu_si128((const __m128i *)(q - dwStride))));
+			_mm_storeu_si128((__m128i *)(q + 16), _mm_add_epi8(s1, _mm_loadu_si128((const __m128i *)(q - dwStride + 16))));
+			prev = _mm_shuffle_epi8(s1, _mm_set1_epi8(15));
+		}
+#endif
+		for (; p < pp + dwStride; p++, q++)
+		{
+			*q = *p + (*(q - 1) + *(q - dwStride) - *(q - dwStride - 1));
+		}
+	}
+}
+
+#ifdef GENERATE_SSSE3
+template void tuned_RestorePlanarGradient8<CODEFEATURE_SSSE3>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_RestorePlanarGradient8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
+#endif

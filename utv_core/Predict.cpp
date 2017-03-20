@@ -117,3 +117,69 @@ void cpp_RestoreCylindricalLeft(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin,
 
 template void cpp_RestoreCylindricalLeft<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd);
 template void cpp_RestoreCylindricalLeft<10>(symbol_t<10> *pDst, const symbol_t<10> *pSrcBegin, const symbol_t<10> *pSrcEnd);
+
+
+template<int B>
+void cpp_PredictPlanarGradientAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
+{
+	const uint8_t *p = pSrcBegin;
+	uint8_t *q = pDst;
+
+	*q = (*p - CSymbolBits<B>::midval) & CSymbolBits<B>::maskval;
+	pCountTable[*q]++;
+	p++;
+	q++;
+
+	for (; p < pSrcBegin + dwStride; p++, q++)
+	{
+		*q = (*p - *(p - 1)) & CSymbolBits<B>::maskval;
+		pCountTable[*q]++;
+	}
+
+	for (auto pp = pSrcBegin + dwStride; pp != pSrcEnd; pp += dwStride)
+	{
+		*q = (*p - *(p - dwStride)) & CSymbolBits<B>::maskval;
+		pCountTable[*q]++;
+		p++;
+		q++;
+
+		for (; p < pp + dwStride; p++, q++)
+		{
+			*q = (*p - (*(p - dwStride) + *(p - 1) - *(p - 1 - dwStride))) & CSymbolBits<B>::maskval;
+			pCountTable[*q]++;
+		}
+	}
+}
+
+template void cpp_PredictPlanarGradientAndCount<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
+
+
+template<int B>
+void cpp_RestorePlanarGradient(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t dwStride)
+{
+	const uint8_t *p = pSrcBegin;
+	uint8_t *q = pDst;
+
+	*q = (*p + CSymbolBits<B>::midval) & CSymbolBits<B>::maskval;
+	p++;
+	q++;
+
+	for (; p < pSrcBegin + dwStride; p++, q++)
+	{
+		*q = (*p + *(q - 1)) & CSymbolBits<B>::maskval;
+	}
+
+	for (auto pp = pSrcBegin + dwStride; pp != pSrcEnd; pp += dwStride)
+	{
+		*q = (*p + *(q - dwStride)) & CSymbolBits<B>::maskval;
+		p++;
+		q++;
+
+		for (; p < pp + dwStride; p++, q++)
+		{
+			*q = (*p + (*(q - dwStride) + *(q - 1) - *(q - 1 - dwStride))) & CSymbolBits<B>::maskval;
+		}
+	}
+}
+
+template void cpp_RestorePlanarGradient<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t dwStride);
