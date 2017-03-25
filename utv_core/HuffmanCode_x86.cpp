@@ -27,23 +27,59 @@ extern "C" size_t i686_HuffmanEncode(uint8_t *pDstBegin, const uint8_t *pSrcBegi
 	mov			bl, -32
 	mov			cl, 0
 
+	mov			eax, ebp
+	sub			eax, esi
+	and			eax, 3
+
+	cmp			eax, 3
+	jne			1f
+	sub			esi, 1
+	jmp			label1
+
+1:
+	cmp			eax, 2
+	jne			1f
+	sub			esi, 2
+	jmp			label2
+
+1:
+	cmp			eax, 1
+	jne			1f
+	sub			esi, 3
+	jmp			label3
+
 	.balign		64
 1:
+.irp offset, 0, 1, 2, 3
+label\offset:
 	shld		eax, ecx, cl
+.if \offset == 0
 	cmp			esi, ebp
 	jnb			4f
-	movzx		ecx, byte ptr [esi]
-	add			esi, 1
+.endif
+
+	movzx		ecx, byte ptr [esi+\offset]
+.if \offset == 3
+	add			esi, 4
+.endif
 	mov			ecx, dword ptr [edx+ecx*4]
 	add			bl, cl
+.if \offset != 3
+	jnc			2f
+.else
 	jnc			1b
+.endif
 	sub			cl, bl
 	shld		eax, ecx, cl
 	mov			dword ptr [edi], eax
 	add			edi, 4
 	add			cl, bl
 	sub			bl, 32
+.if \offset == 3
 	jmp			1b
+.endif
+2:
+.endr
 
 4:
 	test		bl, 0x1f
