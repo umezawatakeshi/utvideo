@@ -465,35 +465,122 @@ void CULYUV420Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 template<class C>
 bool CULYUV420Codec<C>::PredictDirect(uint32_t nBandIndex)
 {
-	if (m_utvfRaw == UTVF_YV12)
+	switch (m_utvfRaw)
 	{
-		const uint8_t *pSrcBegin[3];
+	case UTVF_YV12:
+		{
+			const uint8_t *pSrcBegin[3];
 
-		pSrcBegin[0] = ((const uint8_t *)m_pInput);
-		pSrcBegin[2] = pSrcBegin[0] + m_nWidth * m_nHeight;
-		pSrcBegin[1] = pSrcBegin[2] + m_nWidth * m_nHeight / 4;
+			pSrcBegin[0] = ((const uint8_t *)m_pInput);
+			pSrcBegin[2] = pSrcBegin[0] + m_nWidth * m_nHeight;
+			pSrcBegin[1] = pSrcBegin[2] + m_nWidth * m_nHeight / 4;
 
-		PredictFromPlanar(nBandIndex, pSrcBegin);
+			PredictFromPlanar(nBandIndex, pSrcBegin);
+		}
+		return true;
+	case UTVF_YV16:
+		{
+			const uint8_t *pSrcYBegin, *pSrcVBegin, *pSrcUBegin;
 
+			uint8_t *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+			uint8_t *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+
+			pSrcYBegin = ((uint8_t *)m_pInput);
+			pSrcVBegin = pSrcYBegin + m_nWidth * m_nHeight;
+			pSrcUBegin = pSrcVBegin + m_nWidth * m_nHeight / 2;
+
+			size_t cbChromaStride = m_nWidth / 2 * (m_bInterlace ? 2 : 1);
+
+			pSrcVBegin += m_dwPlaneStripeBegin[nBandIndex] * cbChromaStride * 2;
+			pSrcUBegin += m_dwPlaneStripeBegin[nBandIndex] * cbChromaStride * 2;
+
+			auto du = pDstUBegin;
+			auto dv = pDstVBegin;
+			auto su = pSrcUBegin;
+			auto sv = pSrcVBegin;
+			for (auto i = m_dwPlaneStripeBegin[nBandIndex]; i < m_dwPlaneStripeEnd[nBandIndex]; ++i)
+			{
+				for (size_t j = 0; j < cbChromaStride; ++j)
+				{
+					du[j] = (su[j] + su[j + cbChromaStride]) / 2;
+					dv[j] = (sv[j] + sv[j + cbChromaStride]) / 2;
+				}
+				du += cbChromaStride;
+				dv += cbChromaStride;
+				su += cbChromaStride * 2;
+				sv += cbChromaStride * 2;
+			}
+
+			const uint8_t *pSrcBegin[3];
+
+			pSrcBegin[0] = ((const uint8_t *)m_pInput);
+			pSrcBegin[1] = m_pCurFrame->GetPlane(1);
+			pSrcBegin[2] = m_pCurFrame->GetPlane(2);
+
+			PredictFromPlanar(nBandIndex, pSrcBegin);
+		}
 		return true;
 	}
-	
+
 	return false;
 }
 
 template<class C>
 bool CULYUV420Codec<C>::DecodeDirect(uint32_t nBandIndex)
 {
-	if (m_utvfRaw == UTVF_YV12)
+	switch (m_utvfRaw)
 	{
-		uint8_t *pDstBegin[3];
+	case UTVF_YV12:
+		{
+			uint8_t *pDstBegin[3];
 
-		pDstBegin[0] = ((uint8_t *)m_pOutput);
-		pDstBegin[2] = pDstBegin[0] + m_nWidth * m_nHeight;
-		pDstBegin[1] = pDstBegin[2] + m_nWidth * m_nHeight / 4;
+			pDstBegin[0] = ((uint8_t *)m_pOutput);
+			pDstBegin[2] = pDstBegin[0] + m_nWidth * m_nHeight;
+			pDstBegin[1] = pDstBegin[2] + m_nWidth * m_nHeight / 4;
 
-		DecodeToPlanar(nBandIndex, pDstBegin);
+			DecodeToPlanar(nBandIndex, pDstBegin);
+		}
+		return true;
+	case UTVF_YV16:
+		{
+			uint8_t *pDstBegin[3];
 
+			pDstBegin[0] = ((uint8_t *)m_pOutput);
+			pDstBegin[1] = m_pRestoredFrame->GetPlane(1);
+			pDstBegin[2] = m_pRestoredFrame->GetPlane(2);
+
+			DecodeToPlanar(nBandIndex, pDstBegin);
+
+			uint8_t *pDstYBegin, *pDstVBegin, *pDstUBegin;
+
+			const uint8_t *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+			const uint8_t *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+
+			pDstYBegin = ((uint8_t *)m_pOutput);
+			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
+			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight / 2;
+
+			size_t cbChromaStride = m_nWidth / 2 * (m_bInterlace ? 2 : 1);
+
+			pDstVBegin += m_dwPlaneStripeBegin[nBandIndex] * cbChromaStride * 2;
+			pDstUBegin += m_dwPlaneStripeBegin[nBandIndex] * cbChromaStride * 2;
+
+			auto du = pDstUBegin;
+			auto dv = pDstVBegin;
+			auto su = pSrcUBegin;
+			auto sv = pSrcVBegin;
+			for (auto i = m_dwPlaneStripeBegin[nBandIndex]; i < m_dwPlaneStripeEnd[nBandIndex]; ++i)
+			{
+				memcpy(du, su, cbChromaStride);
+				memcpy(du + cbChromaStride, su, cbChromaStride);
+				memcpy(dv, sv, cbChromaStride);
+				memcpy(dv + cbChromaStride, sv, cbChromaStride);
+				du += cbChromaStride * 2;
+				dv += cbChromaStride * 2;
+				su += cbChromaStride;
+				sv += cbChromaStride;
+			}
+		}
 		return true;
 	}
 
