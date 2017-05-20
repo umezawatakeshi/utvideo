@@ -488,19 +488,19 @@ void tuned_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 	{
 		rb2y = _mm_set2_epi16_shift(C::R2Y, C::B2Y, shift);
 		xg2y = _mm_set2_epi16_shift(16.5 / 0xff, C::G2Y, shift);
-		rb2u = _mm_set4_epi16_shift(0, 0, C::R2U / 2, C::B2U / 2, shift);
-		xg2u = _mm_set4_epi16_shift(0, 0, 128.5 / 2 / 0xff, C::G2U / 2, shift);
-		rb2v = _mm_set4_epi16_shift(0, 0, C::R2V / 2, C::B2V / 2, shift);
-		xg2v = _mm_set4_epi16_shift(0, 0, 128.5 / 2 / 0xff, C::G2V / 2, shift);
+		rb2u = _mm_set4_epi16_shift(0, 0, C::R2U, C::B2U, shift);
+		xg2u = _mm_set4_epi16_shift(0, 0, 128.5 / 0xff, C::G2U, shift);
+		rb2v = _mm_set4_epi16_shift(0, 0, C::R2V, C::B2V, shift);
+		xg2v = _mm_set4_epi16_shift(0, 0, 128.5 / 0xff, C::G2V, shift);
 	}
 	else
 	{
 		rb2y = _mm_set2_epi16_shift(C::B2Y, C::R2Y, shift);
 		xg2y = _mm_set2_epi16_shift(C::G2Y, 16.5 / 0xff, shift);
-		rb2u = _mm_set4_epi16_shift(0, 0, C::B2U / 2, C::R2U / 2, shift);
-		xg2u = _mm_set4_epi16_shift(0, 0, C::G2U / 2, 128.5 / 2 / 0xff, shift);
-		rb2v = _mm_set4_epi16_shift(0, 0, C::B2V / 2, C::R2V / 2, shift);
-		xg2v = _mm_set4_epi16_shift(0, 0, C::G2V / 2, 128.5 / 2 / 0xff, shift);
+		rb2u = _mm_set4_epi16_shift(0, 0, C::B2U, C::R2U, shift);
+		xg2u = _mm_set4_epi16_shift(0, 0, C::G2U, 128.5 / 0xff, shift);
+		rb2v = _mm_set4_epi16_shift(0, 0, C::B2V, C::R2V, shift);
+		xg2v = _mm_set4_epi16_shift(0, 0, C::G2V, 128.5 / 0xff, shift);
 	}
 
 	auto y = pYBegin;
@@ -563,7 +563,7 @@ void tuned_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 			xg = _mm_add_epi16(xg, _mm_srli_epi64(xg, 32));
 			auto xrgb2uv = [rb, xg, shift](__m128i rb2uv, __m128i xg2uv) -> uint32_t {
 				__m128i uv = _mm_add_epi32(_mm_madd_epi16(rb, rb2uv), _mm_madd_epi16(xg, xg2uv));
-				uv = _mm_srli_epi32(uv, shift);
+				uv = _mm_srli_epi32(uv, shift + 1);
 #ifdef __SSSE3__
 				if (F >= CODEFEATURE_SSSE3)
 				{
@@ -641,7 +641,7 @@ void tuned_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 			xg = _mm_add_epi16(xg, _mm_srli_epi64(xg, 32));
 			auto xrgb2uv = [rb, xg, shift](__m128i rb2uv, __m128i xg2uv) -> uint8_t {
 				__m128i uv = _mm_add_epi32(_mm_madd_epi16(rb, rb2uv), _mm_madd_epi16(xg, xg2uv));
-				uv = _mm_srli_epi32(uv, shift);
+				uv = _mm_srli_epi32(uv, shift + 1);
 				return (uint8_t)_mm_cvtsi128_si32(uv);
 			};
 			*u = xrgb2uv(rb2u, xg2u);
