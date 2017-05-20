@@ -63,6 +63,14 @@ struct TUNEDFUNC_CONVERT_YUVRGB_COLORSPACE
 	void(*pfnConvertBGRXToULY4)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 	void(*pfnConvertRGBToULY4)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 	void(*pfnConvertXRGBToULY4)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	void(*pfnConvertULY0ToBGR)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace);
+	void(*pfnConvertULY0ToBGRX)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace);
+	void(*pfnConvertULY0ToRGB)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace);
+	void(*pfnConvertULY0ToXRGB)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace);
+	void(*pfnConvertBGRToULY0)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace);
+	void(*pfnConvertBGRXToULY0)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace);
+	void(*pfnConvertRGBToULY0)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace);
+	void(*pfnConvertXRGBToULY0)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace);
 };
 
 struct TUNEDFUNC_CONVERT_YUVRGB
@@ -154,6 +162,15 @@ public:
 #define ConvertBGRXToULY4(C) CYUVTunedFunc<C>::tf().pfnConvertBGRXToULY4
 #define ConvertRGBToULY4(C) CYUVTunedFunc<C>::tf().pfnConvertRGBToULY4
 #define ConvertXRGBToULY4(C) CYUVTunedFunc<C>::tf().pfnConvertXRGBToULY4
+
+#define ConvertULY0ToBGR(C) CYUVTunedFunc<C>::tf().pfnConvertULY0ToBGR
+#define ConvertULY0ToBGRX(C) CYUVTunedFunc<C>::tf().pfnConvertULY0ToBGRX
+#define ConvertULY0ToRGB(C) CYUVTunedFunc<C>::tf().pfnConvertULY0ToRGB
+#define ConvertULY0ToXRGB(C) CYUVTunedFunc<C>::tf().pfnConvertULY0ToXRGB
+#define ConvertBGRToULY0(C) CYUVTunedFunc<C>::tf().pfnConvertBGRToULY0
+#define ConvertBGRXToULY0(C) CYUVTunedFunc<C>::tf().pfnConvertBGRXToULY0
+#define ConvertRGBToULY0(C) CYUVTunedFunc<C>::tf().pfnConvertRGBToULY0
+#define ConvertXRGBToULY0(C) CYUVTunedFunc<C>::tf().pfnConvertXRGBToULY0
 
 #define ConvertBGRToULRG tfn.pConvertShuffle->pfnConvertBGRToULRG
 #define ConvertRGBToULRG(g, b, r, p, q, w, s) ConvertBGRToULRG(g, r, b, p, q, w, s)
