@@ -63,13 +63,13 @@ void tuned_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 #endif
 			else if (std::is_same<T, CARGBColorOrder>::value)
 			{
-				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rr, rr), _mm_unpacklo_epi8(gg, bb));
+				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rr), _mm_unpacklo_epi8(gg, bb));
 				_mm_storeu_si128((__m128i *)pp, xrgb);
 			}
 #ifdef __SSSE3__
 			else if (std::is_same<T, CRGBColorOrder>::value)
 			{
-				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rr), _mm_unpacklo_epi8(gg, bb));
+				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rr, rr), _mm_unpacklo_epi8(gg, bb));
 				__m128i rgb = _mm_shuffle_epi8(xrgb, _mm_set_epi8(-1, -1, -1, -1, 15, 14, 13, 11, 10, 9, 7, 6, 5, 3, 2, 1));
 				_mm_storeu_si128((__m128i *)pp, rgb);
 			}
@@ -109,7 +109,7 @@ void tuned_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 			}
 			else if (std::is_same<T, CARGBColorOrder>::value)
 			{
-				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rr, rr), _mm_unpacklo_epi8(gg, bb));
+				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rr), _mm_unpacklo_epi8(gg, bb));
 				*(uint32_t *)pp = _mm_cvtsi128_si32(xrgb);
 			}
 			else if (std::is_same<T, CBGRColorOrder>::value || std::is_same<T, CRGBColorOrder>::value)
@@ -379,13 +379,13 @@ void tuned_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 #endif
 			else if (std::is_same<T, CARGBColorOrder>::value)
 			{
-				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rr, rr), _mm_unpacklo_epi8(gg, bb));
+				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rr), _mm_unpacklo_epi8(gg, bb));
 				_mm_storeu_si128((__m128i *)pp, xrgb);
 			}
 #ifdef __SSSE3__
 			else if (std::is_same<T, CRGBColorOrder>::value)
 			{
-				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rr), _mm_unpacklo_epi8(gg, bb));
+				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rr, rr), _mm_unpacklo_epi8(gg, bb));
 				__m128i rgb = _mm_shuffle_epi8(xrgb, _mm_set_epi8(-1, -1, -1, -1, 15, 14, 13, 11, 10, 9, 7, 6, 5, 3, 2, 1));
 				_mm_storeu_si128((__m128i *)pp, rgb);
 			}
@@ -427,7 +427,7 @@ void tuned_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 			}
 			else if (std::is_same<T, CARGBColorOrder>::value)
 			{
-				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rr, rr), _mm_unpacklo_epi8(gg, bb));
+				__m128i xrgb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rr), _mm_unpacklo_epi8(gg, bb));
 				_mm_storel_epi64((__m128i *)pp, xrgb);
 			}
 			else if (std::is_same<T, CBGRColorOrder>::value || std::is_same<T, CRGBColorOrder>::value)
@@ -757,16 +757,16 @@ void tuned_ConvertULY0ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 #endif
 				else if (std::is_same<T, CARGBColorOrder>::value)
 				{
-					__m128i xrgbt = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rrt, rrt), _mm_unpacklo_epi8(ggt, bbt));
-					__m128i xrgbb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rrb, rrb), _mm_unpacklo_epi8(ggb, bbb));
+					__m128i xrgbt = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rrt), _mm_unpacklo_epi8(ggt, bbt));
+					__m128i xrgbb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rrb), _mm_unpacklo_epi8(ggb, bbb));
 					_mm_storeu_si128((__m128i *)pp, xrgbt);
 					_mm_storeu_si128((__m128i *)(pp + scbPredictStride), xrgbb);
 				}
 #ifdef __SSSE3__
 				else if (std::is_same<T, CRGBColorOrder>::value)
 				{
-					__m128i xrgbt = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rrt), _mm_unpacklo_epi8(ggt, bbt));
-					__m128i xrgbb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rrb), _mm_unpacklo_epi8(ggb, bbb));
+					__m128i xrgbt = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rrt, rrt), _mm_unpacklo_epi8(ggt, bbt));
+					__m128i xrgbb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rrb, rrb), _mm_unpacklo_epi8(ggb, bbb));
 					__m128i rgbt = _mm_shuffle_epi8(xrgbt, _mm_set_epi8(-1, -1, -1, -1, 15, 14, 13, 11, 10, 9, 7, 6, 5, 3, 2, 1));
 					__m128i rgbb = _mm_shuffle_epi8(xrgbb, _mm_set_epi8(-1, -1, -1, -1, 15, 14, 13, 11, 10, 9, 7, 6, 5, 3, 2, 1));
 					_mm_storeu_si128((__m128i *)pp, rgbt);
@@ -818,8 +818,8 @@ void tuned_ConvertULY0ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 				}
 				else if (std::is_same<T, CARGBColorOrder>::value)
 				{
-					__m128i xrgbt = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rrt, rrt), _mm_unpacklo_epi8(ggt, bbt));
-					__m128i xrgbb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(rrb, rrb), _mm_unpacklo_epi8(ggb, bbb));
+					__m128i xrgbt = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rrt), _mm_unpacklo_epi8(ggt, bbt));
+					__m128i xrgbb = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_setone_si128(), rrb), _mm_unpacklo_epi8(ggb, bbb));
 					_mm_storel_epi64((__m128i *)pp, xrgbt);
 					_mm_storel_epi64((__m128i *)(pp + scbPredictStride), xrgbb);
 				}
