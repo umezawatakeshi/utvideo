@@ -228,10 +228,10 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Identity)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Identity)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Identity)</Message>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HuffmanCode.h</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HuffmanCode.h</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HuffmanCode.h</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HuffmanCode.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HuffmanCode.h;HuffmanCode_x64_HuffmanDecode.cpp;HuffmanCode_x64_HuffmanEncode.cpp</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HuffmanCode.h;HuffmanCode_x64_HuffmanDecode.cpp;HuffmanCode_x64_HuffmanEncode.cpp</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HuffmanCode.h;HuffmanCode_x64_HuffmanDecode.cpp;HuffmanCode_x64_HuffmanEncode.cpp</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HuffmanCode.h;HuffmanCode_x64_HuffmanDecode.cpp;HuffmanCode_x64_HuffmanEncode.cpp</AdditionalInputs>
     </CustomBuild>
     <CustomBuild Include="HuffmanCode_x86.cpp">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">c:\cygwin\bin\env PATH=/bin c:\cygwin\bin\g++ -std=c++11 -O2 -masm=intel -c -o $(IntDir)%(Filename).obj %(Identity)</Command>
@@ -248,11 +248,35 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Identity)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Identity)</Message>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Identity)</Message>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HuffmanCode.h</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HuffmanCode.h</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HuffmanCode.h</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HuffmanCode.h</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">HuffmanCode.h;HuffmanCode_x86_HuffmanDecode.cpp;HuffmanCode_x86_HuffmanEncode.cpp</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">HuffmanCode.h;HuffmanCode_x86_HuffmanDecode.cpp;HuffmanCode_x86_HuffmanEncode.cpp</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">HuffmanCode.h;HuffmanCode_x86_HuffmanDecode.cpp;HuffmanCode_x86_HuffmanEncode.cpp</AdditionalInputs>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">HuffmanCode.h;HuffmanCode_x86_HuffmanDecode.cpp;HuffmanCode_x86_HuffmanEncode.cpp</AdditionalInputs>
     </CustomBuild>
+    <ClCompile Include="HuffmanCode_x64_HuffmanDecode.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="HuffmanCode_x64_HuffmanEncode.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="HuffmanCode_x86_HuffmanDecode.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="HuffmanCode_x86_HuffmanEncode.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Predict.cpp" />
     <ClCompile Include="Predict_x86x64_xmm.cpp">
