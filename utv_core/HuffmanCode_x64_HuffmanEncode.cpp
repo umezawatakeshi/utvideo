@@ -30,24 +30,24 @@
 	cmp			rax, 3 * \symsize
 	jne			1f
 	sub			rsi, 1 * \symsize
-	jmp			label1
+	jmp			91f
 
 1:
 	cmp			rax, 2 * \symsize
 	jne			1f
 	sub			rsi, 2 * \symsize
-	jmp			label2
+	jmp			92f
 
 1:
 	cmp			rax, 1 * \symsize
 	jne			1f
 	sub			rsi, 3 * \symsize
-	jmp			label3
+	jmp			93f
 
 	.balign		64
 1:
 .irp offset, 0, 1, 2, 3
-label\offset:
+9\offset:
 	shld		rax, rcx, cl
 .if \offset == 0
 	cmp			rsi, r8

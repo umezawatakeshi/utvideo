@@ -30,24 +30,24 @@
 	cmp			eax, 3 * \symsize
 	jne			1f
 	sub			esi, 1 * \symsize
-	jmp			label1
+	jmp			91f
 
 1:
 	cmp			eax, 2 * \symsize
 	jne			1f
 	sub			esi, 2 * \symsize
-	jmp			label2
+	jmp			92f
 
 1:
 	cmp			eax, 1 * \symsize
 	jne			1f
 	sub			esi, 3 * \symsize
-	jmp			label3
+	jmp			93f
 
 	.balign		64
 1:
 .irp offset, 0, 1, 2, 3
-label\offset:
+9\offset:
 	shld		eax, ecx, cl
 .if \offset == 0
 	cmp			esi, ebp
