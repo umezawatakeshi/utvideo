@@ -383,7 +383,7 @@ void CUQ00Codec::EncodeProc(uint32_t nBandIndex)
 		dwDstEnd = m_pdwOffsetTable[nPlaneIndex][nBandIndex];
 		dwEncodedSize =
 #endif
-		cpp_HuffmanEncode<10>(m_pEncodedBits[nPlaneIndex] + dwDstOffset, (uint16_t *)(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), &m_het[nPlaneIndex]);
+		HuffmanEncode10(m_pEncodedBits[nPlaneIndex] + dwDstOffset, (uint16_t *)(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), &m_het[nPlaneIndex]);
 		_ASSERT(dwEncodedSize == dwDstEnd - dwDstOffset);
 	}
 }

@@ -37,6 +37,7 @@ struct TUNEDFUNC_HUFFMAN_ENCODE
 {
 	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_HUFFMAN_ENCODE);
 	size_t (*pfnHuffmanEncode8)(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable);
+	size_t (*pfnHuffmanEncode10)(uint8_t *pDstBegin, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<10> *pEncodeTable);
 };
 
 struct TUNEDFUNC_HUFFMAN_DECODE
@@ -143,6 +144,7 @@ public:
 #define RestorePlanarGradient8 tfn.pPredict->pfnRestorePlanarGradient8
 
 #define HuffmanEncode8 tfn.pHuffmanEncode->pfnHuffmanEncode8
+#define HuffmanEncode10 tfn.pHuffmanEncode->pfnHuffmanEncode10
 #define HuffmanDecode8 tfn.pHuffmanDecode->pfnHuffmanDecode8
 
 #define ConvertULY2ToBGR(C) CYUVTunedFunc<C>::tf().pfnConvertULY2ToBGR

@@ -131,7 +131,8 @@ const TUNEDFUNC_PREDICT tfnPredictAVX1 = {
 const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeI686 = {
 	NULL,
 	{ 0, 0 },
-	i686_HuffmanEncode,
+	i686_HuffmanEncode8,
+	i686_HuffmanEncode10,
 };
 
 
