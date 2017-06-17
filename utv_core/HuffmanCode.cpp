@@ -160,10 +160,10 @@ struct GenerateMultiSpeedTable0<B, sizeof(uint32_t) / sizeof(symbol_t<B>)>
 */
 
 template<>
-void GenerateMultiSpeedTable0<8, 4>::f(HUFFMAN_DECODE_TABLE<8> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<8> *pCodeLengthTable, const SYMBOL_AND_CODELEN<8> *cls, const int *clsidx, const uint32_t *codes, uint32_t prefix, int preflen) {}
+void GenerateMultiSpeedTable0<8, sizeof(HUFFMAN_DECODE_TABLE<8>::combined_t) / sizeof(symbol_t<8>)>::f(HUFFMAN_DECODE_TABLE<8> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<8> *pCodeLengthTable, const SYMBOL_AND_CODELEN<8> *cls, const int *clsidx, const uint32_t *codes, uint32_t prefix, int preflen) {}
 
 template<>
-void GenerateMultiSpeedTable0<10, 2>::f(HUFFMAN_DECODE_TABLE<10> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<10> *pCodeLengthTable, const SYMBOL_AND_CODELEN<10> *cls, const int *clsidx, const uint32_t *codes, uint32_t prefix, int preflen) {}
+void GenerateMultiSpeedTable0<10, sizeof(HUFFMAN_DECODE_TABLE<10>::combined_t) / sizeof(symbol_t<10>)>::f(HUFFMAN_DECODE_TABLE<10> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<10> *pCodeLengthTable, const SYMBOL_AND_CODELEN<10> *cls, const int *clsidx, const uint32_t *codes, uint32_t prefix, int preflen) {}
 
 template<int B, int syms>
 void GenerateMultiSpeedTable0<B, syms>::f(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable, const SYMBOL_AND_CODELEN<B> *cls, const int *clsidx, const uint32_t *codes, uint32_t prefix, int preflen)
@@ -184,7 +184,7 @@ void GenerateMultiSpeedTable0<B, syms>::f(HUFFMAN_DECODE_TABLE<B> *pDecodeTable,
 		{
 			pDecodeTable->MultiSpeedTable_cs[idx + j].codelen = newpreflen;
 			pDecodeTable->MultiSpeedTable_cs[idx + j].symlen = syms + 1;
-			pDecodeTable->MultiSpeedTable_sym[idx + j].symbols8[syms] = cls[i].symbol;
+			pDecodeTable->MultiSpeedTable_sym[idx + j].symbols[syms] = cls[i].symbol;
 		}
 		GenerateMultiSpeedTable0<B, syms + 1>::f(pDecodeTable, pCodeLengthTable, cls, clsidx, codes, newprefix, newpreflen);
 	}
@@ -225,7 +225,7 @@ void GenerateMultiSpeedTable(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUFFMA
 	{
 		pDecodeTable->MultiSpeedTable_cs[i].codelen = 255;
 		pDecodeTable->MultiSpeedTable_cs[i].symlen = 0;
-		pDecodeTable->MultiSpeedTable_sym[i].symbols32 = 0;
+		pDecodeTable->MultiSpeedTable_sym[i].combined = 0;
 	}
 
 	GenerateMultiSpeedTable0<B, 0>::f(pDecodeTable, pCodeLengthTable, cls, clsidx, codes, 0, 0);
@@ -249,7 +249,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUF
 	if (cls[0].codelen == 0)
 	{
 		pDecodeTable->MultiSpeedTable_cs[0].codelen = 0;
-		pDecodeTable->MultiSpeedTable_sym[0].symbols8[0] = cls[0].symbol;
+		pDecodeTable->MultiSpeedTable_sym[0].symbols[0] = cls[0].symbol;
 		return;
 	}
 
@@ -369,7 +369,7 @@ symbol_t<B> * cpp_HuffmanDecode(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, co
 	for (pDst = (symbol_t<B> *)pDstBegin; pDst < (symbol_t<B> *)pDstEnd;)
 	{
 		uint32_t code;
-		uint32_t symbol32;
+		HUFFMAN_DECODE_TABLE<B>::combined_t combined;
 		int codelen;
 		int symlen;
 
@@ -381,7 +381,7 @@ symbol_t<B> * cpp_HuffmanDecode(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, co
 		int tableidx = code >> (32 - HUFFMAN_DECODE_TABLE<B>::LOOKUP_BITS);
 		if (pDecodeTable->MultiSpeedTable_cs[tableidx].codelen != 255)
 		{
-			symbol32 = pDecodeTable->MultiSpeedTable_sym[tableidx].symbols32;
+			combined = pDecodeTable->MultiSpeedTable_sym[tableidx].combined;
 			codelen = pDecodeTable->MultiSpeedTable_cs[tableidx].codelen;
 			symlen = pDecodeTable->MultiSpeedTable_cs[tableidx].symlen;
 		}
@@ -391,15 +391,15 @@ symbol_t<B> * cpp_HuffmanDecode(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, co
 			int codeshift = pDecodeTable->nCodeShift[bsrval];
 			code >>= codeshift;
 			tableidx = pDecodeTable->dwSymbolBase[bsrval] + code;
-			symbol32 = pDecodeTable->SymbolAndCodeLength[tableidx].symbol;
+			combined = pDecodeTable->SymbolAndCodeLength[tableidx].symbol;
 			codelen = pDecodeTable->SymbolAndCodeLength[tableidx].codelen;
 			symlen = 1;
 		}
 
 		for (int i = 0; i < symlen && pDst < (symbol_t<B> *)pDstEnd; i++)
 		{
-			*pDst++ = symbol32;
-			symbol32 >>= sizeof(symbol_t<B>) * 8;
+			*pDst++ = combined;
+			combined >>= sizeof(symbol_t<B>) * 8;
 		}
 		nBits += codelen;
 
@@ -446,7 +446,7 @@ symbol_t<B> *HuffmanDecode(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, const u
 {
 	if (pDecodeTable->MultiSpeedTable_cs[0].codelen == 0)
 	{
-		std::fill(pDstBegin, pDstEnd, pDecodeTable->MultiSpeedTable_sym[0].symbols8[0]);
+		std::fill(pDstBegin, pDstEnd, pDecodeTable->MultiSpeedTable_sym[0].symbols[0]);
 		return pDstEnd;
 	}
 	else

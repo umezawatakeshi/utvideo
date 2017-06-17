@@ -39,6 +39,8 @@ struct HUFFMAN_ENCODE_TABLE
 template<int B>
 struct HUFFMAN_DECODE_TABLE
 {
+	typedef uint32_t combined_t;
+
 	static const int LOOKUP_BITS = (B == 8) ? 12 : 11; /* XXX */
 
 	struct
@@ -48,8 +50,8 @@ struct HUFFMAN_DECODE_TABLE
 	} MultiSpeedTable_cs[1 << LOOKUP_BITS];
 	union
 	{
-		uint32_t symbols32;
-		symbol_t<B> symbols8[sizeof(uint32_t) / sizeof(symbol_t<B>)];
+		combined_t combined;
+		symbol_t<B> symbols[sizeof(combined_t) / sizeof(symbol_t<B>)];
 	} MultiSpeedTable_sym[1 << LOOKUP_BITS];
 
 	uint8_t nCodeShift[32];
