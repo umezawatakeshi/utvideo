@@ -1,6 +1,7 @@
 /* ï∂éöÉRÅ[ÉhÇÕÇrÇiÇhÇr â¸çsÉRÅ[ÉhÇÕÇbÇqÇkÇe */
 /* $Id$ */
 
+	typedef typename std::remove_reference<decltype(*pDecodeTable)>::type decodetable_t;
 	uint8_t *ret;
 	void* clobber;
 #ifdef __GNUC__
@@ -48,9 +49,9 @@
 	mov			rax, rdx
 	shl			rax, cl
 .endif
-	shr			rax, 20+32
-	mov			r11d, dword ptr [rbx + 8192 + rax*4]						# pDecodeTable->MultiSpeedTable_sym[rax]
-	movzx		eax, word ptr [rbx + rax*2]									# pDecodeTable->MultiSpeedTable_cs[rax]
+	shr			rax, 64 - %c[lookup_bits]
+	mov			r11d, dword ptr [rbx + %c[offsetof_multispeedtable_sym] + rax*4]
+	movzx		eax, word ptr [rbx + %c[offsetof_multispeedtable_cs] + rax*2]
 	cmp			ah, 255
 	jne			0f
 
@@ -65,16 +66,16 @@
 	or			eax, 1
 	bsr			r10, rax
 .if \bmi2
-	movzx		r13d, byte ptr [rbx + 8192 + 16384 + r10]					# pDecodeTable->nCodeShift[r10]
+	movzx		r13d, byte ptr [rbx + %c[offsetof_codeshift] + r10]
 	shrx		eax, eax, r13d
 .else
-	mov			cl, byte ptr [rbx + 8192 + 16384 + r10]						# pDecodeTable->nCodeShift[r10]
+	mov			cl, byte ptr [rbx + %c[offsetof_codeshift] + r10]
 	shr			eax, cl
 	mov			ecx, r15d
 .endif
-	mov			r10d, dword ptr [rbx + 8192 + 16384 + 32 + r10*4]			# pDecodeTable->dwSymbolBase[r10]
+	mov			r10d, dword ptr [rbx + %c[offsetof_symbolbase] + r10*4]
 	add			r10, rax
-	mov			eax, dword ptr [rbx + 8192 + 16384 + 32 + 4*32 + r10*2]		# pDecodeTable->SymbolAndCodeLength[r10]
+	mov			eax, dword ptr [rbx + %c[offsetof_symbolandcodelength] + r10*2]
 	mov			r11d, eax
 	mov			al, 1
 
@@ -107,7 +108,13 @@
 .purgem HUFFMAN_DECODE_8
 	)"
 		: "=a"(ret), "=D"(clobber), "=S"(clobber), "=b"(clobber)
-		: "D"(pDstBegin), "a"(pDstEnd), "S"(pSrcBegin), "b"(pDecodeTable)
+		: "D"(pDstBegin), "a"(pDstEnd), "S"(pSrcBegin), "b"(pDecodeTable),
+		  [lookup_bits]"i"(decodetable_t::LOOKUP_BITS),
+		  [offsetof_multispeedtable_cs]"i"(offsetof(decodetable_t, MultiSpeedTable_cs)),
+		  [offsetof_multispeedtable_sym]"i"(offsetof(decodetable_t, MultiSpeedTable_sym)),
+		  [offsetof_codeshift]"i"(offsetof(decodetable_t, nCodeShift)),
+		  [offsetof_symbolbase]"i"(offsetof(decodetable_t, dwSymbolBase)),
+		  [offsetof_symbolandcodelength]"i"(offsetof(decodetable_t, SymbolAndCodeLength))
 		: "rcx", "rdx", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15");
 #endif
 	return ret;
