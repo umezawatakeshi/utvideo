@@ -2,7 +2,8 @@
 /* $Id$ */
 
 	typedef typename std::remove_reference<decltype(*pDecodeTable)>::type decodetable_t;
-	uint8_t *ret;
+	typedef typename std::remove_reference<decltype(*pDstBegin)>::type sym_t;
+	sym_t *ret;
 	void* clobber;
 #ifdef __GNUC__
 	asm volatile (
@@ -21,11 +22,11 @@
 	mov			cl, 32
 	sub			esi, 4
 
-.irp perbyte, 0, 1
-.if !\perbyte
-	sub			dword ptr [esp], 4
+.irp persym, 0, 1
+.if !\persym
+	sub			dword ptr [esp], %c[sizeof_combined_t]
 .else
-	add			dword ptr [esp], 4
+	add			dword ptr [esp], %c[sizeof_combined_t]
 .endif
 
 	.balign		64
@@ -43,7 +44,11 @@
 	mov			eax, dword ptr [esi]
 	shld		eax, ebp, cl
 	shr			eax, 32 - %c[lookup_bits]
+.if %c[sizeof_combined_t] == 4
 	mov			edx, dword ptr [ebx + %c[offsetof_multispeedtable_sym] + eax*4]
+.else
+.err
+.endif
 	movzx		eax, word ptr [ebx + %c[offsetof_multispeedtable_cs] + eax*2]
 	cmp			ah, 255
 	jne			0f
@@ -57,23 +62,55 @@
 	shr			eax, cl
 	mov			cl, ch
 	add			eax, dword ptr [ebx + %c[offsetof_symbolbase] + edx*4]
+.if %c[sizeof_combined_t] == 4
+.if %c[sizeof_sym_t] == 1
 	mov			eax, dword ptr [ebx + %c[offsetof_symbolandcodelength] + eax*2]
 	mov			edx, eax
+.elseif %c[sizeof_sym_t] == 2
+	mov			eax, dword ptr [ebx + %c[offsetof_symbolandcodelength] + eax*4]
+	mov			edx, eax
+	shr			eax, 8
+.else
+.err
+.endif
+.else
+.err
+.endif
 	mov			al, 1
 
 0:
 	add			cl, ah
 
-.if !\perbyte
+.if !\persym
+.if %c[sizeof_combined_t] == 4
 	mov			dword ptr [edi], edx
+.else
+.err
+.endif
 	movzx		eax, al
+.if %c[sizeof_sym_t] == 1
 	add			edi, eax
+.elseif %c[sizeof_sym_t] == 2
+	lea			edi, [edi + eax * 2]
+.else
+.err
+.endif
 	jmp			1b
 .else
 5:
+.if %c[sizeof_combined_t] == 4
+.if %c[sizeof_sym_t] == 1
 	mov			byte ptr [edi], dl
-	shr			edx, 8
-	add			edi, 1
+.elseif %c[sizeof_sym_t] == 2
+	mov			word ptr [edi], dx
+.else
+.err
+.endif
+	shr			edx, 8 * %c[sizeof_sym_t]
+.else
+.err
+.endif
+	add			edi, %c[sizeof_sym_t]
 	cmp			edi, dword ptr [esp]
 	jae			3f
 	sub			al, 1
@@ -96,7 +133,9 @@
 		  [offsetof_multispeedtable_sym]"i"(offsetof(decodetable_t, MultiSpeedTable_sym)),
 		  [offsetof_codeshift]"i"(offsetof(decodetable_t, nCodeShift)),
 		  [offsetof_symbolbase]"i"(offsetof(decodetable_t, dwSymbolBase)),
-		  [offsetof_symbolandcodelength]"i"(offsetof(decodetable_t, SymbolAndCodeLength))
+		  [offsetof_symbolandcodelength]"i"(offsetof(decodetable_t, SymbolAndCodeLength)),
+		  [sizeof_sym_t]"i"(sizeof(sym_t)),
+		  [sizeof_combined_t]"i"(sizeof(decodetable_t::combined_t))
 		: "ecx", "edx", "ebp");
 #endif
 	return ret;

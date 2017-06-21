@@ -44,6 +44,7 @@ struct TUNEDFUNC_HUFFMAN_DECODE
 {
 	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_HUFFMAN_DECODE);
 	uint8_t* (*pfnHuffmanDecode8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<8> *pDecodeTable);
+	uint16_t* (*pfnHuffmanDecode10)(uint16_t *pDstBegin, uint16_t *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<10> *pDecodeTable);
 };
 
 struct TUNEDFUNC_CONVERT_YUVRGB_COLORSPACE
@@ -146,6 +147,7 @@ public:
 #define HuffmanEncode8 tfn.pHuffmanEncode->pfnHuffmanEncode8
 #define HuffmanEncode10 tfn.pHuffmanEncode->pfnHuffmanEncode10
 #define HuffmanDecode8 tfn.pHuffmanDecode->pfnHuffmanDecode8
+#define HuffmanDecode10 tfn.pHuffmanDecode->pfnHuffmanDecode10
 
 #define ConvertULY2ToBGR(C) CYUVTunedFunc<C>::tf().pfnConvertULY2ToBGR
 #define ConvertULY2ToBGRX(C) CYUVTunedFunc<C>::tf().pfnConvertULY2ToBGRX

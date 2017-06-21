@@ -2,7 +2,8 @@
 /* $Id$ */
 
 	typedef typename std::remove_reference<decltype(*pDecodeTable)>::type decodetable_t;
-	uint8_t *ret;
+	typedef typename std::remove_reference<decltype(*pDstBegin)>::type sym_t;
+	sym_t *ret;
 	void* clobber;
 #ifdef __GNUC__
 	asm volatile (
@@ -22,11 +23,11 @@
 	mov			edx, dword ptr [rsi]
 	add			rsi, 4
 
-.irp perbyte, 0, 1
-.if !\perbyte
-	sub			r8, 4
+.irp persym, 0, 1
+.if !\persym
+	sub			r8, %c[sizeof_combined_t]
 .else
-	add			r8, 4
+	add			r8, %c[sizeof_combined_t]
 .endif
 
 	.balign		64
@@ -50,7 +51,11 @@
 	shl			rax, cl
 .endif
 	shr			rax, 64 - %c[lookup_bits]
+.if %c[sizeof_combined_t] == 4
 	mov			r11d, dword ptr [rbx + %c[offsetof_multispeedtable_sym] + rax*4]
+.else
+.err
+.endif
 	movzx		eax, word ptr [rbx + %c[offsetof_multispeedtable_cs] + rax*2]
 	cmp			ah, 255
 	jne			0f
@@ -75,23 +80,51 @@
 .endif
 	mov			r10d, dword ptr [rbx + %c[offsetof_symbolbase] + r10*4]
 	add			r10, rax
+.if %c[sizeof_combined_t] == 4
+.if %c[sizeof_sym_t] == 1
 	mov			eax, dword ptr [rbx + %c[offsetof_symbolandcodelength] + r10*2]
 	mov			r11d, eax
+.elseif %c[sizeof_sym_t] == 2
+	mov			eax, dword ptr [rbx + %c[offsetof_symbolandcodelength] + r10*4]
+	mov			r11d, eax
+	shr			eax, 8
+.else
+.err
+.endif
+.else
+.err
+.endif
 	mov			al, 1
 
 0:
 	add			cl, ah
 
-.if !\perbyte
+.if !\persym
+.if %c[sizeof_combined_t] == 4
 	mov			dword ptr [rdi], r11d
+.else
+.err
+.endif
 	movzx		rax, al
+.if %c[sizeof_sym_t] == 1
 	add			rdi, rax
+.elseif %c[sizeof_sym_t] == 2
+	lea			rdi, [rdi + rax * 2]
+.else
+.err
+.endif
 	jmp			1b
 .else
 5:
+.if %c[sizeof_sym_t] == 1
 	mov			byte ptr [rdi], r11b
-	shr			r11d, 8
-	add			rdi, 1
+.elseif %c[sizeof_sym_t] == 2
+	mov			word ptr [rdi], r11w
+.else
+.err
+.endif
+	shr			r11, 8 * %c[sizeof_sym_t]
+	add			rdi, %c[sizeof_sym_t]
 	cmp			rdi, r8
 	jae			3f
 	sub			al, 1
@@ -114,7 +147,9 @@
 		  [offsetof_multispeedtable_sym]"i"(offsetof(decodetable_t, MultiSpeedTable_sym)),
 		  [offsetof_codeshift]"i"(offsetof(decodetable_t, nCodeShift)),
 		  [offsetof_symbolbase]"i"(offsetof(decodetable_t, dwSymbolBase)),
-		  [offsetof_symbolandcodelength]"i"(offsetof(decodetable_t, SymbolAndCodeLength))
+		  [offsetof_symbolandcodelength]"i"(offsetof(decodetable_t, SymbolAndCodeLength)),
+		  [sizeof_sym_t]"i"(sizeof(sym_t)),
+		  [sizeof_combined_t]"i"(sizeof(decodetable_t::combined_t))
 		: "rcx", "rdx", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15");
 #endif
 	return ret;

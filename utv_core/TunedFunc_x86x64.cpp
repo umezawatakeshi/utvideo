@@ -139,14 +139,16 @@ const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeI686 = {
 const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeI686 = {
 	NULL,
 	{ 0, 0 },
-	i686_HuffmanDecode,
+	i686_HuffmanDecode8,
+	i686_HuffmanDecode10,
 };
 
 #ifdef __x86_64__
 const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeBMI2 = {
 	&tfnHuffmanDecodeI686,
 	{ 0, FEATURE1_BMI2 },
-	bmi2_HuffmanDecode,
+	bmi2_HuffmanDecode8,
+	bmi2_HuffmanDecode10,
 };
 #endif
 

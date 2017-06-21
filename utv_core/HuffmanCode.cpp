@@ -437,7 +437,7 @@ struct tfnHuffmanDecode<10>
 {
 	static symbol_t<10> *f(symbol_t<10> *pDstBegin, symbol_t<10> *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<10> *pDecodeTable)
 	{
-		return cpp_HuffmanDecode<10>(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable);
+		return HuffmanDecode10(pDstBegin, pDstEnd, pSrcBegin, pDecodeTable);
 	}
 };
 

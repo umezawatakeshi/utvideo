@@ -33,7 +33,8 @@ const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeCPP = {
 const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeCPP = {
 	NULL,
 	{ 0 },
-	cpp_HuffmanDecode,
+	cpp_HuffmanDecode<8>,
+	cpp_HuffmanDecode<10>,
 };
 
 const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBCPP = {
