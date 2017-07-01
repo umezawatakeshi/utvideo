@@ -99,6 +99,12 @@ struct TUNEDFUNC_CONVERT_SHUFFLE
 	void (*pfnConvertULRAToARGB)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertULY2ToYUYV)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertULY2ToUYVY)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertB48rToUQRG)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertB64aToUQRG)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertB64aToUQRA)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertUQRGToB48r)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertUQRGToB64a)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertUQRAToB64a)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 };
 
 struct TUNEDFUNC
@@ -192,3 +198,9 @@ public:
 #define ConvertULRAToARGB tfn.pConvertShuffle->pfnConvertULRAToARGB
 #define ConvertULY2ToYUYV tfn.pConvertShuffle->pfnConvertULY2ToYUYV
 #define ConvertULY2ToUYVY tfn.pConvertShuffle->pfnConvertULY2ToUYVY
+#define ConvertB48rToUQRG tfn.pConvertShuffle->pfnConvertB48rToUQRG
+#define ConvertB64aToUQRG tfn.pConvertShuffle->pfnConvertB64aToUQRG
+#define ConvertB64aToUQRA tfn.pConvertShuffle->pfnConvertB64aToUQRA
+#define ConvertUQRGToB48r tfn.pConvertShuffle->pfnConvertUQRGToB48r
+#define ConvertUQRGToB64a tfn.pConvertShuffle->pfnConvertUQRGToB64a
+#define ConvertUQRAToB64a tfn.pConvertShuffle->pfnConvertUQRAToB64a

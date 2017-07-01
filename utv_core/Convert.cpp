@@ -6,6 +6,7 @@
 #include "Convert.h"
 #include "ColorOrder.h"
 #include "Coefficient.h"
+#include "ByteOrder.h"
 
 template<class C, class T>
 void cpp_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
@@ -404,3 +405,110 @@ void cpp_ConvertULY2ToYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 
 template void cpp_ConvertULY2ToYUV422<CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULY2ToYUV422<CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+
+//
+
+template<class T>
+void cpp_ConvertRGBToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	uint16_t *g = (uint16_t *)pGBegin;
+	uint16_t *b = (uint16_t *)pBBegin;
+	uint16_t *r = (uint16_t *)pRBegin;
+
+	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += scbStride)
+	{
+		const uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += T::BYPP)
+		{
+			const uint16_t *pp = (const uint16_t *)p;
+			uint16_t gg = Convert16To10Fullrange(btoh16(pp[T::G]));
+			uint16_t bb = Convert16To10Fullrange(btoh16(pp[T::B]));
+			uint16_t rr = Convert16To10Fullrange(btoh16(pp[T::R]));
+
+			*g++ = gg;
+			*b++ = (bb - gg + 0x200) & 0x3ff;
+			*r++ = (rr - gg + 0x200) & 0x3ff;
+		}
+	}
+}
+
+template void cpp_ConvertRGBToUQRG<CB48rColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertRGBToUQRG<CB64aColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+
+//
+
+template<class T> void cpp_ConvertUQRGToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
+{
+	const uint16_t *g = (const uint16_t *)pGBegin;
+	const uint16_t *b = (const uint16_t *)pBBegin;
+	const uint16_t *r = (const uint16_t *)pRBegin;
+
+	for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin != pDstEnd; pStrideBegin += scbStride)
+	{
+		uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += T::BYPP)
+		{
+			uint16_t *pp = (uint16_t *)p;
+
+			pp[T::G] = htob16(Convert10To16Fullrange(*g));
+			pp[T::B] = htob16(Convert10To16Fullrange(*b + *g - 0x200));
+			pp[T::R] = htob16(Convert10To16Fullrange(*r + *g - 0x200));
+			g++; b++; r++;
+		}
+	}
+
+}
+
+template void cpp_ConvertUQRGToRGB<CB48rColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertUQRGToRGB<CB64aColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+
+//
+
+void cpp_ConvertB64aToUQRA(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	uint16_t *g = (uint16_t *)pGBegin;
+	uint16_t *b = (uint16_t *)pBBegin;
+	uint16_t *r = (uint16_t *)pRBegin;
+	uint16_t *a = (uint16_t *)pABegin;
+
+	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += scbStride)
+	{
+		const uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += 8)
+		{
+			const uint16_t *pp = (const uint16_t *)p;
+			uint16_t gg = Convert16To10Fullrange(btoh16(pp[2]));
+			uint16_t bb = Convert16To10Fullrange(btoh16(pp[3]));
+			uint16_t rr = Convert16To10Fullrange(btoh16(pp[1]));
+			uint16_t aa = Convert16To10Fullrange(btoh16(pp[0]));
+
+			*g++ = gg;
+			*b++ = (bb - gg + 0x200) & 0x3ff;
+			*r++ = (rr - gg + 0x200) & 0x3ff;
+			*a++ = aa;
+		}
+	}
+}
+
+void cpp_ConvertUQRAToB64a(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+{
+	const uint16_t *g = (const uint16_t *)pGBegin;
+	const uint16_t *b = (const uint16_t *)pBBegin;
+	const uint16_t *r = (const uint16_t *)pRBegin;
+	const uint16_t *a = (const uint16_t *)pABegin;
+
+	for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin != pDstEnd; pStrideBegin += scbStride)
+	{
+		uint8_t *pStrideEnd = pStrideBegin + cbWidth;
+		for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += 8)
+		{
+			uint16_t *pp = (uint16_t *)p;
+
+			pp[2] = htob16(Convert10To16Fullrange(*g));
+			pp[3] = htob16(Convert10To16Fullrange(*b + *g - 0x200));
+			pp[1] = htob16(Convert10To16Fullrange(*r + *g - 0x200));
+			pp[0] = htob16(Convert10To16Fullrange(*a));
+			g++; b++; r++; a++;
+		}
+	}
+}

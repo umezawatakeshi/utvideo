@@ -342,6 +342,12 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleSSSE3 = {
 	tuned_ConvertULRAToRGBA<CODEFEATURE_SSSE3, CARGBColorOrder>,
 	tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_SSSE3, CYUYVColorOrder>,
 	tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_SSSE3, CUYVYColorOrder>,
+	cpp_ConvertRGBToUQRG<CB48rColorOrder>,
+	cpp_ConvertRGBToUQRG<CB64aColorOrder>,
+	cpp_ConvertB64aToUQRA,
+	cpp_ConvertUQRGToRGB<CB48rColorOrder>,
+	cpp_ConvertUQRGToRGB<CB64aColorOrder>,
+	cpp_ConvertUQRAToB64a,
 };
 
 const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX1 = {
@@ -361,6 +367,12 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX1 = {
 	tuned_ConvertULRAToRGBA<CODEFEATURE_AVX1, CARGBColorOrder>,
 	tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX1, CYUYVColorOrder>,
 	tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX1, CUYVYColorOrder>,
+	cpp_ConvertRGBToUQRG<CB48rColorOrder>,
+	cpp_ConvertRGBToUQRG<CB64aColorOrder>,
+	cpp_ConvertB64aToUQRA,
+	cpp_ConvertUQRGToRGB<CB48rColorOrder>,
+	cpp_ConvertUQRGToRGB<CB64aColorOrder>,
+	cpp_ConvertUQRAToB64a,
 };
 
 

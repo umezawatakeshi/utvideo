@@ -60,3 +60,23 @@ public:
 	static const int U  = 0;
 	static const int V  = 2;
 };
+
+class CB64aColorOrder
+{
+public:
+	static const int A = 0;
+	static const int R = 1;
+	static const int G = 2;
+	static const int B = 3;
+	static const int BYPP = 8;
+};
+
+class CB48rColorOrder
+{
+public:
+	static const int A = INT_MIN;
+	static const int R = 0;
+	static const int G = 1;
+	static const int B = 2;
+	static const int BYPP = 6;
+};

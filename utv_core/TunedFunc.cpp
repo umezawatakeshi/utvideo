@@ -111,6 +111,12 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleCPP = {
 	cpp_ConvertULRAToARGB<CARGBColorOrder>,
 	cpp_ConvertULY2ToYUV422<CYUYVColorOrder>,
 	cpp_ConvertULY2ToYUV422<CUYVYColorOrder>,
+	cpp_ConvertRGBToUQRG<CB48rColorOrder>,
+	cpp_ConvertRGBToUQRG<CB64aColorOrder>,
+	cpp_ConvertB64aToUQRA,
+	cpp_ConvertUQRGToRGB<CB48rColorOrder>,
+	cpp_ConvertUQRGToRGB<CB64aColorOrder>,
+	cpp_ConvertUQRAToB64a,
 };
 
 TUNEDFUNC tfn = {

@@ -51,97 +51,44 @@ void CUQRGCodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 
 void CUQRGCodec::ConvertToPlanar(uint32_t nBandIndex)
 {
-	uint16_t *g, *b, *r;
+	uint8_t *g, *b, *r;
 	const uint8_t *pSrcBegin, *pSrcEnd;
 
 	pSrcBegin = ((uint8_t *)m_pInput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
 	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = (uint16_t *)(m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0]);
-	b = (uint16_t *)(m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1]);
-	r = (uint16_t *)(m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2]);
+	g = m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	b = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	r = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_b48r:
-		for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += m_cbRawGrossWidth)
-		{
-			const uint8_t *pStrideEnd = pStrideBegin + m_cbRawNetWidth;
-			for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += 6)
-			{
-				const uint16_t *pp = (const uint16_t *)p;
-				uint16_t gg = Convert16To10Fullrange(btoh16(pp[1]));
-				uint16_t bb = Convert16To10Fullrange(btoh16(pp[2]));
-				uint16_t rr = Convert16To10Fullrange(btoh16(pp[0]));
-
-				*g++ = gg;
-				*b++ = (bb - gg + 0x200) & 0x3ff;
-				*r++ = (rr - gg + 0x200) & 0x3ff;
-			}
-		}
+		ConvertB48rToUQRG(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
 		break;
 	case UTVF_b64a:
-		for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += m_cbRawGrossWidth)
-		{
-			const uint8_t *pStrideEnd = pStrideBegin + m_cbRawNetWidth;
-			for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += 8)
-			{
-				const uint16_t *pp = (const uint16_t *)p;
-				uint16_t gg = Convert16To10Fullrange(btoh16(pp[2]));
-				uint16_t bb = Convert16To10Fullrange(btoh16(pp[3]));
-				uint16_t rr = Convert16To10Fullrange(btoh16(pp[1]));
-
-				*g++ = gg;
-				*b++ = (bb - gg + 0x200) & 0x3ff;
-				*r++ = (rr - gg + 0x200) & 0x3ff;
-			}
-		}
+		ConvertB64aToUQRG(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
 		break;
 	}
 }
 
 void CUQRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 {
-	const uint16_t *g, *b, *r;
+	const uint8_t *g, *b, *r;
 	uint8_t *pDstBegin, *pDstEnd;
 
 	pDstBegin = ((uint8_t *)m_pOutput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
 	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = (uint16_t *)(m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0]);
-	b = (uint16_t *)(m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1]);
-	r = (uint16_t *)(m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2]);
+	g = m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	b = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	r = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_b48r:
-		for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin != pDstEnd; pStrideBegin += m_cbRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_cbRawNetWidth;
-			for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += 6)
-			{
-				uint16_t *pp = (uint16_t *)p;
-
-				pp[1] = htob16(Convert10To16Fullrange(*g));
-				pp[2] = htob16(Convert10To16Fullrange(*b + *g - 0x200));
-				pp[0] = htob16(Convert10To16Fullrange(*r + *g - 0x200));
-				g++; b++; r++;
-			}
-		}
+		ConvertUQRGToB48r(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
 		break;
 	case UTVF_b64a:
-		for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin != pDstEnd; pStrideBegin += m_cbRawGrossWidth)
-		{
-			uint8_t *pStrideEnd = pStrideBegin + m_cbRawNetWidth;
-			for (uint8_t *p = pStrideBegin; p < pStrideEnd; p += 8)
-			{
-				uint16_t *pp = (uint16_t *)p;
-
-				pp[2] = htob16(Convert10To16Fullrange(*g));
-				pp[3] = htob16(Convert10To16Fullrange(*b + *g - 0x200));
-				pp[1] = htob16(Convert10To16Fullrange(*r + *g - 0x200));
-				pp[0] = 0xffff;
-				g++; b++; r++;
-			}
-		}
+		ConvertUQRGToB64a(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
 		break;
 	}
 }
