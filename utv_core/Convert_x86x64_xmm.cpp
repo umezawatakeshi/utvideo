@@ -2,6 +2,7 @@
 /* $Id$ */
 
 #include <myintrin_x86x64.h>
+#include "ByteOrder.h"
 
 #if !defined(GENERATE_SSE2) && !defined(GENERATE_SSSE3) && !defined(GENERATE_SSE41) && !defined(GENERATE_AVX1)
 #error
@@ -151,6 +152,7 @@ template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX1, CBT709Coefficient, CRGBCo
 template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX1, CBT709Coefficient, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 #endif
 
+//
 
 template<int F, class C, class T>
 void tuned_ConvertRGBToULY4(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
@@ -320,6 +322,7 @@ template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX1, CBT709Coefficient, CRGBCo
 template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX1, CBT709Coefficient, CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 #endif
 
+//
 
 // èàóùÇ™ ULY4 Ç∆ÇŸÇ⁄ìØÇ∂Ç»ÇÃÇÇ»ÇÒÇ∆Ç©ÇµÇΩÇ¢
 template<int F, class C, class T>
@@ -475,6 +478,7 @@ template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX1, CBT709Coefficient, CRGBCo
 template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX1, CBT709Coefficient, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 #endif
 
+//
 
 // ULY2ToRGB ÇŸÇ«Ç≈ÇÕÇ»Ç¢Ç™ ULY4 Ç∆Ç©Ç»ÇËãﬂÇ¢ÇÃÇà»â∫ó™
 template<int F, class C, class T>
@@ -683,6 +687,7 @@ template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX1, CBT709Coefficient, CRGBCo
 template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX1, CBT709Coefficient, CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 #endif
 
+//
 
 template<int F, class C, class T>
 void tuned_ConvertULY0ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace)
@@ -880,6 +885,7 @@ template void tuned_ConvertULY0ToRGB<CODEFEATURE_AVX1, CBT709Coefficient, CRGBCo
 template void tuned_ConvertULY0ToRGB<CODEFEATURE_AVX1, CBT709Coefficient, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace);
 #endif
 
+//
 
 template<int F, class C, class T>
 void tuned_ConvertRGBToULY0(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace)
@@ -1126,6 +1132,7 @@ template void tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT709Coefficient, CRGBCo
 template void tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT709Coefficient, CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t dwYPlaneGrossWidth, bool bInterlace);
 #endif
 
+//
 
 template<int F, class T>
 void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
@@ -1195,6 +1202,7 @@ template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX1, CYUYVColorOrder>
 template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX1, CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 #endif
 
+//
 
 template<int F, class T>
 void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
@@ -1259,6 +1267,7 @@ template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX1, CYUYVColorOrder>
 template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX1, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 #endif
 
+//
 
 template<int F>
 static inline void tuned_ConvertBGRToULRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
@@ -1417,9 +1426,10 @@ template void tuned_ConvertRGBAToULRA<CODEFEATURE_AVX1, CBGRAColorOrder>(uint8_t
 template void tuned_ConvertRGBAToULRA<CODEFEATURE_AVX1, CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 #endif
 
+//
 
 template<int F>
-void tuned_ConvertULRGToBGR(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
+static inline void tuned_ConvertULRGToBGR(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
 {
 #ifdef __SSSE3__
 	__m128i ctl = _mm_set_epi8(5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11, 0);
@@ -1478,7 +1488,7 @@ void tuned_ConvertULRGToBGR(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 }
 
 template<int F, class T, bool A>
-void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
 	__m128i ctl;
 	if (std::is_same<T, CBGRAColorOrder>::value)
@@ -1583,4 +1593,232 @@ template void tuned_ConvertULRGToRGB<CODEFEATURE_AVX1, CBGRAColorOrder>(uint8_t 
 template void tuned_ConvertULRGToRGB<CODEFEATURE_AVX1, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin,  size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertULRAToRGBA<CODEFEATURE_AVX1, CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertULRAToRGBA<CODEFEATURE_AVX1, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
+#endif
+
+//
+
+static inline __m128i _mm_Convert16To10Fullrange(__m128i x)
+{
+	return _mm_srli_epi16(_mm_sub_epi16(_mm_add_epi16(x, _mm_set1_epi16(1 << 5)), _mm_srli_epi16(x, 10)), 6);
+}
+
+static inline __m128i _mm_Convert10To16Fullrange(__m128i x)
+{
+	__m128i tmp = _mm_slli_epi16(x, 6);
+	return _mm_or_si128(tmp, _mm_srli_epi16(tmp, 10));
+}
+
+#if 0
+template<int F>
+static inline void tuned_ConvertB48rToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+#endif
+
+template<int F, bool A>
+static inline void tuned_ConvertRGBXToUQRX(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	__m128i ctl = _mm_set_epi8(8, 9, 0, 1, 10, 11, 2, 3, 12, 13, 4, 5, 14, 15, 6, 7);
+
+	uint16_t *r = (uint16_t *)pRBegin;
+	uint16_t *g = (uint16_t *)pGBegin;
+	uint16_t *b = (uint16_t *)pBBegin;
+	uint16_t *a = (uint16_t *)pABegin;
+
+	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride)
+	{
+		auto pp = p;
+
+#ifdef __SSSE3__
+		for (; pp <= p + cbWidth - 64; pp += 64)
+		{
+			__m128i m0 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)pp), ctl); // A1 A0 R1 R0 G1 G0 B1 B0
+			__m128i m1 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), ctl);
+			__m128i m2 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), ctl);
+			__m128i m3 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), ctl);
+
+			__m128i gb0 = _mm_unpacklo_epi32(m0, m1);
+			__m128i gb1 = _mm_unpacklo_epi32(m2, m3);
+			__m128i ar0 = _mm_unpackhi_epi32(m0, m1);
+			__m128i ar1 = _mm_unpackhi_epi32(m2, m3);
+
+			__m128i gg = _mm_Convert16To10Fullrange(_mm_unpackhi_epi64(gb0, gb1));
+			__m128i gg200 = _mm_add_epi16(gg, _mm_set1_epi16(0x200));
+			__m128i bb = _mm_and_si128(_mm_sub_epi16(_mm_Convert16To10Fullrange(_mm_unpacklo_epi64(gb0, gb1)), gg200), _mm_set1_epi16(0x3ff));
+			__m128i rr = _mm_and_si128(_mm_sub_epi16(_mm_Convert16To10Fullrange(_mm_unpacklo_epi64(ar0, ar1)), gg200), _mm_set1_epi16(0x3ff));
+
+			_mm_storeu_si128((__m128i *)b, bb);
+			_mm_storeu_si128((__m128i *)g, gg);
+			_mm_storeu_si128((__m128i *)r, rr);
+			if (A)
+				_mm_storeu_si128((__m128i *)a, _mm_Convert16To10Fullrange(_mm_unpackhi_epi64(ar0, ar1)));
+
+			b += 8;
+			g += 8;
+			r += 8;
+			if (A)
+				a += 8;
+		}
+#endif
+
+		for (; pp < p + cbWidth; pp += 8)
+		{
+			uint16_t *ppp = (uint16_t *)pp;
+
+			uint16_t gg = Convert16To10Fullrange(btoh16(ppp[2]));
+			uint16_t bb = Convert16To10Fullrange(btoh16(ppp[3]));
+			uint16_t rr = Convert16To10Fullrange(btoh16(ppp[1]));
+
+			*g++ = gg;
+			*b++ = (bb - gg + 0x200) & 0x3ff;
+			*r++ = (rr - gg + 0x200) & 0x3ff;
+
+			if (A)
+			{
+				uint16_t aa = Convert16To10Fullrange(btoh16(ppp[0]));
+				*a++ = aa;
+			}
+		}
+	}
+
+}
+
+template<int F, class T>
+void tuned_ConvertRGBToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+#if 0
+	if (std::is_same<T, CB48rColorOrder>::value)
+		tuned_ConvertB48rToUQRG<F>(pGBegin, pBBegin, pRBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride);
+	else
+#endif
+	static_assert(std::is_same<T, CB64aColorOrder>::value, "tuned_ConvertB48rToUQRG is not implemented.");
+	tuned_ConvertRGBXToUQRX<F, false>(pGBegin, pBBegin, pRBegin, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride);
+}
+
+template<int F>
+void tuned_ConvertB64aToUQRA(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	tuned_ConvertRGBXToUQRX<F, true>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride);
+}
+
+#ifdef GENERATE_SSSE3
+//template void tuned_ConvertRGBToUQRG<CODEFEATURE_SSSE3, CB48rColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertRGBToUQRG<CODEFEATURE_SSSE3, CB64aColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertB64aToUQRA<CODEFEATURE_SSSE3>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+//template void tuned_ConvertRGBToUQRG<CODEFEATURE_AVX1, CB48rColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertRGBToUQRG<CODEFEATURE_AVX1, CB64aColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertB64aToUQRA<CODEFEATURE_AVX1>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+#endif
+
+//
+
+#if 0
+template<int F>
+static inline void tuned_ConvertUQRGToB48r(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+#endif
+
+template<int F, bool A>
+static inline void tuned_ConvertUQRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+{
+	__m128i ctl = _mm_set_epi8(2, 3, 6, 7, 10, 11, 14, 15, 0, 1, 4, 5, 8, 9, 12, 13);
+
+	const uint16_t *r = (const uint16_t *)pRBegin;
+	const uint16_t *g = (const uint16_t *)pGBegin;
+	const uint16_t *b = (const uint16_t *)pBBegin;
+	const uint16_t *a = (const uint16_t *)pABegin;
+
+	__m128i aa;
+
+	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+#ifdef __SSSE3__
+		for (; pp <= p + cbWidth - 64; pp += 64)
+		{
+			__m128i gg = _mm_loadu_si128((const __m128i *)g);
+			__m128i bb = _mm_loadu_si128((const __m128i *)b);
+			__m128i rr = _mm_loadu_si128((const __m128i *)r);
+			if (A)
+				aa = _mm_Convert10To16Fullrange(_mm_loadu_si128((const __m128i *)a));
+			else
+				aa = _mm_set1_epi16(0x3ff);
+
+			__m128i gg200 = _mm_add_epi16(gg, _mm_set1_epi16(0x200));
+			gg = _mm_Convert10To16Fullrange(gg);
+			bb = _mm_Convert10To16Fullrange(_mm_add_epi16(bb, gg200));
+			rr = _mm_Convert10To16Fullrange(_mm_add_epi16(rr, gg200));
+
+			__m128i gb0 = _mm_unpacklo_epi32(bb, gg); // G3 G2 B3 B2 G1 G0 B1 B0
+			__m128i gb1 = _mm_unpackhi_epi32(bb, gg);
+			__m128i ar0 = _mm_unpacklo_epi32(rr, aa);
+			__m128i ar1 = _mm_unpackhi_epi32(rr, aa);
+
+			__m128i m0 = _mm_unpacklo_epi64(gb0, ar0); // A1 A0 R1 R0 G1 G0 B1 B0
+			__m128i m1 = _mm_unpackhi_epi64(gb0, ar0);
+			__m128i m2 = _mm_unpacklo_epi64(gb1, ar1);
+			__m128i m3 = _mm_unpackhi_epi64(gb1, ar1);
+
+			_mm_storeu_si128((__m128i *)pp, _mm_shuffle_epi8(m0, ctl));
+			_mm_storeu_si128((__m128i *)(pp + 16), _mm_shuffle_epi8(m1, ctl));
+			_mm_storeu_si128((__m128i *)(pp + 32), _mm_shuffle_epi8(m2, ctl));
+			_mm_storeu_si128((__m128i *)(pp + 48), _mm_shuffle_epi8(m3, ctl));
+
+			b += 8;
+			g += 8;
+			r += 8;
+			if (A)
+				a += 8;
+		}
+#endif
+
+		for (; pp < p + cbWidth; pp += 8)
+		{
+			uint16_t *ppp = (uint16_t *)pp;
+
+			ppp[2] = htob16(Convert10To16Fullrange(*g));
+			ppp[3] = htob16(Convert10To16Fullrange(*b + *g - 0x200));
+			ppp[1] = htob16(Convert10To16Fullrange(*r + *g - 0x200));
+			g++; b++; r++;
+			if (A)
+			{
+				ppp[0] = htob16(Convert10To16Fullrange(*a));
+				a++;
+			}
+			else
+				ppp[0] = htob16(0x3ff);
+		}
+	}
+}
+
+template<int F, class T>
+void tuned_ConvertUQRGToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
+{
+#if 0
+	if (std::is_same<T, CB48rColorOrder>::value)
+		tuned_ConvertUQRGToB48r<F>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin,cbWidth, scbStride);
+	else
+#endif
+	static_assert(std::is_same<T, CB64aColorOrder>::value, "tuned_ConvertUQRGToB48r is not implemented.");
+	tuned_ConvertUQRXToRGBX<F, false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, NULL, cbWidth, scbStride);
+}
+
+template<int F>
+void tuned_ConvertUQRAToB64a(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+{
+	tuned_ConvertUQRXToRGBX<F, true>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
+}
+
+
+#ifdef GENERATE_SSSE3
+//template void tuned_ConvertUQRGToRGB<CODEFEATURE_SSSE3, CB48rColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertUQRGToRGB<CODEFEATURE_SSSE3, CB64aColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertUQRAToB64a<CODEFEATURE_SSSE3>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+//template void tuned_ConvertUQRGToRGB<CODEFEATURE_AVX1, CB48rColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertUQRGToRGB<CODEFEATURE_AVX1, CB64aColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertUQRAToB64a<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 #endif
