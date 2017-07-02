@@ -119,6 +119,8 @@
 		25B2570D1DD0D73C00D2013A /* TunedFunc_x86x64_sse2.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = TunedFunc_x86x64_sse2.cpp; path = utv_core/TunedFunc_x86x64_sse2.cpp; sourceTree = "<group>"; };
 		25B2570E1DD0D73C00D2013A /* TunedFunc_x86x64_ssse3.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = TunedFunc_x86x64_ssse3.cpp; path = utv_core/TunedFunc_x86x64_ssse3.cpp; sourceTree = "<group>"; };
 		25B2570F1DD0D73C00D2013A /* TunedFunc_x86x64.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = TunedFunc_x86x64.h; path = utv_core/TunedFunc_x86x64.h; sourceTree = "<group>"; };
+		25B6A1611F08DFC000F98106 /* HuffmanCode_x86_HuffmanDecode.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = HuffmanCode_x86_HuffmanDecode.cpp; path = utv_core/HuffmanCode_x86_HuffmanDecode.cpp; sourceTree = "<group>"; };
+		25B6A1621F08DFC000F98106 /* HuffmanCode_x86_HuffmanEncode.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = HuffmanCode_x86_HuffmanEncode.cpp; path = utv_core/HuffmanCode_x86_HuffmanEncode.cpp; sourceTree = "<group>"; };
 		25CCB6ED18FD137F00076B45 /* ByteOrder.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = ByteOrder.h; path = utv_core/ByteOrder.h; sourceTree = "<group>"; };
 		25CCB6EE18FD137F00076B45 /* CodecBase.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = CodecBase.cpp; path = utv_core/CodecBase.cpp; sourceTree = "<group>"; };
 		25CCB6EF18FD137F00076B45 /* CodecBase.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = CodecBase.h; path = utv_core/CodecBase.h; sourceTree = "<group>"; };
@@ -256,6 +258,8 @@
 				258DB3E01411F8600059F47E /* HuffmanCode.cpp */,
 				258DB3E11411F8600059F47E /* HuffmanCode.h */,
 				2589822D1E61870D0022231E /* HuffmanCode_x86.cpp */,
+				25B6A1611F08DFC000F98106 /* HuffmanCode_x86_HuffmanDecode.cpp */,
+				25B6A1621F08DFC000F98106 /* HuffmanCode_x86_HuffmanEncode.cpp */,
 				255FB94A1AE13F67009B2DC4 /* Log.cpp */,
 				255FB94B1AE13F67009B2DC4 /* Log.h */,
 				258DB3E21411F8600059F47E /* Predict.cpp */,
