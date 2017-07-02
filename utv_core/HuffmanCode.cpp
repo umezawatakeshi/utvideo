@@ -369,7 +369,7 @@ symbol_t<B> * cpp_HuffmanDecode(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, co
 	for (pDst = (symbol_t<B> *)pDstBegin; pDst < (symbol_t<B> *)pDstEnd;)
 	{
 		uint32_t code;
-		HUFFMAN_DECODE_TABLE<B>::combined_t combined;
+		typename HUFFMAN_DECODE_TABLE<B>::combined_t combined;
 		int codelen;
 		int symlen;
 
