@@ -13,6 +13,7 @@
 CUQ00Codec::CUQ00Codec(const char *pszTinyName, const char *pszInterfaceName) : CCodecBase(pszTinyName, pszInterfaceName)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
+	m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
 
 	LoadConfig();
 }
