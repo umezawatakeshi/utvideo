@@ -61,12 +61,11 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <tr><td>ULH4</td><td>UtVideo YUV444 BT.709</td><td>YCbCr (BT.709) 4:4:4 8bit limited</td><td><strong>YV24</strong><br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
 <tr><td>ULH2</td><td>UtVideo YUV422 BT.709</td><td>YCbCr (BT.709) 4:2:2 8bit limited</td><td><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td><td><strong>HDYC</strong><br><strong>yuvs</strong><br><strong>2vuy</strong><br>RGB<br>ARGB</td></tr>
 <tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit limited</td><td><strong>YV12</strong><br>HDYC<br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td><td>HDYC<br>yuvs<br>2vuy<br>RGB<br>ARGB</td></tr>
-<tr><td>UQRA</td><td>UtVideo Pro RGBA 10bit</td><td>RGBA 4:4:4 10bit</td><td>b64a</td><td>b64a</td></tr>
-<tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit</td><td>b48r<br>b64a</td><td>b48r<br>b64a</td></tr>
-<tr><td>UQY2</td><td>UtVideo Pro YUV422 10bit</td><td>YCbCr 4:2:2 10bit</td><td><strong>v210</strong></td><td><strong>v210</strong></td></tr>
+<tr><td>UQRA</td><td>UtVideo Pro RGBA 10bit</td><td>RGBA 4:4:4 10bit full-range</td><td>b64a</td><td>b64a</td></tr>
+<tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit full-range</td><td>b48r<br>b64a</td><td>b48r<br>b64a</td></tr>
+<tr><td>UQY2</td><td>UtVideo Pro YUV422 10bit</td><td>YCbCr 4:2:2 10bit limited</td><td><strong>v210</strong></td><td><strong>v210</strong></td></tr>
 </table>
 <ul>
-<li>In &quot;8-bit full-range&quot; of RGB formats, R,G,B=0-255. In &quot;8-bit limited&quot; of YUV formats, Y=16-235 and U,V=16-240.</li>
 <li><strong>Bold</strong> are &quot;native&quot; (no colorspace conversion occurs) formats. It is recommended to input/output with that formats.</li>
 <li>Formats written in brackets are equivalent format with preceding format. For example, YUY2, YUYV and YUNV are equivalent.</li>
 </ul>
