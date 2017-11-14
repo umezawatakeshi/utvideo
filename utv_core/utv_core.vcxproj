@@ -71,12 +71,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <LibraryPath>D:\vcpkg\installed\x64-windows-static\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <LibraryPath>D:\vcpkg\installed\x64-windows-static\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -84,7 +86,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;UTV_CORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\include;..\utv_logl</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\utv_logl;D:\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -102,12 +104,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;UTV_CORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\include;..\utv_logl</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\utv_logl;D:\vcpkg\installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>user32.lib;advapi32.lib;lz4.lib</AdditionalDependencies>
       <ModuleDefinitionFile>utv_core.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
@@ -123,7 +125,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;UTV_CORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\include;..\utv_logl</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\utv_logl;D:\vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -147,14 +149,14 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;UTV_CORE_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <AdditionalIncludeDirectories>..\include;..\utv_logl</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\utv_logl;D:\vcpkg\installed\x64-windows-static\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>user32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>user32.lib;advapi32.lib;lz4.lib</AdditionalDependencies>
       <ModuleDefinitionFile>utv_core.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
@@ -195,6 +197,7 @@
     <ClInclude Include="UQRACodec.h" />
     <ClInclude Include="UQRGCodec.h" />
     <ClInclude Include="UQY2Codec.h" />
+    <ClInclude Include="UTRDCodec.h" />
     <ClInclude Include="utvideo.h" />
     <ClInclude Include="utv_core.h" />
     <ClInclude Include="version.h" />
@@ -362,6 +365,7 @@
     <ClCompile Include="UQRACodec.cpp" />
     <ClCompile Include="UQRGCodec.cpp" />
     <ClCompile Include="UQY2Codec.cpp" />
+    <ClCompile Include="UTRDCodec.cpp" />
     <ClCompile Include="utv_core.cpp" />
   </ItemGroup>
   <ItemGroup>

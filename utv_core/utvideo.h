@@ -104,6 +104,7 @@ typedef uint32_t utvf_t;
 #define UTVF_UQRA ((utvf_t)'UQRA')
 #define UTVF_UQRG ((utvf_t)'UQRG')
 #define UTVF_UQY2 ((utvf_t)'UQY2')
+#define UTVF_UTRD ((utvf_t)'UTRD')
 
 #define UTVF_YV24 ((utvf_t)'YV24')
 #define UTVF_YUY2 ((utvf_t)'YUY2')

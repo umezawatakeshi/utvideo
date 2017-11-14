@@ -464,6 +464,67 @@ template void tuned_PredictPlanarGradientAndCount8<CODEFEATURE_AVX1>(uint8_t *pD
 
 
 template<int F>
+void tuned_PredictPlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride)
+{
+	auto p = pSrcBegin;
+	auto q = pDst;
+
+	__m128i prev = _mm_set1_epi8((char)0x80);
+	__m128i topprev;
+
+#ifdef __SSSE3__
+	for (; p <= pSrcBegin + dwStride - 16; p += 16, q += 16)
+	{
+		__m128i value = _mm_loadu_si128((const __m128i *)p);
+		__m128i left = _mm_alignr_epi8(value, prev, 15);
+
+		__m128i error = _mm_sub_epi8(value, left);
+		_mm_storeu_si128((__m128i *)q, error);
+		prev = value;
+	}
+#endif
+	for (; p < pSrcBegin + dwStride; p++, q++)
+	{
+		*q = *p - *(p - 1);
+	}
+
+	for (auto pp = pSrcBegin + dwStride; pp != pSrcEnd; pp += dwStride)
+	{
+		prev = _mm_set1_epi8((char)0x80);
+		topprev = _mm_set1_epi8((char)0x80);
+
+#ifdef __SSSE3__
+		for (; p <= pp + dwStride - 16; p += 16, q += 16)
+		{
+			__m128i value = _mm_loadu_si128((const __m128i *)p);
+			__m128i top = _mm_loadu_si128((const __m128i *)(p - dwStride));
+			__m128i left = _mm_alignr_epi8(value, prev, 15);
+			__m128i topleft = _mm_alignr_epi8(top, topprev, 15);
+			__m128i pred = _mm_sub_epi8(_mm_add_epi8(left, top), topleft);
+
+			__m128i error = _mm_sub_epi8(value, pred);
+			_mm_storeu_si128((__m128i *)q, error);
+			prev = value;
+			topprev = top;
+		}
+#endif
+		for (; p < pp + dwStride; p++, q++)
+		{
+			*q = *p - (*(p - 1) + *(p - dwStride) - *(p - dwStride - 1));
+		}
+	}
+}
+
+#ifdef GENERATE_SSE41
+template void tuned_PredictPlanarGradient8<CODEFEATURE_SSE41>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_PredictPlanarGradient8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
+#endif
+
+
+template<int F>
 void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride)
 {
 	auto p = pSrcBegin;
