@@ -81,7 +81,7 @@ size_t CUTRDCodec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 	for (int nPlaneIndex = 0; nPlaneIndex < 3; nPlaneIndex++)
 	{
-		uint32_t counts[256];
+//		uint32_t counts[256];
 /*		PredictCylindricalLeftAndCount8(
 			m_pMedianPredicted->GetPlane(nPlaneIndex),
 			m_pCurFrame->GetPlane(nPlaneIndex),
@@ -154,10 +154,11 @@ size_t CUTRDCodec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 				*(uint64_t*)p = w;
 				p += bits;
 				*(uint32_t *)idxp |= (mode << shift);
-				shift += 3;
-				if (shift == 24)
+#define MODEBITS 3
+				shift += MODEBITS;
+				if (shift == MODEBITS*8)
 				{
-					idxp += 3;
+					idxp += MODEBITS;
 					shift = 0;
 				}
 			}
@@ -275,23 +276,41 @@ size_t CUTRDCodec::DecodeFrame(void *pOutput, const void *volatile pInput)
 		{
 			for (unsigned x = 0; x < m_nWidth; x += 8)
 			{
-				uint8_t a[8];
-				uint64_t w = *(uint64_t *)p;
+				uint64_t w;
+				uint64_t z, mask;
 				int bits = ((*(uint32_t *)idxp) >> shift) & 7;
-				if (bits != 0)
+				if (bits == 0)
+					w = 0;
+				else
+				{
+					w = *(uint64_t *)p;
 					bits++;
-				for (int i = 0; i < 8; ++i)
-				{
-					a[i] = ((w >> (i*bits)) & ((1 << bits) - 1)) - ((1 << bits) >> 1);
+					int rembits = 8 - bits;
+
+					z = w << rembits * 4;
+					mask = (1ULL << bits * 4) - 1ULL;
+					w = (w & mask) | (z & (mask << 32));
+
+					z = w << rembits * 2;
+					mask = (0x100000001ULL << bits * 2) - 0x100000001ULL;
+					w = (w & mask) | (z & (mask << 16));
+
+					z = w << rembits;
+					mask = (0x1000100010001ULL << bits) - 0x1000100010001ULL;
+					w = (w & mask) | (z & (mask << 8));
+
+					uint64_t offset = 0x101010101010101ULL << (bits - 1);
+					uint64_t offadj = (~w & offset) << (rembits + 1); // packed byte Œ¸ŽZ‚Å‚Í‚È‚¢‚Ì‚Åˆø‚«‚·‚¬‚½•ª‚ð•â³‚·‚é
+					w -= offset - offadj;
 				}
+
 				p += bits;
+				*(uint64_t*)&m_pDecodedFrame->GetPlane(nPlaneIndex)[y * m_nWidth + x] = w;
 
-				memcpy(&m_pDecodedFrame->GetPlane(nPlaneIndex)[y * m_nWidth + x], a, 8);
-
-				shift += 3;
-				if (shift == 24)
+				shift += MODEBITS;
+				if (shift == MODEBITS*8)
 				{
-					idxp += 3;
+					idxp += MODEBITS;
 					shift = 0;
 				}
 			}
