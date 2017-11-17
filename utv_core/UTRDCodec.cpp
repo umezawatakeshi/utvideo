@@ -114,42 +114,53 @@ size_t CUTRDCodec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 		{
 			for (unsigned x = 0; x < m_nWidth; x += 8)
 			{
-				int8_t a[8];
-				memcpy(a, &m_pMedianPredicted->GetPlane(nPlaneIndex)[y * m_nWidth + x], 8);
-
-				auto isn = [](int x, int n) -> bool
-				{
-					if (n == 0)
-						return (x == 0);
-					else
-						return (x <= (1 << (n-1)) - 1) && (x >= -(1 << (n-1)));
-				};
-				auto isnall = [isn](int8_t* a, int n) -> bool
-				{
-					return isn(a[0], n) && isn(a[1], n) && isn(a[2], n) && isn(a[3], n) && isn(a[4], n) && isn(a[5], n) && isn(a[6], n) && isn(a[7], n);
-				};
+				uint64_t w = *(uint64_t*)&m_pMedianPredicted->GetPlane(nPlaneIndex)[y * m_nWidth + x];
 
 				int mode;
 				int bits = 0;
-				uint64_t w = 0;
-				if (isnall(a, 0))
+
+				if (w == 0)
 				{
 					mode = 0;
 					bits = 0;
 				}
 				else
 				{
-					for (bits = 2; bits < 8; bits++)
-					{
-						if (isnall(a, bits))
-							break;
-					}
+					auto signs = w & 0x8080808080808080ULL; // 符号bitだけを抽出
+					signs = (signs << 1) - (signs >> 7); //符号bitをbyteに展開
+
+					uint64_t z = w ^ signs;
+					z = z | (z >> 32);
+					z = z | (z >> 16);
+					z = z | (z >> 8);
+					z &= 0xff;
+					if (z & 0x40)
+						bits = 8;
+					else if (z & 0x20)
+						bits = 7;
+					else if (z & 0x10)
+						bits = 6;
+					else if (z & 0x08)
+						bits = 5;
+					else if (z & 0x04)
+						bits = 4;
+					else if (z & 0x02)
+						bits = 3;
+					else
+						bits = 2;
+					int rembits = 8 - bits;
 					mode = bits - 1;
-					for (int i = 0; i < 8; i++)
-					{
-						a[i] += 1 << (bits - 1);
-						w |= ((uint64_t)a[i] & ((1 << bits) - 1)) << (bits * i);
-					}
+
+					// 値の調整
+
+					uint64_t offset = 0x8080808080808080ULL >> rembits;
+					uint64_t offadj = (w & 0x8080808080808080ULL) << 1; // 符号だけ分かればいいので offset から計算する必要はない / 最初の方の処理と同じ式なのでコンパイラが賢ければ使いまわしてくれるはず
+					w += offset;
+					w -= offadj;
+
+					w = (w & 0x00ff00ff00ff00ffULL) | ((w & 0xff00ff00ff00ff00ULL) >> rembits);
+					w = (w & 0x0000ffff0000ffffULL) | ((w & 0xffff0000ffff0000ULL) >> rembits * 2);
+					w = (w & 0x00000000ffffffffULL) | ((w & 0xffffffff00000000ULL) >> rembits * 4);
 				}
 				*(uint64_t*)p = w;
 				p += bits;
