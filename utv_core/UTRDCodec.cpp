@@ -277,31 +277,33 @@ size_t CUTRDCodec::DecodeFrame(void *pOutput, const void *volatile pInput)
 			for (unsigned x = 0; x < m_nWidth; x += 8)
 			{
 				uint64_t w;
-				uint64_t z, mask;
 				int bits = ((*(uint32_t *)idxp) >> shift) & 7;
 				if (bits == 0)
 					w = 0;
 				else
 				{
+					uint64_t z, mask;
+
 					w = *(uint64_t *)p;
 					bits++;
 					int rembits = 8 - bits;
 
 					z = w << rembits * 4;
-					mask = (1ULL << bits * 4) - 1ULL;
-					w = (w & mask) | (z & (mask << 32));
+					w = (w & 0x00000000ffffffffULL) | (z & 0xffffffff00000000ULL);
 
 					z = w << rembits * 2;
-					mask = (0x100000001ULL << bits * 2) - 0x100000001ULL;
-					w = (w & mask) | (z & (mask << 16));
+					w = (w & 0x0000ffff0000ffffULL) | (z & 0xffff0000ffff0000ULL);
 
 					z = w << rembits;
-					mask = (0x1000100010001ULL << bits) - 0x1000100010001ULL;
-					w = (w & mask) | (z & (mask << 8));
+					w = (w & 0x00ff00ff00ff00ffULL) | (z & 0xff00ff00ff00ff00ULL);
 
-					uint64_t offset = 0x101010101010101ULL << (bits - 1);
+					mask = (0x101010101010101ULL << bits) - 0x101010101010101ULL;
+					w &= mask;
+
+					uint64_t offset = 0x8080808080808080ULL >> rembits;
 					uint64_t offadj = (~w & offset) << (rembits + 1); // packed byte Œ¸ŽZ‚Å‚Í‚È‚¢‚Ì‚Åˆø‚«‚·‚¬‚½•ª‚ð•â³‚·‚é
-					w -= offset - offadj;
+					w -= offset;
+					w += offadj;
 				}
 
 				p += bits;
