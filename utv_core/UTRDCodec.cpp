@@ -114,55 +114,41 @@ size_t CUTRDCodec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 		{
 			for (unsigned x = 0; x < m_nWidth; x += 8)
 			{
-				uint64_t w = *(uint64_t*)&m_pMedianPredicted->GetPlane(nPlaneIndex)[y * m_nWidth + x];
+				uint64_t wi = *(uint64_t*)&m_pMedianPredicted->GetPlane(nPlaneIndex)[y * m_nWidth + x];
+				__m128i w = _mm_cvtsi64x_si128(wi);
 
 				int mode;
-				int bits = 0;
+				int bits;
 
-				if (w == 0)
+				if (wi == 0)
 				{
 					mode = 0;
 					bits = 0;
 				}
 				else
 				{
-					auto signs = w & 0x8080808080808080ULL; // 符号bitだけを抽出
-					signs = (signs << 1) - (signs >> 7); //符号bitをbyteに展開
-
-					uint64_t z = w ^ signs;
-					z = z | (z >> 32);
-					z = z | (z >> 16);
-					z = z | (z >> 8);
-					z &= 0xff;
-					if (z & 0x40)
-						bits = 8;
-					else if (z & 0x20)
-						bits = 7;
-					else if (z & 0x10)
-						bits = 6;
-					else if (z & 0x08)
-						bits = 5;
-					else if (z & 0x04)
-						bits = 4;
-					else if (z & 0x02)
-						bits = 3;
-					else
-						bits = 2;
-					int rembits = 8 - bits;
-					mode = bits - 1;
-
-					// 値の調整
-
-					uint64_t offset = 0x8080808080808080ULL >> rembits;
-					uint64_t offadj = (w & 0x8080808080808080ULL) << 1; // 符号だけ分かればいいので offset から計算する必要はない / 最初の方の処理と同じ式なのでコンパイラが賢ければ使いまわしてくれるはず
-					w += offset;
-					w -= offadj;
-
-					w = (w & 0x00ff00ff00ff00ffULL) | ((w & 0xff00ff00ff00ff00ULL) >> rembits);
-					w = (w & 0x0000ffff0000ffffULL) | ((w & 0xffff0000ffff0000ULL) >> rembits * 2);
-					w = (w & 0x00000000ffffffffULL) | ((w & 0xffffffff00000000ULL) >> rembits * 4);
+					__m128i z;
+					__m128i signs = _mm_cmpgt_epi8(_mm_setzero_si128(), w);
+					z = _mm_xor_si128(w, signs);
+					z = _mm_or_si128(z, _mm_srli_epi64(z, 32));
+					z = _mm_or_si128(z, _mm_srli_epi64(z, 16));
+					z = _mm_or_si128(z, _mm_srli_epi64(z, 8));
+					z = _mm_and_si128(z, _mm_set1_epi64x(0xff));
+					z = _mm_or_si128(z, _mm_set1_epi64x(1));
+					_BitScanReverse((unsigned long *)&mode, _mm_cvtsi128_si32(z));
+					bits = mode + 2;
+					int rembits = 6 - mode;
+					mode++;
+					__m128i vrembits = _mm_cvtsi64x_si128(rembits);
+					w = _mm_add_epi8(w, _mm_srl_epi64(_mm_set1_epi8((char)0x80), vrembits));
+					w = _mm_or_si128(_mm_and_si128(w, _mm_set1_epi16(0x00ff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi16(0x00ff), w), vrembits));
+					vrembits = _mm_slli_epi64(vrembits, 1);
+					w = _mm_or_si128(_mm_and_si128(w, _mm_set1_epi32(0x0000ffff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi32(0x0000ffff), w), vrembits));
+					vrembits = _mm_slli_epi64(vrembits, 1);
+					w = _mm_or_si128(_mm_and_si128(w, _mm_set1_epi64x(0x00000000ffffffff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi64x(0x00000000ffffffff), w), vrembits));
+					*(uint64_t*)p = _mm_cvtsi128_si64x(w);
 				}
-				*(uint64_t*)p = w;
+
 				p += bits;
 				*(uint32_t *)idxp |= (mode << shift);
 #define MODEBITS 3
