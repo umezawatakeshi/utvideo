@@ -286,6 +286,7 @@ size_t CUTRDCodec::DecodeFrame(void *pOutput, const void *volatile pInput)
 		{
 			for (unsigned x = 0; x < m_nWidth; x += 8)
 			{
+				// デコードはエンコードと違いSSE2の範囲で2ブロック同時に処理しても速くならなかった
 				__m128i w;
 				int mode = ((*(uint32_t *)idxp) >> shift) & 7;
 				int bits;
