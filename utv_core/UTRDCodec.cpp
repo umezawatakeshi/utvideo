@@ -286,41 +286,29 @@ size_t CUTRDCodec::DecodeFrame(void *pOutput, const void *volatile pInput)
 		{
 			for (unsigned x = 0; x < m_nWidth; x += 8)
 			{
-				// デコードはエンコードと違いSSE2の範囲で2ブロック同時に処理しても速くならなかった
-				__m128i w;
+				uint64_t w;
 				int mode = ((*(uint32_t *)idxp) >> shift) & 7;
 				int bits;
 				if (mode == 0)
 				{
-					w = _mm_setzero_si128();
+					w = 0;
 					bits = 0;
 				}
 				else
 				{
-					__m128i z, mask;
-
-					w = _mm_cvtsi64_si128(*(uint64_t *)p);
+					w = *(uint64_t *)p;
 					bits = mode + 1;
+					uint64_t mask = (0x101010101010101ULL << bits) - 0x101010101010101ULL;
+					w = _pdep_u64(w, mask);
 					int rembits = 8 - bits;
-					__m128i vrembits = _mm_cvtsi32_si128(rembits);
-					__m128i vbits = _mm_cvtsi32_si128(bits);
-
-					__m128i vrembitsn = _mm_slli_epi64(vrembits, 2);
-					z = _mm_sll_epi64(w, vrembitsn);
-					w = _mm_blend_epi16(w, z, 0xcc);
-					vrembitsn = _mm_srli_epi64(vrembitsn, 1);
-					z = _mm_sll_epi64(w, vrembitsn);
-					w = _mm_blend_epi16(w, z, 0xaa);
-					z = _mm_sll_epi64(w, vrembits);
-					w = _mm_blendv_epi8(w, z, _mm_set1_epi16((short)0xff00));
-					mask = _mm_sub_epi64(_mm_sll_epi64(_mm_set1_epi8(1), vbits), _mm_set1_epi8(1));
-					w = _mm_and_si128(w, mask);
-					__m128i offset = _mm_srl_epi64(_mm_set1_epi8((char)0x80), vrembits);
-					w = _mm_sub_epi8(w, offset);
+					uint64_t offset = 0x8080808080808080ULL >> rembits;
+					uint64_t offadj = (~w & offset) << (rembits + 1);
+					w -= offset;
+					w += offadj;
 				}
 
 				p += bits;
-				*(uint64_t*)&m_pDecodedFrame->GetPlane(nPlaneIndex)[y * m_nWidth + x] = _mm_cvtsi128_si64(w);
+				*(uint64_t*)&m_pDecodedFrame->GetPlane(nPlaneIndex)[y * m_nWidth + x] = w;
 
 				shift += MODEBITS;
 				if (shift == MODEBITS*8)
