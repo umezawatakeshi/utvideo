@@ -284,9 +284,9 @@ size_t CUTRDCodec::DecodeFrame(void *pOutput, const void *volatile pInput)
 
 		for (unsigned y = 0; y < m_nHeight; y += 1)
 		{
-			for (unsigned x = 0; x < m_nWidth; x += 16)
+			for (unsigned x = 0; x < m_nWidth; x += 32)
 			{
-				__m128i w;
+				__m256i w;
 				int modes = ((*(uint32_t *)idxp) >> shift);
 				int bits0 = modes & 7;
 				if (bits0 != 0)
@@ -294,34 +294,53 @@ size_t CUTRDCodec::DecodeFrame(void *pOutput, const void *volatile pInput)
 				int bits1 = (modes>>3) & 7;
 				if (bits1 != 0)
 					bits1++;
+				int bits2 = (modes>>6) & 7;
+				if (bits2 != 0)
+					bits2++;
+				int bits3 = (modes >> 9) & 7;
+				if (bits3 != 0)
+					bits3++;
 
 				{
-					__m128i z, mask;
+					__m128i w0, w1, vbits0, vbits1;
+					__m256i z, mask;
+					__m256i vbits;
 
-					w = _mm_cvtsi64_si128(*(uint64_t *)p);
-					w = _mm_insert_epi64(w, *(uint64_t *)(p + bits0), 1);
-					__m128i vbits = _mm_cvtsi64_si128(bits0);
-					vbits = _mm_insert_epi64(vbits, bits1, 1);
-					__m128i vrembits = _mm_sub_epi64(_mm_set1_epi64x(8), vbits);
+					w0 = _mm_cvtsi64_si128(*(uint64_t *)p);
+					p += bits0;
+					w0 = _mm_insert_epi64(w0, *(uint64_t *)p, 1);
+					p += bits1;
+					w1 = _mm_cvtsi64_si128(*(uint64_t *)p);
+					p += bits2;
+					w1 = _mm_insert_epi64(w1, *(uint64_t *)p, 1);
+					p += bits3;
+					w = _mm256_inserti128_si256(_mm256_castsi128_si256(w0), w1, 1);
 
-					__m128i vrembitsn = _mm_slli_epi64(vrembits, 2);
-					z = _mm_sllv_epi64(w, vrembitsn);
-					w = _mm_blend_epi16(w, z, 0xcc);
-					vrembitsn = _mm_srli_epi64(vrembitsn, 1);
-					z = _mm_sllv_epi64(w, vrembitsn);
-					w = _mm_blend_epi16(w, z, 0xaa);
-					z = _mm_sllv_epi64(w, vrembits);
-					w = _mm_blendv_epi8(w, z, _mm_set1_epi16((short)0xff00));
-					mask = _mm_sub_epi64(_mm_sllv_epi64(_mm_set1_epi8(1), vbits), _mm_set1_epi8(1));
-					w = _mm_and_si128(w, mask);
-					__m128i offset = _mm_and_si128(_mm_srlv_epi64(_mm_set1_epi8((char)0x80), vrembits), mask);
-					w = _mm_sub_epi8(w, offset);
+					vbits0 = _mm_cvtsi64_si128(bits0);
+					vbits0 = _mm_insert_epi64(vbits0, bits1, 1);
+					vbits1 = _mm_cvtsi64_si128(bits2);
+					vbits1 = _mm_insert_epi64(vbits1, bits3, 1);
+					vbits = _mm256_inserti128_si256(_mm256_castsi128_si256(vbits0), vbits1, 1);
+
+					__m256i vrembits = _mm256_sub_epi64(_mm256_set1_epi64x(8), vbits);
+
+					__m256i vrembitsn = _mm256_slli_epi64(vrembits, 2);
+					z = _mm256_sllv_epi64(w, vrembitsn);
+					w = _mm256_blend_epi16(w, z, 0xcc);
+					vrembitsn = _mm256_srli_epi64(vrembitsn, 1);
+					z = _mm256_sllv_epi64(w, vrembitsn);
+					w = _mm256_blend_epi16(w, z, 0xaa);
+					z = _mm256_sllv_epi64(w, vrembits);
+					w = _mm256_blendv_epi8(w, z, _mm256_set1_epi16((short)0xff00));
+					mask = _mm256_sub_epi64(_mm256_sllv_epi64(_mm256_set1_epi8(1), vbits), _mm256_set1_epi8(1));
+					w = _mm256_and_si256(w, mask);
+					__m256i offset = _mm256_and_si256(_mm256_srlv_epi64(_mm256_set1_epi8((char)0x80), vrembits), mask);
+					w = _mm256_sub_epi8(w, offset);
 				}
 
-				p += bits0 + bits1;
-				_mm_storeu_si128((__m128i*)&m_pDecodedFrame->GetPlane(nPlaneIndex)[y * m_nWidth + x], w);
+				_mm256_storeu_si256((__m256i*)&m_pDecodedFrame->GetPlane(nPlaneIndex)[y * m_nWidth + x], w);
 
-				shift += MODEBITS*2;
+				shift += MODEBITS*4;
 				if (shift == MODEBITS*8)
 				{
 					idxp += MODEBITS;
