@@ -284,33 +284,44 @@ size_t CUTRDCodec::DecodeFrame(void *pOutput, const void *volatile pInput)
 
 		for (unsigned y = 0; y < m_nHeight; y += 1)
 		{
-			for (unsigned x = 0; x < m_nWidth; x += 8)
+			for (unsigned x = 0; x < m_nWidth; x += 16)
 			{
-				uint64_t w;
-				int mode = ((*(uint32_t *)idxp) >> shift) & 7;
-				int bits;
-				if (mode == 0)
+				__m128i w;
+				int modes = ((*(uint32_t *)idxp) >> shift);
+				int bits0 = modes & 7;
+				if (bits0 != 0)
+					bits0++;
+				int bits1 = (modes>>3) & 7;
+				if (bits1 != 0)
+					bits1++;
+
 				{
-					w = 0;
-					bits = 0;
-				}
-				else
-				{
-					w = *(uint64_t *)p;
-					bits = mode + 1;
-					uint64_t mask = (0x101010101010101ULL << bits) - 0x101010101010101ULL;
-					w = _pdep_u64(w, mask);
-					int rembits = 8 - bits;
-					uint64_t offset = 0x8080808080808080ULL >> rembits;
-					uint64_t offadj = (~w & offset) << (rembits + 1);
-					w -= offset;
-					w += offadj;
+					__m128i z, mask;
+
+					w = _mm_cvtsi64_si128(*(uint64_t *)p);
+					w = _mm_insert_epi64(w, *(uint64_t *)(p + bits0), 1);
+					__m128i vbits = _mm_cvtsi64_si128(bits0);
+					vbits = _mm_insert_epi64(vbits, bits1, 1);
+					__m128i vrembits = _mm_sub_epi64(_mm_set1_epi64x(8), vbits);
+
+					__m128i vrembitsn = _mm_slli_epi64(vrembits, 2);
+					z = _mm_sllv_epi64(w, vrembitsn);
+					w = _mm_blend_epi16(w, z, 0xcc);
+					vrembitsn = _mm_srli_epi64(vrembitsn, 1);
+					z = _mm_sllv_epi64(w, vrembitsn);
+					w = _mm_blend_epi16(w, z, 0xaa);
+					z = _mm_sllv_epi64(w, vrembits);
+					w = _mm_blendv_epi8(w, z, _mm_set1_epi16((short)0xff00));
+					mask = _mm_sub_epi64(_mm_sllv_epi64(_mm_set1_epi8(1), vbits), _mm_set1_epi8(1));
+					w = _mm_and_si128(w, mask);
+					__m128i offset = _mm_and_si128(_mm_srlv_epi64(_mm_set1_epi8((char)0x80), vrembits), mask);
+					w = _mm_sub_epi8(w, offset);
 				}
 
-				p += bits;
-				*(uint64_t*)&m_pDecodedFrame->GetPlane(nPlaneIndex)[y * m_nWidth + x] = w;
+				p += bits0 + bits1;
+				_mm_storeu_si128((__m128i*)&m_pDecodedFrame->GetPlane(nPlaneIndex)[y * m_nWidth + x], w);
 
-				shift += MODEBITS;
+				shift += MODEBITS*2;
 				if (shift == MODEBITS*8)
 				{
 					idxp += MODEBITS;
