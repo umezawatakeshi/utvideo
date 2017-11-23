@@ -117,7 +117,7 @@ size_t CUTRDCodec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 				__m256i w = _mm256_loadu_si256((const __m256i *)&m_pMedianPredicted->GetPlane(nPlaneIndex)[y * m_nWidth + x]);
 				__m256i visnotzero = _mm256_cmpeq_epi64(_mm256_cmpeq_epi64(w, _mm256_setzero_si256()), _mm256_setzero_si256());
 
-				int mode0, mode1, mode2, mode3;
+				int modes;
 				int bits0, bits1, bits2, bits3;
 
 				{
@@ -139,16 +139,16 @@ size_t CUTRDCodec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 					__m256i vmode = _mm256_sub_epi64(vbits, _mm256_set1_epi64x(1));
 					vbits = _mm256_and_si256(vbits, visnotzero);
 					vmode = _mm256_and_si256(vmode, visnotzero);
+
 					bits0 = _mm_cvtsi128_si64(_mm256_castsi256_si128(vbits));
 					bits1 = _mm_extract_epi64(_mm256_castsi256_si128(vbits), 1);
 					__m128i vbitshigh = _mm256_extracti128_si256(vbits, 1);
 					bits2 = _mm_cvtsi128_si64(vbitshigh);
 					bits3 = _mm_extract_epi64(vbitshigh, 1);
-					mode0 = _mm_cvtsi128_si64(_mm256_castsi256_si128(vmode));
-					mode1 = _mm_extract_epi64(_mm256_castsi256_si128(vmode), 1);
-					__m128i vmodehigh = _mm256_extracti128_si256(vmode, 1);
-					mode2 = _mm_cvtsi128_si64(vmodehigh);
-					mode3 = _mm_extract_epi64(vmodehigh, 1);
+
+					vmode = _mm256_permutevar8x32_epi32(vmode, _mm256_castsi128_si256(_mm_set_epi32(6, 4, 2, 0))); // VPERMD
+					__m128i vmode128 = _mm_shuffle_epi8(_mm256_castsi256_si128(vmode), _mm_set1_epi32(0x0c080400));
+					modes = _pext_u32(_mm_cvtsi128_si32(vmode128), 0x07070707);
 
 					w = _mm256_add_epi8(w, _mm256_srlv_epi64(_mm256_set1_epi8((char)0x80), vrembits));
 					w = _mm256_or_si256(_mm256_and_si256(w, _mm256_set1_epi16(0x00ff)), _mm256_srlv_epi64(_mm256_andnot_si256(_mm256_set1_epi16(0x00ff), w), vrembits));
@@ -168,7 +168,7 @@ size_t CUTRDCodec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 				}
 
 #define MODEBITS 3
-				*(uint32_t *)idxp |= (((mode3 << (MODEBITS*3)) | (mode2 << (MODEBITS * 2)) | (mode1 << MODEBITS) | mode0) << shift);
+				*(uint32_t *)idxp |= modes << shift;
 				shift += MODEBITS*4;
 				if (shift == MODEBITS*8)
 				{
