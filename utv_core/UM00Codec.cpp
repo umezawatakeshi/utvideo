@@ -175,8 +175,6 @@ size_t CUM00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	if (pOutputEnd - pControlStreamsBegin <= 256)
 		pOutputEnd = pControlStreamsBegin + 256;
 
-	// XXX コピーフレームになるかどうかの判定が要るが後で実装
-
 	memset(fi, 0, sizeof(FRAMEINFO));
 	fi->fiFrameType = FI_FRAME_TYPE_INTRA;
 	fi->fiSizeArrayOffset = (uint32_t)(cbPackedStreams + cbControlStreams);
@@ -324,7 +322,7 @@ int CUM00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, un
 
 size_t CUM00Codec::EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height)
 {
-	return ROUNDUP(width, 128) * height * GetRealBitCount() / 8 + 4096; // +4096 はどんぶり勘定。
+	return ROUNDUP(width, 128) * height * GetRealBitCount() / 64 * 67 / 8 + 4096; // +4096 はどんぶり勘定。
 }
 
 int CUM00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height)
@@ -373,11 +371,7 @@ size_t CUM00Codec::DecodeFrame(void *pOutput, const void *pInput)
 	if (is_not_all_zero(fi->fiReserved))
 		return m_cbRawSize;
 
-	if (fi->fiFrameType == FI_FRAME_TYPE_COPY)
-	{
-		// XXX あとで
-	}
-	else if (fi->fiFrameType != FI_FRAME_TYPE_INTRA)
+	if (fi->fiFrameType != FI_FRAME_TYPE_INTRA)
 		return m_cbRawSize;
 
 	const uint8_t *pPackedStreams = (const uint8_t *)pInput + sizeof(FRAMEINFO);

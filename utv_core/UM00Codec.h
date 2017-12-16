@@ -51,7 +51,7 @@ protected:
 		uint32_t fiSizeArrayOffset;
 	};
 
-	static constexpr uint8_t FI_FRAME_TYPE_COPY  = 0;
+	// static constexpr uint8_t FI_FRAME_TYPE_COPY  = 0;
 	static constexpr uint8_t FI_FRAME_TYPE_INTRA = 1;
 	// static constexpr uint8_t FI_FRAME_TYPE_DELTA = 2;
 
