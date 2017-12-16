@@ -58,6 +58,7 @@ inline BOOL EnableDlgItem(HWND hwndParent, UINT nID, BOOL bEnable)
 
 #include <queue>
 #include <algorithm>
+#include <memory>
 
 #include <stdint.h>
 #include <myinttypes.h>
@@ -91,6 +92,18 @@ inline bool IS_ALIGNED(uintptr_t v, uintptr_t a)
 inline bool IS_ALIGNED(const void *p, uintptr_t a)
 {
 	return IS_ALIGNED((uintptr_t)p, a);
+}
+
+template<typename Iterator>
+static inline bool is_not_all_zero(Iterator begin, Iterator end)
+{
+	return std::find_if_not(begin, end, [](auto x) { return x == 0; }) != end;
+}
+
+template<typename Container>
+static inline bool is_not_all_zero(const Container& c)
+{
+	return is_not_all_zero(std::begin(c), std::end(c));
 }
 
 #define LOG_MODULE_NAME "utv_core"

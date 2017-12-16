@@ -396,8 +396,8 @@ template void tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_AVX1>(uint8_t *pD
 #endif
 
 
-template<int F>
-void tuned_PredictPlanarGradientAndCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
+template<int F, bool DoCount>
+static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
 {
 	auto p = pSrcBegin;
 	auto q = pDst;
@@ -415,13 +415,15 @@ void tuned_PredictPlanarGradientAndCount8(uint8_t *pDst, const uint8_t *pSrcBegi
 		_mm_storeu_si128((__m128i *)q, error);
 		prev = value;
 
-		IncrementCounters8<F>(error, pCountTable);
+		if (DoCount)
+			IncrementCounters8<F>(error, pCountTable);
 	}
 #endif
 	for (; p < pSrcBegin + dwStride; p++, q++)
 	{
 		*q = *p - *(p - 1);
-		++pCountTable[*q];
+		if (DoCount)
+			++pCountTable[*q];
 	}
 
 	for (auto pp = pSrcBegin + dwStride; pp != pSrcEnd; pp += dwStride)
@@ -443,23 +445,39 @@ void tuned_PredictPlanarGradientAndCount8(uint8_t *pDst, const uint8_t *pSrcBegi
 			prev = value;
 			topprev = top;
 
-			IncrementCounters8<F>(error, pCountTable);
+			if (DoCount)
+				IncrementCounters8<F>(error, pCountTable);
 		}
 #endif
 		for (; p < pp + dwStride; p++, q++)
 		{
 			*q = *p - (*(p - 1) + *(p - dwStride) - *(p - dwStride - 1));
-			++pCountTable[*q];
+			if (DoCount)
+				++pCountTable[*q];
 		}
 	}
 }
 
+template<int F>
+void tuned_PredictPlanarGradientAndCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
+{
+	tuned_PredictPlanarGradientAndMayCount8<F, true>(pDst, pSrcBegin, pSrcEnd, dwStride, pCountTable);
+}
+
+template<int F>
+void tuned_PredictPlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride)
+{
+	tuned_PredictPlanarGradientAndMayCount8<F, false>(pDst, pSrcBegin, pSrcEnd, dwStride, NULL);
+}
+
 #ifdef GENERATE_SSE41
 template void tuned_PredictPlanarGradientAndCount8<CODEFEATURE_SSE41>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
+template void tuned_PredictPlanarGradient8<CODEFEATURE_SSE41>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
 #endif
 
 #ifdef GENERATE_AVX1
 template void tuned_PredictPlanarGradientAndCount8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
+template void tuned_PredictPlanarGradient8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride);
 #endif
 
 

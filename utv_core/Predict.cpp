@@ -119,39 +119,56 @@ template void cpp_RestoreCylindricalLeft<8>(symbol_t<8> *pDst, const symbol_t<8>
 template void cpp_RestoreCylindricalLeft<10>(symbol_t<10> *pDst, const symbol_t<10> *pSrcBegin, const symbol_t<10> *pSrcEnd);
 
 
-template<int B>
-void cpp_PredictPlanarGradientAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
+template<int B, bool DoCount>
+static inline void cpp_PredictPlanarGradientAndMayCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
 
 	*q = (*p - CSymbolBits<B>::midval) & CSymbolBits<B>::maskval;
-	pCountTable[*q]++;
+	if (DoCount)
+		pCountTable[*q]++;
 	p++;
 	q++;
 
 	for (; p < pSrcBegin + dwStride; p++, q++)
 	{
 		*q = (*p - *(p - 1)) & CSymbolBits<B>::maskval;
-		pCountTable[*q]++;
+		if (DoCount)
+			pCountTable[*q]++;
 	}
 
 	for (auto pp = pSrcBegin + dwStride; pp != pSrcEnd; pp += dwStride)
 	{
 		*q = (*p - *(p - dwStride)) & CSymbolBits<B>::maskval;
-		pCountTable[*q]++;
+		if (DoCount)
+			pCountTable[*q]++;
 		p++;
 		q++;
 
 		for (; p < pp + dwStride; p++, q++)
 		{
 			*q = (*p - (*(p - dwStride) + *(p - 1) - *(p - 1 - dwStride))) & CSymbolBits<B>::maskval;
-			pCountTable[*q]++;
+			if (DoCount)
+				pCountTable[*q]++;
 		}
 	}
 }
 
+template<int B>
+void cpp_PredictPlanarGradientAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
+{
+	cpp_PredictPlanarGradientAndMayCount<B, true>(pDst, pSrcBegin, pSrcEnd, dwStride, pCountTable);
+}
+
+template<int B>
+void cpp_PredictPlanarGradient(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t dwStride)
+{
+	cpp_PredictPlanarGradientAndMayCount<B, false>(pDst, pSrcBegin, pSrcEnd, dwStride, NULL);
+}
+
 template void cpp_PredictPlanarGradientAndCount<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
+template void cpp_PredictPlanarGradient<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t dwStride);
 
 
 template<int B>

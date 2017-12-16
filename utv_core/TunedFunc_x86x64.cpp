@@ -85,6 +85,7 @@ const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
 	cpp_PredictCylindricalLeftAndCount<10>,
 	cpp_RestoreCylindricalLeft<10>,
 	cpp_PredictPlanarGradientAndCount<8>,
+	cpp_PredictPlanarGradient<8>,
 	cpp_RestorePlanarGradient<8>,
 };
 
@@ -98,6 +99,7 @@ const TUNEDFUNC_PREDICT tfnPredictSSSE3 = {
 	cpp_PredictCylindricalLeftAndCount<10>,
 	tuned_RestoreCylindricalLeft10<CODEFEATURE_SSSE3>,
 	cpp_PredictPlanarGradientAndCount<8>,
+	cpp_PredictPlanarGradient<8>,
 	tuned_RestorePlanarGradient8<CODEFEATURE_SSSE3>,
 };
 
@@ -111,6 +113,7 @@ const TUNEDFUNC_PREDICT tfnPredictSSE41 = {
 	tuned_PredictCylindricalLeftAndCount10<CODEFEATURE_SSE41>,
 	tuned_RestoreCylindricalLeft10<CODEFEATURE_SSSE3>,
 	tuned_PredictPlanarGradientAndCount8<CODEFEATURE_SSE41>,
+	tuned_PredictPlanarGradient8<CODEFEATURE_SSE41>,
 	tuned_RestorePlanarGradient8<CODEFEATURE_SSSE3>,
 };
 
@@ -124,6 +127,7 @@ const TUNEDFUNC_PREDICT tfnPredictAVX1 = {
 	tuned_PredictCylindricalLeftAndCount10<CODEFEATURE_AVX1>,
 	tuned_RestoreCylindricalLeft10<CODEFEATURE_AVX1>,
 	tuned_PredictPlanarGradientAndCount8<CODEFEATURE_AVX1>,
+	tuned_PredictPlanarGradient8<CODEFEATURE_AVX1>,
 	tuned_RestorePlanarGradient8<CODEFEATURE_AVX1>,
 };
 

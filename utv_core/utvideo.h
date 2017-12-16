@@ -101,9 +101,12 @@ typedef uint32_t utvf_t;
 #define UTVF_ULH4 ((utvf_t)'ULH4')
 #define UTVF_ULH2 ((utvf_t)'ULH2')
 #define UTVF_ULH0 ((utvf_t)'ULH0')
+
 #define UTVF_UQRA ((utvf_t)'UQRA')
 #define UTVF_UQRG ((utvf_t)'UQRG')
 #define UTVF_UQY2 ((utvf_t)'UQY2')
+
+#define UTVF_UMRG ((utvf_t)'UMRG')
 
 #define UTVF_YV24 ((utvf_t)'YV24')
 #define UTVF_YUY2 ((utvf_t)'YUY2')

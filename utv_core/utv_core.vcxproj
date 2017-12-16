@@ -182,6 +182,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SymbolBits.h" />
+    <ClInclude Include="SymPack.h" />
     <ClInclude Include="Thread.h" />
     <ClInclude Include="TunedFunc.h" />
     <ClInclude Include="TunedFunc_x86x64.h" />
@@ -191,6 +192,8 @@
     <ClInclude Include="ULYUV420Codec.h" />
     <ClInclude Include="ULYUV422Codec.h" />
     <ClInclude Include="ULYUV444Codec.h" />
+    <ClInclude Include="UM00Codec.h" />
+    <ClInclude Include="UMRGCodec.h" />
     <ClInclude Include="UQ00Codec.h" />
     <ClInclude Include="UQRACodec.h" />
     <ClInclude Include="UQRGCodec.h" />
@@ -291,6 +294,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SymPack.cpp" />
     <ClCompile Include="Thread.cpp" />
     <ClCompile Include="TunedFunc.cpp" />
     <ClCompile Include="TunedFunc_x86x64.cpp" />
@@ -358,6 +362,8 @@
     <ClCompile Include="ULYUV420Codec.cpp" />
     <ClCompile Include="ULYUV422Codec.cpp" />
     <ClCompile Include="ULYUV444Codec.cpp" />
+    <ClCompile Include="UM00Codec.cpp" />
+    <ClCompile Include="UMRGCodec.cpp" />
     <ClCompile Include="UQ00Codec.cpp" />
     <ClCompile Include="UQRACodec.cpp" />
     <ClCompile Include="UQRGCodec.cpp" />

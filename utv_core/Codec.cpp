@@ -13,6 +13,7 @@
 #include "UQY2Codec.h"
 #include "UQRGCodec.h"
 #include "UQRACodec.h"
+#include "UMRGCodec.h"
 
 CCodec::CCodec(void)
 {
@@ -59,6 +60,7 @@ static const struct CODECLIST codeclist[] = {
 	CODECENTRY(CUQY2Codec),
 	CODECENTRY(CUQRGCodec),
 	CODECENTRY(CUQRACodec),
+	CODECENTRY(CUMRGCodec),
 };
 
 DLLEXPORT CCodec *CCodec::CreateInstance(utvf_t utvf, const char *pszInterfaceName)
