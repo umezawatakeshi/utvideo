@@ -193,7 +193,10 @@
     <ClInclude Include="ULYUV422Codec.h" />
     <ClInclude Include="ULYUV444Codec.h" />
     <ClInclude Include="UM00Codec.h" />
+    <ClInclude Include="UMRACodec.h" />
     <ClInclude Include="UMRGCodec.h" />
+    <ClInclude Include="UMYUV422Codec.h" />
+    <ClInclude Include="UMYUV444Codec.h" />
     <ClInclude Include="UQ00Codec.h" />
     <ClInclude Include="UQRACodec.h" />
     <ClInclude Include="UQRGCodec.h" />
@@ -363,7 +366,10 @@
     <ClCompile Include="ULYUV422Codec.cpp" />
     <ClCompile Include="ULYUV444Codec.cpp" />
     <ClCompile Include="UM00Codec.cpp" />
+    <ClCompile Include="UMRACodec.cpp" />
     <ClCompile Include="UMRGCodec.cpp" />
+    <ClCompile Include="UMYUV422Codec.cpp" />
+    <ClCompile Include="UMYUV444Codec.cpp" />
     <ClCompile Include="UQ00Codec.cpp" />
     <ClCompile Include="UQRACodec.cpp" />
     <ClCompile Include="UQRGCodec.cpp" />
