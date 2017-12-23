@@ -272,7 +272,7 @@ int CUM00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 		for (unsigned int j = 0; j < m_dwDivideCount; ++j)
 		{
 			m_pPackedStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwStripeEnd[j] - m_dwStripeBegin[j]));
-			m_pControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwStripeEnd[j] - m_dwStripeBegin[j]) / 64 * 3);
+			m_pControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwStripeEnd[j] - m_dwStripeBegin[j]) / 64 * 3 + 8);
 		}
 	}
 
