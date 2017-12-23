@@ -356,8 +356,9 @@ void CUM00Codec::EncodeProc(uint32_t nBandIndex)
 
 		cpp_Pack8Sym8(
 			m_pPackedStream[nPlaneIndex][nBandIndex], &m_cbPackedStream[nPlaneIndex][nBandIndex],
-			m_pControlStream[nPlaneIndex][nBandIndex], &m_cbControlStream[nPlaneIndex][nBandIndex],
+			m_pControlStream[nPlaneIndex][nBandIndex],
 			m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd);
+		m_cbControlStream[nPlaneIndex][nBandIndex] = (cbPlaneEnd - cbPlaneBegin) / 64 * 3;
 	}
 }
 
@@ -512,8 +513,7 @@ void CUM00Codec::DecodeProc(uint32_t nBandIndex)
 
 		cpp_Unpack8Sym8(
 			m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd,
-			m_pPackedStream[nPlaneIndex][nBandIndex],
-			m_pControlStream[nPlaneIndex][nBandIndex], m_cbControlStream[nPlaneIndex][nBandIndex]);
+			m_pPackedStream[nPlaneIndex][nBandIndex], m_pControlStream[nPlaneIndex][nBandIndex]);
 
 		RestorePlanarGradient8(
 			m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin,
