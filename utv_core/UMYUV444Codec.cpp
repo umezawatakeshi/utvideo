@@ -118,18 +118,35 @@ void CUMYUV444Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 	case UTVF_YV24:
 		{
 			const uint8_t *pSrcYBegin, *pSrcVBegin, *pSrcUBegin;
+			const uint8_t *pSrcYEnd, *pSrcVEnd, *pSrcUEnd;
 
 			pSrcYBegin = ((uint8_t *)m_pInput);
 			pSrcVBegin = pSrcYBegin + m_nWidth * m_nHeight;
 			pSrcUBegin = pSrcVBegin + m_nWidth * m_nHeight;
 
-			pSrcYBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcVBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-			pSrcUBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+			pSrcYEnd = pSrcYBegin + m_dwStripeEnd[nBandIndex] * m_nWidth;
+			pSrcVEnd = pSrcVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth;
+			pSrcUEnd = pSrcUBegin + m_dwStripeEnd[nBandIndex] * m_nWidth;
 
-			memcpy(pDstYBegin, pSrcYBegin, (m_dwStripeEnd[nBandIndex] - m_dwStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[0]);
-			memcpy(pDstUBegin, pSrcUBegin, (m_dwStripeEnd[nBandIndex] - m_dwStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[1]);
-			memcpy(pDstVBegin, pSrcVBegin, (m_dwStripeEnd[nBandIndex] - m_dwStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[2]);
+			pSrcYBegin += m_dwStripeBegin[nBandIndex] * m_nWidth;
+			pSrcVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth;
+			pSrcUBegin += m_dwStripeBegin[nBandIndex] * m_nWidth;
+
+			for (auto p = pSrcYBegin; p != pSrcYEnd; p += m_nWidth, pDstYBegin += m_cbPlaneWidth[0])
+			{
+				memcpy(pDstYBegin, p, m_nWidth);
+				std::fill(pDstYBegin + m_nWidth, pDstYBegin + m_cbPlaneWidth[0], pDstYBegin[m_nWidth - 1]);
+			}
+			for (auto p = pSrcUBegin; p != pSrcUEnd; p += m_nWidth, pDstUBegin += m_cbPlaneWidth[1])
+			{
+				memcpy(pDstUBegin, p, m_nWidth);
+				std::fill(pDstUBegin + m_nWidth, pDstUBegin + m_cbPlaneWidth[1], pDstUBegin[m_nWidth - 1]);
+			}
+			for (auto p = pSrcVBegin; p != pSrcVEnd; p += m_nWidth, pDstVBegin += m_cbPlaneWidth[2])
+			{
+				memcpy(pDstVBegin, p, m_nWidth);
+				std::fill(pDstVBegin + m_nWidth, pDstVBegin + m_cbPlaneWidth[2], pDstVBegin[m_nWidth - 1]);
+			}
 		}
 		return;
 	}
@@ -140,22 +157,22 @@ void CUMYUV444Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 	switch (m_utvfRaw)
 	{
 	case UTVF_NFCC_BGR_BU:
-		ConvertBGRToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+		ConvertBGRToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertBGRXToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+		ConvertBGRXToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGR_TD:
-		ConvertBGRToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertBGRToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertBGRXToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertBGRXToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertRGBToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertRGBToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertXRGBToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertXRGBToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	}
 }
@@ -172,18 +189,26 @@ void CUMYUV444Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 	case UTVF_YV24:
 		{
 			uint8_t *pDstYBegin, *pDstVBegin, *pDstUBegin;
+			uint8_t *pDstYEnd, *pDstVEnd, *pDstUEnd;
 
 			pDstYBegin = ((uint8_t *)m_pOutput);
 			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
 			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight;
 
-			pDstYBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pDstVBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-			pDstUBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+			pDstYEnd = pDstYBegin + m_dwStripeEnd[nBandIndex] * m_nWidth;
+			pDstVEnd = pDstVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth;
+			pDstUEnd = pDstUBegin + m_dwStripeEnd[nBandIndex] * m_nWidth;
 
-			memcpy(pDstYBegin, pSrcYBegin, (m_dwStripeEnd[nBandIndex] - m_dwStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[0]);
-			memcpy(pDstUBegin, pSrcUBegin, (m_dwStripeEnd[nBandIndex] - m_dwStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[1]);
-			memcpy(pDstVBegin, pSrcVBegin, (m_dwStripeEnd[nBandIndex] - m_dwStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[2]);
+			pDstYBegin += m_dwStripeBegin[nBandIndex] * m_nWidth;
+			pDstVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth;
+			pDstUBegin += m_dwStripeBegin[nBandIndex] * m_nWidth;
+
+			for (auto p = pDstYBegin; p != pDstYEnd; p += m_nWidth, pSrcYBegin += m_cbPlaneWidth[0])
+				memcpy(p, pSrcYBegin, m_nWidth);
+			for (auto p = pDstUBegin; p != pDstUEnd; p += m_nWidth, pSrcUBegin += m_cbPlaneWidth[1])
+				memcpy(p, pSrcUBegin, m_nWidth);
+			for (auto p = pDstVBegin; p != pDstVEnd; p += m_nWidth, pSrcVBegin += m_cbPlaneWidth[2])
+				memcpy(p, pSrcVBegin, m_nWidth);
 		}
 		return;
 	}
@@ -194,22 +219,22 @@ void CUMYUV444Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 	switch (m_utvfRaw)
 	{
 	case UTVF_NFCC_BGR_BU:
-		ConvertULY4ToBGR(C)(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+		ConvertULY4ToBGR(C)(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULY4ToBGRX(C)(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+		ConvertULY4ToBGRX(C)(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGR_TD:
-		ConvertULY4ToBGR(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertULY4ToBGR(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertULY4ToBGRX(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertULY4ToBGRX(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertULY4ToRGB(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertULY4ToRGB(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULY4ToXRGB(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertULY4ToXRGB(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	}
 }

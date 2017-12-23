@@ -74,13 +74,13 @@ void CUMRACodec::ConvertToPlanar(uint32_t nBandIndex)
 	{
 	case UTVF_NFCC_BGRA_BU:
 	case UTVF_NFCC_BGRX_BU:
-		ConvertBGRAToULRA(g, b, r, a, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+		ConvertBGRAToULRA(g, b, r, a, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGRA_TD:
-		ConvertBGRAToULRA(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertBGRAToULRA(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertARGBToULRA(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertARGBToULRA(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	}
 }
@@ -101,13 +101,13 @@ void CUMRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 	{
 	case UTVF_NFCC_BGRA_BU:
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULRAToBGRA(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, a, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+		ConvertULRAToBGRA(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, a, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGRA_TD:
-		ConvertULRAToBGRA(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertULRAToBGRA(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULRAToARGB(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertULRAToARGB(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
 		break;
 	}
 }
