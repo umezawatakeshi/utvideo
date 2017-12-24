@@ -120,9 +120,9 @@ void CUMYUV422Codec<C>::CalcPlaneSizes(unsigned int width, unsigned int height)
 template<class C>
 void CUMYUV422Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 {
-	uint8_t *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	uint8_t *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	uint8_t *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	uint8_t *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	uint8_t *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	uint8_t *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
 	switch (m_utvfRaw)
 	{
@@ -135,13 +135,13 @@ void CUMYUV422Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 			pSrcVBegin = pSrcYBegin + m_nWidth * m_nHeight;
 			pSrcUBegin = pSrcVBegin + m_nWidth * m_nHeight / 2;
 
-			pSrcYEnd = pSrcYBegin + m_dwStripeEnd[nBandIndex] * m_nWidth;
-			pSrcVEnd = pSrcVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth / 2;
-			pSrcUEnd = pSrcUBegin + m_dwStripeEnd[nBandIndex] * m_nWidth / 2;
+			pSrcYEnd = pSrcYBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth;
+			pSrcVEnd = pSrcVBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth / 2;
+			pSrcUEnd = pSrcUBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth / 2;
 
-			pSrcYBegin += m_dwStripeBegin[nBandIndex] * m_nWidth;
-			pSrcVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth / 2;
-			pSrcUBegin += m_dwStripeBegin[nBandIndex] * m_nWidth / 2;
+			pSrcYBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth;
+			pSrcVBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth / 2;
+			pSrcUBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth / 2;
 
 			for (auto p = pSrcYBegin; p != pSrcYEnd; p += m_nWidth, pDstYBegin += m_cbPlaneWidth[0])
 			{
@@ -162,8 +162,8 @@ void CUMYUV422Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 		return;
 	}
 
-	const uint8_t *pSrcBegin = ((uint8_t *)m_pInput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	const uint8_t *pSrcEnd   = ((uint8_t *)m_pInput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
+	const uint8_t *pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	const uint8_t *pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
 
 	switch (m_utvfRaw)
 	{
@@ -203,9 +203,9 @@ void CUMYUV422Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 template<class C>
 void CUMYUV422Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 {
-	const uint8_t *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	const uint8_t *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	const uint8_t *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	const uint8_t *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	const uint8_t *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	const uint8_t *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
 	switch (m_utvfRaw)
 	{
@@ -218,13 +218,13 @@ void CUMYUV422Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
 			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight / 2;
 
-			pDstYEnd = pDstYBegin + m_dwStripeEnd[nBandIndex] * m_nWidth;
-			pDstVEnd = pDstVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth / 2;
-			pDstUEnd = pDstUBegin + m_dwStripeEnd[nBandIndex] * m_nWidth / 2;
+			pDstYEnd = pDstYBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth;
+			pDstVEnd = pDstVBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth / 2;
+			pDstUEnd = pDstUBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth / 2;
 
-			pDstYBegin += m_dwStripeBegin[nBandIndex] * m_nWidth;
-			pDstVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth / 2;
-			pDstUBegin += m_dwStripeBegin[nBandIndex] * m_nWidth / 2;
+			pDstYBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth;
+			pDstVBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth / 2;
+			pDstUBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth / 2;
 
 			for (auto p = pDstYBegin; p != pDstYEnd; p += m_nWidth, pSrcYBegin += m_cbPlaneWidth[0])
 				memcpy(p, pSrcYBegin, m_nWidth);
@@ -236,8 +236,8 @@ void CUMYUV422Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 		return;
 	}
 
-	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
+	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
 
 	switch (m_utvfRaw)
 	{

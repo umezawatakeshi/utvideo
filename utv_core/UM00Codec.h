@@ -70,8 +70,10 @@ protected:
 	size_t m_cbPlaneWidth[4];
 	size_t m_cbPlaneStripeSize[4];
 	size_t m_cbPlanePredictStride[4];
-	uint32_t m_dwStripeBegin[256];
-	uint32_t m_dwStripeEnd[256];
+	uint32_t m_dwPlaneStripeBegin[256];
+	uint32_t m_dwPlaneStripeEnd[256];
+	uint32_t m_dwRawStripeBegin[256];
+	uint32_t m_dwRawStripeEnd[256];
 	uint8_t* m_pPackedStream[4][256];
 	size_t m_cbPackedStream[4][256];
 	uint8_t* m_pControlStream[4][256];
