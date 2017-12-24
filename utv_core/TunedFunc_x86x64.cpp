@@ -396,6 +396,13 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackAVX1 = {
 	tuned_Unpack8Sym8<CODEFEATURE_AVX1>,
 };
 
+extern const TUNEDFUNC_SYMPACK tfnSymPackAVX2 = {
+	&tfnSymPackAVX1,
+	{ FEATURE0_AVX2, 0 },
+	tuned_Pack8Sym8<CODEFEATURE_AVX2>,
+	tuned_Unpack8Sym8<CODEFEATURE_AVX2>,
+};
+
 
 const TUNEDFUNC tfnRoot = {
 	&tfnPredictAVX1,
@@ -407,7 +414,7 @@ const TUNEDFUNC tfnRoot = {
 #endif
 	&tfnConvertYUVRGBAVX1,
 	&tfnConvertShuffleAVX1,
-	&tfnSymPackAVX1,
+	&tfnSymPackAVX2,
 };
 
 uint32_t dwSupportedFeatures[FEATURESIZE];
