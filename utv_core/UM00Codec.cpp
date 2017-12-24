@@ -365,7 +365,7 @@ void CUM00Codec::EncodeProc(uint32_t nBandIndex)
 			m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd,
 			m_cbPlanePredictStride[nPlaneIndex]);
 
-		cpp_Pack8Sym8(
+		Pack8Sym8(
 			m_pPackedStream[nPlaneIndex][nBandIndex], &m_cbPackedStream[nPlaneIndex][nBandIndex],
 			m_pControlStream[nPlaneIndex][nBandIndex],
 			m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd);
@@ -522,7 +522,7 @@ void CUM00Codec::DecodeProc(uint32_t nBandIndex)
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
-		cpp_Unpack8Sym8(
+		Unpack8Sym8(
 			m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd,
 			m_pPackedStream[nPlaneIndex][nBandIndex], m_pControlStream[nPlaneIndex][nBandIndex]);
 

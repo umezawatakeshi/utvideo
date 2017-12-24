@@ -10,6 +10,8 @@
 #include "HuffmanCode.h"
 #include "Convert.h"
 #include "Convert_x86x64.h"
+#include "SymPack.h"
+#include "SymPack_x86x64.h"
 #include "ColorOrder.h"
 #include "Coefficient.h"
 #include "CPUID.h"
@@ -380,6 +382,21 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX1 = {
 };
 
 
+extern const TUNEDFUNC_SYMPACK tfnSymPackSSE41 = {
+	&tfnSymPackCPP,
+	{ FEATURE0_SSE41, 0 },
+	tuned_Pack8Sym8<CODEFEATURE_SSE41>,
+	tuned_Unpack8Sym8<CODEFEATURE_SSE41>,
+};
+
+extern const TUNEDFUNC_SYMPACK tfnSymPackAVX1 = {
+	&tfnSymPackSSE41,
+	{ FEATURE0_AVX1, 0 },
+	tuned_Pack8Sym8<CODEFEATURE_AVX1>,
+	tuned_Unpack8Sym8<CODEFEATURE_AVX1>,
+};
+
+
 const TUNEDFUNC tfnRoot = {
 	&tfnPredictAVX1,
 	&tfnHuffmanEncodeI686,
@@ -390,6 +407,7 @@ const TUNEDFUNC tfnRoot = {
 #endif
 	&tfnConvertYUVRGBAVX1,
 	&tfnConvertShuffleAVX1,
+	&tfnSymPackAVX1,
 };
 
 uint32_t dwSupportedFeatures[FEATURESIZE];

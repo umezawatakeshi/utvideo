@@ -9,6 +9,7 @@
 #include "Convert.h"
 #include "ColorOrder.h"
 #include "Coefficient.h"
+#include "SymPack.h"
 
 const TUNEDFUNC_PREDICT tfnPredictCPP = {
 	NULL,
@@ -120,12 +121,20 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleCPP = {
 	cpp_ConvertUQRAToB64a,
 };
 
+extern const TUNEDFUNC_SYMPACK tfnSymPackCPP = {
+	NULL,
+	{ 0 },
+	cpp_Pack8Sym8,
+	cpp_Unpack8Sym8,
+};
+
 TUNEDFUNC tfn = {
 	&tfnPredictCPP,
 	&tfnHuffmanEncodeCPP,
 	&tfnHuffmanDecodeCPP,
 	&tfnConvertYUVRGBCPP,
 	&tfnConvertShuffleCPP,
+	&tfnSymPackCPP,
 };
 
 

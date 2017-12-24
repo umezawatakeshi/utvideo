@@ -14,3 +14,4 @@
 #define GENERATE_SSE2 1
 #include "Convert_x86x64_xmm.cpp"
 #include "Predict_x86x64_xmm.cpp"
+#include "SymPack_x86x64.cpp"

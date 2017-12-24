@@ -108,6 +108,13 @@ struct TUNEDFUNC_CONVERT_SHUFFLE
 	void (*pfnConvertUQRAToB64a)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 };
 
+struct TUNEDFUNC_SYMPACK
+{
+	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_SYMPACK);
+	void (*pfnPack8Sym8)(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+	void (*pfnUnpack8Sym8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl);
+};
+
 struct TUNEDFUNC
 {
 	const TUNEDFUNC_PREDICT *pPredict;
@@ -115,6 +122,7 @@ struct TUNEDFUNC
 	const TUNEDFUNC_HUFFMAN_DECODE *pHuffmanDecode;
 	const TUNEDFUNC_CONVERT_YUVRGB *pConvertYUVRGB;
 	const TUNEDFUNC_CONVERT_SHUFFLE *pConvertShuffle;
+	const TUNEDFUNC_SYMPACK *pSymPack;
 };
 
 extern TUNEDFUNC tfn;
@@ -123,6 +131,7 @@ extern const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeCPP;
 extern const TUNEDFUNC_HUFFMAN_DECODE tfnHuffmanDecodeCPP;
 extern const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBCPP;
 extern const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleCPP;
+extern const TUNEDFUNC_SYMPACK tfnSymPackCPP;
 
 void ResolveTunedFunc(const TUNEDFUNC *ptfnRoot, const uint32_t *pdwSupportedFeatures);
 
@@ -206,3 +215,6 @@ public:
 #define ConvertUQRGToB48r tfn.pConvertShuffle->pfnConvertUQRGToB48r
 #define ConvertUQRGToB64a tfn.pConvertShuffle->pfnConvertUQRGToB64a
 #define ConvertUQRAToB64a tfn.pConvertShuffle->pfnConvertUQRAToB64a
+
+#define Pack8Sym8 tfn.pSymPack->pfnPack8Sym8
+#define Unpack8Sym8 tfn.pSymPack->pfnUnpack8Sym8
