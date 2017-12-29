@@ -7,6 +7,9 @@ resource 'strn' (SUBTYPE_RID) {
 	SUBTYPE_FMTN " QT"
 };
 
+
+#ifdef SUBTYPE_DEC
+
 resource 'stri' (SUBTYPE_RID) {
 	"Decompresses video stored in " SUBTYPE_FMTN " format."
 };
@@ -45,6 +48,13 @@ resource 'thnr' (SUBTYPE_RID) {
 		'cpix', SUBTYPE_RID, 0,
 	}
 };
+
+#undef SUBTYPE_DEC
+
+#endif
+
+
+#if defined SUBTYPE_ENC
 
 resource 'stri' (SUBTYPE_RID + 256) {
 	"Compresses video stored in " SUBTYPE_FMTN " format."
@@ -85,11 +95,14 @@ resource 'thnr' (SUBTYPE_RID + 256) {
 	}
 };
 
+#undef SUBTYPE_ENC
+
+#endif
+
+
 #undef SUBTYPE_FMTN
 
 #undef SUBTYPE
 #undef SUBTYPE_VAL
 #undef SUBTYPE_RID
 #undef SUBTYPE_INFO
-#undef SUBTYPE_ENC
-#undef SUBTYPE_DEC

@@ -146,3 +146,58 @@ resource 'dlle' (257) {
 #define SUBTYPE_ENC  { /*'YV24',*/ k32ARGBPixelFormat, k24RGBPixelFormat }
 #define SUBTYPE_DEC  { /*'YV24',*/ k32ARGBPixelFormat, k24RGBPixelFormat }
 #include "utv_qt.in.r"
+
+
+#define SUBTYPE      UMRA
+#define SUBTYPE_VAL  'UMRA'
+#define SUBTYPE_STR  "UMRA"
+#define SUBTYPE_RID  280
+#define SUBTYPE_INFO "T2 RGBA"
+//#define SUBTYPE_ENC  { k32ARGBPixelFormat }
+#define SUBTYPE_DEC  { k32ARGBPixelFormat }
+#include "utv_qt.in.r"
+
+#define SUBTYPE      UMRG
+#define SUBTYPE_VAL  'UMRG'
+#define SUBTYPE_STR  "UMRG"
+#define SUBTYPE_RID  281
+#define SUBTYPE_INFO "T2 RGB"
+//#define SUBTYPE_ENC  { k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { k32ARGBPixelFormat, k24RGBPixelFormat }
+#include "utv_qt.in.r"
+
+#define SUBTYPE      UMY2
+#define SUBTYPE_VAL  'UMY2'
+#define SUBTYPE_STR  "UMY2"
+#define SUBTYPE_RID  282
+#define SUBTYPE_INFO "T2 YUV422 BT.601"
+//#define SUBTYPE_ENC  { 'yuvs', '2vuy', k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { 'yuvs', '2vuy', k32ARGBPixelFormat, k24RGBPixelFormat }
+#include "utv_qt.in.r"
+
+#define SUBTYPE      UMH2
+#define SUBTYPE_VAL  'UMH2'
+#define SUBTYPE_STR  "UMH2"
+#define SUBTYPE_RID  283
+#define SUBTYPE_INFO "T2 YUV422 BT.709"
+//#define SUBTYPE_ENC  { 'HDYC', 'yuvs', '2vuy', k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { 'HDYC', 'yuvs', '2vuy', k32ARGBPixelFormat, k24RGBPixelFormat }
+#include "utv_qt.in.r"
+
+#define SUBTYPE      UMY4
+#define SUBTYPE_VAL  'UMY4'
+#define SUBTYPE_STR  "UMY4"
+#define SUBTYPE_RID  284
+#define SUBTYPE_INFO "T2 YUV444 BT.601"
+//#define SUBTYPE_ENC  { /*'YV24',*/ k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { /*'YV24',*/ k32ARGBPixelFormat, k24RGBPixelFormat }
+#include "utv_qt.in.r"
+
+#define SUBTYPE      UMH4
+#define SUBTYPE_VAL  'UMH4'
+#define SUBTYPE_STR  "UMH4"
+#define SUBTYPE_RID  285
+#define SUBTYPE_INFO "T2 YUV444 BT.709"
+//#define SUBTYPE_ENC  { /*'YV24',*/ k32ARGBPixelFormat, k24RGBPixelFormat }
+#define SUBTYPE_DEC  { /*'YV24',*/ k32ARGBPixelFormat, k24RGBPixelFormat }
+#include "utv_qt.in.r"

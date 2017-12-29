@@ -20,6 +20,13 @@
 		2582390B1AE25036003BA1AD /* LogReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 255FB9331AE13DC2009B2DC4 /* LogReader.cpp */; };
 		258239121AE250C4003BA1AD /* utv_logc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258239111AE250C4003BA1AD /* utv_logc.cpp */; };
 		2582392E1AE264C7003BA1AD /* libpthread.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2582392D1AE264C7003BA1AD /* libpthread.dylib */; };
+		25871D501FF622C2008CE447 /* SymPack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25871D421FF622C2008CE447 /* SymPack.cpp */; };
+		25871D511FF622C2008CE447 /* TunedFunc_x86x64_avx2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25871D441FF622C2008CE447 /* TunedFunc_x86x64_avx2.cpp */; settings = {COMPILER_FLAGS = "-mavx2 -mbmi2"; }; };
+		25871D521FF622C2008CE447 /* UM00Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25871D451FF622C2008CE447 /* UM00Codec.cpp */; };
+		25871D531FF622C2008CE447 /* UMRACodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25871D471FF622C2008CE447 /* UMRACodec.cpp */; };
+		25871D541FF622C2008CE447 /* UMRGCodec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25871D491FF622C2008CE447 /* UMRGCodec.cpp */; };
+		25871D551FF622C2008CE447 /* UMYUV422Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25871D4B1FF622C2008CE447 /* UMYUV422Codec.cpp */; };
+		25871D561FF622C2008CE447 /* UMYUV444Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25871D4D1FF622C2008CE447 /* UMYUV444Codec.cpp */; };
 		258955261A9B58B100FDE981 /* TunedFunc_x86x64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 25CF5DF9172422DE0089819C /* TunedFunc_x86x64.cpp */; };
 		2589822E1E61870D0022231E /* HuffmanCode_x86.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2589822D1E61870D0022231E /* HuffmanCode_x86.cpp */; };
 		258DB4001411F91A0059F47E /* Codec.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 258DB3D41411F8600059F47E /* Codec.cpp */; };
@@ -82,6 +89,21 @@
 		258239101AE250C4003BA1AD /* stdafx.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = stdafx.h; path = utv_logc/stdafx.h; sourceTree = "<group>"; };
 		258239111AE250C4003BA1AD /* utv_logc.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = utv_logc.cpp; path = utv_logc/utv_logc.cpp; sourceTree = "<group>"; };
 		2582392D1AE264C7003BA1AD /* libpthread.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libpthread.dylib; path = /usr/lib/libpthread.dylib; sourceTree = "<absolute>"; };
+		25871D401FF622C2008CE447 /* SymPack_x86x64.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = SymPack_x86x64.cpp; path = utv_core/SymPack_x86x64.cpp; sourceTree = "<group>"; };
+		25871D411FF622C2008CE447 /* SymPack_x86x64.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = SymPack_x86x64.h; path = utv_core/SymPack_x86x64.h; sourceTree = "<group>"; };
+		25871D421FF622C2008CE447 /* SymPack.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = SymPack.cpp; path = utv_core/SymPack.cpp; sourceTree = "<group>"; };
+		25871D431FF622C2008CE447 /* SymPack.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = SymPack.h; path = utv_core/SymPack.h; sourceTree = "<group>"; };
+		25871D441FF622C2008CE447 /* TunedFunc_x86x64_avx2.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = TunedFunc_x86x64_avx2.cpp; path = utv_core/TunedFunc_x86x64_avx2.cpp; sourceTree = "<group>"; };
+		25871D451FF622C2008CE447 /* UM00Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = UM00Codec.cpp; path = utv_core/UM00Codec.cpp; sourceTree = "<group>"; };
+		25871D461FF622C2008CE447 /* UM00Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = UM00Codec.h; path = utv_core/UM00Codec.h; sourceTree = "<group>"; };
+		25871D471FF622C2008CE447 /* UMRACodec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = UMRACodec.cpp; path = utv_core/UMRACodec.cpp; sourceTree = "<group>"; };
+		25871D481FF622C2008CE447 /* UMRACodec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = UMRACodec.h; path = utv_core/UMRACodec.h; sourceTree = "<group>"; };
+		25871D491FF622C2008CE447 /* UMRGCodec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = UMRGCodec.cpp; path = utv_core/UMRGCodec.cpp; sourceTree = "<group>"; };
+		25871D4A1FF622C2008CE447 /* UMRGCodec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = UMRGCodec.h; path = utv_core/UMRGCodec.h; sourceTree = "<group>"; };
+		25871D4B1FF622C2008CE447 /* UMYUV422Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = UMYUV422Codec.cpp; path = utv_core/UMYUV422Codec.cpp; sourceTree = "<group>"; };
+		25871D4C1FF622C2008CE447 /* UMYUV422Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = UMYUV422Codec.h; path = utv_core/UMYUV422Codec.h; sourceTree = "<group>"; };
+		25871D4D1FF622C2008CE447 /* UMYUV444Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = UMYUV444Codec.cpp; path = utv_core/UMYUV444Codec.cpp; sourceTree = "<group>"; };
+		25871D4E1FF622C2008CE447 /* UMYUV444Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = UMYUV444Codec.h; path = utv_core/UMYUV444Codec.h; sourceTree = "<group>"; };
 		2589822D1E61870D0022231E /* HuffmanCode_x86.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = HuffmanCode_x86.cpp; path = utv_core/HuffmanCode_x86.cpp; sourceTree = "<group>"; };
 		258DB3D41411F8600059F47E /* Codec.cpp */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.cpp.cpp; name = Codec.cpp; path = utv_core/Codec.cpp; sourceTree = "<group>"; };
 		258DB3D51411F8600059F47E /* Codec.h */ = {isa = PBXFileReference; fileEncoding = 8; lastKnownFileType = sourcecode.c.h; name = Codec.h; path = utv_core/Codec.h; sourceTree = "<group>"; };
@@ -268,12 +290,17 @@
 				25F2F9B31E154BBC0095F415 /* Predict_x86x64.h */,
 				258DB3E41411F8600059F47E /* stdafx.h */,
 				255FB94C1AE13F67009B2DC4 /* SymbolBits.h */,
+				25871D421FF622C2008CE447 /* SymPack.cpp */,
+				25871D431FF622C2008CE447 /* SymPack.h */,
+				25871D401FF622C2008CE447 /* SymPack_x86x64.cpp */,
+				25871D411FF622C2008CE447 /* SymPack_x86x64.h */,
 				258DB3E51411F8600059F47E /* Thread.cpp */,
 				258DB3E61411F8600059F47E /* Thread.h */,
 				258DB3E71411F8600059F47E /* TunedFunc.cpp */,
 				258DB3E81411F8600059F47E /* TunedFunc.h */,
 				25CF5DF9172422DE0089819C /* TunedFunc_x86x64.cpp */,
 				25B2570C1DD0D73C00D2013A /* TunedFunc_x86x64_avx1.cpp */,
+				25871D441FF622C2008CE447 /* TunedFunc_x86x64_avx2.cpp */,
 				25B2570D1DD0D73C00D2013A /* TunedFunc_x86x64_sse2.cpp */,
 				25EF212A1E2B879A00CBF2ED /* TunedFunc_x86x64_sse41.cpp */,
 				25B2570E1DD0D73C00D2013A /* TunedFunc_x86x64_ssse3.cpp */,
@@ -290,6 +317,16 @@
 				25817AE9175A052D00888CE2 /* ULYUV422Codec.h */,
 				25F161BD1D6AB9B4003C2B42 /* ULYUV444Codec.cpp */,
 				25F161BE1D6AB9B4003C2B42 /* ULYUV444Codec.h */,
+				25871D451FF622C2008CE447 /* UM00Codec.cpp */,
+				25871D461FF622C2008CE447 /* UM00Codec.h */,
+				25871D471FF622C2008CE447 /* UMRACodec.cpp */,
+				25871D481FF622C2008CE447 /* UMRACodec.h */,
+				25871D491FF622C2008CE447 /* UMRGCodec.cpp */,
+				25871D4A1FF622C2008CE447 /* UMRGCodec.h */,
+				25871D4B1FF622C2008CE447 /* UMYUV422Codec.cpp */,
+				25871D4C1FF622C2008CE447 /* UMYUV422Codec.h */,
+				25871D4D1FF622C2008CE447 /* UMYUV444Codec.cpp */,
+				25871D4E1FF622C2008CE447 /* UMYUV444Codec.h */,
 				25CCB6F018FD137F00076B45 /* UQ00Codec.cpp */,
 				25CCB6F118FD137F00076B45 /* UQ00Codec.h */,
 				2500E14A1CBA4BC300B79A76 /* UQRACodec.cpp */,
@@ -433,6 +470,7 @@
 				258DB4041411F9290059F47E /* FrameBuffer.cpp in Sources */,
 				258DB4051411F9290059F47E /* GlobalConfig.cpp in Sources */,
 				258DB4061411F9290059F47E /* HuffmanCode.cpp in Sources */,
+				25871D551FF622C2008CE447 /* UMYUV422Codec.cpp in Sources */,
 				258DB4071411F9290059F47E /* Predict.cpp in Sources */,
 				258DB4081411F9290059F47E /* Thread.cpp in Sources */,
 				258DB4091411F9290059F47E /* TunedFunc.cpp in Sources */,
@@ -444,19 +482,25 @@
 				25B257131DD0D73C00D2013A /* TunedFunc_x86x64_ssse3.cpp in Sources */,
 				258DB40F1411F9290059F47E /* utv_core.cpp in Sources */,
 				25F09D4314122EC900D214B9 /* QTDecoder.cpp in Sources */,
+				25871D541FF622C2008CE447 /* UMRGCodec.cpp in Sources */,
+				25871D521FF622C2008CE447 /* UM00Codec.cpp in Sources */,
 				25EF212B1E2B879A00CBF2ED /* TunedFunc_x86x64_sse41.cpp in Sources */,
 				25D59BCE14CD624800FDCD1F /* QTCodec.cpp in Sources */,
 				25D59BE014CD6BA300FDCD1F /* QTEncoder.cpp in Sources */,
 				25817AEA175A052D00888CE2 /* ULYUV420Codec.cpp in Sources */,
 				2589822E1E61870D0022231E /* HuffmanCode_x86.cpp in Sources */,
 				25817AEB175A052D00888CE2 /* ULYUV422Codec.cpp in Sources */,
+				25871D531FF622C2008CE447 /* UMRACodec.cpp in Sources */,
 				25CCB6F518FD137F00076B45 /* CodecBase.cpp in Sources */,
 				25CCB6F618FD137F00076B45 /* UQ00Codec.cpp in Sources */,
+				25871D561FF622C2008CE447 /* UMYUV444Codec.cpp in Sources */,
 				25CCB6F718FD137F00076B45 /* UQY2Codec.cpp in Sources */,
 				25CCB71018FD189300076B45 /* QuickTimeFormat.cpp in Sources */,
 				258955261A9B58B100FDE981 /* TunedFunc_x86x64.cpp in Sources */,
+				25871D511FF622C2008CE447 /* TunedFunc_x86x64_avx2.cpp in Sources */,
 				25B257111DD0D73C00D2013A /* TunedFunc_x86x64_avx1.cpp in Sources */,
 				255FB93B1AE13DC2009B2DC4 /* LogPath.cpp in Sources */,
+				25871D501FF622C2008CE447 /* SymPack.cpp in Sources */,
 				2500E14F1CBA4BC300B79A76 /* UQRGCodec.cpp in Sources */,
 				255FB93D1AE13DC2009B2DC4 /* LogUtil.cpp in Sources */,
 				255FB93E1AE13DC2009B2DC4 /* LogWriter.cpp in Sources */,
@@ -501,7 +545,7 @@
 		258DB3C61411F4BA0059F47E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				COPY_PHASE_STRIP = NO;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
@@ -512,7 +556,7 @@
 		258DB3C71411F4BA0059F47E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CLANG_CXX_LANGUAGE_STANDARD = "c++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++14";
 				CLANG_CXX_LIBRARY = "libc++";
 				COPY_PHASE_STRIP = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
