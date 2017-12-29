@@ -33,8 +33,15 @@ void tuned_Pack8Sym8(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, cons
 		z = _mm_or_si128(z, _mm_srli_epi64(z, 8));
 		z = _mm_and_si128(z, _mm_set1_epi64x(0xff));
 		z = _mm_or_si128(z, _mm_set1_epi64x(1));
+#if defined(_MSC_VER)
 		_BitScanReverse((unsigned long *)&mode0, _mm_cvtsi128_si32(z));
 		_BitScanReverse((unsigned long *)&mode1, _mm_extract_epi32(z, 2));
+#elif defined(__GNUC__)
+		mode0 = 31 - __builtin_clz(_mm_cvtsi128_si32(z));
+		mode1 = 31 - __builtin_clz(_mm_extract_epi32(z, 2));
+#else
+#error
+#endif
 		bits0 = mode0 + 2;
 		int rembits0 = 6 - mode0;
 		mode0++;
