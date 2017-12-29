@@ -5,10 +5,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" type="text/css" href="style.css">
-<title>Ut Video Codec Suite 18.2.1 readme (English)</title>
+<title>Ut Video Codec Suite 19.0.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 18.2.1 readme (English)</h1>
+<h1>Ut Video Codec Suite 19.0.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008-2017  UMEZAWA Takeshi</p>
@@ -38,7 +38,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 </dl>
 <h3>Minimum requirement (Mac)</h3>
 <dl>
-<dt>OS</dt><dd>OS X 10.10 Yosemite or later</dd>
+<dt>OS</dt><dd>OS X 10.11 El Capitan or later</dd>
 <dt>CPU</dt><dd>i686-compatible CPU with SSE2 support<br>(All Intel Mac meet this requirements)</dd>
 </dl>
 <h3>Recommended</h3>
@@ -53,13 +53,19 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <table>
 <tr><th rowspan="2">FourCC</th><th rowspan="2">Codec name</th><th rowspan="2">Internal format</th><th colspan="2">Supported input/output format (in order of priority)</th></tr>
 <tr><th>VCM / DMO</th><th>QT</th></tr>
-<tr><td>ULRA</td><td>UtVideo RGBA</td><td>RGBA 4:4:4:4 8bit full-range</td><td><strong>RGBA</strong></td><td><strong>ARGB</strong></td></tr>
-<tr><td>ULRG</td><td>UtVideo RGB</td><td>RGB 4:4:4 8bit full-range</td><td><strong>RGB24<br>RGB32</strong></td><td><strong>RGB<br>ARGB</strong></td></tr>
-<tr><td>ULY4</td><td>UtVideo YUV444 BT.601</td><td>YCbCr (BT.601) 4:4:4 8bit limited</td><td><strong>YV24</strong><br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
-<tr><td>ULY2</td><td>UtVideo YUV422 BT.601</td><td>YCbCr (BT.601) 4:2:2 8bit limited</td><td><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td><td><strong>yuvs</strong><br><strong>2vuy</strong><br>RGB<br>ARGB</td></tr>
+<tr><td>ULRA</td><td>UtVideo RGBA</td><td rowspan="2">RGBA 4:4:4:4 8bit full-range</td><td rowspan="2"><strong>RGBA</strong></td><td rowspan="2"><strong>ARGB</strong></td></tr>
+<tr><td>UMRA</td><td>UtVideo T2 RGBA</td></tr>
+<tr><td>ULRG</td><td>UtVideo RGB</td><td rowspan="2">RGB 4:4:4 8bit full-range</td><td rowspan="2"><strong>RGB24<br>RGB32</strong></td><td rowspan="2"><strong>RGB<br>ARGB</strong></td></tr>
+<tr><td>UMRG</td><td>UtVideo T2 RGB</td></tr>
+<tr><td>ULY4</td><td>UtVideo YUV444 BT.601</td><td rowspan="2">YCbCr (BT.601) 4:4:4 8bit limited</td><td rowspan="2"><strong>YV24</strong><br>RGB24<br>RGB32</td><td rowspan="2">RGB<br>ARGB</td></tr>
+<tr><td>UMY4</td><td>UtVideo T2 YUV444 BT.601</td></tr>
+<tr><td>ULY2</td><td>UtVideo YUV422 BT.601</td><td rowspan="2">YCbCr (BT.601) 4:2:2 8bit limited</td><td rowspan="2"><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td><td rowspan="2"><strong>yuvs</strong><br><strong>2vuy</strong><br>RGB<br>ARGB</td></tr>
+<tr><td>UMY2</td><td>UtVideo T2 YUV422 BT.601</td></tr>
 <tr><td>ULY0</td><td>UtVideo YUV420 BT.601</td><td>YCbCr (BT.601) 4:2:0 8bit limited</td><td><strong>YV12</strong><br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td><td>yuvs<br>2vuy<br>RGB<br>ARGB</td></tr>
-<tr><td>ULH4</td><td>UtVideo YUV444 BT.709</td><td>YCbCr (BT.709) 4:4:4 8bit limited</td><td><strong>YV24</strong><br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
-<tr><td>ULH2</td><td>UtVideo YUV422 BT.709</td><td>YCbCr (BT.709) 4:2:2 8bit limited</td><td><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td><td><strong>HDYC</strong><br><strong>yuvs</strong><br><strong>2vuy</strong><br>RGB<br>ARGB</td></tr>
+<tr><td>ULH4</td><td>UtVideo YUV444 BT.709</td><td rowspan="2">YCbCr (BT.709) 4:4:4 8bit limited</td><td rowspan="2"><strong>YV24</strong><br>RGB24<br>RGB32</td><td rowspan="2">RGB<br>ARGB</td></tr>
+<tr><td>UMH4</td><td>UtVideo T2 YUV444 BT.709</td></tr>
+<tr><td>ULH2</td><td>UtVideo YUV422 BT.709</td><td rowspan="2">YCbCr (BT.709) 4:2:2 8bit limited</td><td rowspan="2"><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td><td rowspan="2"><strong>HDYC</strong><br><strong>yuvs</strong><br><strong>2vuy</strong><br>RGB<br>ARGB</td></tr>
+<tr><td>UMH2</td><td>UtVideo T2 YUV422 BT.709</td></tr>
 <tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit limited</td><td><strong>YV12</strong><br>HDYC<br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td><td>HDYC<br>yuvs<br>2vuy<br>RGB<br>ARGB</td></tr>
 <tr><td>UQRA</td><td>UtVideo Pro RGBA 10bit</td><td>RGBA 4:4:4 10bit full-range</td><td>b64a</td><td>b64a</td></tr>
 <tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit full-range</td><td>b48r<br>b64a</td><td>b48r<br>b64a</td></tr>
@@ -116,6 +122,12 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
 <dt>RAM</dt><dd>DDR3-1333 8GB</dd>
 </dl>
 <h2 id="history">Version history</h2>
+<h3>Version 19.0.0</h3>
+<dl>
+<dt>New features</dt><dd><ul>
+<li>Add new codecs which focus on speed (FourCC: UMRA, UMRG, UMY4, UMY2, UMH4, UMH2). Decode only in case of QuickTime components.</li>
+</ul></dd>
+</dl>
 <h3>Version 18.2.1</h3>
 <dl>
 <dt>Others</dt><dd><ul>

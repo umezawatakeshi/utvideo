@@ -5,10 +5,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" type="text/css" href="style.css">
-<title>Ut Video Codec Suite 18.2.1 readme （日本語）</title>
+<title>Ut Video Codec Suite 19.0.0 readme （日本語）</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 18.2.1 readme （日本語）</h1>
+<h1>Ut Video Codec Suite 19.0.0 readme （日本語）</h1>
 <hr>
 <h2 id="copyright_notice">著作権表示</h2>
 <h3>英語</h3>
@@ -40,7 +40,7 @@ GNU 一般公衆利用許諾契約書の複製物を一部受け取ったはずです。
 (宛先は the Free Software Foundation, Inc.,
 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 <h2 id="overview">概要</h2>
-<p>Ut Video Codec Suite は、複数のプラットフォームとインターフェースをサポートするロスレス映像コーデックです。インターフェースは VCM、DMO、QuickTime をサポートします。内部保持形式は RGB、RGBA、YUV422、YUV420 をサポートします。</p>
+<p>Ut Video Codec Suite は、複数のプラットフォームとインターフェースをサポートするロスレス映像コーデックです。インターフェースは VCM、DMO、QuickTime をサポートします。内部保持形式は RGB、RGBA、YUV444、YUV422、YUV420 をサポートします。</p>
 <h2 id="environment">動作環境</h2>
 <h3>必須環境 (Windows x86)</h3>
 <dl>
@@ -54,7 +54,7 @@ GNU 一般公衆利用許諾契約書の複製物を一部受け取ったはずです。
 </dl>
 <h3>必須環境 (Mac)</h3>
 <dl>
-<dt>OS</dt><dd>OS X 10.10 Yosemite 以降</dd>
+<dt>OS</dt><dd>OS X 10.11 El Capitan 以降</dd>
 <dt>CPU</dt><dd>SSE2 をサポートする i686 以降の CPU<br>（Intel Mac でこれに該当しないものは存在しません）</dd>
 </dl>
 <h3>推奨環境</h3>
@@ -69,13 +69,19 @@ GNU 一般公衆利用許諾契約書の複製物を一部受け取ったはずです。
 <table>
 <tr><th rowspan="2">FourCC</th><th rowspan="2">コーデック名</th><th rowspan="2">内部保持形式</th><th colspan="2">対応入出力フォーマット（優先度順）</th></tr>
 <tr><th>VCM / DMO</th><th>QT</th></tr>
-<tr><td>ULRA</td><td>UtVideo RGBA</td><td>RGBA 4:4:4:4 8bit フルレンジ</td><td><strong>RGBA</strong></td><td><strong>ARGB</strong></td></tr>
-<tr><td>ULRG</td><td>UtVideo RGB</td><td>RGB 4:4:4 8bit フルレンジ</td><td><strong>RGB24<br>RGB32</strong></td><td><strong>RGB<br>ARGB</strong></td></tr>
-<tr><td>ULY4</td><td>UtVideo YUV444 BT.601</td><td>YCbCr (BT.601) 4:4:4 8bit リミテッド</td><td><strong>YV24</strong><br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
-<tr><td>ULY2</td><td>UtVideo YUV422 BT.601</td><td>YCbCr (BT.601) 4:2:2 8bit リミテッド</td><td><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td><td><strong>yuvs</strong><br><strong>2vuy</strong><br>RGB<br>ARGB</td></tr>
+<tr><td>ULRA</td><td>UtVideo RGBA</td><td rowspan="2">RGBA 4:4:4:4 8bit フルレンジ</td><td rowspan="2"><strong>RGBA</strong></td><td rowspan="2"><strong>ARGB</strong></td></tr>
+<tr><td>UMRA</td><td>UtVideo T2 RGBA</td></tr>
+<tr><td>ULRG</td><td>UtVideo RGB</td><td rowspan="2">RGB 4:4:4 8bit フルレンジ</td><td rowspan="2"><strong>RGB24<br>RGB32</strong></td><td rowspan="2"><strong>RGB<br>ARGB</strong></td></tr>
+<tr><td>UMRG</td><td>UtVideo T2 RGB</td></tr>
+<tr><td>ULY4</td><td>UtVideo YUV444 BT.601</td><td rowspan="2">YCbCr (BT.601) 4:4:4 8bit リミテッド</td><td rowspan="2"><strong>YV24</strong><br>RGB24<br>RGB32</td><td rowspan="2">RGB<br>ARGB</td></tr>
+<tr><td>UMY4</td><td>UtVideo T2 YUV444 BT.601</td></tr>
+<tr><td>ULY2</td><td>UtVideo YUV422 BT.601</td><td rowspan="2">YCbCr (BT.601) 4:2:2 8bit リミテッド</td><td rowspan="2"><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td><td rowspan="2"><strong>yuvs</strong><br><strong>2vuy</strong><br>RGB<br>ARGB</td></tr>
+<tr><td>UMY2</td><td>UtVideo T2 YUV422 BT.601</td></tr>
 <tr><td>ULY0</td><td>UtVideo YUV420 BT.601</td><td>YCbCr (BT.601) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td><td>yuvs<br>2vuy<br>RGB<br>ARGB</td></tr>
-<tr><td>ULH4</td><td>UtVideo YUV444 BT.709</td><td>YCbCr (BT.709) 4:4:4 8bit リミテッド</td><td><strong>YV24</strong><br>RGB24<br>RGB32</td><td>RGB<br>ARGB</td></tr>
-<tr><td>ULH2</td><td>UtVideo YUV422 BT.709</td><td>YCbCr (BT.709) 4:2:2 8bit リミテッド</td><td><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td><td><strong>HDYC</strong><br><strong>yuvs</strong><br><strong>2vuy</strong><br>RGB<br>ARGB</td></tr>
+<tr><td>ULH4</td><td>UtVideo YUV444 BT.709</td><td rowspan="2">YCbCr (BT.709) 4:4:4 8bit リミテッド</td><td rowspan="2"><strong>YV24</strong><br>RGB24<br>RGB32</td><td rowspan="2">RGB<br>ARGB</td></tr>
+<tr><td>UMH4</td><td>UtVideo T2 YUV444 BT.709</td></tr>
+<tr><td>ULH2</td><td>UtVideo YUV422 BT.709</td><td rowspan="2">YCbCr (BT.709) 4:2:2 8bit リミテッド</td><td rowspan="2"><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td><td rowspan="2"><strong>HDYC</strong><br><strong>yuvs</strong><br><strong>2vuy</strong><br>RGB<br>ARGB</td></tr>
+<tr><td>UMH2</td><td>UtVideo T2 YUV422 BT.709</td></tr>
 <tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>HDYC<br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td><td>HDYC<br>yuvs<br>2vuy<br>RGB<br>ARGB</td></tr>
 <tr><td>UQRA</td><td>UtVideo Pro RGBA 10bit</td><td>RGBA 4:4:4 10bit フルレンジ</td><td>b64a</td><td>b64a</td></tr>
 <tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit フルレンジ</td><td>b48r<br>b64a</td><td>b48r<br>b64a</td></tr>
@@ -134,6 +140,12 @@ GNU 一般公衆利用許諾契約書の複製物を一部受け取ったはずです。
 <dt>RAM</dt><dd>DDR3-1333 8GB</dd>
 </dl>
 <h2 id="history">改版履歴</h2>
+<h3>バージョン 19.0.0</h3>
+<dl>
+<dt>機能追加</dt><dd><ul>
+<li>速度を重視した新しいコーデック (FourCC: UMRA, UMRG, UMY4, UMY2, UMH4, UMH2) を追加した。QuickTime コンポーネントではデコードのみ。</li>
+</ul></dd>
+</dl>
 <h3>バージョン 18.2.1</h3>
 <dl>
 <dt>その他</dt><dd><ul>
