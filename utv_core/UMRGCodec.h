@@ -19,8 +19,6 @@ private:
 	static const utvf_t m_utvfDecoderOutput[];
 	static const utvf_t m_utvfCompressed[];
 
-protected:
-
 public:
 	CUMRGCodec(const char *pszInterfaceName);
 	virtual ~CUMRGCodec(void) {}

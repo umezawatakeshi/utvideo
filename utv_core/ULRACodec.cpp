@@ -110,27 +110,6 @@ void CULRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 	}
 }
 
-int CULRACodec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
-{
-	int ret;
-
-	ret = CUL00Codec::InternalDecodeBegin(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
-	if (ret != 0)
-		return ret;
-
-	m_pRawDecoded = new CFrameBuffer();
-	m_pRawDecoded->AddPlane(m_cbRawSize, 0);
-
-	return 0;
-}
-
-int CULRACodec::InternalDecodeEnd(void)
-{
-	delete m_pRawDecoded;
-
-	return CUL00Codec::InternalDecodeEnd();
-}
-
 bool CULRACodec::DecodeDirect(uint32_t nBandIndex)
 {
 	return false;

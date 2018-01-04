@@ -19,9 +19,6 @@ private:
 	static const utvf_t m_utvfDecoderOutput[];
 	static const utvf_t m_utvfCompressed[];
 
-protected:
-	CFrameBuffer *m_pRawDecoded;
-
 public:
 	CUMRACodec(const char *pszInterfaceName);
 	virtual ~CUMRACodec(void) {}
