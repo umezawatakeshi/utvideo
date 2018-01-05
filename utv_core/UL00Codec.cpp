@@ -142,10 +142,16 @@ int CUL00Codec::GetState(void *pState, size_t cb)
 
 int CUL00Codec::InternalSetState(const void *pState, size_t cb)
 {
-	memset(&m_ec, 0, sizeof(ENCODERCONF));
+	ENCODERCONF ec;
 
-	memcpy(&m_ec, pState, min(sizeof(ENCODERCONF), cb));
-	m_ec.dwFlags0 &= ~EC_FLAGS0_RESERVED;
+	memset(&ec, 0, sizeof(ENCODERCONF));
+	memcpy(&ec, pState, min(sizeof(ENCODERCONF), cb));
+
+	if ((ec.dwFlags0 & EC_FLAGS0_RESERVED) != 0)
+		return -1;
+
+	memcpy(&m_ec, &ec, sizeof(ENCODERCONF));
+
 	if ((m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK) == EC_FLAGS0_INTRAFRAME_PREDICT_RESERVED)
 		m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
 	if (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS)
@@ -153,6 +159,7 @@ int CUL00Codec::InternalSetState(const void *pState, size_t cb)
 		m_ec.dwFlags0 &= ~EC_FLAGS0_DIVIDE_COUNT_MASK;
 		m_ec.dwFlags0 |= (CThreadManager::GetNumProcessors() - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
 	}
+
 	return 0;
 }
 
