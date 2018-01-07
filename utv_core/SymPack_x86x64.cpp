@@ -15,30 +15,45 @@ void tuned_Pack8Sym8(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, cons
 	auto r = pControl;
 	memset(pControl, 0, (pSrcEnd - pSrcBegin) / 64 * 3);
 
-	for (auto p = pSrcBegin; p != pSrcEnd; p += 16)
+	for (auto p = pSrcBegin; p != pSrcEnd; p += 32)
 	{
-		__m128i w = _mm_loadu_si128((const __m128i *)p);
-		__m128i visnotzero = _mm_cmpeq_epi64(_mm_cmpeq_epi64(w, _mm_setzero_si128()), _mm_setzero_si128());
+		__m128i wa = _mm_loadu_si128((const __m128i *)p);
+		__m128i wb = _mm_loadu_si128((const __m128i *)(p + 16));
+		__m128i visnotzeroa = _mm_cmpeq_epi64(_mm_cmpeq_epi64(wa, _mm_setzero_si128()), _mm_setzero_si128());
+		__m128i visnotzerob = _mm_cmpeq_epi64(_mm_cmpeq_epi64(wb, _mm_setzero_si128()), _mm_setzero_si128());
 
-		int mode0, mode1;
-		int bits0, bits1;
+		int mode0, mode1, mode2, mode3;
+		int bits0, bits1, bits2, bits3;
 
-		__m128i z;
-		__m128i signs = _mm_cmpgt_epi8(_mm_setzero_si128(), w);
-		int isnotzero0 = _mm_cvtsi128_si32(visnotzero);
-		int isnotzero1 = _mm_extract_epi32(visnotzero, 2);
-		z = _mm_xor_si128(w, signs);
-		z = _mm_or_si128(z, _mm_srli_epi64(z, 32));
-		z = _mm_or_si128(z, _mm_srli_epi64(z, 16));
-		z = _mm_or_si128(z, _mm_srli_epi64(z, 8));
-		z = _mm_and_si128(z, _mm_set1_epi64x(0xff));
-		z = _mm_or_si128(z, _mm_set1_epi64x(1));
+		__m128i za, zb;
+		__m128i signsa = _mm_cmpgt_epi8(_mm_setzero_si128(), wa);
+		__m128i signsb = _mm_cmpgt_epi8(_mm_setzero_si128(), wb);
+		int isnotzero0 = _mm_cvtsi128_si32(visnotzeroa);
+		int isnotzero1 = _mm_extract_epi32(visnotzeroa, 2);
+		int isnotzero2 = _mm_cvtsi128_si32(visnotzerob);
+		int isnotzero3 = _mm_extract_epi32(visnotzerob, 2);
+		za = _mm_xor_si128(wa, signsa);
+		zb = _mm_xor_si128(wb, signsb);
+		za = _mm_or_si128(za, _mm_srli_epi64(za, 32));
+		zb = _mm_or_si128(zb, _mm_srli_epi64(zb, 32));
+		za = _mm_or_si128(za, _mm_srli_epi64(za, 16));
+		zb = _mm_or_si128(zb, _mm_srli_epi64(zb, 16));
+		za = _mm_or_si128(za, _mm_srli_epi64(za, 8));
+		zb = _mm_or_si128(zb, _mm_srli_epi64(zb, 8));
+		za = _mm_and_si128(za, _mm_set1_epi64x(0xff));
+		zb = _mm_and_si128(zb, _mm_set1_epi64x(0xff));
+		za = _mm_or_si128(za, _mm_set1_epi64x(1));
+		zb = _mm_or_si128(zb, _mm_set1_epi64x(1));
 #if defined(_MSC_VER)
-		_BitScanReverse((unsigned long *)&mode0, _mm_cvtsi128_si32(z));
-		_BitScanReverse((unsigned long *)&mode1, _mm_extract_epi32(z, 2));
+		_BitScanReverse((unsigned long *)&mode0, _mm_cvtsi128_si32(za));
+		_BitScanReverse((unsigned long *)&mode1, _mm_extract_epi32(za, 2));
+		_BitScanReverse((unsigned long *)&mode2, _mm_cvtsi128_si32(zb));
+		_BitScanReverse((unsigned long *)&mode3, _mm_extract_epi32(zb, 2));
 #elif defined(__GNUC__)
-		mode0 = 31 - __builtin_clz(_mm_cvtsi128_si32(z));
-		mode1 = 31 - __builtin_clz(_mm_extract_epi32(z, 2));
+		mode0 = 31 - __builtin_clz(_mm_cvtsi128_si32(za));
+		mode1 = 31 - __builtin_clz(_mm_extract_epi32(za, 2));
+		mode2 = 31 - __builtin_clz(_mm_cvtsi128_si32(zb));
+		mode3 = 31 - __builtin_clz(_mm_extract_epi32(zb, 2));
 #else
 #error
 #endif
@@ -48,31 +63,60 @@ void tuned_Pack8Sym8(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, cons
 		bits1 = mode1 + 2;
 		int rembits1 = 6 - mode1;
 		mode1++;
+		bits2 = mode2 + 2;
+		int rembits2 = 6 - mode2;
+		mode2++;
+		bits3 = mode3 + 2;
+		int rembits3 = 6 - mode3;
+		mode3++;
 
 		bits0 &= isnotzero0;
 		mode0 &= isnotzero0;
 		bits1 &= isnotzero1;
 		mode1 &= isnotzero1;
+		bits2 &= isnotzero2;
+		mode2 &= isnotzero2;
+		bits3 &= isnotzero3;
+		mode3 &= isnotzero3;
 		__m128i vrembits0 = _mm_cvtsi32_si128(rembits0);
 		__m128i vrembits1 = _mm_cvtsi32_si128(rembits1);
-		__m128i w0 = _mm_add_epi8(w, _mm_srl_epi64(_mm_set1_epi8((char)0x80), vrembits0));
-		__m128i w1 = _mm_add_epi8(_mm_srli_si128(w, 8), _mm_srl_epi64(_mm_set1_epi8((char)0x80), vrembits1));
+		__m128i vrembits2 = _mm_cvtsi32_si128(rembits2);
+		__m128i vrembits3 = _mm_cvtsi32_si128(rembits3);
+		__m128i w0 = _mm_add_epi8(wa, _mm_srl_epi64(_mm_set1_epi8((char)0x80), vrembits0));
+		__m128i w1 = _mm_add_epi8(_mm_srli_si128(wa, 8), _mm_srl_epi64(_mm_set1_epi8((char)0x80), vrembits1));
+		__m128i w2 = _mm_add_epi8(wb, _mm_srl_epi64(_mm_set1_epi8((char)0x80), vrembits2));
+		__m128i w3 = _mm_add_epi8(_mm_srli_si128(wb, 8), _mm_srl_epi64(_mm_set1_epi8((char)0x80), vrembits3));
 		w0 = _mm_or_si128(_mm_and_si128(w0, _mm_set1_epi16(0x00ff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi16(0x00ff), w0), vrembits0));
 		w1 = _mm_or_si128(_mm_and_si128(w1, _mm_set1_epi16(0x00ff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi16(0x00ff), w1), vrembits1));
+		w2 = _mm_or_si128(_mm_and_si128(w2, _mm_set1_epi16(0x00ff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi16(0x00ff), w2), vrembits2));
+		w3 = _mm_or_si128(_mm_and_si128(w3, _mm_set1_epi16(0x00ff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi16(0x00ff), w3), vrembits3));
 		vrembits0 = _mm_slli_epi64(vrembits0, 1);
 		vrembits1 = _mm_slli_epi64(vrembits1, 1);
+		vrembits2 = _mm_slli_epi64(vrembits2, 1);
+		vrembits3 = _mm_slli_epi64(vrembits3, 1);
 		w0 = _mm_or_si128(_mm_and_si128(w0, _mm_set1_epi32(0x0000ffff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi32(0x0000ffff), w0), vrembits0));
 		w1 = _mm_or_si128(_mm_and_si128(w1, _mm_set1_epi32(0x0000ffff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi32(0x0000ffff), w1), vrembits1));
+		w2 = _mm_or_si128(_mm_and_si128(w2, _mm_set1_epi32(0x0000ffff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi32(0x0000ffff), w2), vrembits2));
+		w3 = _mm_or_si128(_mm_and_si128(w3, _mm_set1_epi32(0x0000ffff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi32(0x0000ffff), w3), vrembits3));
 		vrembits0 = _mm_slli_epi64(vrembits0, 1);
 		vrembits1 = _mm_slli_epi64(vrembits1, 1);
+		vrembits2 = _mm_slli_epi64(vrembits2, 1);
+		vrembits3 = _mm_slli_epi64(vrembits3, 1);
 		w0 = _mm_or_si128(_mm_and_si128(w0, _mm_set1_epi64x(0x00000000ffffffff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi64x(0x00000000ffffffff), w0), vrembits0));
 		w1 = _mm_or_si128(_mm_and_si128(w1, _mm_set1_epi64x(0x00000000ffffffff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi64x(0x00000000ffffffff), w1), vrembits1));
+		w2 = _mm_or_si128(_mm_and_si128(w2, _mm_set1_epi64x(0x00000000ffffffff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi64x(0x00000000ffffffff), w2), vrembits2));
+		w3 = _mm_or_si128(_mm_and_si128(w3, _mm_set1_epi64x(0x00000000ffffffff)), _mm_srl_epi64(_mm_andnot_si128(_mm_set1_epi64x(0x00000000ffffffff), w3), vrembits3));
 		_mm_storel_epi64((__m128i*)q, w0);
-		_mm_storel_epi64((__m128i*)(q + bits0), w1);
+		q += bits0;
+		_mm_storel_epi64((__m128i*)q, w1);
+		q += bits1;
+		_mm_storel_epi64((__m128i*)q, w2);
+		q += bits2;
+		_mm_storel_epi64((__m128i*)q, w3);
+		q += bits3;
 
-		q += bits0 + bits1;
-		*(uint32_t *)r |= (((mode1 << 3) | mode0) << shift);
-		shift += 6;
+		*(uint32_t *)r |= (((mode3 << 9) | (mode2 << 6) | (mode1 << 3) | mode0) << shift);
+		shift += 12;
 		if (shift == 24)
 		{
 			r += 3;
