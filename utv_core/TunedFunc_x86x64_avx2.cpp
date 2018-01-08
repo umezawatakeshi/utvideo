@@ -12,6 +12,6 @@
 #include "Coefficient.h"
 
 #define GENERATE_AVX2 1
-#include "Convert_x86x64_xmm.cpp"
-#include "Predict_x86x64_xmm.cpp"
+#include "Convert_x86x64.cpp"
+#include "Predict_x86x64.cpp"
 #include "SymPack_x86x64.cpp"

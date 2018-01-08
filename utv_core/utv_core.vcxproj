@@ -210,7 +210,7 @@
     <ClCompile Include="Codec.cpp" />
     <ClCompile Include="CodecBase.cpp" />
     <ClCompile Include="Convert.cpp" />
-    <ClCompile Include="Convert_x86x64_xmm.cpp">
+    <ClCompile Include="Convert_x86x64.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -286,7 +286,7 @@
     </ClCompile>
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Predict.cpp" />
-    <ClCompile Include="Predict_x86x64_xmm.cpp">
+    <ClCompile Include="Predict_x86x64.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
