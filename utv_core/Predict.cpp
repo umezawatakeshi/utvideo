@@ -12,7 +12,7 @@ static inline T median(T a, T b, T c)
 	return max(min(max(a,b),c),min(a,b));
 }
 
-void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
+void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t *pCountTable)
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
@@ -24,7 +24,7 @@ void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSr
 	q++;
 
 	// 最初のラインの残りのピクセルは predict left と同じ。
-	for (; p < pSrcBegin + dwStride; p++, q++)
+	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = *p - *(p - 1);
 		pCountTable[*q]++;
@@ -36,7 +36,7 @@ void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSr
 
 	// 次のラインの最初のピクセルは predict above。
 	// こうしておくとアセンブラ化した時に処理が若干簡単になる。
-	*q = *p - *(p - dwStride);
+	*q = *p - *(p - cbStride);
 	pCountTable[*q]++;
 	p++;
 	q++;
@@ -44,19 +44,19 @@ void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSr
 	// 残りのピクセルが predict median の本番
 	for (; p < pSrcEnd; p++, q++)
 	{
-		*q = *p - median<uint8_t>(*(p - dwStride), *(p - 1), *(p - dwStride) + *(p - 1) - *(p - 1 - dwStride));
+		*q = *p - median<uint8_t>(*(p - cbStride), *(p - 1), *(p - cbStride) + *(p - 1) - *(p - 1 - cbStride));
 		pCountTable[*q]++;
 	}
 }
 
-void cpp_RestoreCylindricalWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t dwStride)
+void cpp_RestoreCylindricalWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride)
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
 
 	*q++ = *p++ + 0x80;
 
-	for (; p < pSrcBegin + dwStride; p++, q++)
+	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = *p + *(q - 1);
 	}
@@ -64,13 +64,13 @@ void cpp_RestoreCylindricalWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, 
 	if (p == pSrcEnd)
 		return;
 
-	*q = *p + *(q - dwStride);
+	*q = *p + *(q - cbStride);
 	p++;
 	q++;
 
 	for (; p < pSrcEnd; p++, q++)
 	{
-		*q = *p + median<uint8_t>(*(q - dwStride), *(q - 1), *(q - dwStride) + *(q - 1) - *(q - 1 - dwStride));
+		*q = *p + median<uint8_t>(*(q - cbStride), *(q - 1), *(q - cbStride) + *(q - 1) - *(q - 1 - cbStride));
 	}
 }
 
@@ -120,7 +120,7 @@ template void cpp_RestoreCylindricalLeft<10>(symbol_t<10> *pDst, const symbol_t<
 
 
 template<int B, bool DoCount>
-static inline void cpp_PredictPlanarGradientAndMayCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
+static inline void cpp_PredictPlanarGradientAndMayCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t cbStride, uint32_t *pCountTable)
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
@@ -131,24 +131,24 @@ static inline void cpp_PredictPlanarGradientAndMayCount(symbol_t<B> *pDst, const
 	p++;
 	q++;
 
-	for (; p < pSrcBegin + dwStride; p++, q++)
+	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = (*p - *(p - 1)) & CSymbolBits<B>::maskval;
 		if (DoCount)
 			pCountTable[*q]++;
 	}
 
-	for (auto pp = pSrcBegin + dwStride; pp != pSrcEnd; pp += dwStride)
+	for (auto pp = pSrcBegin + cbStride; pp != pSrcEnd; pp += cbStride)
 	{
-		*q = (*p - *(p - dwStride)) & CSymbolBits<B>::maskval;
+		*q = (*p - *(p - cbStride)) & CSymbolBits<B>::maskval;
 		if (DoCount)
 			pCountTable[*q]++;
 		p++;
 		q++;
 
-		for (; p < pp + dwStride; p++, q++)
+		for (; p < pp + cbStride; p++, q++)
 		{
-			*q = (*p - (*(p - dwStride) + *(p - 1) - *(p - 1 - dwStride))) & CSymbolBits<B>::maskval;
+			*q = (*p - (*(p - cbStride) + *(p - 1) - *(p - 1 - cbStride))) & CSymbolBits<B>::maskval;
 			if (DoCount)
 				pCountTable[*q]++;
 		}
@@ -156,23 +156,23 @@ static inline void cpp_PredictPlanarGradientAndMayCount(symbol_t<B> *pDst, const
 }
 
 template<int B>
-void cpp_PredictPlanarGradientAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t dwStride, uint32_t *pCountTable)
+void cpp_PredictPlanarGradientAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t cbStride, uint32_t *pCountTable)
 {
-	cpp_PredictPlanarGradientAndMayCount<B, true>(pDst, pSrcBegin, pSrcEnd, dwStride, pCountTable);
+	cpp_PredictPlanarGradientAndMayCount<B, true>(pDst, pSrcBegin, pSrcEnd, cbStride, pCountTable);
 }
 
 template<int B>
-void cpp_PredictPlanarGradient(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t dwStride)
+void cpp_PredictPlanarGradient(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t cbStride)
 {
-	cpp_PredictPlanarGradientAndMayCount<B, false>(pDst, pSrcBegin, pSrcEnd, dwStride, NULL);
+	cpp_PredictPlanarGradientAndMayCount<B, false>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
 }
 
-template void cpp_PredictPlanarGradientAndCount<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t dwStride, uint32_t *pCountTable);
-template void cpp_PredictPlanarGradient<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t dwStride);
+template void cpp_PredictPlanarGradientAndCount<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t cbStride, uint32_t *pCountTable);
+template void cpp_PredictPlanarGradient<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t cbStride);
 
 
 template<int B>
-void cpp_RestorePlanarGradient(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t dwStride)
+void cpp_RestorePlanarGradient(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t cbStride)
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
@@ -181,22 +181,22 @@ void cpp_RestorePlanarGradient(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, 
 	p++;
 	q++;
 
-	for (; p < pSrcBegin + dwStride; p++, q++)
+	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = (*p + *(q - 1)) & CSymbolBits<B>::maskval;
 	}
 
-	for (auto pp = pSrcBegin + dwStride; pp != pSrcEnd; pp += dwStride)
+	for (auto pp = pSrcBegin + cbStride; pp != pSrcEnd; pp += cbStride)
 	{
-		*q = (*p + *(q - dwStride)) & CSymbolBits<B>::maskval;
+		*q = (*p + *(q - cbStride)) & CSymbolBits<B>::maskval;
 		p++;
 		q++;
 
-		for (; p < pp + dwStride; p++, q++)
+		for (; p < pp + cbStride; p++, q++)
 		{
-			*q = (*p + (*(q - dwStride) + *(q - 1) - *(q - 1 - dwStride))) & CSymbolBits<B>::maskval;
+			*q = (*p + (*(q - cbStride) + *(q - 1) - *(q - 1 - cbStride))) & CSymbolBits<B>::maskval;
 		}
 	}
 }
 
-template void cpp_RestorePlanarGradient<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t dwStride);
+template void cpp_RestorePlanarGradient<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t cbStride);

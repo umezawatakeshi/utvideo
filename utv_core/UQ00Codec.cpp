@@ -275,9 +275,9 @@ int CUQ00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
-	m_pMedianPredicted = new CFrameBuffer();
+	m_pPredicted = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pMedianPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
+		m_pPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
 #ifdef _WIN32
 	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
@@ -294,7 +294,7 @@ int CUQ00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 int CUQ00Codec::InternalEncodeEnd(void)
 {
 	delete m_pCurFrame;
-	delete m_pMedianPredicted;
+	delete m_pPredicted;
 
 #ifdef _WIN32
 	VirtualFree(m_counts, 0, MEM_RELEASE);
@@ -359,7 +359,7 @@ void CUQ00Codec::PredictProc(uint32_t nBandIndex)
 		for (int i = 0; i < 1024; i++)
 			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
 
-		PredictCylindricalLeftAndCount10((uint16_t *)(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd), m_counts[nBandIndex].dwCount[nPlaneIndex]);
+		PredictCylindricalLeftAndCount10((uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd), m_counts[nBandIndex].dwCount[nPlaneIndex]);
 	}
 }
 
@@ -384,7 +384,7 @@ void CUQ00Codec::EncodeProc(uint32_t nBandIndex)
 		dwDstEnd = m_pdwOffsetTable[nPlaneIndex][nBandIndex];
 		dwEncodedSize =
 #endif
-		HuffmanEncode10(m_pEncodedBits[nPlaneIndex] + dwDstOffset, (uint16_t *)(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), &m_het[nPlaneIndex]);
+		HuffmanEncode10(m_pEncodedBits[nPlaneIndex] + dwDstOffset, (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), &m_het[nPlaneIndex]);
 		_ASSERT(dwEncodedSize == dwDstEnd - dwDstOffset);
 	}
 }

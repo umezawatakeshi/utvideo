@@ -305,9 +305,9 @@ int CUL00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
-	m_pMedianPredicted = new CFrameBuffer();
+	m_pPredicted = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pMedianPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
+		m_pPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
 #ifdef _WIN32
 	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
@@ -324,7 +324,7 @@ int CUL00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 int CUL00Codec::InternalEncodeEnd(void)
 {
 	delete m_pCurFrame;
-	delete m_pMedianPredicted;
+	delete m_pPredicted;
 
 #ifdef _WIN32
 	VirtualFree(m_counts, 0, MEM_RELEASE);
@@ -411,13 +411,13 @@ void CUL00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 		switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
 		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-			PredictCylindricalLeftAndCount8(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			PredictCylindricalLeftAndCount8(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		case EC_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
-			PredictPlanarGradientAndCount8(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			PredictPlanarGradientAndCount8(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-			PredictCylindricalWrongMedianAndCount8(m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			PredictCylindricalWrongMedianAndCount8(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		default:
 			_ASSERT(false);
@@ -451,7 +451,7 @@ void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 		dwDstEnd = ((uint32_t *)((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex];
 		dwEncodedSize =
 #endif
-		HuffmanEncode8((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwDstOffset, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pMedianPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, &m_het[nPlaneIndex]);
+		HuffmanEncode8((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwDstOffset, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, &m_het[nPlaneIndex]);
 		_ASSERT(dwEncodedSize == dwDstEnd - dwDstOffset);
 	}
 }

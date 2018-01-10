@@ -88,7 +88,7 @@ protected:
 
 	CThreadManager *m_ptm;
 	CFrameBuffer *m_pCurFrame;
-	CFrameBuffer *m_pMedianPredicted;
+	CFrameBuffer *m_pPredicted;
 	struct COUNTS
 	{
 		uint32_t dwCount[4][256];
