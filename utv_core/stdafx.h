@@ -114,3 +114,11 @@ static inline bool is_not_all_zero(const Container& c)
 
 using std::max;
 using std::min;
+
+#if defined(_MSC_VER)
+#define FORCEINLINE __forceinline
+#elif defined(__GNUC__)
+#define FORCEINLINE __attribute__((always_inline))
+#else
+#error
+#endif

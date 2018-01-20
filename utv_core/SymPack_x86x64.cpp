@@ -347,7 +347,7 @@ void tuned_Unpack8Sym8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pDstEnd, c
 
 
 template<int F>
-static inline __forceinline void packer(uint8_t*& q, uint8_t*& r, int& shift, __m128i wa, __m128i wb)
+static inline FORCEINLINE void packer(uint8_t*& q, uint8_t*& r, int& shift, __m128i wa, __m128i wb)
 {
 	__m128i visnotzeroa = _mm_cmpeq_epi64(_mm_cmpeq_epi64(wa, _mm_setzero_si128()), _mm_setzero_si128());
 	__m128i visnotzerob = _mm_cmpeq_epi64(_mm_cmpeq_epi64(wb, _mm_setzero_si128()), _mm_setzero_si128());
@@ -516,7 +516,7 @@ template void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1>(uint8_
 
 #ifdef GENERATE_AVX2
 template<int F>
-static inline __forceinline void packer(uint8_t*& q, uint8_t*& r, __m256i wa, __m256i wb)
+static inline FORCEINLINE void packer(uint8_t*& q, uint8_t*& r, __m256i wa, __m256i wb)
 {
 	__m256i visnotzeroa = _mm256_cmpeq_epi64(_mm256_cmpeq_epi64(wa, _mm256_setzero_si256()), _mm256_setzero_si256());
 	__m256i visnotzerob = _mm256_cmpeq_epi64(_mm256_cmpeq_epi64(wb, _mm256_setzero_si256()), _mm256_setzero_si256());
@@ -677,7 +677,7 @@ void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pPacke
 
 
 template<int F>
-static inline __forceinline typename std::enable_if<F < CODEFEATURE_AVX2, __m128i>::type unpacker(const uint8_t*& q, const uint8_t *& r, int& shift)
+static inline FORCEINLINE typename std::enable_if<F < CODEFEATURE_AVX2, __m128i>::type unpacker(const uint8_t*& q, const uint8_t *& r, int& shift)
 {
 	__m128i w;
 	int mode = ((*(const uint32_t *)r) >> shift) & 7;
@@ -780,7 +780,7 @@ template void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX1>(uint8_
 
 #ifdef GENERATE_AVX2
 template<int F>
-static inline __forceinline typename std::enable_if<F == CODEFEATURE_AVX2, __m256i>::type unpacker(const uint8_t*& q, const uint8_t *& r, int& shift)
+static inline FORCEINLINE typename std::enable_if<F == CODEFEATURE_AVX2, __m256i>::type unpacker(const uint8_t*& q, const uint8_t *& r, int& shift)
 {
 	__m256i w;
 	int modes = ((*(uint32_t *)r) >> shift);
