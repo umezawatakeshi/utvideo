@@ -126,6 +126,8 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackCPP = {
 	{ 0 },
 	cpp_Pack8Sym8,
 	cpp_Unpack8Sym8,
+	cpp_Pack8SymAfterPredictPlanarGradient8,
+	cpp_Unpack8SymAndRestorePlanarGradient8,
 };
 
 TUNEDFUNC tfn = {

@@ -359,16 +359,11 @@ void CUM00Codec::EncodeProc(uint32_t nBandIndex)
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
-		PredictPlanarGradient8(
-			m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin,
-			m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin,
-			m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd,
-			m_cbPlanePredictStride[nPlaneIndex]);
-
-		Pack8Sym8(
+		Pack8SymAfterPredictPlanarGradient8(
 			m_pPackedStream[nPlaneIndex][nBandIndex], &m_cbPackedStream[nPlaneIndex][nBandIndex],
 			m_pControlStream[nPlaneIndex][nBandIndex],
-			m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd);
+			m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd,
+			m_cbPlanePredictStride[nPlaneIndex]);
 		m_cbControlStream[nPlaneIndex][nBandIndex] = (cbPlaneEnd - cbPlaneBegin) / 64 * 3;
 	}
 }
@@ -522,14 +517,10 @@ void CUM00Codec::DecodeProc(uint32_t nBandIndex)
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
-		Unpack8Sym8(
-			m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd,
-			m_pPackedStream[nPlaneIndex][nBandIndex], m_pControlStream[nPlaneIndex][nBandIndex]);
-
-		RestorePlanarGradient8(
+		Unpack8SymAndRestorePlanarGradient8(
 			m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin,
-			m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin,
-			m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd,
+			m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd,
+			m_pPackedStream[nPlaneIndex][nBandIndex], m_pControlStream[nPlaneIndex][nBandIndex],
 			m_cbPlanePredictStride[nPlaneIndex]);
 	}
 
