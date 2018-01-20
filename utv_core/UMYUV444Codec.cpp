@@ -240,8 +240,39 @@ void CUMYUV444Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 }
 
 template<class C>
+bool CUMYUV444Codec<C>::PredictDirect(uint32_t nBandIndex)
+{
+	if (m_utvfRaw == UTVF_YV24 && (m_nWidth % 64) == 0)
+	{
+		const uint8_t *pSrcBegin[3];
+
+		pSrcBegin[0] = ((const uint8_t *)m_pInput);
+		pSrcBegin[2] = pSrcBegin[0] + m_nWidth * m_nHeight;
+		pSrcBegin[1] = pSrcBegin[2] + m_nWidth * m_nHeight;
+
+		PredictFromPlanar(nBandIndex, pSrcBegin);
+
+		return true;
+	}
+
+	return false;
+}
+
+template<class C>
 bool CUMYUV444Codec<C>::DecodeDirect(uint32_t nBandIndex)
 {
+	if (m_utvfRaw == UTVF_YV24 && (m_nWidth % 64) == 0)
+	{
+		uint8_t *pDstBegin[3];
+
+		pDstBegin[0] = ((uint8_t *)m_pOutput);
+		pDstBegin[2] = pDstBegin[0] + m_nWidth * m_nHeight;
+		pDstBegin[1] = pDstBegin[2] + m_nWidth * m_nHeight;
+
+		DecodeToPlanar(nBandIndex, pDstBegin);
+
+		return true;
+	}
 
 	return false;
 }
