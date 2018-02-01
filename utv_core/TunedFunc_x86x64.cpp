@@ -459,7 +459,7 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackAVX1 = {
 
 extern const TUNEDFUNC_SYMPACK tfnSymPackAVX2 = {
 	&tfnSymPackAVX1,
-	{ FEATURE0_AVX2, 0 },
+	{ FEATURE0_AVX2, FEATURE1_BMI2 },
 	tuned_Pack8Sym8<CODEFEATURE_AVX2>,
 	tuned_Unpack8Sym8<CODEFEATURE_AVX2>,
 	tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2>,
