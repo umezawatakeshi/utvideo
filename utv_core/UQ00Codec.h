@@ -89,8 +89,6 @@ protected:
 	uint32_t *m_pdwOffsetTable[4];
 	uint8_t *m_pEncodedBits[4];
 
-	CFrameBuffer *m_pRestoredFrame;
-	CFrameBuffer *m_pDecodedFrame;
 	FRAMEINFO m_fi;
 	HUFFMAN_DECODE_TABLE<10> m_hdt[4];
 

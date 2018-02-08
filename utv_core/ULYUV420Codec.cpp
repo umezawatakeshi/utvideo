@@ -358,8 +358,8 @@ bool CULYUV420Codec<C>::DecodeDirect(uint32_t nBandIndex)
 			uint8_t *pDstBegin[3];
 
 			pDstBegin[0] = ((uint8_t *)m_pOutput);
-			pDstBegin[1] = m_pRestoredFrame->GetPlane(1);
-			pDstBegin[2] = m_pRestoredFrame->GetPlane(2);
+			pDstBegin[1] = m_pCurFrame->GetPlane(1);
+			pDstBegin[2] = m_pCurFrame->GetPlane(2);
 
 			DecodeToPlanar(nBandIndex, pDstBegin);
 

@@ -457,13 +457,13 @@ int CUQ00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	m_nWidth = width;
 	m_nHeight = height;
 
-	m_pRestoredFrame = new CFrameBuffer();
+	m_pCurFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pRestoredFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
+		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
-	m_pDecodedFrame = new CFrameBuffer();
+	m_pPredicted = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pDecodedFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
+		m_pPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
 	m_ptm = new CThreadManager();
 
@@ -472,8 +472,8 @@ int CUQ00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 
 int CUQ00Codec::InternalDecodeEnd(void)
 {
-	delete m_pRestoredFrame;
-	delete m_pDecodedFrame;
+	delete m_pCurFrame;
+	delete m_pPredicted;
 
 	delete m_ptm;
 
@@ -525,10 +525,8 @@ void CUQ00Codec::DecodeProc(uint32_t nBandIndex)
 		else
 			dwOffset = m_pdwOffsetTable[nPlaneIndex][nBandIndex - 1];
 
-		HuffmanDecode<10>((uint16_t *)(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd), m_pEncodedBits[nPlaneIndex] + dwOffset, &m_hdt[nPlaneIndex]);
-		RestoreCylindricalLeft10((uint16_t *)(m_pRestoredFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd));
-		m_pCurFrame = m_pDecodedFrame;
-		m_pCurFrame = m_pRestoredFrame;
+		HuffmanDecode<10>((uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), m_pEncodedBits[nPlaneIndex] + dwOffset, &m_hdt[nPlaneIndex]);
+		RestoreCylindricalLeft10((uint16_t *)(m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
 	}
 
 	ConvertFromPlanar(nBandIndex);

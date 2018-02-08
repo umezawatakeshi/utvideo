@@ -96,8 +96,6 @@ protected:
 	/* const */ HUFFMAN_CODELEN_TABLE<8> *m_pCodeLengthTable[4];
 	HUFFMAN_ENCODE_TABLE<8> m_het[4];
 
-	CFrameBuffer *m_pRestoredFrame;
-	CFrameBuffer *m_pDecodedFrame;
 	FRAMEINFO m_fi;
 	HUFFMAN_DECODE_TABLE<8> m_hdt[4];
 	const uint8_t *m_pDecodeCode[4][256];

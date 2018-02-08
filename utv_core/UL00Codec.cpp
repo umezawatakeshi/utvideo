@@ -530,13 +530,13 @@ int CUL00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	m_nWidth = width;
 	m_nHeight = height;
 
-	m_pRestoredFrame = new CFrameBuffer();
+	m_pCurFrame = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pRestoredFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
+		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
-	m_pDecodedFrame = new CFrameBuffer();
+	m_pPredicted = new CFrameBuffer();
 	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pDecodedFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
+		m_pPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
 	m_ptm = new CThreadManager();
 
@@ -545,8 +545,8 @@ int CUL00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 
 int CUL00Codec::InternalDecodeEnd(void)
 {
-	delete m_pRestoredFrame;
-	delete m_pDecodedFrame;
+	delete m_pCurFrame;
+	delete m_pPredicted;
 
 	delete m_ptm;
 
@@ -601,7 +601,7 @@ void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 
 	uint8_t* pDstBegin[4];
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
-		pDstBegin[nPlaneIndex] = m_pRestoredFrame->GetPlane(nPlaneIndex);
+		pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
 	DecodeToPlanar(nBandIndex, pDstBegin);
 
 	ConvertFromPlanar(nBandIndex);
@@ -615,26 +615,23 @@ void CUL00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
 		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
 #ifdef _DEBUG
-		uint8_t *pRetExpected = m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd;
+		uint8_t *pRetExpected = m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd;
 		uint8_t *pRetActual =
 #endif
-		HuffmanDecode<8>(m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
+		HuffmanDecode<8>(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
 		_ASSERT(pRetActual == pRetExpected);
 
 		switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
 		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
 		case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-			RestoreCylindricalLeft8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd);
-			m_pCurFrame = m_pRestoredFrame;
+			RestoreCylindricalLeft8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd);
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
-			RestorePlanarGradient8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
-			m_pCurFrame = m_pRestoredFrame;
+			RestorePlanarGradient8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
 			break;
 		case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-			RestoreCylindricalWrongMedian8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pDecodedFrame->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
-			m_pCurFrame = m_pRestoredFrame;
+			RestoreCylindricalWrongMedian8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
 			break;
 		}
 	}
