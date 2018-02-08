@@ -77,9 +77,9 @@ protected:
 	uint32_t m_dwStripeBegin[256];
 	uint32_t m_dwStripeEnd[256];
 
-	CThreadManager *m_ptm;
-	CFrameBuffer *m_pCurFrame;
-	CFrameBuffer *m_pPredicted;
+	std::unique_ptr<CThreadManager> m_ptm;
+	std::unique_ptr<CFrameBuffer> m_pCurFrame;
+	std::unique_ptr<CFrameBuffer> m_pPredicted;
 	struct COUNTS
 	{
 		uint32_t dwCount[4][1024];

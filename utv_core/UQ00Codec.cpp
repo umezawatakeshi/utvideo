@@ -271,11 +271,11 @@ int CUQ00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	m_dwDivideCount = m_ec.ecDivideCountMinusOne + 1;
 	CalcStripeMetric();
 
-	m_pCurFrame = new CFrameBuffer();
+	m_pCurFrame = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
-	m_pPredicted = new CFrameBuffer();
+	m_pPredicted = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
@@ -286,15 +286,15 @@ int CUQ00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	m_counts = (COUNTS *)mmap(NULL, sizeof(COUNTS) * m_dwDivideCount, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 #endif
 
-	m_ptm = new CThreadManager();
+	m_ptm = std::make_unique<CThreadManager>();
 
 	return 0;
 }
 
 int CUQ00Codec::InternalEncodeEnd(void)
 {
-	delete m_pCurFrame;
-	delete m_pPredicted;
+	m_pCurFrame.reset();
+	m_pPredicted.reset();
 
 #ifdef _WIN32
 	VirtualFree(m_counts, 0, MEM_RELEASE);
@@ -303,7 +303,7 @@ int CUQ00Codec::InternalEncodeEnd(void)
 	munmap(m_counts, sizeof(COUNTS) * m_dwDivideCount);
 #endif
 
-	delete m_ptm;
+	m_ptm.reset();
 
 	return 0;
 }
@@ -457,25 +457,25 @@ int CUQ00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	m_nWidth = width;
 	m_nHeight = height;
 
-	m_pCurFrame = new CFrameBuffer();
+	m_pCurFrame = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
-	m_pPredicted = new CFrameBuffer();
+	m_pPredicted = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
-	m_ptm = new CThreadManager();
+	m_ptm = std::make_unique<CThreadManager>();
 
 	return 0;
 }
 
 int CUQ00Codec::InternalDecodeEnd(void)
 {
-	delete m_pCurFrame;
-	delete m_pPredicted;
+	m_pCurFrame.reset();
+	m_pPredicted.reset();
 
-	delete m_ptm;
+	m_ptm.reset();
 
 	return 0;
 }

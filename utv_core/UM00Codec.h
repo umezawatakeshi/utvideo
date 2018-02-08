@@ -79,9 +79,9 @@ protected:
 	uint8_t* m_pControlStream[4][256];
 	size_t m_cbControlStream[4][256];
 
-	CThreadManager* m_ptm;
-	CFrameBuffer* m_pCurFrame;
-	CFrameBuffer* m_pPredicted;
+	std::unique_ptr<CThreadManager> m_ptm;
+	std::unique_ptr<CFrameBuffer> m_pCurFrame;
+	std::unique_ptr<CFrameBuffer> m_pPredicted;
 
 protected:
 	CUM00Codec(const char *pszTinyName, const char *pszInterfaceName);
