@@ -275,10 +275,6 @@ int CUM00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
-	m_pPredicted = std::make_unique<CFrameBuffer>();
-	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
-
 	m_ptm = std::make_unique<CThreadManager>();
 
 	for (int i = 0; i < GetNumPlanes(); i++)
@@ -305,7 +301,6 @@ int CUM00Codec::InternalEncodeEnd(void)
 	}
 
 	m_pCurFrame.reset();
-	m_pPredicted.reset();
 
 	m_ptm.reset();
 
@@ -463,10 +458,6 @@ int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
-	m_pPredicted = std::make_unique<CFrameBuffer>();
-	for (int i = 0; i < GetNumPlanes(); i++)
-		m_pPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
-
 	m_ptm = std::make_unique<CThreadManager>();
 
 	return 0;
@@ -475,7 +466,6 @@ int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 int CUM00Codec::InternalDecodeEnd(void)
 {
 	m_pCurFrame.reset();
-	m_pPredicted.reset();
 
 	m_ptm.reset();
 

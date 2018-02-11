@@ -81,7 +81,6 @@ protected:
 
 	std::unique_ptr<CThreadManager> m_ptm;
 	std::unique_ptr<CFrameBuffer> m_pCurFrame;
-	std::unique_ptr<CFrameBuffer> m_pPredicted;
 
 protected:
 	CUM00Codec(const char *pszTinyName, const char *pszInterfaceName);
