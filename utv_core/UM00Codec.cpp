@@ -132,6 +132,9 @@ int CUM00Codec::InternalSetState(const void *pState, size_t cb)
 	if (ec.ecReserved[1] != 0)
 		return -1;
 
+	if (sizeof(ENCODERCONF) > cb && is_not_all_zero((uint8_t*)pState + sizeof(ENCODERCONF), (uint8_t*)pState + cb))
+		return -1;
+
 	memcpy(&m_ec, &ec, sizeof(ENCODERCONF));
 
 	if (m_ec.ecFlags & EC_FLAGS_DIVIDE_COUNT_AUTO)
