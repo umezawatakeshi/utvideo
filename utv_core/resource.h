@@ -16,6 +16,10 @@
 #define IDC_DIVIDE_COUNT_AUTO           1005
 #define IDC_WORKER_THREAD_PRIORITY_SLIDER 1006
 #define IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO 1007
+#define IDC_USE_TEMPORAL_COMPRESSION_CHECK 1008
+#define IDC_EDIT1                       1009
+#define IDC_KEY_FRAME_INTERVAL_EDIT     1009
+#define IDC_CHECK1                      1010
 
 // Next default values for new objects
 // 
@@ -23,7 +27,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        104
 #define _APS_NEXT_COMMAND_VALUE         40001
-#define _APS_NEXT_CONTROL_VALUE         1008
+#define _APS_NEXT_CONTROL_VALUE         1011
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

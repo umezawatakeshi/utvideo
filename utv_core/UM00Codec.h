@@ -16,11 +16,15 @@ protected:
 	{
 		uint8_t ecFlags;
 		uint8_t ecDivideCountMinusOne;
-		uint8_t ecReserved[2];
+		uint16_t ecKeyFrameIntervalMinusOne;
 	};
 
-	static constexpr uint8_t EC_FLAGS_DIVIDE_COUNT_AUTO = 0x01;
-	static constexpr uint8_t EC_FLAGS_RESERVED          = 0xfe;
+	static constexpr uint8_t EC_FLAGS_DIVIDE_COUNT_AUTO        = 0x01;
+	static constexpr uint8_t EC_FLAGS_USE_TEMPORAL_COMPRESSION = 0x02;
+	static constexpr uint8_t EC_FLAGS_RESERVED                 = 0xfc;
+
+	static constexpr uint16_t EC_KEY_FRAME_INTERVAL_DEFAULT = 30;
+	static constexpr uint16_t EC_KEY_FRAME_INTERVAL_MAX     = 60000; // max keyframe interval (inclusive)
 
 	struct STREAMINFO
 	{
@@ -39,10 +43,14 @@ protected:
 		};
 		uint8_t siEncodingMode;
 		uint8_t siDivideCountMinusOne;
-		uint8_t siReserved[6];
+		uint8_t siFlags;
+		uint8_t siReserved[5];
 	};
 
 	static constexpr uint8_t SI_ENCODING_MODE_8SYMPACK = 2;
+
+	static constexpr uint8_t SI_FLAGS_USE_TEMPORAL_COMPRESSION = 0x02;
+	static constexpr uint8_t SI_FLAGS_RESERVED                 = 0xfd;
 
 	struct FRAMEINFO
 	{

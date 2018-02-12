@@ -16,6 +16,7 @@ CUM00Codec::CUM00Codec(const char *pszTinyName, const char *pszInterfaceName) : 
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
 	m_ec.ecFlags = EC_FLAGS_DIVIDE_COUNT_AUTO;
 	m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
+	m_ec.ecKeyFrameIntervalMinusOne = EC_KEY_FRAME_INTERVAL_DEFAULT - 1;
 
 	LoadConfig();
 }
@@ -58,16 +59,23 @@ INT_PTR CALLBACK CUM00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_AUTO, BST_CHECKED);
 			EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, FALSE);
 		}
+		if (pThis->m_ec.ecFlags & EC_FLAGS_USE_TEMPORAL_COMPRESSION)
+			CheckDlgButton(hwnd, IDC_USE_TEMPORAL_COMPRESSION_CHECK, BST_CHECKED);
+		else
+			EnableDlgItem(hwnd, IDC_KEY_FRAME_INTERVAL_EDIT, FALSE);
+		wsprintf(buf, "%d", pThis->m_ec.ecKeyFrameIntervalMinusOne + 1);
+		SetDlgItemText(hwnd, IDC_KEY_FRAME_INTERVAL_EDIT, buf);
 		return TRUE;
 	case WM_COMMAND:
 		switch(LOWORD(wParam))
 		{
 		case IDOK:
-			memset(&pThis->m_ec, 0, sizeof(ENCODERCONF));
+			ENCODERCONF ec;
+			memset(&ec, 0, sizeof(ENCODERCONF));
 			if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_AUTO))
 			{
-				pThis->m_ec.ecFlags |= EC_FLAGS_DIVIDE_COUNT_AUTO;
-				pThis->m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
+				ec.ecFlags |= EC_FLAGS_DIVIDE_COUNT_AUTO;
+				ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
 			}
 			else
 			{
@@ -78,8 +86,22 @@ INT_PTR CALLBACK CUM00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 					MessageBox(hwnd, "1 <= DIVIDE_COUNT <= 256", "ERR", MB_ICONERROR);
 					return TRUE;
 				}
-				pThis->m_ec.ecDivideCountMinusOne = n - 1;
+				ec.ecDivideCountMinusOne = n - 1;
 			}
+
+			if (IsDlgButtonChecked(hwnd, IDC_USE_TEMPORAL_COMPRESSION_CHECK))
+				ec.ecFlags |= EC_FLAGS_USE_TEMPORAL_COMPRESSION;
+
+			GetDlgItemText(hwnd, IDC_KEY_FRAME_INTERVAL_EDIT, buf, sizeof(buf));
+			n = atoi(buf);
+			if (n < 1 || n > EC_KEY_FRAME_INTERVAL_MAX)
+			{
+				MessageBox(hwnd, "1 <= KEY_FRAME_INTERVAL <= 60000", "ERR", MB_ICONERROR);
+				return TRUE;
+			}
+			ec.ecKeyFrameIntervalMinusOne = n - 1;
+
+			pThis->m_ec = ec;
 			pThis->SaveConfig();
 			/* FALLTHROUGH */
 		case IDCANCEL:
@@ -94,6 +116,12 @@ INT_PTR CALLBACK CUM00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 					wsprintf(buf, "%d", CThreadManager::GetNumProcessors());
 					SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
 				}
+			}
+			break;
+		case IDC_USE_TEMPORAL_COMPRESSION_CHECK:
+			if (HIWORD(wParam) == BN_CLICKED)
+			{
+				EnableDlgItem(hwnd, IDC_KEY_FRAME_INTERVAL_EDIT, IsDlgButtonChecked(hwnd, IDC_USE_TEMPORAL_COMPRESSION_CHECK));
 			}
 			break;
 		}
@@ -127,9 +155,7 @@ int CUM00Codec::InternalSetState(const void *pState, size_t cb)
 
 	if ((ec.ecFlags & EC_FLAGS_RESERVED) != 0)
 		return -1;
-	if (ec.ecReserved[0] != 0)
-		return -1;
-	if (ec.ecReserved[1] != 0)
+	if (ec.ecKeyFrameIntervalMinusOne > EC_KEY_FRAME_INTERVAL_MAX - 1)
 		return -1;
 
 	if (sizeof(ENCODERCONF) > cb && is_not_all_zero((uint8_t*)pState + sizeof(ENCODERCONF), (uint8_t*)pState + cb))
@@ -325,6 +351,8 @@ int CUM00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, un
 	p->siOriginalFormat                  = htob32(infmt);
 	p->siEncodingMode                    = SI_ENCODING_MODE_8SYMPACK;
 	p->siDivideCountMinusOne             = m_ec.ecDivideCountMinusOne;
+	if ((m_ec.ecFlags & EC_FLAGS_USE_TEMPORAL_COMPRESSION) && m_ec.ecKeyFrameIntervalMinusOne > 0)
+		p->siFlags                      |= SI_FLAGS_USE_TEMPORAL_COMPRESSION;
 
 	return 0;
 }
