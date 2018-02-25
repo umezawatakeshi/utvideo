@@ -113,6 +113,8 @@ struct TUNEDFUNC_SYMPACK
 	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_SYMPACK);
 	void (*pfnPack8SymAfterPredictPlanarGradient8)(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride);
 	void (*pfnUnpack8SymAndRestorePlanarGradient8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, size_t cbStride);
+	void (*pfnPack8SymWithDiff8)(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const uint8_t *pPrevBegin, size_t cbStride);
+	void (*pfnUnpack8SymWithDiff8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, const uint8_t *pPrevBegin, size_t cbStride);
 };
 
 struct TUNEDFUNC
@@ -218,3 +220,5 @@ public:
 
 #define Pack8SymAfterPredictPlanarGradient8 tfn.pSymPack->pfnPack8SymAfterPredictPlanarGradient8
 #define Unpack8SymAndRestorePlanarGradient8 tfn.pSymPack->pfnUnpack8SymAndRestorePlanarGradient8
+#define Pack8SymWithDiff8 tfn.pSymPack->pfnPack8SymWithDiff8
+#define Unpack8SymWithDiff8 tfn.pSymPack->pfnUnpack8SymWithDiff8

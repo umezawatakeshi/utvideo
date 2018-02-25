@@ -444,6 +444,8 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackSSE41 = {
 	{ FEATURE0_SSE41, 0 },
 	tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41>,
 	tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_SSE41>,
+	cpp_Pack8SymWithDiff8,
+	cpp_Unpack8SymWithDiff8,
 };
 
 extern const TUNEDFUNC_SYMPACK tfnSymPackAVX1 = {
@@ -451,6 +453,8 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackAVX1 = {
 	{ FEATURE0_AVX1, 0 },
 	tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1>,
 	tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX1>,
+	cpp_Pack8SymWithDiff8,
+	cpp_Unpack8SymWithDiff8,
 };
 
 extern const TUNEDFUNC_SYMPACK tfnSymPackAVX2 = {
@@ -458,6 +462,8 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackAVX2 = {
 	{ FEATURE0_AVX2, FEATURE1_BMI2 },
 	tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2>,
 	tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>,
+	cpp_Pack8SymWithDiff8,
+	cpp_Unpack8SymWithDiff8,
 };
 
 

@@ -435,7 +435,7 @@ void CUM00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 		}
 		else
 		{
-			cpp_Pack8SymWithDiff8(
+			Pack8SymWithDiff8(
 				m_pPackedStream[nPlaneIndex][nBandIndex], &m_cbPackedStream[nPlaneIndex][nBandIndex],
 				m_pControlStream[nPlaneIndex][nBandIndex],
 				pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd,
@@ -627,7 +627,7 @@ void CUM00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin, 
 		}
 		else
 		{
-			cpp_Unpack8SymWithDiff8(
+			Unpack8SymWithDiff8(
 				pDstBegin[nPlaneIndex] + cbPlaneBegin,
 				pDstBegin[nPlaneIndex] + cbPlaneEnd,
 				m_pPackedStream[nPlaneIndex][nBandIndex], m_pControlStream[nPlaneIndex][nBandIndex],
