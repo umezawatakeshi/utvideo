@@ -205,7 +205,7 @@ size_t CUM00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 		pOutputEnd = pControlStreamsBegin + 256;
 
 	memset(fi, 0, sizeof(FRAMEINFO));
-	fi->fiFrameType = FI_FRAME_TYPE_INTRA;
+	fi->fiFrameType = (m_nFrameNumber == 0) ? FI_FRAME_TYPE_INTRA : FI_FRAME_TYPE_DELTA;
 	fi->fiSizeArrayOffset = (uint32_t)(cbPackedStreams + cbControlStreams);
 
 	uint8_t *p = pPackedStreamsBegin;
@@ -240,7 +240,10 @@ size_t CUM00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 	memset(pControlStreamSizeArray, 0, pOutputEnd - (uint8_t*)pControlStreamSizeArray);
 
-	*pbKeyFrame = true;
+	*pbKeyFrame = (m_nFrameNumber == 0);
+	(++m_nFrameNumber) %= m_nKeyFrameInterval;
+	if (m_nKeyFrameInterval > 1)
+		std::swap(m_pCurFrame, m_pPrevFrame);
 	return pOutputEnd - ((uint8_t *)pOutput);
 }
 
@@ -295,11 +298,19 @@ int CUM00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	if (ret != 0)
 		return ret;
 	m_dwDivideCount = m_ec.ecDivideCountMinusOne + 1;
+	m_nKeyFrameInterval = (m_ec.ecFlags & EC_FLAGS_USE_TEMPORAL_COMPRESSION) ? (m_ec.ecKeyFrameIntervalMinusOne + 1) : 1;
 	CalcStripeMetric();
 
 	m_pCurFrame = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
+
+	if (m_nKeyFrameInterval > 1)
+	{
+		m_pPrevFrame = std::make_unique<CFrameBuffer>();
+		for (int i = 0; i < GetNumPlanes(); i++)
+			m_pPrevFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
+	}
 
 	m_ptm = std::make_unique<CThreadManager>();
 
@@ -308,9 +319,11 @@ int CUM00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 		for (unsigned int j = 0; j < m_dwDivideCount; ++j)
 		{
 			m_pPackedStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]));
-			m_pControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 3 + 8);
+			m_pControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4 + 8);
 		}
 	}
+
+	m_nFrameNumber = 0;
 
 	return 0;
 }
@@ -327,6 +340,7 @@ int CUM00Codec::InternalEncodeEnd(void)
 	}
 
 	m_pCurFrame.reset();
+	m_pPrevFrame.reset();
 
 	m_ptm.reset();
 
@@ -359,7 +373,7 @@ int CUM00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, un
 
 size_t CUM00Codec::EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height)
 {
-	return ROUNDUP(width, 128) * height * GetRealBitCount() / 64 * 67 / 8 + 4096; // +4096 ‚Í‚Ç‚ñ‚Ô‚èŠ¨’èB
+	return ROUNDUP(width, 128) * height * GetRealBitCount() / 64 * 68 / 8 + 4096; // +4096 ‚Í‚Ç‚ñ‚Ô‚èŠ¨’èB
 }
 
 int CUM00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height)
@@ -383,30 +397,52 @@ bool CUM00Codec::PredictDirect(uint32_t nBandIndex)
 
 void CUM00Codec::EncodeProc(uint32_t nBandIndex)
 {
-	if (PredictDirect(nBandIndex))
-		return;
+	if (m_nKeyFrameInterval <= 1)
+	{
+		if (PredictDirect(nBandIndex))
+			return;
+	}
 
 	ConvertToPlanar(nBandIndex);
 
 	const uint8_t* pSrcBegin[4];
+	const uint8_t* pPrevBegin[4];
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 		pSrcBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
-	PredictFromPlanar(nBandIndex, pSrcBegin);
+	if (m_nKeyFrameInterval > 1)
+	{
+		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+			pPrevBegin[nPlaneIndex] = m_pPrevFrame->GetPlane(nPlaneIndex);
+	}
+	PredictFromPlanar(nBandIndex, pSrcBegin, pPrevBegin);
 }
 
-void CUM00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin)
+void CUM00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin, const uint8_t* const* pPrevBegin)
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
-		Pack8SymAfterPredictPlanarGradient8(
-			m_pPackedStream[nPlaneIndex][nBandIndex], &m_cbPackedStream[nPlaneIndex][nBandIndex],
-			m_pControlStream[nPlaneIndex][nBandIndex],
-			pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd,
-			m_cbPlanePredictStride[nPlaneIndex]);
-		m_cbControlStream[nPlaneIndex][nBandIndex] = (cbPlaneEnd - cbPlaneBegin) / 64 * 3;
+		if (m_nFrameNumber == 0)
+		{
+			Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[nPlaneIndex][nBandIndex], &m_cbPackedStream[nPlaneIndex][nBandIndex],
+				m_pControlStream[nPlaneIndex][nBandIndex],
+				pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd,
+				m_cbPlanePredictStride[nPlaneIndex]);
+			m_cbControlStream[nPlaneIndex][nBandIndex] = (cbPlaneEnd - cbPlaneBegin) / 64 * 3;
+		}
+		else
+		{
+			cpp_Pack8SymWithDiff8(
+				m_pPackedStream[nPlaneIndex][nBandIndex], &m_cbPackedStream[nPlaneIndex][nBandIndex],
+				m_pControlStream[nPlaneIndex][nBandIndex],
+				pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd,
+				pPrevBegin[nPlaneIndex] + cbPlaneBegin,
+				m_cbPlanePredictStride[nPlaneIndex]);
+			m_cbControlStream[nPlaneIndex][nBandIndex] = (cbPlaneEnd - cbPlaneBegin) / 64 * 4;
+		}
 	}
 }
 
@@ -415,16 +451,16 @@ size_t CUM00Codec::DecodeFrame(void *pOutput, const void *pInput)
 	m_pInput = pInput;
 	m_pOutput = pOutput;
 
-	const FRAMEINFO *fi = (const FRAMEINFO*)pInput;
+	m_fiDecode = (const FRAMEINFO*)pInput;
 
-	if (is_not_all_zero(fi->fiReserved))
+	if (is_not_all_zero(m_fiDecode->fiReserved))
 		return m_cbRawSize;
 
-	if (fi->fiFrameType != FI_FRAME_TYPE_INTRA)
+	if (m_fiDecode->fiFrameType != FI_FRAME_TYPE_INTRA && m_fiDecode->fiFrameType != FI_FRAME_TYPE_DELTA)
 		return m_cbRawSize;
 
 	const uint8_t *pPackedStreams = (const uint8_t *)pInput + sizeof(FRAMEINFO);
-	const uint32_t *pcbControlStreams = (const uint32_t*)(pPackedStreams + fi->fiSizeArrayOffset);
+	const uint32_t *pcbControlStreams = (const uint32_t*)(pPackedStreams + m_fiDecode->fiSizeArrayOffset);
 	const uint8_t *pControlStreams = (const uint8_t*)pcbControlStreams - *pcbControlStreams;
 	const uint32_t *pPackedStreamSizeArray = pcbControlStreams + 1;
 	const uint32_t *pControlStreamSizeArray = pPackedStreamSizeArray + GetNumPlanes() * m_dwDivideCount;
@@ -449,6 +485,9 @@ size_t CUM00Codec::DecodeFrame(void *pOutput, const void *pInput)
 		m_ptm->SubmitJob(new CThreadJob(this, &CUM00Codec::DecodeProc, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
+	if (m_siDecode.siFlags & SI_FLAGS_USE_TEMPORAL_COMPRESSION)
+		std::swap(m_pCurFrame, m_pPrevFrame);
+
 	return m_cbRawSize;
 }
 
@@ -470,12 +509,10 @@ int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	if (ret != 0)
 		return ret;
 
-	STREAMINFO si;
+	memset(&m_siDecode, 0, sizeof(STREAMINFO));
+	memcpy(&m_siDecode, pExtraData, min(sizeof(STREAMINFO), cbExtraData));
 
-	memset(&si, 0, sizeof(STREAMINFO));
-	memcpy(&si, pExtraData, min(sizeof(STREAMINFO), cbExtraData));
-
-	m_dwDivideCount = si.siDivideCountMinusOne + 1;
+	m_dwDivideCount = m_siDecode.siDivideCountMinusOne + 1;
 	CalcStripeMetric();
 
 	m_utvfRaw = outfmt;
@@ -485,6 +522,13 @@ int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	m_pCurFrame = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
+
+	if (m_siDecode.siFlags & SI_FLAGS_USE_TEMPORAL_COMPRESSION)
+	{
+		m_pPrevFrame = std::make_unique<CFrameBuffer>();
+		for (int i = 0; i < GetNumPlanes(); i++)
+			m_pPrevFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
+	}
 
 	m_ptm = std::make_unique<CThreadManager>();
 
@@ -546,29 +590,50 @@ int CUM00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned 
 
 void CUM00Codec::DecodeProc(uint32_t nBandIndex)
 {
-	if (DecodeDirect(nBandIndex))
-		return;
+	if (!(m_siDecode.siFlags & SI_FLAGS_USE_TEMPORAL_COMPRESSION))
+	{
+		if (DecodeDirect(nBandIndex))
+			return;
+	}
 
 	uint8_t* pDstBegin[4];
+	const uint8_t* pPrevBegin[4];
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 		pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
-	DecodeToPlanar(nBandIndex, pDstBegin);
+	if (m_siDecode.siFlags & SI_FLAGS_USE_TEMPORAL_COMPRESSION)
+	{
+		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+			pPrevBegin[nPlaneIndex] = m_pPrevFrame->GetPlane(nPlaneIndex);
+	}
+	DecodeToPlanar(nBandIndex, pDstBegin, pPrevBegin);
 
 	ConvertFromPlanar(nBandIndex);
 }
 
-void CUM00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
+void CUM00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin, const uint8_t* const* pPrevBegin)
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
-		Unpack8SymAndRestorePlanarGradient8(
-			pDstBegin[nPlaneIndex] + cbPlaneBegin,
-			pDstBegin[nPlaneIndex] + cbPlaneEnd,
-			m_pPackedStream[nPlaneIndex][nBandIndex], m_pControlStream[nPlaneIndex][nBandIndex],
-			m_cbPlanePredictStride[nPlaneIndex]);
+		if (m_fiDecode->fiFrameType == FI_FRAME_TYPE_INTRA)
+		{
+			Unpack8SymAndRestorePlanarGradient8(
+				pDstBegin[nPlaneIndex] + cbPlaneBegin,
+				pDstBegin[nPlaneIndex] + cbPlaneEnd,
+				m_pPackedStream[nPlaneIndex][nBandIndex], m_pControlStream[nPlaneIndex][nBandIndex],
+				m_cbPlanePredictStride[nPlaneIndex]);
+		}
+		else
+		{
+			cpp_Unpack8SymWithDiff8(
+				pDstBegin[nPlaneIndex] + cbPlaneBegin,
+				pDstBegin[nPlaneIndex] + cbPlaneEnd,
+				m_pPackedStream[nPlaneIndex][nBandIndex], m_pControlStream[nPlaneIndex][nBandIndex],
+				pPrevBegin[nPlaneIndex] + cbPlaneBegin,
+				m_cbPlanePredictStride[nPlaneIndex]);
+		}
 	}
 }
 

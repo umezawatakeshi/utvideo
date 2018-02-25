@@ -61,7 +61,7 @@ protected:
 
 	// static constexpr uint8_t FI_FRAME_TYPE_COPY  = 0;
 	static constexpr uint8_t FI_FRAME_TYPE_INTRA = 1;
-	// static constexpr uint8_t FI_FRAME_TYPE_DELTA = 2;
+	static constexpr uint8_t FI_FRAME_TYPE_DELTA = 2;
 
 protected:
 	ENCODERCONF m_ec;
@@ -71,8 +71,12 @@ protected:
 	unsigned int m_nHeight;
 	const void *m_pInput;
 	void *m_pOutput;
+	const FRAMEINFO* m_fiDecode;
+	STREAMINFO m_siDecode;
 	uint32_t m_dwNumStripes;
 	uint32_t m_dwDivideCount;
+	uint32_t m_nKeyFrameInterval;
+	uint32_t m_nFrameNumber;
 	size_t m_cbRawStripeSize;
 	size_t m_cbPlaneSize[4];
 	size_t m_cbPlaneWidth[4];
@@ -89,6 +93,7 @@ protected:
 
 	std::unique_ptr<CThreadManager> m_ptm;
 	std::unique_ptr<CFrameBuffer> m_pCurFrame;
+	std::unique_ptr<CFrameBuffer> m_pPrevFrame;
 
 protected:
 	CUM00Codec(const char *pszTinyName, const char *pszInterfaceName);
@@ -142,8 +147,8 @@ protected:
 	virtual bool PredictDirect(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 
-	void PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin);
-	void DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
+	void PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin, const uint8_t* const* pPrevBegin = NULL);
+	void DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin, const uint8_t* const* pPrevBegin = NULL);
 
 private:
 	void EncodeProc(uint32_t nBandIndex);
