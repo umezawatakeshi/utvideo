@@ -178,6 +178,12 @@ static vector<pair<string, vector<uint8_t>>> divs_umxx = {
 	{ "div11",{ 0x00, 0x0a, 0x00, 0x00, } },
 };
 
+static vector<vector<uint8_t>> intra_umxx = {
+	{ 0x00, 0x00, 0x00, 0x00, }, // no-temporal, k1
+	{ 0x00, 0x00, 0x1e, 0x00, }, // no-temporal, k30
+	{ 0x02, 0x00, 0x00, 0x00, }, // temporal, k1
+};
+
 vector<tuple<string, string, unsigned int>> conv_clip000_umxx(const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> &v, const vector<pair<int, int>>& sz, bool rawprop)
 {
 	vector<tuple<string, string, unsigned int>> r;
@@ -370,19 +376,22 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 			{
 				for (auto& size : sz)
 				{
-					auto width = size.first;
-					auto height = size.second;
-					if (width % widthstep != 0 || height % heightstep != 0)
-						continue;
+					for (auto intra : intra_umxx)
+					{
+						auto width = size.first;
+						auto height = size.second;
+						if (width % widthstep != 0 || height % heightstep != 0)
+							continue;
 
-					char comp[256], raw[256];
+						char comp[256], raw[256];
 
-					sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divpair.first.c_str(), width, height);
-					if (rawprop)
-						sprintf(raw, "%s-gradient-%s-%dx%d.avi", rawbase.c_str(), divpair.first.c_str(), width, height);
-					else
-						sprintf(raw, "%s-%dx%d.avi", rawbase.c_str(), width, height);
-					r.push_back(make_tuple(raw, comp, confbase | divpair.second, umxx_extradata_mask));
+						sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divpair.first.c_str(), width, height);
+						if (rawprop)
+							sprintf(raw, "%s-gradient-%s-%dx%d.avi", rawbase.c_str(), divpair.first.c_str(), width, height);
+						else
+							sprintf(raw, "%s-%dx%d.avi", rawbase.c_str(), width, height);
+						r.push_back(make_tuple(raw, comp, confbase | divpair.second | intra, umxx_extradata_mask));
+					}
 				}
 			}
 		}
@@ -553,22 +562,25 @@ vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> conv_encd
 				{
 					for (auto& size : sz)
 					{
-						auto width = size.first;
-						auto height = size.second;
-						if (width % widthstep != 0 || height % heightstep != 0)
-							continue;
+						for (auto intra : intra_umxx)
+						{
+							auto width = size.first;
+							auto height = size.second;
+							if (width % widthstep != 0 || height % heightstep != 0)
+								continue;
 
-						char src[256], dst[256];
+							char src[256], dst[256];
 
-						if (srcprop)
-							sprintf(src, "%s-%s-%dx%d.avi", srcbase.c_str(), divpair.first.c_str(), width, height);
-						else
-							sprintf(src, "%s-%dx%d.avi", srcbase.c_str(), width, height);
-						if (dstprop)
-							sprintf(dst, "%s-%s-%dx%d.avi", dstbase.c_str(), divpair.first.c_str(), width, height);
-						else
-							sprintf(dst, "%s-%dx%d.avi", dstbase.c_str(), width, height);
-						r.push_back(make_tuple(src, dst, codecfmt, confbase | divpair.second, tolerance));
+							if (srcprop)
+								sprintf(src, "%s-%s-%dx%d.avi", srcbase.c_str(), divpair.first.c_str(), width, height);
+							else
+								sprintf(src, "%s-%dx%d.avi", srcbase.c_str(), width, height);
+							if (dstprop)
+								sprintf(dst, "%s-%s-%dx%d.avi", dstbase.c_str(), divpair.first.c_str(), width, height);
+							else
+								sprintf(dst, "%s-%dx%d.avi", dstbase.c_str(), width, height);
+							r.push_back(make_tuple(src, dst, codecfmt, confbase | divpair.second | intra, tolerance));
+						}
 					}
 				}
 			}
