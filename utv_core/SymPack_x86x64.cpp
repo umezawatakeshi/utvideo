@@ -539,3 +539,120 @@ void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pDstBe
 
 }
 #endif
+
+
+template<int F>
+static inline FORCEINLINE typename std::enable_if<F < CODEFEATURE_AVX2, std::pair<__m128i, __m128i>>::type UnpackForDelta(const uint8_t*& q, const uint8_t *& r, int& shift)
+{
+	__m128i w;
+	int mode = ((*(const uint32_t *)r) >> shift) & 7;
+	__m128i rmask = _mm_cmpeq_epi64(_mm_and_si128(_mm_cvtsi32_si128(*(const uint32_t *)r >> shift), _mm_set1_epi64x(8)), _mm_set1_epi64x(8));
+	int bits;
+	if (mode == 0)
+	{
+		w = _mm_setzero_si128();
+		bits = 0;
+	}
+	else
+	{
+		__m128i z, mask;
+
+		w = _mm_loadl_epi64((const __m128i *)q);
+		bits = mode + 1;
+		int rembits = 8 - bits;
+		__m128i vrembits = _mm_cvtsi32_si128(rembits);
+		__m128i vbits = _mm_cvtsi32_si128(bits);
+
+		__m128i vrembitsn = _mm_slli_epi64(vrembits, 2);
+		z = _mm_sll_epi64(w, vrembitsn);
+		w = _mm_blend_epi16(w, z, 0xcc);
+		vrembitsn = _mm_srli_epi64(vrembitsn, 1);
+		z = _mm_sll_epi64(w, vrembitsn);
+		w = _mm_blend_epi16(w, z, 0xaa);
+		z = _mm_sll_epi64(w, vrembits);
+		w = _mm_blendv_epi8(w, z, _mm_set1_epi16((short)0xff00));
+		mask = _mm_sub_epi64(_mm_sll_epi64(_mm_set1_epi8(1), vbits), _mm_set1_epi8(1));
+		w = _mm_and_si128(w, mask);
+		__m128i offset = _mm_srl_epi64(_mm_set1_epi8((char)0x80), vrembits);
+		w = _mm_sub_epi8(w, offset);
+	}
+
+	q += bits;
+
+	shift += 4;
+	if (shift == 32)
+	{
+		r += 4;
+		shift = 0;
+	}
+
+	return { w, rmask };
+}
+
+template<int F>
+void tuned_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, const uint8_t *pPrevBegin, size_t cbStride)
+{
+	int shift = 0;
+	auto q = pPacked;
+	auto r = pControl;
+
+	{
+		__m128i prev = _mm_set1_epi8((char)0x80);
+
+		auto t = pPrevBegin;
+		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 16, t += 16)
+		{
+			auto w0 = UnpackForDelta<F>(q, r, shift);
+			auto w1 = UnpackForDelta<F>(q, r, shift);
+			__m128i s0 = _mm_unpacklo_epi64(w0.first, w1.first);
+			__m128i m0 = _mm_unpacklo_epi64(w0.second, w1.second);
+
+			auto t0 = _mm_add_epi8(s0, _mm_loadu_si128((const __m128i*)t));
+			auto a = _mm_alignr_epi8(_mm_and_si128(t0, m0), prev, 15);
+			s0 = _mm_andnot_si128(m0, _mm_add_epi8(s0, a));
+			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
+			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
+			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
+			s0 = _mm_add_epi8(s0, _mm_andnot_si128(m0, _mm_slli_si128(s0, 8)));
+			s0 = _mm_blendv_epi8(s0, t0, m0);
+			_mm_storeu_si128((__m128i *)p, s0);
+			prev = s0;
+		}
+	}
+
+	auto tt = pPrevBegin + cbStride;
+	for (auto pp = pDstBegin + cbStride; pp != pDstEnd; pp += cbStride, tt += cbStride)
+	{
+		__m128i prev = _mm_set1_epi8((char)0);
+
+		auto t = tt;
+		for (auto p = pp; p != pp + cbStride; p += 16, t += 16)
+		{
+			auto w0 = UnpackForDelta<F>(q, r, shift);
+			auto w1 = UnpackForDelta<F>(q, r, shift);
+			__m128i s0 = _mm_unpacklo_epi64(w0.first, w1.first);
+			__m128i m0 = _mm_unpacklo_epi64(w0.second, w1.second);
+
+			__m128i top = _mm_loadu_si128((const __m128i*)(p - cbStride));
+			auto t0 = _mm_add_epi8(s0, _mm_loadu_si128((const __m128i*)t));
+			auto a = _mm_alignr_epi8(_mm_and_si128(_mm_sub_epi8(t0, top), m0), prev, 15);
+			s0 = _mm_andnot_si128(m0, _mm_add_epi8(s0, a));
+			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
+			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
+			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
+			s0 = _mm_add_epi8(s0, _mm_andnot_si128(m0, _mm_slli_si128(s0, 8)));
+			s0 = _mm_add_epi8(s0, top);
+			s0 = _mm_blendv_epi8(s0, t0, m0);
+			_mm_storeu_si128((__m128i *)p, s0);
+			prev = _mm_sub_epi8(s0, top);
+		}
+	}
+}
+
+#ifdef GENERATE_SSE41
+template void tuned_Unpack8SymWithDiff8<CODEFEATURE_SSE41>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, const uint8_t *pPrevBegin, size_t cbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, const uint8_t *pPrevBegin, size_t cbStride);
+#endif
