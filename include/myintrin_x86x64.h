@@ -13,13 +13,16 @@
 
 static inline __m128i _mm_setone_si128()
 {
-	/*
-	 * Clang には _mm_undefined_si128 は無いらしい。
-	 * Visual C++ では _mm_setzero_si128 に置き換えられる。
-	 * どうせ処理の他の部分で all 0 を使うので、この処理でも問題なかろう。
-	 */
-	__m128i x = _mm_setzero_si128(); // _mm_undefined_si128();
+#if defined(_MSC_VER)
+	__m128i x = _mm_undefined_si128();
 	return _mm_cmpeq_epi32(x, x);
+#elif defined(__GNUC__)
+	// GCC や Clang は、これを one idiom (pcmpeqd) にしてくれる
+	// Visual C++ はダメ
+	return _mm_set1_epi8(-1);
+#else
+#error
+#endif
 }
 
 static inline __m128i _mm_set2_epi8(char a, char b)
@@ -58,8 +61,14 @@ static inline __m128i _mm_set4_epi16_shift(double a, double b, double c, double 
 
 static inline __m256i _mm256_setone_si256()
 {
-	__m256i x = _mm256_setzero_si256();
+#if defined(_MSC_VER)
+	__m256i x = _mm256_undefined_si256();
 	return _mm256_cmpeq_epi32(x, x);
+#elif defined(__GNUC__)
+	return _mm256_set1_epi8(-1);
+#else
+#error
+#endif
 }
 
 static inline __m256i _mm256_set2_epi16(short a, short b)
