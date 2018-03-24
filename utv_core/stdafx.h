@@ -117,8 +117,10 @@ using std::min;
 
 #if defined(_MSC_VER)
 #define FORCEINLINE __forceinline
+#define VECTORCALL __vectorcall
 #elif defined(__GNUC__)
 #define FORCEINLINE __attribute__((always_inline))
+#define VECTORCALL
 #else
 #error
 #endif
