@@ -111,8 +111,6 @@ struct TUNEDFUNC_CONVERT_SHUFFLE
 struct TUNEDFUNC_SYMPACK
 {
 	DECLARE_TUNEDFUNC_FRAGMENT_HEADER(TUNEDFUNC_SYMPACK);
-	void (*pfnPack8Sym8)(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
-	void (*pfnUnpack8Sym8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl);
 	void (*pfnPack8SymAfterPredictPlanarGradient8)(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride);
 	void (*pfnUnpack8SymAndRestorePlanarGradient8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, size_t cbStride);
 };
@@ -218,7 +216,5 @@ public:
 #define ConvertUQRGToB64a tfn.pConvertShuffle->pfnConvertUQRGToB64a
 #define ConvertUQRAToB64a tfn.pConvertShuffle->pfnConvertUQRAToB64a
 
-#define Pack8Sym8 tfn.pSymPack->pfnPack8Sym8
-#define Unpack8Sym8 tfn.pSymPack->pfnUnpack8Sym8
 #define Pack8SymAfterPredictPlanarGradient8 tfn.pSymPack->pfnPack8SymAfterPredictPlanarGradient8
 #define Unpack8SymAndRestorePlanarGradient8 tfn.pSymPack->pfnUnpack8SymAndRestorePlanarGradient8
