@@ -463,7 +463,7 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackAVX2 = {
 	tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2>,
 	tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>,
 	tuned_Pack8SymWithDiff8<CODEFEATURE_AVX2>,
-	tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX1>,
+	tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>,
 };
 
 
