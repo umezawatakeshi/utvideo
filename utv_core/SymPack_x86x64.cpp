@@ -1089,17 +1089,15 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 			__m256i atmp = _mm256_permute2x128_si256(t0masked, prev, 0x03);
 			__m256i a0 = _mm256_alignr_epi8(t0masked, atmp, 15);
 			s0 = _mm256_andnot_si256(m0, _mm256_add_epi8(s0, a0));
-			__m256i shift1 = _mm256_alignr_epi8(s0, _mm256_permute2x128_si256(s0, _mm256_setzero_si256(), 0x03), 15);
-			s0 = _mm256_add_epi8(s0, shift1);
-			__m256i shift2 = _mm256_alignr_epi8(s0, _mm256_permute2x128_si256(s0, _mm256_setzero_si256(), 0x03), 14);
-			s0 = _mm256_add_epi8(s0, shift2);
-			__m256i shift4 = _mm256_and_si256(_mm256_permutevar8x32_epi32(s0, _mm256_set_epi32(6, 5, 4, 3, 2, 1, 0, 0)), _mm256_set_epi32(-1, -1, -1, -1, -1, -1, -1, 0));
-			s0 = _mm256_add_epi8(s0, shift4);
-			__m256i shift8withmask = _mm256_and_si256(_mm256_permute4x64_epi64(_mm256_andnot_si256(m0, s0), _MM_SHUFFLE(2, 1, 0, 0)), _mm256_set_epi64x(-1, -1, -1, 0));
-			s0 = _mm256_add_epi8(s0, shift8withmask);
-			__m256i mask8 = _mm256_or_si256(m0, _mm256_permute4x64_epi64(m0, _MM_SHUFFLE(3, 3, 2, 1)));
-			__m256i shift16withmask = _mm256_inserti128_si256(_mm256_setzero_si256(), _mm256_castsi256_si128(_mm256_andnot_si256(mask8, s0)), 1);
-			s0 = _mm256_add_epi8(s0, shift16withmask);
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 8));
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 16));
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 32));
+			s0 = _mm256_add_epi8(s0, _mm256_shuffle_epi8(_mm256_andnot_si256(m0, s0), _mm256_set16_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1)));
+			__m256i mask16 = _mm256_or_si256(m0, _mm256_permute4x64_epi64(m0, _MM_SHUFFLE(3, 3, 2, 1)));
+			s0 = _mm256_add_epi8(s0, _mm256_shuffle_epi8(_mm256_broadcastsi128_si256(_mm256_castsi256_si128(_mm256_andnot_si256(mask16, s0))), _mm256_set_epi8(
+				15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+			)));
 			s0 = _mm256_blendv_epi8(s0, t0, m0);
 			_mm256_storeu_si256((__m256i *)p, s0);
 			prev = s0;
@@ -1124,17 +1122,15 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 			__m256i atmp = _mm256_permute2x128_si256(t0masked, prev, 0x03);
 			__m256i a0 = _mm256_alignr_epi8(t0masked, atmp, 15);
 			s0 = _mm256_andnot_si256(m0, _mm256_add_epi8(s0, a0));
-			__m256i shift1 = _mm256_alignr_epi8(s0, _mm256_permute2x128_si256(s0, _mm256_setzero_si256(), 0x03), 15);
-			s0 = _mm256_add_epi8(s0, shift1);
-			__m256i shift2 = _mm256_alignr_epi8(s0, _mm256_permute2x128_si256(s0, _mm256_setzero_si256(), 0x03), 14);
-			s0 = _mm256_add_epi8(s0, shift2);
-			__m256i shift4 = _mm256_and_si256(_mm256_permutevar8x32_epi32(s0, _mm256_set_epi32(6, 5, 4, 3, 2, 1, 0, 0)), _mm256_set_epi32(-1, -1, -1, -1, -1, -1, -1, 0));
-			s0 = _mm256_add_epi8(s0, shift4);
-			__m256i shift8withmask = _mm256_and_si256(_mm256_permute4x64_epi64(_mm256_andnot_si256(m0, s0), _MM_SHUFFLE(2, 1, 0, 0)), _mm256_set_epi64x(-1, -1, -1, 0));
-			s0 = _mm256_add_epi8(s0, shift8withmask);
-			__m256i mask8 = _mm256_or_si256(m0, _mm256_permute4x64_epi64(m0, _MM_SHUFFLE(3, 3, 2, 1)));
-			__m256i shift16withmask = _mm256_inserti128_si256(_mm256_setzero_si256(), _mm256_castsi256_si128(_mm256_andnot_si256(mask8, s0)), 1);
-			s0 = _mm256_add_epi8(s0, shift16withmask);
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 8));
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 16));
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 32));
+			s0 = _mm256_add_epi8(s0, _mm256_shuffle_epi8(_mm256_andnot_si256(m0, s0), _mm256_set16_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1)));
+			__m256i mask16 = _mm256_or_si256(m0, _mm256_permute4x64_epi64(m0, _MM_SHUFFLE(3, 3, 2, 1)));
+			s0 = _mm256_add_epi8(s0, _mm256_shuffle_epi8(_mm256_broadcastsi128_si256(_mm256_castsi256_si128(_mm256_andnot_si256(mask16, s0))), _mm256_set_epi8(
+				15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+			)));
 			s0 = _mm256_add_epi8(s0, top);
 			s0 = _mm256_blendv_epi8(s0, t0, m0);
 			_mm256_storeu_si256((__m256i *)p, s0);
