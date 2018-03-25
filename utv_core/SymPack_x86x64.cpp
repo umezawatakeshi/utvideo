@@ -708,6 +708,184 @@ template void tuned_Pack8SymWithDiff8<CODEFEATURE_SSE41>(uint8_t *pPacked, size_
 template void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX1>(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const uint8_t *pPrevBegin, size_t cbStride);
 #endif
 
+#ifdef GENERATE_AVX2
+template<int F>
+static inline FORCEINLINE void VECTORCALL PackForDelta(uint8_t*& q, uint8_t*& r, __m256i wa, __m256i wb, __m256i ta, __m256i tb)
+{
+	int modesa, modesb;
+	int bits0, bits1, bits2, bits3, bits4, bits5, bits6, bits7;
+
+	auto getvbits = [](__m256i xa, __m256i xb)
+	{
+		__m256i za;
+		__m256i zb;
+		__m256i viszeroa = _mm256_cmpeq_epi64(xa, _mm256_setzero_si256());
+		__m256i viszerob = _mm256_cmpeq_epi64(xb, _mm256_setzero_si256());
+		__m256i signsa = _mm256_cmpgt_epi8(_mm256_setzero_si256(), xa);
+		__m256i signsb = _mm256_cmpgt_epi8(_mm256_setzero_si256(), xb);
+		za = _mm256_xor_si256(xa, signsa);
+		zb = _mm256_xor_si256(xb, signsb);
+		za = _mm256_or_si256(za, _mm256_srli_epi64(za, 32));
+		zb = _mm256_or_si256(zb, _mm256_srli_epi64(zb, 32));
+		za = _mm256_or_si256(za, _mm256_srli_epi64(za, 16));
+		zb = _mm256_or_si256(zb, _mm256_srli_epi64(zb, 16));
+		za = _mm256_or_si256(za, _mm256_srli_epi64(za, 8));
+		zb = _mm256_or_si256(zb, _mm256_srli_epi64(zb, 8));
+		za = _mm256_and_si256(za, _mm256_set1_epi64x(0xff));
+		zb = _mm256_and_si256(zb, _mm256_set1_epi64x(0xff));
+
+		// Ç±Ç±Ç≈ BSR/LZCNT
+		za = _mm256_or_si256(za, _mm256_set1_epi64x(1));
+		zb = _mm256_or_si256(zb, _mm256_set1_epi64x(1));
+		za = _mm256_castps_si256(_mm256_cvtepi32_ps(za));
+		zb = _mm256_castps_si256(_mm256_cvtepi32_ps(zb));
+		za = _mm256_srli_epi32(za, 23);
+		zb = _mm256_srli_epi32(zb, 23);
+		za = _mm256_sub_epi32(za, _mm256_set1_epi64x(0x7d));
+		zb = _mm256_sub_epi32(zb, _mm256_set1_epi64x(0x7d));
+		return std::make_pair(_mm256_andnot_si256(viszeroa, za), _mm256_andnot_si256(viszerob, zb));
+	};
+
+	auto vbitspairw = getvbits(wa, wb);
+	auto vbitspairt = getvbits(ta, tb);
+	__m256i vbitswa = vbitspairw.first;
+	__m256i vbitswb = vbitspairw.second;
+	__m256i vbitsta = vbitspairt.first;
+	__m256i vbitstb = vbitspairt.second;
+	__m256i vspatiala = _mm256_cmpgt_epi64(vbitsta, vbitswa);
+	__m256i vspatialb = _mm256_cmpgt_epi64(vbitstb, vbitswb);
+	wa = _mm256_blendv_epi8(ta, wa, vspatiala);
+	wb = _mm256_blendv_epi8(tb, wb, vspatialb);
+	__m256i vbitsa = _mm256_min_epi32(vbitswa, vbitsta); // Ç«Ç§Çπè„à  32bit ÇÕÉ[ÉçÇ»ÇÃÇ≈ epi32 Ç≈ëÂè‰ïvÅipminuqñΩóﬂÇÕë∂ç›ÇµÇ»Ç¢Åj
+	__m256i vbitsb = _mm256_min_epi32(vbitswb, vbitstb);
+	__m256i vrembitsa = _mm256_sub_epi64(_mm256_set1_epi64x(8), vbitsa);
+	__m256i vrembitsb = _mm256_sub_epi64(_mm256_set1_epi64x(8), vbitsb);
+	__m256i vmodea = _mm256_add_epi64(vbitsa, _mm256_cmpgt_epi64(vbitsa, _mm256_setzero_si256()));
+	__m256i vmodeb = _mm256_add_epi64(vbitsb, _mm256_cmpgt_epi64(vbitsb, _mm256_setzero_si256()));
+	vmodea = _mm256_or_si256(vmodea, _mm256_andnot_si256(vspatiala, _mm256_set1_epi64x(8)));
+	vmodeb = _mm256_or_si256(vmodeb, _mm256_andnot_si256(vspatialb, _mm256_set1_epi64x(8)));
+
+	bits0 = _mm_cvtsi128_si32(_mm256_castsi256_si128(vbitsa));
+	bits1 = _mm_extract_epi32(_mm256_castsi256_si128(vbitsa), 2);
+	__m128i vbitshigha = _mm256_extracti128_si256(vbitsa, 1);
+	bits2 = _mm_cvtsi128_si32(vbitshigha);
+	bits3 = _mm_extract_epi32(vbitshigha, 2);
+	bits4 = _mm_cvtsi128_si32(_mm256_castsi256_si128(vbitsb));
+	bits5 = _mm_extract_epi32(_mm256_castsi256_si128(vbitsb), 2);
+	__m128i vbitshighb = _mm256_extracti128_si256(vbitsb, 1);
+	bits6 = _mm_cvtsi128_si32(vbitshighb);
+	bits7 = _mm_extract_epi32(vbitshighb, 2);
+
+	vmodea = _mm256_permutevar8x32_epi32(vmodea, _mm256_castsi128_si256(_mm_set_epi32(6, 4, 2, 0))); // VPERMD
+	vmodeb = _mm256_permutevar8x32_epi32(vmodeb, _mm256_castsi128_si256(_mm_set_epi32(6, 4, 2, 0))); // VPERMD
+	__m128i vmode128a = _mm_shuffle_epi8(_mm256_castsi256_si128(vmodea), _mm_set1_epi32(0x0c080400));
+	__m128i vmode128b = _mm_shuffle_epi8(_mm256_castsi256_si128(vmodeb), _mm_set1_epi32(0x0c080400));
+	modesa = _pext_u32(_mm_cvtsi128_si32(vmode128a), 0x0f0f0f0f);
+	modesb = _pext_u32(_mm_cvtsi128_si32(vmode128b), 0x0f0f0f0f);
+
+	wa = _mm256_add_epi8(wa, _mm256_srlv_epi64(_mm256_set1_epi8((char)0x80), vrembitsa));
+	wb = _mm256_add_epi8(wb, _mm256_srlv_epi64(_mm256_set1_epi8((char)0x80), vrembitsb));
+	wa = _mm256_or_si256(_mm256_and_si256(wa, _mm256_set1_epi16(0x00ff)), _mm256_srlv_epi64(_mm256_andnot_si256(_mm256_set1_epi16(0x00ff), wa), vrembitsa));
+	wb = _mm256_or_si256(_mm256_and_si256(wb, _mm256_set1_epi16(0x00ff)), _mm256_srlv_epi64(_mm256_andnot_si256(_mm256_set1_epi16(0x00ff), wb), vrembitsb));
+	vrembitsa = _mm256_slli_epi64(vrembitsa, 1);
+	vrembitsb = _mm256_slli_epi64(vrembitsb, 1);
+	wa = _mm256_or_si256(_mm256_and_si256(wa, _mm256_set1_epi32(0x0000ffff)), _mm256_srlv_epi64(_mm256_andnot_si256(_mm256_set1_epi32(0x0000ffff), wa), vrembitsa));
+	wb = _mm256_or_si256(_mm256_and_si256(wb, _mm256_set1_epi32(0x0000ffff)), _mm256_srlv_epi64(_mm256_andnot_si256(_mm256_set1_epi32(0x0000ffff), wb), vrembitsb));
+	vrembitsa = _mm256_slli_epi64(vrembitsa, 1);
+	vrembitsb = _mm256_slli_epi64(vrembitsb, 1);
+	wa = _mm256_or_si256(_mm256_and_si256(wa, _mm256_set1_epi64x(0x00000000ffffffff)), _mm256_srlv_epi64(_mm256_andnot_si256(_mm256_set1_epi64x(0x00000000ffffffff), wa), vrembitsa));
+	wb = _mm256_or_si256(_mm256_and_si256(wb, _mm256_set1_epi64x(0x00000000ffffffff)), _mm256_srlv_epi64(_mm256_andnot_si256(_mm256_set1_epi64x(0x00000000ffffffff), wb), vrembitsb));
+
+	_mm_storel_epi64((__m128i*)q, _mm256_castsi256_si128(wa));
+	q += bits0;
+	_mm_storel_epi64((__m128i*)q, _mm_srli_si128(_mm256_castsi256_si128(wa), 8));
+	q += bits1;
+	__m128i whigha = _mm256_extracti128_si256(wa, 1);
+	_mm_storel_epi64((__m128i*)q, whigha);
+	q += bits2;
+	_mm_storel_epi64((__m128i*)q, _mm_srli_si128(whigha, 8));
+	q += bits3;
+
+	_mm_storel_epi64((__m128i*)q, _mm256_castsi256_si128(wb));
+	q += bits4;
+	_mm_storel_epi64((__m128i*)q, _mm_srli_si128(_mm256_castsi256_si128(wb), 8));
+	q += bits5;
+	__m128i whighb = _mm256_extracti128_si256(wb, 1);
+	_mm_storel_epi64((__m128i*)q, whighb);
+	q += bits6;
+	_mm_storel_epi64((__m128i*)q, _mm_srli_si128(whighb, 8));
+	q += bits7;
+
+	*(uint32_t *)r = (modesb << 16) | modesa;
+	r += 4;
+}
+
+template<>
+void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const uint8_t *pPrevBegin, size_t cbStride)
+{
+	auto q = pPacked;
+	auto r = pControl;
+	memset(pControl, 0, (pSrcEnd - pSrcBegin) / 64 * 4);
+
+	{
+		__m256i prev = _mm256_set1_epi8((char)0x80);
+
+		for (auto p = pSrcBegin, t = pPrevBegin; p != pSrcBegin + cbStride; p += 64, t += 64)
+		{
+			__m256i value0 = _mm256_loadu_si256((const __m256i *)p);
+			__m256i value1 = _mm256_loadu_si256((const __m256i *)(p + 32));
+			__m256i tmp0 = _mm256_permute2x128_si256(value0, prev, 0x03);
+			__m256i tmp1 = _mm256_permute2x128_si256(value1, value0, 0x03);
+			__m256i left0 = _mm256_alignr_epi8(value0, tmp0, 15);
+			__m256i left1 = _mm256_alignr_epi8(value1, tmp1, 15);
+
+			__m256i error0 = _mm256_sub_epi8(value0, left0);
+			__m256i error1 = _mm256_sub_epi8(value1, left1);
+			__m256i t0 = _mm256_sub_epi8(value0, _mm256_loadu_si256((const __m256i *)t));
+			__m256i t1 = _mm256_sub_epi8(value1, _mm256_loadu_si256((const __m256i *)(t + 32)));
+			prev = value1;
+
+			PackForDelta<CODEFEATURE_AVX2>(q, r, error0, error1, t0, t1);
+		}
+	}
+
+	for (auto pp = pSrcBegin + cbStride, tt = pPrevBegin + cbStride; pp != pSrcEnd; pp += cbStride, tt += cbStride)
+	{
+		__m256i prev = _mm256_set1_epi8((char)0x80);
+		__m256i topprev = _mm256_set1_epi8((char)0x80);
+
+		for (auto p = pp, t = tt; p != pp + cbStride; p += 64, t += 64)
+		{
+			__m256i value0 = _mm256_loadu_si256((const __m256i *)p);
+			__m256i value1 = _mm256_loadu_si256((const __m256i *)(p + 32));
+			__m256i top0 = _mm256_loadu_si256((const __m256i *)(p - cbStride));
+			__m256i top1 = _mm256_loadu_si256((const __m256i *)(p + 32 - cbStride));
+			__m256i tmp0 = _mm256_permute2x128_si256(value0, prev, 0x03);
+			__m256i tmp1 = _mm256_permute2x128_si256(value1, value0, 0x03);
+			__m256i toptmp0 = _mm256_permute2x128_si256(top0, topprev, 0x03);
+			__m256i toptmp1 = _mm256_permute2x128_si256(top1, top0, 0x03);
+			__m256i left0 = _mm256_alignr_epi8(value0, tmp0, 15);
+			__m256i left1 = _mm256_alignr_epi8(value1, tmp1, 15);
+			__m256i topleft0 = _mm256_alignr_epi8(top0, toptmp0, 15);
+			__m256i topleft1 = _mm256_alignr_epi8(top1, toptmp1, 15);
+
+			__m256i error0 = _mm256_sub_epi8(_mm256_add_epi8(value0, topleft0), _mm256_add_epi8(left0, top0));
+			__m256i error1 = _mm256_sub_epi8(_mm256_add_epi8(value1, topleft1), _mm256_add_epi8(left1, top1));
+			__m256i t0 = _mm256_sub_epi8(value0, _mm256_loadu_si256((const __m256i *)t));
+			__m256i t1 = _mm256_sub_epi8(value1, _mm256_loadu_si256((const __m256i *)(t + 32)));
+			prev = value1;
+			topprev = top1;
+
+			PackForDelta<CODEFEATURE_AVX2>(q, r, error0, error1, t0, t1);
+		}
+	}
+
+	*cbPacked = q - pPacked;
+
+}
+#endif
+
+
 template<int F>
 static inline FORCEINLINE typename std::enable_if<F < CODEFEATURE_AVX2, std::pair<__m128i, __m128i>>::type UnpackForDelta(const uint8_t*& q, const uint8_t *& r, int& shift)
 {
