@@ -5,7 +5,14 @@
 
 extern "C"
 {
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4819)
+#endif
 #include <libavformat/avformat.h>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 }
 
 class bad_video_clip

@@ -85,13 +85,11 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(FFMPEG_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_LIB_X86);$(FFMPEG_LIB_X86)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib;rpcrt4.lib;amstrmid.lib;avformat.lib;avcodec.lib;avutil.lib</AdditionalDependencies>
+      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib;rpcrt4.lib;amstrmid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -101,13 +99,11 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(FFMPEG_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(BOOST_LIB_X64);$(FFMPEG_LIB_X64)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib;rpcrt4.lib;amstrmid.lib;avformat.lib;avcodec.lib;avutil.lib</AdditionalDependencies>
+      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib;rpcrt4.lib;amstrmid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,7 +115,6 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(FFMPEG_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -127,8 +122,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(BOOST_LIB_X86);$(FFMPEG_LIB_X86)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib;rpcrt4.lib;amstrmid.lib;avformat.lib;avcodec.lib;avutil.lib</AdditionalDependencies>
+      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib;rpcrt4.lib;amstrmid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -140,7 +134,6 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(BOOST_ROOT);$(FFMPEG_ROOT);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -148,8 +141,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(BOOST_LIB_X64);$(FFMPEG_LIB_X64)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib;rpcrt4.lib;amstrmid.lib;avformat.lib;avcodec.lib;avutil.lib</AdditionalDependencies>
+      <AdditionalDependencies>vfw32.lib;msdmo.lib;ole32.lib;dmoguids.lib;rpcrt4.lib;amstrmid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
