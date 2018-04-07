@@ -49,19 +49,24 @@ protected:
 
 	static constexpr uint8_t SI_ENCODING_MODE_8SYMPACK = 2;
 
+	static constexpr uint8_t SI_FLAGS_USE_CONTROL_COMPRESSION  = 0x01;
 	static constexpr uint8_t SI_FLAGS_USE_TEMPORAL_COMPRESSION = 0x02;
-	static constexpr uint8_t SI_FLAGS_RESERVED                 = 0xfd;
+	static constexpr uint8_t SI_FLAGS_RESERVED                 = 0xfc;
 
 	struct FRAMEINFO
 	{
 		uint8_t fiFrameType;
-		uint8_t fiReserved[3];
+		uint8_t fiFlags;
+		uint8_t fiReserved[2];
 		uint32_t fiSizeArrayOffset;
 	};
 
 	// static constexpr uint8_t FI_FRAME_TYPE_COPY  = 0;
 	static constexpr uint8_t FI_FRAME_TYPE_INTRA = 1;
 	static constexpr uint8_t FI_FRAME_TYPE_DELTA = 2;
+
+	static constexpr uint8_t FI_FLAGS_CONTROL_COMPRESSED = 0x01;
+	static constexpr uint8_t FI_FLAGS_RESERVED           = 0xfe;
 
 protected:
 	ENCODERCONF m_ec;
@@ -90,6 +95,7 @@ protected:
 	size_t m_cbPackedStream[4][256];
 	uint8_t* m_pControlStream[4][256];
 	size_t m_cbControlStream[4][256];
+	uint8_t* m_pTmpControlStream[4][256];
 
 	std::unique_ptr<CThreadManager> m_ptm;
 	std::unique_ptr<CFrameBuffer> m_pCurFrame;

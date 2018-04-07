@@ -11,6 +11,15 @@
 #include "SymPack.h"
 #include "resource.h"
 
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4819)
+#endif
+#include <lz4.h>
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
+
 CUM00Codec::CUM00Codec(const char *pszTinyName, const char *pszInterfaceName) : CCodecBase(pszTinyName, pszInterfaceName)
 {
 	memset(&m_ec, 0, sizeof(ENCODERCONF));
@@ -206,6 +215,7 @@ size_t CUM00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 	memset(fi, 0, sizeof(FRAMEINFO));
 	fi->fiFrameType = (m_nFrameNumber == 0) ? FI_FRAME_TYPE_INTRA : FI_FRAME_TYPE_DELTA;
+	fi->fiFlags = (m_nFrameNumber == 0) ? 0 : FI_FLAGS_CONTROL_COMPRESSED;
 	fi->fiSizeArrayOffset = (uint32_t)(cbPackedStreams + cbControlStreams);
 
 	uint8_t *p = pPackedStreamsBegin;
@@ -319,7 +329,9 @@ int CUM00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 		for (unsigned int j = 0; j < m_dwDivideCount; ++j)
 		{
 			m_pPackedStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]));
-			m_pControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4 + 8);
+			m_pControlStream[i][j] = (uint8_t*)malloc(LZ4_compressBound(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4));
+			if (m_nKeyFrameInterval > 1)
+				m_pTmpControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4);
 		}
 	}
 
@@ -336,6 +348,8 @@ int CUM00Codec::InternalEncodeEnd(void)
 		{
 			free(m_pPackedStream[i][j]);
 			free(m_pControlStream[i][j]);
+			if (m_nKeyFrameInterval > 1)
+				free(m_pTmpControlStream[i][j]);
 		}
 	}
 
@@ -366,7 +380,7 @@ int CUM00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, un
 	p->siEncodingMode                    = SI_ENCODING_MODE_8SYMPACK;
 	p->siDivideCountMinusOne             = m_ec.ecDivideCountMinusOne;
 	if ((m_ec.ecFlags & EC_FLAGS_USE_TEMPORAL_COMPRESSION) && m_ec.ecKeyFrameIntervalMinusOne > 0)
-		p->siFlags                      |= SI_FLAGS_USE_TEMPORAL_COMPRESSION;
+		p->siFlags                      |= SI_FLAGS_USE_TEMPORAL_COMPRESSION | SI_FLAGS_USE_CONTROL_COMPRESSION;
 
 	return 0;
 }
@@ -437,11 +451,11 @@ void CUM00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 		{
 			Pack8SymWithDiff8(
 				m_pPackedStream[nPlaneIndex][nBandIndex], &m_cbPackedStream[nPlaneIndex][nBandIndex],
-				m_pControlStream[nPlaneIndex][nBandIndex],
+				m_pTmpControlStream[nPlaneIndex][nBandIndex],
 				pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd,
 				pPrevBegin[nPlaneIndex] + cbPlaneBegin,
 				m_cbPlanePredictStride[nPlaneIndex]);
-			m_cbControlStream[nPlaneIndex][nBandIndex] = (cbPlaneEnd - cbPlaneBegin) / 64 * 4;
+			m_cbControlStream[nPlaneIndex][nBandIndex] = LZ4_compress_default((char*)m_pTmpControlStream[nPlaneIndex][nBandIndex], (char*)m_pControlStream[nPlaneIndex][nBandIndex], (cbPlaneEnd - cbPlaneBegin) / 64 * 4, LZ4_compressBound((cbPlaneEnd - cbPlaneBegin) / 64 * 4));
 		}
 	}
 }
@@ -519,6 +533,13 @@ int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	m_nWidth = width;
 	m_nHeight = height;
 
+	if (m_siDecode.siFlags & SI_FLAGS_USE_CONTROL_COMPRESSION)
+	{
+		for (int i = 0; i < GetNumPlanes(); i++)
+			for (unsigned int j = 0; j < m_dwDivideCount; ++j)
+				m_pTmpControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4);
+	}
+
 	m_pCurFrame = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
@@ -537,6 +558,14 @@ int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 
 int CUM00Codec::InternalDecodeEnd(void)
 {
+
+	if (m_siDecode.siFlags & SI_FLAGS_USE_CONTROL_COMPRESSION)
+	{
+		for (int i = 0; i < GetNumPlanes(); i++)
+			for (unsigned int j = 0; j < m_dwDivideCount; ++j)
+				free(m_pTmpControlStream[i][j]);
+	}
+
 	m_pCurFrame.reset();
 
 	m_ptm.reset();
@@ -574,6 +603,8 @@ int CUM00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned 
 	}
 
 	if (si.siEncodingMode != SI_ENCODING_MODE_8SYMPACK)
+		return -1;
+	if ((si.siFlags & SI_FLAGS_RESERVED) != 0)
 		return -1;
 
 	if (is_not_all_zero(si.siReserved))
@@ -617,12 +648,23 @@ void CUM00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin, 
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
+		uint8_t *pControl;
+		if (m_fiDecode->fiFlags & FI_FLAGS_CONTROL_COMPRESSED)
+		{
+			LZ4_decompress_safe((char*)m_pControlStream[nPlaneIndex][nBandIndex], (char*)m_pTmpControlStream[nPlaneIndex][nBandIndex], m_cbControlStream[nPlaneIndex][nBandIndex], (cbPlaneEnd - cbPlaneBegin) / 64 * 4);
+			pControl = m_pTmpControlStream[nPlaneIndex][nBandIndex];
+		}
+		else
+		{
+			pControl = m_pControlStream[nPlaneIndex][nBandIndex];
+		}
+
 		if (m_fiDecode->fiFrameType == FI_FRAME_TYPE_INTRA)
 		{
 			Unpack8SymAndRestorePlanarGradient8(
 				pDstBegin[nPlaneIndex] + cbPlaneBegin,
 				pDstBegin[nPlaneIndex] + cbPlaneEnd,
-				m_pPackedStream[nPlaneIndex][nBandIndex], m_pControlStream[nPlaneIndex][nBandIndex],
+				m_pPackedStream[nPlaneIndex][nBandIndex], pControl,
 				m_cbPlanePredictStride[nPlaneIndex]);
 		}
 		else
@@ -630,7 +672,7 @@ void CUM00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin, 
 			Unpack8SymWithDiff8(
 				pDstBegin[nPlaneIndex] + cbPlaneBegin,
 				pDstBegin[nPlaneIndex] + cbPlaneEnd,
-				m_pPackedStream[nPlaneIndex][nBandIndex], m_pControlStream[nPlaneIndex][nBandIndex],
+				m_pPackedStream[nPlaneIndex][nBandIndex], pControl,
 				pPrevBegin[nPlaneIndex] + cbPlaneBegin,
 				m_cbPlanePredictStride[nPlaneIndex]);
 		}
