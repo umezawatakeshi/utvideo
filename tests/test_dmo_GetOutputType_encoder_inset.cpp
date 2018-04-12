@@ -72,9 +72,9 @@ void dmo_GetOutputType_encoder_inset_(REFGUID clsidCodec,
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_encoder")*depends_on("dmo_QueryInterface_encoder")*depends_on("dmo_SetInputType_encoder_subtype_ok"))
-BOOST_DATA_TEST_CASE(dmo_GetOutputType_encoder_inset, data::make(vecCodecFcc) ^ data::make(vecTopPriorityEncoderInputSubtype), fcc, guid)
+BOOST_DATA_TEST_CASE(dmo_GetOutputType_encoder_inset, data::make(vecCodecFcc) ^ data::make(vecTopPriorityEncoderInputSubtype) ^ data::make(vecTemporalCompressionSupported), fcc, guid, temporal)
 {
 	DMOEncoderCLSID clsid(fcc);
 	FourCCGUID outSubtype(fcc);
-	dmo_GetOutputType_encoder_inset_(clsid, guid, TRUE, FALSE, outSubtype, FALSE, FALSE, TEST_WIDTH, TEST_HEIGHT);
+	dmo_GetOutputType_encoder_inset_(clsid, guid, TRUE, FALSE, outSubtype, FALSE, temporal, TEST_WIDTH, TEST_HEIGHT);
 }

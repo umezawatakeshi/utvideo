@@ -111,7 +111,7 @@ public:
 	virtual const utvf_t *GetEncoderInputFormat(void) = 0;
 	virtual const utvf_t *GetDecoderOutputFormat(void) = 0;
 	virtual const utvf_t *GetCompressedFormat(void) = 0;
-	virtual bool IsTemporalCompressionSupported(void) { return false; }
+	virtual bool IsTemporalCompressionSupported(void) { return true; }
 
 #ifdef _WIN32
 	virtual INT_PTR Configure(HWND hwnd);

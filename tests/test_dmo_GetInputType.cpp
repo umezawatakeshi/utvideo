@@ -40,11 +40,11 @@ BOOST_DATA_TEST_CASE(dmo_GetInputType_encoder, data::make(vecCodecFcc) ^ data::m
 }
 
 BOOST_TEST_DECORATOR(*depends_on("dmo_CoCreateInstance_decoder")*depends_on("dmo_QueryInterface_decoder"))
-BOOST_DATA_TEST_CASE(dmo_GetInputType_decoder, data::make(vecCodecFcc), fcc)
+BOOST_DATA_TEST_CASE(dmo_GetInputType_decoder, data::make(vecCodecFcc) ^ data::make(vecTemporalCompressionSupported), fcc, temporal)
 {
 	DMODecoderCLSID clsid(fcc);
 	vector<GUID> codecType;
 
 	codecType.push_back(FourCCGUID(fcc));
-	dmo_GetInputType(clsid, codecType, FALSE, FALSE);
+	dmo_GetInputType(clsid, codecType, FALSE, temporal);
 }

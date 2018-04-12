@@ -17,6 +17,7 @@ extern vector<vector<LONG>> vecSupportedWidth;
 extern vector<vector<LONG>> vecSupportedHeight;
 extern vector<vector<LONG>> vecUnsupportedWidth;
 extern vector<vector<LONG>> vecUnsupportedHeight;
+extern vector<BOOL> vecTemporalCompressionSupported; // vector<bool> ‚¾‚ÆƒNƒ\‚È“ÁŽê‰»‚ªŽg‚í‚ê‚Ä‚µ‚Ü‚¤
 
 #define TEST_WIDTH ((LONG)1920)
 #define TEST_HEIGHT ((LONG)1080)
