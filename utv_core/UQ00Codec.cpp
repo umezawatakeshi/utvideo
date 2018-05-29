@@ -12,9 +12,7 @@
 
 CUQ00Codec::CUQ00Codec(const char *pszTinyName, const char *pszInterfaceName) : CCodecBase(pszTinyName, pszInterfaceName)
 {
-	memset(&m_ec, 0, sizeof(ENCODERCONF));
-	m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
-
+	SetDefaultState();
 	LoadConfig();
 }
 
@@ -136,8 +134,20 @@ int CUQ00Codec::GetState(void *pState, size_t cb)
 	return 0;
 }
 
+void CUQ00Codec::SetDefaultState()
+{
+	memset(&m_ec, 0, sizeof(ENCODERCONF));
+	m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
+}
+
 int CUQ00Codec::InternalSetState(const void *pState, size_t cb)
 {
+	if (pState == NULL)
+	{
+		SetDefaultState();
+		return sizeof(ENCODERCONF);
+	}
+
 	ENCODERCONF ec;
 
 	memset(&ec, 0, sizeof(ENCODERCONF));

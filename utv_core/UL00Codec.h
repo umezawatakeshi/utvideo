@@ -139,6 +139,7 @@ public:
 
 protected:
 	virtual int InternalSetState(const void *pState, size_t cb);
+	void SetDefaultState();
 	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 
 	virtual const char *GetColorFormatName(void) = 0;

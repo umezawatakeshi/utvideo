@@ -12,9 +12,7 @@
 
 CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : CCodecBase(pszTinyName, pszInterfaceName)
 {
-	memset(&m_ec, 0, sizeof(ENCODERCONF));
-	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
-
+	SetDefaultState();
 	LoadConfig();
 }
 
@@ -140,8 +138,20 @@ int CUL00Codec::GetState(void *pState, size_t cb)
 	return 0;
 }
 
+void CUL00Codec::SetDefaultState()
+{
+	memset(&m_ec, 0, sizeof(ENCODERCONF));
+	m_ec.dwFlags0 = (CThreadManager::GetNumProcessors() - 1) | EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
+}
+
 int CUL00Codec::InternalSetState(const void *pState, size_t cb)
 {
+	if (pState == NULL)
+	{
+		SetDefaultState();
+		return sizeof(ENCODERCONF);
+	}
+
 	ENCODERCONF ec;
 
 	memset(&ec, 0, sizeof(ENCODERCONF));

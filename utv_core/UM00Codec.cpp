@@ -22,11 +22,7 @@
 
 CUM00Codec::CUM00Codec(const char *pszTinyName, const char *pszInterfaceName) : CCodecBase(pszTinyName, pszInterfaceName)
 {
-	memset(&m_ec, 0, sizeof(ENCODERCONF));
-	m_ec.ecFlags = EC_FLAGS_DIVIDE_COUNT_AUTO;
-	m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
-	m_ec.ecKeyFrameIntervalMinusOne = EC_KEY_FRAME_INTERVAL_DEFAULT - 1;
-
+	SetDefaultState();
 	LoadConfig();
 }
 
@@ -155,8 +151,22 @@ int CUM00Codec::GetState(void *pState, size_t cb)
 	return 0;
 }
 
+void CUM00Codec::SetDefaultState()
+{
+	memset(&m_ec, 0, sizeof(ENCODERCONF));
+	m_ec.ecFlags = EC_FLAGS_DIVIDE_COUNT_AUTO;
+	m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
+	m_ec.ecKeyFrameIntervalMinusOne = EC_KEY_FRAME_INTERVAL_DEFAULT - 1;
+}
+
 int CUM00Codec::InternalSetState(const void *pState, size_t cb)
 {
+	if (pState == NULL)
+	{
+		SetDefaultState();
+		return sizeof(ENCODERCONF);
+	}
+
 	ENCODERCONF ec;
 
 	memset(&ec, 0, sizeof(ENCODERCONF));
