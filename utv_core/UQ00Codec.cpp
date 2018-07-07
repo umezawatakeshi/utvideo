@@ -359,8 +359,19 @@ int CUQ00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned i
 
 void CUQ00Codec::PredictProc(uint32_t nBandIndex)
 {
+	if (PredictDirect(nBandIndex))
+		return;
+
 	ConvertToPlanar(nBandIndex);
 
+	const uint8_t* pSrcBegin[4];
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+		pSrcBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
+	PredictFromPlanar(nBandIndex, pSrcBegin);
+}
+
+void CUQ00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin)
+{
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
@@ -369,8 +380,13 @@ void CUQ00Codec::PredictProc(uint32_t nBandIndex)
 		for (int i = 0; i < 1024; i++)
 			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
 
-		PredictCylindricalLeftAndCount10((uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneEnd), m_counts[nBandIndex].dwCount[nPlaneIndex]);
+		PredictCylindricalLeftAndCount10((uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(pSrcBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t *)(pSrcBegin[nPlaneIndex] + cbPlaneEnd), m_counts[nBandIndex].dwCount[nPlaneIndex]);
 	}
+}
+
+bool CUQ00Codec::PredictDirect(uint32_t nBandIndex)
+{
+	return false;
 }
 
 void CUQ00Codec::EncodeProc(uint32_t nBandIndex)
@@ -523,6 +539,17 @@ void CUQ00Codec::DecodeProc(uint32_t nBandIndex)
 	if (DecodeDirect(nBandIndex))
 		return;
 
+	uint8_t* pDstBegin[4];
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+		pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
+	DecodeToPlanar(nBandIndex, pDstBegin);
+
+	ConvertFromPlanar(nBandIndex);
+}
+
+void CUQ00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
+{
+
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
@@ -536,7 +563,7 @@ void CUQ00Codec::DecodeProc(uint32_t nBandIndex)
 			dwOffset = m_pdwOffsetTable[nPlaneIndex][nBandIndex - 1];
 
 		HuffmanDecode<10>((uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), m_pEncodedBits[nPlaneIndex] + dwOffset, &m_hdt[nPlaneIndex]);
-		RestoreCylindricalLeft10((uint16_t *)(m_pCurFrame->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
+		RestoreCylindricalLeft10((uint16_t *)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
 	}
 
 	ConvertFromPlanar(nBandIndex);
