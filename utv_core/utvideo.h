@@ -127,3 +127,6 @@ typedef uint32_t utvf_t;
 #define UTVF_v210 ((utvf_t)'v210')
 #define UTVF_b64a ((utvf_t)'b64a')
 #define UTVF_b48r ((utvf_t)'b48r')
+#define UTVF_r210 ((utvf_t)'r210')
+#define UTVF_P210 ((utvf_t)'P210')
+#define UTVF_P216 ((utvf_t)'P216')
