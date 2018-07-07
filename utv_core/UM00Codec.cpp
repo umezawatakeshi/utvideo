@@ -339,7 +339,7 @@ int CUM00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 		for (unsigned int j = 0; j < m_dwDivideCount; ++j)
 		{
 			m_pPackedStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]));
-			m_pControlStream[i][j] = (uint8_t*)malloc(LZ4_compressBound(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4));
+			m_pControlStream[i][j] = (uint8_t*)malloc(LZ4_compressBound((int)(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4)));
 			if (m_nKeyFrameInterval > 1)
 				m_pTmpControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4);
 		}
@@ -465,7 +465,7 @@ void CUM00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 				pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd,
 				pPrevBegin[nPlaneIndex] + cbPlaneBegin,
 				m_cbPlanePredictStride[nPlaneIndex]);
-			m_cbControlStream[nPlaneIndex][nBandIndex] = LZ4_compress_default((char*)m_pTmpControlStream[nPlaneIndex][nBandIndex], (char*)m_pControlStream[nPlaneIndex][nBandIndex], (cbPlaneEnd - cbPlaneBegin) / 64 * 4, LZ4_compressBound((cbPlaneEnd - cbPlaneBegin) / 64 * 4));
+			m_cbControlStream[nPlaneIndex][nBandIndex] = LZ4_compress_default((char*)m_pTmpControlStream[nPlaneIndex][nBandIndex], (char*)m_pControlStream[nPlaneIndex][nBandIndex], (int)((cbPlaneEnd - cbPlaneBegin) / 64 * 4), LZ4_compressBound((int)((cbPlaneEnd - cbPlaneBegin) / 64 * 4)));
 		}
 	}
 }
@@ -661,7 +661,7 @@ void CUM00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin, 
 		uint8_t *pControl;
 		if (m_fiDecode->fiFlags & FI_FLAGS_CONTROL_COMPRESSED)
 		{
-			LZ4_decompress_safe((char*)m_pControlStream[nPlaneIndex][nBandIndex], (char*)m_pTmpControlStream[nPlaneIndex][nBandIndex], m_cbControlStream[nPlaneIndex][nBandIndex], (cbPlaneEnd - cbPlaneBegin) / 64 * 4);
+			LZ4_decompress_safe((char*)m_pControlStream[nPlaneIndex][nBandIndex], (char*)m_pTmpControlStream[nPlaneIndex][nBandIndex], (int)m_cbControlStream[nPlaneIndex][nBandIndex], (int)((cbPlaneEnd - cbPlaneBegin) / 64 * 4));
 			pControl = m_pTmpControlStream[nPlaneIndex][nBandIndex];
 		}
 		else

@@ -165,7 +165,7 @@ void cpp_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEn
 			uint64_t w = unpacker();
 			for (int i = 0; i < 8; ++i)
 			{
-				p[i] = (w >> (i * 8)) + left;
+				p[i] = (uint8_t)((w >> (i * 8)) + left);
 				left = p[i];
 			}
 		}
@@ -180,7 +180,7 @@ void cpp_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEn
 			uint64_t w = unpacker();
 			for (int i = 0; i < 8; ++i)
 			{
-				p[i] = (w >> (i * 8)) + left + (p - cbStride)[i] - topleft;
+				p[i] = (uint8_t)((w >> (i * 8)) + left + (p - cbStride)[i] - topleft);
 				left = p[i];
 				topleft = (p - cbStride)[i];
 			}
@@ -323,7 +323,7 @@ void cpp_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 	{
 		uint64_t w;
 		int bits = ((*(uint32_t *)r) >> shift) & 7;
-		bool temporal = ((*(uint32_t *)r) >> shift) & 8;
+		bool temporal = (((*(uint32_t *)r) >> shift) & 8) != 0;
 		if (bits == 0)
 			w = 0;
 		else
@@ -376,7 +376,7 @@ void cpp_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 				uint64_t w = ret.first;
 				for (int i = 0; i < 8; ++i)
 				{
-					p[i] = (w >> (i * 8)) + left;
+					p[i] = (uint8_t)((w >> (i * 8)) + left);
 					left = p[i];
 				}
 			}
@@ -385,7 +385,7 @@ void cpp_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 				uint64_t t = ret.first;
 				for (int i = 0; i < 8; ++i)
 				{
-					p[i] = (t >> (i * 8)) + s[i];
+					p[i] = (uint8_t)((t >> (i * 8)) + s[i]);
 				}
 				left = p[7];
 			}
@@ -407,7 +407,7 @@ void cpp_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 				uint64_t w = ret.first;
 				for (int i = 0; i < 8; ++i)
 				{
-					p[i] = (w >> (i * 8)) + left + (p - cbStride)[i] - topleft;
+					p[i] = (uint8_t)((w >> (i * 8)) + left + (p - cbStride)[i] - topleft);
 					left = p[i];
 					topleft = (p - cbStride)[i];
 				}
@@ -417,7 +417,7 @@ void cpp_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 				uint64_t t = ret.first;
 				for (int i = 0; i < 8; ++i)
 				{
-					p[i] = (t >> (i * 8)) + s[i];
+					p[i] = (uint8_t)((t >> (i * 8)) + s[i]);
 				}
 				left = p[7];
 				topleft = (p - cbStride)[7];
