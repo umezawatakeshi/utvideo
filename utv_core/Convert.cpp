@@ -464,7 +464,8 @@ template void cpp_ConvertRGBToUQRG<CB64aColorOrder>(uint8_t *pGBegin, uint8_t *p
 
 //
 
-template<class T> void cpp_ConvertUQRGToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
+template<class T>
+void cpp_ConvertUQRGToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
 {
 	const uint16_t *g = (const uint16_t *)pGBegin;
 	const uint16_t *b = (const uint16_t *)pBBegin;
@@ -537,5 +538,103 @@ void cpp_ConvertUQRAToB64a(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *
 			pp[0] = htob16(Convert10To16Fullrange(*a));
 			g++; b++; r++; a++;
 		}
+	}
+}
+
+//
+
+void cpp_ConvertV210ToUQY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride)
+{
+	uint16_t *y = (uint16_t *)pYBegin;
+	uint16_t *u = (uint16_t *)pUBegin;
+	uint16_t *v = (uint16_t *)pVBegin;
+
+	for (const uint8_t *pStripeBegin = pSrcBegin; pStripeBegin != pSrcEnd; pStripeBegin += scbStride)
+	{
+		const uint8_t *p = pStripeBegin;
+		for (unsigned int x = 0; x < nWidth; x += 6, p += 16)
+		{
+			const uint32_t *pp = (const uint32_t *)p;
+
+			*u++ = (ltoh32(pp[0])) & 0x3ff;
+			*y++ = (ltoh32(pp[0]) >> 10) & 0x3ff;
+			*v++ = (ltoh32(pp[0]) >> 20) & 0x3ff;
+			*y++ = (ltoh32(pp[1])) & 0x3ff;
+
+			if (x + 2 < nWidth)
+			{
+				*u++ = (ltoh32(pp[1]) >> 10) & 0x3ff;
+				*y++ = (ltoh32(pp[1]) >> 20) & 0x3ff;
+				*v++ = (ltoh32(pp[2])) & 0x3ff;
+				*y++ = (ltoh32(pp[2]) >> 10) & 0x3ff;
+			}
+
+			if (x + 4 < nWidth)
+			{
+				*u++ = (ltoh32(pp[2]) >> 20) & 0x3ff;
+				*y++ = (ltoh32(pp[3])) & 0x3ff;
+				*v++ = (ltoh32(pp[3]) >> 10) & 0x3ff;
+				*y++ = (ltoh32(pp[3]) >> 20) & 0x3ff;
+			}
+		}
+	}
+}
+
+void cpp_ConvertUQY2ToV210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, unsigned int nWidth, ssize_t scbStride)
+{
+	const uint16_t *y = (const uint16_t *)pYBegin;
+	const uint16_t *u = (const uint16_t *)pUBegin;
+	const uint16_t *v = (const uint16_t *)pVBegin;
+
+	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; pStripeBegin += scbStride)
+	{
+		uint8_t *p = pStripeBegin;
+		for (unsigned int x = 0; x < nWidth; x += 6, p += 16)
+		{
+			uint32_t *pp = (uint32_t *)p;
+
+			uint16_t y0, y1, y2, y3, y4, y5, u0, u1, u2, v0, v1, v2;
+
+			u0 = *u++;
+			y0 = *y++;
+			v0 = *v++;
+			y1 = *y++;
+
+			if (x + 2 < nWidth)
+			{
+				u1 = *u++;
+				y2 = *y++;
+				v1 = *v++;
+				y3 = *y++;
+			}
+			else
+			{
+				u1 = 0;
+				y2 = 0;
+				v1 = 0;
+				y3 = 0;
+			}
+
+			if (x + 4 < nWidth)
+			{
+				u2 = *u++;
+				y4 = *y++;
+				v2 = *v++;
+				y5 = *y++;
+			}
+			else
+			{
+				u2 = 0;
+				y4 = 0;
+				v2 = 0;
+				y5 = 0;
+			}
+
+			pp[0] = htol32((v0 << 20) | (y0 << 10) | u0);
+			pp[1] = htol32((y2 << 20) | (u1 << 10) | y1);
+			pp[2] = htol32((u2 << 20) | (y3 << 10) | v1);
+			pp[3] = htol32((y5 << 20) | (v2 << 10) | y4);
+		}
+		memset(p, 0, pStripeBegin + ((nWidth + 47) / 48 * 128) - p);
 	}
 }
