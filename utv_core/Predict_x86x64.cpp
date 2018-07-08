@@ -215,7 +215,7 @@ void tuned_PredictCylindricalLeftAndCount10(uint16_t *pDst, const uint16_t *pSrc
 #endif
 	for (; p < pSrcEnd; p++, q++)
 	{
-		*q = *p - *(p - 1);
+		*q = (*p - *(p - 1)) & CSymbolBits<10>::maskval;
 		++pCountTable[*q];
 	}
 }
