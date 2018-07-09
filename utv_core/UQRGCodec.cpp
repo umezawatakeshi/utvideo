@@ -10,12 +10,14 @@
 #include "ByteOrder.h"
 
 const utvf_t CUQRGCodec::m_utvfEncoderInput[] = {
+	UTVF_r210,
 	UTVF_b48r,
 	UTVF_b64a,
 	UTVF_INVALID,
 };
 
 const utvf_t CUQRGCodec::m_utvfDecoderOutput[] = {
+	UTVF_r210,
 	UTVF_b48r,
 	UTVF_b64a,
 	UTVF_INVALID,
@@ -68,6 +70,9 @@ void CUQRGCodec::ConvertToPlanar(uint32_t nBandIndex)
 	case UTVF_b64a:
 		ConvertB64aToUQRG(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
 		break;
+	case UTVF_r210:
+		cpp_ConvertR210ToUQRG(g, b, r, pSrcBegin, pSrcEnd, m_nWidth, m_cbRawGrossWidth);
+		break;
 	}
 }
 
@@ -89,6 +94,9 @@ void CUQRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 		break;
 	case UTVF_b64a:
 		ConvertUQRGToB64a(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+		break;
+	case UTVF_r210:
+		cpp_ConvertUQRGToR210(pDstBegin, pDstEnd, g, b, r, m_nWidth, m_cbRawGrossWidth);
 		break;
 	}
 }

@@ -638,3 +638,55 @@ void cpp_ConvertUQY2ToV210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *
 		memset(p, 0, pStripeBegin + ((nWidth + 47) / 48 * 128) - p);
 	}
 }
+
+//
+
+void cpp_ConvertR210ToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride)
+{
+	uint16_t *g = (uint16_t *)pGBegin;
+	uint16_t *b = (uint16_t *)pBBegin;
+	uint16_t *r = (uint16_t *)pRBegin;
+
+	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += scbStride)
+	{
+		const uint8_t *pStrideEnd = pStrideBegin + nWidth * 4;
+		for (const uint8_t *p = pStrideBegin; p < pStrideEnd; p += 4)
+		{
+			uint32_t val = btoh32(*(const uint32_t *)p);
+			uint16_t gg = val >> 10;
+			uint16_t bb = val - gg + 0x200;
+			uint16_t rr = (val >> 20) - gg + 0x200;
+
+			*g++ = gg & 0x3ff;
+			*b++ = bb & 0x3ff;
+			*r++ = rr & 0x3ff;
+		}
+	}
+}
+
+//
+
+void cpp_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
+{
+	const uint16_t *g = (const uint16_t *)pGBegin;
+	const uint16_t *b = (const uint16_t *)pBBegin;
+	const uint16_t *r = (const uint16_t *)pRBegin;
+
+	for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin != pDstEnd; pStrideBegin += scbStride)
+	{
+		uint8_t *pStrideEnd = pStrideBegin + nWidth * 4;
+		uint8_t *p = pStrideBegin;
+		for (; p < pStrideEnd; p += 4)
+		{
+			uint32_t gg = *g;
+			uint32_t bb = (*b + *g - 0x200) & 0x3ff;
+			uint32_t rr = (*r + *g - 0x200) & 0x3ff;
+
+			*(uint32_t *)p = htob32((rr << 20) | (gg << 10) | bb);
+			g++;
+			b++;
+			r++;
+		}
+		memset(p, 0, pStrideBegin + ((nWidth + 63) / 64 * 256) - p);
+	}
+}
