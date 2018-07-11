@@ -106,6 +106,10 @@ struct TUNEDFUNC_CONVERT_SHUFFLE
 	void (*pfnConvertUQRGToB48r)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertUQRGToB64a)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertUQRAToB64a)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertV210ToUQY2)(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride);
+	void (*pfnConvertUQY2ToV210)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, unsigned int nWidth, ssize_t scbStride);
+	void (*pfnConvertR210ToUQRG)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride);
+	void (*pfnConvertUQRGToR210)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride);
 };
 
 struct TUNEDFUNC_SYMPACK
@@ -217,6 +221,10 @@ public:
 #define ConvertUQRGToB48r tfn.pConvertShuffle->pfnConvertUQRGToB48r
 #define ConvertUQRGToB64a tfn.pConvertShuffle->pfnConvertUQRGToB64a
 #define ConvertUQRAToB64a tfn.pConvertShuffle->pfnConvertUQRAToB64a
+#define ConvertV210ToUQY2 tfn.pConvertShuffle->pfnConvertV210ToUQY2
+#define ConvertUQY2ToV210 tfn.pConvertShuffle->pfnConvertUQY2ToV210
+#define ConvertR210ToUQRG tfn.pConvertShuffle->pfnConvertR210ToUQRG
+#define ConvertUQRGToR210 tfn.pConvertShuffle->pfnConvertUQRGToR210
 
 #define Pack8SymAfterPredictPlanarGradient8 tfn.pSymPack->pfnPack8SymAfterPredictPlanarGradient8
 #define Unpack8SymAndRestorePlanarGradient8 tfn.pSymPack->pfnUnpack8SymAndRestorePlanarGradient8

@@ -119,6 +119,10 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleCPP = {
 	cpp_ConvertUQRGToRGB<CB48rColorOrder>,
 	cpp_ConvertUQRGToRGB<CB64aColorOrder>,
 	cpp_ConvertUQRAToB64a,
+	cpp_ConvertV210ToUQY2,
+	cpp_ConvertUQY2ToV210,
+	cpp_ConvertR210ToUQRG,
+	cpp_ConvertUQRGToR210,
 };
 
 extern const TUNEDFUNC_SYMPACK tfnSymPackCPP = {

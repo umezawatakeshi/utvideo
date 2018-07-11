@@ -411,6 +411,10 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleSSSE3 = {
 	cpp_ConvertUQRGToRGB<CB48rColorOrder>,
 	tuned_ConvertUQRGToRGB<CODEFEATURE_SSSE3, CB64aColorOrder>,
 	tuned_ConvertUQRAToB64a<CODEFEATURE_SSSE3>,
+	cpp_ConvertV210ToUQY2,
+	cpp_ConvertUQY2ToV210,
+	tuned_ConvertR210ToUQRG<CODEFEATURE_SSSE3>,
+	tuned_ConvertUQRGToR210<CODEFEATURE_SSSE3>,
 };
 
 const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX1 = {
@@ -436,6 +440,10 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX1 = {
 	cpp_ConvertUQRGToRGB<CB48rColorOrder>,
 	tuned_ConvertUQRGToRGB<CODEFEATURE_AVX1, CB64aColorOrder>,
 	tuned_ConvertUQRAToB64a<CODEFEATURE_AVX1>,
+	cpp_ConvertV210ToUQY2,
+	cpp_ConvertUQY2ToV210,
+	tuned_ConvertR210ToUQRG<CODEFEATURE_AVX1>,
+	tuned_ConvertUQRGToR210<CODEFEATURE_AVX1>,
 };
 
 

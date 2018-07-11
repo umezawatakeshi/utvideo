@@ -2158,3 +2158,132 @@ template void tuned_ConvertUQRAToB64a<CODEFEATURE_SSSE3>(uint8_t *pDstBegin, uin
 template void tuned_ConvertUQRGToRGB<CODEFEATURE_AVX1, CB64aColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertUQRAToB64a<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 #endif
+
+//
+
+template<int F>
+void tuned_ConvertR210ToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride)
+{
+	uint16_t *g = (uint16_t *)pGBegin;
+	uint16_t *b = (uint16_t *)pBBegin;
+	uint16_t *r = (uint16_t *)pRBegin;
+
+	for (const uint8_t *pStrideBegin = pSrcBegin; pStrideBegin != pSrcEnd; pStrideBegin += scbStride)
+	{
+		const uint8_t *pStrideEnd = pStrideBegin + nWidth * 4;
+		const uint8_t *p = pStrideBegin;
+
+#ifdef __SSSE3__
+		for (; p <= pStrideEnd - 32; p += 32)
+		{
+			__m128i m0 = _mm_loadu_si128((const __m128i*)p);
+			__m128i m1 = _mm_loadu_si128((const __m128i*)(p + 16));
+
+			__m128i rb0 = _mm_shuffle_epi8(m0, _mm_set_epi8(12, 13, 8, 9, 4, 5, 0, 1, 14, 15, 10, 11, 6, 7, 2, 3)); // XXRRRRRRRRRRXXXX|XXXXXXBBBBBBBBBB
+			__m128i rb1 = _mm_shuffle_epi8(m1, _mm_set_epi8(12, 13, 8, 9, 4, 5, 0, 1, 14, 15, 10, 11, 6, 7, 2, 3));
+			__m128i g00 = _mm_shuffle_epi8(m0, _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, 13, 14, 9, 10, 5, 6, 1, 2)); // XXXXGGGGGGGGGGXX
+			__m128i g01 = _mm_shuffle_epi8(m1, _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, 13, 14, 9, 10, 5, 6, 1, 2));
+			__m128i bb = _mm_unpacklo_epi64(rb0, rb1);
+			__m128i rr = _mm_srli_epi16(_mm_unpackhi_epi64(rb0, rb1), 4);
+			__m128i gg = _mm_srli_epi16(_mm_unpacklo_epi64(g00, g01), 2);
+			bb = _mm_and_si128(_mm_add_epi16(_mm_sub_epi16(bb, gg), _mm_set1_epi16(0x200)), _mm_set1_epi16(0x3ff));
+			rr = _mm_and_si128(_mm_add_epi16(_mm_sub_epi16(rr, gg), _mm_set1_epi16(0x200)), _mm_set1_epi16(0x3ff));
+			gg = _mm_and_si128(gg, _mm_set1_epi16(0x3ff));
+			_mm_storeu_si128((__m128i*)g, gg);
+			_mm_storeu_si128((__m128i*)b, bb);
+			_mm_storeu_si128((__m128i*)r, rr);
+
+			g += 8;
+			b += 8;
+			r += 8;
+		}
+#endif
+
+		for (; p < pStrideEnd; p += 4)
+		{
+			uint32_t val = btoh32(*(const uint32_t *)p);
+			uint16_t gg = val >> 10;
+			uint16_t bb = val - gg + 0x200;
+			uint16_t rr = (val >> 20) - gg + 0x200;
+
+			*g++ = gg & 0x3ff;
+			*b++ = bb & 0x3ff;
+			*r++ = rr & 0x3ff;
+		}
+	}
+}
+
+#ifdef GENERATE_SSSE3
+template void tuned_ConvertR210ToUQRG<CODEFEATURE_SSSE3>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_ConvertR210ToUQRG<CODEFEATURE_AVX1>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride);
+#endif
+
+//
+
+template<int F>
+void tuned_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
+{
+	const uint16_t *g = (const uint16_t *)pGBegin;
+	const uint16_t *b = (const uint16_t *)pBBegin;
+	const uint16_t *r = (const uint16_t *)pRBegin;
+
+	for (uint8_t *pStrideBegin = pDstBegin; pStrideBegin != pDstEnd; pStrideBegin += scbStride)
+	{
+		uint8_t *pStrideEnd = pStrideBegin + nWidth * 4;
+		uint8_t *p = pStrideBegin;
+
+#ifdef __SSSE3__
+		for (; p <= pStrideEnd - 32; p += 32)
+		{
+			__m128i gg = _mm_loadu_si128((const __m128i*)g);
+			__m128i bb = _mm_loadu_si128((const __m128i*)b);
+			__m128i rr = _mm_loadu_si128((const __m128i*)r);
+
+			bb = _mm_and_si128(_mm_sub_epi16(_mm_add_epi16(bb, gg), _mm_set1_epi16(0x200)), _mm_set1_epi16(0x3ff));
+			rr = _mm_and_si128(_mm_sub_epi16(_mm_add_epi16(rr, gg), _mm_set1_epi16(0x200)), _mm_set1_epi16(0x3ff));
+			rr = _mm_slli_epi16(rr, 4);
+			__m128i rb0 = _mm_unpacklo_epi16(bb, rr);
+			__m128i rb1 = _mm_unpackhi_epi16(bb, rr);
+			__m128i g00 = _mm_unpacklo_epi16(gg, _mm_setzero_si128());
+			__m128i g01 = _mm_unpackhi_epi16(gg, _mm_setzero_si128());
+			g00 = _mm_slli_epi32(g00, 10);
+			g01 = _mm_slli_epi32(g01, 10);
+			__m128i m0 = _mm_or_si128(rb0, g00);
+			__m128i m1 = _mm_or_si128(rb1, g01);
+			m0 = _mm_shuffle_epi8(m0, _mm_set_epi8(12, 13, 14, 15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1, 2, 3));
+			m1 = _mm_shuffle_epi8(m1, _mm_set_epi8(12, 13, 14, 15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1, 2, 3));
+			_mm_storeu_si128((__m128i*)p, m0);
+			_mm_storeu_si128((__m128i*)(p + 16), m1);
+
+			g += 8;
+			b += 8;
+			r += 8;
+		}
+#endif
+
+		for (; p < pStrideEnd; p += 4)
+		{
+			uint32_t gg = *g;
+			uint32_t bb = (*b + *g - 0x200) & 0x3ff;
+			uint32_t rr = (*r + *g - 0x200) & 0x3ff;
+
+			*(uint32_t *)p = htob32((rr << 20) | (gg << 10) | bb);
+			g++;
+			b++;
+			r++;
+		}
+
+		memset(p, 0, pStrideBegin + ((nWidth + 63) / 64 * 256) - p);
+	}
+}
+
+#ifdef GENERATE_SSSE3
+template void tuned_ConvertUQRGToR210<CODEFEATURE_SSSE3>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_ConvertUQRGToR210<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride);
+#endif
