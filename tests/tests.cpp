@@ -41,6 +41,8 @@ void av_log_custom_callback(void *avcl, int level, const char *fmt, va_list vl)
 {
 	if (level == AV_LOG_WARNING && strstr(fmt, "Could not find codec parameters") != NULL)
 		return;
+	if (level == AV_LOG_WARNING && strstr(fmt, "mov tag found in avi") != NULL)
+		return;
 	av_log_default_callback(avcl, level, fmt, vl);
 }
 
