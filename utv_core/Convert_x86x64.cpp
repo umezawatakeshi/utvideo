@@ -2079,7 +2079,7 @@ static inline void tuned_ConvertUQRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd,
 			if (A)
 				aa = _mm_Convert10To16Fullrange(_mm_loadu_si128((const __m128i *)a));
 			else
-				aa = _mm_set1_epi16(0x3ff);
+				aa = _mm_set1_epi16((short)0xffff);
 
 			__m128i gg200 = _mm_add_epi16(gg, _mm_set1_epi16(0x200));
 			gg = _mm_Convert10To16Fullrange(gg);
@@ -2123,7 +2123,7 @@ static inline void tuned_ConvertUQRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd,
 				a++;
 			}
 			else
-				ppp[0] = htob16(0x3ff);
+				ppp[0] = 0xffff;
 		}
 	}
 }

@@ -481,6 +481,8 @@ void cpp_ConvertUQRGToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *p
 			pp[T::G] = htob16(Convert10To16Fullrange(*g));
 			pp[T::B] = htob16(Convert10To16Fullrange(*b + *g - 0x200));
 			pp[T::R] = htob16(Convert10To16Fullrange(*r + *g - 0x200));
+			if (T::BYPP == 8)
+				pp[T::A] = 0xffff;
 			g++; b++; r++;
 		}
 	}
