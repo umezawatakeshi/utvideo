@@ -85,7 +85,7 @@ vector<vector<DWORD> > vecSupportedInputFccs = {
 	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy'), FCC('HDYC'), FCC('YV16'), FCC('YV12') },
 
 	{ FCC('v210') },
-	{ FCC('b48r'), FCC('b64a') },
+	{ FCC('r210'), FCC('b48r'), FCC('b64a'), },
 	{ FCC('b64a') },
 
 	{ 32, 24 },
@@ -108,9 +108,9 @@ vector<vector<DWORD> > vecUnsupportedInputFccs = {
 	{ 15, 16, FCC('YVYU'), FCC('VYUY'), FCC('YV12') },
 	{ 15, 16, FCC('YVYU'), FCC('VYUY') },
 
-	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12'), FCC('b48r'), FCC('b64a') },
+	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12'), FCC('r210'), FCC('b48r'), FCC('b64a') },
 	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12'), FCC('v210'), },
-	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12'), FCC('b48r'), FCC('v210') },
+	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12'), FCC('r210'), FCC('b48r'), FCC('v210') },
 
 	{ 15, 16 },
 	{ 15, 16, 24 },
@@ -221,7 +221,7 @@ vector<DWORD> vecTopPriorityRawFcc = {
 	FCC('YV12'),
 
 	FCC('v210'),
-	FCC('b48r'),
+	FCC('r210'),
 	FCC('b64a'),
 
 	24,

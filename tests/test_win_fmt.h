@@ -86,6 +86,8 @@ static inline WORD FCC2BitCount(DWORD dw)
 		return 48;
 	case FCC('b64a'):
 		return 64;
+	case FCC('r210'):
+		return 30;
 	default:
 		return 0; // XXX
 	}
