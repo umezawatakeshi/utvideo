@@ -5,10 +5,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" type="text/css" href="style.css">
-<title>Ut Video Codec Suite 20.0.0 readme (English)</title>
+<title>Ut Video Codec Suite 20.1.0 readme (English)</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 20.0.0 readme (English)</h1>
+<h1>Ut Video Codec Suite 20.1.0 readme (English)</h1>
 <hr>
 <h2 id="copyright_notice">Copyright Notice</h2>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008-2018  UMEZAWA Takeshi</p>
@@ -96,7 +96,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <tr><td>UMH2</td><td>UtVideo T2 YUV422 BT.709</td></tr>
 <tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit limited</td><td><strong>YV12</strong><br>HDYC<br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td><td>HDYC<br>yuvs<br>2vuy<br>RGB<br>ARGB</td></tr>
 <tr><td>UQRA</td><td>UtVideo Pro RGBA 10bit</td><td>RGBA 4:4:4 10bit full-range</td><td>b64a</td><td>b64a</td></tr>
-<tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit full-range</td><td>b48r<br>b64a</td><td>b48r<br>b64a</td></tr>
+<tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit full-range</td><td><strong>r210</strong><br>b48r<br>b64a</td><td>b48r<br>b64a</td></tr>
 <tr><td>UQY2</td><td>UtVideo Pro YUV422 10bit</td><td>YCbCr 4:2:2 10bit limited</td><td><strong>v210</strong></td><td><strong>v210</strong></td></tr>
 </table>
 <ul>
@@ -150,6 +150,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <dt>RAM</dt><dd>DDR3-1333 8GB</dd>
 </dl>
 <h2 id="history">Version history</h2>
+<h3>Version 20.1.0</h3>
+<dl>
+<dt>New features</dt><dd><ul>
+<li>UMRG: Add suppport of r210 input/output.</li>
+</ul></dd>
+<dt>Bug fixes</dt><dd><ul>
+<li>all: Wrong behavior in encoder configuration resetting process.</li>
+<li>UQxx: May crashed if video width is not multiple of 8.</li>
+<li>UQRG: Alpha value is wrong in b64a output.</li>
+</ul></dd>
+</dl>
 <h3>Version 20.0.0</h3>
 <dl>
 <dt>New features</dt><dd><ul>
