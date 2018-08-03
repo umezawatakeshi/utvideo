@@ -11,7 +11,7 @@ LRESULT CALLBACK DriverProc(DWORD_PTR dwDriverId, HDRVR hdrvr, UINT uMsg, LPARAM
 
 #ifdef _DEBUG
 	if (uMsg != ICM_COMPRESS && uMsg != ICM_DECOMPRESS)
-		DBGPRINTF("DriverProc() dwDriverId=%IX hdrvr=%p uMsg=%08X lParam1=%IX lParam2=%IX\n", dwDriverId, hdrvr, uMsg, lParam1, lParam2);
+		DBGPRINTF("DriverProc() dwDriverId=%IX hdrvr=%p uMsg=%08X lParam1=%IX lParam2=%IX", dwDriverId, hdrvr, uMsg, lParam1, lParam2);
 #endif
 
 	switch (uMsg)
