@@ -22,4 +22,5 @@ blockquote {
 blockquote pre {
 	font-size: small;
 	overflow-x: auto;
+	padding: 0.5em;
 }
