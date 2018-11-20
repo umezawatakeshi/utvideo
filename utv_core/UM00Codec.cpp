@@ -421,11 +421,8 @@ bool CUM00Codec::PredictDirect(uint32_t nBandIndex)
 
 void CUM00Codec::EncodeProc(uint32_t nBandIndex)
 {
-	if (m_nKeyFrameInterval <= 1)
-	{
-		if (PredictDirect(nBandIndex))
-			return;
-	}
+	if (PredictDirect(nBandIndex))
+		return;
 
 	ConvertToPlanar(nBandIndex);
 
@@ -631,11 +628,8 @@ int CUM00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned 
 
 void CUM00Codec::DecodeProc(uint32_t nBandIndex)
 {
-	if (!(m_siDecode.siFlags & SI_FLAGS_USE_TEMPORAL_COMPRESSION))
-	{
-		if (DecodeDirect(nBandIndex))
-			return;
-	}
+	if (DecodeDirect(nBandIndex))
+		return;
 
 	uint8_t* pDstBegin[4];
 	const uint8_t* pPrevBegin[4];
