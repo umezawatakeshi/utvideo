@@ -122,6 +122,52 @@ void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE<B> *pEncodeTable, const HUF
 	}
 }
 
+#ifdef ENABLE_MULTI_SYMBOL_HUFFMAN_ENCODE
+template<>
+void GenerateHuffmanEncodeTable<8>(HUFFMAN_ENCODE_TABLE<8> *pEncodeTable, const HUFFMAN_CODELEN_TABLE<8> *pCodeLengthTable)
+{
+	constexpr int B = 8;
+	struct SYMBOL_AND_CODELEN<B> cls[1 << B];
+	uintenc_t curcode;
+
+	for (int i = 0; i < (1 << B); i++)
+	{
+		cls[i].symbol = i;
+		cls[i].codelen = pCodeLengthTable->codelen[i];
+	}
+
+	std::sort(cls, cls + (1 << B), cls_less<B>);
+
+	if (cls[0].codelen == 0)
+	{
+		memset(pEncodeTable, 0, sizeof(HUFFMAN_ENCODE_TABLE<B>));
+		return;
+	}
+
+	memset(pEncodeTable, 0xff, sizeof(HUFFMAN_ENCODE_TABLE<B>));
+
+	int ub;
+	for (ub = (1 << B) - 1; ub >= 0; ub--)
+	{
+		if (cls[ub].codelen != 255)
+			break;
+	}
+
+	curcode = 0;
+	for (int i = ub; i >= 0; i--)
+	{
+		uintenc_t curcodej = 0;
+		for (int j = ub; j >= 0; j--)
+		{
+			pEncodeTable->dwTableMuxUnrolled[cls[i].symbol + (cls[j].symbol << 8)] = curcode | (curcodej >> cls[i].codelen) | (cls[i].codelen + cls[j].codelen);
+			curcodej += UINTENC_MSB >> (cls[j].codelen - 1);
+		}
+		pEncodeTable->dwTableMux[cls[i].symbol] = curcode | cls[i].codelen;
+		curcode += UINTENC_MSB >> (cls[i].codelen - 1);
+	}
+}
+#endif
+
 template void GenerateHuffmanEncodeTable<8>(HUFFMAN_ENCODE_TABLE<8> *pEncodeTable, const HUFFMAN_CODELEN_TABLE<8> *pCodeLengthTable);
 template void GenerateHuffmanEncodeTable<10>(HUFFMAN_ENCODE_TABLE<10> *pEncodeTable, const HUFFMAN_CODELEN_TABLE<10> *pCodeLengthTable);
 

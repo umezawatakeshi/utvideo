@@ -17,6 +17,10 @@ typedef uint32_t uintenc_t;
 #define UINTENC_MASK 0xffffff00U
 #endif
 
+#if defined(__x86_64__)
+#define ENABLE_MULTI_SYMBOL_HUFFMAN_ENCODE 1
+#endif
+
 template<int B>
 struct SYMBOL_AND_CODELEN
 {
@@ -33,8 +37,20 @@ struct HUFFMAN_CODELEN_TABLE
 template<int B>
 struct HUFFMAN_ENCODE_TABLE
 {
-	uintenc_t dwTableMux[1 << B];
+	union {
+		uintenc_t dwTableMuxUnrolled;
+		uintenc_t dwTableMux[1 << B];
+	};
 };
+
+#ifdef ENABLE_MULTI_SYMBOL_HUFFMAN_ENCODE
+template<>
+struct HUFFMAN_ENCODE_TABLE<8>
+{
+	uintenc_t dwTableMuxUnrolled[1 << 16];
+	uintenc_t dwTableMux[1 << 8];
+};
+#endif
 
 template<int B>
 struct HUFFMAN_DECODE_TABLE

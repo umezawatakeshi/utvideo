@@ -8,13 +8,13 @@
 
 extern "C" size_t i686_HuffmanEncode8(uint8_t *pDstBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<8> *pEncodeTable)
 {
-#define ARGS "byte, 1"
+#define ARGS "byte, 1, word, 2"
 #include "HuffmanCode_x64_HuffmanEncode.cpp"
 }
 
 extern "C" size_t i686_HuffmanEncode10(uint8_t *pDstBegin, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, const HUFFMAN_ENCODE_TABLE<10> *pEncodeTable)
 {
-#define ARGS "word, 2"
+#define ARGS "word, 2, word, 2"
 #include "HuffmanCode_x64_HuffmanEncode.cpp"
 }
 
