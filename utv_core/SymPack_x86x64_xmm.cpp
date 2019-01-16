@@ -128,8 +128,7 @@ void tuned_Pack8SymAfterPredictPlanarGradient8(uint8_t *pPacked, size_t *cbPacke
 
 	for (auto pp = pSrcBegin + cbStride; pp != pSrcEnd; pp += cbStride)
 	{
-		__m128i prev = _mm_set1_epi8((char)0x80);
-		__m128i topprev = _mm_set1_epi8((char)0x80);
+		__m128i prev = _mm_setzero_si128();
 
 		for (auto p = pp; p != pp + cbStride; p += 32)
 		{
@@ -137,15 +136,13 @@ void tuned_Pack8SymAfterPredictPlanarGradient8(uint8_t *pPacked, size_t *cbPacke
 			__m128i value1 = _mm_loadu_si128((const __m128i *)(p + 16));
 			__m128i top0 = _mm_loadu_si128((const __m128i *)(p - cbStride));
 			__m128i top1 = _mm_loadu_si128((const __m128i *)(p + 16 - cbStride));
-			__m128i left0 = _mm_alignr_epi8(value0, prev, 15);
-			__m128i left1 = _mm_alignr_epi8(value1, value0, 15);
-			__m128i topleft0 = _mm_alignr_epi8(top0, topprev, 15);
-			__m128i topleft1 = _mm_alignr_epi8(top1, top0, 15);
-
-			__m128i error0 = _mm_sub_epi8(_mm_add_epi8(value0, topleft0), _mm_add_epi8(left0, top0));
-			__m128i error1 = _mm_sub_epi8(_mm_add_epi8(value1, topleft1), _mm_add_epi8(left1, top1));
-			prev = value1;
-			topprev = top1;
+			__m128i tmp0 = _mm_sub_epi8(value0, top0);
+			__m128i tmp1 = _mm_sub_epi8(value1, top1);
+			__m128i left0 = _mm_alignr_epi8(tmp0, prev, 15);
+			__m128i left1 = _mm_alignr_epi8(tmp1, tmp0, 15);
+			__m128i error0 = _mm_sub_epi8(tmp0, left0);
+			__m128i error1 = _mm_sub_epi8(tmp1, left1);
+			prev = tmp1;
 			packer<F>(q, r, shift, error0, error1);
 		}
 	}
@@ -396,8 +393,7 @@ void tuned_Pack8SymWithDiff8(uint8_t *pPacked, size_t *cbPacked, uint8_t *pContr
 
 	for (auto pp = pSrcBegin + cbStride, tt = pPrevBegin + cbStride; pp != pSrcEnd; pp += cbStride, tt += cbStride)
 	{
-		__m128i prev = _mm_set1_epi8((char)0x80);
-		__m128i topprev = _mm_set1_epi8((char)0x80);
+		__m128i prev = _mm_setzero_si128();
 
 		for (auto p = pp, t = tt; p != pp + cbStride; p += 32, t += 32)
 		{
@@ -405,17 +401,15 @@ void tuned_Pack8SymWithDiff8(uint8_t *pPacked, size_t *cbPacked, uint8_t *pContr
 			__m128i value1 = _mm_loadu_si128((const __m128i *)(p + 16));
 			__m128i top0 = _mm_loadu_si128((const __m128i *)(p - cbStride));
 			__m128i top1 = _mm_loadu_si128((const __m128i *)(p + 16 - cbStride));
-			__m128i left0 = _mm_alignr_epi8(value0, prev, 15);
-			__m128i left1 = _mm_alignr_epi8(value1, value0, 15);
-			__m128i topleft0 = _mm_alignr_epi8(top0, topprev, 15);
-			__m128i topleft1 = _mm_alignr_epi8(top1, top0, 15);
-
-			__m128i error0 = _mm_sub_epi8(_mm_add_epi8(value0, topleft0), _mm_add_epi8(left0, top0));
-			__m128i error1 = _mm_sub_epi8(_mm_add_epi8(value1, topleft1), _mm_add_epi8(left1, top1));
+			__m128i tmp0 = _mm_sub_epi8(value0, top0);
+			__m128i tmp1 = _mm_sub_epi8(value1, top1);
+			__m128i left0 = _mm_alignr_epi8(tmp0, prev, 15);
+			__m128i left1 = _mm_alignr_epi8(tmp1, tmp0, 15);
+			__m128i error0 = _mm_sub_epi8(tmp0, left0);
+			__m128i error1 = _mm_sub_epi8(tmp1, left1);
 			__m128i t0 = _mm_sub_epi8(value0, _mm_loadu_si128((const __m128i *)t));
 			__m128i t1 = _mm_sub_epi8(value1, _mm_loadu_si128((const __m128i *)(t + 16)));
-			prev = value1;
-			topprev = top1;
+			prev = tmp1;
 			PackForDelta<F>(q, r, shift, error0, error1, t0, t1);
 		}
 	}

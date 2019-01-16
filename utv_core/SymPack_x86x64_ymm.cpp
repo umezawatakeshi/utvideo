@@ -117,10 +117,8 @@ void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pPacke
 		{
 			__m256i value0 = _mm256_loadu_si256((const __m256i *)p);
 			__m256i value1 = _mm256_loadu_si256((const __m256i *)(p + 32));
-			__m256i tmp0 = _mm256_permute2x128_si256(value0, prev, 0x03);
-			__m256i tmp1 = _mm256_permute2x128_si256(value1, value0, 0x03);
-			__m256i left0 = _mm256_alignr_epi8(value0, tmp0, 15);
-			__m256i left1 = _mm256_alignr_epi8(value1, tmp1, 15);
+			__m256i left0 = _mm256_alignr_epi8(value0, _mm256_permute2x128_si256(value0, prev, 0x03), 15);
+			__m256i left1 = _mm256_alignr_epi8(value1, _mm256_permute2x128_si256(value1, value0, 0x03), 15);
 
 			__m256i error0 = _mm256_sub_epi8(value0, left0);
 			__m256i error1 = _mm256_sub_epi8(value1, left1);
@@ -132,8 +130,7 @@ void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pPacke
 
 	for (auto pp = pSrcBegin + cbStride; pp != pSrcEnd; pp += cbStride)
 	{
-		__m256i prev = _mm256_set1_epi8((char)0x80);
-		__m256i topprev = _mm256_set1_epi8((char)0x80);
+		__m256i prev = _mm256_setzero_si256();
 
 		for (auto p = pp; p != pp + cbStride; p += 64)
 		{
@@ -141,19 +138,13 @@ void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pPacke
 			__m256i value1 = _mm256_loadu_si256((const __m256i *)(p + 32));
 			__m256i top0 = _mm256_loadu_si256((const __m256i *)(p - cbStride));
 			__m256i top1 = _mm256_loadu_si256((const __m256i *)(p + 32 - cbStride));
-			__m256i tmp0 = _mm256_permute2x128_si256(value0, prev, 0x03);
-			__m256i tmp1 = _mm256_permute2x128_si256(value1, value0, 0x03);
-			__m256i toptmp0 = _mm256_permute2x128_si256(top0, topprev, 0x03);
-			__m256i toptmp1 = _mm256_permute2x128_si256(top1, top0, 0x03);
-			__m256i left0 = _mm256_alignr_epi8(value0, tmp0, 15);
-			__m256i left1 = _mm256_alignr_epi8(value1, tmp1, 15);
-			__m256i topleft0 = _mm256_alignr_epi8(top0, toptmp0, 15);
-			__m256i topleft1 = _mm256_alignr_epi8(top1, toptmp1, 15);
-
-			__m256i error0 = _mm256_sub_epi8(_mm256_add_epi8(value0, topleft0), _mm256_add_epi8(left0, top0));
-			__m256i error1 = _mm256_sub_epi8(_mm256_add_epi8(value1, topleft1), _mm256_add_epi8(left1, top1));
-			prev = value1;
-			topprev = top1;
+			__m256i tmp0 = _mm256_sub_epi8(value0, top0);
+			__m256i tmp1 = _mm256_sub_epi8(value1, top1);
+			__m256i left0 = _mm256_alignr_epi8(tmp0, _mm256_permute2x128_si256(tmp0, prev, 0x03), 15);
+			__m256i left1 = _mm256_alignr_epi8(tmp1, _mm256_permute2x128_si256(tmp1, tmp0, 0x03), 15);
+			__m256i error0 = _mm256_sub_epi8(tmp0, left0);
+			__m256i error1 = _mm256_sub_epi8(tmp1, left1);
+			prev = tmp1;
 
 			packer<CODEFEATURE_AVX2>(q, r, error0, error1);
 		}
@@ -393,10 +384,8 @@ void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pPacked, size_t *cbPacke
 		{
 			__m256i value0 = _mm256_loadu_si256((const __m256i *)p);
 			__m256i value1 = _mm256_loadu_si256((const __m256i *)(p + 32));
-			__m256i tmp0 = _mm256_permute2x128_si256(value0, prev, 0x03);
-			__m256i tmp1 = _mm256_permute2x128_si256(value1, value0, 0x03);
-			__m256i left0 = _mm256_alignr_epi8(value0, tmp0, 15);
-			__m256i left1 = _mm256_alignr_epi8(value1, tmp1, 15);
+			__m256i left0 = _mm256_alignr_epi8(value0, _mm256_permute2x128_si256(value0, prev, 0x03), 15);
+			__m256i left1 = _mm256_alignr_epi8(value1, _mm256_permute2x128_si256(value1, value0, 0x03), 15);
 
 			__m256i error0 = _mm256_sub_epi8(value0, left0);
 			__m256i error1 = _mm256_sub_epi8(value1, left1);
@@ -410,8 +399,7 @@ void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pPacked, size_t *cbPacke
 
 	for (auto pp = pSrcBegin + cbStride, tt = pPrevBegin + cbStride; pp != pSrcEnd; pp += cbStride, tt += cbStride)
 	{
-		__m256i prev = _mm256_set1_epi8((char)0x80);
-		__m256i topprev = _mm256_set1_epi8((char)0x80);
+		__m256i prev = _mm256_setzero_si256();
 
 		for (auto p = pp, t = tt; p != pp + cbStride; p += 64, t += 64)
 		{
@@ -419,21 +407,15 @@ void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pPacked, size_t *cbPacke
 			__m256i value1 = _mm256_loadu_si256((const __m256i *)(p + 32));
 			__m256i top0 = _mm256_loadu_si256((const __m256i *)(p - cbStride));
 			__m256i top1 = _mm256_loadu_si256((const __m256i *)(p + 32 - cbStride));
-			__m256i tmp0 = _mm256_permute2x128_si256(value0, prev, 0x03);
-			__m256i tmp1 = _mm256_permute2x128_si256(value1, value0, 0x03);
-			__m256i toptmp0 = _mm256_permute2x128_si256(top0, topprev, 0x03);
-			__m256i toptmp1 = _mm256_permute2x128_si256(top1, top0, 0x03);
-			__m256i left0 = _mm256_alignr_epi8(value0, tmp0, 15);
-			__m256i left1 = _mm256_alignr_epi8(value1, tmp1, 15);
-			__m256i topleft0 = _mm256_alignr_epi8(top0, toptmp0, 15);
-			__m256i topleft1 = _mm256_alignr_epi8(top1, toptmp1, 15);
-
-			__m256i error0 = _mm256_sub_epi8(_mm256_add_epi8(value0, topleft0), _mm256_add_epi8(left0, top0));
-			__m256i error1 = _mm256_sub_epi8(_mm256_add_epi8(value1, topleft1), _mm256_add_epi8(left1, top1));
+			__m256i tmp0 = _mm256_sub_epi8(value0, top0);
+			__m256i tmp1 = _mm256_sub_epi8(value1, top1);
+			__m256i left0 = _mm256_alignr_epi8(tmp0, _mm256_permute2x128_si256(tmp0, prev, 0x03), 15);
+			__m256i left1 = _mm256_alignr_epi8(tmp1, _mm256_permute2x128_si256(tmp1, tmp0, 0x03), 15);
+			__m256i error0 = _mm256_sub_epi8(tmp0, left0);
+			__m256i error1 = _mm256_sub_epi8(tmp1, left1);
 			__m256i t0 = _mm256_sub_epi8(value0, _mm256_loadu_si256((const __m256i *)t));
 			__m256i t1 = _mm256_sub_epi8(value1, _mm256_loadu_si256((const __m256i *)(t + 32)));
-			prev = value1;
-			topprev = top1;
+			prev = tmp1;
 
 			PackForDelta<CODEFEATURE_AVX2>(q, r, error0, error1, t0, t1);
 		}

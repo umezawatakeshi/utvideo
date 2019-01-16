@@ -403,7 +403,6 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 	auto q = pDst;
 
 	__m128i prev = _mm_set1_epi8((char)0x80);
-	__m128i topprev;
 
 #ifdef __SSSE3__
 	for (; p <= pSrcBegin + cbStride - 16; p += 16, q += 16)
@@ -428,22 +427,18 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 
 	for (auto pp = pSrcBegin + cbStride; pp != pSrcEnd; pp += cbStride)
 	{
-		prev = _mm_set1_epi8((char)0x80);
-		topprev = _mm_set1_epi8((char)0x80);
+		prev = _mm_setzero_si128();
 
 #ifdef __SSSE3__
 		for (; p <= pp + cbStride - 16; p += 16, q += 16)
 		{
 			__m128i value = _mm_loadu_si128((const __m128i *)p);
 			__m128i top = _mm_loadu_si128((const __m128i *)(p - cbStride));
-			__m128i left = _mm_alignr_epi8(value, prev, 15);
-			__m128i topleft = _mm_alignr_epi8(top, topprev, 15);
-			__m128i pred = _mm_sub_epi8(_mm_add_epi8(left, top), topleft);
-
-			__m128i error = _mm_sub_epi8(value, pred);
+			__m128i tmp = _mm_sub_epi8(value, top);
+			__m128i left = _mm_alignr_epi8(tmp, prev, 15);
+			__m128i error = _mm_sub_epi8(tmp, left);
 			_mm_storeu_si128((__m128i *)q, error);
-			prev = value;
-			topprev = top;
+			prev = tmp;
 
 			if (DoCount)
 				IncrementCounters8<F>(error, pCountTable);
