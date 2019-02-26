@@ -8,6 +8,49 @@
 #error
 #endif
 
+template<typename T>
+struct VECTOR_RGB
+{
+	T g, b, r;
+};
+
+template<typename T>
+struct VECTOR_RGBA
+{
+	T g, b, r, a;
+};
+
+template<typename T>
+struct VECTOR_YUV422
+{
+	T y0, y1, u, v;
+};
+
+
+/*
+ * array や tuple を使うと一部のメンバ関数がインライン展開されず、
+ * また AVX1 でコンパイルしたメンバ関数の実体が共有され SSSE3 でコンパイルした関数から呼ばれて illegal instruction となったりすることがある。
+ * （コンパイラの最適化能力が低いせいだとは思うが）
+ */
+
+template<typename T>
+struct VECTOR2
+{
+	T v0, v1;
+};
+
+template<typename T>
+struct VECTOR3
+{
+	T v0, v1, v2;
+};
+
+template<typename T>
+struct VECTOR4
+{
+	T v0, v1, v2, v3;
+};
+
 template<int F, class C, class T>
 void tuned_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
@@ -1457,7 +1500,7 @@ template void tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT709Coefficient, CARGBC
 //
 
 template<int F, class T>
-void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
+static inline FORCEINLINE VECTOR_YUV422<__m128i> VECTORCALL tuned_ConvertPackedYUV422ToPlanarElement(__m128i m0, __m128i m1, __m128i m2, __m128i m3)
 {
 	__m128i ctl;
 	if (std::is_same<T, CYUYVColorOrder>::value)
@@ -1465,6 +1508,36 @@ void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t
 	else
 		ctl = _mm_set_epi8(14, 10, 6, 2, 12, 8, 4, 0, 15, 13, 11, 9, 7, 5, 3, 1);
 
+	m0 = _mm_shuffle_epi8(m0, ctl);
+	m1 = _mm_shuffle_epi8(m1, ctl);
+	m2 = _mm_shuffle_epi8(m2, ctl);
+	m3 = _mm_shuffle_epi8(m3, ctl);
+
+	__m128i yy0 = _mm_unpacklo_epi64(m0, m1);
+	__m128i yy1 = _mm_unpacklo_epi64(m2, m3);
+	__m128i uv0 = _mm_unpackhi_epi32(m0, m1);
+	__m128i uv1 = _mm_unpackhi_epi32(m2, m3);
+
+	__m128i uu = _mm_unpacklo_epi64(uv0, uv1);
+	__m128i vv = _mm_unpackhi_epi64(uv0, uv1);
+
+	return { yy0, yy1, uu, vv };
+}
+
+template<int F, class T>
+static inline FORCEINLINE VECTOR_YUV422<__m128i> tuned_ConvertPackedYUV422ToPlanarElement(const uint8_t* pp)
+{
+	return tuned_ConvertPackedYUV422ToPlanarElement<F, T>(
+		_mm_loadu_si128((const __m128i *)pp),
+		_mm_loadu_si128((const __m128i *)(pp + 16)),
+		_mm_loadu_si128((const __m128i *)(pp + 32)),
+		_mm_loadu_si128((const __m128i *)(pp + 48))
+	);
+}
+
+template<int F, class T>
+void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
+{
 	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride, pYBegin += cbYWidth, pUBegin += cbCWidth, pVBegin += cbCWidth)
 	{
 		auto y = pYBegin;
@@ -1476,23 +1549,11 @@ void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t
 #ifdef __SSSE3__
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			__m128i m0 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)pp), ctl);
-			__m128i m1 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), ctl);
-			__m128i m2 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), ctl);
-			__m128i m3 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), ctl);
-
-			__m128i yy0 = _mm_unpacklo_epi64(m0, m1);
-			__m128i yy1 = _mm_unpacklo_epi64(m2, m3);
-			__m128i uv0 = _mm_unpackhi_epi32(m0, m1);
-			__m128i uv1 = _mm_unpackhi_epi32(m2, m3);
-
-			__m128i uu = _mm_unpacklo_epi64(uv0, uv1);
-			__m128i vv = _mm_unpackhi_epi64(uv0, uv1);
-
-			_mm_storeu_si128((__m128i *)y, yy0);
-			_mm_storeu_si128((__m128i *)(y + 16), yy1);
-			_mm_storeu_si128((__m128i *)u, uu);
-			_mm_storeu_si128((__m128i *)v, vv);
+			auto result = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp);
+			_mm_storeu_si128((__m128i *)y, result.y0);
+			_mm_storeu_si128((__m128i *)(y + 16), result.y1);
+			_mm_storeu_si128((__m128i *)u, result.u);
+			_mm_storeu_si128((__m128i *)v, result.v);
 
 			y += 32;
 			u += 16;
@@ -1531,7 +1592,7 @@ template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX1, CUYVYColorOrder>
 //
 
 template<int F, class T>
-void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
+static inline FORCEINLINE VECTOR4<__m128i> VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(__m128i yy0, __m128i yy1, __m128i uu, __m128i vv)
 {
 	__m128i ctl;
 	if (std::is_same<T, CYUYVColorOrder>::value)
@@ -1539,6 +1600,30 @@ void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const
 	else
 		ctl = _mm_set_epi8(7, 15, 6, 11, 5, 14, 4, 10, 3, 13, 2, 9, 1, 12, 0, 8);
 
+	__m128i uv0 = _mm_unpacklo_epi32(uu, vv);
+	__m128i uv1 = _mm_unpackhi_epi32(uu, vv);
+
+	return {
+		_mm_shuffle_epi8(_mm_unpacklo_epi64(yy0, uv0), ctl),
+		_mm_shuffle_epi8(_mm_unpackhi_epi64(yy0, uv0), ctl),
+		_mm_shuffle_epi8(_mm_unpacklo_epi64(yy1, uv1), ctl),
+		_mm_shuffle_epi8(_mm_unpackhi_epi64(yy1, uv1), ctl)
+	};
+}
+
+template<int F, class T>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(uint8_t* pp, __m128i yy0, __m128i yy1, __m128i uu, __m128i vv)
+{
+	auto result = tuned_ConvertPlanarYUV422ToPackedElement<F, T>(yy0, yy1, uu, vv);
+	_mm_storeu_si128((__m128i *)pp, result.v0);
+	_mm_storeu_si128((__m128i *)(pp + 16), result.v1);
+	_mm_storeu_si128((__m128i *)(pp + 32), result.v2);
+	_mm_storeu_si128((__m128i *)(pp + 48), result.v3);
+}
+
+template<int F, class T>
+void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
+{
 	for (auto p = pDstBegin; p != pDstEnd; p += scbStride, pYBegin += cbYWidth, pUBegin += cbCWidth, pVBegin += cbCWidth)
 	{
 		auto y = pYBegin;
@@ -1554,14 +1639,7 @@ void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const
 			__m128i yy1 = _mm_loadu_si128((const __m128i *)(y + 16));
 			__m128i uu = _mm_loadu_si128((const __m128i *)u);
 			__m128i vv = _mm_loadu_si128((const __m128i *)v);
-
-			__m128i uv0 = _mm_unpacklo_epi32(uu, vv);
-			__m128i uv1 = _mm_unpackhi_epi32(uu, vv);
-
-			_mm_storeu_si128((__m128i *)pp, _mm_shuffle_epi8(_mm_unpacklo_epi64(yy0, uv0), ctl));
-			_mm_storeu_si128((__m128i *)(pp + 16), _mm_shuffle_epi8(_mm_unpackhi_epi64(yy0, uv0), ctl));
-			_mm_storeu_si128((__m128i *)(pp + 32), _mm_shuffle_epi8(_mm_unpacklo_epi64(yy1, uv1), ctl));
-			_mm_storeu_si128((__m128i *)(pp + 48), _mm_shuffle_epi8(_mm_unpackhi_epi64(yy1, uv1), ctl));
+			tuned_ConvertPlanarYUV422ToPackedElement<F, T>(pp, yy0, yy1, uu, vv);
 
 			y += 32;
 			u += 16;
@@ -1595,12 +1673,47 @@ template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX1, CUYVYColorOrder>
 
 //
 
+template<int F, bool NeedOffset = true>
+static inline FORCEINLINE VECTOR_RGB<__m128i> tuned_ConvertPackedBGRToPlanarElement(__m128i m0, __m128i m1, __m128i m2)
+{
+	__m128i ctl = _mm_set_epi8(13, 10, 7, 4, 1, 14, 11, 8, 5, 2, 15, 12, 9, 6, 3, 0);
+
+	m0 = _mm_shuffle_epi8(m0, ctl); // G4 G3 G2 G1 G0 R4 R3 R2 R1 R0 B5 B4 B3 B2 B1 B0
+	m1 = _mm_shuffle_epi8(m1, ctl); // R9 R8 R7 R6 R5 Ba B9 B8 B7 B6 Ga G9 G8 G7 G6 G5
+	m2 = _mm_shuffle_epi8(m2, ctl); // Bf Be Bd Bc Bb Gf Ge Gd Gc Gb Rf Re Rd Rc Rb Ra
+
+	__m128i n0 = _mm_alignr_epi8(m0, m2, 6); // B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb Gf Ge Gd Gc Gb
+	__m128i n1 = _mm_alignr_epi8(m2, m1, 6); // Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 Ba B9 B8 B7 B6
+	__m128i n2 = _mm_alignr_epi8(m1, m0, 6); // Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0 R4 R3 R2 R1 R0
+
+	__m128i bb = _mm_alignr_epi8(n1, n0, 5); // Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb
+	__m128i gg = _mm_alignr_epi8(n0, n2, 5); // Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
+	__m128i rr = _mm_alignr_epi8(n2, n1, 5); // R4 R3 R2 R1 R0 Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5
+
+	bb = _mm_alignr_epi8(bb, bb, 5);
+	rr = _mm_alignr_epi8(rr, rr, 11);
+
+	__m128i ggtmp = NeedOffset ? _mm_add_epi8(gg, _mm_set1_epi8((char)0x80)) : gg;
+	bb = _mm_sub_epi8(bb, ggtmp);
+	rr = _mm_sub_epi8(rr, ggtmp);
+
+	return { gg, bb, rr };
+}
+
+template<int F, bool NeedOffset = true>
+static inline FORCEINLINE VECTOR_RGB<__m128i> tuned_ConvertPackedBGRToPlanarElement(const uint8_t* pp)
+{
+	return tuned_ConvertPackedBGRToPlanarElement<F, NeedOffset>(
+		_mm_loadu_si128((const __m128i *)pp),
+		_mm_loadu_si128((const __m128i *)(pp + 16)),
+		_mm_loadu_si128((const __m128i *)(pp + 32))
+	);
+}
+
 template<int F>
 static inline void tuned_ConvertBGRToULRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
 #ifdef __SSSE3__
-	__m128i ctl = _mm_set_epi8(13, 10, 7, 4, 1, 14, 11, 8, 5, 2, 15, 12, 9, 6, 3, 0);
-
 	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride, pGBegin += cbPlaneWidth, pBBegin += cbPlaneWidth, pRBegin += cbPlaneWidth)
 	{
 		auto r = pRBegin;
@@ -1611,28 +1724,10 @@ static inline void tuned_ConvertBGRToULRG(uint8_t *pGBegin, uint8_t *pBBegin, ui
 
 		for (; pp <= p + cbWidth - 48; pp += 48)
 		{
-			__m128i m0 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)pp), ctl);        // G4 G3 G2 G1 G0 R4 R3 R2 R1 R0 B5 B4 B3 B2 B1 B0
-			__m128i m1 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), ctl); // R9 R8 R7 R6 R5 Ba B9 B8 B7 B6 Ga G9 G8 G7 G6 G5
-			__m128i m2 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), ctl); // Bf Be Bd Bc Bb Gf Ge Gd Gc Gb Rf Re Rd Rc Rb Ra
-
-			__m128i n0 = _mm_alignr_epi8(m0, m2, 6); // B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb Gf Ge Gd Gc Gb
-			__m128i n1 = _mm_alignr_epi8(m2, m1, 6); // Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 Ba B9 B8 B7 B6
-			__m128i n2 = _mm_alignr_epi8(m1, m0, 6); // Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0 R4 R3 R2 R1 R0
-
-			__m128i bb = _mm_alignr_epi8(n1, n0, 5); // Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb
-			__m128i gg = _mm_alignr_epi8(n0, n2, 5); // Gf Ge Gd Gc Gb Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0
-			__m128i rr = _mm_alignr_epi8(n2, n1, 5); // R4 R3 R2 R1 R0 Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5
-
-			bb = _mm_alignr_epi8(bb, bb, 5);
-			rr = _mm_alignr_epi8(rr, rr, 11);
-
-			__m128i gg80 = _mm_add_epi8(gg, _mm_set1_epi8((char)0x80));
-			bb = _mm_sub_epi8(bb, gg80);
-			rr = _mm_sub_epi8(rr, gg80);
-
-			_mm_storeu_si128((__m128i *)b, bb);
-			_mm_storeu_si128((__m128i *)g, gg);
-			_mm_storeu_si128((__m128i *)r, rr);
+			auto result = tuned_ConvertPackedBGRToPlanarElement<F>(pp);
+			_mm_storeu_si128((__m128i *)b, result.b);
+			_mm_storeu_si128((__m128i *)g, result.g);
+			_mm_storeu_si128((__m128i *)r, result.r);
 
 			b += 16;
 			g += 16;
@@ -1658,8 +1753,8 @@ static inline void tuned_ConvertBGRToULRG(uint8_t *pGBegin, uint8_t *pBBegin, ui
 #endif
 }
 
-template<int F, class T, bool A>
-static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
+template<int F, class T, bool A, bool NeedOffset = true>
+static inline FORCEINLINE VECTOR_RGBA<__m128i> VECTORCALL tuned_ConvertPackedRGBXToPlanarElement(__m128i m0, __m128i m1, __m128i m2, __m128i m3)
 {
 	__m128i ctl;
 	if (std::is_same<T, CBGRAColorOrder>::value)
@@ -1667,6 +1762,40 @@ static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 	else
 		ctl = _mm_set_epi8(12, 8, 4, 0, 13, 9, 5, 1, 14, 10, 6, 2, 15, 11, 7, 3);
 
+	m0 = _mm_shuffle_epi8(m0, ctl); // A3 A2 A1 A0 R3 R2 R1 R0 G3 G2 G1 G0 B3 B2 B1 B0
+	m1 = _mm_shuffle_epi8(m1, ctl);
+	m2 = _mm_shuffle_epi8(m2, ctl);
+	m3 = _mm_shuffle_epi8(m3, ctl);
+
+	__m128i gb0 = _mm_unpacklo_epi32(m0, m1);
+	__m128i gb1 = _mm_unpacklo_epi32(m2, m3);
+	__m128i ar0 = _mm_unpackhi_epi32(m0, m1);
+	__m128i ar1 = _mm_unpackhi_epi32(m2, m3);
+
+	__m128i gg = _mm_unpackhi_epi64(gb0, gb1);
+	__m128i ggtmp = NeedOffset ? _mm_add_epi8(gg, _mm_set1_epi8((char)0x80)) : gg;
+	__m128i bb = _mm_sub_epi8(_mm_unpacklo_epi64(gb0, gb1), ggtmp);
+	__m128i rr = _mm_sub_epi8(_mm_unpacklo_epi64(ar0, ar1), ggtmp);
+	if (A)
+		return { gg, bb, rr, _mm_unpackhi_epi64(ar0, ar1) };
+	else
+		return { gg, bb, rr, _mm_setzero_si128() };
+}
+
+template<int F, class T, bool A, bool NeedOffset = true>
+static inline FORCEINLINE VECTOR_RGBA<__m128i> tuned_ConvertPackedRGBXToPlanarElement(const uint8_t* pp)
+{
+	return tuned_ConvertPackedRGBXToPlanarElement<F, T, A, NeedOffset>(
+		_mm_loadu_si128((const __m128i *)pp),
+		_mm_loadu_si128((const __m128i *)(pp + 16)),
+		_mm_loadu_si128((const __m128i *)(pp + 32)),
+		_mm_loadu_si128((const __m128i *)(pp + 48))
+	);
+}
+
+template<int F, class T, bool A>
+static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
+{
 	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride, pGBegin += cbPlaneWidth, pBBegin += cbPlaneWidth, pRBegin += cbPlaneWidth, pABegin += cbPlaneWidth)
 	{
 		auto r = pRBegin;
@@ -1679,26 +1808,12 @@ static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 #ifdef __SSSE3__
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			__m128i m0 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)pp), ctl); // A3 A2 A1 A0 R3 R2 R1 R0 G3 G2 G1 G0 B3 B2 B1 B0
-			__m128i m1 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), ctl);
-			__m128i m2 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), ctl);
-			__m128i m3 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), ctl);
-
-			__m128i gb0 = _mm_unpacklo_epi32(m0, m1);
-			__m128i gb1 = _mm_unpacklo_epi32(m2, m3);
-			__m128i ar0 = _mm_unpackhi_epi32(m0, m1);
-			__m128i ar1 = _mm_unpackhi_epi32(m2, m3);
-
-			__m128i gg = _mm_unpackhi_epi64(gb0, gb1);
-			__m128i gg80 = _mm_add_epi8(gg, _mm_set1_epi8((char)0x80));
-			__m128i bb = _mm_sub_epi8(_mm_unpacklo_epi64(gb0, gb1), gg80);
-			__m128i rr = _mm_sub_epi8(_mm_unpacklo_epi64(ar0, ar1), gg80);
-
-			_mm_storeu_si128((__m128i *)b, bb);
-			_mm_storeu_si128((__m128i *)g, gg);
-			_mm_storeu_si128((__m128i *)r, rr);
+			auto result = tuned_ConvertPackedRGBXToPlanarElement<F, T, A>(pp);
+			_mm_storeu_si128((__m128i *)b, result.b);
+			_mm_storeu_si128((__m128i *)g, result.g);
+			_mm_storeu_si128((__m128i *)r, result.r);
 			if (A)
-				_mm_storeu_si128((__m128i *)a, _mm_unpackhi_epi64(ar0, ar1));
+				_mm_storeu_si128((__m128i *)a, result.a);
 
 			b += 16;
 			g += 16;
@@ -1764,12 +1879,46 @@ template void tuned_ConvertRGBAToULRA<CODEFEATURE_AVX1, CARGBColorOrder>(uint8_t
 
 //
 
+template<int F, bool NeedOffset = true>
+static inline FORCEINLINE VECTOR3<__m128i> tuned_ConvertPlanarBGRToPackedElement(__m128i gg, __m128i bb, __m128i rr)
+{
+	__m128i ctl = _mm_set_epi8(5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11, 0);
+
+	__m128i ggtmp = NeedOffset ? _mm_add_epi8(gg, _mm_set1_epi8((char)0x80)) : gg;
+	bb = _mm_add_epi8(bb, ggtmp);
+	rr = _mm_add_epi8(rr, ggtmp);
+
+	rr = _mm_alignr_epi8(rr, rr, 5);  // R4 R3 R2 R1 R0 Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5
+	bb = _mm_alignr_epi8(bb, bb, 11); // Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb
+
+	__m128i m0 = _mm_alignr_epi8(gg, rr, 11); // Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0 R4 R3 R2 R1 R0
+	__m128i m1 = _mm_alignr_epi8(rr, bb, 11); // Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 Ba B9 B8 B7 B6
+	__m128i m2 = _mm_alignr_epi8(bb, gg, 11); // B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb Gf Ge Gd Gc Gb
+
+	__m128i n0 = _mm_alignr_epi8(m0, m2, 10); // G4 G3 G2 G1 G0 R4 R3 R2 R1 R0 B5 B4 B3 B2 B1 B0
+	__m128i n1 = _mm_alignr_epi8(m1, m0, 10); // R9 R8 R7 R6 R5 Ba B9 B8 B7 B6 Ga G9 G8 G7 G6 G5
+	__m128i n2 = _mm_alignr_epi8(m2, m1, 10); // Bf Be Bd Bc Bb Gf Ge Gd Gc Gb Rf Re Rd Rc Rb Ra
+
+	return {
+		_mm_shuffle_epi8(n0, ctl),
+		_mm_shuffle_epi8(n1, ctl),
+		_mm_shuffle_epi8(n2, ctl)
+	};
+}
+
+template<int F, bool NeedOffset = true>
+static inline FORCEINLINE void tuned_ConvertPlanarBGRToPackedElement(uint8_t* pp, __m128i gg, __m128i bb, __m128i rr)
+{
+	auto result = tuned_ConvertPlanarBGRToPackedElement<F, NeedOffset>(gg, bb, rr);
+	_mm_storeu_si128((__m128i *)pp, result.v0);
+	_mm_storeu_si128((__m128i *)(pp + 16), result.v1);
+	_mm_storeu_si128((__m128i *)(pp + 32), result.v2);
+}
+
 template<int F>
 static inline void tuned_ConvertULRGToBGR(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
 #ifdef __SSSE3__
-	__m128i ctl = _mm_set_epi8(5, 10, 15, 4, 9, 14, 3, 8, 13, 2, 7, 12, 1, 6, 11, 0);
-
 	for (auto p = pDstBegin; p != pDstEnd; p += scbStride, pGBegin += cbPlaneWidth, pBBegin += cbPlaneWidth, pRBegin += cbPlaneWidth)
 	{
 		auto r = pRBegin;
@@ -1783,25 +1932,7 @@ static inline void tuned_ConvertULRGToBGR(uint8_t *pDstBegin, uint8_t *pDstEnd, 
 			__m128i gg = _mm_loadu_si128((const __m128i *)g);
 			__m128i bb = _mm_loadu_si128((const __m128i *)b);
 			__m128i rr = _mm_loadu_si128((const __m128i *)r);
-
-			__m128i gg80 = _mm_add_epi8(gg, _mm_set1_epi8((char)0x80));
-			bb = _mm_add_epi8(bb, gg80);
-			rr = _mm_add_epi8(rr, gg80);
-
-			rr = _mm_alignr_epi8(rr, rr, 5);  // R4 R3 R2 R1 R0 Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5
-			bb = _mm_alignr_epi8(bb, bb, 11); // Ba B9 B8 B7 B6 B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb
-
-			__m128i m0 = _mm_alignr_epi8(gg, rr, 11); // Ga G9 G8 G7 G6 G5 G4 G3 G2 G1 G0 R4 R3 R2 R1 R0
-			__m128i m1 = _mm_alignr_epi8(rr, bb, 11); // Rf Re Rd Rc Rb Ra R9 R8 R7 R6 R5 Ba B9 B8 B7 B6
-			__m128i m2 = _mm_alignr_epi8(bb, gg, 11); // B5 B4 B3 B2 B1 B0 Bf Be Bd Bc Bb Gf Ge Gd Gc Gb
-
-			__m128i n0 = _mm_alignr_epi8(m0, m2, 10); // G4 G3 G2 G1 G0 R4 R3 R2 R1 R0 B5 B4 B3 B2 B1 B0
-			__m128i n1 = _mm_alignr_epi8(m1, m0, 10); // R9 R8 R7 R6 R5 Ba B9 B8 B7 B6 Ga G9 G8 G7 G6 G5
-			__m128i n2 = _mm_alignr_epi8(m2, m1, 10); // Bf Be Bd Bc Bb Gf Ge Gd Gc Gb Rf Re Rd Rc Rb Ra
-
-			_mm_storeu_si128((__m128i *)pp, _mm_shuffle_epi8(n0, ctl));
-			_mm_storeu_si128((__m128i *)(pp + 16), _mm_shuffle_epi8(n1, ctl));
-			_mm_storeu_si128((__m128i *)(pp + 32), _mm_shuffle_epi8(n2, ctl));
+			tuned_ConvertPlanarBGRToPackedElement<F>(pp, gg, bb, rr);
 
 			b += 16;
 			g += 16;
@@ -1823,8 +1954,8 @@ static inline void tuned_ConvertULRGToBGR(uint8_t *pDstBegin, uint8_t *pDstEnd, 
 #endif
 }
 
-template<int F, class T, bool A>
-static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
+template<int F, class T, bool NeedOffset = true> /* A はテンプレートパラメータとしては要らない */
+static inline FORCEINLINE VECTOR4<__m128i> VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(__m128i gg, __m128i bb, __m128i rr, __m128i aa)
 {
 	__m128i ctl;
 	if (std::is_same<T, CBGRAColorOrder>::value)
@@ -1832,8 +1963,41 @@ static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd,
 	else
 		ctl = _mm_set_epi8(3, 7, 11, 15, 2, 6, 10, 14, 1, 5, 9, 13, 0, 4, 8, 12);
 
-	__m128i aa;
+	__m128i ggtmp = NeedOffset ? _mm_add_epi8(gg, _mm_set1_epi8((char)0x80)) : gg;
+	bb = _mm_add_epi8(bb, ggtmp);
+	rr = _mm_add_epi8(rr, ggtmp);
 
+	__m128i gb0 = _mm_unpacklo_epi32(bb, gg); // G7 G6 G5 G4 B7 B6 B5 B4 G3 G2 G1 G0 B3 B2 B1 B0
+	__m128i gb1 = _mm_unpackhi_epi32(bb, gg);
+	__m128i ar0 = _mm_unpacklo_epi32(rr, aa);
+	__m128i ar1 = _mm_unpackhi_epi32(rr, aa);
+
+	__m128i m0 = _mm_unpacklo_epi64(gb0, ar0); // A3 R3 G3 B3 A2 R2 G2 B2 A1 R1 G1 B1 A0 R0 G0 B0
+	__m128i m1 = _mm_unpackhi_epi64(gb0, ar0);
+	__m128i m2 = _mm_unpacklo_epi64(gb1, ar1);
+	__m128i m3 = _mm_unpackhi_epi64(gb1, ar1);
+
+	return {
+		_mm_shuffle_epi8(m0, ctl),
+		_mm_shuffle_epi8(m1, ctl),
+		_mm_shuffle_epi8(m2, ctl),
+		_mm_shuffle_epi8(m3, ctl)
+	};
+}
+
+template<int F, class T, bool NeedOffset = true> /* A はテンプレートパラメータとしては要らない */
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, __m128i gg, __m128i bb, __m128i rr, __m128i aa)
+{
+	auto result = tuned_ConvertPlanarRGBXToPackedElement<F, T, NeedOffset>(gg, bb, rr, aa);
+	_mm_storeu_si128((__m128i *)pp, result.v0);
+	_mm_storeu_si128((__m128i *)(pp + 16), result.v1);
+	_mm_storeu_si128((__m128i *)(pp + 32), result.v2);
+	_mm_storeu_si128((__m128i *)(pp + 48), result.v3);
+}
+
+template<int F, class T, bool A>
+static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
+{
 	for (auto p = pDstBegin; p != pDstEnd; p += scbStride, pGBegin += cbPlaneWidth, pBBegin += cbPlaneWidth, pRBegin += cbPlaneWidth, pABegin += cbPlaneWidth)
 	{
 		auto r = pRBegin;
@@ -1849,29 +2013,7 @@ static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd,
 			__m128i gg = _mm_loadu_si128((const __m128i *)g);
 			__m128i bb = _mm_loadu_si128((const __m128i *)b);
 			__m128i rr = _mm_loadu_si128((const __m128i *)r);
-			if (A)
-				aa = _mm_loadu_si128((const __m128i *)a);
-			else
-				aa = _mm_set1_epi8((char)0xff);
-
-			__m128i gg80 = _mm_add_epi8(gg, _mm_set1_epi8((char)0x80));
-			bb = _mm_add_epi8(bb, gg80);
-			rr = _mm_add_epi8(rr, gg80);
-
-			__m128i gb0 = _mm_unpacklo_epi32(bb, gg); // G7 G6 G5 G4 B7 B6 B5 B4 G3 G2 G1 G0 B3 B2 B1 B0
-			__m128i gb1 = _mm_unpackhi_epi32(bb, gg);
-			__m128i ar0 = _mm_unpacklo_epi32(rr, aa);
-			__m128i ar1 = _mm_unpackhi_epi32(rr, aa);
-
-			__m128i m0 = _mm_unpacklo_epi64(gb0, ar0); // A3 R3 G3 B3 A2 R2 G2 B2 A1 R1 G1 B1 A0 R0 G0 B0
-			__m128i m1 = _mm_unpackhi_epi64(gb0, ar0);
-			__m128i m2 = _mm_unpacklo_epi64(gb1, ar1);
-			__m128i m3 = _mm_unpackhi_epi64(gb1, ar1);
-
-			_mm_storeu_si128((__m128i *)pp, _mm_shuffle_epi8(m0, ctl));
-			_mm_storeu_si128((__m128i *)(pp + 16), _mm_shuffle_epi8(m1, ctl));
-			_mm_storeu_si128((__m128i *)(pp + 32), _mm_shuffle_epi8(m2, ctl));
-			_mm_storeu_si128((__m128i *)(pp + 48), _mm_shuffle_epi8(m3, ctl));
+			tuned_ConvertPlanarRGBXToPackedElement<F, T>(pp, gg, bb, rr, A ? _mm_loadu_si128((const __m128i *)a) : _mm_set1_epi8((char)0xff));
 
 			b += 16;
 			g += 16;

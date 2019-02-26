@@ -109,6 +109,22 @@ static inline void IncrementCounters16(__m128i xmm, uint32_t* pCountTable)
 #endif
 }
 
+template<int F>
+static inline FORCEINLINE __m128i tuned_PredictLeft8Element(__m128i prev, __m128i value)
+{
+	__m128i left = _mm_alignr_epi8(value, prev, 15);
+	__m128i residual = _mm_sub_epi8(value, left);
+	return residual;
+}
+
+template<int F, bool DoCount = true>
+static inline FORCEINLINE __m128i tuned_PredictLeftAndCount8Element(__m128i prev, __m128i value, uint32_t* pCountTable)
+{
+	__m128i residual = tuned_PredictLeft8Element<F>(prev, value);
+	if (DoCount)
+		IncrementCounters8<F>(residual, pCountTable);
+	return residual;
+}
 
 template<int F>
 void tuned_PredictCylindricalLeftAndCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, uint32_t *pCountTable)
@@ -122,14 +138,9 @@ void tuned_PredictCylindricalLeftAndCount8(uint8_t *pDst, const uint8_t *pSrcBeg
 	for (; p <= pSrcEnd - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
-		//__m128i left = _mm_or_si128(_mm_slli_si128(value, 1), _mm_srli_si128(prev, 15));
-		__m128i left = _mm_alignr_epi8(value, prev, 15);
-
-		__m128i error = _mm_sub_epi8(value, left);
-		_mm_storeu_si128((__m128i *)q, error);
+		__m128i residual = tuned_PredictLeftAndCount8Element<F>(prev, value, pCountTable);
+		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
-
-		IncrementCounters8<F>(error, pCountTable);
 	}
 #endif
 	for (; p < pSrcEnd; p++, q++)
@@ -149,6 +160,22 @@ template void tuned_PredictCylindricalLeftAndCount8<CODEFEATURE_AVX1>(uint8_t *p
 
 
 template<int F>
+static inline FORCEINLINE VECTOR3<__m128i> /* value0, value1, nextprev */ tuned_RestoreLeft8Element(__m128i prev, __m128i s0, __m128i s1)
+{
+	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
+	s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 1));
+	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
+	s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 2));
+	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
+	s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 4));
+	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
+	s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 8));
+	s0 = _mm_add_epi8(s0, prev);
+	s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)));
+	return { s0, s1, _mm_shuffle_epi8(s1, _mm_set1_epi8(15)) };
+}
+
+template<int F>
 void tuned_RestoreCylindricalLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd)
 {
 	auto p = pSrcBegin;
@@ -161,20 +188,10 @@ void tuned_RestoreCylindricalLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, cons
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
 		__m128i s1 = _mm_loadu_si128((const __m128i *)(p+16));
-
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 1));
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 2));
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 4));
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 8));
-		s0 = _mm_add_epi8(s0, prev);
-		s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)));
-		_mm_storeu_si128((__m128i *)q, s0);
-		_mm_storeu_si128((__m128i *)(q+16), s1);
-		prev = _mm_shuffle_epi8(s1, _mm_set1_epi8(15));
+		auto result = tuned_RestoreLeft8Element<F>(prev, s0, s1);
+		_mm_storeu_si128((__m128i *)q, result.v0);
+		_mm_storeu_si128((__m128i *)(q+16), result.v1);
+		prev = result.v2;
 	}
 #endif
 	for (; p < pSrcEnd; p++, q++)
@@ -193,6 +210,23 @@ template void tuned_RestoreCylindricalLeft8<CODEFEATURE_AVX1>(uint8_t *pDst, con
 
 
 template<int F>
+static inline FORCEINLINE __m128i tuned_PredictLeft10Element(__m128i prev, __m128i value)
+{
+	__m128i left = _mm_alignr_epi8(value, prev, 14);
+	__m128i residual = _mm_and_si128(_mm_sub_epi16(value, left), _mm_set1_epi16(CSymbolBits<10>::maskval));
+	return residual;
+}
+
+template<int F, bool DoCount = true>
+static inline FORCEINLINE __m128i tuned_PredictLeftAndCount10Element(__m128i prev, __m128i value, uint32_t* pCountTable)
+{
+	__m128i residual = tuned_PredictLeft10Element<F>(prev, value);
+	if (DoCount)
+		IncrementCounters16<F>(residual, pCountTable);
+	return residual;
+}
+
+template<int F>
 void tuned_PredictCylindricalLeftAndCount10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd, uint32_t *pCountTable)
 {
 	auto p = pSrcBegin;
@@ -204,13 +238,9 @@ void tuned_PredictCylindricalLeftAndCount10(uint16_t *pDst, const uint16_t *pSrc
 	for (; p <= pSrcEnd - 8; p += 8, q += 8)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
-		__m128i left = _mm_alignr_epi8(value, prev, 14);
-
-		__m128i error = _mm_and_si128(_mm_sub_epi16(value, left), _mm_set1_epi16(CSymbolBits<10>::maskval));
-		_mm_storeu_si128((__m128i *)q, error);
+		__m128i residual = tuned_PredictLeftAndCount10Element<F>(prev, value, pCountTable);
+		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
-
-		IncrementCounters16<F>(error, pCountTable);
 	}
 #endif
 	for (; p < pSrcEnd; p++, q++)
@@ -230,6 +260,22 @@ template void tuned_PredictCylindricalLeftAndCount10<CODEFEATURE_AVX1>(uint16_t 
 
 
 template<int F>
+static inline FORCEINLINE VECTOR3<__m128i> /* value0, value1, nextprev */ tuned_RestoreLeft10Element(__m128i prev, __m128i s0, __m128i s1)
+{
+	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 2));
+	s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 2));
+	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 4));
+	s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 4));
+	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 8));
+	s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 8));
+	s0 = _mm_add_epi16(s0, prev);
+	s1 = _mm_add_epi16(s1, _mm_shuffle_epi8(s0, _mm_set2_epi8(15, 14)));
+	s0 = _mm_and_si128(s0, _mm_set1_epi16(CSymbolBits<10>::maskval));
+	s1 = _mm_and_si128(s1, _mm_set1_epi16(CSymbolBits<10>::maskval));
+	return { s0, s1, _mm_shuffle_epi8(s1, _mm_set2_epi8(15, 14)) };
+}
+
+template<int F>
 void tuned_RestoreCylindricalLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd)
 {
 	auto p = pSrcBegin;
@@ -242,20 +288,10 @@ void tuned_RestoreCylindricalLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, c
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
 		__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 8));
-
-		s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 2));
-		s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 2));
-		s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 4));
-		s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 4));
-		s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 8));
-		s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 8));
-		s0 = _mm_add_epi16(s0, prev);
-		s1 = _mm_add_epi16(s1, _mm_shuffle_epi8(s0, _mm_set2_epi8(15, 14)));
-		s0 = _mm_and_si128(s0, _mm_set1_epi16(CSymbolBits<10>::maskval));
-		s1 = _mm_and_si128(s1, _mm_set1_epi16(CSymbolBits<10>::maskval));
-		_mm_storeu_si128((__m128i *)q, s0);
-		_mm_storeu_si128((__m128i *)(q + 8), s1);
-		prev = _mm_shuffle_epi8(s1, _mm_set2_epi8(15, 14));
+		auto result = tuned_RestoreLeft10Element<F>(prev, s0, s1);
+		_mm_storeu_si128((__m128i *)q, result.v0);
+		_mm_storeu_si128((__m128i *)(q + 8), result.v1);
+		prev = result.v2;
 	}
 #endif
 	for (; p < pSrcEnd; p++, q++)
@@ -286,13 +322,9 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 	for (; p <= pSrcBegin + cbStride - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
-		__m128i left = _mm_alignr_epi8(value, prev, 15);
-
-		__m128i error = _mm_sub_epi8(value, left);
-		_mm_storeu_si128((__m128i *)q, error);
+		__m128i residual = tuned_PredictLeftAndCount8Element<F>(prev, value, pCountTable);
+		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
-
-		IncrementCounters8<F>(error, pCountTable);
 	}
 #endif
 	for (; p < pSrcBegin + cbStride; p++, q++)
@@ -351,20 +383,10 @@ void tuned_RestoreCylindricalWrongMedian8(uint8_t *pDst, const uint8_t *pSrcBegi
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
 		__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 16));
-
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 1));
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 2));
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 4));
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 8));
-		s0 = _mm_add_epi8(s0, prev);
-		s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)));
-		_mm_storeu_si128((__m128i *)q, s0);
-		_mm_storeu_si128((__m128i *)(q + 16), s1);
-		prev = _mm_shuffle_epi8(s1, _mm_set1_epi8(15));
+		auto result = tuned_RestoreLeft8Element<F>(prev, s0, s1);
+		_mm_storeu_si128((__m128i *)q, result.v0);
+		_mm_storeu_si128((__m128i *)(q + 16), result.v1);
+		prev = result.v2;
 	}
 #endif
 	for (; p < pSrcBegin + cbStride; p++, q++)
@@ -408,14 +430,9 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 	for (; p <= pSrcBegin + cbStride - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
-		__m128i left = _mm_alignr_epi8(value, prev, 15);
-
-		__m128i error = _mm_sub_epi8(value, left);
-		_mm_storeu_si128((__m128i *)q, error);
+		__m128i residual = tuned_PredictLeftAndCount8Element<F, DoCount>(prev, value, pCountTable);
+		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
-
-		if (DoCount)
-			IncrementCounters8<F>(error, pCountTable);
 	}
 #endif
 	for (; p < pSrcBegin + cbStride; p++, q++)
@@ -432,16 +449,10 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 #ifdef __SSSE3__
 		for (; p <= pp + cbStride - 16; p += 16, q += 16)
 		{
-			__m128i value = _mm_loadu_si128((const __m128i *)p);
-			__m128i top = _mm_loadu_si128((const __m128i *)(p - cbStride));
-			__m128i tmp = _mm_sub_epi8(value, top);
-			__m128i left = _mm_alignr_epi8(tmp, prev, 15);
-			__m128i error = _mm_sub_epi8(tmp, left);
-			_mm_storeu_si128((__m128i *)q, error);
-			prev = tmp;
-
-			if (DoCount)
-				IncrementCounters8<F>(error, pCountTable);
+			__m128i value = _mm_sub_epi8(_mm_loadu_si128((const __m128i *)p), _mm_loadu_si128((const __m128i *)(p - cbStride)));
+			__m128i residual = tuned_PredictLeftAndCount8Element<F, DoCount>(prev, value, pCountTable);
+			_mm_storeu_si128((__m128i *)q, residual);
+			prev = value;
 		}
 #endif
 		for (; p < pp + cbStride; p++, q++)
@@ -489,20 +500,10 @@ void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
 		__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 16));
-
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 1));
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 2));
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 4));
-		s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
-		s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 8));
-		s0 = _mm_add_epi8(s0, prev);
-		s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)));
-		_mm_storeu_si128((__m128i *)q, s0);
-		_mm_storeu_si128((__m128i *)(q + 16), s1);
-		prev = _mm_shuffle_epi8(s1, _mm_set1_epi8(15));
+		auto result = tuned_RestoreLeft8Element<F>(prev, s0, s1);
+		_mm_storeu_si128((__m128i *)q, result.v0);
+		_mm_storeu_si128((__m128i *)(q + 16), result.v1);
+		prev = result.v2;
 	}
 #endif
 	for (; p < pSrcBegin + cbStride; p++, q++)
@@ -519,20 +520,10 @@ void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const
 		{
 			__m128i s0 = _mm_loadu_si128((const __m128i *)p);
 			__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 16));
-
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
-			s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 1));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
-			s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 2));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
-			s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 4));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
-			s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 8));
-			s0 = _mm_add_epi8(s0, prev);
-			s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)));
-			_mm_storeu_si128((__m128i *)q, _mm_add_epi8(s0, _mm_loadu_si128((const __m128i *)(q - cbStride))));
-			_mm_storeu_si128((__m128i *)(q + 16), _mm_add_epi8(s1, _mm_loadu_si128((const __m128i *)(q - cbStride + 16))));
-			prev = _mm_shuffle_epi8(s1, _mm_set1_epi8(15));
+			auto result = tuned_RestoreLeft8Element<F>(prev, s0, s1);
+			_mm_storeu_si128((__m128i *)q, _mm_add_epi8(result.v0, _mm_loadu_si128((const __m128i *)(q - cbStride))));
+			_mm_storeu_si128((__m128i *)(q + 16), _mm_add_epi8(result.v1, _mm_loadu_si128((const __m128i *)(q - cbStride + 16))));
+			prev = result.v2;
 		}
 #endif
 		for (; p < pp + cbStride; p++, q++)
