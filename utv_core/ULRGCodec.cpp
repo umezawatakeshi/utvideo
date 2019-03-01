@@ -124,7 +124,7 @@ void CULRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 	}
 }
 
-bool CULRGCodec::DecodeDirect(uint32_t nBandIndex)
+bool CULRGCodec::RestoreDirect(uint32_t nBandIndex)
 {
 	return false;
 }

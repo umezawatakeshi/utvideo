@@ -606,19 +606,6 @@ int CUL00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned 
 
 void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 {
-	if (DecodeDirect(nBandIndex))
-		return;
-
-	uint8_t* pDstBegin[4];
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
-		pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
-	DecodeToPlanar(nBandIndex, pDstBegin);
-
-	ConvertFromPlanar(nBandIndex);
-}
-
-void CUL00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
-{
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
@@ -630,6 +617,25 @@ void CUL00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
 #endif
 		HuffmanDecode<8>(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
 		_ASSERT(pRetActual == pRetExpected);
+	}
+
+	if (RestoreDirect(nBandIndex))
+		return;
+
+	uint8_t* pDstBegin[4];
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+		pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
+	RestoreToPlanar(nBandIndex, pDstBegin);
+
+	ConvertFromPlanar(nBandIndex);
+}
+
+void CUL00Codec::RestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
+{
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	{
+		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
 		switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
@@ -647,7 +653,7 @@ void CUL00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
 	}
 }
 
-bool CUL00Codec::DecodeDirect(uint32_t nBandIndex)
+bool CUL00Codec::RestoreDirect(uint32_t nBandIndex)
 {
 	return false;
 }

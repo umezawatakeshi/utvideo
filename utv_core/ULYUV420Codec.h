@@ -46,5 +46,5 @@ protected:
 	virtual void ConvertToPlanar(uint32_t nBandIndex);
 	virtual void ConvertFromPlanar(uint32_t nBandIndex);
 	virtual bool PredictDirect(uint32_t nBandIndex);
-	virtual bool DecodeDirect(uint32_t nBandIndex);
+	virtual bool RestoreDirect(uint32_t nBandIndex);
 };

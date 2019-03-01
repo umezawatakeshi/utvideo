@@ -110,7 +110,7 @@ void CULRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 	}
 }
 
-bool CULRACodec::DecodeDirect(uint32_t nBandIndex)
+bool CULRACodec::RestoreDirect(uint32_t nBandIndex)
 {
 	return false;
 }
