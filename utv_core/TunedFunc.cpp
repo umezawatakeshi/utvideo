@@ -10,6 +10,7 @@
 #include "ColorOrder.h"
 #include "Coefficient.h"
 #include "SymPack.h"
+#include "ConvertPredict.h"
 
 const TUNEDFUNC_PREDICT tfnPredictCPP = {
 	NULL,
@@ -134,6 +135,39 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackCPP = {
 	cpp_Unpack8SymWithDiff8,
 };
 
+const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictCPP = {
+	NULL,
+	{ 0 },
+	cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount<CBGRColorOrder>,
+	cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount<CBGRAColorOrder>,
+	cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount<CARGBColorOrder>,
+	cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount<CBGRColorOrder>,
+	cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount<CBGRAColorOrder>,
+	cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount<CARGBColorOrder>,
+	cpp_ConvertRGBAToULRA_PredictCylindricalLeftAndCount<CBGRAColorOrder>,
+	cpp_ConvertRGBAToULRA_PredictCylindricalLeftAndCount<CARGBColorOrder>,
+	cpp_ConvertRGBAToULRA_PredictPlanarGradientAndCount<CBGRAColorOrder>,
+	cpp_ConvertRGBAToULRA_PredictPlanarGradientAndCount<CARGBColorOrder>,
+	cpp_ConvertULRGToRGB_RestoreCylindricalLeft<CBGRColorOrder>,
+	cpp_ConvertULRGToRGB_RestoreCylindricalLeft<CBGRAColorOrder>,
+	cpp_ConvertULRGToRGB_RestoreCylindricalLeft<CARGBColorOrder>,
+	cpp_ConvertULRGToRGB_RestorePlanarGradient<CBGRColorOrder>,
+	cpp_ConvertULRGToRGB_RestorePlanarGradient<CBGRAColorOrder>,
+	cpp_ConvertULRGToRGB_RestorePlanarGradient<CARGBColorOrder>,
+	cpp_ConvertULRAToRGBA_RestoreCylindricalLeft<CBGRAColorOrder>,
+	cpp_ConvertULRAToRGBA_RestoreCylindricalLeft<CARGBColorOrder>,
+	cpp_ConvertULRAToRGBA_RestorePlanarGradient<CBGRAColorOrder>,
+	cpp_ConvertULRAToRGBA_RestorePlanarGradient<CARGBColorOrder>,
+	cpp_ConvertPackedYUV422ToULY2_PredictCylindricalLeftAndCount<CYUYVColorOrder>,
+	cpp_ConvertPackedYUV422ToULY2_PredictCylindricalLeftAndCount<CUYVYColorOrder>,
+	cpp_ConvertPackedYUV422ToULY2_PredictPlanarGradientAndCount<CYUYVColorOrder>,
+	cpp_ConvertPackedYUV422ToULY2_PredictPlanarGradientAndCount<CUYVYColorOrder>,
+	cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft<CYUYVColorOrder>,
+	cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft<CUYVYColorOrder>,
+	cpp_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CYUYVColorOrder>,
+	cpp_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CUYVYColorOrder>,
+};
+
 TUNEDFUNC tfn = {
 	&tfnPredictCPP,
 	&tfnHuffmanEncodeCPP,
@@ -141,6 +175,7 @@ TUNEDFUNC tfn = {
 	&tfnConvertYUVRGBCPP,
 	&tfnConvertShuffleCPP,
 	&tfnSymPackCPP,
+	&tfnConvertPredictCPP,
 };
 
 
@@ -154,18 +189,28 @@ void ResolveTunedFunc(const TUNEDFUNC *ptfnRoot, const uint32_t *pdwSupportedFea
 
 	for (int i = 0; i < (sizeof(TUNEDFUNC) / sizeof(void *)); i++)
 	{
+		LOGPRINTF("element #%d", i);
 		for (pTest = pSrc[i]; pTest != NULL; pTest = (const TUNEDFUNC_FRAGMENT *)pTest->pNext)
 		{
 			int j;
 			for (j = 0; j < _countof(pTest->dwRequiredFeatures); j++)
 			{
 				if ((pTest->dwRequiredFeatures[j] & pdwSupportedFeatures[j]) != pTest->dwRequiredFeatures[j])
+				{
+					LOGPRINTF("feature is insufficient");
 					break;
+				}
 			}
 			if (j == _countof(pTest->dwRequiredFeatures))
+			{
+				LOGPRINTF("sufficient");
 				break;
+			}
 		}
 		if (pTest != NULL)
+		{
+			LOGPRINTF("setting %p", pTest);
 			pDst[i] = pTest;
+		}
 	}
 }

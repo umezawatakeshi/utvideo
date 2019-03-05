@@ -6,6 +6,7 @@
 #include "ULYUV422Codec.h"
 #include "Predict.h"
 #include "Convert.h"
+#include "ConvertPredict.h"
 #include "TunedFunc.h"
 
 template<>
@@ -220,6 +221,55 @@ bool CULYUV422Codec<C>::PredictDirect(uint32_t nBandIndex)
 		return true;
 	}
 
+	uint8_t *y, *u, *v;
+	const uint8_t *pSrcBegin, *pSrcEnd;
+
+	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	pSrcEnd = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
+	y = m_pPredicted->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	u = m_pPredicted->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	v = m_pPredicted->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+
+	switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
+	{
+	case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+			ConvertYUYVToULY2_PredictCylindricalLeftAndCount(y, u, v, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			ConvertUYVYToULY2_PredictCylindricalLeftAndCount(y, u, v, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		}
+		break;
+	case EC_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+		if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+			ConvertYUYVToULY2_PredictPlanarGradientAndCount(y, u, v, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			ConvertUYVYToULY2_PredictPlanarGradientAndCount(y, u, v, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		}
+		break;
+	}
+
 	return false;
 }
 
@@ -237,6 +287,56 @@ bool CULYUV422Codec<C>::RestoreDirect(uint32_t nBandIndex)
 		RestoreToPlanar(nBandIndex, pDstBegin);
 
 		return true;
+	}
+
+	const uint8_t *y, *u, *v;
+	uint8_t *pDstBegin, *pDstEnd;
+
+	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	pDstEnd = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
+	y = m_pPredicted->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	u = m_pPredicted->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	v = m_pPredicted->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+
+	switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+	{
+	case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
+	case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+			ConvertULY2ToYUYV_RestoreCylindricalLeft(pDstBegin, pDstEnd, y, u, v, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			ConvertULY2ToUYVY_RestoreCylindricalLeft(pDstBegin, pDstEnd, y, u, v, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		}
+		break;
+	case FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+		if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+			ConvertULY2ToYUYV_RestorePlanarGradient(pDstBegin, pDstEnd, y, u, v, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			ConvertULY2ToUYVY_RestorePlanarGradient(pDstBegin, pDstEnd, y, u, v, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		}
+		break;
 	}
 
 	return false;

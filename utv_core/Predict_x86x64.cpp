@@ -160,6 +160,17 @@ template void tuned_PredictCylindricalLeftAndCount8<CODEFEATURE_AVX1>(uint8_t *p
 
 
 template<int F>
+static inline FORCEINLINE VECTOR2<__m128i> /* value0, nextprev */ tuned_RestoreLeft8Element(__m128i prev, __m128i s0)
+{
+	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
+	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
+	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
+	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
+	s0 = _mm_add_epi8(s0, prev);
+	return { s0, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)) };
+}
+
+template<int F>
 static inline FORCEINLINE VECTOR3<__m128i> /* value0, value1, nextprev */ tuned_RestoreLeft8Element(__m128i prev, __m128i s0, __m128i s1)
 {
 	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));

@@ -397,6 +397,12 @@ int CUL00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned i
 
 void CUL00Codec::PredictProc(uint32_t nBandIndex)
 {
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	{
+		for (int i = 0; i < 256; i++)
+			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
+	}
+
 	if (PredictDirect(nBandIndex))
 		return;
 
@@ -414,9 +420,6 @@ void CUL00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 	{
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
-
-		for (int i = 0; i < 256; i++)
-			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
 
 		switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
