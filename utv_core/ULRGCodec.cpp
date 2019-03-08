@@ -186,6 +186,31 @@ bool CULRGCodec::PredictDirect(uint32_t nBandIndex)
 			return true;
 		}
 		break;
+	case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_NFCC_BGR_BU:
+			ConvertBGRToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		case UTVF_NFCC_BGRX_BU:
+			ConvertBGRXToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		case UTVF_NFCC_BGR_TD:
+			ConvertBGRToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		case UTVF_NFCC_BGRX_TD:
+			ConvertBGRXToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		case UTVF_NFCC_RGB_TD:
+			ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		case UTVF_NFCC_ARGB_TD:
+			ConvertXRGBToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		}
+		break;
 	}
 
 	return false;

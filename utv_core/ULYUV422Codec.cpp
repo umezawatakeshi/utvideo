@@ -268,6 +268,25 @@ bool CULYUV422Codec<C>::PredictDirect(uint32_t nBandIndex)
 			return true;
 		}
 		break;
+	case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+			ConvertYUYVToULY2_PredictCylindricalWrongMedianAndCount(y, u, v, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			ConvertUYVYToULY2_PredictCylindricalWrongMedianAndCount(y, u, v, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		}
+		break;
 	}
 
 	return false;

@@ -321,6 +321,27 @@ template void tuned_RestoreCylindricalLeft10<CODEFEATURE_AVX1>(uint16_t *pDst, c
 
 
 template<int F>
+static inline FORCEINLINE __m128i VECTORCALL tuned_PredictWrongMedian8Element(__m128i topprev, __m128i top, __m128i prev, __m128i value)
+{
+	__m128i left = _mm_alignr_epi8(value, prev, 15);
+	__m128i topleft = _mm_alignr_epi8(top, topprev, 15);
+	__m128i grad = _mm_sub_epi8(_mm_add_epi8(left, top), topleft);
+	__m128i pred = _mm_max_epu8(_mm_min_epu8(_mm_max_epu8(left, top), grad), _mm_min_epu8(left, top));
+	__m128i residual = _mm_sub_epi8(value, pred);
+
+	return residual;
+}
+
+template<int F, bool DoCount = true>
+static inline FORCEINLINE __m128i VECTORCALL tuned_PredictWrongMedianAndCount8Element(__m128i topprev, __m128i top, __m128i prev, __m128i value, uint32_t* pCountTable)
+{
+	__m128i residual = tuned_PredictWrongMedian8Element<F>(topprev, top, prev, value);
+	if (DoCount)
+		IncrementCounters8<F>(residual, pCountTable);
+	return residual;
+}
+
+template<int F>
 void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t *pCountTable)
 {
 	auto p = pSrcBegin;
@@ -352,17 +373,10 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
 		__m128i top = _mm_loadu_si128((const __m128i *)(p - cbStride));
-		__m128i left = _mm_alignr_epi8(value, prev, 15);
-		__m128i topleft = _mm_alignr_epi8(top, topprev, 15);
-		__m128i grad = _mm_sub_epi8(_mm_add_epi8(left, top), topleft);
-		__m128i pred = _mm_max_epu8(_mm_min_epu8(_mm_max_epu8(left, top), grad), _mm_min_epu8(left, top));
-
-		__m128i error = _mm_sub_epi8(value, pred);
-		_mm_storeu_si128((__m128i *)q, error);
+		__m128i residual = tuned_PredictWrongMedianAndCount8Element<F>(topprev, top, prev, value, pCountTable);
+		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 		topprev = top;
-
-		IncrementCounters8<F>(error, pCountTable);
 	}
 #endif
 	for (; p < pSrcEnd; p++, q++)

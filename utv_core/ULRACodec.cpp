@@ -157,6 +157,23 @@ bool CULRACodec::PredictDirect(uint32_t nBandIndex)
 			return true;
 		}
 		break;
+	case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_NFCC_BGRA_BU:
+		case UTVF_NFCC_BGRX_BU:
+			ConvertBGRAToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			return true;
+		case UTVF_NFCC_BGRA_TD:
+			ConvertBGRAToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			return true;
+		case UTVF_NFCC_ARGB_TD:
+			ConvertARGBToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			return true;
+		}
+		break;
 	}
 
 	return false;
