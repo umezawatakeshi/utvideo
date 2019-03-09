@@ -316,7 +316,7 @@ template void cpp_ConvertRGBAToULRA_PredictCylindricalWrongMedianAndCount<CARGBC
 
 //
 
-template<class T, bool Gradient>
+template<class T, PREDICTION_TYPE Pred>
 static inline void cpp_ConvertULRGToRGB_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint8_t gprevb = 0x80;
@@ -327,7 +327,7 @@ static inline void cpp_ConvertULRGToRGB_Restore(uint8_t *pDstBegin, uint8_t *pDs
 	auto b = pBBegin;
 	auto r = pRBegin;
 
-	for (auto p = pDstBegin; p != (Gradient ? pDstBegin + scbStride : pDstEnd); p += scbStride)
+	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pp = p;
 
@@ -345,7 +345,7 @@ static inline void cpp_ConvertULRGToRGB_Restore(uint8_t *pDstBegin, uint8_t *pDs
 		}
 	}
 
-	if (Gradient) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
 	{
 		auto pp = p;
 
@@ -366,18 +366,63 @@ static inline void cpp_ConvertULRGToRGB_Restore(uint8_t *pDstBegin, uint8_t *pDs
 			r += 1;
 		}
 	}
+
+	gprevb = 0;
+	bprevb = 0;
+	rprevb = 0;
+
+	uint8_t gtopprevb = 0;
+	uint8_t btopprevb = 0;
+	uint8_t rtopprevb = 0;
+
+	if (Pred == CYLINDRICAL_WRONG_MEDIAN) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp < p + cbWidth; pp += T::BYPP)
+		{
+			uint8_t gtop = (pp - scbStride)[T::G];
+			uint8_t gg = *g + median<uint8_t>(gprevb, gtop, gprevb + gtop - gtopprevb);
+			pp[T::G] = gg;
+			uint8_t btop = (pp - scbStride)[T::B] - gtop + 0x80;
+			uint8_t bb = *b + median<uint8_t>(bprevb, btop, bprevb + btop - btopprevb);
+			pp[T::B] = bb + gg - 0x80;
+			uint8_t rtop = (pp - scbStride)[T::R] - gtop + 0x80;
+			uint8_t rr = *r + median<uint8_t>(rprevb, rtop, rprevb + rtop - rtopprevb);
+			pp[T::R] = rr + gg - 0x80;
+			if (T::BYPP == 4)
+				pp[T::A] = 0xff;
+
+			gprevb = gg;
+			bprevb = bb;
+			rprevb = rr;
+			gtopprevb = gtop;
+			btopprevb = btop;
+			rtopprevb = rtop;
+
+			b += 1;
+			g += 1;
+			r += 1;
+		}
+	}
 }
 
 template<class T>
 void cpp_ConvertULRGToRGB_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_ConvertULRGToRGB_Restore<T, false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, cbWidth, scbStride);
+	cpp_ConvertULRGToRGB_Restore<T, CYLINDRICAL_LEFT>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, cbWidth, scbStride);
 }
 
 template<class T>
 void cpp_ConvertULRGToRGB_RestorePlanarGradient(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_ConvertULRGToRGB_Restore<T, true>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, cbWidth, scbStride);
+	cpp_ConvertULRGToRGB_Restore<T, PLANAR_GRADIENT>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, cbWidth, scbStride);
+}
+
+template<class T>
+void cpp_ConvertULRGToRGB_RestoreCylindricalWrongMedian(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
+{
+	cpp_ConvertULRGToRGB_Restore<T, CYLINDRICAL_WRONG_MEDIAN>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, cbWidth, scbStride);
 }
 
 template void cpp_ConvertULRGToRGB_RestoreCylindricalLeft<CBGRColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
@@ -386,10 +431,13 @@ template void cpp_ConvertULRGToRGB_RestoreCylindricalLeft<CARGBColorOrder>(uint8
 template void cpp_ConvertULRGToRGB_RestorePlanarGradient<CBGRColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULRGToRGB_RestorePlanarGradient<CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULRGToRGB_RestorePlanarGradient<CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULRGToRGB_RestoreCylindricalWrongMedian<CBGRColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULRGToRGB_RestoreCylindricalWrongMedian<CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULRGToRGB_RestoreCylindricalWrongMedian<CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
 
 //
 
-template<class T, bool Gradient>
+template<class T, PREDICTION_TYPE Pred>
 void cpp_ConvertULRAToRGBA_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint8_t gprevb = 0x80;
@@ -402,7 +450,7 @@ void cpp_ConvertULRAToRGBA_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const u
 	auto r = pRBegin;
 	auto a = pABegin;
 
-	for (auto p = pDstBegin; p != (Gradient ? pDstBegin + scbStride : pDstEnd); p += scbStride)
+	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pp = p;
 
@@ -420,7 +468,7 @@ void cpp_ConvertULRAToRGBA_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const u
 		}
 	}
 
-	if (Gradient) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
 	{
 		auto pp = p;
 
@@ -442,24 +490,77 @@ void cpp_ConvertULRAToRGBA_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const u
 			a += 1;
 		}
 	}
+
+	gprevb = 0;
+	bprevb = 0;
+	rprevb = 0;
+	aprevb = 0;
+
+	uint8_t gtopprevb = 0;
+	uint8_t btopprevb = 0;
+	uint8_t rtopprevb = 0;
+	uint8_t atopprevb = 0;
+
+	if (Pred == CYLINDRICAL_WRONG_MEDIAN) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp < p + cbWidth; pp += T::BYPP)
+		{
+			uint8_t gtop = (pp - scbStride)[T::G];
+			uint8_t gg = *g + median<uint8_t>(gprevb, gtop, gprevb + gtop - gtopprevb);
+			pp[T::G] = gg;
+			uint8_t btop = (pp - scbStride)[T::B] - gtop + 0x80;
+			uint8_t bb = *b + median<uint8_t>(bprevb, btop, bprevb + btop - btopprevb);
+			pp[T::B] = bb + gg - 0x80;
+			uint8_t rtop = (pp - scbStride)[T::R] - gtop + 0x80;
+			uint8_t rr = *r + median<uint8_t>(rprevb, rtop, rprevb + rtop - rtopprevb);
+			pp[T::R] = rr + gg - 0x80;
+			uint8_t atop = (pp - scbStride)[T::A];
+			uint8_t aa = *a + median<uint8_t>(aprevb, atop, aprevb + atop - atopprevb);
+			pp[T::A] = aa;
+
+			gprevb = gg;
+			bprevb = bb;
+			rprevb = rr;
+			aprevb = aa;
+			gtopprevb = gtop;
+			btopprevb = btop;
+			rtopprevb = rtop;
+			atopprevb = atop;
+
+			b += 1;
+			g += 1;
+			r += 1;
+			a += 1;
+		}
+	}
 }
 
 template<class T>
 void cpp_ConvertULRAToRGBA_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_ConvertULRAToRGBA_Restore<T, false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
+	cpp_ConvertULRAToRGBA_Restore<T, CYLINDRICAL_LEFT>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
 }
 
 template<class T>
 void cpp_ConvertULRAToRGBA_RestorePlanarGradient(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_ConvertULRAToRGBA_Restore<T, true>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
+	cpp_ConvertULRAToRGBA_Restore<T, PLANAR_GRADIENT>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
+}
+
+template<class T>
+void cpp_ConvertULRAToRGBA_RestoreCylindricalWrongMedian(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+{
+	cpp_ConvertULRAToRGBA_Restore<T, CYLINDRICAL_WRONG_MEDIAN>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
 }
 
 template void cpp_ConvertULRAToRGBA_RestoreCylindricalLeft<CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULRAToRGBA_RestoreCylindricalLeft<CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULRAToRGBA_RestorePlanarGradient<CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULRAToRGBA_RestorePlanarGradient<CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULRAToRGBA_RestoreCylindricalWrongMedian<CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULRAToRGBA_RestoreCylindricalWrongMedian<CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 
 //
 

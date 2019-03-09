@@ -226,6 +226,23 @@ bool CULRACodec::RestoreDirect(uint32_t nBandIndex)
 			return true;
 		}
 		break;
+	case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_NFCC_BGRA_BU:
+		case UTVF_NFCC_BGRX_BU:
+			ConvertULRAToBGRA_RestoreCylindricalWrongMedian(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, a, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGRA_TD:
+			ConvertULRAToBGRA_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_ARGB_TD:
+			ConvertULRAToARGB_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		}
+		break;
 	}
 	return false;
 }

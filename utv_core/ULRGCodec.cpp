@@ -278,6 +278,31 @@ bool CULRGCodec::RestoreDirect(uint32_t nBandIndex)
 			return true;
 		}
 		break;
+	case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_NFCC_BGR_BU:
+			ConvertULRGToBGR_RestoreCylindricalWrongMedian(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGRX_BU:
+			ConvertULRGToBGRX_RestoreCylindricalWrongMedian(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGR_TD:
+			ConvertULRGToBGR_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGRX_TD:
+			ConvertULRGToBGRX_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_RGB_TD:
+			ConvertULRGToRGB_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_ARGB_TD:
+			ConvertULRGToXRGB_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		}
+		break;
 	}
 
 	return false;
