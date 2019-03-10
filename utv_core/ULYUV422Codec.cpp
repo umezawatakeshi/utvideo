@@ -356,6 +356,25 @@ bool CULYUV422Codec<C>::RestoreDirect(uint32_t nBandIndex)
 			return true;
 		}
 		break;
+	case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+			ConvertULY2ToYUYV_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, y, u, v, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			ConvertULY2ToUYVY_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, y, u, v, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		}
+		break;
 	}
 
 	return false;

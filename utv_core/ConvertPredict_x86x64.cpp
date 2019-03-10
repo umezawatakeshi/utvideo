@@ -1452,7 +1452,7 @@ template void tuned_ConvertPackedYUV422ToULY2_PredictCylindricalWrongMedianAndCo
 
 //
 
-template<int F, class T, bool Gradient>
+template<int F, class T, PREDICTION_TYPE Pred>
 static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint8_t yprevb = 0x80;
@@ -1463,7 +1463,7 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 	auto u = pUBegin;
 	auto v = pVBegin;
 
-	for (auto p = pDstBegin; p != (Gradient ? pDstBegin + scbStride : pDstEnd); p += scbStride)
+	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pp = p;
 
@@ -1510,7 +1510,7 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 		}
 	}
 
-	if (Gradient) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
 	{
 		auto pp = p;
 
@@ -1560,18 +1560,83 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 			v += 1;
 		}
 	}
+
+	__m128i prev = _mm_set1_epi8(0);
+	__m128i topprev = _mm_set1_epi8(0);
+
+	if (Pred == CYLINDRICAL_WRONG_MEDIAN) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		__m128i ctl_fromprev;
+		__m128i ctl_fromcur;
+		if (std::is_same<T, CYUYVColorOrder>::value)
+		{
+			ctl_fromprev = _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 3, -1, 1, 2);
+			ctl_fromcur = _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 0, -1, -1);
+		}
+		else
+		{
+			ctl_fromprev = _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 2, 3, 0);
+			ctl_fromcur = _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 1, -1, -1, -1);
+		}
+
+		for (; pp < p + cbWidth; pp += 4)
+		{
+			__m128i residual;
+			if (std::is_same<T, CYUYVColorOrder>::value)
+				residual = _mm_cvtsi32_si128(y[0] | (u[0] << 8) | (y[1] << 16) | (v[0] << 24));
+			else
+				residual = _mm_cvtsi32_si128(u[0] | (y[0] << 8) | (v[0] << 16) | (y[1] << 24));
+			__m128i top = _mm_cvtsi32_si128(*(const uint32_t *)(pp - scbStride));
+
+			__m128i left = _mm_shuffle_epi8(prev, ctl_fromprev);
+			__m128i topleft = _mm_or_si128(
+				_mm_shuffle_epi8(topprev, ctl_fromprev),
+				_mm_shuffle_epi8(top, ctl_fromcur));
+
+			__m128i top_minus_topleft = _mm_sub_epi8(top, topleft);
+			__m128i grad;
+			__m128i pred;
+			__m128i value;
+
+			grad = _mm_add_epi8(left, top_minus_topleft);
+			pred = _mm_max_epu8(_mm_min_epu8(_mm_max_epu8(left, top), grad), _mm_min_epu8(left, top));
+			value = _mm_add_epi8(residual, pred);
+
+			left = _mm_or_si128(left, _mm_shuffle_epi8(value, ctl_fromcur));
+			grad = _mm_add_epi8(left, top_minus_topleft);
+			pred = _mm_max_epu8(_mm_min_epu8(_mm_max_epu8(left, top), grad), _mm_min_epu8(left, top));
+			value = _mm_add_epi8(residual, pred);
+
+			*(uint32_t *)pp = _mm_cvtsi128_si32(value);
+
+			prev = value;
+			topprev = top;
+
+			y += 2;
+			u += 1;
+			v += 1;
+		}
+	}
 }
 
 template<int F, class T>
 void tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
 {
-	tuned_ConvertULY2ToPackedYUV422_Restore<F, T, false>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
+	tuned_ConvertULY2ToPackedYUV422_Restore<F, T, CYLINDRICAL_LEFT>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
 }
 
 template<int F, class T>
 void tuned_ConvertULY2ToPackedYUV422_RestorePlanarGradient(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
 {
-	tuned_ConvertULY2ToPackedYUV422_Restore<F, T, true>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
+	tuned_ConvertULY2ToPackedYUV422_Restore<F, T, PLANAR_GRADIENT>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
+}
+
+template<int F, class T>
+void tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	tuned_ConvertULY2ToPackedYUV422_Restore<F, T, CYLINDRICAL_WRONG_MEDIAN>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
 }
 
 #ifdef GENERATE_SSE41
@@ -1579,6 +1644,8 @@ template void tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft<CODEFEATURE
 template void tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft<CODEFEATURE_SSE41, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CODEFEATURE_SSE41, CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CODEFEATURE_SSE41, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CODEFEATURE_SSE41, CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CODEFEATURE_SSE41, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 #endif
 
 #ifdef GENERATE_AVX1
@@ -1586,4 +1653,6 @@ template void tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft<CODEFEATURE
 template void tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft<CODEFEATURE_AVX1, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CODEFEATURE_AVX1, CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CODEFEATURE_AVX1, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CODEFEATURE_AVX1, CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CODEFEATURE_AVX1, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 #endif

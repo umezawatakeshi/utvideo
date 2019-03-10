@@ -709,7 +709,7 @@ template void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalWrongMedianAndCoun
 
 //
 
-template<class T, bool Gradient>
+template<class T, PREDICTION_TYPE Pred>
 static inline void cpp_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint8_t yprevb = 0x80;
@@ -720,7 +720,7 @@ static inline void cpp_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, uin
 	auto u = pUBegin;
 	auto v = pVBegin;
 
-	for (auto p = pDstBegin; p != (Gradient ? pDstBegin + scbStride : pDstEnd); p += scbStride)
+	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pp = p;
 
@@ -737,7 +737,7 @@ static inline void cpp_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, uin
 		}
 	}
 
-	if (Gradient) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
 	{
 		auto pp = p;
 
@@ -757,21 +757,69 @@ static inline void cpp_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, uin
 			v += 1;
 		}
 	}
+
+	yprevb = 0;
+	uprevb = 0;
+	vprevb = 0;
+
+	uint8_t ytopprevb = 0;
+	uint8_t utopprevb = 0;
+	uint8_t vtopprevb = 0;
+
+	if (Pred == CYLINDRICAL_WRONG_MEDIAN) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp < p + cbWidth; pp += 4)
+		{
+			uint8_t ytop0 = (pp - scbStride)[T::Y0];
+			uint8_t yy0 = *y + median<uint8_t>(yprevb, ytop0, yprevb + ytop0 - ytopprevb);
+			pp[T::Y0] = yy0;
+			uint8_t ytop1 = (pp - scbStride)[T::Y1];
+			uint8_t yy1 = *(y + 1) + median<uint8_t>(yy0, ytop1, yy0 + ytop1 - ytop0);
+			pp[T::Y1] = yy1;
+			uint8_t utop = (pp - scbStride)[T::U];
+			uint8_t uu = *u + median<uint8_t>(uprevb, utop, uprevb + utop - utopprevb);
+			pp[T::U] = uu;
+			uint8_t vtop = (pp - scbStride)[T::V];
+			uint8_t vv = *v + median<uint8_t>(vprevb, vtop, vprevb + vtop - vtopprevb);
+			pp[T::V] = vv;
+
+			yprevb = yy1;
+			uprevb = uu;
+			vprevb = vv;
+			ytopprevb = ytop1;
+			utopprevb = utop;
+			vtopprevb = vtop;
+
+			y += 2;
+			u += 1;
+			v += 1;
+		}
+	}
 }
 
 template<class T>
 void cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_ConvertULY2ToPackedYUV422_Restore<T, false>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
+	cpp_ConvertULY2ToPackedYUV422_Restore<T, CYLINDRICAL_LEFT>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
 }
 
 template<class T>
 void cpp_ConvertULY2ToPackedYUV422_RestorePlanarGradient(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
 {
-	cpp_ConvertULY2ToPackedYUV422_Restore<T, true>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
+	cpp_ConvertULY2ToPackedYUV422_Restore<T, PLANAR_GRADIENT>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
+}
+
+template<class T>
+void cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	cpp_ConvertULY2ToPackedYUV422_Restore<T, CYLINDRICAL_WRONG_MEDIAN>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
 }
 
 template void cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft<CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft<CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);

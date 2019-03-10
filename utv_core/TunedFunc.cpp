@@ -178,6 +178,8 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictCPP = {
 	cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalLeft<CUYVYColorOrder>,
 	cpp_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CYUYVColorOrder>,
 	cpp_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CUYVYColorOrder>,
+	cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CYUYVColorOrder>,
+	cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CUYVYColorOrder>,
 };
 
 TUNEDFUNC tfn = {
