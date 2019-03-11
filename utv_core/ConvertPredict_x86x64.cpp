@@ -8,13 +8,6 @@
 #error
 #endif
 
-enum PREDICTION_TYPE
-{
-	CYLINDRICAL_LEFT,
-	PLANAR_GRADIENT,
-	CYLINDRICAL_WRONG_MEDIAN,
-};
-
 template<int F, PREDICTION_TYPE Pred>
 static inline void tuned_ConvertBGRToULRG_PredictAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable)
 {

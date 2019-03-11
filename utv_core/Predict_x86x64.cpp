@@ -7,12 +7,6 @@
 #error
 #endif
 
-template<class T>
-static inline T median(T a, T b, T c)
-{
-	return max(min(max(a, b), c), min(a, b));
-}
-
 template<int F>
 static inline void IncrementCounters8(__m128i xmm, uint32_t* pCountTable)
 {
