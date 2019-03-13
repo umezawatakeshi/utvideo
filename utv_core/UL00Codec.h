@@ -152,10 +152,13 @@ protected:
 	virtual void ConvertToPlanar(uint32_t nBandIndex) = 0;
 	virtual void ConvertFromPlanar(uint32_t nBandIndex) = 0;
 	virtual bool PredictDirect(uint32_t nBandIndex);
+	virtual bool DecodeDirect(uint32_t nBandIndex);
 	virtual bool RestoreDirect(uint32_t nBandIndex);
 
 	void PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin);
+	void DecodeToPlanar(uint32_t nBandIndex);
 	void RestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
+	void DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
 
 private:
 	void PredictProc(uint32_t nBandIndex);

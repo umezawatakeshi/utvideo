@@ -190,7 +190,7 @@ bool CULYUV444Codec<C>::PredictDirect(uint32_t nBandIndex)
 }
 
 template<class C>
-bool CULYUV444Codec<C>::RestoreDirect(uint32_t nBandIndex)
+bool CULYUV444Codec<C>::DecodeDirect(uint32_t nBandIndex)
 {
 	if (m_utvfRaw == UTVF_YV24)
 	{
@@ -200,7 +200,7 @@ bool CULYUV444Codec<C>::RestoreDirect(uint32_t nBandIndex)
 		pDstBegin[2] = pDstBegin[0] + m_nWidth * m_nHeight;
 		pDstBegin[1] = pDstBegin[2] + m_nWidth * m_nHeight;
 
-		RestoreToPlanar(nBandIndex, pDstBegin);
+		DecodeAndRestoreToPlanar(nBandIndex, pDstBegin);
 
 		return true;
 	}

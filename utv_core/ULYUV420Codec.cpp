@@ -338,7 +338,7 @@ bool CULYUV420Codec<C>::PredictDirect(uint32_t nBandIndex)
 }
 
 template<class C>
-bool CULYUV420Codec<C>::RestoreDirect(uint32_t nBandIndex)
+bool CULYUV420Codec<C>::DecodeDirect(uint32_t nBandIndex)
 {
 	switch (m_utvfRaw)
 	{
@@ -350,7 +350,7 @@ bool CULYUV420Codec<C>::RestoreDirect(uint32_t nBandIndex)
 			pDstBegin[2] = pDstBegin[0] + m_nWidth * m_nHeight;
 			pDstBegin[1] = pDstBegin[2] + m_nWidth * m_nHeight / 4;
 
-			RestoreToPlanar(nBandIndex, pDstBegin);
+			DecodeAndRestoreToPlanar(nBandIndex, pDstBegin);
 		}
 		return true;
 	case UTVF_YV16:
@@ -361,7 +361,7 @@ bool CULYUV420Codec<C>::RestoreDirect(uint32_t nBandIndex)
 			pDstBegin[1] = m_pCurFrame->GetPlane(1);
 			pDstBegin[2] = m_pCurFrame->GetPlane(2);
 
-			RestoreToPlanar(nBandIndex, pDstBegin);
+			DecodeAndRestoreToPlanar(nBandIndex, pDstBegin);
 
 			uint8_t *pDstYBegin, *pDstVBegin, *pDstUBegin;
 

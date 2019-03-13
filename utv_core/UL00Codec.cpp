@@ -609,6 +609,24 @@ int CUL00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned 
 
 void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 {
+	if (DecodeDirect(nBandIndex))
+		return;
+
+	DecodeToPlanar(nBandIndex);
+
+	if (RestoreDirect(nBandIndex))
+		return;
+
+	uint8_t* pDstBegin[4];
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+		pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
+	RestoreToPlanar(nBandIndex, pDstBegin);
+
+	ConvertFromPlanar(nBandIndex);
+}
+
+void CUL00Codec::DecodeToPlanar(uint32_t nBandIndex)
+{
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
@@ -621,16 +639,6 @@ void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 		HuffmanDecode<8>(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
 		_ASSERT(pRetActual == pRetExpected);
 	}
-
-	if (RestoreDirect(nBandIndex))
-		return;
-
-	uint8_t* pDstBegin[4];
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
-		pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
-	RestoreToPlanar(nBandIndex, pDstBegin);
-
-	ConvertFromPlanar(nBandIndex);
 }
 
 void CUL00Codec::RestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
@@ -654,6 +662,47 @@ void CUL00Codec::RestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
 			break;
 		}
 	}
+}
+
+void CUL00Codec::DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
+{
+	/*
+	 * decode と restore をお仕着せの処理で行う場合、
+	 * 全部の plane を decode してから全部の plane を restore するよりも、
+	 * plane ごとに decode して restore した方が、メインメモリへのアクセスが最適化されて速い。
+	 */
+
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	{
+		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
+
+#ifdef _DEBUG
+		uint8_t *pRetExpected = m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd;
+		uint8_t *pRetActual =
+#endif
+		HuffmanDecode<8>(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
+		_ASSERT(pRetActual == pRetExpected);
+
+		switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+		{
+		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
+		case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+			RestoreCylindricalLeft8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd);
+			break;
+		case FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+			RestorePlanarGradient8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
+			break;
+		case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+			RestoreCylindricalWrongMedian8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
+			break;
+		}
+	}
+}
+
+bool CUL00Codec::DecodeDirect(uint32_t nBandIndex)
+{
+	return false;
 }
 
 bool CUL00Codec::RestoreDirect(uint32_t nBandIndex)
