@@ -612,17 +612,24 @@ void CUL00Codec::DecodeProc(uint32_t nBandIndex)
 	if (DecodeDirect(nBandIndex))
 		return;
 
-	DecodeToPlanar(nBandIndex);
+	if (IsDirectRestorable())
+	{
+		DecodeToPlanar(nBandIndex);
 
-	if (RestoreDirect(nBandIndex))
-		return;
+		if (RestoreDirect(nBandIndex))
+			return;
 
-	uint8_t* pDstBegin[4];
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
-		pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
-	RestoreToPlanar(nBandIndex, pDstBegin);
+		_ASSERT(false);
+	}
+	else
+	{
+		uint8_t* pDstBegin[4];
+		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+			pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
+		DecodeAndRestoreToPlanar(nBandIndex, pDstBegin);
 
-	ConvertFromPlanar(nBandIndex);
+		ConvertFromPlanar(nBandIndex);
+	}
 }
 
 void CUL00Codec::DecodeToPlanar(uint32_t nBandIndex)
@@ -706,6 +713,11 @@ bool CUL00Codec::DecodeDirect(uint32_t nBandIndex)
 }
 
 bool CUL00Codec::RestoreDirect(uint32_t nBandIndex)
+{
+	return false;
+}
+
+bool CUL00Codec::IsDirectRestorable()
 {
 	return false;
 }

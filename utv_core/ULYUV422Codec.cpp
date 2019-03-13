@@ -385,3 +385,60 @@ bool CULYUV422Codec<C>::RestoreDirect(uint32_t nBandIndex)
 
 	return false;
 }
+
+template<class C>
+bool CULYUV422Codec<C>::IsDirectRestorable()
+{
+	switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+	{
+	case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
+	case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			return true;
+		}
+		break;
+	case FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+		if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			return true;
+		}
+		break;
+	case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			return true;
+		}
+		break;
+	}
+
+	return false;
+}

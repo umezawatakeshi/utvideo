@@ -246,3 +246,46 @@ bool CULRACodec::RestoreDirect(uint32_t nBandIndex)
 	}
 	return false;
 }
+
+bool CULRACodec::IsDirectRestorable()
+{
+	switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+	{
+	case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
+	case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_NFCC_BGRA_BU:
+		case UTVF_NFCC_BGRX_BU:
+		case UTVF_NFCC_BGRA_TD:
+		case UTVF_NFCC_ARGB_TD:
+			return true;
+		}
+		break;
+	case FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+		if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_NFCC_BGRA_BU:
+		case UTVF_NFCC_BGRX_BU:
+		case UTVF_NFCC_BGRA_TD:
+		case UTVF_NFCC_ARGB_TD:
+			return true;
+		}
+		break;
+	case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_NFCC_BGRA_BU:
+		case UTVF_NFCC_BGRX_BU:
+		case UTVF_NFCC_BGRA_TD:
+		case UTVF_NFCC_ARGB_TD:
+			return true;
+		}
+		break;
+	}
+	return false;
+}
