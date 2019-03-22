@@ -25,7 +25,6 @@ static inline void tuned_ConvertBGRToULRG_PredictAndCount(uint8_t *pGBegin, uint
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i gprev = _mm_slli_si128(_mm_cvtsi32_si128(gprevb), 15);
 		__m128i bprev = _mm_slli_si128(_mm_cvtsi32_si128(bprevb), 15);
 		__m128i rprev = _mm_slli_si128(_mm_cvtsi32_si128(rprevb), 15);
@@ -49,7 +48,6 @@ static inline void tuned_ConvertBGRToULRG_PredictAndCount(uint8_t *pGBegin, uint
 		gprevb = _mm_cvtsi128_si32(_mm_srli_si128(gprev, 15));
 		bprevb = _mm_cvtsi128_si32(_mm_srli_si128(bprev, 15));
 		rprevb = _mm_cvtsi128_si32(_mm_srli_si128(rprev, 15));
-#endif
 
 		for (; pp < p + cbWidth; pp += 3)
 		{
@@ -77,7 +75,6 @@ static inline void tuned_ConvertBGRToULRG_PredictAndCount(uint8_t *pGBegin, uint
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i gprev = _mm_setzero_si128();
 		__m128i bprev = _mm_setzero_si128();
 		__m128i rprev = _mm_setzero_si128();
@@ -105,7 +102,6 @@ static inline void tuned_ConvertBGRToULRG_PredictAndCount(uint8_t *pGBegin, uint
 		gprevb = _mm_cvtsi128_si32(_mm_srli_si128(gprev, 15));
 		bprevb = _mm_cvtsi128_si32(_mm_srli_si128(bprev, 15));
 		rprevb = _mm_cvtsi128_si32(_mm_srli_si128(rprev, 15));
-#endif
 
 		for (; pp < p + cbWidth; pp += 3)
 		{
@@ -141,7 +137,6 @@ static inline void tuned_ConvertBGRToULRG_PredictAndCount(uint8_t *pGBegin, uint
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i gprev = _mm_slli_si128(_mm_cvtsi32_si128(gprevb), 15);
 		__m128i bprev = _mm_slli_si128(_mm_cvtsi32_si128(bprevb), 15);
 		__m128i rprev = _mm_slli_si128(_mm_cvtsi32_si128(rprevb), 15);
@@ -175,7 +170,6 @@ static inline void tuned_ConvertBGRToULRG_PredictAndCount(uint8_t *pGBegin, uint
 		gtopprevb = _mm_cvtsi128_si32(_mm_srli_si128(gtopprev, 15));
 		btopprevb = _mm_cvtsi128_si32(_mm_srli_si128(btopprev, 15));
 		rtopprevb = _mm_cvtsi128_si32(_mm_srli_si128(rtopprev, 15));
-#endif
 
 		for (; pp < p + cbWidth; pp += 3)
 		{
@@ -223,7 +217,6 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i gprev = _mm_slli_si128(_mm_cvtsi32_si128(gprevb), 15);
 		__m128i bprev = _mm_slli_si128(_mm_cvtsi32_si128(bprevb), 15);
 		__m128i rprev = _mm_slli_si128(_mm_cvtsi32_si128(rprevb), 15);
@@ -258,7 +251,6 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 		rprevb = _mm_cvtsi128_si32(_mm_srli_si128(rprev, 15));
 		if (A)
 			aprevb = _mm_cvtsi128_si32(_mm_srli_si128(aprev, 15));
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -294,7 +286,6 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i gprev = _mm_setzero_si128();
 		__m128i bprev = _mm_setzero_si128();
 		__m128i rprev = _mm_setzero_si128();
@@ -334,7 +325,6 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 		rprevb = _mm_cvtsi128_si32(_mm_srli_si128(rprev, 15));
 		if (A)
 			aprevb = _mm_cvtsi128_si32(_mm_srli_si128(aprev, 15));
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -381,7 +371,6 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i gprev = _mm_slli_si128(_mm_cvtsi32_si128(gprevb), 15);
 		__m128i bprev = _mm_slli_si128(_mm_cvtsi32_si128(bprevb), 15);
 		__m128i rprev = _mm_slli_si128(_mm_cvtsi32_si128(rprevb), 15);
@@ -433,7 +422,6 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 		rtopprevb = _mm_cvtsi128_si32(_mm_srli_si128(rtopprev, 15));
 		if (A)
 			atopprevb = _mm_cvtsi128_si32(_mm_srli_si128(atopprev, 15));
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -575,7 +563,6 @@ static inline void tuned_ConvertULRGToBGR_Restore(uint8_t *pDstBegin, uint8_t *p
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i gprev = _mm_set1_epi8(gprevb);
 		__m128i bprev = _mm_set1_epi8(bprevb);
 		__m128i rprev = _mm_set1_epi8(rprevb);
@@ -602,7 +589,6 @@ static inline void tuned_ConvertULRGToBGR_Restore(uint8_t *pDstBegin, uint8_t *p
 		gprevb = _mm_cvtsi128_si32(gprev);
 		bprevb = _mm_cvtsi128_si32(bprev);
 		rprevb = _mm_cvtsi128_si32(rprev);
-#endif
 
 		for (; pp < p + cbWidth; pp += 3)
 		{
@@ -620,7 +606,6 @@ static inline void tuned_ConvertULRGToBGR_Restore(uint8_t *pDstBegin, uint8_t *p
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i gprev = _mm_set1_epi8(0);
 		__m128i bprev = _mm_set1_epi8(0);
 		__m128i rprev = _mm_set1_epi8(0);
@@ -650,7 +635,6 @@ static inline void tuned_ConvertULRGToBGR_Restore(uint8_t *pDstBegin, uint8_t *p
 		gprevb = _mm_cvtsi128_si32(gprev);
 		bprevb = _mm_cvtsi128_si32(bprev);
 		rprevb = _mm_cvtsi128_si32(rprev);
-#endif
 
 		for (; pp < p + cbWidth; pp += 3)
 		{
@@ -676,7 +660,6 @@ static inline void tuned_ConvertULRGToBGR_Restore(uint8_t *pDstBegin, uint8_t *p
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i left;
 		__m128i prevtmp;
 		__m128i topprevtmp;
@@ -748,7 +731,6 @@ static inline void tuned_ConvertULRGToBGR_Restore(uint8_t *pDstBegin, uint8_t *p
 		gtopprevb = toptmp >> 8;
 		btopprevb = toptmp;
 		rtopprevb = toptmp >> 16;
-#endif
 
 		for (; pp < p + cbWidth; pp += 3)
 		{
@@ -793,7 +775,6 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i gprev = _mm_set1_epi8(gprevb);
 		__m128i bprev = _mm_set1_epi8(bprevb);
 		__m128i rprev = _mm_set1_epi8(rprevb);
@@ -840,7 +821,6 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 		rprevb = _mm_cvtsi128_si32(rprev);
 		if (A)
 			aprevb = _mm_cvtsi128_si32(aprev);
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -864,7 +844,6 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i gprev = _mm_set1_epi8(0);
 		__m128i bprev = _mm_set1_epi8(0);
 		__m128i rprev = _mm_set1_epi8(0);
@@ -914,7 +893,6 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 		rprevb = _mm_cvtsi128_si32(rprev);
 		if (A)
 			aprevb = _mm_cvtsi128_si32(aprev);
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -949,7 +927,6 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i left;
 		__m128i prev;
 		__m128i topprev;
@@ -1074,7 +1051,6 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 			if (A)
 				atopprevb = toptmp;
 		}
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -1212,7 +1188,6 @@ static inline void tuned_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBe
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i yprev = _mm_slli_si128(_mm_cvtsi32_si128(yprevb), 15);
 		__m128i uprev = _mm_slli_si128(_mm_cvtsi32_si128(uprevb), 15);
 		__m128i vprev = _mm_slli_si128(_mm_cvtsi32_si128(vprevb), 15);
@@ -1237,7 +1212,6 @@ static inline void tuned_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBe
 		yprevb = _mm_cvtsi128_si32(_mm_srli_si128(yprev, 15));
 		uprevb = _mm_cvtsi128_si32(_mm_srli_si128(uprev, 15));
 		vprevb = _mm_cvtsi128_si32(_mm_srli_si128(vprev, 15));
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -1268,7 +1242,6 @@ static inline void tuned_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBe
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i yprev = _mm_setzero_si128();
 		__m128i uprev = _mm_setzero_si128();
 		__m128i vprev = _mm_setzero_si128();
@@ -1298,7 +1271,6 @@ static inline void tuned_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBe
 		yprevb = _mm_cvtsi128_si32(_mm_srli_si128(yprev, 15));
 		uprevb = _mm_cvtsi128_si32(_mm_srli_si128(uprev, 15));
 		vprevb = _mm_cvtsi128_si32(_mm_srli_si128(vprev, 15));
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -1337,7 +1309,6 @@ static inline void tuned_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBe
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i yprev = _mm_slli_si128(_mm_cvtsi32_si128(yprevb), 15);
 		__m128i uprev = _mm_slli_si128(_mm_cvtsi32_si128(uprevb), 15);
 		__m128i vprev = _mm_slli_si128(_mm_cvtsi32_si128(vprevb), 15);
@@ -1372,7 +1343,6 @@ static inline void tuned_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBe
 		ytopprevb = _mm_cvtsi128_si32(_mm_srli_si128(ytopprev, 15));
 		utopprevb = _mm_cvtsi128_si32(_mm_srli_si128(utopprev, 15));
 		vtopprevb = _mm_cvtsi128_si32(_mm_srli_si128(vtopprev, 15));
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -1460,7 +1430,6 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i yprev = _mm_set1_epi8(yprevb);
 		__m128i uprev = _mm_set1_epi8(uprevb);
 		__m128i vprev = _mm_set1_epi8(vprevb);
@@ -1488,7 +1457,6 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 		yprevb = _mm_cvtsi128_si32(yprev);
 		uprevb = _mm_cvtsi128_si32(uprev);
 		vprevb = _mm_cvtsi128_si32(vprev);
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -1507,7 +1475,6 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
 		__m128i yprev = _mm_set1_epi8(0);
 		__m128i uprev = _mm_set1_epi8(0);
 		__m128i vprev = _mm_set1_epi8(0);
@@ -1539,7 +1506,6 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 		yprevb = _mm_cvtsi128_si32(yprev);
 		uprevb = _mm_cvtsi128_si32(uprev);
 		vprevb = _mm_cvtsi128_si32(vprev);
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
