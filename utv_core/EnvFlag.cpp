@@ -9,13 +9,15 @@ bool GetEnvFlagBool(const char* pszEnvName)
 #if defined(_WIN32)
 	char p[4];
 	auto n = GetEnvironmentVariableA(pszEnvName, p, sizeof(p));
-	if (n == 0)
+	if (n == 0) // ŠÂ‹«•Ï”‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½
 		return false;
+	if (n >= sizeof(p)) // ŠÂ‹«•Ï”‚ª’·‚·‚¬‚½
+		return true;
 #endif
 #if defined(__APPLE__) || defined(__unix__)
 	char *p;
 	p = getenv(pszEnvName);
-	if (p == NULL)
+	if (p == NULL) // ŠÂ‹«•Ï”‚ªŒ©‚Â‚©‚ç‚È‚©‚Á‚½
 		return false;
 #endif
 	if (strcmp(p, "") == 0)
