@@ -780,9 +780,6 @@ ma_found:
 			dwSupportedFeatures[0] |= FEATURE0_SSE2;
 		}
 
-		LOGPRINTF("tfnConvertPredictAVX1 = %p", &tfnConvertPredictAVX1);
-		LOGPRINTF("tfnConvertPredictSSE41 = %p", &tfnConvertPredictSSE41);
-		LOGPRINTF("tfnConvertPredictCPP = %p", &tfnConvertPredictCPP);
 		ResolveTunedFunc(&tfnRoot, dwSupportedFeatures);
 	}
 } tfi;

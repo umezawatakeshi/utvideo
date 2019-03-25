@@ -203,28 +203,18 @@ void ResolveTunedFunc(const TUNEDFUNC *ptfnRoot, const uint32_t *pdwSupportedFea
 
 	for (int i = 0; i < (sizeof(TUNEDFUNC) / sizeof(void *)); i++)
 	{
-		LOGPRINTF("element #%d", i);
 		for (pTest = pSrc[i]; pTest != NULL; pTest = (const TUNEDFUNC_FRAGMENT *)pTest->pNext)
 		{
 			int j;
 			for (j = 0; j < _countof(pTest->dwRequiredFeatures); j++)
 			{
 				if ((pTest->dwRequiredFeatures[j] & pdwSupportedFeatures[j]) != pTest->dwRequiredFeatures[j])
-				{
-					LOGPRINTF("feature is insufficient");
 					break;
-				}
 			}
 			if (j == _countof(pTest->dwRequiredFeatures))
-			{
-				LOGPRINTF("sufficient");
 				break;
-			}
 		}
 		if (pTest != NULL)
-		{
-			LOGPRINTF("setting %p", pTest);
 			pDst[i] = pTest;
-		}
 	}
 }
