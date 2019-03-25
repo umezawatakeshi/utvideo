@@ -177,6 +177,7 @@
     <ClInclude Include="Convert_x86x64.h" />
     <ClInclude Include="CPUID.h" />
     <ClInclude Include="DummyCodec.h" />
+    <ClInclude Include="EnvFlag.h" />
     <ClInclude Include="FrameBuffer.h" />
     <ClInclude Include="GlobalConfig.h" />
     <ClInclude Include="HuffmanCode.h" />
@@ -228,6 +229,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="DummyCodec.cpp" />
+    <ClCompile Include="EnvFlag.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="GlobalConfig.cpp" />
     <ClCompile Include="HuffmanCode.cpp" />

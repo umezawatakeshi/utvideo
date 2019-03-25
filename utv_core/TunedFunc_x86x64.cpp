@@ -18,6 +18,7 @@
 #include "Coefficient.h"
 #include "CPUID.h"
 #include "Log.h"
+#include "EnvFlag.h"
 
 #define FEATURE0_SSE2     (1 <<  0)
 #define FEATURE0_SSE3     (1 <<  1)
@@ -592,40 +593,12 @@ uint32_t dwSupportedFeatures[FEATURESIZE];
 
 class CTunedFuncInitializer
 {
-	/*
-	 * ŠÂ‹«•Ï”‚ªA
-	 *   ‚È‚¯‚ê‚Î false
-	 *   ‹ó•¶Žš—ñ‚È‚ç false
-	 *   "1" ‚È‚ç true
-	 *   ‚»‚êˆÈŠO‚Ìê‡‚Í–¢’è‹`
-	 */
-	static bool IsTunedFuncDisabled()
-	{
-		static const char szEnvName[] = "UTVIDEO_DISABLE_TUNED_FUNC";
-#if defined(_WIN32)
-		char p[4];
-		auto n = GetEnvironmentVariableA(szEnvName, p, sizeof(p));
-		if (n == 0)
-			return false;
-#endif
-#if defined(__APPLE__) || defined(__unix__)
-		char *p;
-		p = getenv(szEnvName);
-		if (p == NULL)
-			return false;
-#endif
-		if (strcmp(p, "") == 0)
-			return false;
-
-		return true;
-	}
-
 public:
 	CTunedFuncInitializer()
 	{
 		CLogInitializer::Initialize();
 
-		if (IsTunedFuncDisabled())
+		if (GetEnvFlagBool("UTVIDEO_DISABLE_TUNED_FUNC"))
 			return;
 
 		cpuid_result cpuid_0   = { 0, 0, 0, 0 };
