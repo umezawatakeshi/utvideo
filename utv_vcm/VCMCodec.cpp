@@ -32,7 +32,7 @@ CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)
 	if (IsLogWriterInitializedOrDebugBuild())
 	{
 		if (icopen != NULL)
-			LOGPRINTF("CVCMCodec::Open(icopen=%p, icopen->fccType=%08X, icopen->fccHandler=%08X)", icopen, icopen->fccType, icopen->fccHandler);
+			LOGPRINTF("CVCMCodec::Open(icopen=%p, icopen->fccType=%08X, icopen->fccHandler=%08X icopen->dwFlags=%08X)", icopen, icopen->fccType, icopen->fccHandler, icopen->dwFlags);
 		else
 			LOGPRINTF("CVCMCodec::Open(icopen=NULL)");
 	}
