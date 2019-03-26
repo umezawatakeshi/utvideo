@@ -599,7 +599,10 @@ public:
 		CLogInitializer::Initialize();
 
 		if (GetEnvFlagBool("UTVIDEO_DISABLE_TUNED_FUNC"))
+		{
+			LOGPRINTF("TunedFunc is disabled. CPU feature detection is skipped.");
 			return;
+		}
 
 		cpuid_result cpuid_0   = { 0, 0, 0, 0 };
 		cpuid_result cpuid_1   = { 0, 0, 0, 0 };
