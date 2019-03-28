@@ -6,11 +6,11 @@
 #include "VCMCodec.h"
 #include <Format.h>
 
-CVCMCodec::CVCMCodec(DWORD fccHandler) : m_fcc(fccHandler)
+CVCMCodec::CVCMCodec(DWORD fccHandler, DWORD dwMode) : m_fcc(fccHandler), m_mode(dwMode)
 {
 	utvf_t utvf;
 
-	LOGPRINTF("%p CVCMCodec::CVCMCodec(fccHandler=%08X)", this, fccHandler);
+	LOGPRINTF("%p CVCMCodec::CVCMCodec(fccHandler=%08X, dwMode=%08X)", this, fccHandler, dwMode);
 
 	if (VCMFormatToUtVideoFormat(&utvf, fccHandler, 0) != 0)
 		utvf = UTVF_INVALID;
@@ -43,6 +43,8 @@ CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)
 		char fccChar[4];
 	};
 
+	DWORD icmode;
+
 	if (icopen != NULL)
 	{
 		if (icopen->fccType != ICTYPE_VIDEO)
@@ -51,12 +53,28 @@ CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)
 		// Ç»Ç∫Ç©è¨ï∂éöÇ≈ìnÇ≥ÇÍÇÈÇ±Ç∆Ç™Ç†ÇÈÇÃÇ≈ÅAç≈èâÇ…ëÂï∂éöâªÇµÇƒÇ®Ç≠ÅB
 		for (int i = 0; i < 4; i++)
 			fccChar[i] = toupper(fccChar[i]);
+
+		switch (icopen->dwFlags)
+		{
+		case ICMODE_COMPRESS:
+		case ICMODE_DECOMPRESS:
+		case ICMODE_QUERY:
+			break;
+		default:
+			icopen->dwError = ICERR_UNSUPPORTED;
+			return NULL;
+		}
+
 		icopen->dwError = ICERR_OK;
+		icmode = icopen->dwFlags;
 	}
 	else
+	{
 		fccHandler = (DWORD)-1;
+		icmode = 0;
+	}
 
-	return new CVCMCodec(fccHandler);
+	return new CVCMCodec(fccHandler, icmode);
 }
 
 LRESULT CVCMCodec::QueryAbout(void)
@@ -91,31 +109,49 @@ LRESULT CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
 
 LRESULT CVCMCodec::QueryConfigure(void)
 {
+	if (m_mode != ICMODE_COMPRESS)
+		return ICERR_UNSUPPORTED;
+
 	return ICERR_OK;
 }
 
 LRESULT CVCMCodec::Configure(HWND hwnd)
 {
+	if (m_mode != ICMODE_COMPRESS)
+		return ICERR_UNSUPPORTED;
+
 	return m_pCodec->Configure(hwnd) == 0 ? ICERR_OK : ICERR_UNSUPPORTED;
 }
 
 LRESULT CVCMCodec::GetStateSize(void)
 {
+	if (m_mode != ICMODE_COMPRESS && m_mode != ICMODE_QUERY)
+		return ICERR_UNSUPPORTED;
+
 	return m_pCodec->GetStateSize();
 }
 
 LRESULT CVCMCodec::GetState(void *pState, SIZE_T cb)
 {
+	if (m_mode != ICMODE_COMPRESS && m_mode != ICMODE_QUERY)
+		return ICERR_UNSUPPORTED;
+
 	return m_pCodec->GetState(pState, cb) == 0 ? ICERR_OK : ICERR_INTERNAL;
 }
 
 LRESULT CVCMCodec::SetState(const void *pState, SIZE_T cb)
 {
+	if (m_mode != ICMODE_COMPRESS)
+		return ICERR_UNSUPPORTED;
+
 	return m_pCodec->SetState(pState, cb) == 0 ? cb : 0;
 }
 
 LRESULT CVCMCodec::Compress(const ICCOMPRESS *icc, SIZE_T cb)
 {
+	if (m_mode != ICMODE_COMPRESS)
+		return ICERR_UNSUPPORTED;
+
 	bool bKeyFrame;
 	size_t cbFrame;
 
@@ -142,6 +178,9 @@ LRESULT CVCMCodec::CompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPINF
 			LOGPRINT_BIH_THIS(this, " pbihOut", pbihOut);
 	}
 
+	if (m_mode != ICMODE_COMPRESS)
+		return ICERR_UNSUPPORTED;
+
 	utvf_t infmt;
 	LRESULT ret;
 
@@ -159,6 +198,9 @@ LRESULT CVCMCodec::CompressEnd(void)
 {
 	LOGPRINTF("%p CVCMCodec::CompressEnd()", this);
 
+	if (m_mode != ICMODE_COMPRESS)
+		return ICERR_UNSUPPORTED;
+
 	return m_pCodec->EncodeEnd();
 }
 
@@ -170,6 +212,9 @@ LRESULT CVCMCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOH
 		if (pbihIn != NULL)
 			LOGPRINT_BIH_THIS(this, " pbihIn ", pbihIn);
 	}
+
+	if (m_mode != ICMODE_COMPRESS && m_mode != ICMODE_QUERY)
+		return ICERR_UNSUPPORTED;
 
 	utvf_t infmt;
 
@@ -195,6 +240,9 @@ LRESULT CVCMCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOH
 
 LRESULT CVCMCodec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	if (m_mode != ICMODE_COMPRESS && m_mode != ICMODE_QUERY)
+		return ICERR_UNSUPPORTED;
+
 	utvf_t infmt;
 
 	if (VCMFormatToUtVideoFormat(&infmt, pbihIn->biCompression, pbihIn->biBitCount) != 0)
@@ -214,6 +262,9 @@ LRESULT CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINF
 			LOGPRINT_BIH_THIS(this, " pbihOut", pbihOut);
 	}
 
+	if (m_mode != ICMODE_COMPRESS && m_mode != ICMODE_QUERY)
+		return ICERR_UNSUPPORTED;
+
 	utvf_t infmt;
 
 	if (VCMFormatToUtVideoFormat(&infmt, pbihIn->biCompression, pbihIn->biBitCount) != 0)
@@ -230,6 +281,9 @@ LRESULT CVCMCodec::CompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPINF
 
 LRESULT CVCMCodec::Decompress(const ICDECOMPRESS *icd, SIZE_T cb)
 {
+	if (m_mode != ICMODE_DECOMPRESS)
+		return ICERR_UNSUPPORTED;
+
 	size_t cbFrame;
 
 	cbFrame = m_pCodec->DecodeFrame(icd->lpOutput, icd->lpInput);
@@ -248,6 +302,9 @@ LRESULT CVCMCodec::DecompressBegin(const BITMAPINFOHEADER *pbihIn, const BITMAPI
 			LOGPRINT_BIH_THIS(this, " pbihOut", pbihOut);
 	}
 
+	if (m_mode != ICMODE_DECOMPRESS)
+		return ICERR_UNSUPPORTED;
+
 	utvf_t utvf;
 	LRESULT ret;
 
@@ -265,6 +322,9 @@ LRESULT CVCMCodec::DecompressEnd(void)
 {
 	LOGPRINTF("%p CVCMCodec::DecompressEnd()", this);
 
+	if (m_mode != ICMODE_DECOMPRESS)
+		return ICERR_UNSUPPORTED;
+
 	return m_pCodec->DecodeEnd();
 }
 
@@ -276,6 +336,9 @@ LRESULT CVCMCodec::DecompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINF
 		if (pbihIn != NULL)
 			LOGPRINT_BIH_THIS(this, " pbihIn ", pbihIn);
 	}
+
+	if (m_mode != ICMODE_DECOMPRESS && m_mode != ICMODE_QUERY)
+		return ICERR_UNSUPPORTED;
 
 	const utvf_t *utvf;
 
@@ -313,6 +376,9 @@ LRESULT CVCMCodec::DecompressQuery(const BITMAPINFOHEADER *pbihIn, const BITMAPI
 		if (pbihOut != NULL)
 			LOGPRINT_BIH_THIS(this, " pbihOut", pbihOut);
 	}
+
+	if (m_mode != ICMODE_DECOMPRESS && m_mode != ICMODE_QUERY)
+		return ICERR_UNSUPPORTED;
 
 	utvf_t utvf;
 	const utvf_t *putvf;

@@ -8,10 +8,11 @@ class CVCMCodec
 {
 private:
 	const DWORD m_fcc;
+	const DWORD m_mode;
 	CCodec *m_pCodec;
 
 private:
-	CVCMCodec(DWORD fccHandler);
+	CVCMCodec(DWORD fccHandler, DWORD dwMode);
 public:
 	~CVCMCodec(void);
 
