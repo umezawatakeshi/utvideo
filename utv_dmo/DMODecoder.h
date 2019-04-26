@@ -10,6 +10,7 @@
 #include "utv_dmo.h"
 #include <vfw.h>
 #include "Codec.h"
+#include "ProcessBlacklist.h"
 #include "ClsID.h"
 
 #include "DMOCodec.h"
@@ -34,6 +35,13 @@ public:
 	BEGIN_COM_MAP(CDMODecoder)
 		COM_INTERFACE_ENTRY(IMediaObject)
 	END_COM_MAP()
+
+	HRESULT FinalConstruct()
+	{
+		if (CheckInterfaceDisabledAndLog("DMO", "Decoder"))
+			return E_FAIL;
+		return CDMOCodec<CDMODecoder>::FinalConstruct();
+	}
 
 public:
 	// CDMOCodec

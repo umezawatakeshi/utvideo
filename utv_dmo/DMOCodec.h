@@ -51,13 +51,7 @@ public:
 			LOGPRINTF("%p CDMOCodec::CDMOCodec(fcc=%08X, clsid=%S)", this, fcc, szClsId);
 		}
 
-		utvf_t utvf;
-
-		VCMFormatToUtVideoFormat(&utvf, fcc, 0);
-		m_pCodec = CCodec::CreateInstance(utvf, "DMO");
 		m_pInputBuffer = NULL;
-
-		LOGPRINTF("%p  m_pCodec=%p, TinyName=\"%s\"", this, m_pCodec, m_pCodec->GetTinyName());
 	}
 
 	virtual ~CDMOCodec()
@@ -68,7 +62,8 @@ public:
 
 		if (m_pInputBuffer != NULL)
 			m_pInputBuffer->Release();
-		CCodec::DeleteInstance(m_pCodec);
+		if (m_pCodec != NULL)
+			CCodec::DeleteInstance(m_pCodec);
 	}
 
 	static HRESULT WINAPI UpdateRegistry(DWORD fcc, REFCLSID clsid, BOOL bRegister)
@@ -131,6 +126,13 @@ public:
 
 	HRESULT FinalConstruct()
 	{
+		utvf_t utvf;
+
+		VCMFormatToUtVideoFormat(&utvf, m_fcc, 0);
+		m_pCodec = CCodec::CreateInstance(utvf, "DMO");
+
+		LOGPRINTF("%p  m_pCodec=%p, TinyName=\"%s\"", this, m_pCodec, m_pCodec->GetTinyName());
+
 		return S_OK;
 	}
 

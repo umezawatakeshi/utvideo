@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "utvideo.h"
 #include "VCMCodec.h"
+#include "ProcessBlacklist.h"
 #include <Format.h>
 
 CVCMCodec::CVCMCodec(DWORD fccHandler, DWORD dwMode) : m_fcc(fccHandler), m_mode(dwMode)
@@ -54,14 +55,22 @@ CVCMCodec *CVCMCodec::Open(ICOPEN *icopen)
 		for (int i = 0; i < 4; i++)
 			fccChar[i] = toupper(fccChar[i]);
 
+		icopen->dwError = ICERR_UNSUPPORTED;
 		switch (icopen->dwFlags)
 		{
 		case ICMODE_COMPRESS:
+			if (CheckInterfaceDisabledAndLog("VCM", "Encoder"))
+				return NULL;
+			break;
 		case ICMODE_DECOMPRESS:
+			if (CheckInterfaceDisabledAndLog("VCM", "Decoder"))
+				return NULL;
+			break;
 		case ICMODE_QUERY:
+			if (CheckInterfaceDisabledAndLog("VCM", "Query"))
+				return NULL;
 			break;
 		default:
-			icopen->dwError = ICERR_UNSUPPORTED;
 			return NULL;
 		}
 

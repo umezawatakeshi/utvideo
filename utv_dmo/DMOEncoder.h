@@ -10,6 +10,7 @@
 #include "utv_dmo.h"
 #include <vfw.h>
 #include "Codec.h"
+#include "ProcessBlacklist.h"
 #include "ClsID.h"
 
 #include "DMOCodec.h"
@@ -39,6 +40,13 @@ public:
 		COM_INTERFACE_ENTRY(IPersistStream)
 		COM_INTERFACE_ENTRY(IAMVfwCompressDialogs)
 	END_COM_MAP()
+
+	HRESULT FinalConstruct()
+	{
+		if (CheckInterfaceDisabledAndLog("DMO", "Encoder"))
+			return E_FAIL;
+		return CDMOCodec<CDMOEncoder>::FinalConstruct();
+	}
 
 public:
 	// CDMOCodec
