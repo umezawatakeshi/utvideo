@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "ProcessBlacklist.h"
+#include "EnvFlag.h"
 
 #if defined(_WIN32)
 #define PATHSEP '\\'
@@ -69,6 +70,15 @@ DLLEXPORT bool IsInterfaceDisabled(const char* pszInterface, const char* pszRole
 	});
 
 	char envname[256];
+
+	snprintf(envname, sizeof(envname), "UTVIDEO_DISABLE_%s_%s", pszInterface, pszRole);
+	envname[sizeof(envname) - 1] = '\0';
+	for (auto p = envname; *p; ++p)
+		*p = toupper((unsigned char)*p);
+
+	if (GetEnvFlagBool(envname))
+		return true;
+
 	snprintf(envname, sizeof(envname), "UTVIDEO_PROCESSBLACKLIST_%s_%s", pszInterface, pszRole);
 	envname[sizeof(envname)-1] = '\0';
 	for (auto p = envname; *p; ++p)
