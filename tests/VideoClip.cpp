@@ -106,6 +106,7 @@ int VideoClip::GetNextFrame(void **bufp, size_t *lenp, bool *keyp)
 	return -1;
 }
 
+#if 0
 int InitFFmpeg()
 {
 	av_register_all();
@@ -113,3 +114,4 @@ int InitFFmpeg()
 }
 
 static int __ffmpeg_init__ = InitFFmpeg();
+#endif
