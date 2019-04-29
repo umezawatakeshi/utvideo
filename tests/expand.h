@@ -68,7 +68,7 @@ class expander
 	* 無限データセットはとりあえずサポート外
 	*/
 public:
-	typedef typename tuple_expand<typename ds_decay::sample>::type sample;
+	typedef typename tuple_expand<typename ds_decay::iterator::iterator_sample>::type sample;
 	typedef typename vector<sample>::const_iterator container_iterator;
 
 	explicit expander(DS&& ds) : m_src(std::forward<DS>(ds))
@@ -95,6 +95,8 @@ public:
 	class iterator
 	{
 	public:
+		typedef sample iterator_sample;
+
 		explicit iterator(container_iterator itr) : m_itr(itr) {}
 
 		void operator++() { ++m_itr; }
