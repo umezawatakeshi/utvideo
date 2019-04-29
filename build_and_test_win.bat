@@ -8,7 +8,7 @@ if ERRORLEVEL 1 goto errexit
 %MSBUILD% utvideo.sln /p:Configuration=Release /p:Platform=x64 /t:Rebuild
 if ERRORLEVEL 1 goto errexit
 
-"C:\Program Files (x86)\Inno Setup 5\ISCC.exe" setup_win\setup_win.iss
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup_win\setup_win.iss
 if ERRORLEVEL 1 goto errexit
 
 set ERRLVL=0
