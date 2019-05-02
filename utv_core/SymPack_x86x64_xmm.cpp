@@ -9,7 +9,7 @@
 #endif
 
 template<int F>
-static inline FORCEINLINE void packer(uint8_t*& q, uint8_t*& r, int& shift, __m128i wa, __m128i wb)
+static inline FORCEINLINE void PackForIntra(uint8_t*& q, uint8_t*& r, int& shift, __m128i wa, __m128i wb)
 {
 	__m128i viszeroa = _mm_cmpeq_epi64(wa, _mm_setzero_si128());
 	__m128i viszerob = _mm_cmpeq_epi64(wb, _mm_setzero_si128());
@@ -122,7 +122,7 @@ void tuned_Pack8SymAfterPredictPlanarGradient8(uint8_t *pPacked, size_t *cbPacke
 			__m128i error0 = _mm_sub_epi8(value0, left0);
 			__m128i error1 = _mm_sub_epi8(value1, left1);
 			prev = value1;
-			packer<F>(q, r, shift, error0, error1);
+			PackForIntra<F>(q, r, shift, error0, error1);
 		}
 	}
 
@@ -143,7 +143,7 @@ void tuned_Pack8SymAfterPredictPlanarGradient8(uint8_t *pPacked, size_t *cbPacke
 			__m128i error0 = _mm_sub_epi8(tmp0, left0);
 			__m128i error1 = _mm_sub_epi8(tmp1, left1);
 			prev = tmp1;
-			packer<F>(q, r, shift, error0, error1);
+			PackForIntra<F>(q, r, shift, error0, error1);
 		}
 	}
 
@@ -160,7 +160,7 @@ template void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1>(uint8_
 
 
 template<int F>
-static inline FORCEINLINE __m128i unpacker(const uint8_t*& q, const uint8_t *& r, int& shift)
+static inline FORCEINLINE __m128i UnpackForIntra(const uint8_t*& q, const uint8_t *& r, int& shift)
 {
 	__m128i w;
 	int mode = ((*(const uint32_t *)r) >> shift) & 7;
@@ -218,8 +218,8 @@ void tuned_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDst
 
 		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 16)
 		{
-			__m128i w0 = unpacker<F>(q, r, shift);
-			__m128i w1 = unpacker<F>(q, r, shift);
+			__m128i w0 = UnpackForIntra<F>(q, r, shift);
+			__m128i w1 = UnpackForIntra<F>(q, r, shift);
 			__m128i s0 = _mm_unpacklo_epi64(w0, w1);
 
 			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
@@ -238,8 +238,8 @@ void tuned_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDst
 
 		for (auto p = pp; p != pp + cbStride; p += 16)
 		{
-			__m128i w0 = unpacker<F>(q, r, shift);
-			__m128i w1 = unpacker<F>(q, r, shift);
+			__m128i w0 = UnpackForIntra<F>(q, r, shift);
+			__m128i w1 = UnpackForIntra<F>(q, r, shift);
 			__m128i s0 = _mm_unpacklo_epi64(w0, w1);
 
 			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));

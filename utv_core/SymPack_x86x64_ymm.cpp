@@ -9,7 +9,7 @@
 #endif
 
 template<int F>
-static inline FORCEINLINE void packer(uint8_t*& q, uint8_t*& r, __m256i wa, __m256i wb)
+static inline FORCEINLINE void PackForIntra(uint8_t*& q, uint8_t*& r, __m256i wa, __m256i wb)
 {
 	__m256i viszeroa = _mm256_cmpeq_epi64(wa, _mm256_setzero_si256());
 	__m256i viszerob = _mm256_cmpeq_epi64(wb, _mm256_setzero_si256());
@@ -124,7 +124,7 @@ void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pPacke
 			__m256i error1 = _mm256_sub_epi8(value1, left1);
 			prev = value1;
 
-			packer<CODEFEATURE_AVX2>(q, r, error0, error1);
+			PackForIntra<CODEFEATURE_AVX2>(q, r, error0, error1);
 		}
 	}
 
@@ -146,7 +146,7 @@ void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pPacke
 			__m256i error1 = _mm256_sub_epi8(tmp1, left1);
 			prev = tmp1;
 
-			packer<CODEFEATURE_AVX2>(q, r, error0, error1);
+			PackForIntra<CODEFEATURE_AVX2>(q, r, error0, error1);
 		}
 	}
 
@@ -156,7 +156,7 @@ void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pPacke
 
 
 template<int F>
-static inline FORCEINLINE __m256i unpacker(const uint8_t*& q, const uint8_t *& r, int& shift)
+static inline FORCEINLINE __m256i UnpackForIntra(const uint8_t*& q, const uint8_t *& r, int& shift)
 {
 	__m256i w;
 	int modes = ((*(uint32_t *)r) >> shift);
@@ -230,7 +230,7 @@ void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pDstBe
 
 		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 32)
 		{
-			__m256i s0 = unpacker<CODEFEATURE_AVX2>(q, r, shift);
+			__m256i s0 = UnpackForIntra<CODEFEATURE_AVX2>(q, r, shift);
 
 			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 1));
 			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 2));
@@ -252,7 +252,7 @@ void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pDstBe
 
 		for (auto p = pp; p != pp + cbStride; p += 32)
 		{
-			__m256i s0 = unpacker<CODEFEATURE_AVX2>(q, r, shift);
+			__m256i s0 = UnpackForIntra<CODEFEATURE_AVX2>(q, r, shift);
 
 			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 1));
 			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 2));
