@@ -1753,7 +1753,7 @@ static inline void tuned_ConvertBGRToULRG(uint8_t *pGBegin, uint8_t *pBBegin, ui
 #endif
 }
 
-template<int F, class T, bool A, bool NeedOffset = true>
+template<int F, class T, bool NeedOffset = true> /* 最適化が有効な場合、返した a を触らなければ a を計算する命令は生成されないので、やはり A はテンプレートパラメータとしては要らない */
 static inline FORCEINLINE VECTOR_RGBA<__m128i> VECTORCALL tuned_ConvertPackedRGBXToPlanarElement(__m128i m0, __m128i m1, __m128i m2, __m128i m3)
 {
 	__m128i ctl;
@@ -1773,19 +1773,21 @@ static inline FORCEINLINE VECTOR_RGBA<__m128i> VECTORCALL tuned_ConvertPackedRGB
 	__m128i ar1 = _mm_unpackhi_epi32(m2, m3);
 
 	__m128i gg = _mm_unpackhi_epi64(gb0, gb1);
+	__m128i bb = _mm_unpacklo_epi64(gb0, gb1);
+	__m128i rr = _mm_unpacklo_epi64(ar0, ar1);
+	__m128i aa = _mm_unpackhi_epi64(ar0, ar1);
+
 	__m128i ggtmp = NeedOffset ? _mm_add_epi8(gg, _mm_set1_epi8((char)0x80)) : gg;
-	__m128i bb = _mm_sub_epi8(_mm_unpacklo_epi64(gb0, gb1), ggtmp);
-	__m128i rr = _mm_sub_epi8(_mm_unpacklo_epi64(ar0, ar1), ggtmp);
-	if (A)
-		return { gg, bb, rr, _mm_unpackhi_epi64(ar0, ar1) };
-	else
-		return { gg, bb, rr, _mm_setzero_si128() };
+	bb = _mm_sub_epi8(bb, ggtmp);
+	rr = _mm_sub_epi8(rr, ggtmp);
+
+	return { gg, bb, rr, aa };
 }
 
-template<int F, class T, bool A, bool NeedOffset = true>
+template<int F, class T, bool NeedOffset = true>
 static inline FORCEINLINE VECTOR_RGBA<__m128i> tuned_ConvertPackedRGBXToPlanarElement(const uint8_t* pp)
 {
-	return tuned_ConvertPackedRGBXToPlanarElement<F, T, A, NeedOffset>(
+	return tuned_ConvertPackedRGBXToPlanarElement<F, T, NeedOffset>(
 		_mm_loadu_si128((const __m128i *)pp),
 		_mm_loadu_si128((const __m128i *)(pp + 16)),
 		_mm_loadu_si128((const __m128i *)(pp + 32)),
@@ -1808,7 +1810,7 @@ static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 #ifdef __SSSE3__
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			auto result = tuned_ConvertPackedRGBXToPlanarElement<F, T, A>(pp);
+			auto result = tuned_ConvertPackedRGBXToPlanarElement<F, T>(pp);
 			_mm_storeu_si128((__m128i *)b, result.b);
 			_mm_storeu_si128((__m128i *)g, result.g);
 			_mm_storeu_si128((__m128i *)r, result.r);

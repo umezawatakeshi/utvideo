@@ -226,7 +226,7 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, A, false>(pp);
+			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp);
 			_mm_storeu_si128((__m128i *)g, tuned_PredictLeftAndCount8Element<F>(gprev, planar.g, pGCountTable));
 			_mm_storeu_si128((__m128i *)b, tuned_PredictLeftAndCount8Element<F>(bprev, planar.b, pBCountTable));
 			_mm_storeu_si128((__m128i *)r, tuned_PredictLeftAndCount8Element<F>(rprev, planar.r, pRCountTable));
@@ -295,7 +295,7 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, A, false>(
+			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(
 				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)pp), _mm_loadu_si128((const __m128i *)(pp - scbStride))),
 				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 16))),
 				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 32))),
@@ -386,8 +386,8 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, A, true>(pp);
-			auto top = tuned_ConvertPackedRGBXToPlanarElement<F, T, A, true>(pp - scbStride);
+			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, true>(pp);
+			auto top = tuned_ConvertPackedRGBXToPlanarElement<F, T, true>(pp - scbStride);
 			_mm_storeu_si128((__m128i *)g, tuned_PredictWrongMedianAndCount8Element<F>(gtopprev, top.g, gprev, planar.g, pGCountTable));
 			_mm_storeu_si128((__m128i *)b, tuned_PredictWrongMedianAndCount8Element<F>(btopprev, top.b, bprev, planar.b, pBCountTable));
 			_mm_storeu_si128((__m128i *)r, tuned_PredictWrongMedianAndCount8Element<F>(rtopprev, top.r, rprev, planar.r, pRCountTable));
