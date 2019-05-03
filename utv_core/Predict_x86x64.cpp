@@ -103,7 +103,7 @@ static inline void IncrementCounters16(__m128i xmm, uint32_t* pCountTable)
 #endif
 }
 
-template<int F>
+template<int F, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE __m128i tuned_PredictLeft8Element(__m128i prev, __m128i value)
 {
 	__m128i left = _mm_alignr_epi8(value, prev, 15);
@@ -111,7 +111,15 @@ static inline FORCEINLINE __m128i tuned_PredictLeft8Element(__m128i prev, __m128
 	return residual;
 }
 
-template<int F, bool DoCount = true>
+template<int F, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE __m256i tuned_PredictLeft8Element(__m256i prev, __m256i value)
+{
+	__m256i left = _mm256_alignr_epi8(value, _mm256_permute2x128_si256(value, prev, 0x03), 15);
+	__m256i residual = _mm256_sub_epi8(value, left);
+	return residual;
+}
+
+template<int F, bool DoCount = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE __m128i tuned_PredictLeftAndCount8Element(__m128i prev, __m128i value, uint32_t* pCountTable)
 {
 	__m128i residual = tuned_PredictLeft8Element<F>(prev, value);
