@@ -14,6 +14,7 @@
 #include "SymPack_x86x64.h"
 #include "ConvertPredict.h"
 #include "ConvertPredict_x86x64.h"
+#include "ConvertSymPack_x86x64.h"
 #include "ColorOrder.h"
 #include "Coefficient.h"
 #include "CPUID.h"
@@ -554,7 +555,6 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictSSE41 = {
 	tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CODEFEATURE_SSE41, CUYVYColorOrder>,
 };
 
-
 const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictAVX1 = {
 	&tfnConvertPredictSSE41,
 	{ FEATURE0_AVX1, 0 },
@@ -603,6 +603,37 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictAVX1 = {
 };
 
 
+const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackSSE41 = {
+	&tfnConvertSymPackCPP,
+	{ FEATURE0_SSE41, 0 },
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CBGRColorOrder>,
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CBGRAColorOrder>,
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CARGBColorOrder>,
+	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CBGRAColorOrder>,
+	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CARGBColorOrder>,
+};
+
+const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX1 = {
+	&tfnConvertSymPackSSE41,
+	{ FEATURE0_AVX1, 0 },
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CBGRColorOrder>,
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CBGRAColorOrder>,
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CARGBColorOrder>,
+	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CBGRAColorOrder>,
+	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CARGBColorOrder>,
+};
+
+const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX2 = {
+	&tfnConvertSymPackAVX1,
+	{ FEATURE0_AVX2, 0 },
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CBGRColorOrder>,
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CBGRAColorOrder>,
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CARGBColorOrder>,
+	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CBGRAColorOrder>,
+	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CARGBColorOrder>,
+};
+
+
 const TUNEDFUNC tfnRoot = {
 	&tfnPredictAVX1,
 	&tfnHuffmanEncodeI686,
@@ -615,6 +646,7 @@ const TUNEDFUNC tfnRoot = {
 	&tfnConvertShuffleAVX2,
 	&tfnSymPackAVX2,
 	&tfnConvertPredictAVX1,
+	&tfnConvertSymPackAVX2,
 };
 
 uint32_t dwSupportedFeatures[FEATURESIZE];

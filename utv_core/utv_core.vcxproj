@@ -174,6 +174,8 @@
     <ClInclude Include="Convert.h" />
     <ClInclude Include="ConvertPredict.h" />
     <ClInclude Include="ConvertPredict_x86x64.h" />
+    <ClInclude Include="ConvertSymPack.h" />
+    <ClInclude Include="ConvertSymPack_x86x64.h" />
     <ClInclude Include="Convert_x86x64.h" />
     <ClInclude Include="CPUID.h" />
     <ClInclude Include="DummyCodec.h" />
@@ -218,6 +220,19 @@
     <ClCompile Include="Convert.cpp" />
     <ClCompile Include="ConvertPredict.cpp" />
     <ClCompile Include="ConvertPredict_x86x64.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ConvertSymPack.cpp" />
+    <ClCompile Include="ConvertSymPack_x86x64_xmm.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="ConvertSymPack_x86x64_ymm.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

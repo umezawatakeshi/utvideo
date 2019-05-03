@@ -39,5 +39,6 @@ protected:
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height);
 	virtual void ConvertToPlanar(uint32_t nBandIndex);
 	virtual void ConvertFromPlanar(uint32_t nBandIndex);
+	virtual bool EncodeDirect(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
 };

@@ -17,3 +17,4 @@
 #include "Predict_x86x64.cpp"
 #include "ConvertPredict_x86x64.cpp"
 #include "SymPack_x86x64_xmm.cpp"
+#include "ConvertSymPack_x86x64_xmm.cpp"

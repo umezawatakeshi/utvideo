@@ -11,6 +11,7 @@
 #include "Coefficient.h"
 #include "SymPack.h"
 #include "ConvertPredict.h"
+#include "ConvertSymPack.h"
 
 const TUNEDFUNC_PREDICT tfnPredictCPP = {
 	NULL,
@@ -126,7 +127,7 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleCPP = {
 	cpp_ConvertUQRGToR210,
 };
 
-extern const TUNEDFUNC_SYMPACK tfnSymPackCPP = {
+const TUNEDFUNC_SYMPACK tfnSymPackCPP = {
 	NULL,
 	{ 0 },
 	cpp_Pack8SymAfterPredictPlanarGradient8,
@@ -182,6 +183,16 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictCPP = {
 	cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CUYVYColorOrder>,
 };
 
+const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackCPP = {
+	NULL,
+	{ 0 },
+	cpp_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CBGRColorOrder>,
+	cpp_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CBGRAColorOrder>,
+	cpp_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CARGBColorOrder>,
+	cpp_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CBGRAColorOrder>,
+	cpp_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CARGBColorOrder>,
+};
+
 TUNEDFUNC tfn = {
 	&tfnPredictCPP,
 	&tfnHuffmanEncodeCPP,
@@ -190,6 +201,7 @@ TUNEDFUNC tfn = {
 	&tfnConvertShuffleCPP,
 	&tfnSymPackCPP,
 	&tfnConvertPredictCPP,
+	&tfnConvertSymPackCPP,
 };
 
 

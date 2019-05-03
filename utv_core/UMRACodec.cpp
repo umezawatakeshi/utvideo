@@ -112,6 +112,72 @@ void CUMRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 	}
 }
 
+bool CUMRACodec::EncodeDirect(uint32_t nBandIndex)
+{
+	uint8_t *g, *b, *r, *a;
+	const uint8_t *pSrcBegin, *pSrcEnd;
+
+	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	pSrcEnd = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
+	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	a = m_pCurFrame->GetPlane(3) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+
+	size_t cbPlane = (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[0];
+
+	if (m_nKeyFrameInterval <= 1)
+	{
+		m_cbControlStream[0][nBandIndex] = cbPlane / 64 * 3;
+		m_cbControlStream[1][nBandIndex] = cbPlane / 64 * 3;
+		m_cbControlStream[2][nBandIndex] = cbPlane / 64 * 3;
+		m_cbControlStream[3][nBandIndex] = cbPlane / 64 * 3;
+
+		switch (m_utvfRaw)
+		{
+		case UTVF_NFCC_BGRA_BU:
+		case UTVF_NFCC_BGRX_BU:
+			ConvertBGRAToULRA_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				m_pPackedStream[3][nBandIndex], &m_cbPackedStream[3][nBandIndex],
+				m_pControlStream[3][nBandIndex],
+				pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGRA_TD:
+			ConvertBGRAToULRA_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				m_pPackedStream[3][nBandIndex], &m_cbPackedStream[3][nBandIndex],
+				m_pControlStream[3][nBandIndex],
+				pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_ARGB_TD:
+			ConvertARGBToULRA_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				m_pPackedStream[3][nBandIndex], &m_cbPackedStream[3][nBandIndex],
+				m_pControlStream[3][nBandIndex],
+				pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool CUMRACodec::DecodeDirect(uint32_t nBandIndex)
 {
 	return false;

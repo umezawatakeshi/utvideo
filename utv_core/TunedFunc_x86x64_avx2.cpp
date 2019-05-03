@@ -15,3 +15,4 @@
 #include "Convert_x86x64.cpp"
 #include "Predict_x86x64.cpp"
 #include "SymPack_x86x64_ymm.cpp"
+#include "ConvertSymPack_x86x64_ymm.cpp"

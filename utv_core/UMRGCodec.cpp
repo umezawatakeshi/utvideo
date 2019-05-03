@@ -126,6 +126,93 @@ void CUMRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 	}
 }
 
+bool CUMRGCodec::EncodeDirect(uint32_t nBandIndex)
+{
+	uint8_t *g, *b, *r;
+	const uint8_t *pSrcBegin, *pSrcEnd;
+
+	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	pSrcEnd = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
+	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+
+	size_t cbPlane = (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[0];
+
+	if (m_nKeyFrameInterval <= 1)
+	{
+		m_cbControlStream[0][nBandIndex] = cbPlane / 64 * 3;
+		m_cbControlStream[1][nBandIndex] = cbPlane / 64 * 3;
+		m_cbControlStream[2][nBandIndex] = cbPlane / 64 * 3;
+
+		switch (m_utvfRaw)
+		{
+		case UTVF_NFCC_BGR_BU:
+			ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGRX_BU:
+			ConvertBGRXToULRG_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGR_TD:
+			ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGRX_TD:
+			ConvertBGRXToULRG_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_RGB_TD:
+			ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_ARGB_TD:
+			ConvertXRGBToULRG_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool CUMRGCodec::DecodeDirect(uint32_t nBandIndex)
 {
 	return false;
