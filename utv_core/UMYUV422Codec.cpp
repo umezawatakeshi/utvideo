@@ -275,7 +275,7 @@ void CUMYUV422Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 }
 
 template<class C>
-bool CUMYUV422Codec<C>::PredictDirect(uint32_t nBandIndex)
+bool CUMYUV422Codec<C>::EncodeDirect(uint32_t nBandIndex)
 {
 	if (m_nKeyFrameInterval <= 1)
 	{
@@ -287,7 +287,7 @@ bool CUMYUV422Codec<C>::PredictDirect(uint32_t nBandIndex)
 			pSrcBegin[2] = pSrcBegin[0] + m_nWidth * m_nHeight;
 			pSrcBegin[1] = pSrcBegin[2] + m_nWidth * m_nHeight / 2;
 
-			PredictFromPlanar(nBandIndex, pSrcBegin);
+			EncodeFromPlanar(nBandIndex, pSrcBegin);
 
 			return true;
 		}

@@ -240,7 +240,7 @@ void CUMYUV444Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 }
 
 template<class C>
-bool CUMYUV444Codec<C>::PredictDirect(uint32_t nBandIndex)
+bool CUMYUV444Codec<C>::EncodeDirect(uint32_t nBandIndex)
 {
 	if (m_nKeyFrameInterval <= 1)
 	{
@@ -252,7 +252,7 @@ bool CUMYUV444Codec<C>::PredictDirect(uint32_t nBandIndex)
 			pSrcBegin[2] = pSrcBegin[0] + m_nWidth * m_nHeight;
 			pSrcBegin[1] = pSrcBegin[2] + m_nWidth * m_nHeight;
 
-			PredictFromPlanar(nBandIndex, pSrcBegin);
+			EncodeFromPlanar(nBandIndex, pSrcBegin);
 
 			return true;
 		}

@@ -414,14 +414,14 @@ int CUM00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned i
 	return -1;
 }
 
-bool CUM00Codec::PredictDirect(uint32_t nBandIndex)
+bool CUM00Codec::EncodeDirect(uint32_t nBandIndex)
 {
 	return false;
 }
 
 void CUM00Codec::EncodeProc(uint32_t nBandIndex)
 {
-	if (PredictDirect(nBandIndex))
+	if (EncodeDirect(nBandIndex))
 		return;
 
 	ConvertToPlanar(nBandIndex);
@@ -435,10 +435,10 @@ void CUM00Codec::EncodeProc(uint32_t nBandIndex)
 		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 			pPrevBegin[nPlaneIndex] = m_pPrevFrame->GetPlane(nPlaneIndex);
 	}
-	PredictFromPlanar(nBandIndex, pSrcBegin, pPrevBegin);
+	EncodeFromPlanar(nBandIndex, pSrcBegin, pPrevBegin);
 }
 
-void CUM00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin, const uint8_t* const* pPrevBegin)
+void CUM00Codec::EncodeFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin, const uint8_t* const* pPrevBegin)
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
