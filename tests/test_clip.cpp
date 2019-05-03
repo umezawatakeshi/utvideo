@@ -239,7 +239,7 @@ static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDe
 	{"clip002-umh2", 2, 1,{ { "clip002-raw-yuy2-progressive", 0 },{ "clip002-raw-uyvy-progressive", 0 },{ "clip002-raw-yv16-progressive", 0 }, }},
 };
 
-static const vector<pair<int, int>> sizes_clip000_umxx = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 320,256 },{ 318,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
+static const vector<pair<int, int>> sizes_clip000_umxx = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 322,256 },{ 320,256 },{ 318,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
 
 static vector<pair<string, vector<uint8_t>>> divs_umxx = {
 	{ "div1",{ 0x00, 0x00, 0x00, 0x00, } },
