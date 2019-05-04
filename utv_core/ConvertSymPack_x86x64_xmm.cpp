@@ -121,16 +121,8 @@ static inline void tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(ui
 
 		for (; pp <= p + cbWidth - 96; pp += 96)
 		{
-			auto planar0 = tuned_ConvertPackedBGRToPlanarElement<F, false>(
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)pp), _mm_loadu_si128((const __m128i *)(pp - scbStride))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 16))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 32)))
-			);
-			auto planar1 = tuned_ConvertPackedBGRToPlanarElement<F, false>(
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 48))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 64)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 64))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 80)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 80)))
-			);
+			auto planar0 = tuned_ConvertPackedBGRToPlanarElement<F, false>(pp, scbStride);
+			auto planar1 = tuned_ConvertPackedBGRToPlanarElement<F, false>(pp + 48, scbStride);
 
 			__m128i gresidual0 = tuned_PredictLeft8Element<F>(gprev, planar0.g);
 			__m128i gresidual1 = tuned_PredictLeft8Element<F>(planar0.g, planar1.g);
@@ -349,18 +341,8 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 
 		for (; pp <= p + cbWidth - 128; pp += 128)
 		{
-			auto planar0 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)pp), _mm_loadu_si128((const __m128i *)(pp - scbStride))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 16))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 32))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 48)))
-			);
-			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 64)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 64))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 80)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 80))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 96)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 96))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 112)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 112)))
-			);
+			auto planar0 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp, scbStride);
+			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp + 64, scbStride);
 
 			__m128i gresidual0 = tuned_PredictLeft8Element<F>(gprev, planar0.g);
 			__m128i gresidual1 = tuned_PredictLeft8Element<F>(planar0.g, planar1.g);

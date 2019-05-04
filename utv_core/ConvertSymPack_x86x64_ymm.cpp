@@ -106,16 +106,8 @@ static inline void tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(ui
 
 		for (; pp <= p + cbWidth - 192; pp += 192)
 		{
-			auto planar0 = tuned_ConvertPackedBGRToPlanarElement<F, false>(
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)pp), _mm256_loadu_si256((const __m256i *)(pp - scbStride))),
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 32)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 32))),
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 64)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 64)))
-			);
-			auto planar1 = tuned_ConvertPackedBGRToPlanarElement<F, false>(
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 96)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 96))),
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 128)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 128))),
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 160)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 160)))
-			);
+			auto planar0 = tuned_ConvertPackedBGRToPlanarElement<F, false>(pp, scbStride);
+			auto planar1 = tuned_ConvertPackedBGRToPlanarElement<F, false>(pp + 96, scbStride);
 
 			__m256i gresidual0 = tuned_PredictLeft8Element<F>(gprev, planar0.g);
 			__m256i gresidual1 = tuned_PredictLeft8Element<F>(planar0.g, planar1.g);
@@ -301,18 +293,8 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 
 		for (; pp <= p + cbWidth - 256; pp += 256)
 		{
-			auto planar0 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)pp), _mm256_loadu_si256((const __m256i *)(pp - scbStride))),
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 32)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 32))),
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 64)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 64))),
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 96)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 96)))
-			);
-			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 128)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 128))),
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 160)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 160))),
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 192)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 192))),
-				_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 224)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 224)))
-			);
+			auto planar0 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp, scbStride);
+			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp + 128, scbStride);
 
 			__m256i gresidual0 = tuned_PredictLeft8Element<F>(gprev, planar0.g);
 			__m256i gresidual1 = tuned_PredictLeft8Element<F>(planar0.g, planar1.g);

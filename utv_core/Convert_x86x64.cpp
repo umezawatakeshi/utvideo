@@ -1578,6 +1578,28 @@ static inline FORCEINLINE VECTOR_YUV422<__m256i> tuned_ConvertPackedYUV422ToPlan
 	);
 }
 
+template<int F, class T, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR_YUV422<__m128i> tuned_ConvertPackedYUV422ToPlanarElement(const uint8_t* pp, ssize_t scbStride)
+{
+	return tuned_ConvertPackedYUV422ToPlanarElement<F, T>(
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)pp), _mm_loadu_si128((const __m128i *)(pp - scbStride))),
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 16))),
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 32))),
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 48)))
+	);
+}
+
+template<int F, class T, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR_YUV422<__m256i> tuned_ConvertPackedYUV422ToPlanarElement(const uint8_t* pp, ssize_t scbStride)
+{
+	return tuned_ConvertPackedYUV422ToPlanarElement<F, T>(
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)pp), _mm256_loadu_si256((const __m256i *)(pp - scbStride))),
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 32)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 32))),
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 64)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 64))),
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 96)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 96)))
+	);
+}
+
 template<int F, class T>
 void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
 {
@@ -1715,6 +1737,26 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedEleme
 	_mm256_storeu_si256((__m256i *)(pp + 32), result.v1);
 	_mm256_storeu_si256((__m256i *)(pp + 64), result.v2);
 	_mm256_storeu_si256((__m256i *)(pp + 96), result.v3);
+}
+
+template<int F, class T, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(uint8_t* pp, __m128i yy0, __m128i yy1, __m128i uu, __m128i vv, ssize_t scbStride)
+{
+	auto result = tuned_ConvertPlanarYUV422ToPackedElement<F, T>(yy0, yy1, uu, vv);
+	_mm_storeu_si128((__m128i *)pp, _mm_add_epi8(result.v0, _mm_loadu_si128((__m128i *)(pp - scbStride))));
+	_mm_storeu_si128((__m128i *)(pp + 16), _mm_add_epi8(result.v1, _mm_loadu_si128((__m128i *)(pp - scbStride + 16))));
+	_mm_storeu_si128((__m128i *)(pp + 32), _mm_add_epi8(result.v2, _mm_loadu_si128((__m128i *)(pp - scbStride + 32))));
+	_mm_storeu_si128((__m128i *)(pp + 48), _mm_add_epi8(result.v3, _mm_loadu_si128((__m128i *)(pp - scbStride + 48))));
+}
+
+template<int F, class T, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(uint8_t* pp, __m256i yy0, __m256i yy1, __m256i uu, __m256i vv, ssize_t scbStride)
+{
+	auto result = tuned_ConvertPlanarYUV422ToPackedElement<F, T>(yy0, yy1, uu, vv);
+	_mm256_storeu_si256((__m256i *)pp, _mm256_add_epi8(result.v0, _mm256_loadu_si256((__m256i *)(pp - scbStride))));
+	_mm256_storeu_si256((__m256i *)(pp + 32), _mm256_add_epi8(result.v1, _mm256_loadu_si256((__m256i *)(pp - scbStride + 32))));
+	_mm256_storeu_si256((__m256i *)(pp + 64), _mm256_add_epi8(result.v2, _mm256_loadu_si256((__m256i *)(pp - scbStride + 64))));
+	_mm256_storeu_si256((__m256i *)(pp + 96), _mm256_add_epi8(result.v3, _mm256_loadu_si256((__m256i *)(pp - scbStride + 96))));
 }
 
 template<int F, class T>
@@ -1865,6 +1907,26 @@ static inline FORCEINLINE VECTOR_RGB<__m256i> tuned_ConvertPackedBGRToPlanarElem
 	);
 }
 
+template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGB<__m128i> tuned_ConvertPackedBGRToPlanarElement(const uint8_t* pp, ssize_t scbStride)
+{
+	return tuned_ConvertPackedBGRToPlanarElement<F, NeedOffset>(
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)pp), _mm_loadu_si128((const __m128i *)(pp - scbStride))),
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 16))),
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 32)))
+	);
+}
+
+template<int F, bool NeedOffset = true, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGB<__m256i> tuned_ConvertPackedBGRToPlanarElement(const uint8_t* pp, ssize_t scbStride)
+{
+	return tuned_ConvertPackedBGRToPlanarElement<F, NeedOffset>(
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)pp), _mm256_loadu_si256((const __m256i *)(pp - scbStride))),
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 32)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 32))),
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 64)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 64)))
+	);
+}
+
 template<int F>
 static inline void tuned_ConvertBGRToULRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
@@ -2006,6 +2068,28 @@ static inline FORCEINLINE VECTOR_RGBA<__m256i> tuned_ConvertPackedRGBXToPlanarEl
 		_mm256_loadu_si256((const __m256i *)(pp + 32)),
 		_mm256_loadu_si256((const __m256i *)(pp + 64)),
 		_mm256_loadu_si256((const __m256i *)(pp + 96))
+	);
+}
+
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGBA<__m128i> tuned_ConvertPackedRGBXToPlanarElement(const uint8_t* pp, ssize_t scbStride)
+{
+	return tuned_ConvertPackedRGBXToPlanarElement<F, T, NeedOffset>(
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)pp), _mm_loadu_si128((const __m128i *)(pp - scbStride))),
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 16))),
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 32))),
+		_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 48)))
+	);
+}
+
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGBA<__m256i> tuned_ConvertPackedRGBXToPlanarElement(const uint8_t* pp, ssize_t scbStride)
+{
+	return tuned_ConvertPackedRGBXToPlanarElement<F, T, NeedOffset>(
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)pp), _mm256_loadu_si256((const __m256i *)(pp - scbStride))),
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 32)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 32))),
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 64)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 64))),
+		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 96)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 96)))
 	);
 }
 
@@ -2195,6 +2279,24 @@ static inline FORCEINLINE void tuned_ConvertPlanarBGRToPackedElement(uint8_t* pp
 	_mm256_storeu_si256((__m256i *)(pp + 64), result.v2);
 }
 
+template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE void tuned_ConvertPlanarBGRToPackedElement(uint8_t* pp, __m128i gg, __m128i bb, __m128i rr, ssize_t scbStride)
+{
+	auto result = tuned_ConvertPlanarBGRToPackedElement<F, NeedOffset>(gg, bb, rr);
+	_mm_storeu_si128((__m128i *)pp, _mm_add_epi8(result.v0, _mm_loadu_si128((__m128i *)(pp - scbStride))));
+	_mm_storeu_si128((__m128i *)(pp + 16), _mm_add_epi8(result.v1, _mm_loadu_si128((__m128i *)(pp - scbStride + 16))));
+	_mm_storeu_si128((__m128i *)(pp + 32), _mm_add_epi8(result.v2, _mm_loadu_si128((__m128i *)(pp - scbStride + 32))));
+}
+
+template<int F, bool NeedOffset = true, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE void tuned_ConvertPlanarBGRToPackedElement(uint8_t* pp, __m256i gg, __m256i bb, __m256i rr, ssize_t scbStride)
+{
+	auto result = tuned_ConvertPlanarBGRToPackedElement<F, NeedOffset>(gg, bb, rr);
+	_mm256_storeu_si256((__m256i *)pp, _mm256_add_epi8(result.v0, _mm256_loadu_si256((__m256i *)(pp - scbStride))));
+	_mm256_storeu_si256((__m256i *)(pp + 32), _mm256_add_epi8(result.v1, _mm256_loadu_si256((__m256i *)(pp - scbStride + 32))));
+	_mm256_storeu_si256((__m256i *)(pp + 64), _mm256_add_epi8(result.v2, _mm256_loadu_si256((__m256i *)(pp - scbStride + 64))));
+}
+
 template<int F>
 static inline void tuned_ConvertULRGToBGR(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
@@ -2331,6 +2433,26 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement
 	_mm256_storeu_si256((__m256i *)(pp + 32), result.v1);
 	_mm256_storeu_si256((__m256i *)(pp + 64), result.v2);
 	_mm256_storeu_si256((__m256i *)(pp + 96), result.v3);
+}
+
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, __m128i gg, __m128i bb, __m128i rr, __m128i aa, ssize_t scbStride)
+{
+	auto result = tuned_ConvertPlanarRGBXToPackedElement<F, T, NeedOffset>(gg, bb, rr, aa);
+	_mm_storeu_si128((__m128i *)pp, _mm_add_epi8(result.v0, _mm_loadu_si128((__m128i *)(pp - scbStride))));
+	_mm_storeu_si128((__m128i *)(pp + 16), _mm_add_epi8(result.v1, _mm_loadu_si128((__m128i *)(pp - scbStride + 16))));
+	_mm_storeu_si128((__m128i *)(pp + 32), _mm_add_epi8(result.v2, _mm_loadu_si128((__m128i *)(pp - scbStride + 32))));
+	_mm_storeu_si128((__m128i *)(pp + 48), _mm_add_epi8(result.v3, _mm_loadu_si128((__m128i *)(pp - scbStride + 48))));
+}
+
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, __m256i gg, __m256i bb, __m256i rr, __m256i aa, ssize_t scbStride)
+{
+	auto result = tuned_ConvertPlanarRGBXToPackedElement<F, T, NeedOffset>(gg, bb, rr, aa);
+	_mm256_storeu_si256((__m256i *)pp, _mm256_add_epi8(result.v0, _mm256_loadu_si256((__m256i *)(pp - scbStride))));
+	_mm256_storeu_si256((__m256i *)(pp + 32), _mm256_add_epi8(result.v1, _mm256_loadu_si256((__m256i *)(pp - scbStride + 32))));
+	_mm256_storeu_si256((__m256i *)(pp + 64), _mm256_add_epi8(result.v2, _mm256_loadu_si256((__m256i *)(pp - scbStride + 64))));
+	_mm256_storeu_si256((__m256i *)(pp + 96), _mm256_add_epi8(result.v3, _mm256_loadu_si256((__m256i *)(pp - scbStride + 96))));
 }
 
 template<int F, class T, bool A>

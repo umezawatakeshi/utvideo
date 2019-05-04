@@ -81,11 +81,7 @@ static inline void tuned_ConvertBGRToULRG_PredictAndCount(uint8_t *pGBegin, uint
 
 		for (; pp <= p + cbWidth - 48; pp += 48)
 		{
-			auto planar = tuned_ConvertPackedBGRToPlanarElement<F, false>(
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)pp), _mm_loadu_si128((const __m128i *)(pp - scbStride))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 16))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 32)))
-			);
+			auto planar = tuned_ConvertPackedBGRToPlanarElement<F, false>(pp, scbStride);
 			_mm_storeu_si128((__m128i *)g, tuned_PredictLeftAndCount8Element<F>(gprev, planar.g, pGCountTable));
 			_mm_storeu_si128((__m128i *)b, tuned_PredictLeftAndCount8Element<F>(bprev, planar.b, pBCountTable));
 			_mm_storeu_si128((__m128i *)r, tuned_PredictLeftAndCount8Element<F>(rprev, planar.r, pRCountTable));
@@ -295,12 +291,7 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)pp), _mm_loadu_si128((const __m128i *)(pp - scbStride))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 16))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 32))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 48)))
-			);
+			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp, scbStride);
 			_mm_storeu_si128((__m128i *)g, tuned_PredictLeftAndCount8Element<F>(gprev, planar.g, pGCountTable));
 			_mm_storeu_si128((__m128i *)b, tuned_PredictLeftAndCount8Element<F>(bprev, planar.b, pBCountTable));
 			_mm_storeu_si128((__m128i *)r, tuned_PredictLeftAndCount8Element<F>(rprev, planar.r, pRCountTable));
@@ -618,10 +609,7 @@ static inline void tuned_ConvertULRGToBGR_Restore(uint8_t *pDstBegin, uint8_t *p
 			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bb);
 			__m128i rr = _mm_loadu_si128((const __m128i *)r);
 			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rr);
-			auto packed = tuned_ConvertPlanarBGRToPackedElement<F, false>(gvalue.v0, bvalue.v0, rvalue.v0);
-			_mm_storeu_si128((__m128i *)pp, _mm_add_epi8(packed.v0, _mm_loadu_si128((__m128i *)(pp - scbStride))));
-			_mm_storeu_si128((__m128i *)(pp + 16), _mm_add_epi8(packed.v1, _mm_loadu_si128((__m128i *)(pp - scbStride + 16))));
-			_mm_storeu_si128((__m128i *)(pp + 32), _mm_add_epi8(packed.v2, _mm_loadu_si128((__m128i *)(pp - scbStride + 32))));
+			tuned_ConvertPlanarBGRToPackedElement<F, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, scbStride);
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -871,11 +859,7 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 			{
 				avalue_v0 = _mm_set1_epi8(0);
 			}
-			auto packed = tuned_ConvertPlanarRGBXToPackedElement<F, T, false>(gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
-			_mm_storeu_si128((__m128i *)pp, _mm_add_epi8(packed.v0, _mm_loadu_si128((__m128i *)(pp - scbStride))));
-			_mm_storeu_si128((__m128i *)(pp + 16), _mm_add_epi8(packed.v1, _mm_loadu_si128((__m128i *)(pp - scbStride + 16))));
-			_mm_storeu_si128((__m128i *)(pp + 32), _mm_add_epi8(packed.v2, _mm_loadu_si128((__m128i *)(pp - scbStride + 32))));
-			_mm_storeu_si128((__m128i *)(pp + 48), _mm_add_epi8(packed.v3, _mm_loadu_si128((__m128i *)(pp - scbStride + 48))));
+			tuned_ConvertPlanarRGBXToPackedElement<F, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0, scbStride);
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -1248,12 +1232,7 @@ static inline void tuned_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBe
 
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			auto planar = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)pp), _mm_loadu_si128((const __m128i *)(pp - scbStride))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 16))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 32))),
-				_mm_sub_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), _mm_loadu_si128((const __m128i *)(pp - scbStride + 48)))
-			);
+			auto planar = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp, scbStride);
 			_mm_storeu_si128((__m128i *)y, tuned_PredictLeftAndCount8Element<F>(yprev, planar.y0, pYCountTable));
 			_mm_storeu_si128((__m128i *)(y + 16), tuned_PredictLeftAndCount8Element<F>(planar.y0, planar.y1, pYCountTable));
 			_mm_storeu_si128((__m128i *)u, tuned_PredictLeftAndCount8Element<F>(uprev, planar.u, pUCountTable));
@@ -1488,11 +1467,7 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uu);
 			__m128i vv = _mm_loadu_si128((const __m128i *)v);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vv);
-			auto packed = tuned_ConvertPlanarYUV422ToPackedElement<F, T>(yvalue.v0, yvalue.v1, uvalue.v0, vvalue.v0);
-			_mm_storeu_si128((__m128i *)pp, _mm_add_epi8(packed.v0, _mm_loadu_si128((__m128i *)(pp - scbStride))));
-			_mm_storeu_si128((__m128i *)(pp + 16), _mm_add_epi8(packed.v1, _mm_loadu_si128((__m128i *)(pp - scbStride + 16))));
-			_mm_storeu_si128((__m128i *)(pp + 32), _mm_add_epi8(packed.v2, _mm_loadu_si128((__m128i *)(pp - scbStride + 32))));
-			_mm_storeu_si128((__m128i *)(pp + 48), _mm_add_epi8(packed.v3, _mm_loadu_si128((__m128i *)(pp - scbStride + 48))));
+			tuned_ConvertPlanarYUV422ToPackedElement<F, T>(pp, yvalue.v0, yvalue.v1, uvalue.v0, vvalue.v0, scbStride);
 
 			yprev = yvalue.v2;
 			uprev = uvalue.v1;
