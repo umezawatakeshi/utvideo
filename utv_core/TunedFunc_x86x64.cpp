@@ -635,8 +635,8 @@ const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX2 = {
 	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CARGBColorOrder>,
 	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CBGRAColorOrder>,
 	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CARGBColorOrder>,
-	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CYUYVColorOrder>,
-	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CUYVYColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CYUYVColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CUYVYColorOrder>,
 };
 
 
