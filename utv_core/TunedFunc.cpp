@@ -191,6 +191,8 @@ const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackCPP = {
 	cpp_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CARGBColorOrder>,
 	cpp_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CBGRAColorOrder>,
 	cpp_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CARGBColorOrder>,
+	cpp_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CYUYVColorOrder>,
+	cpp_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CUYVYColorOrder>,
 };
 
 TUNEDFUNC tfn = {

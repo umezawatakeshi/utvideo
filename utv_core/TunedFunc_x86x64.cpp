@@ -611,6 +611,8 @@ const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackSSE41 = {
 	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CARGBColorOrder>,
 	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CBGRAColorOrder>,
 	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CARGBColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CYUYVColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CUYVYColorOrder>,
 };
 
 const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX1 = {
@@ -621,6 +623,8 @@ const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX1 = {
 	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CARGBColorOrder>,
 	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CBGRAColorOrder>,
 	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CARGBColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CYUYVColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CUYVYColorOrder>,
 };
 
 const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX2 = {
@@ -631,6 +635,8 @@ const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX2 = {
 	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CARGBColorOrder>,
 	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CBGRAColorOrder>,
 	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX2, CARGBColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CYUYVColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CUYVYColorOrder>,
 };
 
 

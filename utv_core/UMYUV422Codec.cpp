@@ -277,6 +277,16 @@ void CUMYUV422Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 template<class C>
 bool CUMYUV422Codec<C>::EncodeDirect(uint32_t nBandIndex)
 {
+	uint8_t *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	uint8_t *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	uint8_t *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+
+	const uint8_t *pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	const uint8_t *pSrcEnd = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
+
+	size_t cbYPlane = (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[0];
+	size_t cbCPlane = (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[1];
+
 	if (m_nKeyFrameInterval <= 1)
 	{
 		if (m_utvfRaw == UTVF_YV16 && (m_nWidth % 128) == 0)
@@ -289,6 +299,40 @@ bool CUMYUV422Codec<C>::EncodeDirect(uint32_t nBandIndex)
 
 			EncodeFromPlanar(nBandIndex, pSrcBegin);
 
+			return true;
+		}
+
+		m_cbControlStream[0][nBandIndex] = cbYPlane / 64 * 3;
+		m_cbControlStream[1][nBandIndex] = cbCPlane / 64 * 3;
+		m_cbControlStream[2][nBandIndex] = cbCPlane / 64 * 3;
+
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+			ConvertYUYVToULY2_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			ConvertUYVYToULY2_Pack8SymAfterPredictPlanarGradient8(
+				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
+				m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
+				m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
+				m_pControlStream[2][nBandIndex],
+				pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
 			return true;
 		}
 	}

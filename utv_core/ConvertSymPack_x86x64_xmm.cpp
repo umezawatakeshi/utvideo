@@ -471,3 +471,207 @@ template void tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEA
 template void tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CBGRAColorOrder>(uint8_t *pGPacked, size_t *cbGPacked, uint8_t *pGControl, uint8_t *pBPacked, size_t *cbBPacked, uint8_t *pBControl, uint8_t *pRPacked, size_t *cbRPacked, uint8_t *pRControl, uint8_t *pAPacked, size_t *cbAPacked, uint8_t *pAControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CARGBColorOrder>(uint8_t *pGPacked, size_t *cbGPacked, uint8_t *pGControl, uint8_t *pBPacked, size_t *cbBPacked, uint8_t *pBControl, uint8_t *pRPacked, size_t *cbRPacked, uint8_t *pRControl, uint8_t *pAPacked, size_t *cbAPacked, uint8_t *pAControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 #endif
+
+//
+
+template<int F, typename T>
+void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	auto yp = pYPacked;
+	auto up = pUPacked;
+	auto vp = pVPacked;
+
+	auto yc = pYControl;
+	auto uc = pUControl;
+	auto vc = pVControl;
+
+	size_t cbYControl = (pSrcEnd - pSrcBegin) / scbStride * ((cbWidth + 127) / 128) * 3;
+	size_t cbCControl = (pSrcEnd - pSrcBegin) / scbStride * ((cbWidth + 255) / 256) * 3;
+	memset(pYControl, 0, cbYControl);
+	memset(pUControl, 0, cbCControl);
+	memset(pVControl, 0, cbCControl);
+
+	int yshift = 0;
+	int ushift = 0;
+	int vshift = 0;
+
+	union padsolve
+	{
+		uint8_t b[32];
+		__m128i xmm[2];
+	};
+
+	{
+		const auto p = pSrcBegin;
+		auto pp = p;
+
+		__m128i yprev = _mm_set1_epi8((char)0x80);
+		__m128i uprev = _mm_set1_epi8((char)0x80);
+		__m128i vprev = _mm_set1_epi8((char)0x80);
+
+		for (; pp <= p + cbWidth - 128; pp += 128)
+		{
+			auto planar0 = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp);
+			auto planar1 = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp + 64);
+
+			__m128i yresidual0 = tuned_PredictLeft8Element<F>(yprev, planar0.y0);
+			__m128i yresidual1 = tuned_PredictLeft8Element<F>(planar0.y0, planar0.y1);
+			__m128i yresidual2 = tuned_PredictLeft8Element<F>(planar0.y1, planar1.y0);
+			__m128i yresidual3 = tuned_PredictLeft8Element<F>(planar1.y0, planar1.y1);
+			__m128i uresidual0 = tuned_PredictLeft8Element<F>(uprev, planar0.u);
+			__m128i uresidual1 = tuned_PredictLeft8Element<F>(planar0.u, planar1.u);
+			__m128i vresidual0 = tuned_PredictLeft8Element<F>(vprev, planar0.v);
+			__m128i vresidual1 = tuned_PredictLeft8Element<F>(planar0.v, planar1.v);
+
+			PackForIntra<F>(yp, yc, yshift, yresidual0, yresidual1);
+			PackForIntra<F>(yp, yc, yshift, yresidual2, yresidual3);
+			PackForIntra<F>(up, uc, ushift, uresidual0, uresidual1);
+			PackForIntra<F>(vp, vc, vshift, vresidual0, vresidual1);
+
+			yprev = planar1.y1;
+			uprev = planar1.u;
+			vprev = planar1.v;
+		}
+
+		if (pp < p + cbWidth)
+		{
+			uint8_t yprevb = _mm_cvtsi128_si32(_mm_srli_si128(yprev, 15));
+			uint8_t uprevb = _mm_cvtsi128_si32(_mm_srli_si128(uprev, 15));
+			uint8_t vprevb = _mm_cvtsi128_si32(_mm_srli_si128(vprev, 15));
+
+			int n = 0;
+			padsolve yps[2], ups, vps;
+
+			for (; pp < p + cbWidth && n < 32; pp += 4, ++n)
+			{
+				uint8_t yy0 = pp[T::Y0];
+				yps[0].b[n * 2] = yy0 - yprevb;
+				uint8_t yy1 = pp[T::Y1];
+				yps[0].b[n * 2 + 1] = yy1 - yy0;
+				uint8_t uu = pp[T::U];
+				ups.b[n] = uu - uprevb;
+				uint8_t vv = pp[T::V];
+				vps.b[n] = vv - vprevb;
+
+				yprevb = yy1;
+				uprevb = uu;
+				vprevb = vv;
+			}
+			for (; n < 32; ++n)
+			{
+				yps[0].b[n * 2] = 0;
+				yps[0].b[n * 2 + 1] = 0;
+				ups.b[n] = 0;
+				vps.b[n] = 0;
+			}
+
+			PackForIntra<F>(yp, yc, yshift, yps[0].xmm[0], yps[0].xmm[1]);
+			PackForIntra<F>(yp, yc, yshift, yps[1].xmm[0], yps[1].xmm[1]);
+			PackForIntra<F>(up, uc, ushift, ups.xmm[0], ups.xmm[1]);
+			PackForIntra<F>(vp, vc, vshift, vps.xmm[0], vps.xmm[1]);
+		}
+
+		if (ushift != 0)
+		{
+			ushift = 0;
+			vshift = 0;
+
+			uc += 3;
+			vc += 3;
+		}
+	}
+
+	for (auto p = pSrcBegin + scbStride; p != pSrcEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		__m128i yprev = _mm_setzero_si128();
+		__m128i uprev = _mm_setzero_si128();
+		__m128i vprev = _mm_setzero_si128();
+
+		for (; pp <= p + cbWidth - 128; pp += 128)
+		{
+			auto planar0 = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp, scbStride);
+			auto planar1 = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp + 64, scbStride);
+
+			__m128i yresidual0 = tuned_PredictLeft8Element<F>(yprev, planar0.y0);
+			__m128i yresidual1 = tuned_PredictLeft8Element<F>(planar0.y0, planar0.y1);
+			__m128i yresidual2 = tuned_PredictLeft8Element<F>(planar0.y1, planar1.y0);
+			__m128i yresidual3 = tuned_PredictLeft8Element<F>(planar1.y0, planar1.y1);
+			__m128i uresidual0 = tuned_PredictLeft8Element<F>(uprev, planar0.u);
+			__m128i uresidual1 = tuned_PredictLeft8Element<F>(planar0.u, planar1.u);
+			__m128i vresidual0 = tuned_PredictLeft8Element<F>(vprev, planar0.v);
+			__m128i vresidual1 = tuned_PredictLeft8Element<F>(planar0.v, planar1.v);
+
+			PackForIntra<F>(yp, yc, yshift, yresidual0, yresidual1);
+			PackForIntra<F>(yp, yc, yshift, yresidual2, yresidual3);
+			PackForIntra<F>(up, uc, ushift, uresidual0, uresidual1);
+			PackForIntra<F>(vp, vc, vshift, vresidual0, vresidual1);
+
+			yprev = planar1.y1;
+			uprev = planar1.u;
+			vprev = planar1.v;
+		}
+
+		if (pp < p + cbWidth)
+		{
+			uint8_t yprevb = _mm_cvtsi128_si32(_mm_srli_si128(yprev, 15));
+			uint8_t uprevb = _mm_cvtsi128_si32(_mm_srli_si128(uprev, 15));
+			uint8_t vprevb = _mm_cvtsi128_si32(_mm_srli_si128(vprev, 15));
+
+			int n = 0;
+			padsolve yps[2], ups, vps;
+
+			for (; pp < p + cbWidth && n < 32; pp += 4, ++n)
+			{
+				uint8_t yy0 = pp[T::Y0] - (pp - scbStride)[T::Y0];
+				yps[0].b[n * 2] = yy0 - yprevb;
+				uint8_t yy1 = pp[T::Y1] - (pp - scbStride)[T::Y1];
+				yps[0].b[n * 2 + 1] = yy1 - yy0;
+				uint8_t uu = pp[T::U] - (pp - scbStride)[T::U];
+				ups.b[n] = uu - uprevb;
+				uint8_t vv = pp[T::V] - (pp - scbStride)[T::V];
+				vps.b[n] = vv - vprevb;
+
+				yprevb = yy1;
+				uprevb = uu;
+				vprevb = vv;
+			}
+			for (; n < 32; ++n)
+			{
+				yps[0].b[n * 2] = 0;
+				yps[0].b[n * 2 + 1] = 0;
+				ups.b[n] = 0;
+				vps.b[n] = 0;
+			}
+
+			PackForIntra<F>(yp, yc, yshift, yps[0].xmm[0], yps[0].xmm[1]);
+			PackForIntra<F>(yp, yc, yshift, yps[1].xmm[0], yps[1].xmm[1]);
+			PackForIntra<F>(up, uc, ushift, ups.xmm[0], ups.xmm[1]);
+			PackForIntra<F>(vp, vc, vshift, vps.xmm[0], vps.xmm[1]);
+		}
+
+		if (ushift != 0)
+		{
+			ushift = 0;
+			vshift = 0;
+
+			uc += 3;
+			vc += 3;
+		}
+	}
+
+	*cbYPacked = yp - pYPacked;
+	*cbUPacked = up - pUPacked;
+	*cbVPacked = vp - pVPacked;
+}
+
+#ifdef GENERATE_SSE41
+template void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CYUYVColorOrder>(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_SSE41, CUYVYColorOrder>(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CYUYVColorOrder>(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CUYVYColorOrder>(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+#endif
