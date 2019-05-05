@@ -65,7 +65,7 @@ static inline void tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(ui
 			rprev = planar1.r;
 		}
 
-		if (pp != p + (cbWidth + 191) / 192 * 192)
+		if (pp < p + cbWidth)
 		{
 			uint8_t gprevb = _mm_cvtsi128_si32(_mm_srli_si128(gprev, 15));
 			uint8_t bprevb = _mm_cvtsi128_si32(_mm_srli_si128(bprev, 15));
@@ -140,7 +140,7 @@ static inline void tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(ui
 			rprev = planar1.r;
 		}
 
-		if (pp != p + (cbWidth + 191) / 192 * 192)
+		if (pp < p + cbWidth)
 		{
 			uint8_t gprevb = _mm_cvtsi128_si32(_mm_srli_si128(gprev, 15));
 			uint8_t bprevb = _mm_cvtsi128_si32(_mm_srli_si128(bprev, 15));
@@ -262,7 +262,7 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 			}
 		}
 
-		if (pp != p + (cbWidth + 255) / 256 * 256)
+		if (pp < p + cbWidth)
 		{
 			uint8_t gprevb = _mm_cvtsi128_si32(_mm_srli_si128(gprev, 15));
 			uint8_t bprevb = _mm_cvtsi128_si32(_mm_srli_si128(bprev, 15));
@@ -368,7 +368,7 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 			}
 		}
 
-		if (pp != p + (cbWidth + 255) / 256 * 256)
+		if (pp < p + cbWidth)
 		{
 			uint8_t gprevb = _mm_cvtsi128_si32(_mm_srli_si128(gprev, 15));
 			uint8_t bprevb = _mm_cvtsi128_si32(_mm_srli_si128(bprev, 15));
