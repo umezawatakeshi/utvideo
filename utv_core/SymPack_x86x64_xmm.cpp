@@ -160,7 +160,7 @@ template void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1>(uint8_
 
 
 template<int F>
-static inline FORCEINLINE __m128i UnpackForIntra(const uint8_t*& q, const uint8_t *& r, int& shift)
+static inline FORCEINLINE __m128i UnpackForIntraElement(const uint8_t*& q, const uint8_t *& r, int shift)
 {
 	__m128i w;
 	int mode = ((*(const uint32_t *)r) >> shift) & 7;
@@ -196,14 +196,23 @@ static inline FORCEINLINE __m128i UnpackForIntra(const uint8_t*& q, const uint8_
 
 	q += bits;
 
-	shift += 3;
+	return w;
+}
+
+template<int F>
+static inline FORCEINLINE __m128i UnpackForIntra(const uint8_t*& q, const uint8_t *& r, int& shift)
+{
+	__m128i w0 = UnpackForIntraElement<F>(q, r, shift);
+	__m128i w1 = UnpackForIntraElement<F>(q, r, shift + 3);
+
+	shift += 6;
 	if (shift == 24)
 	{
 		r += 3;
 		shift = 0;
 	}
 
-	return w;
+	return _mm_unpacklo_epi64(w0, w1);
 }
 
 template<int F>
@@ -218,9 +227,7 @@ void tuned_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDst
 
 		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 16)
 		{
-			__m128i w0 = UnpackForIntra<F>(q, r, shift);
-			__m128i w1 = UnpackForIntra<F>(q, r, shift);
-			__m128i s0 = _mm_unpacklo_epi64(w0, w1);
+			__m128i s0 = UnpackForIntra<F>(q, r, shift);
 
 			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
 			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
@@ -238,9 +245,7 @@ void tuned_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDst
 
 		for (auto p = pp; p != pp + cbStride; p += 16)
 		{
-			__m128i w0 = UnpackForIntra<F>(q, r, shift);
-			__m128i w1 = UnpackForIntra<F>(q, r, shift);
-			__m128i s0 = _mm_unpacklo_epi64(w0, w1);
+			__m128i s0 = UnpackForIntra<F>(q, r, shift);
 
 			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
 			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
