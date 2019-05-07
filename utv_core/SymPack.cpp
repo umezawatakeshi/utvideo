@@ -107,62 +107,62 @@ void cpp_Pack8SymAfterPredictPlanarGradient8(uint8_t *pPacked, size_t *cbPacked,
 	*cbPacked = q - pPacked;
 }
 
+uint64_t cpp_UnpackForIntra(const uint8_t *&q, const uint8_t *&r, int& shift)
+{
+	uint64_t w;
+	int bits = ((*(uint32_t *)r) >> shift) & 7;
+	if (bits == 0)
+		w = 0;
+	else
+	{
+		uint64_t z, mask;
+
+		w = *(uint64_t *)q;
+		bits++;
+		int rembits = 8 - bits;
+
+		z = w << rembits * 4;
+		w = (w & 0x00000000ffffffffULL) | (z & 0xffffffff00000000ULL);
+
+		z = w << rembits * 2;
+		w = (w & 0x0000ffff0000ffffULL) | (z & 0xffff0000ffff0000ULL);
+
+		z = w << rembits;
+		w = (w & 0x00ff00ff00ff00ffULL) | (z & 0xff00ff00ff00ff00ULL);
+
+		mask = (0x101010101010101ULL << bits) - 0x101010101010101ULL;
+		w &= mask;
+
+		uint64_t offset = 0x8080808080808080ULL >> rembits;
+		uint64_t offadj = (~w & offset) << (rembits + 1); // packed byte Œ¸ŽZ‚Å‚Í‚È‚¢‚Ì‚Åˆø‚«‚·‚¬‚½•ª‚ð•â³‚·‚é
+		w -= offset;
+		w += offadj;
+	}
+
+	q += bits;
+
+	shift += 3;
+	if (shift == 24)
+	{
+		r += 3;
+		shift = 0;
+	}
+
+	return w;
+}
+
 void cpp_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, size_t cbStride)
 {
 	int shift = 0;
 	auto q = pPacked;
 	auto r = pControl;
 
-	auto unpacker = [&q, &r, &shift]() -> uint64_t
-	{
-		uint64_t w;
-		int bits = ((*(uint32_t *)r) >> shift) & 7;
-		if (bits == 0)
-			w = 0;
-		else
-		{
-			uint64_t z, mask;
-
-			w = *(uint64_t *)q;
-			bits++;
-			int rembits = 8 - bits;
-
-			z = w << rembits * 4;
-			w = (w & 0x00000000ffffffffULL) | (z & 0xffffffff00000000ULL);
-
-			z = w << rembits * 2;
-			w = (w & 0x0000ffff0000ffffULL) | (z & 0xffff0000ffff0000ULL);
-
-			z = w << rembits;
-			w = (w & 0x00ff00ff00ff00ffULL) | (z & 0xff00ff00ff00ff00ULL);
-
-			mask = (0x101010101010101ULL << bits) - 0x101010101010101ULL;
-			w &= mask;
-
-			uint64_t offset = 0x8080808080808080ULL >> rembits;
-			uint64_t offadj = (~w & offset) << (rembits + 1); // packed byte Œ¸ŽZ‚Å‚Í‚È‚¢‚Ì‚Åˆø‚«‚·‚¬‚½•ª‚ð•â³‚·‚é
-			w -= offset;
-			w += offadj;
-		}
-
-		q += bits;
-
-		shift += 3;
-		if (shift == 24)
-		{
-			r += 3;
-			shift = 0;
-		}
-
-		return w;
-	};
-
 	{
 		uint8_t left = 0x80;
 
 		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 8)
 		{
-			uint64_t w = unpacker();
+			uint64_t w = cpp_UnpackForIntra(q, r, shift);
 			for (int i = 0; i < 8; ++i)
 			{
 				p[i] = (uint8_t)((w >> (i * 8)) + left);
@@ -177,7 +177,7 @@ void cpp_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEn
 		uint8_t topleft = 0;
 		for (auto p = pp; p != pp + cbStride; p += 8)
 		{
-			uint64_t w = unpacker();
+			uint64_t w = cpp_UnpackForIntra(q, r, shift);
 			for (int i = 0; i < 8; ++i)
 			{
 				p[i] = (uint8_t)((w >> (i * 8)) + left + (p - cbStride)[i] - topleft);

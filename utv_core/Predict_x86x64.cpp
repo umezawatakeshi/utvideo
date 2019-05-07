@@ -161,7 +161,7 @@ template void tuned_PredictCylindricalLeftAndCount8<CODEFEATURE_AVX1>(uint8_t *p
 #endif
 
 
-template<int F>
+template<int F, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE VECTOR2<__m128i> /* value0, nextprev */ tuned_RestoreLeft8Element(__m128i prev, __m128i s0)
 {
 	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
@@ -170,6 +170,22 @@ static inline FORCEINLINE VECTOR2<__m128i> /* value0, nextprev */ tuned_RestoreL
 	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
 	s0 = _mm_add_epi8(s0, prev);
 	return { s0, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)) };
+}
+
+template<int F, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR2<__m256i> /* value0, nextprev */ tuned_RestoreLeft8Element(__m256i prev, __m256i s0)
+{
+	s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 1));
+	s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 2));
+	s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 4));
+	s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 8));
+	s0 = _mm256_add_epi8(s0, _mm256_shuffle_epi8(_mm256_broadcastsi128_si256(_mm256_castsi256_si128(s0)), _mm256_set_epi8(
+		15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+	)));
+	s0 = _mm256_add_epi8(s0, prev);
+	prev = _mm256_shuffle_epi8(_mm256_permute2x128_si256(s0, s0, 0x11), _mm256_set1_epi8(15));
+	return { s0, prev };
 }
 
 template<int F>

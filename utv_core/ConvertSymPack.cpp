@@ -305,6 +305,217 @@ template void cpp_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CARGBCol
 //
 
 template<typename T>
+void cpp_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride)
+{
+	auto gp = pGPacked;
+	auto bp = pBPacked;
+	auto rp = pRPacked;
+
+	auto gc = pGControl;
+	auto bc = pBControl;
+	auto rc = pRControl;
+
+	union padsolve
+	{
+		uint8_t b[8];
+		uint64_t w;
+	};
+
+	{
+		const auto p = pDstBegin;
+		auto pp = p;
+
+		uint8_t gprevb = 0x80;
+		uint8_t bprevb = 0;
+		uint8_t rprevb = 0;
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
+
+		while (pp < p + cbWidth)
+		{
+			int n = 0;
+			padsolve gps, bps, rps;
+
+			gps.w = cpp_UnpackForIntra(gp, gc, gshift);
+			bps.w = cpp_UnpackForIntra(bp, bc, bshift);
+			rps.w = cpp_UnpackForIntra(rp, rc, rshift);
+
+			for (; pp < p + cbWidth && n < 8; pp += T::BYPP, ++n)
+			{
+				pp[T::G] = (gprevb += gps.b[n]);
+				pp[T::B] = (bprevb += bps.b[n]) + gprevb;
+				pp[T::R] = (rprevb += rps.b[n]) + gprevb;
+				if (T::BYPP == 4)
+					pp[T::A] = 0xff;
+			}
+		}
+
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
+		}
+	}
+
+	for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		uint8_t gprevb = 0;
+		uint8_t bprevb = 0;
+		uint8_t rprevb = 0;
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
+
+		while (pp < p + cbWidth)
+		{
+			int n = 0;
+			padsolve gps, bps, rps;
+
+			gps.w = cpp_UnpackForIntra(gp, gc, gshift);
+			bps.w = cpp_UnpackForIntra(bp, bc, bshift);
+			rps.w = cpp_UnpackForIntra(rp, rc, rshift);
+
+			for (; pp < p + cbWidth && n < 8; pp += T::BYPP, ++n)
+			{
+				pp[T::G] = (gprevb += gps.b[n]) + (pp - scbStride)[T::G];
+				pp[T::B] = (bprevb += bps.b[n]) + (pp - scbStride)[T::B] + gprevb;
+				pp[T::R] = (rprevb += rps.b[n]) + (pp - scbStride)[T::R] + gprevb;
+				if (T::BYPP == 4)
+					pp[T::A] = 0xff;
+			}
+		}
+
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
+		}
+	}
+}
+
+template void cpp_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CBGRColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+
+//
+
+template<typename T>
+void cpp_ConvertULRAToRGBA_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride)
+{
+	auto gp = pGPacked;
+	auto bp = pBPacked;
+	auto rp = pRPacked;
+	auto ap = pAPacked;
+
+	auto gc = pGControl;
+	auto bc = pBControl;
+	auto rc = pRControl;
+	auto ac = pAControl;
+
+	union padsolve
+	{
+		uint8_t b[8];
+		uint64_t w;
+	};
+
+	{
+		const auto p = pDstBegin;
+		auto pp = p;
+
+		uint8_t gprevb = 0x80;
+		uint8_t bprevb = 0;
+		uint8_t rprevb = 0;
+		uint8_t aprevb = 0x80;
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
+		int ashift = 0;
+
+		while (pp < p + cbWidth)
+		{
+			int n = 0;
+			padsolve gps, bps, rps, aps;
+
+			gps.w = cpp_UnpackForIntra(gp, gc, gshift);
+			bps.w = cpp_UnpackForIntra(bp, bc, bshift);
+			rps.w = cpp_UnpackForIntra(rp, rc, rshift);
+			aps.w = cpp_UnpackForIntra(ap, ac, ashift);
+
+			for (; pp < p + cbWidth && n < 8; pp += T::BYPP, ++n)
+			{
+				pp[T::G] = (gprevb += gps.b[n]);
+				pp[T::B] = (bprevb += bps.b[n]) + gprevb;
+				pp[T::R] = (rprevb += rps.b[n]) + gprevb;
+				pp[T::A] = (aprevb += aps.b[n]);
+			}
+		}
+
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
+			ac += 3;
+		}
+	}
+
+	for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		uint8_t gprevb = 0;
+		uint8_t bprevb = 0;
+		uint8_t rprevb = 0;
+		uint8_t aprevb = 0;
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
+		int ashift = 0;
+
+		while (pp < p + cbWidth)
+		{
+			int n = 0;
+			padsolve gps, bps, rps, aps;
+
+			gps.w = cpp_UnpackForIntra(gp, gc, gshift);
+			bps.w = cpp_UnpackForIntra(bp, bc, bshift);
+			rps.w = cpp_UnpackForIntra(rp, rc, rshift);
+			aps.w = cpp_UnpackForIntra(ap, ac, ashift);
+
+			for (; pp < p + cbWidth && n < 8; pp += T::BYPP, ++n)
+			{
+				pp[T::G] = (gprevb += gps.b[n]) + (pp - scbStride)[T::G];
+				pp[T::B] = (bprevb += bps.b[n]) + (pp - scbStride)[T::B] + gprevb;
+				pp[T::R] = (rprevb += rps.b[n]) + (pp - scbStride)[T::R] + gprevb;
+				pp[T::A] = (aprevb += aps.b[n]) + (pp - scbStride)[T::A];
+			}
+		}
+
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
+			ac += 3;
+		}
+	}
+}
+
+template void cpp_ConvertULRAToRGBA_Unpack8SymAndRestorePlanarGradient8<CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULRAToRGBA_Unpack8SymAndRestorePlanarGradient8<CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride);
+
+//
+
+template<typename T>
 void cpp_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
 	auto yp = pYPacked;
@@ -454,3 +665,107 @@ void cpp_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8(uint8_t *
 
 template void cpp_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CYUYVColorOrder>(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CUYVYColorOrder>(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+
+//
+
+template<typename T>
+void cpp_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYPacked, const uint8_t *pYControl, const uint8_t *pUPacked, const uint8_t *pUControl, const uint8_t *pVPacked, const uint8_t *pVControl, size_t cbWidth, ssize_t scbStride)
+{
+	auto yp = pYPacked;
+	auto up = pUPacked;
+	auto vp = pVPacked;
+
+	auto yc = pYControl;
+	auto uc = pUControl;
+	auto vc = pVControl;
+
+	union padsolve
+	{
+		uint8_t b[8];
+		uint64_t w;
+	};
+
+	{
+		const auto p = pDstBegin;
+		auto pp = p;
+
+		uint8_t yprevb = 0x80;
+		uint8_t uprevb = 0x80;
+		uint8_t vprevb = 0x80;
+
+		int yshift = 0;
+		int ushift = 0;
+		int vshift = 0;
+
+		while (pp < p + cbWidth)
+		{
+			int n = 0;
+			padsolve yps[2], ups, vps;
+
+			yps[0].w = cpp_UnpackForIntra(yp, yc, yshift);
+			yps[1].w = cpp_UnpackForIntra(yp, yc, yshift);
+			ups.w = cpp_UnpackForIntra(up, uc, ushift);
+			vps.w = cpp_UnpackForIntra(vp, vc, vshift);
+
+			for (; pp < p + cbWidth && n < 8; pp += 4, ++n)
+			{
+				pp[T::Y0] = (yprevb += yps[0].b[n * 2]);
+				pp[T::Y1] = (yprevb += yps[0].b[n * 2 + 1]);
+				pp[T::U] = (uprevb += ups.b[n]);
+				pp[T::V] = (vprevb += vps.b[n]);
+			}
+		}
+
+		if (yshift != 0)
+			yc += 3;
+
+		if (ushift != 0)
+		{
+			uc += 3;
+			vc += 3;
+		}
+	}
+
+	for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		uint8_t yprevb = 0;
+		uint8_t uprevb = 0;
+		uint8_t vprevb = 0;
+
+		int yshift = 0;
+		int ushift = 0;
+		int vshift = 0;
+
+		while (pp < p + cbWidth)
+		{
+			int n = 0;
+			padsolve yps[2], ups, vps;
+
+			yps[0].w = cpp_UnpackForIntra(yp, yc, yshift);
+			yps[1].w = cpp_UnpackForIntra(yp, yc, yshift);
+			ups.w = cpp_UnpackForIntra(up, uc, ushift);
+			vps.w = cpp_UnpackForIntra(vp, vc, vshift);
+
+			for (; pp < p + cbWidth && n < 8; pp += 4, ++n)
+			{
+				pp[T::Y0] = (yprevb += yps[0].b[n * 2]) + (pp - scbStride)[T::Y0];
+				pp[T::Y1] = (yprevb += yps[0].b[n * 2 + 1]) + (pp - scbStride)[T::Y1];
+				pp[T::U] = (uprevb += ups.b[n]) + (pp - scbStride)[T::U];
+				pp[T::V] = (vprevb += vps.b[n]) + (pp - scbStride)[T::V];
+			}
+		}
+
+		if (yshift != 0)
+			yc += 3;
+
+		if (ushift != 0)
+		{
+			uc += 3;
+			vc += 3;
+		}
+	}
+}
+template void cpp_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYPacked, const uint8_t *pYControl, const uint8_t *pUPacked, const uint8_t *pUControl, const uint8_t *pVPacked, const uint8_t *pVControl, size_t cbWidth, ssize_t scbStride);
+template void cpp_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYPacked, const uint8_t *pYControl, const uint8_t *pUPacked, const uint8_t *pUControl, const uint8_t *pVPacked, const uint8_t *pVControl, size_t cbWidth, ssize_t scbStride);

@@ -176,8 +176,15 @@ struct TUNEDFUNC_CONVERT_SYMPACK
 	void (*pfnConvertXRGBToULRG_Pack8SymAfterPredictPlanarGradient8)(uint8_t *pGPacked, size_t *cbGPacked, uint8_t *pGControl, uint8_t *pBPacked, size_t *cbBPacked, uint8_t *pBControl, uint8_t *pRPacked, size_t *cbRPacked, uint8_t *pRControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertBGRAToULRA_Pack8SymAfterPredictPlanarGradient8)(uint8_t *pGPacked, size_t *cbGPacked, uint8_t *pGControl, uint8_t *pBPacked, size_t *cbBPacked, uint8_t *pBControl, uint8_t *pRPacked, size_t *cbRPacked, uint8_t *pRControl, uint8_t *pAPacked, size_t *cbAPacked, uint8_t *pAControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertARGBToULRA_Pack8SymAfterPredictPlanarGradient8)(uint8_t *pGPacked, size_t *cbGPacked, uint8_t *pGControl, uint8_t *pBPacked, size_t *cbBPacked, uint8_t *pBControl, uint8_t *pRPacked, size_t *cbRPacked, uint8_t *pRControl, uint8_t *pAPacked, size_t *cbAPacked, uint8_t *pAControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertULRGToBGR_Unpack8SymAndRestorePlanarGradient8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertULRGToBGRX_Unpack8SymAndRestorePlanarGradient8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertULRGToXRGB_Unpack8SymAndRestorePlanarGradient8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertULRAToBGRA_Unpack8SymAndRestorePlanarGradient8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertULRAToARGB_Unpack8SymAndRestorePlanarGradient8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertYUYVToULY2_Pack8SymAfterPredictPlanarGradient8)(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertUYVYToULY2_Pack8SymAfterPredictPlanarGradient8)(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertULY2ToYUYV_Unpack8SymAndRestorePredictPlanarGradient8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYPacked, const uint8_t *pYControl, const uint8_t *pUPacked, const uint8_t *pUControl, const uint8_t *pVPacked, const uint8_t *pVControl, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertULY2ToUYVY_Unpack8SymAndRestorePredictPlanarGradient8)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYPacked, const uint8_t *pYControl, const uint8_t *pUPacked, const uint8_t *pUControl, const uint8_t *pVPacked, const uint8_t *pVControl, size_t cbWidth, ssize_t scbStride);
 };
 
 struct TUNEDFUNC
@@ -344,10 +351,18 @@ public:
 #define ConvertULY2ToUYVY_RestoreCylindricalWrongMedian tfn.pConvertPredict->pfnConvertULY2ToUYVY_RestoreCylindricalWrongMedian
 
 #define ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8
-#define ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8(gp, gcb, gc, bp, bcb, bc, rp, rcb, rc, p, q, w, s) ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(gp, gcb, gc, bp, bcb, bc, rp, rcb, rc, p, q, w, s)
+#define ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8(gp, gcb, gc, bp, bcb, bc, rp, rcb, rc, p, q, w, s) ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(gp, gcb, gc, rp, rcb, rc, bp, bcb, bc, p, q, w, s)
 #define ConvertBGRXToULRG_Pack8SymAfterPredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertBGRXToULRG_Pack8SymAfterPredictPlanarGradient8
 #define ConvertXRGBToULRG_Pack8SymAfterPredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertXRGBToULRG_Pack8SymAfterPredictPlanarGradient8
 #define ConvertBGRAToULRA_Pack8SymAfterPredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertBGRAToULRA_Pack8SymAfterPredictPlanarGradient8
 #define ConvertARGBToULRA_Pack8SymAfterPredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertARGBToULRA_Pack8SymAfterPredictPlanarGradient8
+#define ConvertULRGToBGR_Unpack8SymAndRestorePlanarGradient8 tfn.pConvertSymPack->pfnConvertULRGToBGR_Unpack8SymAndRestorePlanarGradient8
+#define ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8(p, q, gp, gc, bp, bc, rp, rc, w, s) ConvertULRGToBGR_Unpack8SymAndRestorePlanarGradient8(p, q, gp, gc, rp, rc, bp, bc, w, s)
+#define ConvertULRGToBGRX_Unpack8SymAndRestorePlanarGradient8 tfn.pConvertSymPack->pfnConvertULRGToBGRX_Unpack8SymAndRestorePlanarGradient8
+#define ConvertULRGToXRGB_Unpack8SymAndRestorePlanarGradient8 tfn.pConvertSymPack->pfnConvertULRGToXRGB_Unpack8SymAndRestorePlanarGradient8
+#define ConvertULRAToBGRA_Unpack8SymAndRestorePlanarGradient8 tfn.pConvertSymPack->pfnConvertULRAToBGRA_Unpack8SymAndRestorePlanarGradient8
+#define ConvertULRAToARGB_Unpack8SymAndRestorePlanarGradient8 tfn.pConvertSymPack->pfnConvertULRAToARGB_Unpack8SymAndRestorePlanarGradient8
 #define ConvertYUYVToULY2_Pack8SymAfterPredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertYUYVToULY2_Pack8SymAfterPredictPlanarGradient8
 #define ConvertUYVYToULY2_Pack8SymAfterPredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertUYVYToULY2_Pack8SymAfterPredictPlanarGradient8
+#define ConvertULY2ToYUYV_Unpack8SymAndRestorePredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertULY2ToYUYV_Unpack8SymAndRestorePredictPlanarGradient8
+#define ConvertULY2ToUYVY_Unpack8SymAndRestorePredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertULY2ToUYVY_Unpack8SymAndRestorePredictPlanarGradient8

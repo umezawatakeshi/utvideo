@@ -474,6 +474,375 @@ template void tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFE
 
 //
 
+template<int F>
+static inline void tuned_ConvertULRGToBGR_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride)
+{
+	typedef CBGRColorOrder T;
+
+	auto gp = pGPacked;
+	auto bp = pBPacked;
+	auto rp = pRPacked;
+
+	auto gc = pGControl;
+	auto bc = pBControl;
+	auto rc = pRControl;
+
+	union padsolve
+	{
+		uint8_t b[16];
+		__m128i xmm;
+	};
+
+	{
+		const auto p = pDstBegin;
+		auto pp = p;
+
+		__m128i gprev = _mm_set1_epi8((char)0x80);
+		__m128i bprev = _mm_setzero_si128();
+		__m128i rprev = _mm_setzero_si128();
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
+
+		for (; pp <= p + cbWidth - 48; pp += 48)
+		{
+			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
+			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
+			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
+
+			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
+			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
+			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
+
+			tuned_ConvertPlanarBGRToPackedElement<F, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0);
+
+			gprev = gvalue.v1;
+			bprev = bvalue.v1;
+			rprev = rvalue.v1;
+		}
+
+		if (pp < p + cbWidth)
+		{
+			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
+			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
+			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
+
+			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
+			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
+			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
+
+			int n = 0;
+			padsolve gps, bps, rps;
+
+			gps.xmm = gvalue.v0;
+			bps.xmm = _mm_add_epi8(bvalue.v0, gvalue.v0);
+			rps.xmm = _mm_add_epi8(rvalue.v0, gvalue.v0);
+
+			for (; pp < p + cbWidth; pp += 3, ++n)
+			{
+				pp[T::G] = gps.b[n];
+				pp[T::B] = bps.b[n];
+				pp[T::R] = rps.b[n];
+			}
+		}
+
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
+		}
+	}
+
+	for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		__m128i gprev = _mm_setzero_si128();
+		__m128i bprev = _mm_setzero_si128();
+		__m128i rprev = _mm_setzero_si128();
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
+
+		for (; pp <= p + cbWidth - 48; pp += 48)
+		{
+			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
+			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
+			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
+
+			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
+			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
+			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
+
+			tuned_ConvertPlanarBGRToPackedElement<F, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, scbStride);
+
+			gprev = gvalue.v1;
+			bprev = bvalue.v1;
+			rprev = rvalue.v1;
+		}
+
+		if (pp < p + cbWidth)
+		{
+			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
+			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
+			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
+
+			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
+			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
+			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
+
+			int n = 0;
+			padsolve gps, bps, rps;
+
+			gps.xmm = gvalue.v0;
+			bps.xmm = _mm_add_epi8(bvalue.v0, gvalue.v0);
+			rps.xmm = _mm_add_epi8(rvalue.v0, gvalue.v0);
+
+			for (; pp < p + cbWidth; pp += 3, ++n)
+			{
+				pp[T::G] = gps.b[n] + (pp - scbStride)[T::G];
+				pp[T::B] = bps.b[n] + (pp - scbStride)[T::B];
+				pp[T::R] = rps.b[n] + (pp - scbStride)[T::R];
+			}
+		}
+
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
+		}
+	}
+}
+
+template<int F, typename T, bool A>
+static inline void tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride)
+{
+	auto gp = pGPacked;
+	auto bp = pBPacked;
+	auto rp = pRPacked;
+	auto ap = pAPacked;
+
+	auto gc = pGControl;
+	auto bc = pBControl;
+	auto rc = pRControl;
+	auto ac = pAControl;
+
+	union padsolve
+	{
+		uint8_t b[16];
+		__m128i xmm;
+	};
+
+	{
+		const auto p = pDstBegin;
+		auto pp = p;
+
+		__m128i gprev = _mm_set1_epi8((char)0x80);
+		__m128i bprev = _mm_setzero_si128();
+		__m128i rprev = _mm_setzero_si128();
+		__m128i aprev = _mm_set1_epi8((char)0x80);
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
+		int ashift = 0;
+
+		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
+		{
+			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
+			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
+			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
+			__m128i aresidual;
+			if (A)
+				aresidual = UnpackForIntra<F>(ap, ac, ashift);
+
+			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
+			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
+			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
+			VECTOR2<__m128i> avalue;
+			if (A)
+				avalue = tuned_RestoreLeft8Element<F>(aprev, aresidual);
+
+			tuned_ConvertPlanarRGBXToPackedElement<F, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, A ? avalue.v0 : _mm_set1_epi8((char)0xff));
+
+			gprev = gvalue.v1;
+			bprev = bvalue.v1;
+			rprev = rvalue.v1;
+			if (A)
+				aprev = avalue.v1;
+		}
+
+		if (pp < p + cbWidth)
+		{
+			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
+			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
+			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
+			__m128i aresidual;
+			if (A)
+				aresidual = UnpackForIntra<F>(ap, ac, ashift);
+
+			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
+			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
+			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
+			VECTOR2<__m128i> avalue;
+			if (A)
+				avalue = tuned_RestoreLeft8Element<F>(aprev, aresidual);
+
+			int n = 0;
+			padsolve gps, bps, rps, aps;
+
+			gps.xmm = gvalue.v0;
+			bps.xmm = _mm_add_epi8(bvalue.v0, gvalue.v0);
+			rps.xmm = _mm_add_epi8(rvalue.v0, gvalue.v0);
+			if (A)
+				aps.xmm = avalue.v0;
+
+			for (; pp < p + cbWidth; pp += T::BYPP, ++n)
+			{
+				pp[T::G] = gps.b[n];
+				pp[T::B] = bps.b[n];
+				pp[T::R] = rps.b[n];
+				if (A)
+					pp[T::A] = aps.b[n];
+				else
+					pp[T::A] = 0xff;
+			}
+		}
+
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
+			if (A)
+				ac += 3;
+		}
+	}
+
+	for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		__m128i gprev = _mm_setzero_si128();
+		__m128i bprev = _mm_setzero_si128();
+		__m128i rprev = _mm_setzero_si128();
+		__m128i aprev = _mm_setzero_si128();
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
+		int ashift = 0;
+
+		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
+		{
+			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
+			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
+			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
+			__m128i aresidual;
+			if (A)
+				aresidual = UnpackForIntra<F>(ap, ac, ashift);
+
+			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
+			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
+			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
+			VECTOR2<__m128i> avalue;
+			if (A)
+				avalue = tuned_RestoreLeft8Element<F>(aprev, aresidual);
+
+			tuned_ConvertPlanarRGBXToPackedElement<F, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, A ? avalue.v0 : _mm_set1_epi8(0), scbStride);
+
+			gprev = gvalue.v1;
+			bprev = bvalue.v1;
+			rprev = rvalue.v1;
+			if (A)
+				aprev = avalue.v1;
+		}
+
+		if (pp < p + cbWidth)
+		{
+			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
+			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
+			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
+			__m128i aresidual;
+			if (A)
+				aresidual = UnpackForIntra<F>(ap, ac, ashift);
+
+			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
+			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
+			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
+			VECTOR2<__m128i> avalue;
+			if (A)
+				avalue = tuned_RestoreLeft8Element<F>(aprev, aresidual);
+
+			int n = 0;
+			padsolve gps, bps, rps, aps;
+
+			gps.xmm = gvalue.v0;
+			bps.xmm = _mm_add_epi8(bvalue.v0, gvalue.v0);
+			rps.xmm = _mm_add_epi8(rvalue.v0, gvalue.v0);
+			if (A)
+				aps.xmm = avalue.v0;
+
+			for (; pp < p + cbWidth; pp += T::BYPP, ++n)
+			{
+				pp[T::G] = gps.b[n] + (pp - scbStride)[T::G];
+				pp[T::B] = bps.b[n] + (pp - scbStride)[T::B];
+				pp[T::R] = rps.b[n] + (pp - scbStride)[T::R];
+				if (A)
+					pp[T::A] = aps.b[n] + (pp - scbStride)[T::A];
+				else
+					pp[T::A] = 0xff;
+			}
+		}
+
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
+			if (A)
+				ac += 3;
+		}
+	}
+}
+
+template<int F, class T>
+void tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride)
+{
+	if (std::is_same<T, CBGRColorOrder>::value)
+		tuned_ConvertULRGToBGR_Unpack8SymAndRestorePlanarGradient8<F>(pDstBegin, pDstEnd, pGPacked, pGControl, pBPacked, pBControl, pRPacked, pRControl, cbWidth, scbStride);
+	else
+		tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8<F, T, false>(pDstBegin, pDstEnd, pGPacked, pGControl, pBPacked, pBControl, pRPacked, pRControl, NULL, NULL, cbWidth, scbStride);
+}
+
+template<int F, class T>
+void tuned_ConvertULRAToRGBA_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride)
+{
+	tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8<F, T, true>(pDstBegin, pDstEnd, pGPacked, pGControl, pBPacked, pBControl, pRPacked, pRControl, pAPacked, pAControl, cbWidth, scbStride);
+}
+
+#ifdef GENERATE_SSE41
+template void tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_SSE41, CBGRColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_SSE41, CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_SSE41, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULRAToRGBA_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_SSE41, CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULRAToRGBA_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_SSE41, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX1, CBGRColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX1, CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX1, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULRAToRGBA_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX1, CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULRAToRGBA_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX1, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride);
+#endif
+
+//
+
 template<int F, typename T>
 void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
@@ -674,4 +1043,174 @@ template void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient
 #ifdef GENERATE_AVX1
 template void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CYUYVColorOrder>(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX1, CUYVYColorOrder>(uint8_t *pYPacked, size_t *cbYPacked, uint8_t *pYControl, uint8_t *pUPacked, size_t *cbUPacked, uint8_t *pUControl, uint8_t *pVPacked, size_t *cbVPacked, uint8_t *pVControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
+#endif
+
+//
+
+template<int F, typename T>
+void tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYPacked, const uint8_t *pYControl, const uint8_t *pUPacked, const uint8_t *pUControl, const uint8_t *pVPacked, const uint8_t *pVControl, size_t cbWidth, ssize_t scbStride)
+{
+	auto yp = pYPacked;
+	auto up = pUPacked;
+	auto vp = pVPacked;
+
+	auto yc = pYControl;
+	auto uc = pUControl;
+	auto vc = pVControl;
+
+	union padsolve
+	{
+		uint8_t b[16];
+		__m128i xmm;
+	};
+
+	{
+		const auto p = pDstBegin;
+		auto pp = p;
+
+		__m128i yprev = _mm_set1_epi8((char)0x80);
+		__m128i uprev = _mm_set1_epi8((char)0x80);
+		__m128i vprev = _mm_set1_epi8((char)0x80);
+
+		int yshift = 0;
+		int ushift = 0;
+		int vshift = 0;
+
+		for (; pp <= p + cbWidth - 64; pp += 64)
+		{
+			__m128i yresidual0 = UnpackForIntra<F>(yp, yc, yshift);
+			__m128i yresidual1 = UnpackForIntra<F>(yp, yc, yshift);
+			__m128i uresidual = UnpackForIntra<F>(up, uc, ushift);
+			__m128i vresidual = UnpackForIntra<F>(vp, vc, vshift);
+
+			auto yvalue0 = tuned_RestoreLeft8Element<F>(yprev, yresidual0);
+			auto yvalue1 = tuned_RestoreLeft8Element<F>(yvalue0.v1, yresidual1);
+			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uresidual);
+			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vresidual);
+
+			tuned_ConvertPlanarYUV422ToPackedElement<F, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0);
+
+			yprev = yvalue1.v1;
+			uprev = uvalue.v1;
+			vprev = vvalue.v1;
+		}
+
+		if (pp < p + cbWidth)
+		{
+			__m128i yresidual0 = UnpackForIntra<F>(yp, yc, yshift);
+			__m128i yresidual1 = UnpackForIntra<F>(yp, yc, yshift);
+			__m128i uresidual = UnpackForIntra<F>(up, uc, ushift);
+			__m128i vresidual = UnpackForIntra<F>(vp, vc, vshift);
+
+			auto yvalue0 = tuned_RestoreLeft8Element<F>(yprev, yresidual0);
+			auto yvalue1 = tuned_RestoreLeft8Element<F>(yvalue0.v1, yresidual1);
+			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uresidual);
+			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vresidual);
+
+			int n = 0;
+			padsolve yps[2], ups, vps;
+
+			yps[0].xmm = yvalue0.v0;
+			yps[1].xmm = yvalue1.v0;
+			ups.xmm = uvalue.v0;
+			vps.xmm = vvalue.v0;
+
+			for (; pp < p + cbWidth; pp += 4, ++n)
+			{
+				pp[T::Y0] = yps[0].b[n * 2];
+				pp[T::Y1] = yps[0].b[n * 2 + 1];
+				pp[T::U] = ups.b[n];
+				pp[T::V] = vps.b[n];
+			}
+		}
+
+		if (yshift != 0)
+			yc += 3;
+
+		if (ushift != 0)
+		{
+			uc += 3;
+			vc += 3;
+		}
+	}
+
+	for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		__m128i yprev = _mm_setzero_si128();
+		__m128i uprev = _mm_setzero_si128();
+		__m128i vprev = _mm_setzero_si128();
+
+		int yshift = 0;
+		int ushift = 0;
+		int vshift = 0;
+
+		for (; pp <= p + cbWidth - 64; pp += 64)
+		{
+			__m128i yresidual0 = UnpackForIntra<F>(yp, yc, yshift);
+			__m128i yresidual1 = UnpackForIntra<F>(yp, yc, yshift);
+			__m128i uresidual = UnpackForIntra<F>(up, uc, ushift);
+			__m128i vresidual = UnpackForIntra<F>(vp, vc, vshift);
+
+			auto yvalue0 = tuned_RestoreLeft8Element<F>(yprev, yresidual0);
+			auto yvalue1 = tuned_RestoreLeft8Element<F>(yvalue0.v1, yresidual1);
+			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uresidual);
+			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vresidual);
+
+			tuned_ConvertPlanarYUV422ToPackedElement<F, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0, scbStride);
+
+			yprev = yvalue1.v1;
+			uprev = uvalue.v1;
+			vprev = vvalue.v1;
+		}
+
+		if (pp < p + cbWidth)
+		{
+			__m128i yresidual0 = UnpackForIntra<F>(yp, yc, yshift);
+			__m128i yresidual1 = UnpackForIntra<F>(yp, yc, yshift);
+			__m128i uresidual = UnpackForIntra<F>(up, uc, ushift);
+			__m128i vresidual = UnpackForIntra<F>(vp, vc, vshift);
+
+			auto yvalue0 = tuned_RestoreLeft8Element<F>(yprev, yresidual0);
+			auto yvalue1 = tuned_RestoreLeft8Element<F>(yvalue0.v1, yresidual1);
+			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uresidual);
+			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vresidual);
+
+			int n = 0;
+			padsolve yps[2], ups, vps;
+
+			yps[0].xmm = yvalue0.v0;
+			yps[1].xmm = yvalue1.v0;
+			ups.xmm = uvalue.v0;
+			vps.xmm = vvalue.v0;
+
+			for (; pp < p + cbWidth; pp += 4, ++n)
+			{
+				pp[T::Y0] = yps[0].b[n * 2] + (pp - scbStride)[T::Y0];
+				pp[T::Y1] = yps[0].b[n * 2 + 1] + (pp - scbStride)[T::Y1];
+				pp[T::U] = ups.b[n] + (pp - scbStride)[T::U];
+				pp[T::V] = vps.b[n] + (pp - scbStride)[T::V];
+			}
+		}
+
+		if (yshift != 0)
+			yc += 3;
+
+		if (ushift != 0)
+		{
+			uc += 3;
+			vc += 3;
+		}
+	}
+}
+
+#ifdef GENERATE_SSE41
+template void tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CODEFEATURE_SSE41, CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYPacked, const uint8_t *pYControl, const uint8_t *pUPacked, const uint8_t *pUControl, const uint8_t *pVPacked, const uint8_t *pVControl, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CODEFEATURE_SSE41, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYPacked, const uint8_t *pYControl, const uint8_t *pUPacked, const uint8_t *pUControl, const uint8_t *pVPacked, const uint8_t *pVControl, size_t cbWidth, ssize_t scbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CODEFEATURE_AVX1, CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYPacked, const uint8_t *pYControl, const uint8_t *pUPacked, const uint8_t *pUControl, const uint8_t *pVPacked, const uint8_t *pVControl, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CODEFEATURE_AVX1, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYPacked, const uint8_t *pYControl, const uint8_t *pUPacked, const uint8_t *pUControl, const uint8_t *pVPacked, const uint8_t *pVControl, size_t cbWidth, ssize_t scbStride);
 #endif

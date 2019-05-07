@@ -343,6 +343,11 @@ bool CUMYUV422Codec<C>::EncodeDirect(uint32_t nBandIndex)
 template<class C>
 bool CUMYUV422Codec<C>::DecodeDirect(uint32_t nBandIndex)
 {
+	uint8_t *pDstBegin, *pDstEnd;
+
+	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	pDstEnd = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
+
 	if (!(m_siDecode.siFlags & SI_FLAGS_USE_TEMPORAL_COMPRESSION))
 	{
 		if (m_utvfRaw == UTVF_YV16 && (m_nWidth % 128) == 0)
@@ -355,6 +360,32 @@ bool CUMYUV422Codec<C>::DecodeDirect(uint32_t nBandIndex)
 
 			DecodeToPlanar(nBandIndex, pDstBegin);
 
+			return true;
+		}
+
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUY2:
+		case UTVF_YUYV:
+		case UTVF_YUNV:
+		case UTVF_yuvs:
+			ConvertULY2ToYUYV_Unpack8SymAndRestorePredictPlanarGradient8(
+				pDstBegin, pDstEnd,
+				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
+				m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_UYVY:
+		case UTVF_UYNV:
+		case UTVF_2vuy:
+		case UTVF_HDYC:
+			ConvertULY2ToUYVY_Unpack8SymAndRestorePredictPlanarGradient8(
+				pDstBegin, pDstEnd,
+				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
+				m_cbRawNetWidth, m_cbRawGrossWidth);
 			return true;
 		}
 	}

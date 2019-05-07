@@ -215,5 +215,65 @@ bool CUMRGCodec::EncodeDirect(uint32_t nBandIndex)
 
 bool CUMRGCodec::DecodeDirect(uint32_t nBandIndex)
 {
+	uint8_t *pDstBegin, *pDstEnd;
+
+	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	pDstEnd = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
+
+	if (!(m_siDecode.siFlags & SI_FLAGS_USE_TEMPORAL_COMPRESSION))
+	{
+		switch (m_utvfRaw)
+		{
+		case UTVF_NFCC_BGR_BU:
+			ConvertULRGToBGR_Unpack8SymAndRestorePlanarGradient8(
+				pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth,
+				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
+				m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGRX_BU:
+			ConvertULRGToBGRX_Unpack8SymAndRestorePlanarGradient8(
+				pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth,
+				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
+				m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGR_TD:
+			ConvertULRGToBGR_Unpack8SymAndRestorePlanarGradient8(
+				pDstBegin, pDstEnd,
+				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
+				m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_BGRX_TD:
+			ConvertULRGToBGRX_Unpack8SymAndRestorePlanarGradient8(
+				pDstBegin, pDstEnd,
+				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
+				m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_RGB_TD:
+			ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8(
+				pDstBegin, pDstEnd,
+				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
+				m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		case UTVF_NFCC_ARGB_TD:
+			ConvertULRGToXRGB_Unpack8SymAndRestorePlanarGradient8(
+				pDstBegin, pDstEnd,
+				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
+				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
+				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
+				m_cbRawNetWidth, m_cbRawGrossWidth);
+			return true;
+		}
+	}
+
 	return false;
 }
