@@ -57,7 +57,7 @@ struct HUFFMAN_DECODE_TABLE
 {
 	typedef uint32_t combined_t;
 
-	static const int LOOKUP_BITS = (B == 8) ? 12 : 11; /* XXX */
+	static constexpr int LOOKUP_BITS = 12; // MultiSpeedTable Ç™çáåv 24KiB Ç…Ç»ÇÈ
 
 	struct
 	{
