@@ -14,7 +14,7 @@ static inline uint64_t bswap64(uint64_t x) { return _byteswap_uint64(x); }
 #elif defined(__GNUC__)
 
 /* gcc do not have __builtin_bswap16() */
-static inline uint16_t bswap16(uint16_t x) { return (x >> 8) | (x << 8); }
+static inline uint16_t bswap16(uint16_t x) { return __builtin_bswap16(x); }
 static inline uint32_t bswap32(uint32_t x) { return __builtin_bswap32(x); }
 static inline uint64_t bswap64(uint64_t x) { return __builtin_bswap64(x); }
 
