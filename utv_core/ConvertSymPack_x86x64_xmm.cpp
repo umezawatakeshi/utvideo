@@ -26,10 +26,6 @@ static inline void tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(ui
 	memset(pBControl, 0, cbControl);
 	memset(pRControl, 0, cbControl);
 
-	int gshift = 0;
-	int bshift = 0;
-	int rshift = 0;
-
 	union padsolve
 	{
 		uint8_t b[32];
@@ -39,6 +35,10 @@ static inline void tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(ui
 	{
 		const auto p = pSrcBegin;
 		auto pp = p;
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
 
 		__m128i gprev = _mm_set1_epi8((char)0x80);
 		__m128i bprev = _mm_setzero_si128();
@@ -97,17 +97,13 @@ static inline void tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(ui
 			PackForIntra<F>(gp, gc, gshift, gps.xmm[0], gps.xmm[1]);
 			PackForIntra<F>(bp, bc, bshift, bps.xmm[0], bps.xmm[1]);
 			PackForIntra<F>(rp, rc, rshift, rps.xmm[0], rps.xmm[1]);
+		}
 
-			if (gshift != 0)
-			{
-				gshift = 0;
-				bshift = 0;
-				rshift = 0;
-
-				gc += 3;
-				bc += 3;
-				rc += 3;
-			}
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
 		}
 	}
 
@@ -118,6 +114,10 @@ static inline void tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(ui
 		__m128i gprev = _mm_setzero_si128();
 		__m128i bprev = _mm_setzero_si128();
 		__m128i rprev = _mm_setzero_si128();
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
 
 		for (; pp <= p + cbWidth - 96; pp += 96)
 		{
@@ -172,17 +172,13 @@ static inline void tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(ui
 			PackForIntra<F>(gp, gc, gshift, gps.xmm[0], gps.xmm[1]);
 			PackForIntra<F>(bp, bc, bshift, bps.xmm[0], bps.xmm[1]);
 			PackForIntra<F>(rp, rc, rshift, rps.xmm[0], rps.xmm[1]);
+		}
 
-			if (gshift != 0)
-			{
-				gshift = 0;
-				bshift = 0;
-				rshift = 0;
-
-				gc += 3;
-				bc += 3;
-				rc += 3;
-			}
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
 		}
 	}
 
@@ -211,11 +207,6 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 	if (A)
 		memset(pAControl, 0, cbControl);
 
-	int gshift = 0;
-	int bshift = 0;
-	int rshift = 0;
-	int ashift = 0;
-
 	union padsolve
 	{
 		uint8_t b[32];
@@ -232,6 +223,11 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 		__m128i aprev;
 		if (A)
 			aprev = _mm_set1_epi8((char)0x80);
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
+		int ashift = 0;
 
 		for (; pp <= p + cbWidth - 128; pp += 128)
 		{
@@ -308,23 +304,15 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 			PackForIntra<F>(rp, rc, rshift, rps.xmm[0], rps.xmm[1]);
 			if (A)
 				PackForIntra<F>(ap, ac, ashift, aps.xmm[0], aps.xmm[1]);
+		}
 
-			if (gshift != 0)
-			{
-				gshift = 0;
-				bshift = 0;
-				rshift = 0;
-
-				gc += 3;
-				bc += 3;
-				rc += 3;
-
-				if (A)
-				{
-					ashift = 0;
-					ac += 3;
-				}
-			}
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
+			if (A)
+				ac += 3;
 		}
 	}
 
@@ -338,6 +326,11 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 		__m128i aprev;
 		if (A)
 			aprev = _mm_setzero_si128();
+
+		int gshift = 0;
+		int bshift = 0;
+		int rshift = 0;
+		int ashift = 0;
 
 		for (; pp <= p + cbWidth - 128; pp += 128)
 		{
@@ -414,23 +407,15 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 			PackForIntra<F>(rp, rc, rshift, rps.xmm[0], rps.xmm[1]);
 			if (A)
 				PackForIntra<F>(ap, ac, ashift, aps.xmm[0], aps.xmm[1]);
+		}
 
-			if (gshift != 0)
-			{
-				gshift = 0;
-				bshift = 0;
-				rshift = 0;
-
-				gc += 3;
-				bc += 3;
-				rc += 3;
-
-				if (A)
-				{
-					ashift = 0;
-					ac += 3;
-				}
-			}
+		if (gshift != 0)
+		{
+			gc += 3;
+			bc += 3;
+			rc += 3;
+			if (A)
+				ac += 3;
 		}
 	}
 
@@ -860,10 +845,6 @@ void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8(uint8_t
 	memset(pUControl, 0, cbCControl);
 	memset(pVControl, 0, cbCControl);
 
-	int yshift = 0;
-	int ushift = 0;
-	int vshift = 0;
-
 	union padsolve
 	{
 		uint8_t b[32];
@@ -877,6 +858,10 @@ void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8(uint8_t
 		__m128i yprev = _mm_set1_epi8((char)0x80);
 		__m128i uprev = _mm_set1_epi8((char)0x80);
 		__m128i vprev = _mm_set1_epi8((char)0x80);
+
+		int yshift = 0;
+		int ushift = 0;
+		int vshift = 0;
 
 		for (; pp <= p + cbWidth - 128; pp += 128)
 		{
@@ -957,6 +942,10 @@ void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8(uint8_t
 		__m128i yprev = _mm_setzero_si128();
 		__m128i uprev = _mm_setzero_si128();
 		__m128i vprev = _mm_setzero_si128();
+
+		int yshift = 0;
+		int ushift = 0;
+		int vshift = 0;
 
 		for (; pp <= p + cbWidth - 128; pp += 128)
 		{
