@@ -12,7 +12,7 @@
  * 出力クリップ（出力フォーマットも決まる）
  * 許容誤差
  */
-extern vector<tuple<string, string, unsigned int>> vecDecodeClips;
+extern const vector<tuple<string, string, unsigned int>> vecDecodeClips;
 
 /*
  * エンコードテスト
@@ -22,7 +22,7 @@ extern vector<tuple<string, string, unsigned int>> vecDecodeClips;
  * エンコーダのコンフィギュレーションデータ
  * 出力クリップのストリームヘッダの extradata の比較マスク
  */
-extern vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> vecEncodeClips;
+extern const vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> vecEncodeClips;
 
 /*
  * エンコードデコードテスト
@@ -32,4 +32,4 @@ extern vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> vecEncode
  * エンコーダのコンフィギュレーションデータ
  * 許容誤差
  */
-extern vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> vecEncDecClips;
+extern const vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> vecEncDecClips;

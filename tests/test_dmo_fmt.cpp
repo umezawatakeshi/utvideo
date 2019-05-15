@@ -8,7 +8,7 @@
 
 #include "test_dmo_fmt.h"
 
-vector<wstring> vecEncoderName = {
+const vector<wstring> vecEncoderName = {
 	L"UtVideo RGB DMO",
 	L"UtVideo RGBA DMO",
 	L"UtVideo YUV444 BT.601 DMO",
@@ -30,7 +30,7 @@ vector<wstring> vecEncoderName = {
 	L"UtVideo T2 YUV422 BT.709 DMO",
 };
 
-vector<wstring> vecDecoderName = {
+const vector<wstring> vecDecoderName = {
 	L"ULRG Decoder DMO",
 	L"ULRA Decoder DMO",
 	L"ULY4 Decoder DMO",
@@ -66,7 +66,7 @@ DEFINE_FOURCC_GUID(b48r, FCC('b48r'));
 DEFINE_FOURCC_GUID(b64a, FCC('b64a'));
 DEFINE_FOURCC_GUID(r210, FCC('r210'));
 
-vector<vector<GUID>> vecSupportedEncoderInputSubtypes = {
+const vector<vector<GUID>> vecSupportedEncoderInputSubtypes = {
 	{ MEDIASUBTYPE_RGB24, MEDIASUBTYPE_RGB32, },
 	{ MEDIASUBTYPE_ARGB32, MEDIASUBTYPE_RGB32, },
 	{ MEDIASUBTYPE_YV24, MEDIASUBTYPE_RGB24, MEDIASUBTYPE_RGB32 },
@@ -88,9 +88,9 @@ vector<vector<GUID>> vecSupportedEncoderInputSubtypes = {
 	{ MEDIASUBTYPE_HDYC, MEDIASUBTYPE_YUY2, MEDIASUBTYPE_YUYV, MEDIASUBTYPE_YUNV, MEDIASUBTYPE_yuvs, MEDIASUBTYPE_UYVY, MEDIASUBTYPE_UYNV, MEDIASUBTYPE_2vuy, MEDIASUBTYPE_YV16, MEDIASUBTYPE_RGB24, MEDIASUBTYPE_RGB32, },
 };
 
-vector<vector<GUID>> vecSupportedDecoderOutputSubtypes = vecSupportedEncoderInputSubtypes;
+const vector<vector<GUID>> vecSupportedDecoderOutputSubtypes = vecSupportedEncoderInputSubtypes;
 
-vector<vector<GUID>> vecUnsupportedEncoderInputSubtypes = {
+const vector<vector<GUID>> vecUnsupportedEncoderInputSubtypes = {
 	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565 },
 	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_RGB24 },
 	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_YV12, MEDIASUBTYPE_YUY2, MEDIASUBTYPE_YUYV, MEDIASUBTYPE_YUNV, MEDIASUBTYPE_yuvs, MEDIASUBTYPE_UYVY, MEDIASUBTYPE_UYNV, MEDIASUBTYPE_2vuy, MEDIASUBTYPE_YV16 },
@@ -112,9 +112,9 @@ vector<vector<GUID>> vecUnsupportedEncoderInputSubtypes = {
 	{ MEDIASUBTYPE_RGB555, MEDIASUBTYPE_RGB565, MEDIASUBTYPE_YVYU, MEDIASUBTYPE_YV12 },
 };
 
-vector<vector<GUID>> vecUnsupportedDecoderOutputSubtypes = vecUnsupportedEncoderInputSubtypes;
+const vector<vector<GUID>> vecUnsupportedDecoderOutputSubtypes = vecUnsupportedEncoderInputSubtypes;
 
-vector<GUID> vecTopPriorityEncoderInputSubtype = {
+const vector<GUID> vecTopPriorityEncoderInputSubtype = {
 	MEDIASUBTYPE_RGB24,
 	MEDIASUBTYPE_ARGB32,
 	MEDIASUBTYPE_YV24,
@@ -136,8 +136,8 @@ vector<GUID> vecTopPriorityEncoderInputSubtype = {
 	MEDIASUBTYPE_HDYC,
 };
 
-vector<IID> vecSupportedEncoderInterfaces = { IID_IMediaObject, IID_IPersistStream, IID_IAMVfwCompressDialogs };
-vector<IID> vecSupportedDecoderInterfaces = { IID_IMediaObject };
+const vector<IID> vecSupportedEncoderInterfaces = { IID_IMediaObject, IID_IPersistStream, IID_IAMVfwCompressDialogs };
+const vector<IID> vecSupportedDecoderInterfaces = { IID_IMediaObject };
 
 DWORD DirectShowFormatToVCMFormat(REFGUID subtype)
 {

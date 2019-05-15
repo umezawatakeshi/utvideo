@@ -33,7 +33,7 @@ vector<T, A> operator|(const vector<T, A> &a, const vector<T, A> &b)
 	return ret;
 }
 
-static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip000_ulxx = {
+static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip000_ulxx = {
 	{"clip000-ulrg-progressive", 1, 1, { { "clip000-raw-rgb24", 0 },{ "clip000-raw-rgb32", 0 }, }},
 	{"clip000-ulra-progressive", 1, 1, { { "clip000-raw-rgba", 0 }, }},
 	{"clip000-uly4-progressive", 1, 1, { { "clip000-raw-yv24", 0 }, }},
@@ -72,7 +72,7 @@ static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDe
 	{"clip100-ulh0-interlace", 2, 4,{ { "clip100-raw-yuy2-yv12-yuy2-interlace", 0 },{ "clip100-raw-yuy2-yv12-uyvy-interlace", 0 },{ "clip100-raw-yuy2-yv12-yv16-interlace", 0 }, }},
 };
 
-static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip002_ulxx = {
+static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip002_ulxx = {
 	{"clip002-ulrg-progressive", 1, 1,{ { "clip002-raw-rgb24-progressive", 0 },{ "clip002-raw-rgb32-progressive", 0 }, }},
 	{"clip002-ulra-progressive", 1, 1,{ { "clip002-raw-rgba-progressive", 0 }, }},
 	{"clip002-uly4-progressive", 1, 1,{ { "clip002-raw-yv24-progressive", 0 }, }},
@@ -93,13 +93,13 @@ static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDe
 
 static const vector<pair<int, int>> sizes_clip000_ulxx = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
 
-static vector<pair<string, vector<uint8_t>>> preds_ulxx = {
+static const vector<pair<string, vector<uint8_t>>> preds_ulxx = {
 	{ "left",{ 0x00, 0x01, 0x00, 0x00, } },
 	{ "gradient",{ 0x00, 0x02, 0x00, 0x00, } },
 	{ "median",{ 0x00, 0x03, 0x00, 0x00, } },
 };
 
-static vector<pair<string, vector<uint8_t>>> divs_ulxx = {
+static const vector<pair<string, vector<uint8_t>>> divs_ulxx = {
 	{ "div1",{ 0x00, 0x00, 0x00, 0x00, } },
 	{ "div8",{ 0x07, 0x00, 0x00, 0x00, } },
 	{ "div11",{ 0x0a, 0x00, 0x00, 0x00, } },
@@ -146,7 +146,7 @@ vector<tuple<string, string, unsigned int>> conv_clip000_ulxx(const vector<tuple
 	return r;
 }
 
-static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip000_uqxx = {
+static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip000_uqxx = {
 	{ "clip000-uqrg", 1, 1,{ { "clip000-raw-rgb10bit_b64a", 0 },{ "clip000-raw-rgb10bit_r210", 0 }, } },
 	{ "clip000-uqra", 1, 1,{ { "clip000-raw-rgba10bit_b64a", 0 }, } },
 	{ "clip000-uqy2", 2, 1,{ { "clip000-raw-yuv10bit_v210", 0 }, } },
@@ -156,7 +156,7 @@ static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDe
 	{ "clip001-uqy2", 2, 1,{ { "clip001-raw-yuv10bit_v210", 0 }, } },
 };
 
-static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip002_uqxx = {
+static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip002_uqxx = {
 	{ "clip002-uqrg", 1, 1,{ { "clip002-raw-rgb10bit_b64a", 0 },{ "clip002-raw-rgb10bit_r210", 0 }, } },
 	{ "clip002-uqra", 1, 1,{ { "clip002-raw-rgba10bit_b64a", 0 }, } },
 	{ "clip002-uqy2", 2, 1,{ { "clip002-raw-yuv10bit_v210", 0 }, } },
@@ -164,11 +164,11 @@ static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDe
 
 static const vector<pair<int, int>> sizes_clip000_uqxx = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
 
-static vector<pair<string, vector<uint8_t>>> preds_uqxx = {
+static const vector<pair<string, vector<uint8_t>>> preds_uqxx = {
 	{ "left",{ 0x00, 0x00, 0x00, 0x00, } },
 };
 
-static vector<pair<string, vector<uint8_t>>> divs_uqxx = {
+static const vector<pair<string, vector<uint8_t>>> divs_uqxx = {
 	{ "div1",{ 0x00, 0x00, 0x00, 0x00, } },
 	{ "div8",{ 0x00, 0x00, 0x07, 0x00, } },
 	{ "div11",{ 0x00, 0x00, 0x0a, 0x00, } },
@@ -215,7 +215,7 @@ vector<tuple<string, string, unsigned int>> conv_clip000_uqxx(const vector<tuple
 	return r;
 }
 
-static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip000_umxx = {
+static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip000_umxx = {
 	{"clip000-umrg", 1, 1,{ { "clip000-raw-rgb24", 0 },{ "clip000-raw-rgb32", 0 }, }},
 	{"clip000-umra", 1, 1,{ { "clip000-raw-rgba", 0 }, }},
 	{"clip000-umy4", 1, 1,{ { "clip000-raw-yv24", 0 }, }},
@@ -230,7 +230,7 @@ static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDe
 	{"clip001-umh2", 2, 1,{ { "clip001-raw-yuy2", 0 },{ "clip001-raw-uyvy", 0 },{ "clip001-raw-yv16", 0 }, }},
 };
 
-static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip002_umxx = {
+static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip002_umxx = {
 	{"clip002-umrg", 1, 1,{ { "clip002-raw-rgb24-progressive", 0 },{ "clip002-raw-rgb32-progressive", 0 }, }},
 	{"clip002-umra", 1, 1,{ { "clip002-raw-rgba-progressive", 0 }, }},
 	{"clip002-umy4", 1, 1,{ { "clip002-raw-yv24-progressive", 0 }, }},
@@ -241,13 +241,13 @@ static vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDe
 
 static const vector<pair<int, int>> sizes_clip000_umxx = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 352,256 },{ 322,256 },{ 320,256 },{ 318,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
 
-static vector<pair<string, vector<uint8_t>>> divs_umxx = {
+static const vector<pair<string, vector<uint8_t>>> divs_umxx = {
 	{ "div1",{ 0x00, 0x00, 0x00, 0x00, } },
 	{ "div8",{ 0x00, 0x07, 0x00, 0x00, } },
 	{ "div11",{ 0x00, 0x0a, 0x00, 0x00, } },
 };
 
-static vector<vector<uint8_t>> intra_umxx = {
+static const vector<vector<uint8_t>> intra_umxx = {
 	{ 0x00, 0x00, 0x00, 0x00, }, // no-temporal, k1
 	{ 0x00, 0x00, 0x1e, 0x00, }, // no-temporal, k30
 	{ 0x02, 0x00, 0x00, 0x00, }, // temporal, k1
@@ -291,7 +291,7 @@ vector<tuple<string, string, unsigned int>> conv_clip000_umxx(const vector<tuple
 	return r;
 }
 
-vector<tuple<string, string, unsigned int>> vecDecodeClips =
+const vector<tuple<string, string, unsigned int>> vecDecodeClips =
 	conv_clip000_ulxx(vecDecodeClipsSource_clip000_ulxx, sizes_clip000_ulxx, false) +
 	conv_clip000_ulxx(vecDecodeClipsSource_clip002_ulxx, sizes_clip000_ulxx, true) +
 	conv_clip000_uqxx(vecDecodeClipsSource_clip000_uqxx, sizes_clip000_uqxx, false) +
@@ -301,9 +301,9 @@ vector<tuple<string, string, unsigned int>> vecDecodeClips =
 
 /****************************************************************************/
 
-static vector<uint8_t> ulxx_extradata_mask = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, };
-static vector<uint8_t> ulxx_config_progressive = { 0x00, 0x00, 0x00, 0x00, };
-static vector<uint8_t> ulxx_config_interlace   = { 0x00, 0x08, 0x00, 0x00, };
+static const vector<uint8_t> ulxx_extradata_mask = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, };
+static const vector<uint8_t> ulxx_config_progressive = { 0x00, 0x00, 0x00, 0x00, };
+static const vector<uint8_t> ulxx_config_interlace   = { 0x00, 0x08, 0x00, 0x00, };
 
 static const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> vecEncodeClipsSource_clip000_ulxx = {
 	{"clip000-ulrg-progressive", ulxx_config_progressive, 1, 1,{ "clip000-raw-rgb24", "clip000-raw-rgb32", }},
@@ -405,7 +405,7 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 }
 
 
-static vector<uint8_t> uqxx_extradata_mask = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, };
+static const vector<uint8_t> uqxx_extradata_mask = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, };
 static const vector<uint8_t> uqxx_config_none = { 0x00, 0x00, 0x00, 0x00, };
 
 static const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> vecEncodeClipsSource_clip000_uqxx = {
@@ -464,7 +464,7 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 	return r;
 }
 
-static vector<uint8_t> umxx_extradata_mask = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, };
+static const vector<uint8_t> umxx_extradata_mask = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, };
 static const vector<uint8_t> umxx_config_none = { 0x00, 0x00, 0x00, 0x00, };
 
 static const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> vecEncodeClipsSource_clip000_umxx = {
@@ -531,7 +531,7 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 	return r;
 }
 
-vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> vecEncodeClips =
+const vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> vecEncodeClips =
 	conv_enc_clip000_ulxx(vecEncodeClipsSource_clip000_ulxx, sizes_clip000_ulxx, false) +
 	conv_enc_clip000_ulxx(vecEncodeClipsSource_clip002_ulxx, sizes_clip000_ulxx, true) +
 	conv_enc_clip000_uqxx(vecEncodeClipsSource_clip000_uqxx, sizes_clip000_uqxx, false) +
@@ -723,6 +723,6 @@ vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> conv_encd
 	return r;
 }
 
-vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> vecEncDecClips =
+const vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> vecEncDecClips =
 	conv_encdec_clip200_ulxx(vecEncDecClipsSource_clip200_ulxx, sizes_clip000_ulxx, false, false) +
 	conv_encdec_clip200_umxx(vecEncDecClipsSource_clip200_umxx, sizes_clip000_umxx, false, false);

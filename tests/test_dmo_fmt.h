@@ -5,15 +5,15 @@
 
 #include "print_log_value.h"
 
-extern vector<wstring> vecEncoderName;
-extern vector<wstring> vecDecoderName;
-extern vector<vector<GUID>> vecSupportedEncoderInputSubtypes;
-extern vector<vector<GUID>> vecSupportedDecoderOutputSubtypes;
-extern vector<vector<GUID>> vecUnsupportedEncoderInputSubtypes;
-extern vector<vector<GUID>> vecUnsupportedDecoderOutputSubtypes;
-extern vector<GUID> vecTopPriorityEncoderInputSubtype;
-extern vector<IID> vecSupportedEncoderInterfaces;
-extern vector<IID> vecSupportedDecoderInterfaces;
+extern const vector<wstring> vecEncoderName;
+extern const vector<wstring> vecDecoderName;
+extern const vector<vector<GUID>> vecSupportedEncoderInputSubtypes;
+extern const vector<vector<GUID>> vecSupportedDecoderOutputSubtypes;
+extern const vector<vector<GUID>> vecUnsupportedEncoderInputSubtypes;
+extern const vector<vector<GUID>> vecUnsupportedDecoderOutputSubtypes;
+extern const vector<GUID> vecTopPriorityEncoderInputSubtype;
+extern const vector<IID> vecSupportedEncoderInterfaces;
+extern const vector<IID> vecSupportedDecoderInterfaces;
 
 class DMOEncoderCLSID : public GUID
 {

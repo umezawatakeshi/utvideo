@@ -8,7 +8,7 @@
 
 #include "test_win_fmt.h"
 
-vector<DWORD> vecCodecFcc = {
+const vector<DWORD> vecCodecFcc = {
 	FCC('ULRG'),
 	FCC('ULRA'),
 	FCC('ULY4'),
@@ -30,7 +30,7 @@ vector<DWORD> vecCodecFcc = {
 	FCC('UMH2'),
 };
 
-vector<wstring> vecCodecShortName = {
+const vector<wstring> vecCodecShortName = {
 	L"UtVideo (ULRG)",
 	L"UtVideo (ULRA)",
 	L"UtVideo (ULY4)",
@@ -52,7 +52,7 @@ vector<wstring> vecCodecShortName = {
 	L"UtVideo (UMH2)",
 };
 
-vector<wstring> vecCodecLongName = {
+const vector<wstring> vecCodecLongName = {
 	L"UtVideo RGB VCM",
 	L"UtVideo RGBA VCM",
 	L"UtVideo YUV444 BT.601 VCM",
@@ -74,7 +74,7 @@ vector<wstring> vecCodecLongName = {
 	L"UtVideo T2 YUV422 BT.709 VCM",
 };
 
-vector<vector<DWORD> > vecSupportedInputFccs = {
+const vector<vector<DWORD> > vecSupportedInputFccs = {
 	{ 32, 24 },
 	{ 32 },
 	{ 32, 24, FCC('YV24') },
@@ -96,9 +96,9 @@ vector<vector<DWORD> > vecSupportedInputFccs = {
 	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy'), FCC('HDYC'), FCC('YV16') },
 };
 
-vector<vector<DWORD> > vecSupportedOutputFccs = vecSupportedInputFccs;
+const vector<vector<DWORD> > vecSupportedOutputFccs = vecSupportedInputFccs;
 
-vector<vector<DWORD> > vecUnsupportedInputFccs = {
+const vector<vector<DWORD> > vecUnsupportedInputFccs = {
 	{ 15, 16 },
 	{ 15, 16, 24 },
 	{ 15, 16, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy'), FCC('HDYC'), FCC('YV16'), FCC('YV12') },
@@ -120,9 +120,9 @@ vector<vector<DWORD> > vecUnsupportedInputFccs = {
 	{ 15, 16, FCC('YVYU'), FCC('VYUY'), FCC('YV12') },
 };
 
-vector<vector<DWORD> > vecUnsupportedOutputFccs = vecUnsupportedInputFccs;
+const vector<vector<DWORD> > vecUnsupportedOutputFccs = vecUnsupportedInputFccs;
 
-vector<vector<LONG>> vecSupportedWidth = {
+const vector<vector<LONG>> vecSupportedWidth = {
 	{ 1920, 1921, 1922, 1923, 1924, 1925, 1926, 1927 },
 	{ 1920, 1921, 1922, 1923, 1924, 1925, 1926, 1927 },
 	{ 1920, 1921, 1922, 1923, 1924, 1925, 1926, 1927 },
@@ -144,7 +144,7 @@ vector<vector<LONG>> vecSupportedWidth = {
 	{ 1920, 1922, 1924, 1926 },
 };
 
-vector<vector<LONG>> vecSupportedHeight = {
+const vector<vector<LONG>> vecSupportedHeight = {
 	{ 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087 },
 	{ 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087 },
 	{ 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087 },
@@ -166,7 +166,7 @@ vector<vector<LONG>> vecSupportedHeight = {
 	{ 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087 },
 };
 
-vector<vector<LONG>> vecUnsupportedWidth = {
+const vector<vector<LONG>> vecUnsupportedWidth = {
 	{ -1920, 0 },
 	{ -1920, 0 },
 	{ -1920, 0 },
@@ -188,7 +188,7 @@ vector<vector<LONG>> vecUnsupportedWidth = {
 	{ -1920, 0, 1921, 1923, 1925, 1927 },
 };
 
-vector<vector<LONG>> vecUnsupportedHeight = {
+const vector<vector<LONG>> vecUnsupportedHeight = {
 	{ -1080, 0 },
 	{ -1080, 0 },
 	{ -1080, 0 },
@@ -210,7 +210,7 @@ vector<vector<LONG>> vecUnsupportedHeight = {
 	{ -1080, 0 },
 };
 
-vector<DWORD> vecTopPriorityRawFcc = {
+const vector<DWORD> vecTopPriorityRawFcc = {
 	24,
 	32,
 	FCC('YV24'),
@@ -232,7 +232,7 @@ vector<DWORD> vecTopPriorityRawFcc = {
 	FCC('HDYC'),
 };
 
-vector<BOOL> vecTemporalCompressionSupported = {
+const vector<BOOL> vecTemporalCompressionSupported = {
 	false,
 	false,
 	false,

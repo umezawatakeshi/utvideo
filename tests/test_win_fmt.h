@@ -5,19 +5,19 @@
 
 #include "print_log_value.h"
 
-extern vector<FOURCC> vecCodecFcc;
-extern vector<wstring> vecCodecShortName;
-extern vector<wstring> vecCodecLongName;
-extern vector<DWORD> vecTopPriorityRawFcc;
-extern vector<vector<DWORD>> vecSupportedInputFccs;
-extern vector<vector<DWORD>> vecSupportedOutputFccs;
-extern vector<vector<DWORD>> vecUnsupportedInputFccs;
-extern vector<vector<DWORD>> vecUnsupportedOutputFccs;
-extern vector<vector<LONG>> vecSupportedWidth;
-extern vector<vector<LONG>> vecSupportedHeight;
-extern vector<vector<LONG>> vecUnsupportedWidth;
-extern vector<vector<LONG>> vecUnsupportedHeight;
-extern vector<BOOL> vecTemporalCompressionSupported; // vector<bool> だとクソな特殊化が使われてしまう
+extern const vector<FOURCC> vecCodecFcc;
+extern const vector<wstring> vecCodecShortName;
+extern const vector<wstring> vecCodecLongName;
+extern const vector<DWORD> vecTopPriorityRawFcc;
+extern const vector<vector<DWORD>> vecSupportedInputFccs;
+extern const vector<vector<DWORD>> vecSupportedOutputFccs;
+extern const vector<vector<DWORD>> vecUnsupportedInputFccs;
+extern const vector<vector<DWORD>> vecUnsupportedOutputFccs;
+extern const vector<vector<LONG>> vecSupportedWidth;
+extern const vector<vector<LONG>> vecSupportedHeight;
+extern const vector<vector<LONG>> vecUnsupportedWidth;
+extern const vector<vector<LONG>> vecUnsupportedHeight;
+extern const vector<BOOL> vecTemporalCompressionSupported; // vector<bool> だとクソな特殊化が使われてしまう
 
 #define TEST_WIDTH ((LONG)1920)
 #define TEST_HEIGHT ((LONG)1080)
