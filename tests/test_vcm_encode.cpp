@@ -93,7 +93,13 @@ BOOST_DATA_TEST_CASE(vcm_encode, make_data_from_tuple_container(vecEncodeClips),
 		DWORD dwFlags = 0;
 		lr = ICCompress(hic, 0, &bihCompressed, pEncoderOut, &bihEncoderIn, pRawData, NULL, &dwFlags, lFrameNum++, 0, 0, &bihEncoderIn, NULL);
 		BOOST_REQUIRE(lr == ICERR_OK);
-		BOOST_CHECK(((dwFlags & AVIIF_KEYFRAME) != 0) == bKeyFrame); // 珍妙な書き方だがこうしないと警告が出る…
+		/*
+		 * 現在の FFmpeg は UMxx であっても UtVideo を intra only だと思っており、
+		 * そのようなコーデックでは AVI index にキーフレームフラグが立ってなくても
+		 * キーフレームフラグを付けて返してくる (compute_pkt_fields() in libavformat/utils.c) ので、
+		 * このチェックは正しく動作しない。
+		 */
+		//BOOST_CHECK(((dwFlags & AVIIF_KEYFRAME) != 0) == bKeyFrame); // 珍妙な書き方だがこうしないと警告が出る…
 
 		BOOST_CHECK(bihCompressed.biSizeImage == cbCompressedData);
 		BOOST_CHECK(memcmp(pEncoderOut, pCompressedData, cbCompressedData) == 0);
