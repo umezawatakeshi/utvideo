@@ -291,13 +291,60 @@ vector<tuple<string, string, unsigned int>> conv_clip000_umxx(const vector<tuple
 	return r;
 }
 
+static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip003_umxx = {
+	{ "clip003-umrg", 1, 1,{ { "clip003-raw-rgb24", 0 },{ "clip003-raw-rgb32", 0 }, } },
+	{ "clip003-umra", 1, 1,{ { "clip003-raw-rgba", 0 }, } },
+	{ "clip003-umy4", 1, 1,{ { "clip003-raw-yv24", 0 }, } },
+	{ "clip003-umy2", 2, 1,{ { "clip003-raw-yuy2", 0 },{ "clip003-raw-uyvy", 0 },{ "clip003-raw-yv16", 0 }, } },
+	{ "clip003-umh4", 1, 1,{ { "clip003-raw-yv24", 0 }, } },
+	{ "clip003-umh2", 2, 1,{ { "clip003-raw-yuy2", 0 },{ "clip003-raw-uyvy", 0 },{ "clip003-raw-yv16", 0 }, } },
+};
+
+static const vector<uint8_t> inter_umxx = { 0x02, 0x00, 0x02, 0x00, };
+
+vector<tuple<string, string, unsigned int>> conv_clip003_umxx(const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> &v, const vector<pair<int, int>>& sz)
+{
+	vector<tuple<string, string, unsigned int>> r;
+
+	for (auto& i : v)
+	{
+		auto& compbase = std::get<0>(i);
+		auto widthstep = std::get<1>(i);
+		auto heightstep = std::get<2>(i);
+		for (auto& j : std::get<3>(i))
+		{
+			auto& rawbase = j.first;
+			auto& tolerance = j.second;
+			for (auto divpair : divs_umxx)
+			{
+				for (auto& size : sz)
+				{
+					auto width = size.first;
+					auto height = size.second;
+					if (width % widthstep != 0 || height % heightstep != 0)
+						continue;
+
+					char comp[256], raw[256];
+
+					sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divpair.first.c_str(), width, height);
+					sprintf(raw, "%s-%s-%dx%d.avi", rawbase.c_str(), divpair.first.c_str(), width, height);
+					r.push_back(make_tuple(comp, raw, tolerance));
+				}
+			}
+		}
+	}
+
+	return r;
+}
+
 const vector<tuple<string, string, unsigned int>> vecDecodeClips =
 	conv_clip000_ulxx(vecDecodeClipsSource_clip000_ulxx, sizes_clip000_ulxx, false) +
 	conv_clip000_ulxx(vecDecodeClipsSource_clip002_ulxx, sizes_clip000_ulxx, true) +
 	conv_clip000_uqxx(vecDecodeClipsSource_clip000_uqxx, sizes_clip000_uqxx, false) +
 	conv_clip000_uqxx(vecDecodeClipsSource_clip002_uqxx, sizes_clip000_uqxx, true) +
 	conv_clip000_umxx(vecDecodeClipsSource_clip000_umxx, sizes_clip000_umxx, false) +
-	conv_clip000_umxx(vecDecodeClipsSource_clip002_umxx, sizes_clip000_umxx, true);
+	conv_clip000_umxx(vecDecodeClipsSource_clip002_umxx, sizes_clip000_umxx, true) +
+	conv_clip003_umxx(vecDecodeClipsSource_clip003_umxx, sizes_clip000_umxx);
 
 /****************************************************************************/
 
@@ -531,13 +578,57 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 	return r;
 }
 
+static const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> vecEncodeClipsSource_clip003_umxx = {
+	{ "clip003-umrg", umxx_config_none, 1, 1,{ "clip003-raw-rgb24", "clip003-raw-rgb32", } },
+	{ "clip003-umra", umxx_config_none, 1, 1,{ "clip003-raw-rgba", } },
+	{ "clip003-umy4", umxx_config_none, 1, 1,{ "clip003-raw-yv24", } },
+	{ "clip003-umy2", umxx_config_none, 2, 1,{ "clip003-raw-yuy2", "clip003-raw-uyvy", "clip003-raw-yv16", } },
+	{ "clip003-umh4", umxx_config_none, 1, 1,{ "clip003-raw-yv24", } },
+	{ "clip003-umh2", umxx_config_none, 2, 1,{ "clip003-raw-yuy2", "clip003-raw-uyvy", "clip003-raw-yv16", } },
+};
+
+vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip003_umxx(const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> &v, const vector<pair<int, int>>& sz)
+{
+	vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> r;
+
+	for (auto& i : v)
+	{
+		auto& compbase = std::get<0>(i);
+		auto& confbase = std::get<1>(i);
+		auto widthstep = std::get<2>(i);
+		auto heightstep = std::get<3>(i);
+		for (auto& rawbase : std::get<4>(i))
+		{
+			for (auto divpair : divs_umxx)
+			{
+				for (auto& size : sz)
+				{
+					auto width = size.first;
+					auto height = size.second;
+					if (width % widthstep != 0 || height % heightstep != 0)
+						continue;
+
+					char comp[256], raw[256];
+
+					sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divpair.first.c_str(), width, height);
+					sprintf(raw, "%s-%s-%dx%d.avi", rawbase.c_str(), divpair.first.c_str(), width, height);
+					r.push_back(make_tuple(raw, comp, confbase | divpair.second | inter_umxx, umxx_extradata_mask));
+				}
+			}
+		}
+	}
+
+	return r;
+}
+
 const vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> vecEncodeClips =
 	conv_enc_clip000_ulxx(vecEncodeClipsSource_clip000_ulxx, sizes_clip000_ulxx, false) +
 	conv_enc_clip000_ulxx(vecEncodeClipsSource_clip002_ulxx, sizes_clip000_ulxx, true) +
 	conv_enc_clip000_uqxx(vecEncodeClipsSource_clip000_uqxx, sizes_clip000_uqxx, false) +
 	conv_enc_clip000_uqxx(vecEncodeClipsSource_clip002_uqxx, sizes_clip000_uqxx, true) +
 	conv_enc_clip000_umxx(vecEncodeClipsSource_clip000_umxx, sizes_clip000_umxx, false) +
-	conv_enc_clip000_umxx(vecEncodeClipsSource_clip002_umxx, sizes_clip000_umxx, true);
+	conv_enc_clip000_umxx(vecEncodeClipsSource_clip002_umxx, sizes_clip000_umxx, true) +
+	conv_enc_clip003_umxx(vecEncodeClipsSource_clip003_umxx, sizes_clip000_umxx);
 
 /****************************************************************************/
 
