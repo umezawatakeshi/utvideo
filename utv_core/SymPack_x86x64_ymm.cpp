@@ -45,8 +45,8 @@ static inline FORCEINLINE void PackForIntra(uint8_t*& q, uint8_t*& r, __m256i wa
 	__m256i vrembitsb = _mm256_sub_epi64(_mm256_set1_epi64x(8), vbitsb);
 	vbitsa = _mm256_andnot_si256(viszeroa, vbitsa);
 	vbitsb = _mm256_andnot_si256(viszerob, vbitsb);
-	__m256i vmodea = _mm256_add_epi64(vbitsa, _mm256_cmpgt_epi64(vbitsa, _mm256_setzero_si256()));
-	__m256i vmodeb = _mm256_add_epi64(vbitsb, _mm256_cmpgt_epi64(vbitsb, _mm256_setzero_si256()));
+	__m256i vmodea = _mm256_subs_epu8(vbitsa, _mm256_set1_epi64x(1));
+	__m256i vmodeb = _mm256_subs_epu8(vbitsb, _mm256_set1_epi64x(1));
 
 	bits0 = _mm_cvtsi128_si32(_mm256_castsi256_si128(vbitsa));
 	bits1 = _mm_extract_epi32(_mm256_castsi256_si128(vbitsa), 2);
@@ -306,7 +306,7 @@ static inline FORCEINLINE void VECTORCALL PackForDelta(uint8_t*& q, uint8_t*& r,
 	__m256i vrembits = _mm256_sub_epi32(_mm256_set1_epi32(8), vbits);
 	__m256i vrembitsa = _mm256_and_si256(vrembits, _mm256_set1_epi64x(0x00000000ffffffff));
 	__m256i vrembitsb = _mm256_srli_epi64(vrembits, 32);
-	__m256i vmode = _mm256_add_epi32(vbits, _mm256_cmpgt_epi32(vbits, _mm256_setzero_si256()));
+	__m256i vmode = _mm256_subs_epu8(vbits, _mm256_set1_epi32(1));
 	vmode = _mm256_or_si256(vmode, _mm256_andnot_si256(vspatial, _mm256_set1_epi32(8)));
 
 	bits0 = _mm_cvtsi128_si32(_mm256_castsi256_si128(vbits));

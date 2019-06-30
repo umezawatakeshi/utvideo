@@ -36,7 +36,7 @@ static inline FORCEINLINE void PackForIntra(uint8_t*& q, uint8_t*& r, int& shift
 	__m128i vbits = z;
 	__m128i vrembits = _mm_sub_epi32(_mm_set1_epi32(8), vbits);
 	vbits = _mm_andnot_si128(viszero, vbits);
-	__m128i vmode = _mm_add_epi32(vbits, _mm_cmpgt_epi32(vbits, _mm_setzero_si128()));
+	__m128i vmode = _mm_subs_epu8(vbits, _mm_set1_epi32(1));
 
 	bits0 = _mm_cvtsi128_si32(vbits);
 	bits1 = _mm_extract_epi32(vbits, 2);
@@ -303,7 +303,7 @@ static inline FORCEINLINE void VECTORCALL PackForDelta(uint8_t*& q, uint8_t*& r,
 	wb = _mm_blendv_epi8(tb, wb, _mm_shuffle_epi32(vspatial, _MM_SHUFFLE(3, 3, 1, 1)));
 	__m128i vbits = _mm_min_epi32(vbitsw, vbitst);
 	__m128i vrembits = _mm_sub_epi32(_mm_set1_epi32(8), vbits);
-	__m128i vmode = _mm_add_epi32(vbits, _mm_cmpgt_epi32(vbits, _mm_setzero_si128()));
+	__m128i vmode = _mm_subs_epu8(vbits, _mm_set1_epi32(1));
 	vmode = _mm_or_si128(vmode, _mm_andnot_si128(vspatial, _mm_set1_epi32(8)));
 
 	bits0 = _mm_cvtsi128_si32(vbits);
