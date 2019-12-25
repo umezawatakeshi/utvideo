@@ -249,6 +249,13 @@ LRESULT CVCMCodec::CompressGetFormat(const BITMAPINFOHEADER *pbihIn, BITMAPINFOH
 
 LRESULT CVCMCodec::CompressGetSize(const BITMAPINFOHEADER *pbihIn, const BITMAPINFOHEADER *pbihOut)
 {
+	if (IsLogWriterInitializedOrDebugBuild())
+	{
+		LOGPRINTF("%p CVCMCodec::CompressGetSize(pbihIn=%p, pbihOut=%p)", this, pbihIn, pbihOut);
+		if (pbihIn != NULL)
+			LOGPRINT_BIH_THIS(this, " pbihIn ", pbihIn);
+	}
+
 	if (m_mode != ICMODE_COMPRESS && m_mode != ICMODE_QUERY)
 		return ICERR_UNSUPPORTED;
 
