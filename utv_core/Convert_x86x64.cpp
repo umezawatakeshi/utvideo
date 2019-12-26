@@ -2568,6 +2568,42 @@ static inline __m128i _mm_Convert10To16Fullrange(__m128i x)
 	return _mm_or_si128(tmp, _mm_srli_epi16(tmp, 10));
 }
 
+
+template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler> /* 最適化が有効な場合、返した a を触らなければ a を計算する命令は生成されないので、やはり A はテンプレートパラメータとしては要らない */
+static inline FORCEINLINE VECTOR_RGBA<__m128i> VECTORCALL tuned_ConvertB64aToPlanarElement10(__m128i m0, __m128i m1, __m128i m2, __m128i m3)
+{
+	__m128i ctl = _mm_set_epi8(8, 9, 0, 1, 10, 11, 2, 3, 12, 13, 4, 5, 14, 15, 6, 7);
+
+	m0 = _mm_shuffle_epi8(m0, ctl); // A1 A0 R1 R0 G1 G0 B1 B0
+	m1 = _mm_shuffle_epi8(m1, ctl);
+	m2 = _mm_shuffle_epi8(m2, ctl);
+	m3 = _mm_shuffle_epi8(m3, ctl);
+
+	__m128i gb0 = _mm_unpacklo_epi32(m0, m1);
+	__m128i gb1 = _mm_unpacklo_epi32(m2, m3);
+	__m128i ar0 = _mm_unpackhi_epi32(m0, m1);
+	__m128i ar1 = _mm_unpackhi_epi32(m2, m3);
+
+	__m128i gg = _mm_Convert16To10Fullrange(_mm_unpackhi_epi64(gb0, gb1));
+	__m128i ggtmp = NeedOffset ? _mm_add_epi16(gg, _mm_set1_epi16(0x200)) : gg;
+	__m128i bb = _mm_and_si128(_mm_sub_epi16(_mm_Convert16To10Fullrange(_mm_unpacklo_epi64(gb0, gb1)), ggtmp), _mm_set1_epi16(0x3ff));
+	__m128i rr = _mm_and_si128(_mm_sub_epi16(_mm_Convert16To10Fullrange(_mm_unpacklo_epi64(ar0, ar1)), ggtmp), _mm_set1_epi16(0x3ff));
+	__m128i aa = _mm_Convert16To10Fullrange(_mm_unpackhi_epi64(ar0, ar1));
+
+	return{ gg, bb, rr, aa };
+}
+
+template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGBA<__m128i> tuned_ConvertB64aToPlanarElement10(const uint8_t* pp)
+{
+	return tuned_ConvertB64aToPlanarElement10<F, NeedOffset>(
+		_mm_loadu_si128((const __m128i *)pp),
+		_mm_loadu_si128((const __m128i *)(pp + 16)),
+		_mm_loadu_si128((const __m128i *)(pp + 32)),
+		_mm_loadu_si128((const __m128i *)(pp + 48))
+	);
+}
+
 #if 0
 template<int F>
 static inline void tuned_ConvertB48rToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
@@ -2590,26 +2626,13 @@ static inline void tuned_ConvertRGBXToUQRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 #ifdef __SSSE3__
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			__m128i m0 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)pp), ctl); // A1 A0 R1 R0 G1 G0 B1 B0
-			__m128i m1 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 16)), ctl);
-			__m128i m2 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 32)), ctl);
-			__m128i m3 = _mm_shuffle_epi8(_mm_loadu_si128((const __m128i *)(pp + 48)), ctl);
+			auto result = tuned_ConvertB64aToPlanarElement10<F, true>(pp);
 
-			__m128i gb0 = _mm_unpacklo_epi32(m0, m1);
-			__m128i gb1 = _mm_unpacklo_epi32(m2, m3);
-			__m128i ar0 = _mm_unpackhi_epi32(m0, m1);
-			__m128i ar1 = _mm_unpackhi_epi32(m2, m3);
-
-			__m128i gg = _mm_Convert16To10Fullrange(_mm_unpackhi_epi64(gb0, gb1));
-			__m128i gg200 = _mm_add_epi16(gg, _mm_set1_epi16(0x200));
-			__m128i bb = _mm_and_si128(_mm_sub_epi16(_mm_Convert16To10Fullrange(_mm_unpacklo_epi64(gb0, gb1)), gg200), _mm_set1_epi16(0x3ff));
-			__m128i rr = _mm_and_si128(_mm_sub_epi16(_mm_Convert16To10Fullrange(_mm_unpacklo_epi64(ar0, ar1)), gg200), _mm_set1_epi16(0x3ff));
-
-			_mm_storeu_si128((__m128i *)b, bb);
-			_mm_storeu_si128((__m128i *)g, gg);
-			_mm_storeu_si128((__m128i *)r, rr);
+			_mm_storeu_si128((__m128i *)b, result.b);
+			_mm_storeu_si128((__m128i *)g, result.g);
+			_mm_storeu_si128((__m128i *)r, result.r);
 			if (A)
-				_mm_storeu_si128((__m128i *)a, _mm_Convert16To10Fullrange(_mm_unpackhi_epi64(ar0, ar1)));
+				_mm_storeu_si128((__m128i *)a, result.a);
 
 			b += 8;
 			g += 8;
@@ -2673,6 +2696,45 @@ template void tuned_ConvertB64aToUQRA<CODEFEATURE_AVX1>(uint8_t *pGBegin, uint8_
 
 //
 
+template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR4<__m128i> VECTORCALL tuned_ConvertPlanarRGBXToB64aElement10(__m128i gg, __m128i bb, __m128i rr, __m128i aa)
+{
+	__m128i ctl = _mm_set_epi8(2, 3, 6, 7, 10, 11, 14, 15, 0, 1, 4, 5, 8, 9, 12, 13);
+
+	__m128i ggtmp = NeedOffset ? _mm_add_epi16(gg, _mm_set1_epi16(0x200)) : gg;
+	gg = _mm_Convert10To16Fullrange(gg);
+	bb = _mm_Convert10To16Fullrange(_mm_add_epi16(bb, ggtmp));
+	rr = _mm_Convert10To16Fullrange(_mm_add_epi16(rr, ggtmp));
+	aa = _mm_Convert10To16Fullrange(aa); // tuned_ConvertPlanarRGBXToPackedElement と同様、 aa が定数の場合でもこの行はそこまで問題にならない。
+
+	__m128i gb0 = _mm_unpacklo_epi32(bb, gg); // G3 G2 B3 B2 G1 G0 B1 B0
+	__m128i gb1 = _mm_unpackhi_epi32(bb, gg);
+	__m128i ar0 = _mm_unpacklo_epi32(rr, aa);
+	__m128i ar1 = _mm_unpackhi_epi32(rr, aa);
+
+	__m128i m0 = _mm_unpacklo_epi64(gb0, ar0); // A1 A0 R1 R0 G1 G0 B1 B0
+	__m128i m1 = _mm_unpackhi_epi64(gb0, ar0);
+	__m128i m2 = _mm_unpacklo_epi64(gb1, ar1);
+	__m128i m3 = _mm_unpackhi_epi64(gb1, ar1);
+
+	return {
+		_mm_shuffle_epi8(m0, ctl),
+		_mm_shuffle_epi8(m1, ctl),
+		_mm_shuffle_epi8(m2, ctl),
+		_mm_shuffle_epi8(m3, ctl)
+	};
+}
+
+template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToB64aElement10(uint8_t* pp, __m128i gg, __m128i bb, __m128i rr, __m128i aa)
+{
+	auto result = tuned_ConvertPlanarRGBXToB64aElement10<F, NeedOffset>(gg, bb, rr, aa);
+	_mm_storeu_si128((__m128i *)pp, result.v0);
+	_mm_storeu_si128((__m128i *)(pp + 16), result.v1);
+	_mm_storeu_si128((__m128i *)(pp + 32), result.v2);
+	_mm_storeu_si128((__m128i *)(pp + 48), result.v3);
+}
+
 #if 0
 template<int F>
 static inline void tuned_ConvertUQRGToB48r(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
@@ -2701,29 +2763,11 @@ static inline void tuned_ConvertUQRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd,
 			__m128i bb = _mm_loadu_si128((const __m128i *)b);
 			__m128i rr = _mm_loadu_si128((const __m128i *)r);
 			if (A)
-				aa = _mm_Convert10To16Fullrange(_mm_loadu_si128((const __m128i *)a));
+				aa = _mm_loadu_si128((const __m128i *)a);
 			else
 				aa = _mm_set1_epi16((short)0xffff);
 
-			__m128i gg200 = _mm_add_epi16(gg, _mm_set1_epi16(0x200));
-			gg = _mm_Convert10To16Fullrange(gg);
-			bb = _mm_Convert10To16Fullrange(_mm_add_epi16(bb, gg200));
-			rr = _mm_Convert10To16Fullrange(_mm_add_epi16(rr, gg200));
-
-			__m128i gb0 = _mm_unpacklo_epi32(bb, gg); // G3 G2 B3 B2 G1 G0 B1 B0
-			__m128i gb1 = _mm_unpackhi_epi32(bb, gg);
-			__m128i ar0 = _mm_unpacklo_epi32(rr, aa);
-			__m128i ar1 = _mm_unpackhi_epi32(rr, aa);
-
-			__m128i m0 = _mm_unpacklo_epi64(gb0, ar0); // A1 A0 R1 R0 G1 G0 B1 B0
-			__m128i m1 = _mm_unpackhi_epi64(gb0, ar0);
-			__m128i m2 = _mm_unpacklo_epi64(gb1, ar1);
-			__m128i m3 = _mm_unpackhi_epi64(gb1, ar1);
-
-			_mm_storeu_si128((__m128i *)pp, _mm_shuffle_epi8(m0, ctl));
-			_mm_storeu_si128((__m128i *)(pp + 16), _mm_shuffle_epi8(m1, ctl));
-			_mm_storeu_si128((__m128i *)(pp + 32), _mm_shuffle_epi8(m2, ctl));
-			_mm_storeu_si128((__m128i *)(pp + 48), _mm_shuffle_epi8(m3, ctl));
+			tuned_ConvertPlanarRGBXToB64aElement10<F, true>(pp, gg, bb, rr, aa);
 
 			b += 8;
 			g += 8;
@@ -2785,6 +2829,33 @@ template void tuned_ConvertUQRAToB64a<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint
 
 //
 
+template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGB<__m128i> VECTORCALL tuned_ConvertR210ToPlanarElement10(__m128i m0, __m128i m1)
+{
+	__m128i rb0 = _mm_shuffle_epi8(m0, _mm_set_epi8(12, 13, 8, 9, 4, 5, 0, 1, 14, 15, 10, 11, 6, 7, 2, 3)); // XXRRRRRRRRRRXXXX|XXXXXXBBBBBBBBBB
+	__m128i rb1 = _mm_shuffle_epi8(m1, _mm_set_epi8(12, 13, 8, 9, 4, 5, 0, 1, 14, 15, 10, 11, 6, 7, 2, 3));
+	__m128i g00 = _mm_shuffle_epi8(m0, _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, 13, 14, 9, 10, 5, 6, 1, 2)); // XXXXGGGGGGGGGGXX
+	__m128i g01 = _mm_shuffle_epi8(m1, _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, 13, 14, 9, 10, 5, 6, 1, 2));
+	__m128i bb = _mm_unpacklo_epi64(rb0, rb1);
+	__m128i rr = _mm_srli_epi16(_mm_unpackhi_epi64(rb0, rb1), 4);
+	__m128i gg = _mm_srli_epi16(_mm_unpacklo_epi64(g00, g01), 2);
+	__m128i ggtmp = NeedOffset ? _mm_add_epi16(gg, _mm_set1_epi16(0x200)) : gg;
+	bb = _mm_and_si128(_mm_sub_epi16(bb, ggtmp), _mm_set1_epi16(0x3ff));
+	rr = _mm_and_si128(_mm_sub_epi16(rr, ggtmp), _mm_set1_epi16(0x3ff));
+	gg = _mm_and_si128(gg, _mm_set1_epi16(0x3ff));
+
+	return { gg, bb, rr };
+}
+
+template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGB<__m128i> tuned_ConvertR210ToPlanarElement10(const uint8_t* pp)
+{
+	return tuned_ConvertR210ToPlanarElement10<F, NeedOffset>(
+		_mm_loadu_si128((const __m128i *)pp),
+		_mm_loadu_si128((const __m128i *)(pp + 16))
+	);
+}
+
 template<int F>
 void tuned_ConvertR210ToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride)
 {
@@ -2800,22 +2871,10 @@ void tuned_ConvertR210ToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegi
 #ifdef __SSSE3__
 		for (; p <= pStrideEnd - 32; p += 32)
 		{
-			__m128i m0 = _mm_loadu_si128((const __m128i*)p);
-			__m128i m1 = _mm_loadu_si128((const __m128i*)(p + 16));
-
-			__m128i rb0 = _mm_shuffle_epi8(m0, _mm_set_epi8(12, 13, 8, 9, 4, 5, 0, 1, 14, 15, 10, 11, 6, 7, 2, 3)); // XXRRRRRRRRRRXXXX|XXXXXXBBBBBBBBBB
-			__m128i rb1 = _mm_shuffle_epi8(m1, _mm_set_epi8(12, 13, 8, 9, 4, 5, 0, 1, 14, 15, 10, 11, 6, 7, 2, 3));
-			__m128i g00 = _mm_shuffle_epi8(m0, _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, 13, 14, 9, 10, 5, 6, 1, 2)); // XXXXGGGGGGGGGGXX
-			__m128i g01 = _mm_shuffle_epi8(m1, _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, 13, 14, 9, 10, 5, 6, 1, 2));
-			__m128i bb = _mm_unpacklo_epi64(rb0, rb1);
-			__m128i rr = _mm_srli_epi16(_mm_unpackhi_epi64(rb0, rb1), 4);
-			__m128i gg = _mm_srli_epi16(_mm_unpacklo_epi64(g00, g01), 2);
-			bb = _mm_and_si128(_mm_add_epi16(_mm_sub_epi16(bb, gg), _mm_set1_epi16(0x200)), _mm_set1_epi16(0x3ff));
-			rr = _mm_and_si128(_mm_add_epi16(_mm_sub_epi16(rr, gg), _mm_set1_epi16(0x200)), _mm_set1_epi16(0x3ff));
-			gg = _mm_and_si128(gg, _mm_set1_epi16(0x3ff));
-			_mm_storeu_si128((__m128i*)g, gg);
-			_mm_storeu_si128((__m128i*)b, bb);
-			_mm_storeu_si128((__m128i*)r, rr);
+			auto result = tuned_ConvertR210ToPlanarElement10<F>(p);
+			_mm_storeu_si128((__m128i*)g, result.g);
+			_mm_storeu_si128((__m128i*)b, result.b);
+			_mm_storeu_si128((__m128i*)r, result.r);
 
 			g += 8;
 			b += 8;
@@ -2847,6 +2906,38 @@ template void tuned_ConvertR210ToUQRG<CODEFEATURE_AVX1>(uint8_t *pGBegin, uint8_
 
 //
 
+template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE VECTOR2<__m128i> VECTORCALL tuned_ConvertPlanarRGBXToR210Element10(__m128i gg, __m128i bb, __m128i rr)
+{
+	__m128i ggtmp = NeedOffset ? _mm_add_epi16(gg, _mm_set1_epi16(0x200)) : gg;
+	bb = _mm_and_si128(_mm_add_epi16(bb, ggtmp), _mm_set1_epi16(0x3ff));
+	rr = _mm_and_si128(_mm_add_epi16(rr, ggtmp), _mm_set1_epi16(0x3ff));
+	rr = _mm_slli_epi16(rr, 4);
+	__m128i rb0 = _mm_unpacklo_epi16(bb, rr);
+	__m128i rb1 = _mm_unpackhi_epi16(bb, rr);
+	__m128i g00 = _mm_unpacklo_epi16(gg, _mm_setzero_si128());
+	__m128i g01 = _mm_unpackhi_epi16(gg, _mm_setzero_si128());
+	g00 = _mm_slli_epi32(g00, 10);
+	g01 = _mm_slli_epi32(g01, 10);
+	__m128i m0 = _mm_or_si128(rb0, g00);
+	__m128i m1 = _mm_or_si128(rb1, g01);
+	m0 = _mm_shuffle_epi8(m0, _mm_set_epi8(12, 13, 14, 15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1, 2, 3));
+	m1 = _mm_shuffle_epi8(m1, _mm_set_epi8(12, 13, 14, 15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1, 2, 3));
+
+	return {
+		m0,
+		m1
+	};
+}
+
+template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToR210Element10(uint8_t* pp, __m128i gg, __m128i bb, __m128i rr)
+{
+	auto result = tuned_ConvertPlanarRGBXToR210Element10<F, NeedOffset>(gg, bb, rr);
+	_mm_storeu_si128((__m128i *)pp, result.v0);
+	_mm_storeu_si128((__m128i *)(pp + 16), result.v1);
+}
+
 template<int F>
 void tuned_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
 {
@@ -2865,22 +2956,7 @@ void tuned_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 			__m128i gg = _mm_loadu_si128((const __m128i*)g);
 			__m128i bb = _mm_loadu_si128((const __m128i*)b);
 			__m128i rr = _mm_loadu_si128((const __m128i*)r);
-
-			bb = _mm_and_si128(_mm_sub_epi16(_mm_add_epi16(bb, gg), _mm_set1_epi16(0x200)), _mm_set1_epi16(0x3ff));
-			rr = _mm_and_si128(_mm_sub_epi16(_mm_add_epi16(rr, gg), _mm_set1_epi16(0x200)), _mm_set1_epi16(0x3ff));
-			rr = _mm_slli_epi16(rr, 4);
-			__m128i rb0 = _mm_unpacklo_epi16(bb, rr);
-			__m128i rb1 = _mm_unpackhi_epi16(bb, rr);
-			__m128i g00 = _mm_unpacklo_epi16(gg, _mm_setzero_si128());
-			__m128i g01 = _mm_unpackhi_epi16(gg, _mm_setzero_si128());
-			g00 = _mm_slli_epi32(g00, 10);
-			g01 = _mm_slli_epi32(g01, 10);
-			__m128i m0 = _mm_or_si128(rb0, g00);
-			__m128i m1 = _mm_or_si128(rb1, g01);
-			m0 = _mm_shuffle_epi8(m0, _mm_set_epi8(12, 13, 14, 15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1, 2, 3));
-			m1 = _mm_shuffle_epi8(m1, _mm_set_epi8(12, 13, 14, 15, 8, 9, 10, 11, 4, 5, 6, 7, 0, 1, 2, 3));
-			_mm_storeu_si128((__m128i*)p, m0);
-			_mm_storeu_si128((__m128i*)(p + 16), m1);
+			tuned_ConvertPlanarRGBXToR210Element10<F>(p, gg, bb, rr);
 
 			g += 8;
 			b += 8;
