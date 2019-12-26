@@ -419,8 +419,14 @@ void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pPacked, size_t *cbPacke
 }
 
 
+struct UNPACK_FOR_DELTA_RESULT
+{
+	__m256i s;
+	__m256i m;
+};
+
 template<int F>
-static inline FORCEINLINE typename std::pair<__m256i, __m256i> UnpackForDelta(const uint8_t*& q, const uint8_t *& r, int& shift)
+static inline FORCEINLINE UNPACK_FOR_DELTA_RESULT UnpackForDelta(const uint8_t*& q, const uint8_t *& r, int& shift)
 {
 	__m256i w;
 	int modes = ((*(uint32_t *)r) >> shift);
@@ -497,8 +503,8 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 32, t += 32)
 		{
 			auto w0 = UnpackForDelta<CODEFEATURE_AVX2>(q, r, shift);
-			__m256i s0 = w0.first;
-			__m256i m0 = w0.second;
+			__m256i s0 = w0.s;
+			__m256i m0 = w0.m;
 
 			__m256i t0 = _mm256_add_epi8(s0, _mm256_loadu_si256((const __m256i*)t));
 			__m256i t0masked = _mm256_and_si256(t0, m0);
@@ -529,8 +535,8 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 		for (auto p = pp; p != pp + cbStride; p += 32, t += 32)
 		{
 			auto w0 = UnpackForDelta<CODEFEATURE_AVX2>(q, r, shift);
-			__m256i s0 = w0.first;
-			__m256i m0 = w0.second;
+			__m256i s0 = w0.s;
+			__m256i m0 = w0.m;
 
 			__m256i top = _mm256_loadu_si256((const __m256i*)(p - cbStride));
 			__m256i t0 = _mm256_add_epi8(s0, _mm256_loadu_si256((const __m256i*)t));

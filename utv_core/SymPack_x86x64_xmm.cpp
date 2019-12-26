@@ -431,8 +431,14 @@ template void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX1>(uint8_t *pPacked, size_t
 #endif
 
 
+struct UNPACK_FOR_DELTA_RESULT
+{
+	__m128i s;
+	__m128i m;
+};
+
 template<int F>
-static inline FORCEINLINE std::pair<__m128i, __m128i> UnpackForDelta(const uint8_t*& q, const uint8_t *& r, int& shift)
+static inline FORCEINLINE UNPACK_FOR_DELTA_RESULT UnpackForDelta(const uint8_t*& q, const uint8_t *& r, int& shift)
 {
 	__m128i w;
 	int mode = ((*(const uint32_t *)r) >> shift) & 7;
@@ -494,8 +500,8 @@ void tuned_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8
 		{
 			auto w0 = UnpackForDelta<F>(q, r, shift);
 			auto w1 = UnpackForDelta<F>(q, r, shift);
-			__m128i s0 = _mm_unpacklo_epi64(w0.first, w1.first);
-			__m128i m0 = _mm_unpacklo_epi64(w0.second, w1.second);
+			__m128i s0 = _mm_unpacklo_epi64(w0.s, w1.s);
+			__m128i m0 = _mm_unpacklo_epi64(w0.m, w1.m);
 
 			auto t0 = _mm_add_epi8(s0, _mm_loadu_si128((const __m128i*)t));
 			auto a = _mm_alignr_epi8(_mm_and_si128(t0, m0), prev, 15);
@@ -520,8 +526,8 @@ void tuned_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8
 		{
 			auto w0 = UnpackForDelta<F>(q, r, shift);
 			auto w1 = UnpackForDelta<F>(q, r, shift);
-			__m128i s0 = _mm_unpacklo_epi64(w0.first, w1.first);
-			__m128i m0 = _mm_unpacklo_epi64(w0.second, w1.second);
+			__m128i s0 = _mm_unpacklo_epi64(w0.s, w1.s);
+			__m128i m0 = _mm_unpacklo_epi64(w0.m, w1.m);
 
 			__m128i top = _mm_loadu_si128((const __m128i*)(p - cbStride));
 			auto t0 = _mm_add_epi8(s0, _mm_loadu_si128((const __m128i*)t));
