@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_wfmt", "utv_wfmt\utv_wf
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_dmo", "utv_dmo\utv_dmo.vcxproj", "{7019A21F-92B5-4D63-B9ED-4DB1836A87E4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_mft", "utv_mft\utv_mft.vcxproj", "{B489D833-9B22-4DA2-8024-598434A2B1BC}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_logl", "utv_logl\utv_logl.vcxproj", "{50A4A0B5-BDF1-44B9-897C-B499BBC6ACC0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_logc", "utv_logc\utv_logc.vcxproj", "{F7DE0729-4364-4B12-9122-B0D2D7DC3D32}"
@@ -57,6 +59,14 @@ Global
 		{7019A21F-92B5-4D63-B9ED-4DB1836A87E4}.Release|Win32.Build.0 = Release|Win32
 		{7019A21F-92B5-4D63-B9ED-4DB1836A87E4}.Release|x64.ActiveCfg = Release|x64
 		{7019A21F-92B5-4D63-B9ED-4DB1836A87E4}.Release|x64.Build.0 = Release|x64
+		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Debug|Win32.Build.0 = Debug|Win32
+		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Debug|x64.ActiveCfg = Debug|x64
+		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Debug|x64.Build.0 = Debug|x64
+		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Release|Win32.ActiveCfg = Release|Win32
+		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Release|Win32.Build.0 = Release|Win32
+		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Release|x64.ActiveCfg = Release|x64
+		{B489D833-9B22-4DA2-8024-598434A2B1BC}.Release|x64.Build.0 = Release|x64
 		{50A4A0B5-BDF1-44B9-897C-B499BBC6ACC0}.Debug|Win32.ActiveCfg = Debug|Win32
 		{50A4A0B5-BDF1-44B9-897C-B499BBC6ACC0}.Debug|Win32.Build.0 = Debug|Win32
 		{50A4A0B5-BDF1-44B9-897C-B499BBC6ACC0}.Debug|x64.ActiveCfg = Debug|x64

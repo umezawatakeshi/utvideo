@@ -11,6 +11,8 @@ ipch
 /utv_core/Coefficient.obj
 /utv_dmo/utv_dmo.h
 /utv_dmo/utv_dmo_i.c
+/utv_mft/utv_mft.h
+/utv_mft/utv_mft_i.c
 .DS_Store
 DerivedData
 utvideo.xcodeproj/project.xcworkspace
