@@ -146,13 +146,18 @@ protected:
 	virtual void ConvertFromPlanar(uint32_t nBandIndex) = 0;
 	virtual bool PredictDirect(uint32_t nBandIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
+	virtual bool RestoreDirect(uint32_t nBandIndex);
+	virtual bool IsDirectRestorable();
 
 	void PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin);
-	void DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
+	void DecodeToPlanar(uint32_t nBandIndex);
+	void DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
+	template<bool DoRestore> void DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* const* pDstBegin);
 
 private:
 	void PredictProc(uint32_t nBandIndex);
 	void EncodeProc(uint32_t nBandIndex);
+	void GenerateDecodeTableProc(uint32_t nPlaneIndex);
 	void DecodeProc(uint32_t nBandIndex);
 
 	class CThreadJob : public ::CThreadJob

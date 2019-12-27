@@ -359,6 +359,12 @@ int CUQ00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned i
 
 void CUQ00Codec::PredictProc(uint32_t nBandIndex)
 {
+	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	{
+		for (int i = 0; i < 1024; i++)
+			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
+	}
+
 	if (PredictDirect(nBandIndex))
 		return;
 
@@ -376,9 +382,6 @@ void CUQ00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 	{
 		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
-
-		for (int i = 0; i < 1024; i++)
-			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
 
 		PredictCylindricalLeftAndCount10((uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(pSrcBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t *)(pSrcBegin[nPlaneIndex] + cbPlaneEnd), m_counts[nBandIndex].dwCount[nPlaneIndex]);
 	}
@@ -450,15 +453,21 @@ size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput)
 		p += m_pdwOffsetTable[nPlaneIndex][m_dwDivideCount - 1];
 
 		m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<10> *)p;
-		GenerateHuffmanDecodeTable<10>(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
+		m_ptm->SubmitJob(new CThreadJob(this, &CUQ00Codec::GenerateDecodeTableProc, nPlaneIndex), nPlaneIndex);
 		p += 1024;
 	}
+	m_ptm->WaitForJobCompletion();
 
 	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		m_ptm->SubmitJob(new CThreadJob(this, &CUQ00Codec::DecodeProc, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
 	return m_cbRawSize;
+}
+
+void CUQ00Codec::GenerateDecodeTableProc(uint32_t nPlaneIndex)
+{
+	GenerateHuffmanDecodeTable<10>(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 }
 
 int CUQ00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
@@ -539,17 +548,29 @@ void CUQ00Codec::DecodeProc(uint32_t nBandIndex)
 	if (DecodeDirect(nBandIndex))
 		return;
 
-	uint8_t* pDstBegin[4];
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
-		pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
-	DecodeToPlanar(nBandIndex, pDstBegin);
+	if (IsDirectRestorable())
+	{
+		DecodeToPlanar(nBandIndex);
 
-	ConvertFromPlanar(nBandIndex);
+		if (RestoreDirect(nBandIndex))
+			return;
+
+		_ASSERT(false);
+	}
+	else
+	{
+		uint8_t* pDstBegin[4];
+		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+			pDstBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
+		DecodeAndRestoreToPlanar(nBandIndex, pDstBegin);
+
+		ConvertFromPlanar(nBandIndex);
+	}
 }
 
-void CUQ00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
+template<bool DoRestore>
+void CUQ00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* const* pDstBegin)
 {
-
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
@@ -562,14 +583,39 @@ void CUQ00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
 		else
 			dwOffset = m_pdwOffsetTable[nPlaneIndex][nBandIndex - 1];
 
+#ifdef _DEBUG
+		uint8_t *pRetExpected = m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd;
+		uint8_t *pRetActual = (uint8_t *)
+#endif
 		HuffmanDecode<10>((uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), m_pEncodedBits[nPlaneIndex] + dwOffset, &m_hdt[nPlaneIndex]);
-		RestoreCylindricalLeft10((uint16_t *)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
-	}
+		_ASSERT(pRetActual == pRetExpected);
 
-	ConvertFromPlanar(nBandIndex);
+		if (DoRestore)
+			RestoreCylindricalLeft10((uint16_t *)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
+	}
+}
+
+void CUQ00Codec::DecodeToPlanar(uint32_t nBandIndex)
+{
+	DecodeAndRestoreToPlanarImpl<false>(nBandIndex, NULL);
+}
+
+void CUQ00Codec::DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
+{
+	DecodeAndRestoreToPlanarImpl<true>(nBandIndex, pDstBegin);
 }
 
 bool CUQ00Codec::DecodeDirect(uint32_t nBandIndex)
+{
+	return false;
+}
+
+bool CUQ00Codec::RestoreDirect(uint32_t nBandIndex)
+{
+	return false;
+}
+
+bool CUQ00Codec::IsDirectRestorable()
 {
 	return false;
 }
