@@ -158,7 +158,6 @@ protected:
 
 	void PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin);
 	void DecodeToPlanar(uint32_t nBandIndex);
-	void RestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
 	void DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
 
 private:

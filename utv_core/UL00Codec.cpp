@@ -648,29 +648,6 @@ void CUL00Codec::DecodeToPlanar(uint32_t nBandIndex)
 	}
 }
 
-void CUL00Codec::RestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
-{
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
-	{
-		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
-
-		switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
-		{
-		case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
-		case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
-			RestoreCylindricalLeft8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd);
-			break;
-		case FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
-			RestorePlanarGradient8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
-			break;
-		case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-			RestoreCylindricalWrongMedian8(pDstBegin[nPlaneIndex] + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
-			break;
-		}
-	}
-}
-
 void CUL00Codec::DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
 {
 	/*
