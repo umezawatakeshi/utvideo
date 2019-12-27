@@ -100,8 +100,3 @@ void CUQRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 		break;
 	}
 }
-
-bool CUQRGCodec::DecodeDirect(uint32_t nBandIndex)
-{
-	return false;
-}

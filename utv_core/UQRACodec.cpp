@@ -90,8 +90,3 @@ void CUQRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 		break;
 	}
 }
-
-bool CUQRACodec::DecodeDirect(uint32_t nBandIndex)
-{
-	return false;
-}

@@ -84,8 +84,3 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		break;
 	}
 }
-
-bool CUQY2Codec::DecodeDirect(uint32_t nBandIndex)
-{
-	return false;
-}
