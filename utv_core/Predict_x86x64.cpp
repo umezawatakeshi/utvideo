@@ -289,6 +289,17 @@ template void tuned_PredictCylindricalLeftAndCount10<CODEFEATURE_AVX1>(uint16_t 
 
 
 template<int F>
+static inline FORCEINLINE VECTOR2<__m128i> /* value0, nextprev */ tuned_RestoreLeft10Element(__m128i prev, __m128i s0)
+{
+	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 2));
+	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 4));
+	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 8));
+	s0 = _mm_add_epi16(s0, prev);
+	s0 = _mm_and_si128(s0, _mm_set1_epi16(CSymbolBits<10>::maskval));
+	return { s0, _mm_shuffle_epi8(s0, _mm_set2_epi8(15, 14)) };
+}
+
+template<int F>
 static inline FORCEINLINE VECTOR3<__m128i> /* value0, value1, nextprev */ tuned_RestoreLeft10Element(__m128i prev, __m128i s0, __m128i s1)
 {
 	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 2));

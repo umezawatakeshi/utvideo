@@ -553,6 +553,12 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictSSE41 = {
 	tuned_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CODEFEATURE_SSE41, CUYVYColorOrder>,
 	tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CODEFEATURE_SSE41, CYUYVColorOrder>,
 	tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CODEFEATURE_SSE41, CUYVYColorOrder>,
+	tuned_ConvertB64aToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41>,
+	tuned_ConvertB64aToUQRA_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41>,
+	tuned_ConvertUQRGToB64a_RestoreCylindricalLeft<CODEFEATURE_SSE41>,
+	tuned_ConvertUQRAToB64a_RestoreCylindricalLeft<CODEFEATURE_SSE41>,
+	tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41>,
+	tuned_ConvertUQRGToR210_RestoreCylindricalLeft<CODEFEATURE_SSE41>,
 };
 
 const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictAVX1 = {
@@ -600,6 +606,12 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictAVX1 = {
 	tuned_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CODEFEATURE_AVX1, CUYVYColorOrder>,
 	tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CODEFEATURE_AVX1, CYUYVColorOrder>,
 	tuned_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CODEFEATURE_AVX1, CUYVYColorOrder>,
+	tuned_ConvertB64aToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1>,
+	tuned_ConvertB64aToUQRA_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1>,
+	tuned_ConvertUQRGToB64a_RestoreCylindricalLeft<CODEFEATURE_AVX1>,
+	tuned_ConvertUQRAToB64a_RestoreCylindricalLeft<CODEFEATURE_AVX1>,
+	tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1>,
+	tuned_ConvertUQRGToR210_RestoreCylindricalLeft<CODEFEATURE_AVX1>,
 };
 
 

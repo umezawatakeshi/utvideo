@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "utvideo.h"
 #include "ConvertPredict.h"
+#include "Convert.h"
 #include "Predict.h"
 #include "ColorOrder.h"
 #include "Coefficient.h"
@@ -811,3 +812,184 @@ template void cpp_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CYUYVColorOrde
 template void cpp_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 template void cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+
+//
+
+template<bool A>
+static inline void cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable)
+{
+	uint16_t gprevb = 0x200;
+	uint16_t bprevb = 0;
+	uint16_t rprevb = 0;
+	uint16_t aprevb = 0x200;
+
+	uint16_t *r = (uint16_t *)pRBegin;
+	uint16_t *g = (uint16_t *)pGBegin;
+	uint16_t *b = (uint16_t *)pBBegin;
+	uint16_t *a = (uint16_t *)pABegin;
+
+	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp < p + cbWidth; pp += 8)
+		{
+			uint16_t gg = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[2]));
+			*g = (gg - gprevb) & 0x3ff;
+			++pGCountTable[*g];
+			uint16_t bb = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[3])) - gg;
+			*b = (bb - bprevb) & 0x3ff;
+			++pBCountTable[*b];
+			uint16_t rr = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[1])) - gg;
+			*r = (rr - rprevb) & 0x3ff;
+			++pRCountTable[*r];
+
+			gprevb = gg;
+			bprevb = bb;
+			rprevb = rr;
+			if (A) {
+				uint16_t aa = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[0]));
+				*a = (aa - aprevb) & 0x3ff;
+				++pACountTable[*a];
+				aprevb = aa;
+			}
+
+			b += 1;
+			g += 1;
+			r += 1;
+			if (A)
+				a += 1;
+		}
+	}
+}
+
+void cpp_ConvertB64aToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable)
+{
+	cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount<false>(pGBegin, pBBegin, pRBegin, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, NULL);
+}
+
+void cpp_ConvertB64aToUQRA_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable)
+{
+	cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount<true>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, pACountTable);
+}
+
+//
+
+template<bool A>
+static inline void cpp_ConvertUQRXToB64a_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+{
+	uint16_t gprevb = 0x200;
+	uint16_t bprevb = 0;
+	uint16_t rprevb = 0;
+	uint16_t aprevb = 0x200;
+
+	uint16_t *g = (uint16_t *)pGBegin;
+	uint16_t *b = (uint16_t *)pBBegin;
+	uint16_t *r = (uint16_t *)pRBegin;
+	uint16_t *a = (uint16_t *)pABegin;
+
+	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp < p + cbWidth; pp += 8)
+		{
+			((uint16_t *)pp)[2] = htob16(Convert10To16Fullrange(gprevb += g[0]));
+			((uint16_t *)pp)[3] = htob16(Convert10To16Fullrange((bprevb += b[0]) + gprevb));
+			((uint16_t *)pp)[1] = htob16(Convert10To16Fullrange((rprevb += r[0]) + gprevb));
+			if (A)
+				((uint16_t *)pp)[0] = htob16(Convert10To16Fullrange(aprevb += a[0]));
+			else
+				((uint16_t *)pp)[0] = 0xffff;
+
+			g += 1;
+			b += 1;
+			r += 1;
+			if (A)
+				a += 1;
+		}
+	}
+}
+
+void cpp_ConvertUQRGToB64a_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
+{
+	cpp_ConvertUQRXToB64a_RestoreCylindricalLeft<false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, NULL, cbWidth, scbStride);
+}
+
+void cpp_ConvertUQRAToB64a_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+{
+	cpp_ConvertUQRXToB64a_RestoreCylindricalLeft<true>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
+}
+
+//
+
+void cpp_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable)
+{
+	uint16_t gprevb = 0x200;
+	uint16_t bprevb = 0;
+	uint16_t rprevb = 0;
+
+	uint16_t *r = (uint16_t *)pRBegin;
+	uint16_t *g = (uint16_t *)pGBegin;
+	uint16_t *b = (uint16_t *)pBBegin;
+
+	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride)
+	{
+		const uint8_t *pStrideEnd = p + nWidth * 4;
+		auto pp = p;
+
+		for (; pp < pStrideEnd; pp += 4)
+		{
+			uint32_t val = btoh32(*(const uint32_t *)pp);
+
+			uint16_t gg = val >> 10;
+			*g = (gg - gprevb) & 0x3ff;
+			++pGCountTable[*g];
+			uint16_t bb = val - gg;
+			*b = (bb - bprevb) & 0x3ff;
+			++pBCountTable[*b];
+			uint16_t rr = (val >> 20) - gg;
+			*r = (rr - rprevb) & 0x3ff;
+			++pRCountTable[*r];
+
+			gprevb = gg;
+			bprevb = bb;
+			rprevb = rr;
+
+			b += 1;
+			g += 1;
+			r += 1;
+		}
+	}
+}
+
+//
+
+void cpp_ConvertUQRGToR210_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
+{
+	uint16_t gprevb = 0x200;
+	uint16_t bprevb = 0;
+	uint16_t rprevb = 0;
+
+	uint16_t *g = (uint16_t *)pGBegin;
+	uint16_t *b = (uint16_t *)pBBegin;
+	uint16_t *r = (uint16_t *)pRBegin;
+
+	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	{
+		uint8_t *pStrideEnd = p + nWidth * 4;
+		auto pp = p;
+
+		for (; pp < pStrideEnd; pp += 4)
+		{
+			uint32_t gg = (gprevb += g[0]) & 0x3ff;
+			uint32_t bb = ((bprevb += b[0]) + gprevb) & 0x3ff;
+			uint32_t rr = ((rprevb += r[0]) + gprevb) & 0x3ff;
+			*(uint32_t *)pp = htob32((rr << 20) | (gg << 10) | bb);
+
+			g += 1;
+			b += 1;
+			r += 1;
+		}
+	}
+}

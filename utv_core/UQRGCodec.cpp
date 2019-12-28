@@ -100,3 +100,63 @@ void CUQRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 		break;
 	}
 }
+
+bool CUQRGCodec::PredictDirect(uint32_t nBandIndex)
+{
+	uint8_t *g, *b, *r;
+	const uint8_t *pSrcBegin, *pSrcEnd;
+
+	pSrcBegin = ((uint8_t *)m_pInput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
+	g = m_pPredicted->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	b = m_pPredicted->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	r = m_pPredicted->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+
+	switch (m_utvfRaw)
+	{
+	case UTVF_b64a:
+		ConvertB64aToUQRG_PredictCylindricalLeftAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+		return true;
+	case UTVF_r210:
+		ConvertR210ToUQRG_PredictCylindricalLeftAndCount(g, b, r, pSrcBegin, pSrcEnd, m_nWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+		return true;
+	}
+
+	return false;
+}
+
+bool CUQRGCodec::RestoreDirect(uint32_t nBandIndex)
+{
+	const uint8_t *g, *b, *r;
+	uint8_t *pDstBegin, *pDstEnd;
+
+	pDstBegin = ((uint8_t *)m_pOutput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
+	pDstEnd = ((uint8_t *)m_pOutput) + m_dwStripeEnd[nBandIndex] * m_cbRawStripeSize;
+	g = m_pPredicted->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	b = m_pPredicted->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	r = m_pPredicted->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+
+	switch (m_utvfRaw)
+	{
+	case UTVF_b64a:
+		ConvertUQRGToB64a_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+		return true;
+	case UTVF_r210:
+		ConvertUQRGToR210_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, m_nWidth, m_cbRawGrossWidth);
+		return true;
+	}
+
+	return false;
+}
+
+bool CUQRGCodec::IsDirectRestorable()
+{
+	switch (m_utvfRaw)
+	{
+	case UTVF_b64a:
+	case UTVF_r210:
+		return true;
+	}
+
+	return false;
+}

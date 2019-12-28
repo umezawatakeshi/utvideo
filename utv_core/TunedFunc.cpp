@@ -181,6 +181,12 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictCPP = {
 	cpp_ConvertULY2ToPackedYUV422_RestorePlanarGradient<CUYVYColorOrder>,
 	cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CYUYVColorOrder>,
 	cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CUYVYColorOrder>,
+	cpp_ConvertB64aToUQRG_PredictCylindricalLeftAndCount,
+	cpp_ConvertB64aToUQRA_PredictCylindricalLeftAndCount,
+	cpp_ConvertUQRGToB64a_RestoreCylindricalLeft,
+	cpp_ConvertUQRAToB64a_RestoreCylindricalLeft,
+	cpp_ConvertR210ToUQRG_PredictCylindricalLeftAndCount,
+	cpp_ConvertUQRGToR210_RestoreCylindricalLeft,
 };
 
 const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackCPP = {
