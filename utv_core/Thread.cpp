@@ -87,9 +87,9 @@ CThreadManager::~CThreadManager(void)
 	}
 	LeaveCriticalSection(&m_csJob);
 
-	WaitForMultipleObjects(m_nNumThreads, m_hThread, TRUE, INFINITE);
 	for (int i = 0; i < m_nNumThreads; i++)
 	{
+		WaitForSingleObject(m_hThread[i], INFINITE);
 		CloseHandle(m_hThread[i]);
 		CloseHandle(m_hThreadSemaphore[i]);
 	}
@@ -151,9 +151,11 @@ void CThreadManager::SubmitJob(CThreadJob *pJob, uint32_t dwAffinityHint)
 void CThreadManager::WaitForJobCompletion(void)
 {
 	// 待機中にジョブが追加されることは考慮していない。
-	WaitForMultipleObjects(m_nNumJobs, m_hCompletionEvent, TRUE, INFINITE);
 	for (int i = 0; i < m_nNumJobs; i++)
+	{
+		WaitForSingleObject(m_hCompletionEvent[i], INFINITE);
 		CloseHandle(m_hCompletionEvent[i]);
+	}
 	m_nNumJobs = 0;
 }
 
