@@ -2612,8 +2612,6 @@ static inline void tuned_ConvertB48rToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, u
 template<int F, bool A>
 static inline void tuned_ConvertRGBXToUQRX(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
-	__m128i ctl = _mm_set_epi8(8, 9, 0, 1, 10, 11, 2, 3, 12, 13, 4, 5, 14, 15, 6, 7);
-
 	uint16_t *r = (uint16_t *)pRBegin;
 	uint16_t *g = (uint16_t *)pGBegin;
 	uint16_t *b = (uint16_t *)pBBegin;
@@ -2743,8 +2741,6 @@ static inline void tuned_ConvertUQRGToB48r(uint8_t *pDstBegin, uint8_t *pDstEnd,
 template<int F, bool A>
 static inline void tuned_ConvertUQRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
-	__m128i ctl = _mm_set_epi8(2, 3, 6, 7, 10, 11, 14, 15, 0, 1, 4, 5, 8, 9, 12, 13);
-
 	const uint16_t *r = (const uint16_t *)pRBegin;
 	const uint16_t *g = (const uint16_t *)pGBegin;
 	const uint16_t *b = (const uint16_t *)pBBegin;

@@ -241,7 +241,7 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 int CUQ00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
-	const STREAMINFO *p = (const STREAMINFO *)pExtraData;
+//	const STREAMINFO *p = (const STREAMINFO *)pExtraData;
 
 	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
 	CalcPlaneSizes(width, height);
