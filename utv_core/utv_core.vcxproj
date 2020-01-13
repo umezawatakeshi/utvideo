@@ -184,6 +184,7 @@
     <ClInclude Include="GlobalConfig.h" />
     <ClInclude Include="HuffmanCode.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="POD.h" />
     <ClInclude Include="Predict.h" />
     <ClInclude Include="Predict_x86x64.h" />
     <ClInclude Include="ProcessBlacklist.h" />

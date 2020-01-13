@@ -10,48 +10,7 @@
 
 extern void* enabler;
 
-template<typename T>
-struct VECTOR_RGB
-{
-	T g, b, r;
-};
-
-template<typename T>
-struct VECTOR_RGBA
-{
-	T g, b, r, a;
-};
-
-template<typename T>
-struct VECTOR_YUV422
-{
-	T y0, y1, u, v;
-};
-
-
-/*
- * array や tuple を使うと一部のメンバ関数がインライン展開されず、
- * また AVX1 でコンパイルしたメンバ関数の実体が共有され SSSE3 でコンパイルした関数から呼ばれて illegal instruction となったりすることがある。
- * （コンパイラの最適化能力が低いせいだとは思うが）
- */
-
-template<typename T>
-struct VECTOR2
-{
-	T v0, v1;
-};
-
-template<typename T>
-struct VECTOR3
-{
-	T v0, v1, v2;
-};
-
-template<typename T>
-struct VECTOR4
-{
-	T v0, v1, v2, v3;
-};
+#include "POD.h"
 
 template<int F, class C, class T>
 void tuned_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
