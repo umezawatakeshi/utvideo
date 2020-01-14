@@ -25,14 +25,12 @@ static inline FORCEINLINE void PackForIntra(uint8_t*& q, uint8_t*& r, int& shift
 	za = _mm_or_si128(za, _mm_srli_epi64(za, 32));
 	zb = _mm_or_si128(zb, _mm_slli_epi64(zb, 32));
 	__m128i z = _mm_blend_epi16(za, zb, 0xcc);
-	z = _mm_or_si128(_mm_or_si128(z, _mm_set1_epi32(1)), _mm_srli_epi32(z, 16));
-	z = _mm_or_si128(z, _mm_srli_epi32(z, 8));
-	z = _mm_and_si128(z, _mm_set1_epi32(0xff));
-
+	z = _mm_or_si128(_mm_or_si128(z, _mm_set1_epi32(1 << 24)), _mm_slli_epi32(z, 16));
+	z = _mm_or_si128(z, _mm_slli_epi32(z, 8));
 
 	z = _mm_castps_si128(_mm_cvtepi32_ps(z));
 	z = _mm_srli_epi32(z, 23);
-	z = _mm_sub_epi32(z, _mm_set1_epi32(0x7d));
+	z = _mm_sub_epi32(z, _mm_set1_epi32(0x95));
 	__m128i vbits = z;
 	__m128i vrembits = _mm_sub_epi32(_mm_set1_epi32(8), vbits);
 	vbits = _mm_andnot_si128(viszero, vbits);
@@ -285,13 +283,12 @@ static inline FORCEINLINE void VECTORCALL PackForDelta(uint8_t*& q, uint8_t*& r,
 		za = _mm_or_si128(za, _mm_srli_epi64(za, 32));
 		zb = _mm_or_si128(zb, _mm_slli_epi64(zb, 32));
 		__m128i z = _mm_blend_epi16(za, zb, 0xcc);
-		z = _mm_or_si128(_mm_or_si128(z, _mm_set1_epi32(1)), _mm_srli_epi32(z, 16));
-		z = _mm_or_si128(z, _mm_srli_epi32(z, 8));
-		z = _mm_and_si128(z, _mm_set1_epi32(0xff));
+		z = _mm_or_si128(_mm_or_si128(z, _mm_set1_epi32(1 << 24)), _mm_slli_epi32(z, 16));
+		z = _mm_or_si128(z, _mm_slli_epi32(z, 8));
 
 		z = _mm_castps_si128(_mm_cvtepi32_ps(z));
 		z = _mm_srli_epi32(z, 23);
-		z = _mm_sub_epi32(z, _mm_set1_epi32(0x7d));
+		z = _mm_sub_epi32(z, _mm_set1_epi32(0x95));
 
 		return _mm_andnot_si128(viszero, z);
 	};

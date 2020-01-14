@@ -23,22 +23,20 @@ static inline FORCEINLINE void PackForIntra(uint8_t*& q, uint8_t*& r, __m256i wa
 	__m256i signsb = _mm256_cmpgt_epi8(_mm256_setzero_si256(), wb);
 	za = _mm256_xor_si256(wa, signsa);
 	zb = _mm256_xor_si256(wb, signsb);
-	za = _mm256_or_si256(za, _mm256_srli_epi64(za, 32));
-	zb = _mm256_or_si256(zb, _mm256_srli_epi64(zb, 32));
-	za = _mm256_or_si256(_mm256_or_si256(za, _mm256_set1_epi64x(1)), _mm256_srli_epi64(za, 16));
-	zb = _mm256_or_si256(_mm256_or_si256(zb, _mm256_set1_epi64x(1)), _mm256_srli_epi64(zb, 16));
-	za = _mm256_or_si256(za, _mm256_srli_epi64(za, 8));
-	zb = _mm256_or_si256(zb, _mm256_srli_epi64(zb, 8));
-	za = _mm256_and_si256(za, _mm256_set1_epi64x(0xff));
-	zb = _mm256_and_si256(zb, _mm256_set1_epi64x(0xff));
+	za = _mm256_or_si256(za, _mm256_slli_epi64(za, 32));
+	zb = _mm256_or_si256(zb, _mm256_slli_epi64(zb, 32));
+	za = _mm256_or_si256(_mm256_or_si256(za, _mm256_set1_epi64x(1ULL << 56)), _mm256_slli_epi64(za, 16));
+	zb = _mm256_or_si256(_mm256_or_si256(zb, _mm256_set1_epi64x(1ULL << 56)), _mm256_slli_epi64(zb, 16));
+	za = _mm256_or_si256(za, _mm256_slli_epi64(za, 8));
+	zb = _mm256_or_si256(zb, _mm256_slli_epi64(zb, 8));
 
 	// ‚±‚±‚Å BSR/LZCNT
 	za = _mm256_castps_si256(_mm256_cvtepi32_ps(za));
 	zb = _mm256_castps_si256(_mm256_cvtepi32_ps(zb));
-	za = _mm256_srli_epi32(za, 23);
-	zb = _mm256_srli_epi32(zb, 23);
-	za = _mm256_sub_epi32(za, _mm256_set1_epi64x(0x7d));
-	zb = _mm256_sub_epi32(zb, _mm256_set1_epi64x(0x7d));
+	za = _mm256_srli_epi64(za, 55);
+	zb = _mm256_srli_epi64(zb, 55);
+	za = _mm256_sub_epi64(za, _mm256_set1_epi64x(0x95));
+	zb = _mm256_sub_epi64(zb, _mm256_set1_epi64x(0x95));
 	__m256i vbitsa = za;
 	__m256i vbitsb = zb;
 	__m256i vrembitsa = _mm256_sub_epi64(_mm256_set1_epi64x(8), vbitsa);
@@ -284,14 +282,13 @@ static inline FORCEINLINE void VECTORCALL PackForDelta(uint8_t*& q, uint8_t*& r,
 		za = _mm256_or_si256(za, _mm256_srli_epi64(za, 32));
 		zb = _mm256_or_si256(zb, _mm256_slli_epi64(zb, 32));
 		__m256i z = _mm256_blend_epi16(za, zb, 0xcc);
-		z = _mm256_or_si256(_mm256_or_si256(z, _mm256_set1_epi32(1)), _mm256_srli_epi32(z, 16));
-		z = _mm256_or_si256(z, _mm256_srli_epi32(z, 8));
-		z = _mm256_and_si256(z, _mm256_set1_epi32(0xff));
+		z = _mm256_or_si256(_mm256_or_si256(z, _mm256_set1_epi32(1 << 24)), _mm256_slli_epi32(z, 16));
+		z = _mm256_or_si256(z, _mm256_slli_epi32(z, 8));
 
 		// ‚±‚±‚Å BSR/LZCNT
 		z = _mm256_castps_si256(_mm256_cvtepi32_ps(z));
 		z = _mm256_srli_epi32(z, 23);
-		z = _mm256_sub_epi32(z, _mm256_set1_epi32(0x7d));
+		z = _mm256_sub_epi32(z, _mm256_set1_epi32(0x95));
 		return _mm256_andnot_si256(viszero, z);
 	};
 
