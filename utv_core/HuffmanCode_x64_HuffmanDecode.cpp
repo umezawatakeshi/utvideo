@@ -5,7 +5,7 @@
 	typedef typename std::remove_reference<decltype(*pDstBegin)>::type sym_t;
 	sym_t *ret;
 	void* clobber;
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__clang__)
 	asm volatile (
 	R"(
 	.intel_syntax noprefix

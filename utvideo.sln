@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_core", "utv_core\utv_core.vcxproj", "{F1067D6A-613C-4F1C-B03F-8BAA03AF8E55}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_logc", "utv_logc\utv_logc.vcxproj", "{F7DE0729-4364-4B12-9122-B0D2D7DC3D32}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "tests\tests.vcxproj", "{FB3287A1-287A-4232-973C-0DCE1C688DA6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_core_asm", "utv_core_asm\utv_core_asm.vcxproj", "{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,14 @@ Global
 		{FB3287A1-287A-4232-973C-0DCE1C688DA6}.Release|Win32.Build.0 = Release|Win32
 		{FB3287A1-287A-4232-973C-0DCE1C688DA6}.Release|x64.ActiveCfg = Release|x64
 		{FB3287A1-287A-4232-973C-0DCE1C688DA6}.Release|x64.Build.0 = Release|x64
+		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Debug|Win32.Build.0 = Debug|Win32
+		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Debug|x64.ActiveCfg = Debug|x64
+		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Debug|x64.Build.0 = Debug|x64
+		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Release|Win32.ActiveCfg = Release|Win32
+		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Release|Win32.Build.0 = Release|Win32
+		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Release|x64.ActiveCfg = Release|x64
+		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
