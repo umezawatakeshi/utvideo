@@ -1,6 +1,6 @@
 setlocal
 del tests-*.xml
-set MSBUILD="C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
+set MSBUILD="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\MSBuild.exe"
 
 %MSBUILD% utvideo.sln /p:Configuration=Release /p:Platform=Win32 /t:Rebuild
 if ERRORLEVEL 1 goto errexit
