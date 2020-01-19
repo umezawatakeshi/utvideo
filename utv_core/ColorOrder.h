@@ -6,77 +6,77 @@
 class CBGRColorOrder
 {
 public:
-	static const int A = INT_MIN;
-	static const int R = 2;
-	static const int G = 1;
-	static const int B = 0;
-	static const int BYPP = 3;
+	static constexpr int A = INT_MIN;
+	static constexpr int R = 2;
+	static constexpr int G = 1;
+	static constexpr int B = 0;
+	static constexpr int BYPP = 3;
 };
 
 class CBGRAColorOrder
 {
 public:
-	static const int A = 3;
-	static const int R = 2;
-	static const int G = 1;
-	static const int B = 0;
-	static const int BYPP = 4;
+	static constexpr int A = 3;
+	static constexpr int R = 2;
+	static constexpr int G = 1;
+	static constexpr int B = 0;
+	static constexpr int BYPP = 4;
 };
 
 class CRGBColorOrder
 {
 public:
-	static const int A = INT_MIN;
-	static const int R = 0;
-	static const int G = 1;
-	static const int B = 2;
-	static const int BYPP = 3;
+	static constexpr int A = INT_MIN;
+	static constexpr int R = 0;
+	static constexpr int G = 1;
+	static constexpr int B = 2;
+	static constexpr int BYPP = 3;
 };
 
 class CARGBColorOrder
 {
 public:
-	static const int A = 0;
-	static const int R = 1;
-	static const int G = 2;
-	static const int B = 3;
-	static const int BYPP = 4;
+	static constexpr int A = 0;
+	static constexpr int R = 1;
+	static constexpr int G = 2;
+	static constexpr int B = 3;
+	static constexpr int BYPP = 4;
 };
 
 class CYUYVColorOrder
 {
 public:
-	static const int Y0 = 0;
-	static const int Y1 = 2;
-	static const int U  = 1;
-	static const int V  = 3;
+	static constexpr int Y0 = 0;
+	static constexpr int Y1 = 2;
+	static constexpr int U  = 1;
+	static constexpr int V  = 3;
 };
 
 class CUYVYColorOrder
 {
 public:
-	static const int Y0 = 1;
-	static const int Y1 = 3;
-	static const int U  = 0;
-	static const int V  = 2;
+	static constexpr int Y0 = 1;
+	static constexpr int Y1 = 3;
+	static constexpr int U  = 0;
+	static constexpr int V  = 2;
 };
 
 class CB64aColorOrder
 {
 public:
-	static const int A = 0;
-	static const int R = 1;
-	static const int G = 2;
-	static const int B = 3;
-	static const int BYPP = 8;
+	static constexpr int A = 0;
+	static constexpr int R = 1;
+	static constexpr int G = 2;
+	static constexpr int B = 3;
+	static constexpr int BYPP = 8;
 };
 
 class CB48rColorOrder
 {
 public:
-	static const int A = INT_MIN;
-	static const int R = 0;
-	static const int G = 1;
-	static const int B = 2;
-	static const int BYPP = 6;
+	static constexpr int A = INT_MIN;
+	static constexpr int R = 0;
+	static constexpr int G = 1;
+	static constexpr int B = 2;
+	static constexpr int BYPP = 6;
 };
