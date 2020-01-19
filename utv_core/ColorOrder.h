@@ -10,6 +10,8 @@ public:
 	static constexpr int R = 2;
 	static constexpr int G = 1;
 	static constexpr int B = 0;
+
+	static constexpr bool HAS_ALPHA = false;
 	static constexpr int BYPP = 3;
 };
 
@@ -20,6 +22,8 @@ public:
 	static constexpr int R = 2;
 	static constexpr int G = 1;
 	static constexpr int B = 0;
+
+	static constexpr bool HAS_ALPHA = true;
 	static constexpr int BYPP = 4;
 };
 
@@ -30,6 +34,8 @@ public:
 	static constexpr int R = 0;
 	static constexpr int G = 1;
 	static constexpr int B = 2;
+
+	static constexpr bool HAS_ALPHA = false;
 	static constexpr int BYPP = 3;
 };
 
@@ -40,6 +46,8 @@ public:
 	static constexpr int R = 1;
 	static constexpr int G = 2;
 	static constexpr int B = 3;
+
+	static constexpr bool HAS_ALPHA = true;
 	static constexpr int BYPP = 4;
 };
 
@@ -68,6 +76,8 @@ public:
 	static constexpr int R = 1;
 	static constexpr int G = 2;
 	static constexpr int B = 3;
+
+	static constexpr bool HAS_ALPHA = true;
 	static constexpr int BYPP = 8;
 };
 
@@ -78,5 +88,7 @@ public:
 	static constexpr int R = 0;
 	static constexpr int G = 1;
 	static constexpr int B = 2;
+
+	static constexpr bool HAS_ALPHA = false;
 	static constexpr int BYPP = 6;
 };
