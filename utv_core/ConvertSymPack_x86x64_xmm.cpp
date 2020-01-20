@@ -8,185 +8,6 @@
 #error
 #endif
 
-template<int F>
-static inline void tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(uint8_t *pGPacked, size_t *cbGPacked, uint8_t *pGControl, uint8_t *pBPacked, size_t *cbBPacked, uint8_t *pBControl, uint8_t *pRPacked, size_t *cbRPacked, uint8_t *pRControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
-{
-	typedef CBGRColorOrder T;
-
-	auto gp = pGPacked;
-	auto bp = pBPacked;
-	auto rp = pRPacked;
-
-	auto gc = pGControl;
-	auto bc = pBControl;
-	auto rc = pRControl;
-
-	size_t cbControl = (pSrcEnd - pSrcBegin) / scbStride * ((cbWidth + 191) / 192) * 3;
-	memset(pGControl, 0, cbControl);
-	memset(pBControl, 0, cbControl);
-	memset(pRControl, 0, cbControl);
-
-	union padsolve
-	{
-		uint8_t b[32];
-		__m128i xmm[2];
-	};
-
-	{
-		const auto p = pSrcBegin;
-		auto pp = p;
-
-		int gshift = 0;
-		int bshift = 0;
-		int rshift = 0;
-
-		__m128i gprev = _mm_set1_epi8((char)0x80);
-		__m128i bprev = _mm_setzero_si128();
-		__m128i rprev = _mm_setzero_si128();
-
-		for (; pp <= p + cbWidth - 96; pp += 96)
-		{
-			auto planar0 = tuned_ConvertPackedBGRToPlanarElement<F, false>(pp);
-			auto planar1 = tuned_ConvertPackedBGRToPlanarElement<F, false>(pp + 48);
-
-			__m128i gresidual0 = tuned_PredictLeft8Element<F>(gprev, planar0.g);
-			__m128i gresidual1 = tuned_PredictLeft8Element<F>(planar0.g, planar1.g);
-			__m128i bresidual0 = tuned_PredictLeft8Element<F>(bprev, planar0.b);
-			__m128i bresidual1 = tuned_PredictLeft8Element<F>(planar0.b, planar1.b);
-			__m128i rresidual0 = tuned_PredictLeft8Element<F>(rprev, planar0.r);
-			__m128i rresidual1 = tuned_PredictLeft8Element<F>(planar0.r, planar1.r);
-
-			PackForIntra<F>(gp, gc, gshift, gresidual0, gresidual1);
-			PackForIntra<F>(bp, bc, bshift, bresidual0, bresidual1);
-			PackForIntra<F>(rp, rc, rshift, rresidual0, rresidual1);
-
-			gprev = planar1.g;
-			bprev = planar1.b;
-			rprev = planar1.r;
-		}
-
-		if (pp < p + cbWidth)
-		{
-			uint8_t gprevb = _mm_cvtsi128_si32(_mm_srli_si128(gprev, 15));
-			uint8_t bprevb = _mm_cvtsi128_si32(_mm_srli_si128(bprev, 15));
-			uint8_t rprevb = _mm_cvtsi128_si32(_mm_srli_si128(rprev, 15));
-
-			int n = 0;
-			padsolve gps, bps, rps;
-
-			for (; pp < p + cbWidth && n < 32; pp += 3, ++n)
-			{
-				uint8_t gg = pp[T::G];
-				gps.b[n] = gg - gprevb;
-				uint8_t bb = pp[T::B] - gg;
-				bps.b[n] = bb - bprevb;
-				uint8_t rr = pp[T::R] - gg;
-				rps.b[n] = rr - rprevb;
-
-				gprevb = gg;
-				bprevb = bb;
-				rprevb = rr;
-			}
-			for (; n < 32; ++n)
-			{
-				gps.b[n] = 0;
-				bps.b[n] = 0;
-				rps.b[n] = 0;
-			}
-
-			PackForIntra<F>(gp, gc, gshift, gps.xmm[0], gps.xmm[1]);
-			PackForIntra<F>(bp, bc, bshift, bps.xmm[0], bps.xmm[1]);
-			PackForIntra<F>(rp, rc, rshift, rps.xmm[0], rps.xmm[1]);
-		}
-
-		if (gshift != 0)
-		{
-			gc += 3;
-			bc += 3;
-			rc += 3;
-		}
-	}
-
-	for (auto p = pSrcBegin + scbStride; p != pSrcEnd; p += scbStride)
-	{
-		auto pp = p;
-
-		__m128i gprev = _mm_setzero_si128();
-		__m128i bprev = _mm_setzero_si128();
-		__m128i rprev = _mm_setzero_si128();
-
-		int gshift = 0;
-		int bshift = 0;
-		int rshift = 0;
-
-		for (; pp <= p + cbWidth - 96; pp += 96)
-		{
-			auto planar0 = tuned_ConvertPackedBGRToPlanarElement<F, false>(pp, scbStride);
-			auto planar1 = tuned_ConvertPackedBGRToPlanarElement<F, false>(pp + 48, scbStride);
-
-			__m128i gresidual0 = tuned_PredictLeft8Element<F>(gprev, planar0.g);
-			__m128i gresidual1 = tuned_PredictLeft8Element<F>(planar0.g, planar1.g);
-			__m128i bresidual0 = tuned_PredictLeft8Element<F>(bprev, planar0.b);
-			__m128i bresidual1 = tuned_PredictLeft8Element<F>(planar0.b, planar1.b);
-			__m128i rresidual0 = tuned_PredictLeft8Element<F>(rprev, planar0.r);
-			__m128i rresidual1 = tuned_PredictLeft8Element<F>(planar0.r, planar1.r);
-
-			PackForIntra<F>(gp, gc, gshift, gresidual0, gresidual1);
-			PackForIntra<F>(bp, bc, bshift, bresidual0, bresidual1);
-			PackForIntra<F>(rp, rc, rshift, rresidual0, rresidual1);
-
-			gprev = planar1.g;
-			bprev = planar1.b;
-			rprev = planar1.r;
-		}
-
-		if (pp < p + cbWidth)
-		{
-			uint8_t gprevb = _mm_cvtsi128_si32(_mm_srli_si128(gprev, 15));
-			uint8_t bprevb = _mm_cvtsi128_si32(_mm_srli_si128(bprev, 15));
-			uint8_t rprevb = _mm_cvtsi128_si32(_mm_srli_si128(rprev, 15));
-
-			int n = 0;
-			padsolve gps, bps, rps;
-
-			for (; pp < p + cbWidth && n < 32; pp += 3, ++n)
-			{
-				uint8_t gg = pp[T::G] - (pp - scbStride)[T::G];
-				gps.b[n] = gg - gprevb;
-				uint8_t bb = pp[T::B] - (pp - scbStride)[T::B] - gg;
-				bps.b[n] = bb - bprevb;
-				uint8_t rr = pp[T::R] - (pp - scbStride)[T::R] - gg;
-				rps.b[n] = rr - rprevb;
-
-				gprevb = gg;
-				bprevb = bb;
-				rprevb = rr;
-			}
-			for (; n < 32; ++n)
-			{
-				gps.b[n] = 0;
-				bps.b[n] = 0;
-				rps.b[n] = 0;
-			}
-
-			PackForIntra<F>(gp, gc, gshift, gps.xmm[0], gps.xmm[1]);
-			PackForIntra<F>(bp, bc, bshift, bps.xmm[0], bps.xmm[1]);
-			PackForIntra<F>(rp, rc, rshift, rps.xmm[0], rps.xmm[1]);
-		}
-
-		if (gshift != 0)
-		{
-			gc += 3;
-			bc += 3;
-			rc += 3;
-		}
-	}
-
-	*cbGPacked = gp - pGPacked;
-	*cbBPacked = bp - pBPacked;
-	*cbRPacked = rp - pRPacked;
-}
-
 template<int F, class T, bool A>
 static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(uint8_t *pGPacked, size_t *cbGPacked, uint8_t *pGControl, uint8_t *pBPacked, size_t *cbBPacked, uint8_t *pBControl, uint8_t *pRPacked, size_t *cbRPacked, uint8_t *pRControl, uint8_t *pAPacked, size_t *cbAPacked, uint8_t *pAControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
@@ -200,7 +21,7 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 	auto rc = pRControl;
 	auto ac = pAControl;
 
-	size_t cbControl = (pSrcEnd - pSrcBegin) / scbStride * ((cbWidth + 255) / 256) * 3;
+	size_t cbControl = (pSrcEnd - pSrcBegin) / scbStride * ((cbWidth + T::BYPP * 64 - 1) / (T::BYPP * 64)) * 3;
 	memset(pGControl, 0, cbControl);
 	memset(pBControl, 0, cbControl);
 	memset(pRControl, 0, cbControl);
@@ -229,10 +50,10 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 		int rshift = 0;
 		int ashift = 0;
 
-		for (; pp <= p + cbWidth - 128; pp += 128)
+		for (; pp <= p + cbWidth - T::BYPP * 32; pp += T::BYPP * 32)
 		{
 			auto planar0 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp);
-			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp + 64);
+			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp + T::BYPP * 16);
 
 			__m128i gresidual0 = tuned_PredictLeft8Element<F>(gprev, planar0.g);
 			__m128i gresidual1 = tuned_PredictLeft8Element<F>(planar0.g, planar1.g);
@@ -270,7 +91,7 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 			int n = 0;
 			padsolve gps, bps, rps, aps;
 
-			for (; pp < p + cbWidth && n < 32; pp += 4, ++n)
+			for (; pp < p + cbWidth && n < 32; pp += T::BYPP, ++n)
 			{
 				uint8_t gg = pp[T::G];
 				gps.b[n] = gg - gprevb;
@@ -332,10 +153,10 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 		int rshift = 0;
 		int ashift = 0;
 
-		for (; pp <= p + cbWidth - 128; pp += 128)
+		for (; pp <= p + cbWidth - T::BYPP * 32; pp += T::BYPP * 32)
 		{
 			auto planar0 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp, scbStride);
-			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp + 64, scbStride);
+			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp + T::BYPP * 16, scbStride);
 
 			__m128i gresidual0 = tuned_PredictLeft8Element<F>(gprev, planar0.g);
 			__m128i gresidual1 = tuned_PredictLeft8Element<F>(planar0.g, planar1.g);
@@ -373,7 +194,7 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 			int n = 0;
 			padsolve gps, bps, rps, aps;
 
-			for (; pp < p + cbWidth && n < 32; pp += 4, ++n)
+			for (; pp < p + cbWidth && n < 32; pp += T::BYPP, ++n)
 			{
 				uint8_t gg = pp[T::G] - (pp - scbStride)[T::G];
 				gps.b[n] = gg - gprevb;
@@ -429,10 +250,7 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 template<int F, class T>
 void tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8(uint8_t *pGPacked, size_t *cbGPacked, uint8_t *pGControl, uint8_t *pBPacked, size_t *cbBPacked, uint8_t *pBControl, uint8_t *pRPacked, size_t *cbRPacked, uint8_t *pRControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
-	if (std::is_same<T, CBGRColorOrder>::value)
-		tuned_ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8<F>(pGPacked, cbGPacked, pGControl, pBPacked, cbBPacked, pBControl, pRPacked, cbRPacked, pRControl, pSrcBegin, pSrcEnd, cbWidth, scbStride);
-	else
-		tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8<F, T, false>(pGPacked, cbGPacked, pGControl, pBPacked, cbBPacked, pBControl, pRPacked, cbRPacked, pRControl, NULL, NULL, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride);
+	tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8<F, T, false>(pGPacked, cbGPacked, pGControl, pBPacked, cbBPacked, pBControl, pRPacked, cbRPacked, pRControl, NULL, NULL, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride);
 }
 
 template<int F, class T>
@@ -458,150 +276,6 @@ template void tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFE
 #endif
 
 //
-
-template<int F>
-static inline void tuned_ConvertULRGToBGR_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride)
-{
-	typedef CBGRColorOrder T;
-
-	auto gp = pGPacked;
-	auto bp = pBPacked;
-	auto rp = pRPacked;
-
-	auto gc = pGControl;
-	auto bc = pBControl;
-	auto rc = pRControl;
-
-	union padsolve
-	{
-		uint8_t b[16];
-		__m128i xmm;
-	};
-
-	{
-		const auto p = pDstBegin;
-		auto pp = p;
-
-		__m128i gprev = _mm_set1_epi8((char)0x80);
-		__m128i bprev = _mm_setzero_si128();
-		__m128i rprev = _mm_setzero_si128();
-
-		int gshift = 0;
-		int bshift = 0;
-		int rshift = 0;
-
-		for (; pp <= p + cbWidth - 48; pp += 48)
-		{
-			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
-			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
-			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
-
-			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
-			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
-			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
-
-			tuned_ConvertPlanarBGRToPackedElement<F, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0);
-
-			gprev = gvalue.v1;
-			bprev = bvalue.v1;
-			rprev = rvalue.v1;
-		}
-
-		if (pp < p + cbWidth)
-		{
-			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
-			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
-			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
-
-			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
-			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
-			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
-
-			int n = 0;
-			padsolve gps, bps, rps;
-
-			gps.xmm = gvalue.v0;
-			bps.xmm = _mm_add_epi8(bvalue.v0, gvalue.v0);
-			rps.xmm = _mm_add_epi8(rvalue.v0, gvalue.v0);
-
-			for (; pp < p + cbWidth; pp += 3, ++n)
-			{
-				pp[T::G] = gps.b[n];
-				pp[T::B] = bps.b[n];
-				pp[T::R] = rps.b[n];
-			}
-		}
-
-		if (gshift != 0)
-		{
-			gc += 3;
-			bc += 3;
-			rc += 3;
-		}
-	}
-
-	for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
-	{
-		auto pp = p;
-
-		__m128i gprev = _mm_setzero_si128();
-		__m128i bprev = _mm_setzero_si128();
-		__m128i rprev = _mm_setzero_si128();
-
-		int gshift = 0;
-		int bshift = 0;
-		int rshift = 0;
-
-		for (; pp <= p + cbWidth - 48; pp += 48)
-		{
-			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
-			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
-			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
-
-			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
-			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
-			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
-
-			tuned_ConvertPlanarBGRToPackedElement<F, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, scbStride);
-
-			gprev = gvalue.v1;
-			bprev = bvalue.v1;
-			rprev = rvalue.v1;
-		}
-
-		if (pp < p + cbWidth)
-		{
-			__m128i gresidual = UnpackForIntra<F>(gp, gc, gshift);
-			__m128i bresidual = UnpackForIntra<F>(bp, bc, bshift);
-			__m128i rresidual = UnpackForIntra<F>(rp, rc, rshift);
-
-			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gresidual);
-			auto bvalue = tuned_RestoreLeft8Element<F>(bprev, bresidual);
-			auto rvalue = tuned_RestoreLeft8Element<F>(rprev, rresidual);
-
-			int n = 0;
-			padsolve gps, bps, rps;
-
-			gps.xmm = gvalue.v0;
-			bps.xmm = _mm_add_epi8(bvalue.v0, gvalue.v0);
-			rps.xmm = _mm_add_epi8(rvalue.v0, gvalue.v0);
-
-			for (; pp < p + cbWidth; pp += 3, ++n)
-			{
-				pp[T::G] = gps.b[n] + (pp - scbStride)[T::G];
-				pp[T::B] = bps.b[n] + (pp - scbStride)[T::B];
-				pp[T::R] = rps.b[n] + (pp - scbStride)[T::R];
-			}
-		}
-
-		if (gshift != 0)
-		{
-			gc += 3;
-			bc += 3;
-			rc += 3;
-		}
-	}
-}
 
 template<int F, typename T, bool A>
 static inline void tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, const uint8_t *pAPacked, const uint8_t *pAControl, size_t cbWidth, ssize_t scbStride)
@@ -693,7 +367,7 @@ static inline void tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8(u
 				pp[T::R] = rps.b[n];
 				if (A)
 					pp[T::A] = aps.b[n];
-				else
+				else if (T::HAS_ALPHA)
 					pp[T::A] = 0xff;
 			}
 		}
@@ -779,7 +453,7 @@ static inline void tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8(u
 				pp[T::R] = rps.b[n] + (pp - scbStride)[T::R];
 				if (A)
 					pp[T::A] = aps.b[n] + (pp - scbStride)[T::A];
-				else
+				else if (T::HAS_ALPHA)
 					pp[T::A] = 0xff;
 			}
 		}
@@ -798,10 +472,7 @@ static inline void tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8(u
 template<int F, class T>
 void tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGPacked, const uint8_t *pGControl, const uint8_t *pBPacked, const uint8_t *pBControl, const uint8_t *pRPacked, const uint8_t *pRControl, size_t cbWidth, ssize_t scbStride)
 {
-	if (std::is_same<T, CBGRColorOrder>::value)
-		tuned_ConvertULRGToBGR_Unpack8SymAndRestorePlanarGradient8<F>(pDstBegin, pDstEnd, pGPacked, pGControl, pBPacked, pBControl, pRPacked, pRControl, cbWidth, scbStride);
-	else
-		tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8<F, T, false>(pDstBegin, pDstEnd, pGPacked, pGControl, pBPacked, pBControl, pRPacked, pRControl, NULL, NULL, cbWidth, scbStride);
+	tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8<F, T, false>(pDstBegin, pDstEnd, pGPacked, pGControl, pBPacked, pBControl, pRPacked, pRControl, NULL, NULL, cbWidth, scbStride);
 }
 
 template<int F, class T>

@@ -24,13 +24,13 @@ void cpp_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *p
 			*(p+T::G) = min(max(int((*y-16)*C::Y2RGB + (*u-128)*C::U2G + (*v-128)*C::V2G), 0), 255);
 			*(p+T::B) = min(max(int((*y-16)*C::Y2RGB + (*u-128)*C::U2B                  ), 0), 255);
 			*(p+T::R) = min(max(int((*y-16)*C::Y2RGB                   + (*v-128)*C::V2R), 0), 255);
-			if (T::BYPP == 4)
+			if (T::HAS_ALPHA)
 				*(p+T::A) = 0xff;
 			y++;
 			*(q+T::G) = min(max(int((*y-16)*C::Y2RGB + (*u-128)*C::U2G + (*v-128)*C::V2G), 0), 255);
 			*(q+T::B) = min(max(int((*y-16)*C::Y2RGB + (*u-128)*C::U2B                  ), 0), 255);
 			*(q+T::R) = min(max(int((*y-16)*C::Y2RGB                   + (*v-128)*C::V2R), 0), 255);
-			if (T::BYPP == 4)
+			if (T::HAS_ALPHA)
 				*(q+T::A) = 0xff;
 			y++; u++; v++;
 		}
@@ -100,7 +100,7 @@ void cpp_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *p
 			*(p + T::G) = min(max(int((*y - 16)*C::Y2RGB + (*u - 128)*C::U2G + (*v - 128)*C::V2G), 0), 255);
 			*(p + T::B) = min(max(int((*y - 16)*C::Y2RGB + (*u - 128)*C::U2B                    ), 0), 255);
 			*(p + T::R) = min(max(int((*y - 16)*C::Y2RGB                     + (*v - 128)*C::V2R), 0), 255);
-			if (T::BYPP == 4)
+			if (T::HAS_ALPHA)
 				*(p + T::A) = 0xff;
 			y++; u++; v++;
 		}
@@ -177,7 +177,7 @@ void cpp_ConvertULY0ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *p
 				*(q + T::G) = min(max(int((*(y + dwYPlaneGrossWidth) - 16)*C::Y2RGB + (*u - 128)*C::U2G + (*v - 128)*C::V2G), 0), 255);
 				*(q + T::B) = min(max(int((*(y + dwYPlaneGrossWidth) - 16)*C::Y2RGB + (*u - 128)*C::U2B), 0), 255);
 				*(q + T::R) = min(max(int((*(y + dwYPlaneGrossWidth) - 16)*C::Y2RGB + (*v - 128)*C::V2R), 0), 255);
-				if (T::BYPP == 4)
+				if (T::HAS_ALPHA)
 				{
 					*(p + T::A) = 255;
 					*(q + T::A) = 255;
@@ -189,7 +189,7 @@ void cpp_ConvertULY0ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *p
 				*(q + T::BYPP + T::G) = min(max(int((*(y + dwYPlaneGrossWidth) - 16)*C::Y2RGB + (*u - 128)*C::U2G + (*v - 128)*C::V2G), 0), 255);
 				*(q + T::BYPP + T::B) = min(max(int((*(y + dwYPlaneGrossWidth) - 16)*C::Y2RGB + (*u - 128)*C::U2B), 0), 255);
 				*(q + T::BYPP + T::R) = min(max(int((*(y + dwYPlaneGrossWidth) - 16)*C::Y2RGB + (*v - 128)*C::V2R), 0), 255);
-				if (T::BYPP == 4)
+				if (T::HAS_ALPHA)
 				{
 					*(p + T::BYPP + T::A) = 255;
 					*(q + T::BYPP + T::A) = 255;
@@ -366,7 +366,7 @@ void cpp_ConvertULRGToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *p
 			*(p+T::G) = *g;
 			*(p+T::B) = *b + *g - 0x80;
 			*(p+T::R) = *r + *g - 0x80;
-			if (T::BYPP == 4)
+			if (T::HAS_ALPHA)
 				*(p+T::A) = 0xff;
 			g++; b++; r++;
 		}
@@ -481,7 +481,7 @@ void cpp_ConvertUQRGToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *p
 			pp[T::G] = htob16(Convert10To16Fullrange(*g));
 			pp[T::B] = htob16(Convert10To16Fullrange(*b + *g - 0x200));
 			pp[T::R] = htob16(Convert10To16Fullrange(*r + *g - 0x200));
-			if (T::BYPP == 8)
+			if (T::HAS_ALPHA)
 				pp[T::A] = 0xffff;
 			g++; b++; r++;
 		}
