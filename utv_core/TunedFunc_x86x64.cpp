@@ -21,24 +21,35 @@
 #include "Log.h"
 #include "EnvFlag.h"
 
-#define FEATURE0_SSE2     (1 <<  0)
-#define FEATURE0_SSE3     (1 <<  1)
-#define FEATURE0_SSSE3    (1 <<  2)
-#define FEATURE0_SSE41    (1 <<  3)
-#define FEATURE0_SSE42    (1 <<  4)
-#define FEATURE0_AVX1     (1 <<  5)
-#define FEATURE0_AVX2     (1 <<  6)
-#define FEATURE0_FMA3     (1 <<  7) /* 3-operand FMA */
-//#define FEATURE0_AVX512F  (1 <<  8) /* AVX-512 Foundation */
-//#define FEATURE0_AVX512PF (1 <<  9) /* AVX-512 Prefetch */
-//#define FEATURE0_AVX512ER (1 << 10) /* AVX-512 Exponential & Reciprocal */
-//#define FEATURE0_AVX512CD (1 << 11) /* AVX-512 Conflict Detection */
+#define FEATURE0_SSE2                   (1 <<  0)
+#define FEATURE0_SSE3                   (1 <<  1)
+#define FEATURE0_SSSE3                  (1 <<  2)
+#define FEATURE0_SSE41                  (1 <<  3)
+#define FEATURE0_SSE42                  (1 <<  4)
+#define FEATURE0_AVX1                   (1 <<  5)
+#define FEATURE0_AVX2                   (1 <<  6)
+#define FEATURE0_FMA3                   (1 <<  7) /* 3-operand FMA */
+#define FEATURE0_AVX512F                (1 <<  8) /* AVX-512 Foundation */
+#define FEATURE0_AVX512CD               (1 <<  9) /* AVX-512 Conflict Detection */
+#define FEATURE0_AVX512ER               (1 << 10) /* AVX-512 Exponential & Reciprocal */
+#define FEATURE0_AVX512PF               (1 << 11) /* AVX-512 Prefetch */
+#define FEATURE0_AVX512DQ               (1 << 12) /* AVX-512 Doubleword & Quadword */
+#define FEATURE0_AVX512BW               (1 << 13) /* AVX-512 Byte & Word */
+#define FEATURE0_AVX512VL               (1 << 14) /* AVX-512 Vector Length */
+#define FEATURE0_AVX512_IFMA            (1 << 15) /* AVX-512 Integer FMA */
+#define FEATURE0_AVX512_VBMI            (1 << 16) /* AVX-512 Vector Byte Manipulation Instructions */
+#define FEATURE0_AVX512_4FMAPS          (1 << 17) /* AVX-512 4-iteration FMA, Packed Single */
+#define FEATURE0_AVX512_4VNNIW          (1 << 18) /* AVX-512 4-iteration Vector Neural Network Instructions, Word */
+#define FEATURE0_AVX512_VNNI            (1 << 19) /* AVX-512 Vector Neural Network Instructions */
+#define FEATURE0_AVX512_VPOPCNTDQ       (1 << 20) /* AVX-512 VPOPCNTDQ */
+#define FEATURE0_AVX512_VBMI2           (1 << 21) /* AVX-512 VBMI2 */
+#define FEATURE0_AVX512_BITALG          (1 << 22) /* AVX-512 Bit Algorithms */
 
-#define FEATURE1_MOVBE    (1 <<  0)
-#define FEATURE1_POPCNT   (1 <<  1)
-#define FEATURE1_LZCNT    (1 <<  2)
-#define FEATURE1_BMI1     (1 <<  3)
-#define FEATURE1_BMI2     (1 <<  4)
+#define FEATURE1_MOVBE                  (1 <<  0)
+#define FEATURE1_POPCNT                 (1 <<  1)
+#define FEATURE1_LZCNT                  (1 <<  2)
+#define FEATURE1_BMI1                   (1 <<  3)
+#define FEATURE1_BMI2                   (1 <<  4)
 
 
 #define MA_INVALID            0x00000000
@@ -841,6 +852,105 @@ ma_found:
 				{
 					LOGPRINTF("supports AVX1");
 					dwSupportedFeatures[0] |= FEATURE0_AVX1;
+				}
+
+				if ((xgetbv_0.eax & 0xe0) == 0xe0)
+				{
+					LOGPRINTF("supports opmask/ZMM state by OS");
+
+					if (cpuid_7_0.ebx & (1 << 16))
+					{
+						LOGPRINTF("supports AVX512F");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512F;
+					}
+
+					if (cpuid_7_0.ebx & (1 << 28))
+					{
+						LOGPRINTF("supports AVX512CD");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512CD;
+					}
+
+					if (cpuid_7_0.ebx & (1 << 27))
+					{
+						LOGPRINTF("supports AVX512ER");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512ER;
+					}
+
+					if (cpuid_7_0.ebx & (1 << 26))
+					{
+						LOGPRINTF("supports AVX512PF");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512PF;
+					}
+
+					if (cpuid_7_0.ebx & (1 << 17))
+					{
+						LOGPRINTF("supports AVX512DQ");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512DQ;
+					}
+
+					if (cpuid_7_0.ebx & (1 << 30))
+					{
+						LOGPRINTF("supports AVX512BW");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512BW;
+					}
+
+					if (cpuid_7_0.ebx & (1 << 31))
+					{
+						LOGPRINTF("supports AVX512VL");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512VL;
+					}
+
+					if (cpuid_7_0.ebx & (1 << 21))
+					{
+						LOGPRINTF("supports AVX512_IFMA");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512_IFMA;
+					}
+
+					if (cpuid_7_0.ecx & (1 << 1))
+					{
+						LOGPRINTF("supports AVX512_VBMI");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512_VBMI;
+					}
+
+					if (cpuid_7_0.edx & (1 << 3))
+					{
+						LOGPRINTF("supports AVX512_4FMAPS");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512_4FMAPS;
+					}
+
+					if (cpuid_7_0.edx & (1 << 2))
+					{
+						LOGPRINTF("supports AVX512_4VNNIW");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512_4VNNIW;
+					}
+
+					if (cpuid_7_0.ecx & (1 << 11))
+					{
+						LOGPRINTF("supports AVX512_VNNI");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512_VNNI;
+					}
+
+					if (cpuid_7_0.ecx & (1 << 14))
+					{
+						LOGPRINTF("supports AVX512_VPOPCNTDQ");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512_VPOPCNTDQ;
+					}
+
+					if (cpuid_7_0.ecx & (1 << 6))
+					{
+						LOGPRINTF("supports AVX512_VBMI2");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512_VBMI2;
+					}
+
+					if (cpuid_7_0.ecx & (1 << 12))
+					{
+						LOGPRINTF("supports AVX512_BITALG");
+						dwSupportedFeatures[0] |= FEATURE0_AVX512_BITALG;
+					}
+				}
+				else
+				{
+					LOGPRINTF("does not support opmask/ZMM state by OS");
 				}
 			}
 			else
