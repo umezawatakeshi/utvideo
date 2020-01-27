@@ -2,10 +2,13 @@
 /* $Id$ */
 
 #include <myintrin_x86x64.h>
+#include "POD.h"
 
-#if !defined(GENERATE_SSE2) && !defined(GENERATE_SSSE3) && !defined(GENERATE_SSE41) && !defined(GENERATE_AVX1) && !defined(GENERATE_AVX2)
+#if !defined(GENERATE_SSE2) && !defined(GENERATE_SSSE3) && !defined(GENERATE_SSE41) && !defined(GENERATE_AVX1) && !defined(GENERATE_AVX2) && !defined(GENERATE_AVX512_ICL)
 #error
 #endif
+
+extern void* enabler;
 
 template<int F>
 static inline void IncrementCounters8(__m128i xmm, uint32_t* pCountTable)
@@ -119,6 +122,23 @@ static inline FORCEINLINE __m256i tuned_PredictLeft8Element(__m256i prev, __m256
 	return residual;
 }
 
+template<int F, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE __m512i tuned_PredictLeft8Element(__m512i prev, __m512i value)
+{
+	__m512i left = _mm512_permutex2var_epi8(prev, _mm512_set_epi8(
+		126, 125, 124, 123, 122, 121, 120, 119,
+		118, 117, 116, 115, 114, 113, 112, 111,
+		110, 109, 108, 107, 106, 105, 104, 103,
+		102, 101, 100,  99,  98,  97,  96,  95,
+		 94,  93,  92,  91,  90,  89,  88,  87,
+		 86,  85,  84,  83,  82,  81,  80,  79,
+		 78,  77,  76,  75,  74,  73,  72,  71,
+		 70,  69,  68,  67,  66,  65,  64,  63
+	), value); // prev ÇÕÇ±ÇÃå„ÇÕégÇÌÇÍÇ»Ç¢ÇÃÇ≈ÅAVPERMT2B Ç≈ prev ÇÃï˚Ç™ dst Ç…Ç»Ç¡Çƒè„èëÇ´Ç≥ÇÍÇÈÇ±Ç∆Çä˙ë“ÇµÇƒÇ¢ÇÈÅB
+	__m512i residual = _mm512_sub_epi8(value, left);
+	return residual;
+}
+
 template<int F, bool DoCount = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE __m128i tuned_PredictLeftAndCount8Element(__m128i prev, __m128i value, uint32_t* pCountTable)
 {
@@ -185,6 +205,33 @@ static inline FORCEINLINE VECTOR2<__m256i> /* value0, nextprev */ tuned_RestoreL
 	)));
 	s0 = _mm256_add_epi8(s0, prev);
 	prev = _mm256_shuffle_epi8(_mm256_permute2x128_si256(s0, s0, 0x11), _mm256_set1_epi8(15));
+	return { s0, prev };
+}
+
+template<int F, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR2<__m512i> /* value0, nextprev */ tuned_RestoreLeft8Element(__m512i prev, __m512i s0)
+{
+	s0 = _mm512_add_epi8(s0, _mm512_bslli_epi128(s0, 1));
+	s0 = _mm512_add_epi8(s0, _mm512_bslli_epi128(s0, 2));
+	s0 = _mm512_add_epi8(s0, _mm512_bslli_epi128(s0, 4));
+	s0 = _mm512_add_epi8(s0, _mm512_bslli_epi128(s0, 8));
+	__m512i stmp;
+	stmp = _mm512_add_epi8(s0, _mm512_permutexvar_epi8(_mm512_set_epi8(
+		47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+	), s0));
+	s0 = _mm512_mask_mov_epi64(s0, 0xcc, stmp);
+	stmp = _mm512_add_epi8(s0, _mm512_permutexvar_epi8(_mm512_set_epi8(
+		31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31,
+		31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+	), stmp));
+	s0 = _mm512_mask_mov_epi64(s0, 0xf0, stmp);
+	s0 = _mm512_add_epi8(s0, prev);
+	prev = _mm512_permutexvar_epi8(_mm512_set1_epi8(63), s0);
 	return { s0, prev };
 }
 
