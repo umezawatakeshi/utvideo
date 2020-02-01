@@ -1488,29 +1488,39 @@ static inline FORCEINLINE VECTOR_YUV422<__m128i> VECTORCALL tuned_ConvertPackedY
 template<int F, class T, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE VECTOR_YUV422<__m256i> VECTORCALL tuned_ConvertPackedYUV422ToPlanarElement(__m256i m0, __m256i m1, __m256i m2, __m256i m3)
 {
-	__m256i ctl;
+	__m256i ctl0, ctl1, ctl2, ctl3;
 	if (std::is_same<T, CYUYVColorOrder>::value)
-		ctl = _mm256_set16_epi8(15, 11, 7, 3, 13, 9, 5, 1, 14, 12, 10, 8, 6, 4, 2, 0);
+	{
+		ctl0 = _mm256_set16_epi8(15, 11, 7, 3, 13, 9, 5, 1, 14, 12, 10, 8, 6, 4, 2, 0);
+		ctl1 = _mm256_set16_epi8(14, 12, 10, 8, 6, 4, 2, 0, 15, 11, 7, 3, 13, 9, 5, 1);
+		ctl2 = _mm256_set16_epi8(13, 9, 5, 1, 15, 11, 7, 3, 14, 12, 10, 8, 6, 4, 2, 0);
+		ctl3 = _mm256_set16_epi8(14, 12, 10, 8, 6, 4, 2, 0, 13, 9, 5, 1, 15, 11, 7, 3);
+	}
 	else
-		ctl = _mm256_set16_epi8(14, 10, 6, 2, 12, 8, 4, 0, 15, 13, 11, 9, 7, 5, 3, 1);
+	{
+		ctl0 = _mm256_set16_epi8(14, 10, 6, 2, 12, 8, 4, 0, 15, 13, 11, 9, 7, 5, 3, 1);
+		ctl1 = _mm256_set16_epi8(15, 13, 11, 9, 7, 5, 3, 1, 14, 10, 6, 2, 12, 8, 4, 0);
+		ctl2 = _mm256_set16_epi8(12, 8, 4, 0, 14, 10, 6, 2, 15, 13, 11, 9, 7, 5, 3, 1);
+		ctl3 = _mm256_set16_epi8(15, 13, 11, 9, 7, 5, 3, 1, 12, 8, 4, 0, 14, 10, 6, 2);
+	}
 
-	m0 = _mm256_shuffle_epi8(m0, ctl);
-	m1 = _mm256_shuffle_epi8(m1, ctl);
-	m2 = _mm256_shuffle_epi8(m2, ctl);
-	m3 = _mm256_shuffle_epi8(m3, ctl);
+	m0 = _mm256_shuffle_epi8(m0, ctl0);
+	m1 = _mm256_shuffle_epi8(m1, ctl1);
+	m2 = _mm256_shuffle_epi8(m2, ctl2);
+	m3 = _mm256_shuffle_epi8(m3, ctl3);
 
-	__m256i yy0 = _mm256_unpacklo_epi64(m0, m1);
-	__m256i yy1 = _mm256_unpacklo_epi64(m2, m3);
-	__m256i uv0 = _mm256_unpackhi_epi32(m0, m1);
-	__m256i uv1 = _mm256_unpackhi_epi32(m2, m3);
+	__m256i yy0 = _mm256_blend_epi32(m0, m1, 0xcc);
+	__m256i yy1 = _mm256_blend_epi32(m2, m3, 0xcc);
+	__m256i uv0 = _mm256_blend_epi32(m0, m1, 0x33);
+	__m256i uv1 = _mm256_blend_epi32(m2, m3, 0x33);
 
-	__m256i uu = _mm256_unpacklo_epi64(uv0, uv1);
-	__m256i vv = _mm256_unpackhi_epi64(uv0, uv1);
+	__m256i uu = _mm256_blend_epi32(uv0, uv1, 0xaa);
+	__m256i vv = _mm256_blend_epi32(uv0, uv1, 0x55);
 
 	yy0 = _mm256_permute4x64_epi64(yy0, 0xd8);
 	yy1 = _mm256_permute4x64_epi64(yy1, 0xd8);
-	uu = _mm256_permutevar8x32_epi32(uu, _mm256_set_epi32(7, 3, 6, 2, 5, 1, 4, 0));
-	vv = _mm256_permutevar8x32_epi32(vv, _mm256_set_epi32(7, 3, 6, 2, 5, 1, 4, 0));
+	uu = _mm256_permutevar8x32_epi32(uu, _mm256_set_epi32(5, 1, 7, 3, 4, 0, 6, 2));
+	vv = _mm256_permutevar8x32_epi32(vv, _mm256_set_epi32(4, 0, 6, 2, 5, 1, 7, 3));
 
 	return { yy0, yy1, uu, vv };
 }
@@ -1656,25 +1666,40 @@ static inline FORCEINLINE VECTOR4<__m128i> VECTORCALL tuned_ConvertPlanarYUV422T
 template<int F, class T, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE VECTOR4<__m256i> VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(__m256i yy0, __m256i yy1, __m256i uu, __m256i vv)
 {
-	__m256i ctl;
+	__m256i ctl0, ctl1, ctl2, ctl3;
 	if (std::is_same<T, CYUYVColorOrder>::value)
-		ctl = _mm256_set16_epi8(15, 7, 11, 6, 14, 5, 10, 4, 13, 3, 9, 2, 12, 1, 8, 0);
+	{
+		ctl0 = _mm256_set16_epi8(15, 7, 11, 6, 14, 5, 10, 4, 13, 3, 9, 2, 12, 1, 8, 0);
+		ctl1 = _mm256_set16_epi8(7, 15, 3, 14, 6, 13, 2, 12, 5, 11, 1, 10, 4, 9, 0, 8);
+		ctl2 = _mm256_set16_epi8(11, 7, 15, 6, 10, 5, 14, 4, 9, 3, 13, 2, 8, 1, 12, 0);
+		ctl3 = _mm256_set16_epi8(3, 15, 7, 14, 2, 13, 6, 12, 1, 11, 5, 10, 0, 9, 4, 8);
+	}
 	else
-		ctl = _mm256_set16_epi8(7, 15, 6, 11, 5, 14, 4, 10, 3, 13, 2, 9, 1, 12, 0, 8);
+	{
+		ctl0 = _mm256_set16_epi8(7, 15, 6, 11, 5, 14, 4, 10, 3, 13, 2, 9, 1, 12, 0, 8);
+		ctl1 = _mm256_set16_epi8(15, 7, 14, 3, 13, 6, 12, 2, 11, 5, 10, 1, 9, 4, 8, 0);
+		ctl2 = _mm256_set16_epi8(7, 11, 6, 15, 5, 10, 4, 14, 3, 9, 2, 13, 1, 8, 0, 12);
+		ctl3 = _mm256_set16_epi8(15, 3, 14, 7, 13, 2, 12, 6, 11, 1, 10, 5, 9, 0, 8, 4);
+	}
 
 	yy0 = _mm256_permute4x64_epi64(yy0, 0xd8);
 	yy1 = _mm256_permute4x64_epi64(yy1, 0xd8);
-	uu = _mm256_permutevar8x32_epi32(uu, _mm256_set_epi32(7, 5, 3, 1, 6, 4, 2, 0));
-	vv = _mm256_permutevar8x32_epi32(vv, _mm256_set_epi32(7, 5, 3, 1, 6, 4, 2, 0));
+	uu = _mm256_permutevar8x32_epi32(uu, _mm256_set_epi32(5, 1, 7, 3, 4, 0, 6, 2));
+	vv = _mm256_permutevar8x32_epi32(vv, _mm256_set_epi32(1, 5, 3, 7, 0, 4, 2, 6));
 
-	__m256i uv0 = _mm256_unpacklo_epi32(uu, vv);
-	__m256i uv1 = _mm256_unpackhi_epi32(uu, vv);
+	__m256i uv0 = _mm256_blend_epi32(uu, vv, 0xaa);
+	__m256i uv1 = _mm256_blend_epi32(uu, vv, 0x55);
+
+	__m256i m0 = _mm256_blend_epi32(yy0, uv0, 0xcc);
+	__m256i m1 = _mm256_blend_epi32(yy0, uv0, 0x33);
+	__m256i m2 = _mm256_blend_epi32(yy1, uv1, 0xcc);
+	__m256i m3 = _mm256_blend_epi32(yy1, uv1, 0x33);
 
 	return {
-		_mm256_shuffle_epi8(_mm256_unpacklo_epi64(yy0, uv0), ctl),
-		_mm256_shuffle_epi8(_mm256_unpackhi_epi64(yy0, uv0), ctl),
-		_mm256_shuffle_epi8(_mm256_unpacklo_epi64(yy1, uv1), ctl),
-		_mm256_shuffle_epi8(_mm256_unpackhi_epi64(yy1, uv1), ctl)
+		_mm256_shuffle_epi8(m0, ctl0),
+		_mm256_shuffle_epi8(m1, ctl1),
+		_mm256_shuffle_epi8(m2, ctl2),
+		_mm256_shuffle_epi8(m3, ctl3)
 	};
 }
 
@@ -1880,31 +1905,41 @@ static inline FORCEINLINE VECTOR_RGBA<__m128i> VECTORCALL tuned_ConvertPackedRGB
 template<int F, class T, bool NeedOffset = true, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE VECTOR_RGBA<__m256i> VECTORCALL tuned_ConvertPackedRGBXToPlanarElement(__m256i m0, __m256i m1, __m256i m2, __m256i m3)
 {
-	__m256i ctl;
+	__m256i ctl0, ctl1, ctl2, ctl3;
 	if (std::is_same<T, CBGRAColorOrder>::value)
-		ctl = _mm256_set16_epi8(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0);
+	{
+		ctl0 = _mm256_set16_epi8(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0);
+		ctl1 = _mm256_set16_epi8(13, 9, 5, 1, 12, 8, 4, 0, 15, 11, 7, 3, 14, 10, 6, 2);
+		ctl2 = _mm256_set16_epi8(14, 10, 6, 2, 15, 11, 7, 3, 12, 8, 4, 0, 13, 9, 5, 1);
+		ctl3 = _mm256_set16_epi8(12, 8, 4, 0, 13, 9, 5, 1, 14, 10, 6, 2, 15, 11, 7, 3);
+	}
 	else
-		ctl = _mm256_set16_epi8(12, 8, 4, 0, 13, 9, 5, 1, 14, 10, 6, 2, 15, 11, 7, 3);
+	{
+		ctl0 = _mm256_set16_epi8(12, 8, 4, 0, 13, 9, 5, 1, 14, 10, 6, 2, 15, 11, 7, 3);
+		ctl1 = _mm256_set16_epi8(14, 10, 6, 2, 15, 11, 7, 3, 12, 8, 4, 0, 13, 9, 5, 1);
+		ctl2 = _mm256_set16_epi8(13, 9, 5, 1, 12, 8, 4, 0, 15, 11, 7, 3, 14, 10, 6, 2);
+		ctl3 = _mm256_set16_epi8(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0);
+	}
 
-	m0 = _mm256_shuffle_epi8(m0, ctl); // A3 A2 A1 A0 R3 R2 R1 R0 G3 G2 G1 G0 B3 B2 B1 B0
-	m1 = _mm256_shuffle_epi8(m1, ctl);
-	m2 = _mm256_shuffle_epi8(m2, ctl);
-	m3 = _mm256_shuffle_epi8(m3, ctl);
+	m0 = _mm256_shuffle_epi8(m0, ctl0);
+	m1 = _mm256_shuffle_epi8(m1, ctl1);
+	m2 = _mm256_shuffle_epi8(m2, ctl2);
+	m3 = _mm256_shuffle_epi8(m3, ctl3);
 
-	__m256i gb0 = _mm256_unpacklo_epi32(m0, m1);
-	__m256i gb1 = _mm256_unpacklo_epi32(m2, m3);
-	__m256i ar0 = _mm256_unpackhi_epi32(m0, m1);
-	__m256i ar1 = _mm256_unpackhi_epi32(m2, m3);
+	__m256i n0 = _mm256_blend_epi32(m0, m1, 0xcc);
+	__m256i n1 = _mm256_blend_epi32(m0, m1, 0x33);
+	__m256i n2 = _mm256_blend_epi32(m2, m3, 0xcc);
+	__m256i n3 = _mm256_blend_epi32(m2, m3, 0x33);
 
-	__m256i gg = _mm256_unpackhi_epi64(gb0, gb1);
-	__m256i bb = _mm256_unpacklo_epi64(gb0, gb1);
-	__m256i rr = _mm256_unpacklo_epi64(ar0, ar1);
-	__m256i aa = _mm256_unpackhi_epi64(ar0, ar1);
+	__m256i bb = _mm256_blend_epi32(n0, n2, 0xaa);
+	__m256i gg = _mm256_blend_epi32(n0, n2, 0x55);
+	__m256i rr = _mm256_blend_epi32(n1, n3, 0xaa);
+	__m256i aa = _mm256_blend_epi32(n1, n3, 0x55);
 
-	gg = _mm256_permutevar8x32_epi32(gg, _mm256_set_epi32(7, 3, 6, 2, 5, 1, 4, 0));
-	bb = _mm256_permutevar8x32_epi32(bb, _mm256_set_epi32(7, 3, 6, 2, 5, 1, 4, 0));
-	rr = _mm256_permutevar8x32_epi32(rr, _mm256_set_epi32(7, 3, 6, 2, 5, 1, 4, 0));
-	aa = _mm256_permutevar8x32_epi32(aa, _mm256_set_epi32(7, 3, 6, 2, 5, 1, 4, 0));
+	bb = _mm256_permutevar8x32_epi32(bb, _mm256_set_epi32(7, 3, 5, 1, 6, 2, 4, 0));
+	gg = _mm256_permutevar8x32_epi32(gg, _mm256_set_epi32(6, 2, 4, 0, 7, 3, 5, 1));
+	rr = _mm256_permutevar8x32_epi32(rr, _mm256_set_epi32(5, 1, 7, 3, 4, 0, 6, 2));
+	aa = _mm256_permutevar8x32_epi32(aa, _mm256_set_epi32(4, 0, 6, 2, 5, 1, 7, 3));
 
 	__m256i ggtmp = NeedOffset ? _mm256_add_epi8(gg, _mm256_set1_epi8((char)0x80)) : gg;
 	bb = _mm256_sub_epi8(bb, ggtmp);
@@ -2200,36 +2235,46 @@ static inline FORCEINLINE VECTOR4<__m128i> VECTORCALL tuned_ConvertPlanarRGBXToP
 template<int F, class T, bool NeedOffset = true, typename std::enable_if<F == CODEFEATURE_AVX2>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
 static inline FORCEINLINE VECTOR4<__m256i> VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(__m256i gg, __m256i bb, __m256i rr, __m256i aa)
 {
-	__m256i ctl;
+	__m256i ctl0, ctl1, ctl2, ctl3;
 	if (std::is_same<T, CBGRAColorOrder>::value)
-		ctl = _mm256_set16_epi8(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0);
+	{
+		ctl0 = _mm256_set16_epi8(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0);
+		ctl1 = _mm256_set16_epi8(7, 3, 15, 11, 6, 2, 14, 10, 5, 1, 13, 9, 4, 0, 12, 8);
+		ctl2 = _mm256_set16_epi8(11, 15, 3, 7, 10, 14, 2, 6, 9, 13, 1, 5, 8, 12, 0, 4);
+		ctl3 = _mm256_set16_epi8(3, 7, 11, 15, 2, 6, 10, 14, 1, 5, 9, 13, 0, 4, 8, 12);
+	}
 	else
-		ctl = _mm256_set16_epi8(3, 7, 11, 15, 2, 6, 10, 14, 1, 5, 9, 13, 0, 4, 8, 12);
+	{
+		ctl0 = _mm256_set16_epi8(3, 7, 11, 15, 2, 6, 10, 14, 1, 5, 9, 13, 0, 4, 8, 12);
+		ctl1 = _mm256_set16_epi8(11, 15, 3, 7, 10, 14, 2, 6, 9, 13, 1, 5, 8, 12, 0, 4);
+		ctl2 = _mm256_set16_epi8(7, 3, 15, 11, 6, 2, 14, 10, 5, 1, 13, 9, 4, 0, 12, 8);
+		ctl3 = _mm256_set16_epi8(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0);
+	}
 
 	__m256i ggtmp = NeedOffset ? _mm256_add_epi8(gg, _mm256_set1_epi8((char)0x80)) : gg;
 	bb = _mm256_add_epi8(bb, ggtmp);
 	rr = _mm256_add_epi8(rr, ggtmp);
 
-	gg = _mm256_permutevar8x32_epi32(gg, _mm256_set_epi32(7, 5, 3, 1, 6, 4, 2, 0));
-	bb = _mm256_permutevar8x32_epi32(bb, _mm256_set_epi32(7, 5, 3, 1, 6, 4, 2, 0));
-	rr = _mm256_permutevar8x32_epi32(rr, _mm256_set_epi32(7, 5, 3, 1, 6, 4, 2, 0));
-	aa = _mm256_permutevar8x32_epi32(aa, _mm256_set_epi32(7, 5, 3, 1, 6, 4, 2, 0)); // aa に定数を渡した場合でも VPERMD してしまうが、その場合でもループ外に出されるので許容することにする。Clang なら VPERMD せずに単なる定数ロードに変換してくれる。
+	bb = _mm256_permutevar8x32_epi32(bb, _mm256_set_epi32(7, 3, 5, 1, 6, 2, 4, 0));
+	gg = _mm256_permutevar8x32_epi32(gg, _mm256_set_epi32(3, 7, 1, 5, 2, 6, 0, 4));
+	rr = _mm256_permutevar8x32_epi32(rr, _mm256_set_epi32(5, 1, 7, 3, 4, 0, 6, 2));
+	aa = _mm256_permutevar8x32_epi32(aa, _mm256_set_epi32(1, 5, 3, 7, 0, 4, 2, 6)); // aa に定数を渡した場合でも VPERMD してしまうが、その場合でもループ外に出されるので許容することにする。Clang なら VPERMD せずに単なる定数ロードに変換してくれる。
 
-	__m256i gb0 = _mm256_unpacklo_epi32(bb, gg); // G7 G6 G5 G4 B7 B6 B5 B4 G3 G2 G1 G0 B3 B2 B1 B0
-	__m256i gb1 = _mm256_unpackhi_epi32(bb, gg);
-	__m256i ar0 = _mm256_unpacklo_epi32(rr, aa);
-	__m256i ar1 = _mm256_unpackhi_epi32(rr, aa);
+	__m256i n0 = _mm256_blend_epi32(bb, gg, 0xaa);
+	__m256i n1 = _mm256_blend_epi32(rr, aa, 0xaa);
+	__m256i n2 = _mm256_blend_epi32(bb, gg, 0x55);
+	__m256i n3 = _mm256_blend_epi32(rr, aa, 0x55);
 
-	__m256i m0 = _mm256_unpacklo_epi64(gb0, ar0); // A3 A2 A1 A0 R3 R2 R1 R0 G3 G2 G1 G0 B3 B2 B1 B0
-	__m256i m1 = _mm256_unpackhi_epi64(gb0, ar0);
-	__m256i m2 = _mm256_unpacklo_epi64(gb1, ar1);
-	__m256i m3 = _mm256_unpackhi_epi64(gb1, ar1);
+	__m256i m0 = _mm256_blend_epi32(n0, n1, 0xcc);
+	__m256i m1 = _mm256_blend_epi32(n0, n1, 0x33);
+	__m256i m2 = _mm256_blend_epi32(n2, n3, 0xcc);
+	__m256i m3 = _mm256_blend_epi32(n2, n3, 0x33);
 
 	return {
-		_mm256_shuffle_epi8(m0, ctl),
-		_mm256_shuffle_epi8(m1, ctl),
-		_mm256_shuffle_epi8(m2, ctl),
-		_mm256_shuffle_epi8(m3, ctl)
+		_mm256_shuffle_epi8(m0, ctl0),
+		_mm256_shuffle_epi8(m1, ctl1),
+		_mm256_shuffle_epi8(m2, ctl2),
+		_mm256_shuffle_epi8(m3, ctl3)
 	};
 }
 
