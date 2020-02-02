@@ -108,7 +108,7 @@ static inline FORCEINLINE __m256i _mm256_set16_epi8(char e15, char e14, char e13
 
 #if defined(__AVX512F__)
 
-static inline __m512i _mm512_set8_epi8(char e7, char e6, char e5, char e4, char e3, char e2, char e1, char e0)
+static inline  FORCEINLINE __m512i _mm512_set8_epi8(char e7, char e6, char e5, char e4, char e3, char e2, char e1, char e0)
 {
 	return _mm512_set_epi8(
 		e7, e6, e5, e4, e3, e2, e1, e0,
@@ -122,7 +122,7 @@ static inline __m512i _mm512_set8_epi8(char e7, char e6, char e5, char e4, char 
 	);
 }
 
-static inline __m512i _mm512_set16_epi8(char e15, char e14, char e13, char e12, char e11, char e10, char e9, char e8, char e7, char e6, char e5, char e4, char e3, char e2, char e1, char e0)
+static inline  FORCEINLINE __m512i _mm512_set16_epi8(char e15, char e14, char e13, char e12, char e11, char e10, char e9, char e8, char e7, char e6, char e5, char e4, char e3, char e2, char e1, char e0)
 {
 	return _mm512_set_epi8(
 		e15, e14, e13, e12, e11, e10, e9, e8, e7, e6, e5, e4, e3, e2, e1, e0,
