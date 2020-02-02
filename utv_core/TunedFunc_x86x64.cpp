@@ -490,6 +490,35 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX2 = {
 	tuned_ConvertUQRGToR210<CODEFEATURE_AVX1>,
 };
 
+const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX512ICL = {
+	&tfnConvertShuffleAVX2,
+	{ FEATURE0_AVX512F | FEATURE0_AVX512_VBMI2, 0 },
+	tuned_ConvertRGBToULRG<CODEFEATURE_AVX512_ICL, CBGRColorOrder>,
+	tuned_ConvertRGBToULRG<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>,
+	tuned_ConvertRGBToULRG<CODEFEATURE_AVX512_ICL, CARGBColorOrder>,
+	tuned_ConvertRGBAToULRA<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>,
+	tuned_ConvertRGBAToULRA<CODEFEATURE_AVX512_ICL, CARGBColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX512_ICL, CYUYVColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX512_ICL, CUYVYColorOrder>,
+	tuned_ConvertULRGToRGB<CODEFEATURE_AVX512_ICL, CBGRColorOrder>,
+	tuned_ConvertULRGToRGB<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>,
+	tuned_ConvertULRGToRGB<CODEFEATURE_AVX512_ICL, CARGBColorOrder>,
+	tuned_ConvertULRAToRGBA<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>,
+	tuned_ConvertULRAToRGBA<CODEFEATURE_AVX512_ICL, CARGBColorOrder>,
+	tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX512_ICL, CYUYVColorOrder>,
+	tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX512_ICL, CUYVYColorOrder>,
+	cpp_ConvertRGBToUQRG<CB48rColorOrder>,
+	tuned_ConvertRGBToUQRG<CODEFEATURE_AVX1, CB64aColorOrder>,
+	tuned_ConvertB64aToUQRA<CODEFEATURE_AVX1>,
+	cpp_ConvertUQRGToRGB<CB48rColorOrder>,
+	tuned_ConvertUQRGToRGB<CODEFEATURE_AVX1, CB64aColorOrder>,
+	tuned_ConvertUQRAToB64a<CODEFEATURE_AVX1>,
+	cpp_ConvertV210ToUQY2,
+	cpp_ConvertUQY2ToV210,
+	tuned_ConvertR210ToUQRG<CODEFEATURE_AVX1>,
+	tuned_ConvertUQRGToR210<CODEFEATURE_AVX1>,
+};
+
 
 extern const TUNEDFUNC_SYMPACK tfnSymPackSSE41 = {
 	&tfnSymPackCPP,
@@ -702,7 +731,7 @@ const TUNEDFUNC tfnRoot = {
 	&tfnHuffmanDecodeI686,
 #endif
 	&tfnConvertYUVRGBAVX2,
-	&tfnConvertShuffleAVX2,
+	&tfnConvertShuffleAVX512ICL,
 	&tfnSymPackAVX512ICL,
 	&tfnConvertPredictAVX1,
 	&tfnConvertSymPackAVX2,

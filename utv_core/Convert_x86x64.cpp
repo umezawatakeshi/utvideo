@@ -4,7 +4,7 @@
 #include <myintrin_x86x64.h>
 #include "ByteOrder.h"
 
-#if !defined(GENERATE_SSE2) && !defined(GENERATE_SSSE3) && !defined(GENERATE_SSE41) && !defined(GENERATE_AVX1) && !defined(GENERATE_AVX2)
+#if !defined(GENERATE_SSE2) && !defined(GENERATE_SSSE3) && !defined(GENERATE_SSE41) && !defined(GENERATE_AVX1) && !defined(GENERATE_AVX2) && !defined(GENERATE_AVX512_ICL)
 #error
 #endif
 
@@ -1525,6 +1525,65 @@ static inline FORCEINLINE VECTOR_YUV422<__m256i> VECTORCALL tuned_ConvertPackedY
 	return { yy0, yy1, uu, vv };
 }
 
+static inline void print_zmm(const char* s, __m512i x)
+{
+	union {
+		__m512i zmm;
+		uint8_t b[64];
+	};
+	zmm = x;
+	printf("%s =", s);
+	for (int i = 0; i < 64; ++i)
+		printf(" %02X", b[i]);
+	printf("\n");
+}
+
+template<int F, class T, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR_YUV422<__m512i> VECTORCALL tuned_ConvertPackedYUV422ToPlanarElement(__m512i m0, __m512i m1, __m512i m2, __m512i m3)
+{
+	__m512i ctly, ctluv;
+	if (std::is_same<T, CYUYVColorOrder>::value)
+	{
+		ctly = _mm512_set_epi8(
+			126, 124, 122, 120, 118, 116, 114, 112,	110, 108, 106, 104, 102, 100,  98,  96,
+			 94,  92,  90,  88,  86,  84,  82,  80,	 78,  76,  74,  72,  70,  68,  66,  64,
+			 62,  60,  58,  56,  54,  52,  50,  48,	 46,  44,  42,  40,  38,  36,  34,  32,
+			 30,  28,  26,  24,  22,  20,  18,  16,	 14,  12,  10,   8,   6,   4,   2,   0
+		);
+		ctluv = _mm512_set_epi8(
+			127, 123, 119, 115, 111, 107, 103,  99,	 95,  91,  87,  83,  79,  75,  71,  67,
+			 63,  59,  55,  51,  47,  43,  39,  35,	 31,  27,  23,  19,  15,  11,   7,   3,
+			125, 121, 117, 113, 109, 105, 101,  97,	 93,  89,  85,  81,  77,  73,  69,  65,
+			 61,  57,  53,  49,  45,  41,  37,  33,	 29,  25,  21,  17,  13,   9,   5,   1
+		);
+	}
+	else
+	{
+		ctly = _mm512_set_epi8(
+			127, 125, 123, 121, 119, 117, 115, 113,	111, 109, 107, 105, 103, 101,  99,  97,
+			 95,  93,  91,  89,  87,  85,  83,  81,	 79,  77,  75,  73,  71,  69,  67,  65,
+			 63,  61,  59,  57,  55,  53,  51,  49,	 47,  45,  43,  41,  39,  37,  35,  33,
+			 31,  29,  27,  25,  23,  21,  19,  17,	 15,  13,  11,   9,   7,   5,   3,   1
+		);
+		ctluv = _mm512_set_epi8(
+			126, 122, 118, 114, 110, 106, 102,  98,	 94,  90,  86,  82,  78,  74,  70,  66,
+			 62,  58,  54,  50,  46,  42,  38,  34,	 30,  26,  22,  18,  14,  10,   6,   2,
+			124, 120, 116, 112, 108, 104, 100,  96,	 92,  88,  84,  80,  76,  72,  68,  64,
+			 60,  56,  52,  48,  44,  40,  36,  32,	 28,  24,  20,  16,  12,   8,   4,   0
+		);
+	}
+
+	__m512i yy0 = _mm512_permutex2var_epi8(m0, ctly, m1);
+	__m512i yy1 = _mm512_permutex2var_epi8(m2, ctly, m3);
+	__m512i uv0 = _mm512_permutex2var_epi8(m0, ctluv, m1);
+	__m512i uv1 = _mm512_permutex2var_epi8(m2, ctluv, m3);
+
+	__m512i uu = _mm512_inserti64x4(uv0, _mm512_castsi512_si256(uv1), 1);
+	__m512i vv = _mm512_permutex2var_epi64(uv0, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), uv1);
+
+	return { yy0, yy1, uu, vv };
+}
+
 template<int F, class T, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE VECTOR_YUV422<__m128i> tuned_ConvertPackedYUV422ToPlanarElement(const uint8_t* pp)
 {
@@ -1544,6 +1603,17 @@ static inline FORCEINLINE VECTOR_YUV422<__m256i> tuned_ConvertPackedYUV422ToPlan
 		_mm256_loadu_si256((const __m256i *)(pp + 32)),
 		_mm256_loadu_si256((const __m256i *)(pp + 64)),
 		_mm256_loadu_si256((const __m256i *)(pp + 96))
+	);
+}
+
+template<int F, class T, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR_YUV422<__m512i> tuned_ConvertPackedYUV422ToPlanarElement(const uint8_t* pp)
+{
+	return tuned_ConvertPackedYUV422ToPlanarElement<F, T>(
+		_mm512_loadu_si512((const __m512i *)pp),
+		_mm512_loadu_si512((const __m512i *)(pp + 64)),
+		_mm512_loadu_si512((const __m512i *)(pp + 128)),
+		_mm512_loadu_si512((const __m512i *)(pp + 192))
 	);
 }
 
@@ -1569,6 +1639,17 @@ static inline FORCEINLINE VECTOR_YUV422<__m256i> tuned_ConvertPackedYUV422ToPlan
 	);
 }
 
+template<int F, class T, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR_YUV422<__m512i> tuned_ConvertPackedYUV422ToPlanarElement(const uint8_t* pp, ssize_t scbStride)
+{
+	return tuned_ConvertPackedYUV422ToPlanarElement<F, T>(
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)pp), _mm512_loadu_si512((const __m512i *)(pp - scbStride))),
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)(pp + 64)), _mm512_loadu_si512((const __m512i *)(pp - scbStride + 64))),
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)(pp + 128)), _mm512_loadu_si512((const __m512i *)(pp - scbStride + 128))),
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)(pp + 192)), _mm512_loadu_si512((const __m512i *)(pp - scbStride + 192)))
+	);
+}
+
 template<int F, class T>
 void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
 {
@@ -1580,7 +1661,20 @@ void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t
 
 		auto pp = p;
 
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		for (; pp <= p + cbWidth - 256; pp += 256)
+		{
+			auto result = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp);
+			_mm512_storeu_si512((__m512i *)y, result.y0);
+			_mm512_storeu_si512((__m512i *)(y + 64), result.y1);
+			_mm512_storeu_si512((__m512i *)u, result.u);
+			_mm512_storeu_si512((__m512i *)v, result.v);
+
+			y += 128;
+			u += 64;
+			v += 64;
+		}
+#elif defined(__AVX2__)
 		for (; pp <= p + cbWidth - 128; pp += 128)
 		{
 			auto result = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp);
@@ -1639,6 +1733,11 @@ template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX1, CUYVYColorOrder>
 #ifdef GENERATE_AVX2
 template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX2, CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX2, CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+#endif
+
+#ifdef GENERATE_AVX512_ICL
+template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX512_ICL, CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertPackedYUV422ToULY2<CODEFEATURE_AVX512_ICL, CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 #endif
 
 //
@@ -1703,6 +1802,52 @@ static inline FORCEINLINE VECTOR4<__m256i> VECTORCALL tuned_ConvertPlanarYUV422T
 	};
 }
 
+template<int F, class T, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR4<__m512i> VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(__m512i yy0, __m512i yy1, __m512i uu, __m512i vv)
+{
+	__m512i ctl0, ctl1;
+	if (std::is_same<T, CYUYVColorOrder>::value)
+	{
+		ctl0 = _mm512_set_epi8(
+			111,  31,  79,  30, 110,  29,  78,  28,	109,  27,  77,  26, 108,  25,  76,  24,
+			107,  23,  75,  22, 106,  21,  74,  20,	105,  19,  73,  18, 104,  17,  72,  16,
+			103,  15,  71,  14, 102,  13,  70,  12,	101,  11,  69,  10, 100,   9,  68,   8,
+			 99,   7,  67,   6,  98,   5,  66,   4,	 97,   3,  65,   2,  96,   1,  64,   0
+		);
+		ctl1 = _mm512_set_epi8(
+			127,  63,  95,  62, 126,  61,  94,  60,	125,  59,  93,  58, 124,  57,  92,  56,
+			123,  55,  91,  54, 122,  53,  90,  52,	121,  51,  89,  50, 120,  49,  88,  48,
+			119,  47,  87,  46, 118,  45,  86,  44,	117,  43,  85,  42, 116,  41,  84,  40,
+			115,  39,  83,  38, 114,  37,  82,  36,	113,  35,  81,  34, 112,  33,  80,  32
+		);
+	}
+	else
+	{
+		ctl0 = _mm512_set_epi8(
+			 31, 111,  30,  79,  29, 110,  28,  78,	 27, 109,  26,  77,  25, 108,  24,  76,
+			 23, 107,  22,  75,  21, 106,  20,  74,	 19, 105,  18,  73,  17, 104,  16,  72,
+			 15, 103,  14,  71,  13, 102,  12,  70,	 11, 101,  10,  69,   9, 100,   8,  68,
+			  7,  99,   6,  67,   5,  98,   4,  66,	  3,  97,   2,  65,   1,  96,   0,  64
+		);
+		ctl1 = _mm512_set_epi8(
+			 63, 127,  62,  95,  61, 126,  60,  94,	 59, 125,  58,  93,  57, 124,  56,  92,
+			 55, 123,  54,  91,  53, 122,  52,  90,	 51, 121,  50,  89,  49, 120,  48,  88,
+			 47, 119,  46,  87,  45, 118,  44,  86,	 43, 117,  42,  85,  41, 116,  40,  84,
+			 39, 115,  38,  83,  37, 114,  36,  82,	 35, 113,  34,  81,  33, 112,  32,  80
+		);
+	}
+
+	__m512i uv0 = _mm512_inserti64x4(uu, _mm512_castsi512_si256(vv), 1);
+	__m512i uv1 = _mm512_permutex2var_epi64(uu, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), vv);
+
+	__m512i m0 = _mm512_permutex2var_epi8(yy0, ctl0, uv0);
+	__m512i m1 = _mm512_permutex2var_epi8(yy0, ctl1, uv0);
+	__m512i m2 = _mm512_permutex2var_epi8(yy1, ctl0, uv1);
+	__m512i m3 = _mm512_permutex2var_epi8(yy1, ctl1, uv1);
+
+	return { m0, m1, m2, m3 };
+}
+
 template<int F, class T, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(uint8_t* pp, __m128i yy0, __m128i yy1, __m128i uu, __m128i vv)
 {
@@ -1721,6 +1866,16 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedEleme
 	_mm256_storeu_si256((__m256i *)(pp + 32), result.v1);
 	_mm256_storeu_si256((__m256i *)(pp + 64), result.v2);
 	_mm256_storeu_si256((__m256i *)(pp + 96), result.v3);
+}
+
+template<int F, class T, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(uint8_t* pp, __m512i yy0, __m512i yy1, __m512i uu, __m512i vv)
+{
+	auto result = tuned_ConvertPlanarYUV422ToPackedElement<F, T>(yy0, yy1, uu, vv);
+	_mm512_storeu_si512((__m512i *)pp, result.v0);
+	_mm512_storeu_si512((__m512i *)(pp + 64), result.v1);
+	_mm512_storeu_si512((__m512i *)(pp + 128), result.v2);
+	_mm512_storeu_si512((__m512i *)(pp + 192), result.v3);
 }
 
 template<int F, class T, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
@@ -1743,6 +1898,16 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedEleme
 	_mm256_storeu_si256((__m256i *)(pp + 96), _mm256_add_epi8(result.v3, _mm256_loadu_si256((__m256i *)(pp - scbStride + 96))));
 }
 
+template<int F, class T, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(uint8_t* pp, __m512i yy0, __m512i yy1, __m512i uu, __m512i vv, ssize_t scbStride)
+{
+	auto result = tuned_ConvertPlanarYUV422ToPackedElement<F, T>(yy0, yy1, uu, vv);
+	_mm512_storeu_si512((__m512i *)pp, _mm512_add_epi8(result.v0, _mm512_loadu_si512((__m512i *)(pp - scbStride))));
+	_mm512_storeu_si512((__m512i *)(pp + 64), _mm512_add_epi8(result.v1, _mm512_loadu_si512((__m512i *)(pp - scbStride + 64))));
+	_mm512_storeu_si512((__m512i *)(pp + 128), _mm512_add_epi8(result.v2, _mm512_loadu_si512((__m512i *)(pp - scbStride + 128))));
+	_mm512_storeu_si512((__m512i *)(pp + 192), _mm512_add_epi8(result.v3, _mm512_loadu_si512((__m512i *)(pp - scbStride + 192))));
+}
+
 template<int F, class T>
 void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
 {
@@ -1754,7 +1919,20 @@ void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const
 
 		auto pp = p;
 
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		for (; pp <= p + cbWidth - 256; pp += 256)
+		{
+			__m512i yy0 = _mm512_loadu_si512((const __m512i*)y);
+			__m512i yy1 = _mm512_loadu_si512((const __m512i*)(y + 64));
+			__m512i uu = _mm512_loadu_si512((const __m512i*)u);
+			__m512i vv = _mm512_loadu_si512((const __m512i*)v);
+			tuned_ConvertPlanarYUV422ToPackedElement<F, T>(pp, yy0, yy1, uu, vv);
+
+			y += 128;
+			u += 64;
+			v += 64;
+		}
+#elif defined(__AVX2__)
 		for (; pp <= p + cbWidth - 128; pp += 128)
 		{
 			__m256i yy0 = _mm256_loadu_si256((const __m256i *)y);
@@ -1809,6 +1987,11 @@ template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX1, CUYVYColorOrder>
 #ifdef GENERATE_AVX2
 template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX2, CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX2, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+#endif
+
+#ifdef GENERATE_AVX512_ICL
+template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX512_ICL, CYUYVColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToPackedYUV422<CODEFEATURE_AVX512_ICL, CUYVYColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 #endif
 
 //
@@ -1867,6 +2050,41 @@ static inline FORCEINLINE VECTOR_RGB<__m256i> tuned_ConvertPackedBGRToPlanarElem
 	__m256i ggtmp = NeedOffset ? _mm256_add_epi8(gg, _mm256_set1_epi8((char)0x80)) : gg;
 	bb = _mm256_sub_epi8(bb, ggtmp);
 	rr = _mm256_sub_epi8(rr, ggtmp);
+
+	return { gg, bb, rr };
+}
+
+template<int F, bool NeedOffset = true, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGB<__m512i> tuned_ConvertPackedBGRToPlanarElement(__m512i m0, __m512i m1, __m512i m2)
+{
+	__m512i ctlb = _mm512_set_epi8(
+		125, 122, 119, 116, 113, 110, 107, 104, 101,  98,  95,  92,  89,  86,  83,  80,  77,  74,  71,  68,  65,
+		 62,  59,  56,  53,  50,  47,  44,  41,  38,  35,  32,  29,  26,  23,  20,  17,  14,  11,   8,   5,   2,
+		 63,  60,  57,  54,  51,  48,  45,  42,  39,  36,  33,  30,  27,  24,  21,  18,  15,  12,   9,   6,   3,   0
+	);
+	__m512i ctlg = _mm512_set_epi8(
+		 62,  59,  56,  53,  50,  47,  44,  41,  38,  35,  32,  29,  26,  23,  20,  17,  14,  11,   8,   5,   2,
+		 63,  60,  57,  54,  51,  48,  45,  42,  39,  36,  33,  30,  27,  24,  21,  18,  15,  12,   9,   6,   3,   0,
+		125, 122, 119, 116, 113, 110, 107, 104, 101,  98,  95,  92,  89,  86,  83,  80,  77,  74,  71,  68,  65
+);
+	__m512i ctlr = _mm512_set_epi8(
+		 63,  60,  57,  54,  51,  48,  45,  42,  39,  36,  33,  30,  27,  24,  21,  18,  15,  12,   9,   6,   3,   0,
+		125, 122, 119, 116, 113, 110, 107, 104, 101,  98,  95,  92,  89,  86,  83,  80,  77,  74,  71,  68,  65,
+		 62,  59,  56,  53,  50,  47,  44,  41,  38,  35,  32,  29,  26,  23,  20,  17,  14,  11,   8,   5,   2
+	);
+	__mmask64 k = 0x4924924924924924ULL;
+
+	__m512i o0 = _mm512_mask_mov_epi8(m0, k, m1);
+	__m512i o1 = _mm512_mask_mov_epi8(m1, k, m2);
+	__m512i o2 = _mm512_mask_mov_epi8(m2, k, m0);
+
+	__m512i bb = _mm512_permutex2var_epi8(o0, ctlb, o2);
+	__m512i gg = _mm512_permutex2var_epi8(o1, ctlg, o0);
+	__m512i rr = _mm512_permutex2var_epi8(o2, ctlr, o1);
+
+	__m512i ggtmp = NeedOffset ? _mm512_add_epi8(gg, _mm512_set1_epi8((char)0x80)) : gg;
+	bb = _mm512_sub_epi8(bb, ggtmp);
+	rr = _mm512_sub_epi8(rr, ggtmp);
 
 	return { gg, bb, rr };
 }
@@ -1948,6 +2166,58 @@ static inline FORCEINLINE VECTOR_RGBA<__m256i> VECTORCALL tuned_ConvertPackedRGB
 	return { gg, bb, rr, aa };
 }
 
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGBA<__m512i> VECTORCALL tuned_ConvertPackedRGBXToPlanarElement(__m512i m0, __m512i m1, __m512i m2, __m512i m3)
+{
+	__m512i ctlgb, ctlar;
+	if (std::is_same<T, CBGRAColorOrder>::value)
+	{
+		ctlgb = _mm512_set_epi8(
+			125, 121, 117, 113, 109, 105, 101,  97,	 93,  89,  85,  81,  77,  73,  69,  65,
+			 61,  57,  53,  49,  45,  41,  37,  33,	 29,  25,  21,  17,  13,   9,   5,   1,
+			124, 120, 116, 112, 108, 104, 100,  96,	 92,  88,  84,  80,  76,  72,  68,  64,
+			 60,  56,  52,  48,  44,  40,  36,  32,	 28,  24,  20,  16,  12,   8,   4,   0
+		);
+		ctlar = _mm512_set_epi8(
+			127, 123, 119, 115, 111, 107, 103,  99,	 95,  91,  87,  83,  79,  75,  71,  67,
+			 63,  59,  55,  51,  47,  43,  39,  35,	 31,  27,  23,  19,  15,  11,   7,   3,
+			126, 122, 118, 114, 110, 106, 102,  98,	 94,  90,  86,  82,  78,  74,  70,  66,
+			 62,  58,  54,  50,  46,  42,  38,  34,	 30,  26,  22,  18,  14,  10,   6,   2
+		);
+	}
+	else
+	{
+		ctlgb = _mm512_set_epi8(
+			126, 122, 118, 114, 110, 106, 102,  98,	 94,  90,  86,  82,  78,  74,  70,  66,
+			 62,  58,  54,  50,  46,  42,  38,  34,	 30,  26,  22,  18,  14,  10,   6,   2,
+			127, 123, 119, 115, 111, 107, 103,  99,	 95,  91,  87,  83,  79,  75,  71,  67,
+			 63,  59,  55,  51,  47,  43,  39,  35,	 31,  27,  23,  19,  15,  11,   7,   3
+		);
+		ctlar = _mm512_set_epi8(
+			124, 120, 116, 112, 108, 104, 100,  96,	 92,  88,  84,  80,  76,  72,  68,  64,
+			 60,  56,  52,  48,  44,  40,  36,  32,	 28,  24,  20,  16,  12,   8,   4,   0,
+			125, 121, 117, 113, 109, 105, 101,  97,	 93,  89,  85,  81,  77,  73,  69,  65,
+			 61,  57,  53,  49,  45,  41,  37,  33,	 29,  25,  21,  17,  13,   9,   5,   1
+		);
+	}
+
+	__m512i gb0 = _mm512_permutex2var_epi8(m0, ctlgb, m1);
+	__m512i gb1 = _mm512_permutex2var_epi8(m2, ctlgb, m3);
+	__m512i ar0 = _mm512_permutex2var_epi8(m0, ctlar, m1);
+	__m512i ar1 = _mm512_permutex2var_epi8(m2, ctlar, m3);
+
+	__m512i bb = _mm512_inserti64x4(gb0, _mm512_castsi512_si256(gb1), 1);
+	__m512i gg = _mm512_permutex2var_epi64(gb0, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), gb1);
+	__m512i rr = _mm512_inserti64x4(ar0, _mm512_castsi512_si256(ar1), 1);
+	__m512i aa = _mm512_permutex2var_epi64(ar0, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), ar1);
+
+	__m512i ggtmp = NeedOffset ? _mm512_add_epi8(gg, _mm512_set1_epi8((char)0x80)) : gg;
+	bb = _mm512_sub_epi8(bb, ggtmp);
+	rr = _mm512_sub_epi8(rr, ggtmp);
+
+	return { gg, bb, rr, aa };
+}
+
 template<int F, class T, bool NeedOffset = true, typename std::enable_if<T::BYPP == 4>::type*& = enabler, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE VECTOR_RGBA<__m128i> tuned_ConvertPackedRGBXToPlanarElement(const uint8_t* pp)
 {
@@ -1967,6 +2237,17 @@ static inline FORCEINLINE VECTOR_RGBA<__m256i> tuned_ConvertPackedRGBXToPlanarEl
 		_mm256_loadu_si256((const __m256i *)(pp + 32)),
 		_mm256_loadu_si256((const __m256i *)(pp + 64)),
 		_mm256_loadu_si256((const __m256i *)(pp + 96))
+	);
+}
+
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<T::BYPP == 4>::type*& = enabler, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGBA<__m512i> tuned_ConvertPackedRGBXToPlanarElement(const uint8_t* pp)
+{
+	return tuned_ConvertPackedRGBXToPlanarElement<F, T, NeedOffset>(
+		_mm512_loadu_si512((const __m512i *)pp),
+		_mm512_loadu_si512((const __m512i *)(pp + 64)),
+		_mm512_loadu_si512((const __m512i *)(pp + 128)),
+		_mm512_loadu_si512((const __m512i *)(pp + 192))
 	);
 }
 
@@ -1992,6 +2273,17 @@ static inline FORCEINLINE VECTOR_RGBA<__m256i> tuned_ConvertPackedRGBXToPlanarEl
 	return { ret.g, ret.b, ret.r, _mm256_set1_epi8((char)0xff) };
 }
 
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<std::is_same<T, CBGRColorOrder>::value>::type*& = enabler, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGBA<__m512i> tuned_ConvertPackedRGBXToPlanarElement(const uint8_t* pp)
+{
+	auto ret = tuned_ConvertPackedBGRToPlanarElement<F, NeedOffset>(
+		_mm512_loadu_si512((const __m512i *)pp),
+		_mm512_loadu_si512((const __m512i *)(pp + 64)),
+		_mm512_loadu_si512((const __m512i *)(pp + 128))
+	);
+	return { ret.g, ret.b, ret.r, _mm512_set1_epi8((char)0xff) };
+}
+
 template<int F, class T, bool NeedOffset = true, typename std::enable_if<T::BYPP == 4>::type*& = enabler, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
 static inline FORCEINLINE VECTOR_RGBA<__m128i> tuned_ConvertPackedRGBXToPlanarElement(const uint8_t* pp, ssize_t scbStride)
 {
@@ -2011,6 +2303,17 @@ static inline FORCEINLINE VECTOR_RGBA<__m256i> tuned_ConvertPackedRGBXToPlanarEl
 		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 32)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 32))),
 		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 64)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 64))),
 		_mm256_sub_epi8(_mm256_loadu_si256((const __m256i *)(pp + 96)), _mm256_loadu_si256((const __m256i *)(pp - scbStride + 96)))
+	);
+}
+
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<T::BYPP == 4>::type*& = enabler, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGBA<__m512i> tuned_ConvertPackedRGBXToPlanarElement(const uint8_t* pp, ssize_t scbStride)
+{
+	return tuned_ConvertPackedRGBXToPlanarElement<F, T, NeedOffset>(
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)pp), _mm512_loadu_si512((const __m512i *)(pp - scbStride))),
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)(pp + 64)), _mm512_loadu_si512((const __m512i *)(pp - scbStride + 64))),
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)(pp + 128)), _mm512_loadu_si512((const __m512i *)(pp - scbStride + 128))),
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)(pp + 192)), _mm512_loadu_si512((const __m512i *)(pp - scbStride + 192)))
 	);
 }
 
@@ -2036,6 +2339,17 @@ static inline FORCEINLINE VECTOR_RGBA<__m256i> tuned_ConvertPackedRGBXToPlanarEl
 	return { ret.g, ret.b, ret.r, _mm256_set1_epi8((char)0xff) };
 }
 
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<std::is_same<T, CBGRColorOrder>::value>::type*& = enabler, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR_RGBA<__m512i> tuned_ConvertPackedRGBXToPlanarElement(const uint8_t* pp, ssize_t scbStride)
+{
+	auto ret = tuned_ConvertPackedBGRToPlanarElement<F, NeedOffset>(
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)pp), _mm512_loadu_si512((const __m512i *)(pp - scbStride))),
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)(pp + 64)), _mm512_loadu_si512((const __m512i *)(pp - scbStride + 64))),
+		_mm512_sub_epi8(_mm512_loadu_si512((const __m512i *)(pp + 128)), _mm512_loadu_si512((const __m512i *)(pp - scbStride + 128)))
+	);
+	return { ret.g, ret.b, ret.r, _mm512_set1_epi8((char)0xff) };
+}
+
 template<int F, class T, bool A>
 static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
@@ -2048,7 +2362,23 @@ static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 
 		auto pp = p;
 
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		for (; pp <= p + cbWidth - T::BYPP * 64; pp += T::BYPP * 64)
+		{
+			auto result = tuned_ConvertPackedRGBXToPlanarElement<F, T>(pp);
+			_mm512_storeu_si512((__m512i *)b, result.b);
+			_mm512_storeu_si512((__m512i *)g, result.g);
+			_mm512_storeu_si512((__m512i *)r, result.r);
+			if (A)
+				_mm512_storeu_si512((__m512i *)a, result.a);
+
+			b += 64;
+			g += 64;
+			r += 64;
+			if (A)
+				a += 64;
+		}
+#elif defined(__AVX2__)
 		for (; pp <= p + cbWidth - T::BYPP * 32; pp += T::BYPP * 32)
 		{
 			auto result = tuned_ConvertPackedRGBXToPlanarElement<F, T>(pp);
@@ -2141,6 +2471,14 @@ template void tuned_ConvertRGBAToULRA<CODEFEATURE_AVX2, CBGRAColorOrder>(uint8_t
 template void tuned_ConvertRGBAToULRA<CODEFEATURE_AVX2, CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 #endif
 
+#ifdef GENERATE_AVX512_ICL
+template void tuned_ConvertRGBToULRG<CODEFEATURE_AVX512_ICL, CBGRColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULRG<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULRG<CODEFEATURE_AVX512_ICL, CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBAToULRA<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBAToULRA<CODEFEATURE_AVX512_ICL, CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+#endif
+
 //
 
 template<int F, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler>
@@ -2199,6 +2537,47 @@ static inline FORCEINLINE VECTOR3<__m256i> tuned_ConvertPlanarBGRToPackedElement
 		_mm256_permute2x128_si256(o2, o0, 0x30),
 		_mm256_permute2x128_si256(o1, o2, 0x31)
 	};
+}
+
+template<int F, bool NeedOffset = true, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR3<__m512i> tuned_ConvertPlanarBGRToPackedElement(__m512i gg, __m512i bb, __m512i rr)
+{
+	__m512i ctl0 = _mm512_set_epi8(
+		 21,  42,  84,  20,  41,  83,  19,  40,  82,  18,  39,  81,  17,  38,  80,
+		 16,  37,  79,  15,  36,  78,  14,  35,  77,  13,  34,  76,  12,  33,  75,
+		 11,  32,  74,  10,  31,  73,   9,  30,  72,   8,  29,  71,   7,  28,  70,
+		  6,  27,  69,   5,  26,  68,   4,  25,  67,   3,  24,  66,   2,  23,  65,
+		  1,  22,  64,   0
+	);
+	__m512i ctl1 = _mm512_set_epi8(
+		 42,  63, 105,  41,  62, 104,  40,  61, 103,  39,  60, 102,  38,  59, 101,
+		 37,  58, 100,  36,  57,  99,  35,  56,  98,  34,  55,  97,  33,  54,  96,
+		 32,  53,  95,  31,  52,  94,  30,  51,  93,  29,  50,  92,  28,  49,  91,
+		 27,  48,  90,  26,  47,  89,  25,  46,  88,  24,  45,  87,  23,  44,  86,
+		 22,  43,  85,  21
+	);
+	__m512i ctl2 = _mm512_set_epi8(
+		 63,  20, 127,  62,  19, 126,  61,  18, 125,  60,  17, 124,  59,  16, 123,
+		 58,  15, 122,  57,  14, 121,  56,  13, 120,  55,  12, 119,  54,  11, 118,
+		 53,  10, 117,  52,   9, 116,  51,   8, 115,  50,   7, 114,  49,   6, 113,
+		 48,   5, 112,  47,   4, 111,  46,   3, 110,  45,   2, 109,  44,   1, 108,
+		 43,   0, 107,  42
+	);
+	__mmask64 k = 0x4924924924924924ULL;
+
+	__m512i ggtmp = NeedOffset ? _mm512_add_epi8(gg, _mm512_set1_epi8((char)0x80)) : gg;
+	bb = _mm512_add_epi8(bb, ggtmp);
+	rr = _mm512_add_epi8(rr, ggtmp);
+
+	__m512i m0 = _mm512_permutex2var_epi8(bb, ctl0, gg);
+	__m512i m1 = _mm512_permutex2var_epi8(gg, ctl1, rr);
+	__m512i m2 = _mm512_permutex2var_epi8(rr, ctl2, bb);
+
+	__m512i n0 = _mm512_mask_mov_epi8(m0, k, m2);
+	__m512i n1 = _mm512_mask_mov_epi8(m1, k, m0);
+	__m512i n2 = _mm512_mask_mov_epi8(m2, k, m1);
+
+	return { n0, n1, n2 };
 }
 
 template<int F, class T, bool NeedOffset = true, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
@@ -2278,6 +2657,58 @@ static inline FORCEINLINE VECTOR4<__m256i> VECTORCALL tuned_ConvertPlanarRGBXToP
 	};
 }
 
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR4<__m512i> VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(__m512i gg, __m512i bb, __m512i rr, __m512i aa)
+{
+	__m512i ctl0, ctl1;
+	if (std::is_same<T, CBGRAColorOrder>::value)
+	{
+		ctl0 = _mm512_set_epi8(
+			111,  79,  47,  15, 110,  78,  46,  14, 109,  77,  45,  13, 108,  76,  44,  12,
+			107,  75,  43,  11, 106,  74,  42,  10, 105,  73,  41,   9, 104,  72,  40,   8,
+			103,  71,  39,   7, 102,  70,  38,   6, 101,  69,  37,   5, 100,  68,  36,   4,
+			 99,  67,  35,   3,  98,  66,  34,   2,  97,  65,  33,   1,  96,  64,  32,   0
+		);
+		ctl1 = _mm512_set_epi8(
+			127,  95,  63,  31, 126,  94,  62,  30, 125,  93,  61,  29, 124,  92,  60,  28,
+			123,  91,  59,  27, 122,  90,  58,  26, 121,  89,  57,  25, 120,  88,  56,  24,
+			119,  87,  55,  23, 118,  86,  54,  22, 117,  85,  53,  21, 116,  84,  52,  20,
+			115,  83,  51,  19, 114,  82,  50,  18, 113,  81,  49,  17, 112,  80,  48,  16
+		);
+	}
+	else
+	{
+		ctl0 = _mm512_set_epi8(
+			 15,  47,  79, 111,  14,  46,  78, 110,  13,  45,  77, 109,  12,  44,  76, 108,
+			 11,  43,  75, 107,  10,  42,  74, 106,   9,  41,  73, 105,   8,  40,  72, 104,
+			  7,  39,  71, 103,   6,  38,  70, 102,   5,  37,  69, 101,   4,  36,  68, 100,
+			  3,  35,  67,  99,   2,  34,  66,  98,   1,  33,  65,  97,   0,  32,  64,  96
+		);
+		ctl1 = _mm512_set_epi8(
+			 31,  63,  95, 127,  30,  62,  94, 126,  29,  61,  93, 125,  28,  60,  92, 124,
+			 27,  59,  91, 123,  26,  58,  90, 122,  25,  57,  89, 121,  24,  56,  88, 120,
+			 23,  55,  87, 119,  22,  54,  86, 118,  21,  53,  85, 117,  20,  52,  84, 116,
+			 19,  51,  83, 115,  18,  50,  82, 114,  17,  49,  81, 113,  16,  48,  80, 112
+		);
+	}
+
+	__m512i ggtmp = NeedOffset ? _mm512_add_epi8(gg, _mm512_set1_epi8((char)0x80)) : gg;
+	bb = _mm512_add_epi8(bb, ggtmp);
+	rr = _mm512_add_epi8(rr, ggtmp);
+
+	__m512i gb0 = _mm512_inserti64x4(bb, _mm512_castsi512_si256(gg), 1);
+	__m512i gb1 = _mm512_permutex2var_epi64(bb, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), gg);
+	__m512i ar0 = _mm512_inserti64x4(rr, _mm512_castsi512_si256(aa), 1);
+	__m512i ar1 = _mm512_permutex2var_epi64(rr, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), aa);
+
+	__m512i m0 = _mm512_permutex2var_epi8(gb0, ctl0, ar0);
+	__m512i m1 = _mm512_permutex2var_epi8(gb0, ctl1, ar0);
+	__m512i m2 = _mm512_permutex2var_epi8(gb1, ctl0, ar1);
+	__m512i m3 = _mm512_permutex2var_epi8(gb1, ctl1, ar1);
+
+	return { m0, m1, m2, m3 };
+}
+
 template<int F, class T, bool NeedOffset = true, typename std::enable_if<T::BYPP == 4>::type*& = enabler, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, __m128i gg, __m128i bb, __m128i rr, __m128i aa)
 {
@@ -2298,6 +2729,16 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement
 	_mm256_storeu_si256((__m256i *)(pp + 96), result.v3);
 }
 
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<T::BYPP == 4>::type*& = enabler, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, __m512i gg, __m512i bb, __m512i rr, __m512i aa)
+{
+	auto result = tuned_ConvertPlanarRGBXToPackedElement<F, T, NeedOffset>(gg, bb, rr, aa);
+	_mm512_storeu_si512((__m512i *)pp, result.v0);
+	_mm512_storeu_si512((__m512i *)(pp + 64), result.v1);
+	_mm512_storeu_si512((__m512i *)(pp + 128), result.v2);
+	_mm512_storeu_si512((__m512i *)(pp + 192), result.v3);
+}
+
 template<int F, class T, bool NeedOffset = true, typename std::enable_if<std::is_same<T, CBGRColorOrder>::value>::type*& = enabler, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, __m128i gg, __m128i bb, __m128i rr, __m128i aa)
 {
@@ -2314,6 +2755,15 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement
 	_mm256_storeu_si256((__m256i *)pp, result.v0);
 	_mm256_storeu_si256((__m256i *)(pp + 32), result.v1);
 	_mm256_storeu_si256((__m256i *)(pp + 64), result.v2);
+}
+
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<std::is_same<T, CBGRColorOrder>::value>::type*& = enabler, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, __m512i gg, __m512i bb, __m512i rr, __m512i aa)
+{
+	auto result = tuned_ConvertPlanarBGRToPackedElement<F, NeedOffset>(gg, bb, rr);
+	_mm512_storeu_si512((__m512i *)pp, result.v0);
+	_mm512_storeu_si512((__m512i *)(pp + 64), result.v1);
+	_mm512_storeu_si512((__m512i *)(pp + 128), result.v2);
 }
 
 template<int F, class T, bool NeedOffset = true, typename std::enable_if<T::BYPP == 4>::type*& = enabler, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
@@ -2336,6 +2786,16 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement
 	_mm256_storeu_si256((__m256i *)(pp + 96), _mm256_add_epi8(result.v3, _mm256_loadu_si256((__m256i *)(pp - scbStride + 96))));
 }
 
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<T::BYPP == 4>::type*& = enabler, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, __m512i gg, __m512i bb, __m512i rr, __m512i aa, ssize_t scbStride)
+{
+	auto result = tuned_ConvertPlanarRGBXToPackedElement<F, T, NeedOffset>(gg, bb, rr, aa);
+	_mm512_storeu_si512((__m512i *)pp, _mm512_add_epi8(result.v0, _mm512_loadu_si256((__m512i *)(pp - scbStride))));
+	_mm512_storeu_si512((__m512i *)(pp + 64), _mm512_add_epi8(result.v1, _mm512_loadu_si256((__m512i *)(pp - scbStride + 64))));
+	_mm512_storeu_si512((__m512i *)(pp + 128), _mm512_add_epi8(result.v2, _mm512_loadu_si256((__m512i *)(pp - scbStride + 128))));
+	_mm512_storeu_si512((__m512i *)(pp + 192), _mm512_add_epi8(result.v3, _mm512_loadu_si256((__m512i *)(pp - scbStride + 192))));
+}
+
 template<int F, class T, bool NeedOffset = true, typename std::enable_if<std::is_same<T, CBGRColorOrder>::value>::type*& = enabler, typename std::enable_if<F < CODEFEATURE_AVX2>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, __m128i gg, __m128i bb, __m128i rr, __m128i aa, ssize_t scbStride)
 {
@@ -2354,6 +2814,15 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement
 	_mm256_storeu_si256((__m256i *)(pp + 64), _mm256_add_epi8(result.v2, _mm256_loadu_si256((__m256i *)(pp - scbStride + 64))));
 }
 
+template<int F, class T, bool NeedOffset = true, typename std::enable_if<std::is_same<T, CBGRColorOrder>::value>::type*& = enabler, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, __m512i gg, __m512i bb, __m512i rr, __m512i aa, ssize_t scbStride)
+{
+	auto result = tuned_ConvertPlanarBGRToPackedElement<F, NeedOffset>(gg, bb, rr);
+	_mm512_storeu_si512((__m512i *)pp, _mm512_add_epi8(result.v0, _mm512_loadu_si512((__m512i *)(pp - scbStride))));
+	_mm512_storeu_si512((__m512i *)(pp + 64), _mm512_add_epi8(result.v1, _mm512_loadu_si512((__m512i *)(pp - scbStride + 64))));
+	_mm512_storeu_si512((__m512i *)(pp + 128), _mm512_add_epi8(result.v2, _mm512_loadu_si512((__m512i *)(pp - scbStride + 128))));
+}
+
 template<int F, class T, bool A>
 static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
@@ -2366,7 +2835,21 @@ static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd,
 
 		auto pp = p;
 
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		for (; pp <= p + cbWidth - T::BYPP * 64; pp += T::BYPP * 64)
+		{
+			__m512i gg = _mm512_loadu_si512((const __m512i *)g);
+			__m512i bb = _mm512_loadu_si512((const __m512i *)b);
+			__m512i rr = _mm512_loadu_si512((const __m512i *)r);
+			tuned_ConvertPlanarRGBXToPackedElement<F, T>(pp, gg, bb, rr, A ? _mm512_loadu_si512((const __m512i *)a) : _mm512_set1_epi8((char)0xff));
+
+			b += 64;
+			g += 64;
+			r += 64;
+			if (A)
+				a += 64;
+		}
+#elif defined(__AVX2__)
 		for (; pp <= p + cbWidth - T::BYPP * 32; pp += T::BYPP * 32)
 		{
 			__m256i gg = _mm256_loadu_si256((const __m256i *)g);
@@ -2449,6 +2932,14 @@ template void tuned_ConvertULRGToRGB<CODEFEATURE_AVX2, CBGRAColorOrder>(uint8_t 
 template void tuned_ConvertULRGToRGB<CODEFEATURE_AVX2, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 template void tuned_ConvertULRAToRGBA<CODEFEATURE_AVX2, CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 template void tuned_ConvertULRAToRGBA<CODEFEATURE_AVX2, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+#endif
+
+#ifdef GENERATE_AVX512_ICL
+template void tuned_ConvertULRGToRGB<CODEFEATURE_AVX512_ICL, CBGRColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULRGToRGB<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULRGToRGB<CODEFEATURE_AVX512_ICL, CARGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULRAToRGBA<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, const uint8_t* pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULRAToRGBA<CODEFEATURE_AVX512_ICL, CARGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, const uint8_t* pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 #endif
 
 //
