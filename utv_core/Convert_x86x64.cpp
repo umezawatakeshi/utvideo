@@ -2453,12 +2453,12 @@ template void tuned_ConvertULRAToRGBA<CODEFEATURE_AVX2, CARGBColorOrder>(uint8_t
 
 //
 
-static inline __m128i _mm_Convert16To10Fullrange(__m128i x)
+static inline FORCEINLINE __m128i _mm_Convert16To10Fullrange(__m128i x)
 {
 	return _mm_srli_epi16(_mm_sub_epi16(_mm_add_epi16(x, _mm_set1_epi16(1 << 5)), _mm_srli_epi16(x, 10)), 6);
 }
 
-static inline __m128i _mm_Convert10To16Fullrange(__m128i x)
+static inline FORCEINLINE __m128i _mm_Convert10To16Fullrange(__m128i x)
 {
 	__m128i tmp = _mm_slli_epi16(x, 6);
 	return _mm_or_si128(tmp, _mm_srli_epi16(tmp, 10));
