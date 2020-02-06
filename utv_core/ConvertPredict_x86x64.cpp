@@ -34,7 +34,7 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 
 		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
 		{
-			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp);
+			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, __m128i, T, false>(pp);
 			_mm_storeu_si128((__m128i *)g, tuned_PredictLeftAndCount8Element<F>(gprev, planar.g, pGCountTable));
 			_mm_storeu_si128((__m128i *)b, tuned_PredictLeftAndCount8Element<F>(bprev, planar.b, pBCountTable));
 			_mm_storeu_si128((__m128i *)r, tuned_PredictLeftAndCount8Element<F>(rprev, planar.r, pRCountTable));
@@ -104,7 +104,7 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 
 		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
 		{
-			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp, scbStride);
+			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, __m128i, T, false>(pp, scbStride);
 			_mm_storeu_si128((__m128i *)g, tuned_PredictLeftAndCount8Element<F>(gprev, planar.g, pGCountTable));
 			_mm_storeu_si128((__m128i *)b, tuned_PredictLeftAndCount8Element<F>(bprev, planar.b, pBCountTable));
 			_mm_storeu_si128((__m128i *)r, tuned_PredictLeftAndCount8Element<F>(rprev, planar.r, pRCountTable));
@@ -191,8 +191,8 @@ static inline void tuned_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uin
 
 		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
 		{
-			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, T, true>(pp);
-			auto top = tuned_ConvertPackedRGBXToPlanarElement<F, T, true>(pp - scbStride);
+			auto planar = tuned_ConvertPackedRGBXToPlanarElement<F, __m128i, T, true>(pp);
+			auto top = tuned_ConvertPackedRGBXToPlanarElement<F, __m128i, T, true>(pp - scbStride);
 			_mm_storeu_si128((__m128i *)g, tuned_PredictWrongMedianAndCount8Element<F>(gtopprev, top.g, gprev, planar.g, pGCountTable));
 			_mm_storeu_si128((__m128i *)b, tuned_PredictWrongMedianAndCount8Element<F>(btopprev, top.b, bprev, planar.b, pBCountTable));
 			_mm_storeu_si128((__m128i *)r, tuned_PredictWrongMedianAndCount8Element<F>(rtopprev, top.r, rprev, planar.r, pRCountTable));
@@ -386,7 +386,7 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 			{
 				avalue_v0 = _mm_set1_epi8((char)0xff);
 			}
-			tuned_ConvertPlanarRGBXToPackedElement<F, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
+			tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
 
 
 			gprev = gvalue.v1;
@@ -455,7 +455,7 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 			{
 				avalue_v0 = _mm_set1_epi8(0);
 			}
-			tuned_ConvertPlanarRGBXToPackedElement<F, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0, scbStride);
+			tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0, scbStride);
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -802,7 +802,7 @@ static inline void tuned_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBe
 
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			auto planar = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp);
+			auto planar = tuned_ConvertPackedYUV422ToPlanarElement<F, __m128i, T>(pp);
 			_mm_storeu_si128((__m128i *)y, tuned_PredictLeftAndCount8Element<F>(yprev, planar.y0, pYCountTable));
 			_mm_storeu_si128((__m128i *)(y + 16), tuned_PredictLeftAndCount8Element<F>(planar.y0, planar.y1, pYCountTable));
 			_mm_storeu_si128((__m128i *)u, tuned_PredictLeftAndCount8Element<F>(uprev, planar.u, pUCountTable));
@@ -856,7 +856,7 @@ static inline void tuned_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBe
 
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			auto planar = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp, scbStride);
+			auto planar = tuned_ConvertPackedYUV422ToPlanarElement<F, __m128i, T>(pp, scbStride);
 			_mm_storeu_si128((__m128i *)y, tuned_PredictLeftAndCount8Element<F>(yprev, planar.y0, pYCountTable));
 			_mm_storeu_si128((__m128i *)(y + 16), tuned_PredictLeftAndCount8Element<F>(planar.y0, planar.y1, pYCountTable));
 			_mm_storeu_si128((__m128i *)u, tuned_PredictLeftAndCount8Element<F>(uprev, planar.u, pUCountTable));
@@ -921,8 +921,8 @@ static inline void tuned_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBe
 
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			auto planar = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp);
-			auto top = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp - scbStride);
+			auto planar = tuned_ConvertPackedYUV422ToPlanarElement<F, __m128i, T>(pp);
+			auto top = tuned_ConvertPackedYUV422ToPlanarElement<F, __m128i, T>(pp - scbStride);
 			_mm_storeu_si128((__m128i *)y, tuned_PredictWrongMedianAndCount8Element<F>(ytopprev, top.y0, yprev, planar.y0, pYCountTable));
 			_mm_storeu_si128((__m128i *)(y + 16), tuned_PredictWrongMedianAndCount8Element<F>(top.y0, top.y1, planar.y0, planar.y1, pYCountTable));
 			_mm_storeu_si128((__m128i *)u, tuned_PredictWrongMedianAndCount8Element<F>(utopprev, top.u, uprev, planar.u, pUCountTable));
@@ -1046,7 +1046,7 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uu);
 			__m128i vv = _mm_loadu_si128((const __m128i *)v);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vv);
-			tuned_ConvertPlanarYUV422ToPackedElement<F, T>(pp, yvalue.v0, yvalue.v1, uvalue.v0, vvalue.v0);
+			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue.v0, yvalue.v1, uvalue.v0, vvalue.v0);
 
 			yprev = yvalue.v2;
 			uprev = uvalue.v1;
@@ -1091,7 +1091,7 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uu);
 			__m128i vv = _mm_loadu_si128((const __m128i *)v);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vv);
-			tuned_ConvertPlanarYUV422ToPackedElement<F, T>(pp, yvalue.v0, yvalue.v1, uvalue.v0, vvalue.v0, scbStride);
+			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue.v0, yvalue.v1, uvalue.v0, vvalue.v0, scbStride);
 
 			yprev = yvalue.v2;
 			uprev = uvalue.v1;
@@ -1243,7 +1243,7 @@ static inline void tuned_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_
 
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
-			auto planar = tuned_ConvertB64aToPlanarElement10<F, false>(pp);
+			auto planar = tuned_ConvertB64aToPlanarElement10<F, __m128i, false>(pp);
 			_mm_storeu_si128((__m128i *)g, tuned_PredictLeftAndCount10Element<F>(gprev, planar.g, pGCountTable));
 			_mm_storeu_si128((__m128i *)b, tuned_PredictLeftAndCount10Element<F>(bprev, planar.b, pBCountTable));
 			_mm_storeu_si128((__m128i *)r, tuned_PredictLeftAndCount10Element<F>(rprev, planar.r, pRCountTable));
@@ -1368,7 +1368,7 @@ static inline void tuned_ConvertUQRXToB64a_RestoreCylindricalLeft(uint8_t *pDstB
 			{
 				avalue_v0 = _mm_set1_epi16((short)0xffff);
 			}
-			tuned_ConvertPlanarRGBXToB64aElement10<F, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
+			tuned_ConvertPlanarRGBXToB64aElement10<F, __m128i, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
 
 
 			gprev = gvalue.v1;
@@ -1453,7 +1453,7 @@ void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, ui
 
 		for (; pp <= pStrideEnd - 32; pp += 32)
 		{
-			auto planar = tuned_ConvertR210ToPlanarElement10<F, false>(pp);
+			auto planar = tuned_ConvertR210ToPlanarElement10<F, __m128i, false>(pp);
 			_mm_storeu_si128((__m128i *)g, tuned_PredictLeftAndCount10Element<F>(gprev, planar.g, pGCountTable));
 			_mm_storeu_si128((__m128i *)b, tuned_PredictLeftAndCount10Element<F>(bprev, planar.b, pBCountTable));
 			_mm_storeu_si128((__m128i *)r, tuned_PredictLeftAndCount10Element<F>(rprev, planar.r, pRCountTable));
@@ -1534,7 +1534,7 @@ void tuned_ConvertUQRGToR210_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t 
 			auto bvalue = tuned_RestoreLeft10Element<F>(bprev, bb);
 			__m128i rr = _mm_loadu_si128((const __m128i *)r);
 			auto rvalue = tuned_RestoreLeft10Element<F>(rprev, rr);
-			tuned_ConvertPlanarRGBXToR210Element10<F, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0);
+			tuned_ConvertPlanarRGBXToR210Element10<F, __m128i, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0);
 
 
 			gprev = gvalue.v1;

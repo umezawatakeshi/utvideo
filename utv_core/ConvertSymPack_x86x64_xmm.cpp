@@ -52,8 +52,8 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 
 		for (; pp <= p + cbWidth - T::BYPP * 32; pp += T::BYPP * 32)
 		{
-			auto planar0 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp);
-			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp + T::BYPP * 16);
+			auto planar0 = tuned_ConvertPackedRGBXToPlanarElement<F, __m128i, T, false>(pp);
+			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, __m128i, T, false>(pp + T::BYPP * 16);
 
 			__m128i gresidual0 = tuned_PredictLeft8Element<F>(gprev, planar0.g);
 			__m128i gresidual1 = tuned_PredictLeft8Element<F>(planar0.g, planar1.g);
@@ -155,8 +155,8 @@ static inline void tuned_ConvertRGBXToULRX_Pack8SymAfterPredictPlanarGradient8(u
 
 		for (; pp <= p + cbWidth - T::BYPP * 32; pp += T::BYPP * 32)
 		{
-			auto planar0 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp, scbStride);
-			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, T, false>(pp + T::BYPP * 16, scbStride);
+			auto planar0 = tuned_ConvertPackedRGBXToPlanarElement<F, __m128i, T, false>(pp, scbStride);
+			auto planar1 = tuned_ConvertPackedRGBXToPlanarElement<F, __m128i, T, false>(pp + T::BYPP * 16, scbStride);
 
 			__m128i gresidual0 = tuned_PredictLeft8Element<F>(gprev, planar0.g);
 			__m128i gresidual1 = tuned_PredictLeft8Element<F>(planar0.g, planar1.g);
@@ -326,7 +326,7 @@ static inline void tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8(u
 			if (A)
 				avalue = tuned_RestoreLeft8Element<F>(aprev, aresidual);
 
-			tuned_ConvertPlanarRGBXToPackedElement<F, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, A ? avalue.v0 : _mm_set1_epi8((char)0xff));
+			tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, A ? avalue.v0 : _mm_set1_epi8((char)0xff));
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -412,7 +412,7 @@ static inline void tuned_ConvertULRXToRGBX_Unpack8SymAndRestorePlanarGradient8(u
 			if (A)
 				avalue = tuned_RestoreLeft8Element<F>(aprev, aresidual);
 
-			tuned_ConvertPlanarRGBXToPackedElement<F, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, A ? avalue.v0 : _mm_set1_epi8(0), scbStride);
+			tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, A ? avalue.v0 : _mm_set1_epi8(0), scbStride);
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -536,8 +536,8 @@ void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8(uint8_t
 
 		for (; pp <= p + cbWidth - 128; pp += 128)
 		{
-			auto planar0 = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp);
-			auto planar1 = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp + 64);
+			auto planar0 = tuned_ConvertPackedYUV422ToPlanarElement<F, __m128i, T>(pp);
+			auto planar1 = tuned_ConvertPackedYUV422ToPlanarElement<F, __m128i, T>(pp + 64);
 
 			__m128i yresidual0 = tuned_PredictLeft8Element<F>(yprev, planar0.y0);
 			__m128i yresidual1 = tuned_PredictLeft8Element<F>(planar0.y0, planar0.y1);
@@ -620,8 +620,8 @@ void tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8(uint8_t
 
 		for (; pp <= p + cbWidth - 128; pp += 128)
 		{
-			auto planar0 = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp, scbStride);
-			auto planar1 = tuned_ConvertPackedYUV422ToPlanarElement<F, T>(pp + 64, scbStride);
+			auto planar0 = tuned_ConvertPackedYUV422ToPlanarElement<F, __m128i, T>(pp, scbStride);
+			auto planar1 = tuned_ConvertPackedYUV422ToPlanarElement<F, __m128i, T>(pp + 64, scbStride);
 
 			__m128i yresidual0 = tuned_PredictLeft8Element<F>(yprev, planar0.y0);
 			__m128i yresidual1 = tuned_PredictLeft8Element<F>(planar0.y0, planar0.y1);
@@ -748,7 +748,7 @@ void tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8(
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uresidual);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vresidual);
 
-			tuned_ConvertPlanarYUV422ToPackedElement<F, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0);
+			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0);
 
 			yprev = yvalue1.v1;
 			uprev = uvalue.v1;
@@ -818,7 +818,7 @@ void tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8(
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uresidual);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vresidual);
 
-			tuned_ConvertPlanarYUV422ToPackedElement<F, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0, scbStride);
+			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0, scbStride);
 
 			yprev = yvalue1.v1;
 			uprev = uvalue.v1;
