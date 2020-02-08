@@ -81,22 +81,8 @@ static const struct MAFM mafm[] = {
 };
 
 
-const TUNEDFUNC_PREDICT tfnPredictSSE2 = {
-	NULL,
-	{ FEATURE0_SSE2, 0 },
-	cpp_PredictCylindricalWrongMedianAndCount,
-	cpp_PredictCylindricalLeftAndCount<8>,
-	cpp_RestoreCylindricalWrongMedian,
-	cpp_RestoreCylindricalLeft<8>,
-	cpp_PredictCylindricalLeftAndCount<10>,
-	cpp_RestoreCylindricalLeft<10>,
-	cpp_PredictPlanarGradientAndCount<8>,
-	cpp_PredictPlanarGradient<8>,
-	cpp_RestorePlanarGradient<8>,
-};
-
 const TUNEDFUNC_PREDICT tfnPredictSSSE3 = {
-	&tfnPredictSSE2,
+	NULL,
 	{ FEATURE0_SSSE3, 0 },
 	cpp_PredictCylindricalWrongMedianAndCount,
 	cpp_PredictCylindricalLeftAndCount<8>,
