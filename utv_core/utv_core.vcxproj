@@ -175,9 +175,10 @@
     <ClInclude Include="Convert.h" />
     <ClInclude Include="ConvertPredict.h" />
     <ClInclude Include="ConvertPredict_x86x64.h" />
+    <ClInclude Include="ConvertShuffle_x86x64.h" />
     <ClInclude Include="ConvertSymPack.h" />
     <ClInclude Include="ConvertSymPack_x86x64.h" />
-    <ClInclude Include="Convert_x86x64.h" />
+    <ClInclude Include="ConvertYUVRGB_x86x64.h" />
     <ClInclude Include="CPUID.h" />
     <ClInclude Include="DummyCodec.h" />
     <ClInclude Include="EnvFlag.h" />
@@ -227,6 +228,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="ConvertShuffle_x86x64.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="ConvertSymPack.cpp" />
     <ClCompile Include="ConvertSymPack_x86x64_xmm.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -240,7 +247,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Convert_x86x64.cpp">
+    <ClCompile Include="ConvertYUVRGB_x86x64.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

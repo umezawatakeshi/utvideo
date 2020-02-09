@@ -12,6 +12,7 @@
 #include "Coefficient.h"
 
 #define GENERATE_SSSE3 1
-#include "Convert_x86x64.cpp"
+#include "ConvertYUVRGB_x86x64.cpp"
+#include "ConvertShuffle_x86x64.cpp"
 #include "Predict_x86x64.cpp"
 #include "SymPack_x86x64_xmm.cpp"
