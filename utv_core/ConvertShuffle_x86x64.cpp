@@ -102,6 +102,8 @@ static inline FORCEINLINE VECTOR_YUV422<VT> tuned_ConvertPackedYUV422ToPlanarEle
 template<int F, class T>
 void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
 {
+	using VT = std::conditional_t<F < CODEFEATURE_AVX2, __m128i, __m256i>;
+
 	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride, pYBegin += cbYWidth, pUBegin += cbCWidth, pVBegin += cbCWidth)
 	{
 		auto y = pYBegin;
@@ -110,33 +112,18 @@ void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t
 
 		auto pp = p;
 
-#if defined(__AVX2__)
-		for (; pp <= p + cbWidth - 128; pp += 128)
+		for (; pp <= p + cbWidth - sizeof(VT) * 4; pp += sizeof(VT) * 4)
 		{
-			auto result = tuned_ConvertPackedYUV422ToPlanarElement<F, __m256i, T>(pp);
-			_mm256_storeu_si256((__m256i *)y, result.y0);
-			_mm256_storeu_si256((__m256i *)(y + 32), result.y1);
-			_mm256_storeu_si256((__m256i *)u, result.u);
-			_mm256_storeu_si256((__m256i *)v, result.v);
+			auto result = tuned_ConvertPackedYUV422ToPlanarElement<F, VT, T>(pp);
+			_mmt_storeu<VT>(y, result.y0);
+			_mmt_storeu<VT>(y + sizeof(VT), result.y1);
+			_mmt_storeu<VT>(u, result.u);
+			_mmt_storeu<VT>(v, result.v);
 
-			y += 64;
-			u += 32;
-			v += 32;
+			y += sizeof(VT) * 2;
+			u += sizeof(VT);
+			v += sizeof(VT);
 		}
-#elif defined(__SSSE3__)
-		for (; pp <= p + cbWidth - 64; pp += 64)
-		{
-			auto result = tuned_ConvertPackedYUV422ToPlanarElement<F, __m128i, T>(pp);
-			_mm_storeu_si128((__m128i *)y, result.y0);
-			_mm_storeu_si128((__m128i *)(y + 16), result.y1);
-			_mm_storeu_si128((__m128i *)u, result.u);
-			_mm_storeu_si128((__m128i *)v, result.v);
-
-			y += 32;
-			u += 16;
-			v += 16;
-		}
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -256,6 +243,8 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedEleme
 template<int F, class T>
 void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
 {
+	using VT = std::conditional_t<F < CODEFEATURE_AVX2, __m128i, __m256i>;
+
 	for (auto p = pDstBegin; p != pDstEnd; p += scbStride, pYBegin += cbYWidth, pUBegin += cbCWidth, pVBegin += cbCWidth)
 	{
 		auto y = pYBegin;
@@ -264,33 +253,18 @@ void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const
 
 		auto pp = p;
 
-#if defined(__AVX2__)
-		for (; pp <= p + cbWidth - 128; pp += 128)
+		for (; pp <= p + cbWidth - sizeof(VT) * 4; pp += sizeof(VT) * 4)
 		{
-			__m256i yy0 = _mm256_loadu_si256((const __m256i *)y);
-			__m256i yy1 = _mm256_loadu_si256((const __m256i *)(y + 32));
-			__m256i uu = _mm256_loadu_si256((const __m256i *)u);
-			__m256i vv = _mm256_loadu_si256((const __m256i *)v);
-			tuned_ConvertPlanarYUV422ToPackedElement<F, __m256i, T>(pp, yy0, yy1, uu, vv);
+			VT yy0 = _mmt_loadu<VT>(y);
+			VT yy1 = _mmt_loadu<VT>(y + sizeof(VT));
+			VT uu = _mmt_loadu<VT>(u);
+			VT vv = _mmt_loadu<VT>(v);
+			tuned_ConvertPlanarYUV422ToPackedElement<F, VT, T>(pp, yy0, yy1, uu, vv);
 
-			y += 64;
-			u += 32;
-			v += 32;
+			y += sizeof(VT) * 2;
+			u += sizeof(VT);
+			v += sizeof(VT);
 		}
-#elif defined(__SSSE3__)
-		for (; pp <= p + cbWidth - 64; pp += 64)
-		{
-			__m128i yy0 = _mm_loadu_si128((const __m128i *)y);
-			__m128i yy1 = _mm_loadu_si128((const __m128i *)(y + 16));
-			__m128i uu = _mm_loadu_si128((const __m128i *)u);
-			__m128i vv = _mm_loadu_si128((const __m128i *)v);
-			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yy0, yy1, uu, vv);
-
-			y += 32;
-			u += 16;
-			v += 16;
-		}
-#endif
 
 		for (; pp < p + cbWidth; pp += 4)
 		{
@@ -505,6 +479,8 @@ static inline FORCEINLINE VECTOR_RGBA<VT> tuned_ConvertPackedRGBXToPlanarElement
 template<int F, class T, bool A>
 static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
+	using VT = std::conditional_t<F < CODEFEATURE_AVX2, __m128i, __m256i>;
+
 	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride, pGBegin += cbPlaneWidth, pBBegin += cbPlaneWidth, pRBegin += cbPlaneWidth, pABegin += cbPlaneWidth)
 	{
 		auto r = pRBegin;
@@ -514,39 +490,21 @@ static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 
 		auto pp = p;
 
-#if defined(__AVX2__)
-		for (; pp <= p + cbWidth - T::BYPP * 32; pp += T::BYPP * 32)
+		for (; pp <= p + cbWidth - T::BYPP * sizeof(VT); pp += T::BYPP * sizeof(VT))
 		{
-			auto result = tuned_ConvertPackedRGBXToPlanarElement<F, __m256i, T, true>(pp);
-			_mm256_storeu_si256((__m256i *)b, result.b);
-			_mm256_storeu_si256((__m256i *)g, result.g);
-			_mm256_storeu_si256((__m256i *)r, result.r);
+			auto result = tuned_ConvertPackedRGBXToPlanarElement<F, VT, T, true>(pp);
+			_mmt_storeu<VT>(b, result.b);
+			_mmt_storeu<VT>(g, result.g);
+			_mmt_storeu<VT>(r, result.r);
 			if (A)
-				_mm256_storeu_si256((__m256i *)a, result.a);
+				_mmt_storeu<VT>(a, result.a);
 
-			b += 32;
-			g += 32;
-			r += 32;
+			b += sizeof(VT);
+			g += sizeof(VT);
+			r += sizeof(VT);
 			if (A)
-				a += 32;
+				a += sizeof(VT);
 		}
-#elif defined(__SSSE3__)
-		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
-		{
-			auto result = tuned_ConvertPackedRGBXToPlanarElement<F, __m128i, T, true>(pp);
-			_mm_storeu_si128((__m128i *)b, result.b);
-			_mm_storeu_si128((__m128i *)g, result.g);
-			_mm_storeu_si128((__m128i *)r, result.r);
-			if (A)
-				_mm_storeu_si128((__m128i *)a, result.a);
-
-			b += 16;
-			g += 16;
-			r += 16;
-			if (A)
-				a += 16;
-		}
-#endif
 
 		for (; pp < p + cbWidth; pp += T::BYPP)
 		{
@@ -785,6 +743,8 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement
 template<int F, class T, bool A>
 static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
+	using VT = std::conditional_t<F < CODEFEATURE_AVX2, __m128i, __m256i>;
+
 	for (auto p = pDstBegin; p != pDstEnd; p += scbStride, pGBegin += cbPlaneWidth, pBBegin += cbPlaneWidth, pRBegin += cbPlaneWidth, pABegin += cbPlaneWidth)
 	{
 		auto r = pRBegin;
@@ -794,35 +754,19 @@ static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd,
 
 		auto pp = p;
 
-#if defined(__AVX2__)
-		for (; pp <= p + cbWidth - T::BYPP * 32; pp += T::BYPP * 32)
+		for (; pp <= p + cbWidth - T::BYPP * sizeof(VT); pp += T::BYPP * sizeof(VT))
 		{
-			__m256i gg = _mm256_loadu_si256((const __m256i *)g);
-			__m256i bb = _mm256_loadu_si256((const __m256i *)b);
-			__m256i rr = _mm256_loadu_si256((const __m256i *)r);
-			tuned_ConvertPlanarRGBXToPackedElement<F, __m256i, T, true>(pp, gg, bb, rr, A ? _mm256_loadu_si256((const __m256i *)a) : _mm256_set1_epi8((char)0xff));
+			VT gg = _mmt_loadu<VT>(g);
+			VT bb = _mmt_loadu<VT>(b);
+			VT rr = _mmt_loadu<VT>(r);
+			tuned_ConvertPlanarRGBXToPackedElement<F, VT, T, true>(pp, gg, bb, rr, A ? _mmt_loadu<VT>(a) : _mmt_set1_epi8<VT>((char)0xff));
 
-			b += 32;
-			g += 32;
-			r += 32;
+			b += sizeof(VT);
+			g += sizeof(VT);
+			r += sizeof(VT);
 			if (A)
-				a += 32;
+				a += sizeof(VT);
 		}
-#elif defined(__SSSE3__)
-		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
-		{
-			__m128i gg = _mm_loadu_si128((const __m128i *)g);
-			__m128i bb = _mm_loadu_si128((const __m128i *)b);
-			__m128i rr = _mm_loadu_si128((const __m128i *)r);
-			tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, true>(pp, gg, bb, rr, A ? _mm_loadu_si128((const __m128i *)a) : _mm_set1_epi8((char)0xff));
-
-			b += 16;
-			g += 16;
-			r += 16;
-			if (A)
-				a += 16;
-		}
-#endif
 
 		for (; pp < p + cbWidth; pp += T::BYPP)
 		{
@@ -936,6 +880,8 @@ static inline void tuned_ConvertB48rToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, u
 template<int F, bool A>
 static inline void tuned_ConvertRGBXToUQRX(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
+	using VT = __m128i;
+
 	uint16_t *r = (uint16_t *)pRBegin;
 	uint16_t *g = (uint16_t *)pGBegin;
 	uint16_t *b = (uint16_t *)pBBegin;
@@ -945,24 +891,22 @@ static inline void tuned_ConvertRGBXToUQRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
-		for (; pp <= p + cbWidth - 64; pp += 64)
+		for (; pp <= p + cbWidth - sizeof(VT) * 4; pp += sizeof(VT) * 4)
 		{
-			auto result = tuned_ConvertB64aToPlanarElement10<F, __m128i, true>(pp);
+			auto result = tuned_ConvertB64aToPlanarElement10<F, VT, true>(pp);
 
-			_mm_storeu_si128((__m128i *)b, result.b);
-			_mm_storeu_si128((__m128i *)g, result.g);
-			_mm_storeu_si128((__m128i *)r, result.r);
+			_mmt_storeu<VT>(b, result.b);
+			_mmt_storeu<VT>(g, result.g);
+			_mmt_storeu<VT>(r, result.r);
 			if (A)
-				_mm_storeu_si128((__m128i *)a, result.a);
+				_mmt_storeu<VT>(a, result.a);
 
-			b += 8;
-			g += 8;
-			r += 8;
+			b += sizeof(VT) / 2;
+			g += sizeof(VT) / 2;
+			r += sizeof(VT) / 2;
 			if (A)
-				a += 8;
+				a += sizeof(VT) / 2;
 		}
-#endif
 
 		for (; pp < p + cbWidth; pp += 8)
 		{
@@ -1065,37 +1009,36 @@ static inline void tuned_ConvertUQRGToB48r(uint8_t *pDstBegin, uint8_t *pDstEnd,
 template<int F, bool A>
 static inline void tuned_ConvertUQRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
+	using VT = __m128i;
+
 	const uint16_t *r = (const uint16_t *)pRBegin;
 	const uint16_t *g = (const uint16_t *)pGBegin;
 	const uint16_t *b = (const uint16_t *)pBBegin;
 	const uint16_t *a = (const uint16_t *)pABegin;
 
-	__m128i aa;
-
 	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
 	{
 		auto pp = p;
 
-#ifdef __SSSE3__
-		for (; pp <= p + cbWidth - 64; pp += 64)
+		for (; pp <= p + cbWidth - sizeof(VT) * 4; pp += sizeof(VT) * 4)
 		{
-			__m128i gg = _mm_loadu_si128((const __m128i *)g);
-			__m128i bb = _mm_loadu_si128((const __m128i *)b);
-			__m128i rr = _mm_loadu_si128((const __m128i *)r);
+			VT gg = _mmt_loadu<VT>(g);
+			VT bb = _mmt_loadu<VT>(b);
+			VT rr = _mmt_loadu<VT>(r);
+			VT aa;
 			if (A)
-				aa = _mm_loadu_si128((const __m128i *)a);
+				aa = _mmt_loadu<VT>(a);
 			else
-				aa = _mm_set1_epi16((short)0xffff);
+				aa = _mmt_set1_epi16<VT>((short)0xffff);
 
-			tuned_ConvertPlanarRGBXToB64aElement10<F, __m128i, true>(pp, gg, bb, rr, aa);
+			tuned_ConvertPlanarRGBXToB64aElement10<F, VT, true>(pp, gg, bb, rr, aa);
 
-			b += 8;
-			g += 8;
-			r += 8;
+			b += sizeof(VT) / 2;
+			g += sizeof(VT) / 2;
+			r += sizeof(VT) / 2;
 			if (A)
-				a += 8;
+				a += sizeof(VT) / 2;
 		}
-#endif
 
 		for (; pp < p + cbWidth; pp += 8)
 		{
@@ -1179,6 +1122,8 @@ static inline FORCEINLINE VECTOR_RGB<VT> tuned_ConvertR210ToPlanarElement10(cons
 template<int F>
 void tuned_ConvertR210ToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride)
 {
+	using VT = __m128i;
+
 	uint16_t *g = (uint16_t *)pGBegin;
 	uint16_t *b = (uint16_t *)pBBegin;
 	uint16_t *r = (uint16_t *)pRBegin;
@@ -1188,19 +1133,17 @@ void tuned_ConvertR210ToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegi
 		const uint8_t *pStrideEnd = pStrideBegin + nWidth * 4;
 		const uint8_t *p = pStrideBegin;
 
-#ifdef __SSSE3__
-		for (; p <= pStrideEnd - 32; p += 32)
+		for (; p <= pStrideEnd - sizeof(VT) * 2; p += sizeof(VT) * 2)
 		{
-			auto result = tuned_ConvertR210ToPlanarElement10<F, __m128i, true>(p);
-			_mm_storeu_si128((__m128i*)g, result.g);
-			_mm_storeu_si128((__m128i*)b, result.b);
-			_mm_storeu_si128((__m128i*)r, result.r);
+			auto result = tuned_ConvertR210ToPlanarElement10<F, VT, true>(p);
+			_mmt_storeu<VT>(g, result.g);
+			_mmt_storeu<VT>(b, result.b);
+			_mmt_storeu<VT>(r, result.r);
 
-			g += 8;
-			b += 8;
-			r += 8;
+			g += sizeof(VT) / 2;
+			b += sizeof(VT) / 2;
+			r += sizeof(VT) / 2;
 		}
-#endif
 
 		for (; p < pStrideEnd; p += 4)
 		{
@@ -1261,6 +1204,8 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToR210Element10
 template<int F>
 void tuned_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
 {
+	using VT = __m128i;
+
 	const uint16_t *g = (const uint16_t *)pGBegin;
 	const uint16_t *b = (const uint16_t *)pBBegin;
 	const uint16_t *r = (const uint16_t *)pRBegin;
@@ -1270,19 +1215,17 @@ void tuned_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 		uint8_t *pStrideEnd = pStrideBegin + nWidth * 4;
 		uint8_t *p = pStrideBegin;
 
-#ifdef __SSSE3__
-		for (; p <= pStrideEnd - 32; p += 32)
+		for (; p <= pStrideEnd - sizeof(VT) * 2; p += sizeof(VT) * 2)
 		{
-			__m128i gg = _mm_loadu_si128((const __m128i*)g);
-			__m128i bb = _mm_loadu_si128((const __m128i*)b);
-			__m128i rr = _mm_loadu_si128((const __m128i*)r);
-			tuned_ConvertPlanarRGBXToR210Element10<F, __m128i, true>(p, gg, bb, rr);
+			VT gg = _mmt_loadu<VT>(g);
+			VT bb = _mmt_loadu<VT>(b);
+			VT rr = _mmt_loadu<VT>(r);
+			tuned_ConvertPlanarRGBXToR210Element10<F, VT, true>(p, gg, bb, rr);
 
-			g += 8;
-			b += 8;
-			r += 8;
+			g += sizeof(VT) / 2;
+			b += sizeof(VT) / 2;
+			r += sizeof(VT) / 2;
 		}
-#endif
 
 		for (; p < pStrideEnd; p += 4)
 		{
