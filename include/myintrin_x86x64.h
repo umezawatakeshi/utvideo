@@ -218,6 +218,11 @@ template<> static inline FORCEINLINE __m512i _mmt_set1_epi8<__m512i>(char e0)
 	return _mm512_set1_epi8(e0);
 }
 
+template<> static inline FORCEINLINE __m512i _mmt_set1_epi16<__m512i>(short e0)
+{
+	return _mm512_set1_epi16(e0);
+}
+
 template<> static inline FORCEINLINE __m512i _mmt_add_epi8<__m512i>(__m512i v0, __m512i v1)
 {
 	return _mm512_add_epi8(v0, v1);
