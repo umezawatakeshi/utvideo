@@ -342,9 +342,14 @@ template void tuned_ConvertRGBAToULRA_PredictCylindricalWrongMedianAndCount<CODE
 
 //
 
+// とりあえず non-temporal store がどういう挙動を示すか軽く確認するための実装。 median の場合は正しく動作しない。
+#define NON_TEMPORAL_STORE 1
+
 template<int F, class T, bool A, PREDICTION_TYPE Pred>
 static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
+	uint8_t* line = (uint8_t*)_aligned_malloc(abs(pDstBegin - pDstEnd) + cbWidth * 2 + 4096, 128);
+
 	uint8_t gprevb = 0x80;
 	uint8_t bprevb = 0;
 	uint8_t rprevb = 0;
@@ -358,6 +363,26 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pp = p;
+		auto qq = line;
+
+#ifdef NON_TEMPORAL_STORE
+		for (; (uintptr_t)pp % 16 != 0; pp += T::BYPP, qq += T::BYPP)
+		{
+			pp[T::G] = qq[T::G] = gprevb += g[0];
+			pp[T::B] = qq[T::B] = (bprevb += b[0]) + gprevb;
+			pp[T::R] = qq[T::R] = (rprevb += r[0]) + gprevb;
+			if (A)
+				pp[T::A] = qq[T::A] = aprevb += a[0];
+			else if (T::HAS_ALPHA)
+				pp[T::A] = qq[T::A] = 0xff;
+
+			g += 1;
+			b += 1;
+			r += 1;
+			if (A)
+				a += 1;
+		}
+#endif
 
 		__m128i gprev = _mm_set1_epi8(gprevb);
 		__m128i bprev = _mm_set1_epi8(bprevb);
@@ -366,7 +391,7 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 		if (A)
 			aprev = _mm_set1_epi8(aprevb);
 
-		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
+		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16, qq += T::BYPP * 16)
 		{
 			__m128i gg = _mm_loadu_si128((const __m128i *)g);
 			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gg);
@@ -386,8 +411,33 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 			{
 				avalue_v0 = _mm_set1_epi8((char)0xff);
 			}
-			tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
 
+#ifdef NON_TEMPORAL_STORE
+			if constexpr (T::BYPP == 4)
+			{
+				auto result = tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
+				_mm_storeu_si128((__m128i*)(qq), result.v0);
+				_mm_storeu_si128((__m128i*)(qq + 16), result.v1);
+				_mm_storeu_si128((__m128i*)(qq + 32), result.v2);
+				_mm_storeu_si128((__m128i*)(qq + 48), result.v3);
+				_mm_stream_si128((__m128i*)(pp), result.v0);
+				_mm_stream_si128((__m128i*)(pp + 16), result.v1);
+				_mm_stream_si128((__m128i*)(pp + 32), result.v2);
+				_mm_stream_si128((__m128i*)(pp + 48), result.v3);
+			}
+			else
+			{
+				auto result = tuned_ConvertPlanarBGRToPackedElement<F, __m128i, false>(gvalue.v0, bvalue.v0, rvalue.v0);
+				_mm_storeu_si128((__m128i*)(qq), result.v0);
+				_mm_storeu_si128((__m128i*)(qq + 16), result.v1);
+				_mm_storeu_si128((__m128i*)(qq + 32), result.v2);
+				_mm_stream_si128((__m128i*)(pp), result.v0);
+				_mm_stream_si128((__m128i*)(pp + 16), result.v1);
+				_mm_stream_si128((__m128i*)(pp + 32), result.v2);
+			}
+#else
+			tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
+#endif
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -406,8 +456,17 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 		if (A)
 			aprevb = _mm_cvtsi128_si32(aprev);
 
-		for (; pp < p + cbWidth; pp += T::BYPP)
+		for (; pp < p + cbWidth; pp += T::BYPP, qq += T::BYPP)
 		{
+#ifdef NON_TEMPORAL_STORE
+			pp[T::G] = qq[T::G] = gprevb += g[0];
+			pp[T::B] = qq[T::B] = (bprevb += b[0]) + gprevb;
+			pp[T::R] = qq[T::R] = (rprevb += r[0]) + gprevb;
+			if (A)
+				pp[T::A] = qq[T::A] = aprevb += a[0];
+			else if (T::HAS_ALPHA)
+				pp[T::A] = qq[T::A] = 0xff;
+#else
 			pp[T::G] = gprevb += g[0];
 			pp[T::B] = (bprevb += b[0]) + gprevb;
 			pp[T::R] = (rprevb += r[0]) + gprevb;
@@ -415,6 +474,7 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 				pp[T::A] = aprevb += a[0];
 			else if (T::HAS_ALPHA)
 				pp[T::A] = 0xff;
+#endif
 
 			g += 1;
 			b += 1;
@@ -426,16 +486,40 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 
 	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
 	{
-		auto pp = p;
+		gprevb = 0;
+		bprevb = 0;
+		rprevb = 0;
+		if (A)
+			aprevb = 0;
 
-		__m128i gprev = _mm_set1_epi8(0);
-		__m128i bprev = _mm_set1_epi8(0);
-		__m128i rprev = _mm_set1_epi8(0);
+		auto pp = p;
+		auto qq = line;
+#ifdef NON_TEMPORAL_STORE
+		for (; (uintptr_t)pp % 16 != 0; pp += T::BYPP, qq += T::BYPP)
+		{
+			pp[T::G] = qq[T::G] = (gprevb += g[0]) + qq[T::G];
+			pp[T::B] = qq[T::B] = (bprevb += b[0]) + qq[T::B] + gprevb;
+			pp[T::R] = qq[T::R] = (rprevb += r[0]) + qq[T::R] + gprevb;
+			if (A)
+				pp[T::A] = qq[T::A] = (aprevb += a[0]) + qq[T::A];
+			else if (T::HAS_ALPHA)
+				pp[T::A] = qq[T::A] = 0xff;
+
+			g += 1;
+			b += 1;
+			r += 1;
+			if (A)
+				a += 1;
+		}
+#endif
+		__m128i gprev = _mm_set1_epi8(gprevb);
+		__m128i bprev = _mm_set1_epi8(bprevb);
+		__m128i rprev = _mm_set1_epi8(rprevb);
 		__m128i aprev;
 		if (A)
-			aprev = _mm_set1_epi8(0);
+			aprev = _mm_set1_epi8(aprevb);
 
-		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
+		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16, qq += T::BYPP * 16)
 		{
 			__m128i gg = _mm_loadu_si128((const __m128i *)g);
 			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gg);
@@ -455,7 +539,47 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 			{
 				avalue_v0 = _mm_set1_epi8(0);
 			}
+
+#ifdef NON_TEMPORAL_STORE
+			if constexpr (T::BYPP == 4)
+			{
+				auto result = tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
+				__m128i tmp;
+				tmp = _mm_add_epi8(result.v0, _mm_loadu_si128((__m128i*)(qq)));
+				_mm_storeu_si128((__m128i*)(qq), tmp);
+				_mm_stream_si128((__m128i*)(pp), tmp);
+
+				tmp = _mm_add_epi8(result.v1, _mm_loadu_si128((__m128i*)(qq + 16)));
+				_mm_storeu_si128((__m128i*)(qq + 16), tmp);
+				_mm_stream_si128((__m128i*)(pp + 16), tmp);
+
+				tmp = _mm_add_epi8(result.v2, _mm_loadu_si128((__m128i*)(qq + 32)));
+				_mm_storeu_si128((__m128i*)(qq + 32), tmp);
+				_mm_stream_si128((__m128i*)(pp + 32), tmp);
+			
+				tmp = _mm_add_epi8(result.v3, _mm_loadu_si128((__m128i*)(qq + 48)));
+				_mm_storeu_si128((__m128i*)(qq + 48), tmp);
+				_mm_stream_si128((__m128i*)(pp + 48), tmp);
+			}
+			else
+			{
+				auto result = tuned_ConvertPlanarBGRToPackedElement<F, __m128i, false>(gvalue.v0, bvalue.v0, rvalue.v0);
+				__m128i tmp;
+				tmp = _mm_add_epi8(result.v0, _mm_loadu_si128((__m128i*)(qq)));
+				_mm_storeu_si128((__m128i*)(qq), tmp);
+				_mm_stream_si128((__m128i*)(pp), tmp);
+
+				tmp = _mm_add_epi8(result.v1, _mm_loadu_si128((__m128i*)(qq + 16)));
+				_mm_storeu_si128((__m128i*)(qq + 16), tmp);
+				_mm_stream_si128((__m128i*)(pp + 16), tmp);
+
+				tmp = _mm_add_epi8(result.v2, _mm_loadu_si128((__m128i*)(qq + 32)));
+				_mm_storeu_si128((__m128i*)(qq + 32), tmp);
+				_mm_stream_si128((__m128i*)(pp + 32), tmp);
+			}
+#else
 			tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0, scbStride);
+#endif
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -474,8 +598,17 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 		if (A)
 			aprevb = _mm_cvtsi128_si32(aprev);
 
-		for (; pp < p + cbWidth; pp += T::BYPP)
+		for (; pp < p + cbWidth; pp += T::BYPP, qq += T::BYPP)
 		{
+#ifdef NON_TEMPORAL_STORE
+			pp[T::G] = qq[T::G] = (gprevb += g[0]) + qq[T::G];
+			pp[T::B] = qq[T::B] = (bprevb += b[0]) + qq[T::B] + gprevb;
+			pp[T::R] = qq[T::R] = (rprevb += r[0]) + qq[T::R] + gprevb;
+			if (A)
+				pp[T::A] = qq[T::A] = (aprevb += a[0]) + qq[T::A];
+			else if (T::HAS_ALPHA)
+				pp[T::A] = qq[T::A] = 0xff;
+#else
 			pp[T::G] = (gprevb += g[0]) + (pp - scbStride)[T::G];
 			pp[T::B] = (bprevb += b[0]) + (pp - scbStride)[T::B] + gprevb;
 			pp[T::R] = (rprevb += r[0]) + (pp - scbStride)[T::R] + gprevb;
@@ -483,6 +616,7 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 				pp[T::A] = (aprevb += a[0]) + (pp - scbStride)[T::A];
 			else if (T::HAS_ALPHA)
 				pp[T::A] = 0xff;
+#endif
 
 			g += 1;
 			b += 1;
@@ -705,6 +839,8 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 				a += 1;
 		}
 	}
+
+	_aligned_free(line);
 }
 
 template<int F, class T>
