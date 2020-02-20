@@ -591,11 +591,26 @@ void cpp_ConvertUQY2ToV210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *
 	for (uint8_t *pStripeBegin = pDstBegin; pStripeBegin != pDstEnd; pStripeBegin += scbStride)
 	{
 		uint8_t *p = pStripeBegin;
-		for (unsigned int x = 0; x < nWidth; x += 6, p += 16)
+		unsigned int x = 0;
+
+		for (; x <= nWidth - 6; x += 6, p += 16)
 		{
 			uint32_t *pp = (uint32_t *)p;
 
-			uint16_t y0, y1, y2, y3, y4, y5, u0, u1, u2, v0, v1, v2;
+			pp[0] = htol32((v[0] << 20) | (y[0] << 10) | u[0]);
+			pp[1] = htol32((y[2] << 20) | (u[1] << 10) | y[1]);
+			pp[2] = htol32((u[2] << 20) | (y[3] << 10) | v[1]);
+			pp[3] = htol32((y[5] << 20) | (v[2] << 10) | y[4]);
+			y += 6;
+			u += 3;
+			v += 3;
+		}
+
+		if (x < nWidth)
+		{
+			uint32_t *pp = (uint32_t *)p;
+
+			uint16_t y0, y1, y2, y3, u0, u1, v0, v1;
 
 			u0 = *u++;
 			y0 = *y++;
@@ -617,26 +632,14 @@ void cpp_ConvertUQY2ToV210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *
 				y3 = 0;
 			}
 
-			if (x + 4 < nWidth)
-			{
-				u2 = *u++;
-				y4 = *y++;
-				v2 = *v++;
-				y5 = *y++;
-			}
-			else
-			{
-				u2 = 0;
-				y4 = 0;
-				v2 = 0;
-				y5 = 0;
-			}
-
 			pp[0] = htol32((v0 << 20) | (y0 << 10) | u0);
 			pp[1] = htol32((y2 << 20) | (u1 << 10) | y1);
-			pp[2] = htol32((u2 << 20) | (y3 << 10) | v1);
-			pp[3] = htol32((y5 << 20) | (v2 << 10) | y4);
+			pp[2] = htol32(             (y3 << 10) | v1);
+			pp[3] = 0;
+
+			p += 16;
 		}
+
 		memset(p, 0, pStripeBegin + ((nWidth + 47) / 48 * 128) - p);
 	}
 }
