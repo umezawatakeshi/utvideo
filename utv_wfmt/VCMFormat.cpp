@@ -5,11 +5,6 @@
 #include "utvideo.h"
 #include "Format.h"
 
-inline bool is_fourcc(uint32_t x)
-{
-	return (x >= '    ' /* four SP */ && x <= 0x7e7e7e7e);
-}
-
 int UtVideoFormatToVCMFormat(DWORD *biCompression, WORD *biBitCount, utvf_t utvf)
 {
 	switch (utvf)
@@ -27,9 +22,6 @@ int UtVideoFormatToVCMFormat(DWORD *biCompression, WORD *biBitCount, utvf_t utvf
 		*biBitCount    = 32;
 		return 0;
 	}
-
-	if (!is_fourcc(utvf))
-		return -1;
 
 	switch (utvf)
 	{
@@ -88,9 +80,19 @@ int UtVideoFormatToVCMFormat(DWORD *biCompression, WORD *biBitCount, utvf_t utvf
 	case UTVF_r210:
 		*biBitCount = 30;
 		break;
+	case UTVF_YUV444P10LE:
+	case UTVF_YUV444P16LE:
+		*biBitCount = 48;
+		break;
 	case UTVF_P210:
 	case UTVF_P216:
+	case UTVF_YUV422P10LE:
+	case UTVF_YUV422P16LE:
 		*biBitCount = 32;
+		break;
+	case UTVF_YUV420P10LE:
+	case UTVF_YUV420P16LE:
+		*biBitCount = 24;
 		break;
 
 	default:

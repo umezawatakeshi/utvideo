@@ -5,13 +5,11 @@
 #include "utvideo.h"
 #include "Format.h"
 
-inline bool is_fourcc(uint32_t x)
-{
-	return (x >= '    ' /* four SP */ && x <= 0x7e7e7e7e);
-}
-
 int UtVideoFormatToDirectShowFormat(GUID *subtype, utvf_t utvf)
 {
+	DWORD dwtmp;
+	WORD wtmp;
+
 	switch (utvf)
 	{
 	case UTVF_NFCC_BGR_BU:
@@ -25,7 +23,7 @@ int UtVideoFormatToDirectShowFormat(GUID *subtype, utvf_t utvf)
 		return 0;
 	}
 
-	if (!is_fourcc(utvf))
+	if (UtVideoFormatToVCMFormat(&dwtmp, &wtmp, utvf) != 0)
 		return -1;
 
 	*subtype = MEDIASUBTYPE_YUY2;

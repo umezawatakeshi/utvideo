@@ -76,6 +76,8 @@ typedef ptrdiff_t ssize_t;
 
 typedef uint32_t utvf_t;
 
+#define MAKEUTVF(a, b, c, d) ((utvf_t)(((a) << 24) | ((b) << 16) | ((c) << 8) | (d)))
+
 #define UTVF_INVALID 0
 
 // Non-FourCC RGB formats
@@ -130,3 +132,10 @@ typedef uint32_t utvf_t;
 #define UTVF_r210 ((utvf_t)'r210')
 #define UTVF_P210 ((utvf_t)'P210')
 #define UTVF_P216 ((utvf_t)'P216')
+
+#define UTVF_YUV444P10LE MAKEUTVF('Y', '3',  0, 10)
+#define UTVF_YUV444P16LE MAKEUTVF('Y', '3',  0, 16)
+#define UTVF_YUV422P10LE MAKEUTVF('Y', '3', 10, 10)
+#define UTVF_YUV422P16LE MAKEUTVF('Y', '3', 10, 16)
+#define UTVF_YUV420P10LE MAKEUTVF('Y', '3', 11, 10)
+#define UTVF_YUV420P16LE MAKEUTVF('Y', '3', 11, 16)
