@@ -20,7 +20,7 @@ BOOST_DATA_TEST_CASE(vcm_ICGetInfo, data::make(vecCodecFcc) ^ data::make(vecCode
 	BOOST_CHECK_EQUAL(wstring(info.szName), wstrShortName);
 	BOOST_CHECK_EQUAL(wstring(info.szDescription), wstrLongName);
 	if (temporal)
-		BOOST_TEST_CHECK(info.dwFlags == VIDCF_TEMPORAL);
+		BOOST_TEST_CHECK(info.dwFlags == (VIDCF_TEMPORAL | VIDCF_FASTTEMPORALC | VIDCF_FASTTEMPORALD));
 	else
 		BOOST_TEST_CHECK(info.dwFlags == 0);
 

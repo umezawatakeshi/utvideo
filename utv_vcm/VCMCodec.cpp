@@ -107,7 +107,7 @@ LRESULT CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
 	icinfo->dwSize       = sizeof(ICINFO);
 	icinfo->fccType      = ICTYPE_VIDEO;
 	icinfo->fccHandler   = m_fcc;
-	icinfo->dwFlags      = m_pCodec->IsTemporalCompressionSupported() ? VIDCF_TEMPORAL : 0;
+	icinfo->dwFlags      = m_pCodec->IsTemporalCompressionSupported() ? (VIDCF_TEMPORAL | VIDCF_FASTTEMPORALC | VIDCF_FASTTEMPORALD) : 0;
 	icinfo->dwVersion    = UTVIDEO_VERSION_AND_IMPLEMENTATION;
 	icinfo->dwVersionICM = ICVERSION;
 	m_pCodec->GetShortFriendlyName(icinfo->szName, _countof(icinfo->szName));
