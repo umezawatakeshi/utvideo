@@ -10,6 +10,7 @@
 #include "ULYUV420Codec.h"
 #include "ULYUV422Codec.h"
 #include "ULYUV444Codec.h"
+#include "UQY0Codec.h"
 #include "UQY2Codec.h"
 #include "UQRGCodec.h"
 #include "UQRACodec.h"
@@ -60,6 +61,7 @@ static const struct CODECLIST codeclist[] = {
 	CODECENTRY(CULYUV420Codec<CBT709Coefficient>), // ULH0
 	CODECENTRY(CULYUV422Codec<CBT709Coefficient>), // ULH2
 	CODECENTRY(CULYUV444Codec<CBT709Coefficient>), // ULH4
+	CODECENTRY(CUQY0Codec),
 	CODECENTRY(CUQY2Codec),
 	CODECENTRY(CUQRGCodec),
 	CODECENTRY(CUQRACodec),
