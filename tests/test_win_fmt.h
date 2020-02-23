@@ -59,6 +59,7 @@ static inline WORD FCC2BitCount(DWORD dw)
 	case FCC('UMH2'):
 	case FCC('UMH4'):
 		return 24;
+	case FCC('UQY0'):
 	case FCC('UQY2'):
 	case FCC('UQRG'):
 		return 30;
