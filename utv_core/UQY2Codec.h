@@ -33,7 +33,7 @@ public:
 
 protected:
 	virtual const char *GetColorFormatName(void) { return "YUV422"; }
-	virtual int GetRealBitCount(void) { return 30; }
+	virtual int GetRealBitCount(void) { return 20; }
 	virtual int GetNumPlanes(void) { return 3; }
 	virtual int GetMacroPixelWidth(void) { return 2; }
 	virtual int GetMacroPixelHeight(void) { return 1; }
