@@ -695,3 +695,19 @@ void cpp_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *
 		memset(p, 0, pStrideBegin + ((nWidth + 63) / 64 * 256) - p);
 	}
 }
+
+//
+
+void cpp_ConvertLittleEndian16ToHostEndian10Limited(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
+{
+	auto q = (uint16_t*)pDst;
+	for (auto p = (const uint16_t*)pSrcBegin; p < (const uint16_t*)pSrcEnd; ++p, ++q)
+		*q = Convert16To10Limited(ltoh16(*p));
+}
+
+void cpp_ConvertHostEndian10ToLittleEndian16Limited(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc)
+{
+	auto p = (const uint16_t*)pSrc;
+	for (auto q = (uint16_t*)pDstBegin; q < (uint16_t*)pDstEnd; ++p, ++q)
+		*q = htol16(Convert10To16Limited(*p));
+}

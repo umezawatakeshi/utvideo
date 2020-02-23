@@ -84,7 +84,7 @@ const vector<vector<DWORD> > vecSupportedInputFccs = {
 	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy'), FCC('HDYC'), FCC('YV16') },
 	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy'), FCC('HDYC'), FCC('YV16'), FCC('YV12') },
 
-	{ FCC('v210') },
+	{ FCC('v210'), MAKEFOURCC('Y', '3', 10, 16), },
 	{ FCC('r210'), FCC('b48r'), FCC('b64a'), },
 	{ FCC('b64a') },
 
@@ -108,7 +108,7 @@ const vector<vector<DWORD> > vecUnsupportedInputFccs = {
 	{ 15, 16, FCC('YVYU'), FCC('VYUY'), FCC('YV12') },
 	{ 15, 16, FCC('YVYU'), FCC('VYUY') },
 
-	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12'), FCC('r210'), FCC('b48r'), FCC('b64a') },
+	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12'), FCC('r210'), FCC('b48r'), FCC('b64a'), MAKEFOURCC('Y', '3', 0, 16), MAKEFOURCC('Y', '3', 11, 16), },
 	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12'), FCC('v210'), },
 	{ 15, 16, 24, 32, FCC('YUY2'), FCC('YUYV'), FCC('UYVY'), FCC('YV12'), FCC('r210'), FCC('b48r'), FCC('v210') },
 

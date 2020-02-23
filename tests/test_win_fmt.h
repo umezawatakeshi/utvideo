@@ -88,6 +88,15 @@ static inline WORD FCC2BitCount(DWORD dw)
 		return 64;
 	case FCC('r210'):
 		return 30;
+	case MAKEFOURCC('Y', '3', 0, 10):
+	case MAKEFOURCC('Y', '3', 0, 16):
+		return 48;
+	case MAKEFOURCC('Y', '3', 10, 10):
+	case MAKEFOURCC('Y', '3', 10, 16):
+		return 32;
+	case MAKEFOURCC('Y', '3', 11, 10):
+	case MAKEFOURCC('Y', '3', 11, 16):
+		return 24;
 	default:
 		return 0; // XXX
 	}
