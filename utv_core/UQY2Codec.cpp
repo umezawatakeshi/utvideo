@@ -91,7 +91,7 @@ void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 	switch (m_utvfRaw)
 	{
 	case UTVF_v210:
-		cpp_ConvertV210ToUQY2(y, u, v, pSrcBegin, pSrcEnd, m_nWidth, m_cbRawGrossWidth);
+		ConvertV210ToUQY2(y, u, v, pSrcBegin, pSrcEnd, m_nWidth, m_cbRawGrossWidth);
 		break;
 	}
 }
@@ -138,7 +138,7 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 	switch (m_utvfRaw)
 	{
 	case UTVF_v210:
-		cpp_ConvertUQY2ToV210(pDstBegin, pDstEnd, y, u, v, m_nWidth, m_cbRawGrossWidth);
+		ConvertUQY2ToV210(pDstBegin, pDstEnd, y, u, v, m_nWidth, m_cbRawGrossWidth);
 		break;
 	}
 }
