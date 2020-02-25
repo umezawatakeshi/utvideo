@@ -5,10 +5,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" type="text/css" href="style.css">
-<title>Ut Video Codec Suite 20.6.1 readme （日本語）</title>
+<title>Ut Video Codec Suite 21.0.0 readme （日本語）</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 20.6.1 readme （日本語）</h1>
+<h1>Ut Video Codec Suite 21.0.0 readme （日本語）</h1>
 <hr>
 <h2 id="copyright_notice">著作権表示</h2>
 <h3>英語</h3>
@@ -103,7 +103,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>HDYC<br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td></tr>
 <tr><td>UQRA</td><td>UtVideo Pro RGBA 10bit</td><td>RGBA 4:4:4 10bit フルレンジ</td><td>b64a</td></tr>
 <tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit フルレンジ</td><td><strong>r210</strong><br>b48r<br>b64a</td></tr>
-<tr><td>UQY2</td><td>UtVideo Pro YUV422 10bit</td><td>YCbCr 4:2:2 10bit リミテッド</td><td><strong>v210</strong></td></tr>
+<tr><td>UQY2</td><td>UtVideo Pro YUV422 10bit</td><td>YCbCr 4:2:2 10bit リミテッド</td><td><strong>v210</strong><br>YUV422P16</td></tr>
+<tr><td>UQY0</td><td>UtVideo Pro YUV420 10bit</td><td>YCbCr 4:2:0 10bit リミテッド</td><td>YUV420P16</td></tr>
 </table>
 <ul>
 <li><strong>太字</strong>はネイティブな（=色空間の変換が発生しない）フォーマットです。可能な限りこのフォーマットで入出力することが推奨されます。</li>
@@ -114,6 +115,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <h2 id="nicovideo">ニコニコ動画のコンテンツツリーについて</h2>
 <p>ニコニコ動画において、コンテンツツリーの親作品として指定するために、<a href="http://seiga.nicovideo.jp/seiga/im1922939">静画</a>を投稿してあります（2012年4月2日に再投稿しました）。Ut Video Codec Suite を使用して作成された動画を投稿の際は、親作品として指定していただけると励みになります。</p>
 <h2 id="history">改版履歴</h2>
+<h3>バージョン 21.0.0</h3>
+<dl>
+<dt>機能追加</dt><dd><ul>
+<li>内部保持形式が YUV420 10bit のコーデック (FourCC: UQY0) を追加した。</li>
+<li>UQY2: YUV422P16 での入出力に対応した。</li>
+</ul></dd>
+<dt>性能向上</dt><dd><ul>
+<li>UQY2: v210 へのデコードを若干高速化した。</li>
+</ul></dd>
+</dl>
 <h3>バージョン 20.6.1</h3>
 <dl>
 <dt>バグ修正</dt><dd><ul>
