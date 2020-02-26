@@ -836,6 +836,16 @@ static inline FORCEINLINE __m128i _mm_Convert10To16Fullrange(__m128i x)
 	return _mm_or_si128(tmp, _mm_srli_epi16(tmp, 10));
 }
 
+static inline FORCEINLINE __m128i _mm_Convert16To10Limited(__m128i x)
+{
+	return _mm_srli_epi16(_mm_adds_epu16(x, _mm_set1_epi16(1 << 5)), 6);
+}
+
+static inline FORCEINLINE __m128i _mm_Convert10To16Limited(__m128i x)
+{
+	return _mm_slli_epi16(x, 6);
+}
+
 
 template<int F, typename VT, bool NeedOffset, typename std::enable_if_t<std::is_same_v<VT, __m128i>>*& = enabler> /* 最適化が有効な場合、返した a を触らなければ a を計算する命令は生成されないので、やはり A はテンプレートパラメータとしては要らない */
 static inline FORCEINLINE VECTOR_RGBA<__m128i> VECTORCALL tuned_ConvertB64aToPlanarElement10(__m128i m0, __m128i m1, __m128i m2, __m128i m3)
@@ -1249,4 +1259,50 @@ template void tuned_ConvertUQRGToR210<CODEFEATURE_SSSE3>(uint8_t *pDstBegin, uin
 
 #ifdef GENERATE_AVX1
 template void tuned_ConvertUQRGToR210<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride);
+#endif
+
+//
+
+template<int F>
+void tuned_ConvertLittleEndian16ToHostEndian10Limited(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
+{
+	auto p = (const uint16_t*)pSrcBegin;
+	auto q = (uint16_t*)pDst;
+
+	for (; p <= (const uint16_t*)pSrcEnd - 8; p += 8, q += 8)
+	{
+		auto v = _mm_loadu_si128((const __m128i*)p);
+		v = _mm_Convert16To10Limited(v);
+		_mm_storeu_si128((__m128i*)q, v);
+	}
+
+	for (; p < (const uint16_t*)pSrcEnd; ++p, ++q)
+		*q = Convert16To10Limited(ltoh16(*p));
+}
+
+template<int F>
+void tuned_ConvertHostEndian10ToLittleEndian16Limited(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc)
+{
+	auto p = (const uint16_t*)pSrc;
+	auto q = (uint16_t*)pDstBegin;
+
+	for (; q <= (uint16_t*)pDstEnd - 8; p += 8, q += 8)
+	{
+		auto v = _mm_loadu_si128((const __m128i*)p);
+		v = _mm_Convert10To16Limited(v);
+		_mm_storeu_si128((__m128i*)q, v);
+	}
+
+	for (; q < (uint16_t*)pDstEnd; ++p, ++q)
+		*q = htol16(Convert10To16Limited(*p));
+}
+
+#ifdef GENERATE_SSSE3
+template void tuned_ConvertLittleEndian16ToHostEndian10Limited<CODEFEATURE_SSSE3>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void tuned_ConvertHostEndian10ToLittleEndian16Limited<CODEFEATURE_SSSE3>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_ConvertLittleEndian16ToHostEndian10Limited<CODEFEATURE_AVX1>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void tuned_ConvertHostEndian10ToLittleEndian16Limited<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc);
 #endif

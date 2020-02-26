@@ -76,9 +76,9 @@ void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 			pSrcUBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
 			pSrcVBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
-			cpp_ConvertLittleEndian16ToHostEndian10Limited(y, pSrcYBegin, pSrcYEnd);
-			cpp_ConvertLittleEndian16ToHostEndian10Limited(u, pSrcUBegin, pSrcUEnd);
-			cpp_ConvertLittleEndian16ToHostEndian10Limited(v, pSrcVBegin, pSrcVEnd);
+			ConvertLittleEndian16ToHostEndian10Limited(y, pSrcYBegin, pSrcYEnd);
+			ConvertLittleEndian16ToHostEndian10Limited(u, pSrcUBegin, pSrcUEnd);
+			ConvertLittleEndian16ToHostEndian10Limited(v, pSrcVBegin, pSrcVEnd);
 		}
 		return;
 	}
@@ -123,9 +123,9 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 			pDstUBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
 			pDstVBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
 
-			cpp_ConvertHostEndian10ToLittleEndian16Limited(pDstYBegin, pDstYEnd, y);
-			cpp_ConvertHostEndian10ToLittleEndian16Limited(pDstUBegin, pDstUEnd, u);
-			cpp_ConvertHostEndian10ToLittleEndian16Limited(pDstVBegin, pDstVEnd, v);
+			ConvertHostEndian10ToLittleEndian16Limited(pDstYBegin, pDstYEnd, y);
+			ConvertHostEndian10ToLittleEndian16Limited(pDstUBegin, pDstUEnd, u);
+			ConvertHostEndian10ToLittleEndian16Limited(pDstVBegin, pDstVEnd, v);
 		}
 		return;
 	}

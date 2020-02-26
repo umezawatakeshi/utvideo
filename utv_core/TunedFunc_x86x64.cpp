@@ -406,6 +406,8 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleSSSE3 = {
 	cpp_ConvertUQY2ToV210,
 	tuned_ConvertR210ToUQRG<CODEFEATURE_SSSE3>,
 	tuned_ConvertUQRGToR210<CODEFEATURE_SSSE3>,
+	tuned_ConvertLittleEndian16ToHostEndian10Limited<CODEFEATURE_SSSE3>,
+	tuned_ConvertHostEndian10ToLittleEndian16Limited<CODEFEATURE_SSSE3>,
 };
 
 const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX1 = {
@@ -435,6 +437,8 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX1 = {
 	cpp_ConvertUQY2ToV210,
 	tuned_ConvertR210ToUQRG<CODEFEATURE_AVX1>,
 	tuned_ConvertUQRGToR210<CODEFEATURE_AVX1>,
+	tuned_ConvertLittleEndian16ToHostEndian10Limited<CODEFEATURE_AVX1>,
+	tuned_ConvertHostEndian10ToLittleEndian16Limited<CODEFEATURE_AVX1>,
 };
 
 const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX2 = {
@@ -464,6 +468,8 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleAVX2 = {
 	cpp_ConvertUQY2ToV210,
 	tuned_ConvertR210ToUQRG<CODEFEATURE_AVX1>,
 	tuned_ConvertUQRGToR210<CODEFEATURE_AVX1>,
+	tuned_ConvertLittleEndian16ToHostEndian10Limited<CODEFEATURE_AVX1>,
+	tuned_ConvertHostEndian10ToLittleEndian16Limited<CODEFEATURE_AVX1>,
 };
 
 
