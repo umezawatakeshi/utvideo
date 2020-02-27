@@ -639,6 +639,7 @@ void CUL00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* cons
 	 * decode と restore をお仕着せの処理で行う場合、
 	 * 全部の plane を decode してから全部の plane を restore するよりも、
 	 * plane ごとに decode して restore した方が、メインメモリへのアクセスが最適化されて速い。
+	 * （ULY0->YV12 4k マルチスレッドで 5% ぐらい違う）
 	 */
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
