@@ -552,6 +552,7 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictSSE41 = {
 	tuned_ConvertUQRAToB64a_RestoreCylindricalLeft<CODEFEATURE_SSE41>,
 	tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41>,
 	tuned_ConvertUQRGToR210_RestoreCylindricalLeft<CODEFEATURE_SSE41>,
+	tuned_ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41>,
 };
 
 const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictAVX1 = {
@@ -605,6 +606,7 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictAVX1 = {
 	tuned_ConvertUQRAToB64a_RestoreCylindricalLeft<CODEFEATURE_AVX1>,
 	tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1>,
 	tuned_ConvertUQRGToR210_RestoreCylindricalLeft<CODEFEATURE_AVX1>,
+	tuned_ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1>,
 };
 
 

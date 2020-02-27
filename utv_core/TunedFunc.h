@@ -174,6 +174,7 @@ struct TUNEDFUNC_CONVERT_PREDICT
 	void (*pfnConvertUQRAToB64a_RestoreCylindricalLeft)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertR210ToUQRG_PredictCylindricalLeftAndCount)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable);
 	void (*pfnConvertUQRGToR210_RestoreCylindricalLeft)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride);
+	void (*pfnConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount)(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable);
 };
 
 struct TUNEDFUNC_CONVERT_SYMPACK
@@ -365,6 +366,7 @@ public:
 #define ConvertUQRAToB64a_RestoreCylindricalLeft tfn.pConvertPredict->pfnConvertUQRAToB64a_RestoreCylindricalLeft
 #define ConvertR210ToUQRG_PredictCylindricalLeftAndCount tfn.pConvertPredict->pfnConvertR210ToUQRG_PredictCylindricalLeftAndCount
 #define ConvertUQRGToR210_RestoreCylindricalLeft tfn.pConvertPredict->pfnConvertUQRGToR210_RestoreCylindricalLeft
+#define ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount tfn.pConvertPredict->pfnConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount
 
 #define ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8
 #define ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8(gp, gcb, gc, bp, bcb, bc, rp, rcb, rc, p, q, w, s) ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(gp, gcb, gc, rp, rcb, rc, bp, bcb, bc, p, q, w, s)

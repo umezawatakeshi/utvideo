@@ -142,3 +142,40 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		break;
 	}
 }
+
+bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
+{
+	uint8_t* y, * u, * v;
+
+	y = m_pPredicted->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+	u = m_pPredicted->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+	v = m_pPredicted->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+
+	switch (m_utvfRaw)
+	{
+	case UTVF_YUV422P16LE:
+		{
+			const uint8_t *pSrcYBegin, *pSrcUBegin, *pSrcVBegin;
+			const uint8_t *pSrcYEnd, *pSrcUEnd, *pSrcVEnd;
+
+			pSrcYBegin = ((const uint8_t*)m_pInput);
+			pSrcUBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
+			pSrcVBegin = pSrcUBegin + m_nWidth * m_nHeight;
+
+			pSrcYEnd = pSrcYBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcUEnd = pSrcUBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[1];
+			pSrcVEnd = pSrcVBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[2];
+
+			pSrcYBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcUBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
+			pSrcVBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+
+			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(y, pSrcYBegin, pSrcYEnd, m_cbPlanePredictStride[0], m_cbPlanePredictStride[0], m_counts[nBandIndex].dwCount[0]);
+			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(u, pSrcUBegin, pSrcUEnd, m_cbPlanePredictStride[1], m_cbPlanePredictStride[1], m_counts[nBandIndex].dwCount[1]);
+			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(v, pSrcVBegin, pSrcVEnd, m_cbPlanePredictStride[2], m_cbPlanePredictStride[2], m_counts[nBandIndex].dwCount[2]);
+		}
+		return true;
+	}
+
+	return false;
+}
