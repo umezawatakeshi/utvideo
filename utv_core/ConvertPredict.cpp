@@ -843,3 +843,26 @@ void cpp_ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCou
 		}
 	}
 }
+
+//
+
+void cpp_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride)
+{
+	uint16_t prev = 0x8000;
+
+	auto q = (const uint16_t*)pSrcBegin;
+
+	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	{
+		auto pStrideEnd = (uint16_t*)(p + cbWidth);
+		auto pp = (uint16_t*)p;
+
+		for (; pp < pStrideEnd; ++pp)
+		{
+			uint16_t cur = *q;
+			*pp = htol16(prev += cur);
+
+			++q;
+		}
+	}
+}

@@ -153,3 +153,47 @@ bool CUQY0Codec::PredictDirect(uint32_t nBandIndex)
 
 	return false;
 }
+
+void CUQY0Codec::GenerateDecodeTable(uint32_t nPlaneIndex)
+{
+	if (m_utvfRaw == UTVF_YUV420P16LE)
+	{
+		GenerateHuffmanDecodeTable<10, 6>(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
+	}
+	else
+	{
+		CUQ00Codec::GenerateDecodeTable(nPlaneIndex);
+	}
+}
+
+bool CUQY0Codec::DecodeDirect(uint32_t nBandIndex)
+{
+	if (m_utvfRaw == UTVF_YUV420P16LE)
+	{
+		uint8_t* pDstBegin[3];
+
+		pDstBegin[0] = ((uint8_t*)m_pOutput);
+		pDstBegin[1] = pDstBegin[0] + m_nWidth * m_nHeight * 2;
+		pDstBegin[2] = pDstBegin[1] + m_nWidth * m_nHeight / 2;
+
+		DecodeAndRestoreCustomToPlanar(nBandIndex, pDstBegin);
+
+		return true;
+	}
+
+	return false;
+}
+
+void CUQY0Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd)
+{
+	if (m_utvfRaw == UTVF_YUV420P16LE)
+	{
+		uint8_t* pCurDstBegin;
+		uint8_t* pCurDstEnd;
+
+		pCurDstBegin = pDstBegin[nPlaneIndex] + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		pCurDstEnd = pDstBegin[nPlaneIndex] + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+
+		ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, (const uint8_t*)pSrcBegin, m_cbPlanePredictStride[nPlaneIndex], m_cbPlanePredictStride[nPlaneIndex]);
+	}
+}

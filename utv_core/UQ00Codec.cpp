@@ -467,6 +467,11 @@ size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput)
 
 void CUQ00Codec::GenerateDecodeTableProc(uint32_t nPlaneIndex)
 {
+	GenerateDecodeTable(nPlaneIndex);
+}
+
+void CUQ00Codec::GenerateDecodeTable(uint32_t nPlaneIndex)
+{
 	GenerateHuffmanDecodeTable<10>(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 }
 
@@ -568,7 +573,11 @@ void CUQ00Codec::DecodeProc(uint32_t nBandIndex)
 	}
 }
 
-template<bool DoRestore>
+#define RESTORE_NONE 0
+#define RESTORE_DEFAULT 1
+#define RESTORE_CUSTOM 2
+
+template<int RestoreType>
 void CUQ00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* const* pDstBegin)
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
@@ -590,24 +599,35 @@ void CUQ00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* cons
 		HuffmanDecode<10>((uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), m_pEncodedBits[nPlaneIndex] + dwOffset, &m_hdt[nPlaneIndex]);
 		_ASSERT(pRetActual == pRetExpected);
 
-		if (DoRestore)
+		if (RestoreType == RESTORE_DEFAULT)
 			RestoreCylindricalLeft10((uint16_t *)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
+		else if (RestoreType == RESTORE_CUSTOM)
+			RestoreCustom(nBandIndex, nPlaneIndex, pDstBegin, (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
 	}
 }
 
 void CUQ00Codec::DecodeToPlanar(uint32_t nBandIndex)
 {
-	DecodeAndRestoreToPlanarImpl<false>(nBandIndex, NULL);
+	DecodeAndRestoreToPlanarImpl<RESTORE_NONE>(nBandIndex, NULL);
 }
 
 void CUQ00Codec::DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
 {
-	DecodeAndRestoreToPlanarImpl<true>(nBandIndex, pDstBegin);
+	DecodeAndRestoreToPlanarImpl<RESTORE_DEFAULT>(nBandIndex, pDstBegin);
+}
+
+void CUQ00Codec::DecodeAndRestoreCustomToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
+{
+	DecodeAndRestoreToPlanarImpl<RESTORE_CUSTOM>(nBandIndex, pDstBegin);
 }
 
 bool CUQ00Codec::DecodeDirect(uint32_t nBandIndex)
 {
 	return false;
+}
+
+void CUQ00Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd)
+{
 }
 
 bool CUQ00Codec::RestoreDirect(uint32_t nBandIndex)

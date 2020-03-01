@@ -350,6 +350,17 @@ template void tuned_RestoreCylindricalLeft10<CODEFEATURE_AVX1>(uint16_t *pDst, c
 
 
 template<int F>
+static inline FORCEINLINE VECTOR2<__m128i> /* value0, nextprev */ tuned_RestoreLeft16Element(__m128i prev, __m128i s0)
+{
+	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 2));
+	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 4));
+	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 8));
+	s0 = _mm_add_epi16(s0, prev);
+	return { s0, _mm_shuffle_epi8(s0, _mm_set2_epi8(15, 14)) };
+}
+
+
+template<int F>
 static inline FORCEINLINE __m128i VECTORCALL tuned_PredictWrongMedian8Element(__m128i topprev, __m128i top, __m128i prev, __m128i value)
 {
 	__m128i left = _mm_alignr_epi8(value, prev, 15);
