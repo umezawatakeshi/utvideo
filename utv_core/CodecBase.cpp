@@ -254,6 +254,15 @@ int CCodecBase::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 		m_cbRawSize = (width * height * 3);
 		break;
 
+	case UTVF_P210:
+	case UTVF_P216:
+		m_cbRawSize = width * height * 4;
+		break;
+	case UTVF_P010:
+	case UTVF_P016:
+		m_cbRawSize = width * height * 3;
+		break;
+
 	default:
 		switch (rawfmt)
 		{
@@ -298,10 +307,6 @@ int CCodecBase::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned i
 			break;
 		case UTVF_r210:
 			m_cbRawNetWidth = ((width + 63) / 64) * 256;
-			break;
-		case UTVF_P210:
-		case UTVF_P216:
-			m_cbRawNetWidth = width * 2;
 			break;
 		default:
 			return -1;

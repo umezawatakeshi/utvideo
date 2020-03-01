@@ -91,6 +91,8 @@ int UtVideoFormatToVCMFormat(DWORD *biCompression, WORD *biBitCount, utvf_t utvf
 	case UTVF_YUV422P16LE:
 		*biBitCount = 32;
 		break;
+	case UTVF_P010:
+	case UTVF_P016:
 	case UTVF_YUV420P10LE:
 	case UTVF_YUV420P16LE:
 		*biBitCount = 24;

@@ -133,6 +133,8 @@ typedef uint32_t utvf_t;
 #define UTVF_r210 ((utvf_t)'r210')
 #define UTVF_P210 ((utvf_t)'P210')
 #define UTVF_P216 ((utvf_t)'P216')
+#define UTVF_P010 ((utvf_t)'P010')
+#define UTVF_P016 ((utvf_t)'P016')
 
 #define UTVF_YUV444P10LE MAKEUTVF('Y', '3',  0, 10)
 #define UTVF_YUV444P16LE MAKEUTVF('Y', '3',  0, 16)
