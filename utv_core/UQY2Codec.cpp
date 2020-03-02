@@ -11,12 +11,16 @@
 
 const utvf_t CUQY2Codec::m_utvfEncoderInput[] = {
 	UTVF_v210,
+	UTVF_P210,
+	UTVF_P216,
 	UTVF_YUV422P16LE,
 	UTVF_INVALID,
 };
 
 const utvf_t CUQY2Codec::m_utvfDecoderOutput[] = {
 	UTVF_v210,
+	UTVF_P210,
+	UTVF_P216,
 	UTVF_YUV422P16LE,
 	UTVF_INVALID,
 };
@@ -81,6 +85,44 @@ void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 			ConvertLittleEndian16ToHostEndian10Limited(v, pSrcVBegin, pSrcVEnd);
 		}
 		return;
+
+	case UTVF_P210:
+		{
+			const uint8_t *pSrcYBegin, *pSrcUVBegin;
+			const uint8_t *pSrcYEnd, *pSrcUVEnd;
+
+			pSrcYBegin = ((const uint8_t*)m_pInput);
+			pSrcUVBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
+
+			pSrcYEnd  = pSrcYBegin  + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcUVEnd = pSrcUVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
+
+			pSrcYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
+
+			cpp_ConvertLittleEndian16ToHostEndian10Noround(y, pSrcYBegin, pSrcYEnd);
+			cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround(u, v, pSrcUVBegin, pSrcUVEnd);
+		}
+		return;
+
+	case UTVF_P216:
+		{
+			const uint8_t *pSrcYBegin, *pSrcUVBegin;
+			const uint8_t *pSrcYEnd, *pSrcUVEnd;
+
+			pSrcYBegin = ((const uint8_t*)m_pInput);
+			pSrcUVBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
+
+			pSrcYEnd  = pSrcYBegin  + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcUVEnd = pSrcUVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
+
+			pSrcYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
+
+			cpp_ConvertLittleEndian16ToHostEndian10Limited(y, pSrcYBegin, pSrcYEnd);
+			cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(u, v, pSrcUVBegin, pSrcUVEnd);
+		}
+		return;
 	}
 
 	const uint8_t* pSrcBegin, * pSrcEnd;
@@ -126,6 +168,26 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 			ConvertHostEndian10ToLittleEndian16Limited(pDstYBegin, pDstYEnd, y);
 			ConvertHostEndian10ToLittleEndian16Limited(pDstUBegin, pDstUEnd, u);
 			ConvertHostEndian10ToLittleEndian16Limited(pDstVBegin, pDstVEnd, v);
+		}
+		return;
+
+	case UTVF_P210:
+	case UTVF_P216:
+		{
+			uint8_t *pDstYBegin, *pDstUVBegin;
+			uint8_t *pDstYEnd, *pDstUVEnd;
+
+			pDstYBegin  = ((uint8_t*)m_pOutput);
+			pDstUVBegin = pDstYBegin + m_nWidth * m_nHeight * 2;
+
+			pDstYEnd  = pDstYBegin  + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
+			pDstUVEnd = pDstUVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
+
+			pDstYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+			pDstUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
+
+			cpp_ConvertHostEndian10ToLittleEndian16Limited(pDstYBegin, pDstYEnd, y);
+			cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(pDstUVBegin, pDstUVEnd, u, v);
 		}
 		return;
 	}

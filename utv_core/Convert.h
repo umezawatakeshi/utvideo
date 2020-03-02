@@ -28,6 +28,11 @@ static inline uint16_t Convert10To16Limited(uint16_t x)
 	return x << 6;
 }
 
+static inline uint16_t Convert16To10Noround(uint16_t x)
+{
+	return x >> 6;
+}
+
 template<class C, class T> void cpp_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template<class C, class T> void cpp_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template<class C, class T> void cpp_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
@@ -53,4 +58,9 @@ void cpp_ConvertR210ToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin,
 void cpp_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride);
 
 void cpp_ConvertLittleEndian16ToHostEndian10Limited(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+void cpp_ConvertLittleEndian16ToHostEndian10Noround(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
 void cpp_ConvertHostEndian10ToLittleEndian16Limited(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrc);
+
+void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+void cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(uint8_t* pSrcBegin, uint8_t* pSrcEnd, const uint8_t* pUBegin, const uint8_t* pVBegin);

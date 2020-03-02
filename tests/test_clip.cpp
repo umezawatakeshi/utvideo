@@ -149,20 +149,20 @@ vector<tuple<string, string, unsigned int>> conv_clip000_ulxx(const vector<tuple
 static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip000_uqxx = {
 	{ "clip000-uqrg", 1, 1,{ { "clip000-raw-rgb10bit_b64a", 0 },{ "clip000-raw-rgb10bit_r210", 0 }, } },
 	{ "clip000-uqra", 1, 1,{ { "clip000-raw-rgba10bit_b64a", 0 }, } },
-	{ "clip000-uqy2", 2, 1,{ { "clip000-raw-yuv10bit_v210", 0 },{ "clip000-raw-yuv10bit_yuv422p16le", 0 }, } },
-	{ "clip000-uqy0", 2, 2,{ { "clip000-raw-yuv10bit_yuv420p16le", 0 }, } },
+	{ "clip000-uqy2", 2, 1,{ { "clip000-raw-yuv10bit_v210", 0 },{ "clip000-raw-yuv10bit_p210", 0 },{ "clip000-raw-yuv10bit_p216", 0 },{ "clip000-raw-yuv10bit_yuv422p16le", 0 }, } },
+	{ "clip000-uqy0", 2, 2,{ { "clip000-raw-yuv10bit_p010", 0 },{ "clip000-raw-yuv10bit_p016", 0 },{ "clip000-raw-yuv10bit_yuv420p16le", 0 }, } },
 
 	{ "clip001-uqrg", 1, 1,{ { "clip001-raw-rgb10bit_b64a", 0 },{ "clip001-raw-rgb10bit_r210", 0 }, } },
 	{ "clip001-uqra", 1, 1,{ { "clip001-raw-rgba10bit_b64a", 0 }, } },
-	{ "clip001-uqy2", 2, 1,{ { "clip001-raw-yuv10bit_v210", 0 },{ "clip001-raw-yuv10bit_yuv422p16le", 0 }, } },
-	{ "clip001-uqy0", 2, 2,{ { "clip001-raw-yuv10bit_yuv420p16le", 0 }, } },
+	{ "clip001-uqy2", 2, 1,{ { "clip001-raw-yuv10bit_v210", 0 },{ "clip001-raw-yuv10bit_p210", 0 },{ "clip001-raw-yuv10bit_p216", 0 },{ "clip001-raw-yuv10bit_yuv422p16le", 0 }, } },
+	{ "clip001-uqy0", 2, 2,{ { "clip001-raw-yuv10bit_p010", 0 },{ "clip001-raw-yuv10bit_p016", 0 },{ "clip001-raw-yuv10bit_yuv420p16le", 0 }, } },
 };
 
 static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>> vecDecodeClipsSource_clip002_uqxx = {
 	{ "clip002-uqrg", 1, 1,{ { "clip002-raw-rgb10bit_b64a", 0 },{ "clip002-raw-rgb10bit_r210", 0 }, } },
 	{ "clip002-uqra", 1, 1,{ { "clip002-raw-rgba10bit_b64a", 0 }, } },
-	{ "clip002-uqy2", 2, 1,{ { "clip002-raw-yuv10bit_v210", 0 },{ "clip002-raw-yuv10bit_yuv422p16le", 0 }, } },
-	{ "clip002-uqy0", 2, 2,{ { "clip002-raw-yuv10bit_yuv420p16le", 0 }, } },
+	{ "clip002-uqy2", 2, 1,{ { "clip002-raw-yuv10bit_v210", 0 },{ "clip002-raw-yuv10bit_p210", 0 },{ "clip002-raw-yuv10bit_p216", 0 },{ "clip002-raw-yuv10bit_yuv422p16le", 0 }, } },
+	{ "clip002-uqy0", 2, 2,{ { "clip002-raw-yuv10bit_p010", 0 },{ "clip002-raw-yuv10bit_p016", 0 },{ "clip002-raw-yuv10bit_yuv420p16le", 0 }, } },
 };
 
 static const vector<pair<int, int>> sizes_clip000_uqxx = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
@@ -461,20 +461,20 @@ static const vector<uint8_t> uqxx_config_none = { 0x00, 0x00, 0x00, 0x00, };
 static const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> vecEncodeClipsSource_clip000_uqxx = {
 	{ "clip000-uqrg", uqxx_config_none, 1, 1,{ "clip000-raw-rgb10bit_b64a", "clip000-raw-rgb10bit_r210", } },
 	{ "clip000-uqra", uqxx_config_none, 1, 1,{ "clip000-raw-rgba10bit_b64a", } },
-	{ "clip000-uqy2", uqxx_config_none, 2, 1,{ "clip000-raw-yuv10bit_v210", "clip000-raw-yuv10bit_yuv422p16le", } },
-	{ "clip000-uqy0", uqxx_config_none, 2, 2,{ "clip000-raw-yuv10bit_yuv420p16le", } },
+	{ "clip000-uqy2", uqxx_config_none, 2, 1,{ "clip000-raw-yuv10bit_v210", "clip000-raw-yuv10bit_p210", "clip000-raw-yuv10bit_p216", "clip000-raw-yuv10bit_yuv422p16le", } },
+	{ "clip000-uqy0", uqxx_config_none, 2, 2,{ "clip000-raw-yuv10bit_p010", "clip000-raw-yuv10bit_p016", "clip000-raw-yuv10bit_yuv420p16le", } },
 
 	{ "clip001-uqrg", uqxx_config_none, 1, 1,{ "clip001-raw-rgb10bit_b64a", "clip001-raw-rgb10bitn_b64a", "clip001-raw-rgb10bit_r210", } },
 	{ "clip001-uqra", uqxx_config_none, 1, 1,{ "clip001-raw-rgba10bit_b64a", "clip001-raw-rgba10bitn_b64a", } },
-	{ "clip001-uqy2", uqxx_config_none, 2, 1,{ "clip001-raw-yuv10bit_v210", "clip001-raw-yuv10bit_yuv422p16le", "clip001-raw-yuv10bitn_yuv422p16le", } },
-	{ "clip001-uqy0", uqxx_config_none, 2, 2,{ "clip001-raw-yuv10bit_yuv420p16le", "clip001-raw-yuv10bitn_yuv420p16le", } },
+	{ "clip001-uqy2", uqxx_config_none, 2, 1,{ "clip001-raw-yuv10bit_v210", "clip001-raw-yuv10bit_p210", "clip001-raw-yuv10bit_p216", "clip001-raw-yuv10bitn_p216", "clip001-raw-yuv10bit_yuv422p16le", "clip001-raw-yuv10bitn_yuv422p16le", } },
+	{ "clip001-uqy0", uqxx_config_none, 2, 2,{ "clip001-raw-yuv10bit_p010", "clip001-raw-yuv10bit_p016", "clip001-raw-yuv10bitn_p016", "clip001-raw-yuv10bit_yuv420p16le", "clip001-raw-yuv10bitn_yuv420p16le", } },
 };
 
 static const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> vecEncodeClipsSource_clip002_uqxx = {
 	{ "clip002-uqrg", uqxx_config_none, 1, 1,{ "clip002-raw-rgb10bit_b64a", "clip002-raw-rgb10bit_r210", } },
 	{ "clip002-uqra", uqxx_config_none, 1, 1,{ "clip002-raw-rgba10bit_b64a", } },
-	{ "clip002-uqy2", uqxx_config_none, 2, 1,{ "clip002-raw-yuv10bit_v210", "clip002-raw-yuv10bit_yuv422p16le", } },
-	{ "clip002-uqy0", uqxx_config_none, 2, 2,{ "clip002-raw-yuv10bit_yuv420p16le", } },
+	{ "clip002-uqy2", uqxx_config_none, 2, 1,{ "clip002-raw-yuv10bit_v210", "clip002-raw-yuv10bit_p210", "clip002-raw-yuv10bit_p216", "clip002-raw-yuv10bit_yuv422p16le", } },
+	{ "clip002-uqy0", uqxx_config_none, 2, 2,{ "clip002-raw-yuv10bit_p010", "clip002-raw-yuv10bit_p016", "clip002-raw-yuv10bit_yuv420p16le", } },
 };
 
 vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000_uqxx(const vector<tuple<string, vector<uint8_t>, int, int, vector<string>>> &v, const vector<pair<int, int>>& sz, bool rawprop)
