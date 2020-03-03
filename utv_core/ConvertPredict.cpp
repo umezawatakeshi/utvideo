@@ -3,9 +3,9 @@
 
 #include "stdafx.h"
 #include "utvideo.h"
-#include "ConvertPredict.h"
 #include "Convert.h"
 #include "Predict.h"
+#include "ConvertPredict.h"
 #include "ColorOrder.h"
 #include "Coefficient.h"
 #include "ByteOrder.h"
@@ -821,7 +821,8 @@ void cpp_ConvertUQRGToR210_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *p
 
 //
 
-void cpp_ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable)
+template<VALUERANGE VR>
+void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable)
 {
 	uint16_t prev = 0x200;
 
@@ -834,7 +835,7 @@ void cpp_ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCou
 
 		for (; pp < pStrideEnd; ++pp)
 		{
-			uint16_t cur = Convert16To10Limited(ltoh16(*pp));
+			uint16_t cur = Convert16To10<VR>(ltoh16(*pp));
 			*q = (cur - prev) & 0x3ff;
 			++pCountTable[*q];
 			prev = cur;
@@ -843,6 +844,8 @@ void cpp_ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCou
 		}
 	}
 }
+
+template void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable);
 
 //
 

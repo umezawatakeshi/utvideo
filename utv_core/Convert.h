@@ -3,6 +3,16 @@
 
 #pragma once
 
+enum class VALUERANGE
+{
+	FULL,
+	LIMITED,
+	NOROUND, // ビット数を減らす変換を行う際に、丸め処理が不要であることを示す。 (e.g. P210)
+};
+
+template<VALUERANGE VR> static inline uint16_t Convert16To10(uint16_t x);
+template<VALUERANGE VR> static inline uint16_t Convert10To16(uint16_t x);
+
 static inline uint16_t Convert16To10Fullrange(uint16_t x)
 {
 	return (x - (x >> 10) + (1 << 5)) >> 6;
@@ -33,6 +43,31 @@ static inline uint16_t Convert16To10Noround(uint16_t x)
 	return x >> 6;
 }
 
+template<> static inline uint16_t Convert16To10<VALUERANGE::FULL>(uint16_t x)
+{
+	return Convert16To10Fullrange(x);
+}
+
+template<> static inline uint16_t Convert16To10<VALUERANGE::LIMITED>(uint16_t x)
+{
+	return Convert16To10Limited(x);
+}
+
+template<> static inline uint16_t Convert16To10<VALUERANGE::NOROUND>(uint16_t x)
+{
+	return Convert16To10Noround(x);
+}
+
+template<> static inline uint16_t Convert10To16<VALUERANGE::FULL>(uint16_t x)
+{
+	return Convert10To16Fullrange(x);
+}
+
+template<> static inline uint16_t Convert10To16<VALUERANGE::LIMITED>(uint16_t x)
+{
+	return Convert10To16Limited(x);
+}
+
 template<class C, class T> void cpp_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template<class C, class T> void cpp_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template<class C, class T> void cpp_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
@@ -57,10 +92,8 @@ void cpp_ConvertUQY2ToV210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *
 void cpp_ConvertR210ToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride);
 void cpp_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride);
 
-void cpp_ConvertLittleEndian16ToHostEndian10Limited(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
-void cpp_ConvertLittleEndian16ToHostEndian10Noround(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-void cpp_ConvertHostEndian10ToLittleEndian16Limited(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrc);
+template<VALUERANGE VR> void cpp_ConvertLittleEndian16ToHostEndian10(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+template<VALUERANGE VR> void cpp_ConvertHostEndian10ToLittleEndian16(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pSrc);
 
-void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-void cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(uint8_t* pSrcBegin, uint8_t* pSrcEnd, const uint8_t* pUBegin, const uint8_t* pVBegin);
+template<VALUERANGE VR> void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template<VALUERANGE VR> void cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16(uint8_t* pSrcBegin, uint8_t* pSrcEnd, const uint8_t* pUBegin, const uint8_t* pVBegin);

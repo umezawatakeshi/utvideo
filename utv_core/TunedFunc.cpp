@@ -125,12 +125,12 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleCPP = {
 	cpp_ConvertUQY2ToV210,
 	cpp_ConvertR210ToUQRG,
 	cpp_ConvertUQRGToR210,
-	cpp_ConvertLittleEndian16ToHostEndian10Limited,
-	cpp_ConvertLittleEndian16ToHostEndian10Noround,
-	cpp_ConvertHostEndian10ToLittleEndian16Limited,
-	cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited,
-	cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround,
-	cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited,
+	cpp_ConvertLittleEndian16ToHostEndian10<VALUERANGE::LIMITED>,
+	cpp_ConvertLittleEndian16ToHostEndian10<VALUERANGE::NOROUND>,
+	cpp_ConvertHostEndian10ToLittleEndian16<VALUERANGE::LIMITED>,
+	cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10<VALUERANGE::LIMITED>,
+	cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10<VALUERANGE::NOROUND>,
+	cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16<VALUERANGE::LIMITED>,
 };
 
 const TUNEDFUNC_SYMPACK tfnSymPackCPP = {
@@ -193,7 +193,7 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictCPP = {
 	cpp_ConvertUQRAToB64a_RestoreCylindricalLeft,
 	cpp_ConvertR210ToUQRG_PredictCylindricalLeftAndCount,
 	cpp_ConvertUQRGToR210_RestoreCylindricalLeft,
-	cpp_ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount,
+	cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>,
 	cpp_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft,
 };
 

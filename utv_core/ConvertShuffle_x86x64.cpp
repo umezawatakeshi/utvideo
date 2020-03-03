@@ -825,6 +825,9 @@ template void tuned_ConvertULRAToRGBA<CODEFEATURE_AVX2, CARGBColorOrder>(uint8_t
 
 //
 
+template<VALUERANGE VR> static inline FORCEINLINE __m128i _mm_Convert16To10(__m128i x);
+template<VALUERANGE VR> static inline FORCEINLINE __m128i _mm_Convert10To16(__m128i x);
+
 static inline FORCEINLINE __m128i _mm_Convert16To10Fullrange(__m128i x)
 {
 	return _mm_srli_epi16(_mm_sub_epi16(_mm_add_epi16(x, _mm_set1_epi16(1 << 5)), _mm_srli_epi16(x, 10)), 6);
@@ -849,6 +852,31 @@ static inline FORCEINLINE __m128i _mm_Convert16To10Noround(__m128i x)
 static inline FORCEINLINE __m128i _mm_Convert10To16Limited(__m128i x)
 {
 	return _mm_slli_epi16(x, 6);
+}
+
+template<> static inline FORCEINLINE __m128i _mm_Convert16To10<VALUERANGE::FULL>(__m128i x)
+{
+	return _mm_Convert16To10Fullrange(x);
+}
+
+template<> static inline FORCEINLINE __m128i _mm_Convert16To10<VALUERANGE::LIMITED>(__m128i x)
+{
+	return _mm_Convert16To10Limited(x);
+}
+
+template<> static inline FORCEINLINE __m128i _mm_Convert16To10<VALUERANGE::NOROUND>(__m128i x)
+{
+	return _mm_Convert16To10Noround(x);
+}
+
+template<> static inline FORCEINLINE __m128i _mm_Convert10To16<VALUERANGE::FULL>(__m128i x)
+{
+	return _mm_Convert10To16Fullrange(x);
+}
+
+template<> static inline FORCEINLINE __m128i _mm_Convert10To16<VALUERANGE::LIMITED>(__m128i x)
+{
+	return _mm_Convert10To16Limited(x);
 }
 
 
@@ -1268,8 +1296,8 @@ template void tuned_ConvertUQRGToR210<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint
 
 //
 
-template<int F>
-void tuned_ConvertLittleEndian16ToHostEndian10Limited(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
+template<int F, VALUERANGE VR>
+void tuned_ConvertLittleEndian16ToHostEndian10(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
 {
 	auto p = (const uint16_t*)pSrcBegin;
 	auto q = (uint16_t*)pDst;
@@ -1277,33 +1305,16 @@ void tuned_ConvertLittleEndian16ToHostEndian10Limited(uint8_t* pDst, const uint8
 	for (; p <= (const uint16_t*)pSrcEnd - 8; p += 8, q += 8)
 	{
 		auto v = _mm_loadu_si128((const __m128i*)p);
-		v = _mm_Convert16To10Limited(v);
+		v = _mm_Convert16To10<VR>(v);
 		_mm_storeu_si128((__m128i*)q, v);
 	}
 
 	for (; p < (const uint16_t*)pSrcEnd; ++p, ++q)
-		*q = Convert16To10Limited(ltoh16(*p));
+		*q = Convert16To10<VR>(ltoh16(*p));
 }
 
-template<int F>
-void tuned_ConvertLittleEndian16ToHostEndian10Noround(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
-{
-	auto p = (const uint16_t*)pSrcBegin;
-	auto q = (uint16_t*)pDst;
-
-	for (; p <= (const uint16_t*)pSrcEnd - 8; p += 8, q += 8)
-	{
-		auto v = _mm_loadu_si128((const __m128i*)p);
-		v = _mm_Convert16To10Noround(v);
-		_mm_storeu_si128((__m128i*)q, v);
-	}
-
-	for (; p < (const uint16_t*)pSrcEnd; ++p, ++q)
-		*q = Convert16To10Noround(ltoh16(*p));
-}
-
-template<int F>
-void tuned_ConvertHostEndian10ToLittleEndian16Limited(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc)
+template<int F, VALUERANGE VR>
+void tuned_ConvertHostEndian10ToLittleEndian16(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc)
 {
 	auto p = (const uint16_t*)pSrc;
 	auto q = (uint16_t*)pDstBegin;
@@ -1311,30 +1322,30 @@ void tuned_ConvertHostEndian10ToLittleEndian16Limited(uint8_t* pDstBegin, uint8_
 	for (; q <= (uint16_t*)pDstEnd - 8; p += 8, q += 8)
 	{
 		auto v = _mm_loadu_si128((const __m128i*)p);
-		v = _mm_Convert10To16Limited(v);
+		v = _mm_Convert10To16<VR>(v);
 		_mm_storeu_si128((__m128i*)q, v);
 	}
 
 	for (; q < (uint16_t*)pDstEnd; ++p, ++q)
-		*q = htol16(Convert10To16Limited(*p));
+		*q = htol16(Convert10To16<VR>(*p));
 }
 
 #ifdef GENERATE_SSSE3
-template void tuned_ConvertLittleEndian16ToHostEndian10Limited<CODEFEATURE_SSSE3>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-template void tuned_ConvertLittleEndian16ToHostEndian10Noround<CODEFEATURE_SSSE3>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-template void tuned_ConvertHostEndian10ToLittleEndian16Limited<CODEFEATURE_SSSE3>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc);
+template void tuned_ConvertLittleEndian16ToHostEndian10<CODEFEATURE_SSSE3, VALUERANGE::LIMITED>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void tuned_ConvertLittleEndian16ToHostEndian10<CODEFEATURE_SSSE3, VALUERANGE::NOROUND>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void tuned_ConvertHostEndian10ToLittleEndian16<CODEFEATURE_SSSE3, VALUERANGE::LIMITED>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc);
 #endif
 
 #ifdef GENERATE_AVX1
-template void tuned_ConvertLittleEndian16ToHostEndian10Limited<CODEFEATURE_AVX1>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-template void tuned_ConvertLittleEndian16ToHostEndian10Noround<CODEFEATURE_AVX1>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-template void tuned_ConvertHostEndian10ToLittleEndian16Limited<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc);
+template void tuned_ConvertLittleEndian16ToHostEndian10<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void tuned_ConvertLittleEndian16ToHostEndian10<CODEFEATURE_AVX1, VALUERANGE::NOROUND>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void tuned_ConvertHostEndian10ToLittleEndian16<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc);
 #endif
 
 //
 
-template<int F>
-void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
+template<int F, VALUERANGE VR>
+void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
 {
 	auto u = (uint16_t*)pUBegin;
 	auto v = (uint16_t*)pVBegin;
@@ -1344,8 +1355,8 @@ void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(uint8_t* pUB
 	{
 		auto m0 = _mm_loadu_si128((const __m128i*)p);
 		auto m1 = _mm_loadu_si128((const __m128i*)(p + 8));
-		m0 = _mm_Convert16To10Limited(m0);
-		m1 = _mm_Convert16To10Limited(m1);
+		m0 = _mm_Convert16To10<VR>(m0);
+		m1 = _mm_Convert16To10<VR>(m1);
 		m0 = _mm_shuffle_epi8(m0, _mm_set_epi8(15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0));
 		m1 = _mm_shuffle_epi8(m1, _mm_set_epi8(15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0));
 		auto uu = _mm_unpacklo_epi64(m0, m1);
@@ -1356,41 +1367,13 @@ void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(uint8_t* pUB
 
 	for (; p < (const uint16_t*)pSrcEnd; p += 2, ++u, ++v)
 	{
-		*u = Convert16To10Limited(ltoh16(p[0]));
-		*v = Convert16To10Limited(ltoh16(p[1]));
+		*u = Convert16To10<VR>(ltoh16(p[0]));
+		*v = Convert16To10<VR>(ltoh16(p[1]));
 	}
 }
 
-template<int F>
-void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
-{
-	auto u = (uint16_t*)pUBegin;
-	auto v = (uint16_t*)pVBegin;
-	auto p = (const uint16_t*)pSrcBegin;
-
-	for (; p <= (const uint16_t*)pSrcEnd - 16; p += 16, u += 8, v += 8)
-	{
-		auto m0 = _mm_loadu_si128((const __m128i*)p);
-		auto m1 = _mm_loadu_si128((const __m128i*)(p + 8));
-		m0 = _mm_Convert16To10Noround(m0);
-		m1 = _mm_Convert16To10Noround(m1);
-		m0 = _mm_shuffle_epi8(m0, _mm_set_epi8(15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0));
-		m1 = _mm_shuffle_epi8(m1, _mm_set_epi8(15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0));
-		auto uu = _mm_unpacklo_epi64(m0, m1);
-		auto vv = _mm_unpackhi_epi64(m0, m1);
-		_mm_storeu_si128((__m128i*)u, uu);
-		_mm_storeu_si128((__m128i*)v, vv);
-	}
-
-	for (; p < (const uint16_t*)pSrcEnd; p += 2, ++u, ++v)
-	{
-		*u = Convert16To10Noround(ltoh16(p[0]));
-		*v = Convert16To10Noround(ltoh16(p[1]));
-	}
-}
-
-template<int F>
-void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin)
+template<int F, VALUERANGE VR>
+void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin)
 {
 	auto u = (const uint16_t*)pUBegin;
 	auto v = (const uint16_t*)pVBegin;
@@ -1400,8 +1383,8 @@ void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(uint8_t* pDs
 	{
 		auto uu = _mm_loadu_si128((const __m128i*)u);
 		auto vv = _mm_loadu_si128((const __m128i*)v);
-		uu = _mm_Convert10To16Limited(uu);
-		vv = _mm_Convert10To16Limited(vv);
+		uu = _mm_Convert10To16<VR>(uu);
+		vv = _mm_Convert10To16<VR>(vv);
 		auto m0 = _mm_unpacklo_epi16(uu, vv);
 		auto m1 = _mm_unpackhi_epi16(uu, vv);
 		_mm_storeu_si128((__m128i*)p, m0);
@@ -1410,19 +1393,19 @@ void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(uint8_t* pDs
 
 	for (; p < (uint16_t*)pDstEnd; p += 2, ++u, ++v)
 	{
-		p[0] = htol16(Convert10To16Limited(*u));
-		p[1] = htol16(Convert10To16Limited(*v));
+		p[0] = htol16(Convert10To16<VR>(*u));
+		p[1] = htol16(Convert10To16<VR>(*v));
 	}
 }
 
 #ifdef GENERATE_SSSE3
-template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited<CODEFEATURE_SSSE3>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround<CODEFEATURE_SSSE3>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-template void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited<CODEFEATURE_SSSE3>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin);
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10<CODEFEATURE_SSSE3, VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10<CODEFEATURE_SSSE3, VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16<CODEFEATURE_SSSE3, VALUERANGE::LIMITED>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin);
 #endif
 
 #ifdef GENERATE_AVX1
-template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited<CODEFEATURE_AVX1>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround<CODEFEATURE_AVX1>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
-template void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin);
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10<CODEFEATURE_AVX1, VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin);
 #endif

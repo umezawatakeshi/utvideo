@@ -698,61 +698,54 @@ void cpp_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *
 
 //
 
-void cpp_ConvertLittleEndian16ToHostEndian10Limited(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
+template<VALUERANGE VR>
+void cpp_ConvertLittleEndian16ToHostEndian10(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
 {
 	auto q = (uint16_t*)pDst;
 	for (auto p = (const uint16_t*)pSrcBegin; p < (const uint16_t*)pSrcEnd; ++p, ++q)
-		*q = Convert16To10Limited(ltoh16(*p));
+		*q = Convert16To10<VR>(ltoh16(*p));
 }
 
-void cpp_ConvertLittleEndian16ToHostEndian10Noround(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
-{
-	auto q = (uint16_t*)pDst;
-	for (auto p = (const uint16_t*)pSrcBegin; p < (const uint16_t*)pSrcEnd; ++p, ++q)
-		*q = Convert16To10Noround(ltoh16(*p));
-}
-
-void cpp_ConvertHostEndian10ToLittleEndian16Limited(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc)
+template<VALUERANGE VR>
+void cpp_ConvertHostEndian10ToLittleEndian16(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc)
 {
 	auto p = (const uint16_t*)pSrc;
 	for (auto q = (uint16_t*)pDstBegin; q < (uint16_t*)pDstEnd; ++p, ++q)
-		*q = htol16(Convert10To16Limited(*p));
+		*q = htol16(Convert10To16<VR>(*p));
 }
+
+template void cpp_ConvertLittleEndian16ToHostEndian10<VALUERANGE::LIMITED>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void cpp_ConvertLittleEndian16ToHostEndian10<VALUERANGE::NOROUND>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void cpp_ConvertHostEndian10ToLittleEndian16<VALUERANGE::LIMITED>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc);
 
 //
 
-void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
+template<VALUERANGE VR>
+void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
 {
 	auto u = (uint16_t*)pUBegin;
 	auto v = (uint16_t*)pVBegin;
 
 	for (auto p = (const uint16_t*)pSrcBegin; p < (const uint16_t*)pSrcEnd; p += 2, ++u, ++v)
 	{
-		*u = Convert16To10Limited(ltoh16(p[0]));
-		*v = Convert16To10Limited(ltoh16(p[1]));
+		*u = Convert16To10<VR>(ltoh16(p[0]));
+		*v = Convert16To10<VR>(ltoh16(p[1]));
 	}
 }
 
-void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
-{
-	auto u = (uint16_t*)pUBegin;
-	auto v = (uint16_t*)pVBegin;
-
-	for (auto p = (const uint16_t*)pSrcBegin; p < (const uint16_t*)pSrcEnd; p += 2, ++u, ++v)
-	{
-		*u = Convert16To10Noround(ltoh16(p[0]));
-		*v = Convert16To10Noround(ltoh16(p[1]));
-	}
-}
-
-void cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin)
+template<VALUERANGE VR>
+void cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin)
 {
 	auto u = (const uint16_t*)pUBegin;
 	auto v = (const uint16_t*)pVBegin;
 
 	for (auto q = (uint16_t*)pDstBegin; q < (uint16_t*)pDstEnd; q += 2, ++u, ++v)
 	{
-		q[0] = htol16(Convert10To16Limited(*u));
-		q[1] = htol16(Convert10To16Limited(*v));
+		q[0] = htol16(Convert10To16<VR>(*u));
+		q[1] = htol16(Convert10To16<VR>(*v));
 	}
 }
+
+template void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10<VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10<VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+template void cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16<VALUERANGE::LIMITED>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin);
