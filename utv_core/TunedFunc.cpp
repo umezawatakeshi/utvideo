@@ -126,7 +126,11 @@ const TUNEDFUNC_CONVERT_SHUFFLE tfnConvertShuffleCPP = {
 	cpp_ConvertR210ToUQRG,
 	cpp_ConvertUQRGToR210,
 	cpp_ConvertLittleEndian16ToHostEndian10Limited,
+	cpp_ConvertLittleEndian16ToHostEndian10Noround,
 	cpp_ConvertHostEndian10ToLittleEndian16Limited,
+	cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited,
+	cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround,
+	cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited,
 };
 
 const TUNEDFUNC_SYMPACK tfnSymPackCPP = {

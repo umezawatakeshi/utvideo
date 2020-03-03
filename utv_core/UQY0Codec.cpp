@@ -98,8 +98,8 @@ void CUQY0Codec::ConvertToPlanar(uint32_t nBandIndex)
 			pSrcYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
 			pSrcUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
 
-			cpp_ConvertLittleEndian16ToHostEndian10Noround(y, pSrcYBegin, pSrcYEnd);
-			cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround(u, v, pSrcUVBegin, pSrcUVEnd);
+			ConvertLittleEndian16ToHostEndian10Noround(y, pSrcYBegin, pSrcYEnd);
+			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround(u, v, pSrcUVBegin, pSrcUVEnd);
 		}
 		return;
 
@@ -117,8 +117,8 @@ void CUQY0Codec::ConvertToPlanar(uint32_t nBandIndex)
 			pSrcYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
 			pSrcUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
 
-			cpp_ConvertLittleEndian16ToHostEndian10Limited(y, pSrcYBegin, pSrcYEnd);
-			cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(u, v, pSrcUVBegin, pSrcUVEnd);
+			ConvertLittleEndian16ToHostEndian10Limited(y, pSrcYBegin, pSrcYEnd);
+			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(u, v, pSrcUVBegin, pSrcUVEnd);
 		}
 		return;
 	}
@@ -172,8 +172,8 @@ void CUQY0Codec::ConvertFromPlanar(uint32_t nBandIndex)
 			pDstYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
 			pDstUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
 
-			cpp_ConvertHostEndian10ToLittleEndian16Limited(pDstYBegin, pDstYEnd, y);
-			cpp_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(pDstUVBegin, pDstUVEnd, u, v);
+			ConvertHostEndian10ToLittleEndian16Limited(pDstYBegin, pDstYEnd, y);
+			ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(pDstUVBegin, pDstUVEnd, u, v);
 		}
 		return;
 	}

@@ -111,7 +111,11 @@ struct TUNEDFUNC_CONVERT_SHUFFLE
 	void (*pfnConvertR210ToUQRG)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride);
 	void (*pfnConvertUQRGToR210)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride);
 	void (*pfnConvertLittleEndian16ToHostEndian10Limited)(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+	void (*pfnConvertLittleEndian16ToHostEndian10Noround)(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
 	void (*pfnConvertHostEndian10ToLittleEndian16Limited)(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc);
+	void (*pfnConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited)(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+	void (*pfnConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround)(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd);
+	void (*pfnConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited)(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin);
 };
 
 struct TUNEDFUNC_SYMPACK
@@ -306,7 +310,11 @@ public:
 #define ConvertR210ToUQRG tfn.pConvertShuffle->pfnConvertR210ToUQRG
 #define ConvertUQRGToR210 tfn.pConvertShuffle->pfnConvertUQRGToR210
 #define ConvertLittleEndian16ToHostEndian10Limited tfn.pConvertShuffle->pfnConvertLittleEndian16ToHostEndian10Limited
+#define ConvertLittleEndian16ToHostEndian10Noround tfn.pConvertShuffle->pfnConvertLittleEndian16ToHostEndian10Noround
 #define ConvertHostEndian10ToLittleEndian16Limited tfn.pConvertShuffle->pfnConvertHostEndian10ToLittleEndian16Limited
+#define ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited tfn.pConvertShuffle->pfnConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited
+#define ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround tfn.pConvertShuffle->pfnConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround
+#define ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited tfn.pConvertShuffle->pfnConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited
 
 #define Pack8SymAfterPredictPlanarGradient8 tfn.pSymPack->pfnPack8SymAfterPredictPlanarGradient8
 #define Unpack8SymAndRestorePlanarGradient8 tfn.pSymPack->pfnUnpack8SymAndRestorePlanarGradient8
