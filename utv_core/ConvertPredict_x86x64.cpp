@@ -1611,10 +1611,12 @@ void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount(ui
 
 #ifdef GENERATE_SSE41
 template void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::LIMITED>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable);
+template void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::NOROUND>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable);
 #endif
 
 #ifdef GENERATE_AVX1
 template void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable);
+template void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::NOROUND>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable);
 #endif
 
 //
@@ -1659,4 +1661,67 @@ template void tuned_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft<C
 
 #ifdef GENERATE_AVX1
 template void tuned_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride);
+#endif
+
+//
+
+template<int F, VALUERANGE VR>
+void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable)
+{
+	uint16_t uprev = 0x200;
+	uint16_t vprev = 0x200;
+
+	auto u = (uint16_t*)pUBegin;
+	auto v = (uint16_t*)pVBegin;
+
+	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride)
+	{
+		auto pStrideEnd = (const uint16_t*)(p + cbWidth);
+		auto pp = (const uint16_t*)p;
+
+		__m128i uprevv = _mm_slli_si128(_mm_cvtsi32_si128(uprev), 14);
+		__m128i vprevv = _mm_slli_si128(_mm_cvtsi32_si128(vprev), 14);
+		for (; pp <= pStrideEnd - 16; pp += 16)
+		{
+			auto m0 = _mm_loadu_si128((const __m128i*)pp);
+			auto m1 = _mm_loadu_si128((const __m128i*)(pp + 8));
+			m0 = _mm_Convert16To10<VR>(m0);
+			m1 = _mm_Convert16To10<VR>(m1);
+			m0 = _mm_shuffle_epi8(m0, _mm_set_epi8(15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0));
+			m1 = _mm_shuffle_epi8(m1, _mm_set_epi8(15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0));
+			auto uu = _mm_unpacklo_epi64(m0, m1);
+			auto vv = _mm_unpackhi_epi64(m0, m1);
+			_mm_storeu_si128((__m128i*)u, tuned_PredictLeftAndCount10Element<F>(uprevv, uu, pUCountTable));
+			_mm_storeu_si128((__m128i*)v, tuned_PredictLeftAndCount10Element<F>(vprevv, vv, pVCountTable));
+			uprevv = uu;
+			vprevv = vv;
+
+			u += 8;
+			v += 8;
+		}
+		uprev = _mm_cvtsi128_si32(_mm_srli_si128(uprevv, 14));
+		vprev = _mm_cvtsi128_si32(_mm_srli_si128(vprevv, 14));
+
+		for (; pp < pStrideEnd; pp += 2, ++u, ++v)
+		{
+			auto uu = Convert16To10<VR>(ltoh16(pp[0]));
+			*u = (uu - uprev) & 0x3ff;
+			++pUCountTable[*u];
+			uprev = uu;
+			auto vv = Convert16To10<VR>(ltoh16(pp[1]));
+			*v = (vv - vprev) & 0x3ff;
+			++pVCountTable[*v];
+			vprev = vv;
+		}
+	}
+}
+
+#ifdef GENERATE_SSE41
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
 #endif

@@ -211,6 +211,44 @@ bool CUQY0Codec::PredictDirect(uint32_t nBandIndex)
 			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(v, pSrcVBegin, pSrcVEnd, m_cbPlanePredictStride[2], m_cbPlanePredictStride[2], m_counts[nBandIndex].dwCount[2]);
 		}
 		return true;
+
+	case UTVF_P010:
+		{
+			const uint8_t *pSrcYBegin, *pSrcUVBegin;
+			const uint8_t *pSrcYEnd, *pSrcUVEnd;
+
+			pSrcYBegin = ((const uint8_t*)m_pInput);
+			pSrcUVBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
+
+			pSrcYEnd  = pSrcYBegin  + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcUVEnd = pSrcUVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
+
+			pSrcYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
+
+			ConvertLittleEndian16ToHostEndian10Noround_PredictCylindricalLeftAndCount(y, pSrcYBegin, pSrcYEnd, m_cbPlanePredictStride[0], m_cbPlanePredictStride[0], m_counts[nBandIndex].dwCount[0]);
+			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround_PredictCylindricalLeftAndCount(u, v, pSrcUVBegin, pSrcUVEnd, m_nWidth * 2, m_nWidth * 2, m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+		}
+		return true;
+
+	case UTVF_P016:
+		{
+			const uint8_t *pSrcYBegin, *pSrcUVBegin;
+			const uint8_t *pSrcYEnd, *pSrcUVEnd;
+
+			pSrcYBegin = ((const uint8_t*)m_pInput);
+			pSrcUVBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
+
+			pSrcYEnd  = pSrcYBegin  + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcUVEnd = pSrcUVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
+
+			pSrcYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
+			pSrcUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
+
+			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(y, pSrcYBegin, pSrcYEnd, m_cbPlanePredictStride[0], m_cbPlanePredictStride[0], m_counts[nBandIndex].dwCount[0]);
+			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited_PredictCylindricalLeftAndCount(u, v, pSrcUVBegin, pSrcUVEnd, m_nWidth * 2, m_nWidth * 2, m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+		}
+		return true;
 	}
 
 	return false;

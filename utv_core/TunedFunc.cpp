@@ -194,7 +194,10 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictCPP = {
 	cpp_ConvertR210ToUQRG_PredictCylindricalLeftAndCount,
 	cpp_ConvertUQRGToR210_RestoreCylindricalLeft,
 	cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>,
+	cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::NOROUND>,
 	cpp_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft,
+	cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>,
+	cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::NOROUND>,
 };
 
 const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackCPP = {

@@ -846,6 +846,7 @@ void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount(uint
 }
 
 template void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable);
+template void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::NOROUND>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable);
 
 //
 
@@ -869,3 +870,36 @@ void cpp_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(uint8_t* pDs
 		}
 	}
 }
+
+//
+
+template<VALUERANGE VR>
+void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable)
+{
+	uint16_t uprev = 0x200;
+	uint16_t vprev = 0x200;
+
+	auto u = (uint16_t*)pUBegin;
+	auto v = (uint16_t*)pVBegin;
+
+	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride)
+	{
+		auto pStrideEnd = (const uint16_t*)(p + cbWidth);
+		auto pp = (const uint16_t*)p;
+
+		for (; pp < pStrideEnd; pp += 2, ++u, ++v)
+		{
+			auto uu = Convert16To10<VR>(ltoh16(pp[0]));
+			*u = (uu - uprev) & 0x3ff;
+			++pUCountTable[*u];
+			uprev = uu;
+			auto vv = Convert16To10<VR>(ltoh16(pp[1]));
+			*v = (vv - vprev) & 0x3ff;
+			++pVCountTable[*v];
+			vprev = vv;
+		}
+	}
+}
+
+template void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
+template void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);

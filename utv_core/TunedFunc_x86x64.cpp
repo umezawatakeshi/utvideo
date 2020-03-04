@@ -565,7 +565,10 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictSSE41 = {
 	tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41>,
 	tuned_ConvertUQRGToR210_RestoreCylindricalLeft<CODEFEATURE_SSE41>,
 	tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::LIMITED>,
+	tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::NOROUND>,
 	tuned_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft<CODEFEATURE_SSE41>,
+	tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::LIMITED>,
+	tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::NOROUND>,
 };
 
 const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictAVX1 = {
@@ -620,7 +623,10 @@ const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictAVX1 = {
 	tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1>,
 	tuned_ConvertUQRGToR210_RestoreCylindricalLeft<CODEFEATURE_AVX1>,
 	tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::LIMITED>,
+	tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::NOROUND>,
 	tuned_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft<CODEFEATURE_AVX1>,
+	tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::LIMITED>,
+	tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::NOROUND>,
 };
 
 
