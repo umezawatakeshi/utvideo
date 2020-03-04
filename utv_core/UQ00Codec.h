@@ -147,7 +147,7 @@ protected:
 	virtual bool PredictDirect(uint32_t nBandIndex);
 	virtual void GenerateDecodeTable(uint32_t nPlaneIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
-	virtual void RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd);
+	virtual void RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin);
 	virtual bool RestoreDirect(uint32_t nBandIndex);
 	virtual bool IsDirectRestorable();
 

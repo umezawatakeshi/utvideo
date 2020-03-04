@@ -284,16 +284,18 @@ bool CUQY0Codec::DecodeDirect(uint32_t nBandIndex)
 	return false;
 }
 
-void CUQY0Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd)
+void CUQY0Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin)
 {
 	if (m_utvfRaw == UTVF_YUV420P16LE)
 	{
 		uint8_t* pCurDstBegin;
 		uint8_t* pCurDstEnd;
+		const uint8_t* pSrcBegin;
 
 		pCurDstBegin = pDstBegin[nPlaneIndex] + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		pCurDstEnd = pDstBegin[nPlaneIndex] + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		pSrcBegin = m_pPredicted->GetPlane(nPlaneIndex) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 
-		ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, (const uint8_t*)pSrcBegin, m_cbPlanePredictStride[nPlaneIndex], m_cbPlanePredictStride[nPlaneIndex]);
+		ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, pSrcBegin, m_cbPlanePredictStride[nPlaneIndex], m_cbPlanePredictStride[nPlaneIndex]);
 	}
 }
