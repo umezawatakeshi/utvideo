@@ -183,6 +183,7 @@ struct TUNEDFUNC_CONVERT_PREDICT
 	void (*pfnConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft)(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited_PredictCylindricalLeftAndCount)(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
 	void (*pfnConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround_PredictCylindricalLeftAndCount)(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
+	void (*pfnConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft)(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride);
 };
 
 struct TUNEDFUNC_CONVERT_SYMPACK
@@ -383,6 +384,7 @@ public:
 #define ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft tfn.pConvertPredict->pfnConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft
 #define ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited_PredictCylindricalLeftAndCount tfn.pConvertPredict->pfnConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited_PredictCylindricalLeftAndCount
 #define ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround_PredictCylindricalLeftAndCount tfn.pConvertPredict->pfnConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround_PredictCylindricalLeftAndCount
+#define ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft tfn.pConvertPredict->pfnConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft
 
 #define ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8 tfn.pConvertSymPack->pfnConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8
 #define ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8(gp, gcb, gc, bp, bcb, bc, rp, rcb, rc, p, q, w, s) ConvertBGRToULRG_Pack8SymAfterPredictPlanarGradient8(gp, gcb, gc, rp, rcb, rc, bp, bcb, bc, p, q, w, s)

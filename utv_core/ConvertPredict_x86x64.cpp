@@ -1725,3 +1725,59 @@ template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCyl
 template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
 template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
 #endif
+
+//
+
+template<int F>
+void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	uint16_t uprev = 0x8000;
+	uint16_t vprev = 0x8000;
+
+	auto u = (const uint16_t*)pUBegin;
+	auto v = (const uint16_t*)pVBegin;
+
+	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	{
+		auto pStrideEnd = (uint16_t*)(p + cbWidth);
+		auto pp = (uint16_t*)p;
+
+		__m128i uprevv = _mm_set1_epi16(uprev);
+		__m128i vprevv = _mm_set1_epi16(vprev);
+		for (; pp <= pStrideEnd - 16; pp += 16)
+		{
+			__m128i uu = _mm_loadu_si128((const __m128i*)u);
+			auto uvalue = tuned_RestoreLeft16Element<F>(uprevv, uu);
+			__m128i vv = _mm_loadu_si128((const __m128i*)v);
+			auto vvalue = tuned_RestoreLeft16Element<F>(vprevv, vv);
+			auto m0 = _mm_unpacklo_epi16(uvalue.v0, vvalue.v0);
+			auto m1 = _mm_unpackhi_epi16(uvalue.v0, vvalue.v0);
+			_mm_storeu_si128((__m128i*)pp, m0);
+			_mm_storeu_si128((__m128i*)(pp + 8), m1);
+			uprevv = uvalue.v1;
+			vprevv = vvalue.v1;
+
+			u += 8;
+			v += 8;
+		}
+		uprev = _mm_cvtsi128_si32(uprevv);
+		vprev = _mm_cvtsi128_si32(vprevv);
+
+		for (; pp < pStrideEnd; pp += 2)
+		{
+			pp[0] = htol16(uprev += *u);
+			pp[1] = htol16(vprev += *v);
+
+			++u;
+			++v;
+		}
+	}
+}
+
+#ifdef GENERATE_SSE41
+template void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft<CODEFEATURE_SSE41>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride);
+#endif

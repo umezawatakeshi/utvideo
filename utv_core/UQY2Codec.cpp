@@ -282,28 +282,45 @@ bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
 
 void CUQY2Codec::GenerateDecodeTable(uint32_t nPlaneIndex)
 {
-	if (m_utvfRaw == UTVF_YUV422P16LE)
+	switch (m_utvfRaw)
 	{
+	case UTVF_YUV422P16LE:
+	case UTVF_P210:
+	case UTVF_P216:
 		GenerateHuffmanDecodeTable<10, 6>(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
-	}
-	else
-	{
+		break;
+
+	default:
 		CUQ00Codec::GenerateDecodeTable(nPlaneIndex);
 	}
 }
 
 bool CUQY2Codec::DecodeDirect(uint32_t nBandIndex)
 {
-	if (m_utvfRaw == UTVF_YUV422P16LE)
+	switch (m_utvfRaw)
 	{
-		uint8_t* pDstBegin[3];
+	case UTVF_YUV422P16LE:
+		{
+			uint8_t* pDstBegin[3];
 
-		pDstBegin[0] = ((uint8_t*)m_pOutput);
-		pDstBegin[1] = pDstBegin[0] + m_nWidth * m_nHeight * 2;
-		pDstBegin[2] = pDstBegin[1] + m_nWidth * m_nHeight;
+			pDstBegin[0] = ((uint8_t*)m_pOutput);
+			pDstBegin[1] = pDstBegin[0] + m_nWidth * m_nHeight * 2;
+			pDstBegin[2] = pDstBegin[1] + m_nWidth * m_nHeight;
 
-		DecodeAndRestoreCustomToPlanar(nBandIndex, pDstBegin);
+			DecodeAndRestoreCustomToPlanar(nBandIndex, pDstBegin);
+		}
+		return true;
 
+	case UTVF_P210:
+	case UTVF_P216:
+		{
+			uint8_t* pDstBegin[2];
+
+			pDstBegin[0] = ((uint8_t*)m_pOutput);
+			pDstBegin[1] = pDstBegin[0] + m_nWidth * m_nHeight * 2;
+
+			DecodeAndRestoreCustomToPlanar(nBandIndex, pDstBegin);
+		}
 		return true;
 	}
 
@@ -312,16 +329,50 @@ bool CUQY2Codec::DecodeDirect(uint32_t nBandIndex)
 
 void CUQY2Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin)
 {
-	if (m_utvfRaw == UTVF_YUV422P16LE)
+	switch (m_utvfRaw)
 	{
-		uint8_t *pCurDstBegin;
-		uint8_t *pCurDstEnd;
-		const uint8_t* pSrcBegin;
+	case UTVF_YUV422P16LE:
+		{
+			uint8_t *pCurDstBegin;
+			uint8_t *pCurDstEnd;
+			const uint8_t* pSrcBegin;
 
-		pCurDstBegin = pDstBegin[nPlaneIndex] + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-		pCurDstEnd   = pDstBegin[nPlaneIndex] + m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
-		pSrcBegin = m_pPredicted->GetPlane(nPlaneIndex) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+			pCurDstBegin = pDstBegin[nPlaneIndex] + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+			pCurDstEnd   = pDstBegin[nPlaneIndex] + m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
+			pSrcBegin = m_pPredicted->GetPlane(nPlaneIndex) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 
-		ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, pSrcBegin, m_cbPlanePredictStride[nPlaneIndex], m_cbPlanePredictStride[nPlaneIndex]);
+			ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, pSrcBegin, m_cbPlanePredictStride[nPlaneIndex], m_cbPlanePredictStride[nPlaneIndex]);
+		}
+		break;
+
+	case UTVF_P210:
+	case UTVF_P216:
+		if (nPlaneIndex == 0)
+		{
+			uint8_t* pCurDstBegin;
+			uint8_t* pCurDstEnd;
+			const uint8_t* pSrcBegin;
+
+			pCurDstBegin = pDstBegin[nPlaneIndex] + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+			pCurDstEnd = pDstBegin[nPlaneIndex] + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+			pSrcBegin = m_pPredicted->GetPlane(nPlaneIndex) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+
+			ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, pSrcBegin, m_cbPlanePredictStride[nPlaneIndex], m_cbPlanePredictStride[nPlaneIndex]);
+		}
+		else if (nPlaneIndex == 2)
+		{
+			uint8_t* pCurDstBegin;
+			uint8_t* pCurDstEnd;
+			const uint8_t* pUBegin;
+			const uint8_t* pVBegin;
+
+			pCurDstBegin = pDstBegin[1] + m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
+			pCurDstEnd = pDstBegin[1] + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
+			pUBegin = m_pPredicted->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_nWidth;
+			pVBegin = m_pPredicted->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_nWidth;
+
+			ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, pUBegin, pVBegin, m_nWidth * 2, m_nWidth * 2);
+		}
+		break;
 	}
 }

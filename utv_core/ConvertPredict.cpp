@@ -903,3 +903,29 @@ void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLef
 
 template void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
 template void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
+
+//
+
+void cpp_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	uint16_t uprev = 0x8000;
+	uint16_t vprev = 0x8000;
+
+	auto u = (const uint16_t*)pUBegin;
+	auto v = (const uint16_t*)pVBegin;
+
+	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	{
+		auto pStrideEnd = (uint16_t*)(p + cbWidth);
+		auto pp = (uint16_t*)p;
+
+		for (; pp < pStrideEnd; pp += 2)
+		{
+			pp[0] = htol16(uprev += *u);
+			pp[1] = htol16(vprev += *v);
+
+			++u;
+			++v;
+		}
+	}
+}
