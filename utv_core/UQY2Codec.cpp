@@ -10,18 +10,18 @@
 #include "ByteOrder.h"
 
 const utvf_t CUQY2Codec::m_utvfEncoderInput[] = {
-	UTVF_v210,
 	UTVF_P210,
 	UTVF_P216,
 	UTVF_YUV422P16LE,
+	UTVF_v210,
 	UTVF_INVALID,
 };
 
 const utvf_t CUQY2Codec::m_utvfDecoderOutput[] = {
-	UTVF_v210,
 	UTVF_P210,
 	UTVF_P216,
 	UTVF_YUV422P16LE,
+	UTVF_v210,
 	UTVF_INVALID,
 };
 

@@ -88,7 +88,7 @@ const vector<vector<DWORD> > vecSupportedInputFccs = {
 	{ 32, 24, FCC('YUY2'), FCC('YUYV'), FCC('YUNV'), FCC('yuvs'), FCC('UYVY'), FCC('UYNV'), FCC('2vuy'), FCC('HDYC'), FCC('YV16'), FCC('YV12') },
 
 	{ FCC('P010'), FCC('P016'), MAKEFOURCC('Y', '3', 11, 16), },
-	{ FCC('v210'), FCC('P210'), FCC('P216'), MAKEFOURCC('Y', '3', 10, 16), },
+	{ FCC('P210'), FCC('P216'), MAKEFOURCC('Y', '3', 10, 16), FCC('v210'), },
 	{ FCC('r210'), FCC('b48r'), FCC('b64a'), },
 	{ FCC('b64a') },
 
@@ -230,7 +230,7 @@ const vector<DWORD> vecTopPriorityRawFcc = {
 	FCC('YV12'),
 
 	FCC('P010'),
-	FCC('v210'),
+	FCC('P210'),
 	FCC('r210'),
 	FCC('b64a'),
 
