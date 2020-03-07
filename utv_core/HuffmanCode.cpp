@@ -447,7 +447,7 @@ symbol_t<B> * cpp_HuffmanDecode(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, co
 
 		for (int i = 0; i < symlen && pDst < (symbol_t<B> *)pDstEnd; i++)
 		{
-			*pDst++ = combined;
+			*pDst++ = (symbol_t<B>)combined;
 			combined >>= sizeof(symbol_t<B>) * 8;
 		}
 		nBits += codelen;

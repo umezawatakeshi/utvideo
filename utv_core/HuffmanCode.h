@@ -19,6 +19,7 @@ typedef uint32_t uintenc_t;
 
 #if defined(__x86_64__)
 #define ENABLE_MULTI_SYMBOL_HUFFMAN_ENCODE 1
+#define ENABLE_COMBINE_64BIT_HUFFMAN_DECODE 1
 #endif
 
 template<int B>
@@ -55,9 +56,13 @@ struct HUFFMAN_ENCODE_TABLE<8>
 template<int B>
 struct HUFFMAN_DECODE_TABLE
 {
-	typedef uint32_t combined_t;
+#ifdef ENABLE_COMBINE_64BIT_HUFFMAN_DECODE
+	using combined_t = uint64_t;
+#else
+	using combined_t = uint32_t;
+#endif
 
-	static constexpr int LOOKUP_BITS = 12; // MultiSpeedTable Ç™çáåv 24KiB Ç…Ç»ÇÈ
+	static constexpr int LOOKUP_BITS = 12;
 
 	struct
 	{
