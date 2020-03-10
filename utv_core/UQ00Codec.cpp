@@ -208,7 +208,7 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 			count[i] = 0;
 		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 			for (int i = 0; i < 1024; i++)
-				count[i] += m_counts[nBandIndex].dwCount[nPlaneIndex][i];
+				count[i] += m_counts[nBandIndex].dwCount[nPlaneIndex][0][i];
 		GenerateHuffmanCodeLengthTable<10>(&CodeLengthTable, count);
 		GenerateHuffmanEncodeTable<10>(&m_het[nPlaneIndex], &CodeLengthTable);
 		m_pdwOffsetTable[nPlaneIndex] = (uint32_t *)p;
@@ -218,7 +218,7 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 			uint32_t dwBits;
 			dwBits = 0;
 			for (int i = 0; i < 1024; i++)
-				dwBits += CodeLengthTable.codelen[i] * m_counts[nBandIndex].dwCount[nPlaneIndex][i];
+				dwBits += CodeLengthTable.codelen[i] * m_counts[nBandIndex].dwCount[nPlaneIndex][0][i];
 			dwCurrentOffset += ROUNDUP(dwBits, 32) / 8;
 			*(uint32_t *)p = htol32(dwCurrentOffset);
 			p += 4;
@@ -359,21 +359,24 @@ int CUQ00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned i
 
 void CUQ00Codec::PredictProc(uint32_t nBandIndex)
 {
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	memset(&m_counts[nBandIndex], 0, sizeof(m_counts[nBandIndex]));
+
+	if (!PredictDirect(nBandIndex))
 	{
-		for (int i = 0; i < 1024; i++)
-			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
+		ConvertToPlanar(nBandIndex);
+
+		const uint8_t* pSrcBegin[4];
+		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+			pSrcBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
+		PredictFromPlanar(nBandIndex, pSrcBegin);
 	}
 
-	if (PredictDirect(nBandIndex))
-		return;
-
-	ConvertToPlanar(nBandIndex);
-
-	const uint8_t* pSrcBegin[4];
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
-		pSrcBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
-	PredictFromPlanar(nBandIndex, pSrcBegin);
+	{
+		for (int j = 1; j < NUM_COUNT_TABLES_PER_CHANNEL<10>; ++j)
+			for (int i = 0; i < 1024; i++)
+				m_counts[nBandIndex].dwCount[nPlaneIndex][0][i] += m_counts[nBandIndex].dwCount[nPlaneIndex][j][i];
+	}
 }
 
 void CUQ00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin)

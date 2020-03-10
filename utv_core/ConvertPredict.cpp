@@ -11,7 +11,7 @@
 #include "ByteOrder.h"
 
 template<class T, bool A, PREDICTION_TYPE Pred>
-static inline void cpp_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable)
+static inline void cpp_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256], uint32_t pACountTable[][256])
 {
 	uint8_t gprevb = 0x80;
 	uint8_t bprevb = 0;
@@ -31,13 +31,13 @@ static inline void cpp_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uint8
 		{
 			uint8_t gg = pp[T::G];
 			*g = gg - gprevb;
-			++pGCountTable[*g];
+			++pGCountTable[0][*g];
 			uint8_t bb = pp[T::B] - gg;
 			*b = bb - bprevb;
-			++pBCountTable[*b];
+			++pBCountTable[0][*b];
 			uint8_t rr = pp[T::R] - gg;
 			*r = rr - rprevb;
-			++pRCountTable[*r];
+			++pRCountTable[0][*r];
 
 			gprevb = gg;
 			bprevb = bb;
@@ -46,7 +46,7 @@ static inline void cpp_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uint8
 			{
 				uint8_t aa = pp[T::A];
 				*a = aa - aprevb;
-				++pACountTable[*a];
+				++pACountTable[0][*a];
 				aprevb = aa;
 			}
 
@@ -72,13 +72,13 @@ static inline void cpp_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uint8
 		{
 			uint8_t gg = pp[T::G] - (pp - scbStride)[T::G];
 			*g = gg - gprevb;
-			++pGCountTable[*g];
+			++pGCountTable[0][*g];
 			uint8_t bb = pp[T::B] - (pp - scbStride)[T::B] - gg;
 			*b = bb - bprevb;
-			++pBCountTable[*b];
+			++pBCountTable[0][*b];
 			uint8_t rr = pp[T::R] - (pp - scbStride)[T::R] - gg;
 			*r = rr - rprevb;
-			++pRCountTable[*r];
+			++pRCountTable[0][*r];
 
 			gprevb = gg;
 			bprevb = bb;
@@ -87,7 +87,7 @@ static inline void cpp_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uint8
 			{
 				uint8_t aa = pp[T::A] - (pp - scbStride)[T::A];
 				*a = aa - aprevb;
-				++pACountTable[*a];
+				++pACountTable[0][*a];
 				aprevb = aa;
 			}
 
@@ -119,21 +119,21 @@ static inline void cpp_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uint8
 			uint8_t gg = pp[T::G];
 			uint8_t gtop = (pp - scbStride)[T::G];
 			*g = gg - median<uint8_t>(gprevb, gtop, gprevb + gtop - gtopprevb);
-			++pGCountTable[*g];
+			++pGCountTable[0][*g];
 			uint8_t bb = pp[T::B] - gg + 0x80;
 			uint8_t btop = (pp - scbStride)[T::B] - gtop + 0x80;
 			*b = bb - median<uint8_t>(bprevb, btop, bprevb + btop - btopprevb);
-			++pBCountTable[*b];
+			++pBCountTable[0][*b];
 			uint8_t rr = pp[T::R] - gg + 0x80;
 			uint8_t rtop = (pp - scbStride)[T::R] - gtop + 0x80;
 			*r = rr - median<uint8_t>(rprevb, rtop, rprevb + rtop - rtopprevb);
-			++pRCountTable[*r];
+			++pRCountTable[0][*r];
 			if (A)
 			{
 				uint8_t aa = pp[T::A];
 				uint8_t atop = (pp - scbStride)[T::A];
 				*a = aa - median<uint8_t>(aprevb, atop, aprevb + atop - atopprevb);
-				++pACountTable[*a];
+				++pACountTable[0][*a];
 				aprevb = aa;
 				atopprevb = atop;
 			}
@@ -155,56 +155,56 @@ static inline void cpp_ConvertRGBXToULRX_PredictAndCount(uint8_t *pGBegin, uint8
 }
 
 template<class T>
-void cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable)
+void cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256])
 {
 	cpp_ConvertRGBXToULRX_PredictAndCount<T, false, CYLINDRICAL_LEFT>(pGBegin, pBBegin, pRBegin, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, NULL);
 }
 
 template<class T>
-void cpp_ConvertRGBAToULRA_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable)
+void cpp_ConvertRGBAToULRA_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256], uint32_t pACountTable[][256])
 {
 	cpp_ConvertRGBXToULRX_PredictAndCount<T, true, CYLINDRICAL_LEFT>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, pACountTable);
 }
 
 template<class T>
-void cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable)
+void cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256])
 {
 	cpp_ConvertRGBXToULRX_PredictAndCount<T, false, PLANAR_GRADIENT>(pGBegin, pBBegin, pRBegin, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, NULL);
 }
 
 template<class T>
-void cpp_ConvertRGBAToULRA_PredictPlanarGradientAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable)
+void cpp_ConvertRGBAToULRA_PredictPlanarGradientAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256], uint32_t pACountTable[][256])
 {
 	cpp_ConvertRGBXToULRX_PredictAndCount<T, true, PLANAR_GRADIENT>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, pACountTable);
 }
 
 template<class T>
-void cpp_ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable)
+void cpp_ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256])
 {
 	cpp_ConvertRGBXToULRX_PredictAndCount<T, false, CYLINDRICAL_WRONG_MEDIAN>(pGBegin, pBBegin, pRBegin, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, NULL);
 }
 
 template<class T>
-void cpp_ConvertRGBAToULRA_PredictCylindricalWrongMedianAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable)
+void cpp_ConvertRGBAToULRA_PredictCylindricalWrongMedianAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256], uint32_t pACountTable[][256])
 {
 	cpp_ConvertRGBXToULRX_PredictAndCount<T, true, CYLINDRICAL_WRONG_MEDIAN>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, pACountTable);
 }
 
-template void cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount<CBGRColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable);
-template void cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable);
-template void cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable);
-template void cpp_ConvertRGBAToULRA_PredictCylindricalLeftAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable);
-template void cpp_ConvertRGBAToULRA_PredictCylindricalLeftAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable);
-template void cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount<CBGRColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable);
-template void cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable);
-template void cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable);
-template void cpp_ConvertRGBAToULRA_PredictPlanarGradientAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable);
-template void cpp_ConvertRGBAToULRA_PredictPlanarGradientAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable);
-template void cpp_ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount<CBGRColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable);
-template void cpp_ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable);
-template void cpp_ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable);
-template void cpp_ConvertRGBAToULRA_PredictCylindricalWrongMedianAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable);
-template void cpp_ConvertRGBAToULRA_PredictCylindricalWrongMedianAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable);
+template void cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount<CBGRColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256]);
+template void cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256]);
+template void cpp_ConvertRGBToULRG_PredictCylindricalLeftAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256]);
+template void cpp_ConvertRGBAToULRA_PredictCylindricalLeftAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256], uint32_t pACountTable[][256]);
+template void cpp_ConvertRGBAToULRA_PredictCylindricalLeftAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256], uint32_t pACountTable[][256]);
+template void cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount<CBGRColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256]);
+template void cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256]);
+template void cpp_ConvertRGBToULRG_PredictPlanarGradientAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256]);
+template void cpp_ConvertRGBAToULRA_PredictPlanarGradientAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256], uint32_t pACountTable[][256]);
+template void cpp_ConvertRGBAToULRA_PredictPlanarGradientAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256], uint32_t pACountTable[][256]);
+template void cpp_ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount<CBGRColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256]);
+template void cpp_ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256]);
+template void cpp_ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256]);
+template void cpp_ConvertRGBAToULRA_PredictCylindricalWrongMedianAndCount<CBGRAColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256], uint32_t pACountTable[][256]);
+template void cpp_ConvertRGBAToULRA_PredictCylindricalWrongMedianAndCount<CARGBColorOrder>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][256], uint32_t pBCountTable[][256], uint32_t pRCountTable[][256], uint32_t pACountTable[][256]);
 
 //
 
@@ -379,7 +379,7 @@ template void cpp_ConvertULRAToRGBA_RestoreCylindricalWrongMedian<CARGBColorOrde
 //
 
 template<class T, PREDICTION_TYPE Pred>
-static inline void cpp_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pYCountTable, uint32_t *pUCountTable, uint32_t *pVCountTable)
+static inline void cpp_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pYCountTable[][256], uint32_t pUCountTable[][256], uint32_t pVCountTable[][256])
 {
 	uint8_t yprevb = 0x80;
 	uint8_t uprevb = 0x80;
@@ -397,16 +397,16 @@ static inline void cpp_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBegi
 		{
 			uint8_t yy0 = pp[T::Y0];
 			*y = yy0 - yprevb;
-			++pYCountTable[*y];
+			++pYCountTable[0][*y];
 			uint8_t yy1 = pp[T::Y1];
 			*(y + 1) = yy1 - yy0;
-			++pYCountTable[*(y + 1)];
+			++pYCountTable[1][*(y + 1)];
 			uint8_t uu = pp[T::U];
 			*u = uu - uprevb;
-			++pUCountTable[*u];
+			++pUCountTable[0][*u];
 			uint8_t vv = pp[T::V];
 			*v = vv - vprevb;
-			++pVCountTable[*v];
+			++pVCountTable[0][*v];
 
 			yprevb = yy1;
 			uprevb = uu;
@@ -430,16 +430,16 @@ static inline void cpp_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBegi
 		{
 			uint8_t yy0 = pp[T::Y0] - (pp - scbStride)[T::Y0];
 			*y = yy0 - yprevb;
-			++pYCountTable[*y];
+			++pYCountTable[0][*y];
 			uint8_t yy1 = pp[T::Y1] - (pp - scbStride)[T::Y1];
 			*(y + 1) = yy1 - yy0;
-			++pYCountTable[*(y + 1)];
+			++pYCountTable[1][*(y + 1)];
 			uint8_t uu = pp[T::U] - (pp - scbStride)[T::U];
 			*u = uu - uprevb;
-			++pUCountTable[*u];
+			++pUCountTable[0][*u];
 			uint8_t vv = pp[T::V] - (pp - scbStride)[T::V];
 			*v = vv - vprevb;
-			++pVCountTable[*v];
+			++pVCountTable[0][*v];
 
 			yprevb = yy1;
 			uprevb = uu;
@@ -468,19 +468,19 @@ static inline void cpp_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBegi
 			uint8_t yy0 = pp[T::Y0];
 			uint8_t ytop0 = (pp - scbStride)[T::Y0];
 			*y = yy0 - median<uint8_t>(yprevb, ytop0, yprevb + ytop0 - ytopprevb);
-			++pYCountTable[*y];
+			++pYCountTable[0][*y];
 			uint8_t yy1 = pp[T::Y1];
 			uint8_t ytop1 = (pp - scbStride)[T::Y1];
 			*(y + 1) = yy1 - median<uint8_t>(yy0, ytop1, yy0 + ytop1 - ytop0);
-			++pYCountTable[*(y + 1)];
+			++pYCountTable[1][*(y + 1)];
 			uint8_t uu = pp[T::U];
 			uint8_t utop = (pp - scbStride)[T::U];
 			*u = uu - median<uint8_t>(uprevb, utop, uprevb + utop - utopprevb);
-			++pUCountTable[*u];
+			++pUCountTable[0][*u];
 			uint8_t vv = pp[T::V];
 			uint8_t vtop = (pp - scbStride)[T::V];
 			*v = vv - median<uint8_t>(vprevb, vtop, vprevb + vtop - vtopprevb);
-			++pVCountTable[*v];
+			++pVCountTable[0][*v];
 
 			yprevb = yy1;
 			uprevb = uu;
@@ -497,29 +497,29 @@ static inline void cpp_ConvertPackedYUV422ToULY2_PredictAndCount(uint8_t *pYBegi
 }
 
 template<class T>
-void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalLeftAndCount(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pYCountTable, uint32_t *pUCountTable, uint32_t *pVCountTable)
+void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalLeftAndCount(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pYCountTable[][256], uint32_t pUCountTable[][256], uint32_t pVCountTable[][256])
 {
 	cpp_ConvertPackedYUV422ToULY2_PredictAndCount<T, CYLINDRICAL_LEFT>(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pYCountTable, pUCountTable, pVCountTable);
 }
 
 template<class T>
-void cpp_ConvertPackedYUV422ToULY2_PredictPlanarGradientAndCount(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pYCountTable, uint32_t *pUCountTable, uint32_t *pVCountTable)
+void cpp_ConvertPackedYUV422ToULY2_PredictPlanarGradientAndCount(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pYCountTable[][256], uint32_t pUCountTable[][256], uint32_t pVCountTable[][256])
 {
 	cpp_ConvertPackedYUV422ToULY2_PredictAndCount<T, PLANAR_GRADIENT>(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pYCountTable, pUCountTable, pVCountTable);
 }
 
 template<class T>
-void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalWrongMedianAndCount(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pYCountTable, uint32_t *pUCountTable, uint32_t *pVCountTable)
+void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalWrongMedianAndCount(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pYCountTable[][256], uint32_t pUCountTable[][256], uint32_t pVCountTable[][256])
 {
 	cpp_ConvertPackedYUV422ToULY2_PredictAndCount<T, CYLINDRICAL_WRONG_MEDIAN>(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pYCountTable, pUCountTable, pVCountTable);
 }
 
-template void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalLeftAndCount<CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pYCountTable, uint32_t *pUCountTable, uint32_t *pVCountTable);
-template void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalLeftAndCount<CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pYCountTable, uint32_t *pUCountTable, uint32_t *pVCountTable);
-template void cpp_ConvertPackedYUV422ToULY2_PredictPlanarGradientAndCount<CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pYCountTable, uint32_t *pUCountTable, uint32_t *pVCountTable);
-template void cpp_ConvertPackedYUV422ToULY2_PredictPlanarGradientAndCount<CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pYCountTable, uint32_t *pUCountTable, uint32_t *pVCountTable);
-template void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalWrongMedianAndCount<CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pYCountTable, uint32_t *pUCountTable, uint32_t *pVCountTable);
-template void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalWrongMedianAndCount<CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pYCountTable, uint32_t *pUCountTable, uint32_t *pVCountTable);
+template void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalLeftAndCount<CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pYCountTable[][256], uint32_t pUCountTable[][256], uint32_t pVCountTable[][256]);
+template void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalLeftAndCount<CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pYCountTable[][256], uint32_t pUCountTable[][256], uint32_t pVCountTable[][256]);
+template void cpp_ConvertPackedYUV422ToULY2_PredictPlanarGradientAndCount<CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pYCountTable[][256], uint32_t pUCountTable[][256], uint32_t pVCountTable[][256]);
+template void cpp_ConvertPackedYUV422ToULY2_PredictPlanarGradientAndCount<CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pYCountTable[][256], uint32_t pUCountTable[][256], uint32_t pVCountTable[][256]);
+template void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalWrongMedianAndCount<CYUYVColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pYCountTable[][256], uint32_t pUCountTable[][256], uint32_t pVCountTable[][256]);
+template void cpp_ConvertPackedYUV422ToULY2_PredictCylindricalWrongMedianAndCount<CUYVYColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pYCountTable[][256], uint32_t pUCountTable[][256], uint32_t pVCountTable[][256]);
 
 //
 
@@ -641,7 +641,7 @@ template void cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CUYVYC
 //
 
 template<bool A>
-static inline void cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable)
+static inline void cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024])
 {
 	uint16_t gprevb = 0x200;
 	uint16_t bprevb = 0;
@@ -661,13 +661,13 @@ static inline void cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_t 
 		{
 			uint16_t gg = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[2]));
 			*g = (gg - gprevb) & 0x3ff;
-			++pGCountTable[*g];
+			++pGCountTable[0][*g];
 			uint16_t bb = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[3])) - gg;
 			*b = (bb - bprevb) & 0x3ff;
-			++pBCountTable[*b];
+			++pBCountTable[0][*b];
 			uint16_t rr = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[1])) - gg;
 			*r = (rr - rprevb) & 0x3ff;
-			++pRCountTable[*r];
+			++pRCountTable[0][*r];
 
 			gprevb = gg;
 			bprevb = bb;
@@ -675,7 +675,7 @@ static inline void cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_t 
 			if (A) {
 				uint16_t aa = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[0]));
 				*a = (aa - aprevb) & 0x3ff;
-				++pACountTable[*a];
+				++pACountTable[0][*a];
 				aprevb = aa;
 			}
 
@@ -688,12 +688,12 @@ static inline void cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_t 
 	}
 }
 
-void cpp_ConvertB64aToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable)
+void cpp_ConvertB64aToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024])
 {
 	cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount<false>(pGBegin, pBBegin, pRBegin, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, NULL);
 }
 
-void cpp_ConvertB64aToUQRA_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable, uint32_t *pACountTable)
+void cpp_ConvertB64aToUQRA_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024])
 {
 	cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount<true>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, pACountTable);
 }
@@ -748,7 +748,7 @@ void cpp_ConvertUQRAToB64a_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *p
 
 //
 
-void cpp_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t *pGCountTable, uint32_t *pBCountTable, uint32_t *pRCountTable)
+void cpp_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024])
 {
 	uint16_t gprevb = 0x200;
 	uint16_t bprevb = 0;
@@ -769,13 +769,13 @@ void cpp_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint
 
 			uint16_t gg = val >> 10;
 			*g = (gg - gprevb) & 0x3ff;
-			++pGCountTable[*g];
+			++pGCountTable[0][*g];
 			uint16_t bb = val - gg;
 			*b = (bb - bprevb) & 0x3ff;
-			++pBCountTable[*b];
+			++pBCountTable[0][*b];
 			uint16_t rr = (val >> 20) - gg;
 			*r = (rr - rprevb) & 0x3ff;
-			++pRCountTable[*r];
+			++pRCountTable[0][*r];
 
 			gprevb = gg;
 			bprevb = bb;
@@ -822,7 +822,7 @@ void cpp_ConvertUQRGToR210_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *p
 //
 
 template<VALUERANGE VR>
-void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable)
+void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024])
 {
 	uint16_t prev = 0x200;
 
@@ -837,7 +837,7 @@ void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount(uint
 		{
 			uint16_t cur = Convert16To10<VR>(ltoh16(*pp));
 			*q = (cur - prev) & 0x3ff;
-			++pCountTable[*q];
+			++pCountTable[0][*q];
 			prev = cur;
 
 			++q;
@@ -845,8 +845,8 @@ void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount(uint
 	}
 }
 
-template void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable);
-template void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::NOROUND>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pCountTable);
+template void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024]);
+template void cpp_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::NOROUND>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024]);
 
 //
 
@@ -874,7 +874,7 @@ void cpp_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(uint8_t* pDs
 //
 
 template<VALUERANGE VR>
-void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable)
+void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024])
 {
 	uint16_t uprev = 0x200;
 	uint16_t vprev = 0x200;
@@ -891,18 +891,18 @@ void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLef
 		{
 			auto uu = Convert16To10<VR>(ltoh16(pp[0]));
 			*u = (uu - uprev) & 0x3ff;
-			++pUCountTable[*u];
+			++pUCountTable[0][*u];
 			uprev = uu;
 			auto vv = Convert16To10<VR>(ltoh16(pp[1]));
 			*v = (vv - vprev) & 0x3ff;
-			++pVCountTable[*v];
+			++pVCountTable[0][*v];
 			vprev = vv;
 		}
 	}
 }
 
-template void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
-template void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t* pUCountTable, uint32_t* pVCountTable);
+template void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024]);
+template void cpp_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024]);
 
 //
 
