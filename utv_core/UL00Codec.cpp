@@ -212,7 +212,7 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 			count[i] = 0;
 		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 			for (int i = 0; i < 256; i++)
-				count[i] += m_counts[nBandIndex].dwCount[nPlaneIndex][i];
+				count[i] += m_counts[nBandIndex].dwCount[nPlaneIndex][0][i];
 		m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<8> *)p;
 		GenerateHuffmanCodeLengthTable<8>(m_pCodeLengthTable[nPlaneIndex], count);
 		GenerateHuffmanEncodeTable(&m_het[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
@@ -223,7 +223,7 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 			uint32_t dwBits;
 			dwBits = 0;
 			for (int i = 0; i < 256; i++)
-				dwBits += m_pCodeLengthTable[nPlaneIndex]->codelen[i] * m_counts[nBandIndex].dwCount[nPlaneIndex][i];
+				dwBits += m_pCodeLengthTable[nPlaneIndex]->codelen[i] * m_counts[nBandIndex].dwCount[nPlaneIndex][0][i];
 			dwCurrentOffset += ROUNDUP(dwBits, 32) / 8;
 			*(uint32_t *)p = dwCurrentOffset;
 			p += 4;
@@ -397,21 +397,25 @@ int CUL00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned i
 
 void CUL00Codec::PredictProc(uint32_t nBandIndex)
 {
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	memset(&m_counts[nBandIndex], 0, sizeof(m_counts[nBandIndex]));
+
+	if (!PredictDirect(nBandIndex))
 	{
-		for (int i = 0; i < 256; i++)
-			m_counts[nBandIndex].dwCount[nPlaneIndex][i] = 0;
+		ConvertToPlanar(nBandIndex);
+
+		const uint8_t* pSrcBegin[4];
+		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+			pSrcBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
+		PredictFromPlanar(nBandIndex, pSrcBegin);
 	}
 
-	if (PredictDirect(nBandIndex))
-		return;
-
-	ConvertToPlanar(nBandIndex);
-
-	const uint8_t* pSrcBegin[4];
+	// 理想的にはここベクトル化してほしいんだけどどうなるんだろう
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
-		pSrcBegin[nPlaneIndex] = m_pCurFrame->GetPlane(nPlaneIndex);
-	PredictFromPlanar(nBandIndex, pSrcBegin);
+	{
+		for (int j = 1; j < NUM_COUNT_TABLES_PER_CHANNEL<8>; ++j)
+			for (int i = 0; i < 256; i++)
+				m_counts[nBandIndex].dwCount[nPlaneIndex][0][i] += m_counts[nBandIndex].dwCount[nPlaneIndex][j][i];
+	}
 }
 
 void CUL00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin)
@@ -639,6 +643,7 @@ void CUL00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* cons
 	 * decode と restore をお仕着せの処理で行う場合、
 	 * 全部の plane を decode してから全部の plane を restore するよりも、
 	 * plane ごとに decode して restore した方が、メインメモリへのアクセスが最適化されて速い。
+	 * （ULY0->YV12 4k マルチスレッドで 5% ぐらい違う）
 	 */
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)

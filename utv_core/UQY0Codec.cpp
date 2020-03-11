@@ -3,48 +3,46 @@
 
 #include "stdafx.h"
 #include "utvideo.h"
-#include "UQY2Codec.h"
+#include "UQY0Codec.h"
 #include "Predict.h"
 #include "Convert.h"
 #include "TunedFunc.h"
 #include "ByteOrder.h"
 
-const utvf_t CUQY2Codec::m_utvfEncoderInput[] = {
-	UTVF_P210,
-	UTVF_P216,
-	UTVF_YUV422P16LE,
-	UTVF_v210,
+const utvf_t CUQY0Codec::m_utvfEncoderInput[] = {
+	UTVF_P010,
+	UTVF_P016,
+	UTVF_YUV420P16LE,
 	UTVF_INVALID,
 };
 
-const utvf_t CUQY2Codec::m_utvfDecoderOutput[] = {
-	UTVF_P210,
-	UTVF_P216,
-	UTVF_YUV422P16LE,
-	UTVF_v210,
+const utvf_t CUQY0Codec::m_utvfDecoderOutput[] = {
+	UTVF_P010,
+	UTVF_P016,
+	UTVF_YUV420P16LE,
 	UTVF_INVALID,
 };
 
-const utvf_t CUQY2Codec::m_utvfCompressed[] = {
-	UTVF_UQY2,
+const utvf_t CUQY0Codec::m_utvfCompressed[] = {
+	UTVF_UQY0,
 	UTVF_INVALID,
 };
 
-CUQY2Codec::CUQY2Codec(const char *pszInterfaceName) : CUQ00Codec("UQY2", pszInterfaceName)
+CUQY0Codec::CUQY0Codec(const char *pszInterfaceName) : CUQ00Codec("UQY0", pszInterfaceName)
 {
 }
 
-void CUQY2Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
+void CUQY0Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 {
 	m_cbPlaneSize[0]          = width * height * 2;
-	m_cbPlaneSize[1]          = width * height;
-	m_cbPlaneSize[2]          = width * height;
+	m_cbPlaneSize[1]          = width * height / 2;
+	m_cbPlaneSize[2]          = width * height / 2;
 
 	m_cbPlaneWidth[0]         = width * 2;
 	m_cbPlaneWidth[1]         = width;
 	m_cbPlaneWidth[2]         = width;
 
-	m_cbPlaneStripeSize[0]    = width * 2;
+	m_cbPlaneStripeSize[0]    = width * 4;
 	m_cbPlaneStripeSize[1]    = width;
 	m_cbPlaneStripeSize[2]    = width;
 
@@ -53,7 +51,7 @@ void CUQY2Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 	m_cbPlanePredictStride[2] = width;
 }
 
-void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
+void CUQY0Codec::ConvertToPlanar(uint32_t nBandIndex)
 {
 	uint8_t *y, *u, *v;
 
@@ -63,14 +61,14 @@ void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 
 	switch (m_utvfRaw)
 	{
-	case UTVF_YUV422P16LE:
+	case UTVF_YUV420P16LE:
 		{
 			const uint8_t *pSrcYBegin, *pSrcUBegin, *pSrcVBegin;
 			const uint8_t *pSrcYEnd, *pSrcUEnd, *pSrcVEnd;
 
 			pSrcYBegin = ((const uint8_t*)m_pInput);
 			pSrcUBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
-			pSrcVBegin = pSrcUBegin + m_nWidth * m_nHeight;
+			pSrcVBegin = pSrcUBegin + m_nWidth * m_nHeight / 2;
 
 			pSrcYEnd = pSrcYBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
 			pSrcUEnd = pSrcUBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[1];
@@ -86,7 +84,7 @@ void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 		}
 		return;
 
-	case UTVF_P210:
+	case UTVF_P010:
 		{
 			const uint8_t *pSrcYBegin, *pSrcUVBegin;
 			const uint8_t *pSrcYEnd, *pSrcUVEnd;
@@ -105,7 +103,7 @@ void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 		}
 		return;
 
-	case UTVF_P216:
+	case UTVF_P016:
 		{
 			const uint8_t *pSrcYBegin, *pSrcUVBegin;
 			const uint8_t *pSrcYEnd, *pSrcUVEnd;
@@ -124,21 +122,9 @@ void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 		}
 		return;
 	}
-
-	const uint8_t* pSrcBegin, * pSrcEnd;
-
-	pSrcBegin = ((uint8_t*)m_pInput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd   = ((uint8_t*)m_pInput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-
-	switch (m_utvfRaw)
-	{
-	case UTVF_v210:
-		ConvertV210ToUQY2(y, u, v, pSrcBegin, pSrcEnd, m_nWidth, m_cbRawGrossWidth);
-		break;
-	}
 }
 
-void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
+void CUQY0Codec::ConvertFromPlanar(uint32_t nBandIndex)
 {
 	const uint8_t *y, *u, *v;
 
@@ -148,14 +134,14 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 
 	switch (m_utvfRaw)
 	{
-	case UTVF_YUV422P16LE:
+	case UTVF_YUV420P16LE:
 		{
 			uint8_t *pDstYBegin, *pDstUBegin, *pDstVBegin;
 			uint8_t *pDstYEnd, *pDstUEnd, *pDstVEnd;
 
 			pDstYBegin = ((uint8_t*)m_pOutput);
 			pDstUBegin = pDstYBegin + m_nWidth * m_nHeight * 2;
-			pDstVBegin = pDstUBegin + m_nWidth * m_nHeight;
+			pDstVBegin = pDstUBegin + m_nWidth * m_nHeight / 2;
 
 			pDstYEnd = pDstYBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
 			pDstUEnd = pDstUBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[1];
@@ -171,8 +157,8 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		}
 		return;
 
-	case UTVF_P210:
-	case UTVF_P216:
+	case UTVF_P010:
+	case UTVF_P016:
 		{
 			uint8_t *pDstYBegin, *pDstUVBegin;
 			uint8_t *pDstYEnd, *pDstUVEnd;
@@ -191,21 +177,9 @@ void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 		}
 		return;
 	}
-
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-
-	switch (m_utvfRaw)
-	{
-	case UTVF_v210:
-		ConvertUQY2ToV210(pDstBegin, pDstEnd, y, u, v, m_nWidth, m_cbRawGrossWidth);
-		break;
-	}
 }
 
-bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
+bool CUQY0Codec::PredictDirect(uint32_t nBandIndex)
 {
 	uint8_t* y, * u, * v;
 
@@ -215,14 +189,14 @@ bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
 
 	switch (m_utvfRaw)
 	{
-	case UTVF_YUV422P16LE:
+	case UTVF_YUV420P16LE:
 		{
 			const uint8_t *pSrcYBegin, *pSrcUBegin, *pSrcVBegin;
 			const uint8_t *pSrcYEnd, *pSrcUEnd, *pSrcVEnd;
 
 			pSrcYBegin = ((const uint8_t*)m_pInput);
 			pSrcUBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
-			pSrcVBegin = pSrcUBegin + m_nWidth * m_nHeight;
+			pSrcVBegin = pSrcUBegin + m_nWidth * m_nHeight / 2;
 
 			pSrcYEnd = pSrcYBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
 			pSrcUEnd = pSrcUBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[1];
@@ -238,7 +212,7 @@ bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
 		}
 		return true;
 
-	case UTVF_P210:
+	case UTVF_P010:
 		{
 			const uint8_t *pSrcYBegin, *pSrcUVBegin;
 			const uint8_t *pSrcYEnd, *pSrcUVEnd;
@@ -257,7 +231,7 @@ bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
 		}
 		return true;
 
-	case UTVF_P216:
+	case UTVF_P016:
 		{
 			const uint8_t *pSrcYBegin, *pSrcUVBegin;
 			const uint8_t *pSrcYEnd, *pSrcUVEnd;
@@ -280,13 +254,13 @@ bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
 	return false;
 }
 
-void CUQY2Codec::GenerateDecodeTable(uint32_t nPlaneIndex)
+void CUQY0Codec::GenerateDecodeTable(uint32_t nPlaneIndex)
 {
 	switch (m_utvfRaw)
 	{
-	case UTVF_YUV422P16LE:
-	case UTVF_P210:
-	case UTVF_P216:
+	case UTVF_YUV420P16LE:
+	case UTVF_P010:
+	case UTVF_P016:
 		GenerateHuffmanDecodeTable<10, 6>(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 		break;
 
@@ -295,24 +269,24 @@ void CUQY2Codec::GenerateDecodeTable(uint32_t nPlaneIndex)
 	}
 }
 
-bool CUQY2Codec::DecodeDirect(uint32_t nBandIndex)
+bool CUQY0Codec::DecodeDirect(uint32_t nBandIndex)
 {
 	switch (m_utvfRaw)
 	{
-	case UTVF_YUV422P16LE:
+	case UTVF_YUV420P16LE:
 		{
 			uint8_t* pDstBegin[3];
 
 			pDstBegin[0] = ((uint8_t*)m_pOutput);
 			pDstBegin[1] = pDstBegin[0] + m_nWidth * m_nHeight * 2;
-			pDstBegin[2] = pDstBegin[1] + m_nWidth * m_nHeight;
+			pDstBegin[2] = pDstBegin[1] + m_nWidth * m_nHeight / 2;
 
 			DecodeAndRestoreCustomToPlanar(nBandIndex, pDstBegin);
 		}
 		return true;
 
-	case UTVF_P210:
-	case UTVF_P216:
+	case UTVF_P010:
+	case UTVF_P016:
 		{
 			uint8_t* pDstBegin[2];
 
@@ -327,26 +301,26 @@ bool CUQY2Codec::DecodeDirect(uint32_t nBandIndex)
 	return false;
 }
 
-void CUQY2Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin)
+void CUQY0Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin)
 {
 	switch (m_utvfRaw)
 	{
-	case UTVF_YUV422P16LE:
+	case UTVF_YUV420P16LE:
 		{
-			uint8_t *pCurDstBegin;
-			uint8_t *pCurDstEnd;
+			uint8_t* pCurDstBegin;
+			uint8_t* pCurDstEnd;
 			const uint8_t* pSrcBegin;
 
 			pCurDstBegin = pDstBegin[nPlaneIndex] + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-			pCurDstEnd   = pDstBegin[nPlaneIndex] + m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
+			pCurDstEnd = pDstBegin[nPlaneIndex] + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 			pSrcBegin = m_pPredicted->GetPlane(nPlaneIndex) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 
 			ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, pSrcBegin, m_cbPlanePredictStride[nPlaneIndex], m_cbPlanePredictStride[nPlaneIndex]);
 		}
 		break;
 
-	case UTVF_P210:
-	case UTVF_P216:
+	case UTVF_P010:
+	case UTVF_P016:
 		if (nPlaneIndex == 0)
 		{
 			uint8_t* pCurDstBegin;

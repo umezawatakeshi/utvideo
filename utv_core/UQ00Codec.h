@@ -7,6 +7,7 @@
 #include "FrameBuffer.h"
 #include "Thread.h"
 #include "HuffmanCode.h"
+#include "Predict.h"
 
 
 class CUQ00Codec :
@@ -82,7 +83,7 @@ protected:
 	std::unique_ptr<CFrameBuffer> m_pPredicted;
 	struct COUNTS
 	{
-		uint32_t dwCount[4][1024];
+		uint32_t dwCount[4][NUM_COUNT_TABLES_PER_CHANNEL<10>][1024];
 	} *m_counts;
 	/* const */ HUFFMAN_CODELEN_TABLE<10> *m_pCodeLengthTable[4];
 	HUFFMAN_ENCODE_TABLE<10> m_het[4];
@@ -145,14 +146,17 @@ protected:
 	virtual void ConvertToPlanar(uint32_t nBandIndex) = 0;
 	virtual void ConvertFromPlanar(uint32_t nBandIndex) = 0;
 	virtual bool PredictDirect(uint32_t nBandIndex);
+	virtual void GenerateDecodeTable(uint32_t nPlaneIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
+	virtual void RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin);
 	virtual bool RestoreDirect(uint32_t nBandIndex);
 	virtual bool IsDirectRestorable();
 
 	void PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin);
 	void DecodeToPlanar(uint32_t nBandIndex);
 	void DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
-	template<bool DoRestore> void DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* const* pDstBegin);
+	void DecodeAndRestoreCustomToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
+	template<int RestoreType> void DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* const* pDstBegin);
 
 private:
 	void PredictProc(uint32_t nBandIndex);

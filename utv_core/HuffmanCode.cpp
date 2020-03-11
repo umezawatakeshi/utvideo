@@ -277,15 +277,17 @@ void GenerateMultiSpeedTable(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUFFMA
 	GenerateMultiSpeedTable0<B, 0>::f(pDecodeTable, pCodeLengthTable, cls, clsidx, codes, 0, 0);
 }
 
-template<int B>
+template<int B, int shift>
 void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable)
 {
+	static_assert(sizeof(symbol_t<B>) * 8 >= B + shift, "");
+
 	struct SYMBOL_AND_CODELEN<B> cls[1 << B];
 	int nLastIndex;
 
 	for (int i = 0; i < (1 << B); i++)
 	{
-		cls[i].symbol = i;
+		cls[i].symbol = i << shift;
 		cls[i].codelen = pCodeLengthTable->codelen[i];
 	}
 
@@ -346,6 +348,7 @@ void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUF
 
 template void GenerateHuffmanDecodeTable<8>(HUFFMAN_DECODE_TABLE<8> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<8> *pCodeLengthTable);
 template void GenerateHuffmanDecodeTable<10>(HUFFMAN_DECODE_TABLE<10> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<10> *pCodeLengthTable);
+template void GenerateHuffmanDecodeTable<10, 6>(HUFFMAN_DECODE_TABLE<10>* pDecodeTable, const HUFFMAN_CODELEN_TABLE<10>* pCodeLengthTable);
 
 inline void FlushEncoded(uint32_t *&pDst, uintenc_t &dwTmpEncoded, int &nBits)
 {
@@ -444,7 +447,7 @@ symbol_t<B> * cpp_HuffmanDecode(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, co
 
 		for (int i = 0; i < symlen && pDst < (symbol_t<B> *)pDstEnd; i++)
 		{
-			*pDst++ = combined;
+			*pDst++ = (symbol_t<B>)combined;
 			combined >>= sizeof(symbol_t<B>) * 8;
 		}
 		nBits += codelen;

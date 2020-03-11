@@ -59,6 +59,7 @@ static inline WORD FCC2BitCount(DWORD dw)
 	case FCC('UMH2'):
 	case FCC('UMH4'):
 		return 24;
+	case FCC('UQY0'):
 	case FCC('UQY2'):
 	case FCC('UQRG'):
 		return 30;
@@ -88,6 +89,19 @@ static inline WORD FCC2BitCount(DWORD dw)
 		return 64;
 	case FCC('r210'):
 		return 30;
+	case MAKEFOURCC('Y', '3', 0, 10):
+	case MAKEFOURCC('Y', '3', 0, 16):
+		return 48;
+	case FCC('P210'):
+	case FCC('P216'):
+	case MAKEFOURCC('Y', '3', 10, 10):
+	case MAKEFOURCC('Y', '3', 10, 16):
+		return 32;
+	case FCC('P010'):
+	case FCC('P016'):
+	case MAKEFOURCC('Y', '3', 11, 10):
+	case MAKEFOURCC('Y', '3', 11, 16):
+		return 24;
 	default:
 		return 0; // XXX
 	}

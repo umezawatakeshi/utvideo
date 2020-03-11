@@ -6,14 +6,14 @@
 #include "Predict.h"
 #include "TunedFunc.h"
 
-void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t *pCountTable)
+void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
 
 	// 最初のラインの最初のピクセルは 0x80 を予測しておく。
 	*q = *p - 0x80;
-	pCountTable[*q]++;
+	pCountTable[0][*q]++;
 	p++;
 	q++;
 
@@ -21,7 +21,7 @@ void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSr
 	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = *p - *(p - 1);
-		pCountTable[*q]++;
+		pCountTable[0][*q]++;
 	}
 
 	// 1 ラインしかない場合はここで終了。
@@ -31,7 +31,7 @@ void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSr
 	// 次のラインの最初のピクセルは predict above。
 	// こうしておくとアセンブラ化した時に処理が若干簡単になる。
 	*q = *p - *(p - cbStride);
-	pCountTable[*q]++;
+	pCountTable[0][*q]++;
 	p++;
 	q++;
 
@@ -39,7 +39,7 @@ void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSr
 	for (; p < pSrcEnd; p++, q++)
 	{
 		*q = *p - median<uint8_t>(*(p - cbStride), *(p - 1), *(p - cbStride) + *(p - 1) - *(p - 1 - cbStride));
-		pCountTable[*q]++;
+		pCountTable[0][*q]++;
 	}
 }
 
@@ -70,13 +70,13 @@ void cpp_RestoreCylindricalWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, 
 
 
 template<int B>
-void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, uint32_t *pCountTable)
+void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, uint32_t pCountTable[][1 << B])
 {
 	const symbol_t<B> *p = pSrcBegin;
 	symbol_t<B> *q = pDst;
 
 	*q = (*p - CSymbolBits<B>::midval) & CSymbolBits<B>::maskval;
-	pCountTable[*q]++;
+	pCountTable[0][*q]++;
 	p++;
 	q++;
 
@@ -84,12 +84,12 @@ void cpp_PredictCylindricalLeftAndCount(symbol_t<B> *pDst, const symbol_t<B> *pS
 	for (; p < pSrcEnd; p++, q++)
 	{
 		*q = (*p - *(p-1)) & CSymbolBits<B>::maskval;
-		pCountTable[*q]++;
+		pCountTable[0][*q]++;
 	}
 }
 
-template void cpp_PredictCylindricalLeftAndCount<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, uint32_t *pCountTable);
-template void cpp_PredictCylindricalLeftAndCount<10>(symbol_t<10> *pDst, const symbol_t<10> *pSrcBegin, const symbol_t<10> *pSrcEnd, uint32_t *pCountTable);
+template void cpp_PredictCylindricalLeftAndCount<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, uint32_t pCountTable[][256]);
+template void cpp_PredictCylindricalLeftAndCount<10>(symbol_t<10> *pDst, const symbol_t<10> *pSrcBegin, const symbol_t<10> *pSrcEnd, uint32_t pCountTable[][1024]);
 
 
 template<int B>
@@ -114,14 +114,14 @@ template void cpp_RestoreCylindricalLeft<10>(symbol_t<10> *pDst, const symbol_t<
 
 
 template<int B, bool DoCount>
-static inline void cpp_PredictPlanarGradientAndMayCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t cbStride, uint32_t *pCountTable)
+static inline void cpp_PredictPlanarGradientAndMayCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t cbStride, uint32_t pCountTable[][1 << B])
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
 
 	*q = (*p - CSymbolBits<B>::midval) & CSymbolBits<B>::maskval;
 	if (DoCount)
-		pCountTable[*q]++;
+		pCountTable[0][*q]++;
 	p++;
 	q++;
 
@@ -129,14 +129,14 @@ static inline void cpp_PredictPlanarGradientAndMayCount(symbol_t<B> *pDst, const
 	{
 		*q = (*p - *(p - 1)) & CSymbolBits<B>::maskval;
 		if (DoCount)
-			pCountTable[*q]++;
+			pCountTable[0][*q]++;
 	}
 
 	for (auto pp = pSrcBegin + cbStride; pp != pSrcEnd; pp += cbStride)
 	{
 		*q = (*p - *(p - cbStride)) & CSymbolBits<B>::maskval;
 		if (DoCount)
-			pCountTable[*q]++;
+			pCountTable[0][*q]++;
 		p++;
 		q++;
 
@@ -144,13 +144,13 @@ static inline void cpp_PredictPlanarGradientAndMayCount(symbol_t<B> *pDst, const
 		{
 			*q = (*p - (*(p - cbStride) + *(p - 1) - *(p - 1 - cbStride))) & CSymbolBits<B>::maskval;
 			if (DoCount)
-				pCountTable[*q]++;
+				pCountTable[0][*q]++;
 		}
 	}
 }
 
 template<int B>
-void cpp_PredictPlanarGradientAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t cbStride, uint32_t *pCountTable)
+void cpp_PredictPlanarGradientAndCount(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, size_t cbStride, uint32_t pCountTable[][1 << B])
 {
 	cpp_PredictPlanarGradientAndMayCount<B, true>(pDst, pSrcBegin, pSrcEnd, cbStride, pCountTable);
 }
@@ -161,7 +161,7 @@ void cpp_PredictPlanarGradient(symbol_t<B> *pDst, const symbol_t<B> *pSrcBegin, 
 	cpp_PredictPlanarGradientAndMayCount<B, false>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
 }
 
-template void cpp_PredictPlanarGradientAndCount<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t cbStride, uint32_t *pCountTable);
+template void cpp_PredictPlanarGradientAndCount<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256]);
 template void cpp_PredictPlanarGradient<8>(symbol_t<8> *pDst, const symbol_t<8> *pSrcBegin, const symbol_t<8> *pSrcEnd, size_t cbStride);
 
 

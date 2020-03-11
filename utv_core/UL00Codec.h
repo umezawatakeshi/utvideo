@@ -7,6 +7,7 @@
 #include "FrameBuffer.h"
 #include "Thread.h"
 #include "HuffmanCode.h"
+#include "Predict.h"
 
 
 class CUL00Codec :
@@ -91,7 +92,7 @@ protected:
 	std::unique_ptr<CFrameBuffer> m_pPredicted;
 	struct COUNTS
 	{
-		uint32_t dwCount[4][256];
+		uint32_t dwCount[4][NUM_COUNT_TABLES_PER_CHANNEL<8>][256];
 	} *m_counts;
 	/* const */ HUFFMAN_CODELEN_TABLE<8> *m_pCodeLengthTable[4];
 	HUFFMAN_ENCODE_TABLE<8> m_het[4];

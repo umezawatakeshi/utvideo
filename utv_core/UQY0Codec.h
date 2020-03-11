@@ -8,11 +8,11 @@
 #include "Thread.h"
 #include "HuffmanCode.h"
 
-class CUQY2Codec :
+class CUQY0Codec :
 	public CUQ00Codec
 {
 public:
-	static const utvf_t m_utvfCodec = UTVF_UQY2;
+	static const utvf_t m_utvfCodec = UTVF_UQY0;
 
 private:
 	static const utvf_t m_utvfEncoderInput[];
@@ -22,9 +22,9 @@ private:
 protected:
 
 public:
-	CUQY2Codec(const char *pszInterfaceName);
-	virtual ~CUQY2Codec(void) {}
-	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CUQY2Codec(pszInterfaceName); }
+	CUQY0Codec(const char *pszInterfaceName);
+	virtual ~CUQY0Codec(void) {}
+	static CCodec *CreateInstance(const char *pszInterfaceName) { return new CUQY0Codec(pszInterfaceName); }
 
 public:
 	virtual const utvf_t *GetEncoderInputFormat(void) { return m_utvfEncoderInput; }
@@ -32,11 +32,11 @@ public:
 	virtual const utvf_t *GetCompressedFormat(void) { return m_utvfCompressed; }
 
 protected:
-	virtual const char *GetColorFormatName(void) { return "YUV422"; }
-	virtual int GetRealBitCount(void) { return 20; }
+	virtual const char *GetColorFormatName(void) { return "YUV420"; }
+	virtual int GetRealBitCount(void) { return 15; }
 	virtual int GetNumPlanes(void) { return 3; }
 	virtual int GetMacroPixelWidth(void) { return 2; }
-	virtual int GetMacroPixelHeight(void) { return 1; }
+	virtual int GetMacroPixelHeight(void) { return 2; }
 
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height);
 	virtual void ConvertToPlanar(uint32_t nBandIndex);

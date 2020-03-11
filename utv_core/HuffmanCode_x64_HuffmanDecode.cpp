@@ -53,6 +53,8 @@
 	shr			rax, 64 - %c[lookup_bits]
 .if %c[sizeof_combined_t] == 4
 	mov			r11d, dword ptr [rbx + %c[offsetof_multispeedtable_sym] + rax*4]
+.elseif %c[sizeof_combined_t] == 8
+	mov			r11, qword ptr [rbx + %c[offsetof_multispeedtable_sym] + rax*8]
 .else
 .err
 .endif
@@ -80,7 +82,6 @@
 .endif
 	mov			r10d, dword ptr [rbx + %c[offsetof_symbolbase] + r10*4]
 	add			r10, rax
-.if %c[sizeof_combined_t] == 4
 .if %c[sizeof_sym_t] == 1
 	mov			eax, dword ptr [rbx + %c[offsetof_symbolandcodelength] + r10*2]
 	mov			r11d, eax
@@ -88,9 +89,6 @@
 	mov			eax, dword ptr [rbx + %c[offsetof_symbolandcodelength] + r10*4]
 	mov			r11d, eax
 	shr			eax, 8
-.else
-.err
-.endif
 .else
 .err
 .endif
@@ -102,6 +100,8 @@
 .if !\persym
 .if %c[sizeof_combined_t] == 4
 	mov			dword ptr [rdi], r11d
+.elseif %c[sizeof_combined_t] == 8
+	mov			qword ptr [rdi], r11
 .else
 .err
 .endif
