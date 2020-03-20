@@ -216,12 +216,13 @@ int CCodecBase::DecodeEnd(void)
 size_t CCodecBase::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
 {
 	int ret;
+	FRAME_METRIC fm;
 
-	ret = CalcRawFrameMetric(outfmt, width, height, cbGrossWidth);
+	ret = ::CalcRawFrameMetric(&fm, outfmt, width, height, cbGrossWidth);
 	if (ret != 0)
 		return 0;
 
-	return m_fmRaw.cbTotalSize;
+	return fm.cbTotalSize;
 }
 
 int CCodecBase::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
