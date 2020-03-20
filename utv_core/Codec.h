@@ -36,7 +36,7 @@ public:
 	virtual int GetState(void *pState, size_t cb) = 0;
 	virtual int SetState(const void *pState, size_t cb) = 0;
 
-	virtual int EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth) = 0;
+	virtual int EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t* cbGrossWidth) = 0;
 	virtual size_t EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput) = 0;
 	virtual int EncodeEnd(void) = 0;
 	virtual size_t EncodeGetExtraDataSize(void) = 0;
@@ -44,10 +44,10 @@ public:
 	virtual size_t EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height) = 0;
 	virtual int EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height) = 0;
 
-	virtual int DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData) = 0;
+	virtual int DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth, const void *pExtraData, size_t cbExtraData) = 0;
 	virtual size_t DecodeFrame(void *pOutput, const void *pInput) = 0;
 	virtual int DecodeGetFrameType(bool *pbKeyFrame, const void *pInput) = 0;
 	virtual int DecodeEnd(void) = 0;
-	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth) = 0;
+	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth) = 0;
 	virtual int DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData) = 0;
 };

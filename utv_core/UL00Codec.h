@@ -4,6 +4,7 @@
 #pragma once
 #include "Codec.h"
 #include "CodecBase.h"
+#include "BandParallelCodec.h"
 #include "FrameBuffer.h"
 #include "Thread.h"
 #include "HuffmanCode.h"
@@ -11,7 +12,7 @@
 
 
 class CUL00Codec :
-	public CCodecBase
+	public CBandParallelCodec
 {
 protected:
 	struct EXTRADATA
@@ -72,20 +73,10 @@ protected:
 	utvf_t m_utvfRaw;
 	unsigned int m_nWidth;
 	unsigned int m_nHeight;
-	const void *m_pInput;
-	void *m_pOutput;
-	uint32_t m_dwNumStripes;
-	uint32_t m_dwDivideCount;
 	bool m_bInterlace;
-	size_t m_cbRawStripeSize;
 	size_t m_cbPlaneSize[4];
 	size_t m_cbPlaneWidth[4];
-	size_t m_cbPlaneStripeSize[4];
 	size_t m_cbPlanePredictStride[4];
-	uint32_t m_dwPlaneStripeBegin[256];
-	uint32_t m_dwPlaneStripeEnd[256];
-	uint32_t m_dwRawStripeBegin[256];
-	uint32_t m_dwRawStripeEnd[256];
 
 	std::unique_ptr<CThreadManager> m_ptm;
 	std::unique_ptr<CFrameBuffer> m_pCurFrame;
@@ -123,7 +114,7 @@ public:
 	virtual size_t GetStateSize(void);
 	virtual int GetState(void *pState, size_t cb);
 
-	virtual int InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
+	virtual int InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t* cbGrossWidth);
 	virtual size_t EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput);
 	virtual int InternalEncodeEnd(void);
 	virtual size_t EncodeGetExtraDataSize(void);
@@ -131,17 +122,18 @@ public:
 	virtual size_t EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height);
 	virtual int InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height);
 
-	virtual int InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
+	virtual int InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual size_t DecodeFrame(void *pOutput, const void *pInput);
 	virtual int DecodeGetFrameType(bool *pbKeyFrame, const void *pInput);
 	virtual int InternalDecodeEnd(void);
-	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
+	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth);
 	virtual int InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData);
 
 protected:
 	virtual int InternalSetState(const void *pState, size_t cb);
 	void SetDefaultState();
-	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
+	void ExtractFromExtraData(const void* pExtraData, size_t cbExtraData);
+	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth);
 
 	virtual const char *GetColorFormatName(void) = 0;
 	virtual int GetRealBitCount(void) = 0;

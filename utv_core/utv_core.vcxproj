@@ -171,6 +171,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\myintrin_x86x64.h" />
     <ClInclude Include="..\include\myinttypes.h" />
+    <ClInclude Include="BandParallelCodec.h" />
     <ClInclude Include="ByteOrder.h" />
     <ClInclude Include="Codec.h" />
     <ClInclude Include="CodecBase.h" />
@@ -223,6 +224,7 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BandParallelCodec.cpp" />
     <ClCompile Include="Codec.cpp" />
     <ClCompile Include="CodecBase.cpp" />
     <ClCompile Include="Convert.cpp" />

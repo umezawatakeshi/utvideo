@@ -59,82 +59,56 @@ void CULRGCodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 
 void CULRGCodec::ConvertToPlanar(uint32_t nBandIndex)
 {
-	uint8_t *g, *b, *r;
-	const uint8_t *pSrcBegin, *pSrcEnd;
-
-	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pCurFrame.get(), nBandIndex);
+	auto& [g, b, r, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_NFCC_BGR_BU:
-		ConvertBGRToULRG(g, b, r, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+	case UTVF_NFCC_BGR_TD:
+		ConvertBGRToULRG(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertBGRXToULRG(g, b, r, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
-	case UTVF_NFCC_BGR_TD:
-		ConvertBGRToULRG(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertBGRXToULRG(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertBGRXToULRG(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertRGBToULRG(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertRGBToULRG(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertXRGBToULRG(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertXRGBToULRG(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	}
 }
 
 void CULRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 {
-	const uint8_t *g, *b, *r;
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pCurFrame.get(), nBandIndex);
+	auto& [g, b, r, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_NFCC_BGR_BU:
-		ConvertULRGToBGR(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+	case UTVF_NFCC_BGR_TD:
+		ConvertULRGToBGR(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULRGToBGRX(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
-	case UTVF_NFCC_BGR_TD:
-		ConvertULRGToBGR(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertULRGToBGRX(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertULRGToBGRX(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertULRGToRGB(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertULRGToRGB(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULRGToXRGB(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertULRGToXRGB(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	}
 }
 
 bool CULRGCodec::PredictDirect(uint32_t nBandIndex)
 {
-	uint8_t *g, *b, *r;
-	const uint8_t *pSrcBegin, *pSrcEnd;
-
-	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
-	g = m_pPredicted->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pPredicted->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pPredicted->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pPredicted.get(), nBandIndex);
+	auto& [g, b, r, _] = pPlaneBegin;
 
 	switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
 	{
@@ -142,22 +116,18 @@ bool CULRGCodec::PredictDirect(uint32_t nBandIndex)
 		switch (m_utvfRaw)
 		{
 		case UTVF_NFCC_BGR_BU:
-			ConvertBGRToULRG_PredictCylindricalLeftAndCount(g, b, r, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+		case UTVF_NFCC_BGR_TD:
+			ConvertBGRToULRG_PredictCylindricalLeftAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		case UTVF_NFCC_BGRX_BU:
-			ConvertBGRXToULRG_PredictCylindricalLeftAndCount(g, b, r, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-			return true;
-		case UTVF_NFCC_BGR_TD:
-			ConvertBGRToULRG_PredictCylindricalLeftAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-			return true;
 		case UTVF_NFCC_BGRX_TD:
-			ConvertBGRXToULRG_PredictCylindricalLeftAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			ConvertBGRXToULRG_PredictCylindricalLeftAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		case UTVF_NFCC_RGB_TD:
-			ConvertRGBToULRG_PredictCylindricalLeftAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			ConvertRGBToULRG_PredictCylindricalLeftAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertXRGBToULRG_PredictCylindricalLeftAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			ConvertXRGBToULRG_PredictCylindricalLeftAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		}
 		break;
@@ -167,22 +137,18 @@ bool CULRGCodec::PredictDirect(uint32_t nBandIndex)
 		switch (m_utvfRaw)
 		{
 		case UTVF_NFCC_BGR_BU:
-			ConvertBGRToULRG_PredictPlanarGradientAndCount(g, b, r, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+		case UTVF_NFCC_BGR_TD:
+			ConvertBGRToULRG_PredictPlanarGradientAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		case UTVF_NFCC_BGRX_BU:
-			ConvertBGRXToULRG_PredictPlanarGradientAndCount(g, b, r, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-			return true;
-		case UTVF_NFCC_BGR_TD:
-			ConvertBGRToULRG_PredictPlanarGradientAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-			return true;
 		case UTVF_NFCC_BGRX_TD:
-			ConvertBGRXToULRG_PredictPlanarGradientAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			ConvertBGRXToULRG_PredictPlanarGradientAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		case UTVF_NFCC_RGB_TD:
-			ConvertRGBToULRG_PredictPlanarGradientAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			ConvertRGBToULRG_PredictPlanarGradientAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertXRGBToULRG_PredictPlanarGradientAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			ConvertXRGBToULRG_PredictPlanarGradientAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		}
 		break;
@@ -192,22 +158,18 @@ bool CULRGCodec::PredictDirect(uint32_t nBandIndex)
 		switch (m_utvfRaw)
 		{
 		case UTVF_NFCC_BGR_BU:
-			ConvertBGRToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+		case UTVF_NFCC_BGR_TD:
+			ConvertBGRToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		case UTVF_NFCC_BGRX_BU:
-			ConvertBGRXToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-			return true;
-		case UTVF_NFCC_BGR_TD:
-			ConvertBGRToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-			return true;
 		case UTVF_NFCC_BGRX_TD:
-			ConvertBGRXToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			ConvertBGRXToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		case UTVF_NFCC_RGB_TD:
-			ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertXRGBToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			ConvertXRGBToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 			return true;
 		}
 		break;
@@ -218,14 +180,8 @@ bool CULRGCodec::PredictDirect(uint32_t nBandIndex)
 
 bool CULRGCodec::RestoreDirect(uint32_t nBandIndex)
 {
-	const uint8_t *g, *b, *r;
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
-	g = m_pPredicted->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pPredicted->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pPredicted->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pPredicted.get(), nBandIndex);
+	auto& [g, b, r, _] = pPlaneBegin;
 
 	switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 	{
@@ -234,22 +190,18 @@ bool CULRGCodec::RestoreDirect(uint32_t nBandIndex)
 		switch (m_utvfRaw)
 		{
 		case UTVF_NFCC_BGR_BU:
-			ConvertULRGToBGR_RestoreCylindricalLeft(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+		case UTVF_NFCC_BGR_TD:
+			ConvertULRGToBGR_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_BGRX_BU:
-			ConvertULRGToBGRX_RestoreCylindricalLeft(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
-			return true;
-		case UTVF_NFCC_BGR_TD:
-			ConvertULRGToBGR_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
-			return true;
 		case UTVF_NFCC_BGRX_TD:
-			ConvertULRGToBGRX_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRGToBGRX_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_RGB_TD:
-			ConvertULRGToRGB_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRGToRGB_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertULRGToXRGB_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRGToXRGB_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 		break;
@@ -259,22 +211,18 @@ bool CULRGCodec::RestoreDirect(uint32_t nBandIndex)
 		switch (m_utvfRaw)
 		{
 		case UTVF_NFCC_BGR_BU:
-			ConvertULRGToBGR_RestorePlanarGradient(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+		case UTVF_NFCC_BGR_TD:
+			ConvertULRGToBGR_RestorePlanarGradient(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_BGRX_BU:
-			ConvertULRGToBGRX_RestorePlanarGradient(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
-			return true;
-		case UTVF_NFCC_BGR_TD:
-			ConvertULRGToBGR_RestorePlanarGradient(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
-			return true;
 		case UTVF_NFCC_BGRX_TD:
-			ConvertULRGToBGRX_RestorePlanarGradient(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRGToBGRX_RestorePlanarGradient(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_RGB_TD:
-			ConvertULRGToRGB_RestorePlanarGradient(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRGToRGB_RestorePlanarGradient(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertULRGToXRGB_RestorePlanarGradient(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRGToXRGB_RestorePlanarGradient(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 		break;
@@ -284,22 +232,18 @@ bool CULRGCodec::RestoreDirect(uint32_t nBandIndex)
 		switch (m_utvfRaw)
 		{
 		case UTVF_NFCC_BGR_BU:
-			ConvertULRGToBGR_RestoreCylindricalWrongMedian(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
+		case UTVF_NFCC_BGR_TD:
+			ConvertULRGToBGR_RestoreCylindricalWrongMedian(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_BGRX_BU:
-			ConvertULRGToBGRX_RestoreCylindricalWrongMedian(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
-			return true;
-		case UTVF_NFCC_BGR_TD:
-			ConvertULRGToBGR_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
-			return true;
 		case UTVF_NFCC_BGRX_TD:
-			ConvertULRGToBGRX_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRGToBGRX_RestoreCylindricalWrongMedian(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_RGB_TD:
-			ConvertULRGToRGB_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRGToRGB_RestoreCylindricalWrongMedian(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertULRGToXRGB_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRGToXRGB_RestoreCylindricalWrongMedian(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 		break;

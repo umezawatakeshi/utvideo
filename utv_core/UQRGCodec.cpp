@@ -53,72 +53,54 @@ void CUQRGCodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 
 void CUQRGCodec::ConvertToPlanar(uint32_t nBandIndex)
 {
-	uint8_t *g, *b, *r;
-	const uint8_t *pSrcBegin, *pSrcEnd;
-
-	pSrcBegin = ((uint8_t *)m_pInput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pCurFrame.get(), nBandIndex);
+	auto& [g, b, r, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_b48r:
-		ConvertB48rToUQRG(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertB48rToUQRG(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 		break;
 	case UTVF_b64a:
-		ConvertB64aToUQRG(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertB64aToUQRG(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 		break;
 	case UTVF_r210:
-		ConvertR210ToUQRG(g, b, r, pSrcBegin, pSrcEnd, m_nWidth, m_cbRawGrossWidth);
+		ConvertR210ToUQRG(g, b, r, pRawBegin[0], pRawEnd[0], m_nWidth, m_fmRaw.scbLineStride[0]);
 		break;
 	}
 }
 
 void CUQRGCodec::ConvertFromPlanar(uint32_t nBandIndex)
 {
-	const uint8_t *g, *b, *r;
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pCurFrame.get(), nBandIndex);
+	auto& [g, b, r, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_b48r:
-		ConvertUQRGToB48r(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertUQRGToB48r(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 		break;
 	case UTVF_b64a:
-		ConvertUQRGToB64a(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertUQRGToB64a(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 		break;
 	case UTVF_r210:
-		ConvertUQRGToR210(pDstBegin, pDstEnd, g, b, r, m_nWidth, m_cbRawGrossWidth);
+		ConvertUQRGToR210(pRawBegin[0], pRawEnd[0], g, b, r, m_nWidth, m_fmRaw.scbLineStride[0]);
 		break;
 	}
 }
 
 bool CUQRGCodec::PredictDirect(uint32_t nBandIndex)
 {
-	uint8_t *g, *b, *r;
-	const uint8_t *pSrcBegin, *pSrcEnd;
-
-	pSrcBegin = ((uint8_t *)m_pInput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pPredicted->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pPredicted->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pPredicted->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pPredicted.get(), nBandIndex);
+	auto& [g, b, r, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_b64a:
-		ConvertB64aToUQRG_PredictCylindricalLeftAndCount(g, b, r, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+		ConvertB64aToUQRG_PredictCylindricalLeftAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 		return true;
 	case UTVF_r210:
-		ConvertR210ToUQRG_PredictCylindricalLeftAndCount(g, b, r, pSrcBegin, pSrcEnd, m_nWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+		ConvertR210ToUQRG_PredictCylindricalLeftAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_nWidth, m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 		return true;
 	}
 
@@ -127,22 +109,16 @@ bool CUQRGCodec::PredictDirect(uint32_t nBandIndex)
 
 bool CUQRGCodec::RestoreDirect(uint32_t nBandIndex)
 {
-	const uint8_t *g, *b, *r;
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd = ((uint8_t *)m_pOutput) + m_dwStripeEnd[nBandIndex] * m_cbRawStripeSize;
-	g = m_pPredicted->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pPredicted->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pPredicted->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pPredicted.get(), nBandIndex);
+	auto& [g, b, r, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_b64a:
-		ConvertUQRGToB64a_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertUQRGToB64a_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 		return true;
 	case UTVF_r210:
-		ConvertUQRGToR210_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, m_nWidth, m_cbRawGrossWidth);
+		ConvertUQRGToR210_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, m_nWidth, m_fmRaw.scbLineStride[0]);
 		return true;
 	}
 

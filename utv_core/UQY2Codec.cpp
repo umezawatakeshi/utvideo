@@ -55,225 +55,79 @@ void CUQY2Codec::CalcPlaneSizes(unsigned int width, unsigned int height)
 
 void CUQY2Codec::ConvertToPlanar(uint32_t nBandIndex)
 {
-	uint8_t *y, *u, *v;
-
-	y = m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	u = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	v = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pCurFrame.get(), nBandIndex);
+	auto& [y, u, v, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_YUV422P16LE:
-		{
-			const uint8_t *pSrcYBegin, *pSrcUBegin, *pSrcVBegin;
-			const uint8_t *pSrcYEnd, *pSrcUEnd, *pSrcVEnd;
-
-			pSrcYBegin = ((const uint8_t*)m_pInput);
-			pSrcUBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
-			pSrcVBegin = pSrcUBegin + m_nWidth * m_nHeight;
-
-			pSrcYEnd = pSrcYBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUEnd = pSrcUBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[1];
-			pSrcVEnd = pSrcVBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[2];
-
-			pSrcYBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-			pSrcVBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-
-			ConvertLittleEndian16ToHostEndian10Limited(y, pSrcYBegin, pSrcYEnd);
-			ConvertLittleEndian16ToHostEndian10Limited(u, pSrcUBegin, pSrcUEnd);
-			ConvertLittleEndian16ToHostEndian10Limited(v, pSrcVBegin, pSrcVEnd);
-		}
+		ConvertLittleEndian16ToHostEndian10Limited(y, pRawBegin[0], pRawEnd[0]);
+		ConvertLittleEndian16ToHostEndian10Limited(u, pRawBegin[1], pRawEnd[1]);
+		ConvertLittleEndian16ToHostEndian10Limited(v, pRawBegin[2], pRawEnd[2]);
 		return;
 
 	case UTVF_P210:
-		{
-			const uint8_t *pSrcYBegin, *pSrcUVBegin;
-			const uint8_t *pSrcYEnd, *pSrcUVEnd;
-
-			pSrcYBegin = ((const uint8_t*)m_pInput);
-			pSrcUVBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
-
-			pSrcYEnd  = pSrcYBegin  + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUVEnd = pSrcUVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
-
-			pSrcYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
-
-			ConvertLittleEndian16ToHostEndian10Noround(y, pSrcYBegin, pSrcYEnd);
-			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround(u, v, pSrcUVBegin, pSrcUVEnd);
-		}
+		ConvertLittleEndian16ToHostEndian10Noround(y, pRawBegin[0], pRawEnd[0]);
+		ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround(u, v, pRawBegin[1], pRawEnd[1]);
 		return;
 
 	case UTVF_P216:
-		{
-			const uint8_t *pSrcYBegin, *pSrcUVBegin;
-			const uint8_t *pSrcYEnd, *pSrcUVEnd;
-
-			pSrcYBegin = ((const uint8_t*)m_pInput);
-			pSrcUVBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
-
-			pSrcYEnd  = pSrcYBegin  + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUVEnd = pSrcUVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
-
-			pSrcYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
-
-			ConvertLittleEndian16ToHostEndian10Limited(y, pSrcYBegin, pSrcYEnd);
-			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(u, v, pSrcUVBegin, pSrcUVEnd);
-		}
+		ConvertLittleEndian16ToHostEndian10Limited(y, pRawBegin[0], pRawEnd[0]);
+		ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited(u, v, pRawBegin[1], pRawEnd[1]);
 		return;
-	}
 
-	const uint8_t* pSrcBegin, * pSrcEnd;
-
-	pSrcBegin = ((uint8_t*)m_pInput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd   = ((uint8_t*)m_pInput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-
-	switch (m_utvfRaw)
-	{
 	case UTVF_v210:
-		ConvertV210ToUQY2(y, u, v, pSrcBegin, pSrcEnd, m_nWidth, m_cbRawGrossWidth);
+		ConvertV210ToUQY2(y, u, v, pRawBegin[0], pRawEnd[0], m_nWidth, m_fmRaw.scbLineStride[0]);
 		break;
 	}
 }
 
 void CUQY2Codec::ConvertFromPlanar(uint32_t nBandIndex)
 {
-	const uint8_t *y, *u, *v;
-
-	y = m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	u = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	v = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pCurFrame.get(), nBandIndex);
+	auto& [y, u, v, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_YUV422P16LE:
-		{
-			uint8_t *pDstYBegin, *pDstUBegin, *pDstVBegin;
-			uint8_t *pDstYEnd, *pDstUEnd, *pDstVEnd;
-
-			pDstYBegin = ((uint8_t*)m_pOutput);
-			pDstUBegin = pDstYBegin + m_nWidth * m_nHeight * 2;
-			pDstVBegin = pDstUBegin + m_nWidth * m_nHeight;
-
-			pDstYEnd = pDstYBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
-			pDstUEnd = pDstUBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[1];
-			pDstVEnd = pDstVBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[2];
-
-			pDstYBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pDstUBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-			pDstVBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-
-			ConvertHostEndian10ToLittleEndian16Limited(pDstYBegin, pDstYEnd, y);
-			ConvertHostEndian10ToLittleEndian16Limited(pDstUBegin, pDstUEnd, u);
-			ConvertHostEndian10ToLittleEndian16Limited(pDstVBegin, pDstVEnd, v);
-		}
+		ConvertHostEndian10ToLittleEndian16Limited(pRawBegin[0], pRawEnd[0], y);
+		ConvertHostEndian10ToLittleEndian16Limited(pRawBegin[1], pRawEnd[1], u);
+		ConvertHostEndian10ToLittleEndian16Limited(pRawBegin[2], pRawEnd[2], v);
 		return;
 
 	case UTVF_P210:
 	case UTVF_P216:
-		{
-			uint8_t *pDstYBegin, *pDstUVBegin;
-			uint8_t *pDstYEnd, *pDstUVEnd;
-
-			pDstYBegin  = ((uint8_t*)m_pOutput);
-			pDstUVBegin = pDstYBegin + m_nWidth * m_nHeight * 2;
-
-			pDstYEnd  = pDstYBegin  + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
-			pDstUVEnd = pDstUVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
-
-			pDstYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pDstUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
-
-			ConvertHostEndian10ToLittleEndian16Limited(pDstYBegin, pDstYEnd, y);
-			ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(pDstUVBegin, pDstUVEnd, u, v);
-		}
+		ConvertHostEndian10ToLittleEndian16Limited(pRawBegin[0], pRawEnd[0], y);
+		ConvertPlanarHostEndian10ToPackedUVLittleEndian16Limited(pRawBegin[1], pRawEnd[1], u, v);
 		return;
-	}
 
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-
-	switch (m_utvfRaw)
-	{
 	case UTVF_v210:
-		ConvertUQY2ToV210(pDstBegin, pDstEnd, y, u, v, m_nWidth, m_cbRawGrossWidth);
+		ConvertUQY2ToV210(pRawBegin[0], pRawEnd[0], y, u, v, m_nWidth, m_fmRaw.scbLineStride[0]);
 		break;
 	}
 }
 
 bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
 {
-	uint8_t* y, * u, * v;
-
-	y = m_pPredicted->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	u = m_pPredicted->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	v = m_pPredicted->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pPredicted.get(), nBandIndex);
+	auto& [y, u, v, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_YUV422P16LE:
-		{
-			const uint8_t *pSrcYBegin, *pSrcUBegin, *pSrcVBegin;
-			const uint8_t *pSrcYEnd, *pSrcUEnd, *pSrcVEnd;
-
-			pSrcYBegin = ((const uint8_t*)m_pInput);
-			pSrcUBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
-			pSrcVBegin = pSrcUBegin + m_nWidth * m_nHeight;
-
-			pSrcYEnd = pSrcYBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUEnd = pSrcUBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[1];
-			pSrcVEnd = pSrcVBegin + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[2];
-
-			pSrcYBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-			pSrcVBegin += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-
-			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(y, pSrcYBegin, pSrcYEnd, m_cbPlanePredictStride[0], m_cbPlanePredictStride[0], m_counts[nBandIndex].dwCount[0]);
-			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(u, pSrcUBegin, pSrcUEnd, m_cbPlanePredictStride[1], m_cbPlanePredictStride[1], m_counts[nBandIndex].dwCount[1]);
-			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(v, pSrcVBegin, pSrcVEnd, m_cbPlanePredictStride[2], m_cbPlanePredictStride[2], m_counts[nBandIndex].dwCount[2]);
-		}
+		ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+		ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(u, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1]);
+		ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(v, pRawBegin[2], pRawEnd[2], m_fmRaw.cbLineWidth[2], m_fmRaw.scbLineStride[2], m_counts[nBandIndex].dwCount[2]);
 		return true;
 
 	case UTVF_P210:
-		{
-			const uint8_t *pSrcYBegin, *pSrcUVBegin;
-			const uint8_t *pSrcYEnd, *pSrcUVEnd;
-
-			pSrcYBegin = ((const uint8_t*)m_pInput);
-			pSrcUVBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
-
-			pSrcYEnd  = pSrcYBegin  + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUVEnd = pSrcUVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
-
-			pSrcYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
-
-			ConvertLittleEndian16ToHostEndian10Noround_PredictCylindricalLeftAndCount(y, pSrcYBegin, pSrcYEnd, m_cbPlanePredictStride[0], m_cbPlanePredictStride[0], m_counts[nBandIndex].dwCount[0]);
-			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround_PredictCylindricalLeftAndCount(u, v, pSrcUVBegin, pSrcUVEnd, m_nWidth * 2, m_nWidth * 2, m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-		}
+		ConvertLittleEndian16ToHostEndian10Noround_PredictCylindricalLeftAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+		ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround_PredictCylindricalLeftAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 		return true;
 
 	case UTVF_P216:
-		{
-			const uint8_t *pSrcYBegin, *pSrcUVBegin;
-			const uint8_t *pSrcYEnd, *pSrcUVEnd;
-
-			pSrcYBegin = ((const uint8_t*)m_pInput);
-			pSrcUVBegin = pSrcYBegin + m_nWidth * m_nHeight * 2;
-
-			pSrcYEnd  = pSrcYBegin  + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUVEnd = pSrcUVBegin + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
-
-			pSrcYBegin  += m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-			pSrcUVBegin += m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
-
-			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(y, pSrcYBegin, pSrcYEnd, m_cbPlanePredictStride[0], m_cbPlanePredictStride[0], m_counts[nBandIndex].dwCount[0]);
-			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited_PredictCylindricalLeftAndCount(u, v, pSrcUVBegin, pSrcUVEnd, m_nWidth * 2, m_nWidth * 2, m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-		}
+		ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+		ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited_PredictCylindricalLeftAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 		return true;
 	}
 
@@ -329,50 +183,21 @@ bool CUQY2Codec::DecodeDirect(uint32_t nBandIndex)
 
 void CUQY2Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin)
 {
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pPredicted.get(), nBandIndex);
+	auto& [y, u, v, _] = pPlaneBegin;
+
 	switch (m_utvfRaw)
 	{
 	case UTVF_YUV422P16LE:
-		{
-			uint8_t *pCurDstBegin;
-			uint8_t *pCurDstEnd;
-			const uint8_t* pSrcBegin;
-
-			pCurDstBegin = pDstBegin[nPlaneIndex] + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-			pCurDstEnd   = pDstBegin[nPlaneIndex] + m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
-			pSrcBegin = m_pPredicted->GetPlane(nPlaneIndex) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-
-			ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, pSrcBegin, m_cbPlanePredictStride[nPlaneIndex], m_cbPlanePredictStride[nPlaneIndex]);
-		}
+		ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pRawBegin[nPlaneIndex], pRawEnd[nPlaneIndex], pPlaneBegin[nPlaneIndex], m_fmRaw.cbLineWidth[nPlaneIndex], m_fmRaw.scbLineStride[nPlaneIndex]);
 		break;
 
 	case UTVF_P210:
 	case UTVF_P216:
 		if (nPlaneIndex == 0)
-		{
-			uint8_t* pCurDstBegin;
-			uint8_t* pCurDstEnd;
-			const uint8_t* pSrcBegin;
-
-			pCurDstBegin = pDstBegin[nPlaneIndex] + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-			pCurDstEnd = pDstBegin[nPlaneIndex] + m_dwStripeEnd[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-			pSrcBegin = m_pPredicted->GetPlane(nPlaneIndex) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-
-			ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, pSrcBegin, m_cbPlanePredictStride[nPlaneIndex], m_cbPlanePredictStride[nPlaneIndex]);
-		}
+			ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], y, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 		else if (nPlaneIndex == 2)
-		{
-			uint8_t* pCurDstBegin;
-			uint8_t* pCurDstEnd;
-			const uint8_t* pUBegin;
-			const uint8_t* pVBegin;
-
-			pCurDstBegin = pDstBegin[1] + m_dwStripeBegin[nBandIndex] * m_nWidth * 2;
-			pCurDstEnd = pDstBegin[1] + m_dwStripeEnd[nBandIndex] * m_nWidth * 2;
-			pUBegin = m_pPredicted->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_nWidth;
-			pVBegin = m_pPredicted->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_nWidth;
-
-			ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft(pCurDstBegin, pCurDstEnd, pUBegin, pVBegin, m_nWidth * 2, m_nWidth * 2);
-		}
+			ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
 		break;
 	}
 }

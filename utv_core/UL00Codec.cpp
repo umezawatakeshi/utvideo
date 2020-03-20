@@ -10,7 +10,7 @@
 #include "resource.h"
 #include "ByteOrder.h"
 
-CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : CCodecBase(pszTinyName, pszInterfaceName)
+CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : CBandParallelCodec(pszTinyName, pszInterfaceName)
 {
 	SetDefaultState();
 	LoadConfig();
@@ -243,29 +243,31 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	return p - ((uint8_t *)pOutput);
 }
 
-int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+void CUL00Codec::ExtractFromExtraData(const void* pExtraData, size_t cbExtraData)
 {
-	const EXTRADATA *p = (const EXTRADATA *)pExtraData;
+	const EXTRADATA* p = (const EXTRADATA*)pExtraData;
 
 	m_dwDivideCount = ((p->flags0 & BIE_FLAGS0_DIVIDE_COUNT_MASK) >> BIE_FLAGS0_DIVIDE_COUNT_SHIFT) + 1;
 	m_bInterlace = (p->flags0 & BIE_FLAGS0_ASSUME_INTERLACE) != 0;
+}
 
-	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
-	CalcPlaneSizes(width, height);
+int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
+{
+	int ret;
+	ret = CBandParallelCodec::CalcFrameMetric(rawfmt, width, height, cbGrossWidth);
+	if (ret != 0)
+		return ret;
 
-	if (m_bInterlace)
-	{
-		m_dwNumStripes = height / (GetMacroPixelHeight() * 2);
-		m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight() * 2;
-	}
-	else
-	{
-		m_dwNumStripes = height / GetMacroPixelHeight();
-		m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight();
-	}
+	int nStripeScale = GetMacroPixelHeight() / m_fmRaw.nMacroPixelHeight;
+	for (int i = 0; i < m_fmRaw.nPlanes; ++i)
+		m_fmRaw.nStripeLines[i] *= nStripeScale;
 
 	if (m_bInterlace)
 	{
+		m_dwNumStripes /= 2;
+		for (int i = 0; i < m_fmRaw.nPlanes; ++i)
+			m_fmRaw.nStripeLines[i] *= 2;
+
 		for (int i = 0; i < _countof(m_cbPlaneWidth); i++)
 		{
 			m_cbPlaneStripeSize[i]    *= 2;
@@ -273,27 +275,12 @@ int CUL00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int 
 		}
 	}
 
-	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-	{
-		m_dwPlaneStripeBegin[nBandIndex] = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
-		m_dwPlaneStripeEnd[nBandIndex]   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
-
-		if (!m_bBottomUpFrame)
-		{
-			m_dwRawStripeBegin[nBandIndex] = m_dwPlaneStripeBegin[nBandIndex];
-			m_dwRawStripeEnd[nBandIndex]   = m_dwPlaneStripeEnd[nBandIndex];
-		}
-		else
-		{
-			m_dwRawStripeBegin[nBandIndex] = m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex];
-			m_dwRawStripeEnd[nBandIndex]   = m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex];
-		}
-	}
+	::FixStripeValues(&m_fmRaw);
 
 	return 0;
 }
 
-int CUL00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CUL00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
 {
 	int ret;
 	EXTRADATA ed;
@@ -307,9 +294,11 @@ int CUL00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	m_nHeight = height;
 
 	EncodeGetExtraData(&ed, sizeof(ed), infmt, width, height);
-	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth, &ed, sizeof(ed));
+	ExtractFromExtraData(&ed, sizeof(ed));
+	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth);
 	if (ret != 0)
 		return ret;
+	CalcBandMetric();
 
 	m_pCurFrame = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
@@ -422,8 +411,8 @@ void CUL00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneEnd   = m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
 		switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
@@ -451,8 +440,8 @@ void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneEnd   = m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
 		uint32_t dwDstOffset;
 #ifdef _DEBUG
@@ -514,7 +503,7 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput)
 		m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::DecodeProc, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
-	return m_cbRawSize;
+	return m_fmRaw.cbTotalSize;
 }
 
 void CUL00Codec::GenerateDecodeTableProc(uint32_t nPlaneIndex)
@@ -528,7 +517,7 @@ int CUL00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
 	return 0;
 }
 
-int CUL00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CUL00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
 	int ret;
 
@@ -536,9 +525,11 @@ int CUL00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	if (ret != 0)
 		return ret;
 
-	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	ExtractFromExtraData(pExtraData, cbExtraData);
+	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth);
 	if (ret != 0)
 		return ret;
+	CalcBandMetric();
 
 	memset(&m_ed, 0, sizeof(m_ed));
 	memcpy(&m_ed, pExtraData, min(sizeof(m_ed), cbExtraData));
@@ -570,7 +561,7 @@ int CUL00Codec::InternalDecodeEnd(void)
 	return 0;
 }
 
-size_t CUL00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+size_t CUL00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
 {
 	int ret;
 
@@ -578,7 +569,7 @@ size_t CUL00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsign
 	if (ret != 0)
 		return 0;
 
-	return m_cbRawSize;
+	return m_fmRaw.cbTotalSize;
 }
 
 int CUL00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
@@ -648,8 +639,8 @@ void CUL00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* cons
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneEnd   = m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
 #ifdef _DEBUG
 		uint8_t *pRetExpected = m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd;

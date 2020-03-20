@@ -59,69 +59,44 @@ void CULRACodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 
 void CULRACodec::ConvertToPlanar(uint32_t nBandIndex)
 {
-	uint8_t *g, *b, *r, *a;
-	const uint8_t *pSrcBegin, *pSrcEnd;
-
-	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pCurFrame->GetPlane(3) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pCurFrame.get(), nBandIndex);
+	auto& [g, b, r, a] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_NFCC_BGRA_BU:
 	case UTVF_NFCC_BGRX_BU:
-		ConvertBGRAToULRA(g, b, r, a, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
 	case UTVF_NFCC_BGRA_TD:
-		ConvertBGRAToULRA(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertBGRAToULRA(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertARGBToULRA(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertARGBToULRA(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	}
 }
 
 void CULRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 {
-	const uint8_t *g, *b, *r, *a;
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pCurFrame->GetPlane(3) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pCurFrame.get(), nBandIndex);
+	auto& [g, b, r, a] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_NFCC_BGRA_BU:
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULRAToBGRA(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, a, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
 	case UTVF_NFCC_BGRA_TD:
-		ConvertULRAToBGRA(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertULRAToBGRA(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULRAToARGB(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertULRAToARGB(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	}
 }
 
 bool CULRACodec::PredictDirect(uint32_t nBandIndex)
 {
-	uint8_t *g, *b, *r, *a;
-	const uint8_t *pSrcBegin, *pSrcEnd;
-
-	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
-	g = m_pPredicted->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pPredicted->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pPredicted->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pPredicted->GetPlane(3) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pPredicted.get(), nBandIndex);
+	auto& [g, b, r, a] = pPlaneBegin;
 
 	switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
 	{
@@ -130,13 +105,11 @@ bool CULRACodec::PredictDirect(uint32_t nBandIndex)
 		{
 		case UTVF_NFCC_BGRA_BU:
 		case UTVF_NFCC_BGRX_BU:
-			ConvertBGRAToULRA_PredictCylindricalLeftAndCount(g, b, r, a, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
-			return true;
 		case UTVF_NFCC_BGRA_TD:
-			ConvertBGRAToULRA_PredictCylindricalLeftAndCount(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			ConvertBGRAToULRA_PredictCylindricalLeftAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertARGBToULRA_PredictCylindricalLeftAndCount(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			ConvertARGBToULRA_PredictCylindricalLeftAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
 			return true;
 		}
 		break;
@@ -147,13 +120,11 @@ bool CULRACodec::PredictDirect(uint32_t nBandIndex)
 		{
 		case UTVF_NFCC_BGRA_BU:
 		case UTVF_NFCC_BGRX_BU:
-			ConvertBGRAToULRA_PredictPlanarGradientAndCount(g, b, r, a, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
-			return true;
 		case UTVF_NFCC_BGRA_TD:
-			ConvertBGRAToULRA_PredictPlanarGradientAndCount(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			ConvertBGRAToULRA_PredictPlanarGradientAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertARGBToULRA_PredictPlanarGradientAndCount(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			ConvertARGBToULRA_PredictPlanarGradientAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
 			return true;
 		}
 		break;
@@ -164,13 +135,11 @@ bool CULRACodec::PredictDirect(uint32_t nBandIndex)
 		{
 		case UTVF_NFCC_BGRA_BU:
 		case UTVF_NFCC_BGRX_BU:
-			ConvertBGRAToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
-			return true;
 		case UTVF_NFCC_BGRA_TD:
-			ConvertBGRAToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			ConvertBGRAToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertARGBToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			ConvertARGBToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
 			return true;
 		}
 		break;
@@ -181,15 +150,8 @@ bool CULRACodec::PredictDirect(uint32_t nBandIndex)
 
 bool CULRACodec::RestoreDirect(uint32_t nBandIndex)
 {
-	const uint8_t *g, *b, *r, *a;
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
-	g = m_pPredicted->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pPredicted->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pPredicted->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pPredicted->GetPlane(3) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pPredicted.get(), nBandIndex);
+	auto& [g, b, r, a] = pPlaneBegin;
 
 	switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
 	{
@@ -199,13 +161,11 @@ bool CULRACodec::RestoreDirect(uint32_t nBandIndex)
 		{
 		case UTVF_NFCC_BGRA_BU:
 		case UTVF_NFCC_BGRX_BU:
-			ConvertULRAToBGRA_RestoreCylindricalLeft(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, a, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
-			return true;
 		case UTVF_NFCC_BGRA_TD:
-			ConvertULRAToBGRA_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRAToBGRA_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertULRAToARGB_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRAToARGB_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 		break;
@@ -216,13 +176,11 @@ bool CULRACodec::RestoreDirect(uint32_t nBandIndex)
 		{
 		case UTVF_NFCC_BGRA_BU:
 		case UTVF_NFCC_BGRX_BU:
-			ConvertULRAToBGRA_RestorePlanarGradient(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, a, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
-			return true;
 		case UTVF_NFCC_BGRA_TD:
-			ConvertULRAToBGRA_RestorePlanarGradient(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRAToBGRA_RestorePlanarGradient(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertULRAToARGB_RestorePlanarGradient(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRAToARGB_RestorePlanarGradient(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 		break;
@@ -233,13 +191,11 @@ bool CULRACodec::RestoreDirect(uint32_t nBandIndex)
 		{
 		case UTVF_NFCC_BGRA_BU:
 		case UTVF_NFCC_BGRX_BU:
-			ConvertULRAToBGRA_RestoreCylindricalWrongMedian(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, a, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
-			return true;
 		case UTVF_NFCC_BGRA_TD:
-			ConvertULRAToBGRA_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRAToBGRA_RestoreCylindricalWrongMedian(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertULRAToARGB_RestoreCylindricalWrongMedian(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+			ConvertULRAToARGB_RestoreCylindricalWrongMedian(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 		break;

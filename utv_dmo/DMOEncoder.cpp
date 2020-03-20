@@ -22,7 +22,8 @@ HRESULT CDMOEncoder::InternalAllocateStreamingResources()
 	if (DirectShowFormatToUtVideoFormat(&infmt, pvihIn->bmiHeader.biCompression, pvihIn->bmiHeader.biBitCount, pmtIn->subtype) != 0)
 		return DMO_E_INVALIDTYPE;
 
-	if (m_pCodec->EncodeBegin(infmt, pvihIn->bmiHeader.biWidth, pvihIn->bmiHeader.biHeight, CBGROSSWIDTH_WINDOWS) == 0)
+	size_t cbGrossWidth[4] = { CBGROSSWIDTH_WINDOWS, CBGROSSWIDTH_WINDOWS, CBGROSSWIDTH_WINDOWS, CBGROSSWIDTH_WINDOWS };
+	if (m_pCodec->EncodeBegin(infmt, pvihIn->bmiHeader.biWidth, pvihIn->bmiHeader.biHeight, cbGrossWidth) == 0)
 		return S_OK;
 	else
 		return E_FAIL;
