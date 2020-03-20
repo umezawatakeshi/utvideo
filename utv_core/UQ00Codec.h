@@ -138,14 +138,14 @@ protected:
 	virtual bool PredictDirect(uint32_t nBandIndex);
 	virtual void GenerateDecodeTable(uint32_t nPlaneIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
-	virtual void RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin);
+	virtual void RestoreCustom(uint32_t nBandIndex, int nPlaneIndex);
 	virtual bool RestoreDirect(uint32_t nBandIndex);
 	virtual bool IsDirectRestorable();
 
 	void PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin);
 	void DecodeToPlanar(uint32_t nBandIndex);
 	void DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
-	void DecodeAndRestoreCustomToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
+	void DecodeAndRestoreCustomToPlanar(uint32_t nBandIndex);
 	template<int RestoreType> void DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* const* pDstBegin);
 
 private:

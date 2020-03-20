@@ -154,34 +154,16 @@ bool CUQY2Codec::DecodeDirect(uint32_t nBandIndex)
 	switch (m_utvfRaw)
 	{
 	case UTVF_YUV422P16LE:
-		{
-			uint8_t* pDstBegin[3];
-
-			pDstBegin[0] = ((uint8_t*)m_pOutput);
-			pDstBegin[1] = pDstBegin[0] + m_nWidth * m_nHeight * 2;
-			pDstBegin[2] = pDstBegin[1] + m_nWidth * m_nHeight;
-
-			DecodeAndRestoreCustomToPlanar(nBandIndex, pDstBegin);
-		}
-		return true;
-
 	case UTVF_P210:
 	case UTVF_P216:
-		{
-			uint8_t* pDstBegin[2];
-
-			pDstBegin[0] = ((uint8_t*)m_pOutput);
-			pDstBegin[1] = pDstBegin[0] + m_nWidth * m_nHeight * 2;
-
-			DecodeAndRestoreCustomToPlanar(nBandIndex, pDstBegin);
-		}
+		DecodeAndRestoreCustomToPlanar(nBandIndex);
 		return true;
 	}
 
 	return false;
 }
 
-void CUQY2Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin)
+void CUQY2Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex)
 {
 	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pPredicted.get(), nBandIndex);
 	auto& [y, u, v, _] = pPlaneBegin;

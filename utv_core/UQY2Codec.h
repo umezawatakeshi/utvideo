@@ -44,5 +44,5 @@ protected:
 	virtual bool PredictDirect(uint32_t nBandIndex);
 	virtual void GenerateDecodeTable(uint32_t nPlaneIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
-	virtual void RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin);
+	virtual void RestoreCustom(uint32_t nBandIndex, int nPlaneIndex);
 };
