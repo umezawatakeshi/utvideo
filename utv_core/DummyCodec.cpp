@@ -45,17 +45,17 @@ void CDummyCodec::GetLongFriendlyName(wchar_t *pszName, size_t cchName)
 
 const utvf_t *CDummyCodec::GetEncoderInputFormat(void)
 {
-	return NULL;
+	return &m_utvfCodec;
 }
 
 const utvf_t *CDummyCodec::GetDecoderOutputFormat(void)
 {
-	return NULL;
+	return &m_utvfCodec;
 }
 
 const utvf_t *CDummyCodec::GetCompressedFormat(void)
 {
-	return NULL;
+	return &m_utvfCodec;
 }
 
 #ifdef _WIN32
