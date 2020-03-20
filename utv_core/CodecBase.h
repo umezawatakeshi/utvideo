@@ -49,6 +49,7 @@ public:
 	virtual int EncodeQuery(utvf_t infmt, unsigned int width, unsigned int height);
 	virtual int DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual int DecodeEnd(void);
+	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth);
 	virtual int DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData);
 
 protected:

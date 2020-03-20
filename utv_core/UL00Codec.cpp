@@ -561,17 +561,6 @@ int CUL00Codec::InternalDecodeEnd(void)
 	return 0;
 }
 
-size_t CUL00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
-{
-	int ret;
-
-	ret = CalcRawFrameMetric(outfmt, width, height, cbGrossWidth);
-	if (ret != 0)
-		return 0;
-
-	return m_fmRaw.cbTotalSize;
-}
-
 int CUL00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
 {
 	const EXTRADATA *p = (const EXTRADATA *)pExtraData;
