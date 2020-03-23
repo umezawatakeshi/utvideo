@@ -114,11 +114,8 @@ void tuned_Pack8SymAfterPredictPlanarGradient8(uint8_t *pPacked, size_t *cbPacke
 		{
 			__m128i value0 = _mm_loadu_si128((const __m128i *)p);
 			__m128i value1 = _mm_loadu_si128((const __m128i *)(p + 16));
-			__m128i left0 = _mm_alignr_epi8(value0, prev, 15);
-			__m128i left1 = _mm_alignr_epi8(value1, value0, 15);
-
-			__m128i error0 = _mm_sub_epi8(value0, left0);
-			__m128i error1 = _mm_sub_epi8(value1, left1);
+			__m128i error0 = tuned_PredictLeft8Element<F>(prev, value0);
+			__m128i error1 = tuned_PredictLeft8Element<F>(value0, value1);
 			prev = value1;
 			PackForIntra<F>(q, r, shift, error0, error1);
 		}
@@ -136,10 +133,8 @@ void tuned_Pack8SymAfterPredictPlanarGradient8(uint8_t *pPacked, size_t *cbPacke
 			__m128i top1 = _mm_loadu_si128((const __m128i *)(p + 16 - cbStride));
 			__m128i tmp0 = _mm_sub_epi8(value0, top0);
 			__m128i tmp1 = _mm_sub_epi8(value1, top1);
-			__m128i left0 = _mm_alignr_epi8(tmp0, prev, 15);
-			__m128i left1 = _mm_alignr_epi8(tmp1, tmp0, 15);
-			__m128i error0 = _mm_sub_epi8(tmp0, left0);
-			__m128i error1 = _mm_sub_epi8(tmp1, left1);
+			__m128i error0 = tuned_PredictLeft8Element<F>(prev, tmp0);
+			__m128i error1 = tuned_PredictLeft8Element<F>(tmp0, tmp1);
 			prev = tmp1;
 			PackForIntra<F>(q, r, shift, error0, error1);
 		}
@@ -226,14 +221,9 @@ void tuned_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDst
 		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 16)
 		{
 			__m128i s0 = UnpackForIntra<F>(q, r, shift);
-
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
-			s0 = _mm_add_epi8(s0, prev);
-			_mm_storeu_si128((__m128i *)p, s0);
-			prev = _mm_shuffle_epi8(s0, _mm_set1_epi8(15));
+			auto value = tuned_RestoreLeft8Element<F>(prev, s0);
+			_mm_storeu_si128((__m128i *)p, value.v0);
+			prev = value.v1;
 		}
 	}
 
@@ -244,14 +234,9 @@ void tuned_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDst
 		for (auto p = pp; p != pp + cbStride; p += 16)
 		{
 			__m128i s0 = UnpackForIntra<F>(q, r, shift);
-
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
-			s0 = _mm_add_epi8(s0, prev);
-			_mm_storeu_si128((__m128i *)p, _mm_add_epi8(s0, _mm_loadu_si128((const __m128i *)(p - cbStride))));
-			prev = _mm_shuffle_epi8(s0, _mm_set1_epi8(15));
+			auto value = tuned_RestoreLeft8Element<F>(prev, s0);
+			_mm_storeu_si128((__m128i *)p, _mm_add_epi8(value.v0, _mm_loadu_si128((const __m128i *)(p - cbStride))));
+			prev = value.v1;
 		}
 	}
 }
@@ -381,11 +366,8 @@ void tuned_Pack8SymWithDiff8(uint8_t *pPacked, size_t *cbPacked, uint8_t *pContr
 		{
 			__m128i value0 = _mm_loadu_si128((const __m128i *)p);
 			__m128i value1 = _mm_loadu_si128((const __m128i *)(p + 16));
-			__m128i left0 = _mm_alignr_epi8(value0, prev, 15);
-			__m128i left1 = _mm_alignr_epi8(value1, value0, 15);
-
-			__m128i error0 = _mm_sub_epi8(value0, left0);
-			__m128i error1 = _mm_sub_epi8(value1, left1);
+			__m128i error0 = tuned_PredictLeft8Element<F>(prev, value0);
+			__m128i error1 = tuned_PredictLeft8Element<F>(value0, value1);
 			__m128i t0 = _mm_sub_epi8(value0, _mm_loadu_si128((const __m128i *)t));
 			__m128i t1 = _mm_sub_epi8(value1, _mm_loadu_si128((const __m128i *)(t + 16)));
 			prev = value1;
@@ -405,10 +387,8 @@ void tuned_Pack8SymWithDiff8(uint8_t *pPacked, size_t *cbPacked, uint8_t *pContr
 			__m128i top1 = _mm_loadu_si128((const __m128i *)(p + 16 - cbStride));
 			__m128i tmp0 = _mm_sub_epi8(value0, top0);
 			__m128i tmp1 = _mm_sub_epi8(value1, top1);
-			__m128i left0 = _mm_alignr_epi8(tmp0, prev, 15);
-			__m128i left1 = _mm_alignr_epi8(tmp1, tmp0, 15);
-			__m128i error0 = _mm_sub_epi8(tmp0, left0);
-			__m128i error1 = _mm_sub_epi8(tmp1, left1);
+			__m128i error0 = tuned_PredictLeft8Element<F>(prev, tmp0);
+			__m128i error1 = tuned_PredictLeft8Element<F>(tmp0, tmp1);
 			__m128i t0 = _mm_sub_epi8(value0, _mm_loadu_si128((const __m128i *)t));
 			__m128i t1 = _mm_sub_epi8(value1, _mm_loadu_si128((const __m128i *)(t + 16)));
 			prev = tmp1;

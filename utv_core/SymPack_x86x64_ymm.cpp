@@ -363,6 +363,8 @@ static inline FORCEINLINE void VECTORCALL PackForDelta(uint8_t*& q, uint8_t*& r,
 template<>
 void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pPacked, size_t *cbPacked, uint8_t *pControl, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, const uint8_t *pPrevBegin, size_t cbStride)
 {
+	static constexpr int F = CODEFEATURE_AVX2;
+
 	auto q = pPacked;
 	auto r = pControl;
 	memset(pControl, 0, (pSrcEnd - pSrcBegin) / 64 * 4);
@@ -374,11 +376,8 @@ void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pPacked, size_t *cbPacke
 		{
 			__m256i value0 = _mm256_loadu_si256((const __m256i *)p);
 			__m256i value1 = _mm256_loadu_si256((const __m256i *)(p + 32));
-			__m256i left0 = _mm256_alignr_epi8(value0, _mm256_permute2x128_si256(value0, prev, 0x03), 15);
-			__m256i left1 = _mm256_alignr_epi8(value1, _mm256_permute2x128_si256(value1, value0, 0x03), 15);
-
-			__m256i error0 = _mm256_sub_epi8(value0, left0);
-			__m256i error1 = _mm256_sub_epi8(value1, left1);
+			__m256i error0 = tuned_PredictLeft8Element<F>(prev, value0);
+			__m256i error1 = tuned_PredictLeft8Element<F>(value0, value1);
 			__m256i t0 = _mm256_sub_epi8(value0, _mm256_loadu_si256((const __m256i *)t));
 			__m256i t1 = _mm256_sub_epi8(value1, _mm256_loadu_si256((const __m256i *)(t + 32)));
 			prev = value1;
@@ -399,10 +398,8 @@ void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pPacked, size_t *cbPacke
 			__m256i top1 = _mm256_loadu_si256((const __m256i *)(p + 32 - cbStride));
 			__m256i tmp0 = _mm256_sub_epi8(value0, top0);
 			__m256i tmp1 = _mm256_sub_epi8(value1, top1);
-			__m256i left0 = _mm256_alignr_epi8(tmp0, _mm256_permute2x128_si256(tmp0, prev, 0x03), 15);
-			__m256i left1 = _mm256_alignr_epi8(tmp1, _mm256_permute2x128_si256(tmp1, tmp0, 0x03), 15);
-			__m256i error0 = _mm256_sub_epi8(tmp0, left0);
-			__m256i error1 = _mm256_sub_epi8(tmp1, left1);
+			__m256i error0 = tuned_PredictLeft8Element<F>(prev, tmp0);
+			__m256i error1 = tuned_PredictLeft8Element<F>(tmp0, tmp1);
 			__m256i t0 = _mm256_sub_epi8(value0, _mm256_loadu_si256((const __m256i *)t));
 			__m256i t1 = _mm256_sub_epi8(value1, _mm256_loadu_si256((const __m256i *)(t + 32)));
 			prev = tmp1;
