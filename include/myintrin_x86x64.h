@@ -38,6 +38,14 @@ static inline FORCEINLINE __m128i _mm_set2_epi8(char a, char b)
 	return _mm_set_epi8(a, b, a, b, a, b, a, b, a, b, a, b, a, b, a, b);
 }
 
+static inline FORCEINLINE __m128i _mm_set8_epi8(char e7, char e6, char e5, char e4, char e3, char e2, char e1, char e0)
+{
+	return _mm_set_epi8(
+		e7, e6, e5, e4, e3, e2, e1, e0,
+		e7, e6, e5, e4, e3, e2, e1, e0
+	);
+}
+
 static inline FORCEINLINE __m128i _mm_set2_epi16(short a, short b)
 {
 	return _mm_set_epi16(a, b, a, b, a, b, a, b);
