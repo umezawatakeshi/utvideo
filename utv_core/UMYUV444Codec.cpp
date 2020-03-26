@@ -109,70 +109,37 @@ void CUMYUV444Codec<C>::CalcPlaneSizes(unsigned int width, unsigned int height)
 template<class C>
 void CUMYUV444Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 {
-	uint8_t *pDstYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	uint8_t *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	uint8_t *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pCurFrame.get(), nBandIndex);
+	auto& [y, u, v, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_YV24:
+		for (int i = 0; i < 3; ++i)
 		{
-			const uint8_t *pSrcYBegin, *pSrcVBegin, *pSrcUBegin;
-			const uint8_t *pSrcYEnd, *pSrcVEnd, *pSrcUEnd;
-
-			pSrcYBegin = ((uint8_t *)m_pInput);
-			pSrcVBegin = pSrcYBegin + m_nWidth * m_nHeight;
-			pSrcUBegin = pSrcVBegin + m_nWidth * m_nHeight;
-
-			pSrcYEnd = pSrcYBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth;
-			pSrcVEnd = pSrcVBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth;
-			pSrcUEnd = pSrcUBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth;
-
-			pSrcYBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth;
-			pSrcVBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth;
-			pSrcUBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth;
-
-			for (auto p = pSrcYBegin; p != pSrcYEnd; p += m_nWidth, pDstYBegin += m_cbPlaneWidth[0])
+			auto q = pPlaneBegin[i];
+			auto cbLineWidth = m_fmRaw.cbLineWidth[i];
+			for (auto p = pRawBegin[i]; p != pRawEnd[i]; p += m_fmRaw.scbStripeStride[i], q += m_cbPlaneWidth[i])
 			{
-				memcpy(pDstYBegin, p, m_nWidth);
-				std::fill(pDstYBegin + m_nWidth, pDstYBegin + m_cbPlaneWidth[0], pDstYBegin[m_nWidth - 1]);
-			}
-			for (auto p = pSrcUBegin; p != pSrcUEnd; p += m_nWidth, pDstUBegin += m_cbPlaneWidth[1])
-			{
-				memcpy(pDstUBegin, p, m_nWidth);
-				std::fill(pDstUBegin + m_nWidth, pDstUBegin + m_cbPlaneWidth[1], pDstUBegin[m_nWidth - 1]);
-			}
-			for (auto p = pSrcVBegin; p != pSrcVEnd; p += m_nWidth, pDstVBegin += m_cbPlaneWidth[2])
-			{
-				memcpy(pDstVBegin, p, m_nWidth);
-				std::fill(pDstVBegin + m_nWidth, pDstVBegin + m_cbPlaneWidth[2], pDstVBegin[m_nWidth - 1]);
+				memcpy(q, p, cbLineWidth);
+				std::fill(q + cbLineWidth, q + m_cbPlaneWidth[i], q[cbLineWidth - 1]);
 			}
 		}
 		return;
-	}
 
-	const uint8_t *pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	const uint8_t *pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-
-	switch (m_utvfRaw)
-	{
 	case UTVF_NFCC_BGR_BU:
-		ConvertBGRToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+	case UTVF_NFCC_BGR_TD:
+		ConvertBGRToULY4(C)(y, u, v, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbStripeStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertBGRXToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
-	case UTVF_NFCC_BGR_TD:
-		ConvertBGRToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertBGRXToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertBGRXToULY4(C)(y, u, v, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbStripeStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertRGBToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertRGBToULY4(C)(y, u, v, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbStripeStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertXRGBToULY4(C)(pDstYBegin, pDstUBegin, pDstVBegin, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertXRGBToULY4(C)(y, u, v, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbStripeStride[0], m_cbPlaneWidth[0]);
 		break;
 	}
 }
@@ -180,61 +147,34 @@ void CUMYUV444Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 template<class C>
 void CUMYUV444Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 {
-	const uint8_t *pSrcYBegin = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	const uint8_t *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	const uint8_t *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pCurFrame.get(), nBandIndex);
+	auto& [y, u, v, _] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_YV24:
+		for (int i = 0; i < 3; ++i)
 		{
-			uint8_t *pDstYBegin, *pDstVBegin, *pDstUBegin;
-			uint8_t *pDstYEnd, *pDstVEnd, *pDstUEnd;
-
-			pDstYBegin = ((uint8_t *)m_pOutput);
-			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
-			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight;
-
-			pDstYEnd = pDstYBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth;
-			pDstVEnd = pDstVBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth;
-			pDstUEnd = pDstUBegin + m_dwRawStripeEnd[nBandIndex] * m_nWidth;
-
-			pDstYBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth;
-			pDstVBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth;
-			pDstUBegin += m_dwRawStripeBegin[nBandIndex] * m_nWidth;
-
-			for (auto p = pDstYBegin; p != pDstYEnd; p += m_nWidth, pSrcYBegin += m_cbPlaneWidth[0])
-				memcpy(p, pSrcYBegin, m_nWidth);
-			for (auto p = pDstUBegin; p != pDstUEnd; p += m_nWidth, pSrcUBegin += m_cbPlaneWidth[1])
-				memcpy(p, pSrcUBegin, m_nWidth);
-			for (auto p = pDstVBegin; p != pDstVEnd; p += m_nWidth, pSrcVBegin += m_cbPlaneWidth[2])
-				memcpy(p, pSrcVBegin, m_nWidth);
+			auto q = pPlaneBegin[i];
+			auto cbLineWidth = m_fmRaw.cbLineWidth[i];
+			for (auto p = pRawBegin[i]; p != pRawEnd[i]; p += m_fmRaw.scbLineStride[i], q += m_cbPlaneWidth[i])
+				memcpy(p, q, cbLineWidth);
 		}
 		return;
-	}
 
-	uint8_t *pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	uint8_t *pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-
-	switch (m_utvfRaw)
-	{
 	case UTVF_NFCC_BGR_BU:
-		ConvertULY4ToBGR(C)(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+	case UTVF_NFCC_BGR_TD:
+		ConvertULY4ToBGR(C)(pRawBegin[0], pRawEnd[0], y, u, v, m_fmRaw.cbLineWidth[0], m_fmRaw.scbStripeStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULY4ToBGRX(C)(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
-	case UTVF_NFCC_BGR_TD:
-		ConvertULY4ToBGR(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
 	case UTVF_NFCC_BGRX_TD:
-		ConvertULY4ToBGRX(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertULY4ToBGRX(C)(pRawBegin[0], pRawEnd[0], y, u, v, m_fmRaw.cbLineWidth[0], m_fmRaw.scbStripeStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_RGB_TD:
-		ConvertULY4ToRGB(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertULY4ToRGB(C)(pRawBegin[0], pRawEnd[0], y, u, v, m_fmRaw.cbLineWidth[0], m_fmRaw.scbStripeStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULY4ToXRGB(C)(pDstBegin, pDstEnd, pSrcYBegin, pSrcUBegin, pSrcVBegin, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertULY4ToXRGB(C)(pRawBegin[0], pRawEnd[0], y, u, v, m_fmRaw.cbLineWidth[0], m_fmRaw.scbStripeStride[0], m_cbPlaneWidth[0]);
 		break;
 	}
 }

@@ -10,7 +10,7 @@
 #include "ByteOrder.h"
 #include "resource.h"
 
-CUQ00Codec::CUQ00Codec(const char *pszTinyName, const char *pszInterfaceName) : CCodecBase(pszTinyName, pszInterfaceName)
+CUQ00Codec::CUQ00Codec(const char *pszTinyName, const char *pszInterfaceName) : CBandParallelCodec(pszTinyName, pszInterfaceName)
 {
 	SetDefaultState();
 	LoadConfig();
@@ -239,29 +239,7 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	return p - ((uint8_t *)pOutput);
 }
 
-int CUQ00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
-{
-//	const STREAMINFO *p = (const STREAMINFO *)pExtraData;
-
-	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
-	CalcPlaneSizes(width, height);
-
-	m_dwNumStripes = height / GetMacroPixelHeight();
-	m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight();
-
-	return 0;
-}
-
-void CUQ00Codec::CalcStripeMetric(void)
-{
-	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-	{
-		m_dwStripeBegin[nBandIndex] = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
-		m_dwStripeEnd[nBandIndex]   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
-	}
-}
-
-int CUQ00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CUQ00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
 {
 	int ret;
 	STREAMINFO si;
@@ -275,11 +253,11 @@ int CUQ00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	m_nHeight = height;
 
 	EncodeGetExtraData(&si, sizeof(si), infmt, width, height);
-	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth, &si, sizeof(si));
+	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth);
 	if (ret != 0)
 		return ret;
 	m_dwDivideCount = m_ec.ecDivideCountMinusOne + 1;
-	CalcStripeMetric();
+	CalcBandMetric();
 
 	m_pCurFrame = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
@@ -445,7 +423,7 @@ size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput)
 		return -1;
 
 	m_dwDivideCount = fi0->fiDivideCountMinusOne + 1;
-	CalcStripeMetric();
+	CalcBandMetric();
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
@@ -465,7 +443,7 @@ size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput)
 		m_ptm->SubmitJob(new CThreadJob(this, &CUQ00Codec::DecodeProc, nBandIndex), nBandIndex);
 	m_ptm->WaitForJobCompletion();
 
-	return m_cbRawSize;
+	return m_fmRaw.cbTotalSize;
 }
 
 void CUQ00Codec::GenerateDecodeTableProc(uint32_t nPlaneIndex)
@@ -484,7 +462,7 @@ int CUQ00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
 	return 0;
 }
 
-int CUQ00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CUQ00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
 	int ret;
 
@@ -492,7 +470,7 @@ int CUQ00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	if (ret != 0)
 		return ret;
 
-	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth);
 	if (ret != 0)
 		return ret;
 
@@ -521,17 +499,6 @@ int CUQ00Codec::InternalDecodeEnd(void)
 	m_ptm.reset();
 
 	return 0;
-}
-
-size_t CUQ00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
-{
-	int ret;
-
-	ret = CalcRawFrameMetric(outfmt, width, height, cbGrossWidth);
-	if (ret != 0)
-		return 0;
-
-	return m_cbRawSize;
 }
 
 int CUQ00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
@@ -605,7 +572,7 @@ void CUQ00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* cons
 		if (RestoreType == RESTORE_DEFAULT)
 			RestoreCylindricalLeft10((uint16_t *)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
 		else if (RestoreType == RESTORE_CUSTOM)
-			RestoreCustom(nBandIndex, nPlaneIndex, pDstBegin);
+			RestoreCustom(nBandIndex, nPlaneIndex);
 	}
 }
 
@@ -619,9 +586,9 @@ void CUQ00Codec::DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* p
 	DecodeAndRestoreToPlanarImpl<RESTORE_DEFAULT>(nBandIndex, pDstBegin);
 }
 
-void CUQ00Codec::DecodeAndRestoreCustomToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin)
+void CUQ00Codec::DecodeAndRestoreCustomToPlanar(uint32_t nBandIndex)
 {
-	DecodeAndRestoreToPlanarImpl<RESTORE_CUSTOM>(nBandIndex, pDstBegin);
+	DecodeAndRestoreToPlanarImpl<RESTORE_CUSTOM>(nBandIndex, NULL);
 }
 
 bool CUQ00Codec::DecodeDirect(uint32_t nBandIndex)
@@ -629,7 +596,7 @@ bool CUQ00Codec::DecodeDirect(uint32_t nBandIndex)
 	return false;
 }
 
-void CUQ00Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin)
+void CUQ00Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex)
 {
 }
 

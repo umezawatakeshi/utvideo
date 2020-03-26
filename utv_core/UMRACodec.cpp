@@ -60,71 +60,45 @@ void CUMRACodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 
 void CUMRACodec::ConvertToPlanar(uint32_t nBandIndex)
 {
-	uint8_t *g, *b, *r, *a;
-	const uint8_t *pSrcBegin, *pSrcEnd;
-
-	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pCurFrame->GetPlane(3) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pCurFrame.get(), nBandIndex);
+	auto& [g, b, r, a] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_NFCC_BGRA_BU:
 	case UTVF_NFCC_BGRX_BU:
-		ConvertBGRAToULRA(g, b, r, a, pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
 	case UTVF_NFCC_BGRA_TD:
-		ConvertBGRAToULRA(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertBGRAToULRA(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertARGBToULRA(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertARGBToULRA(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	}
 }
 
 void CUMRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 {
-	const uint8_t *g, *b, *r, *a;
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pCurFrame->GetPlane(3) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pCurFrame.get(), nBandIndex);
+	auto& [g, b, r, a] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_NFCC_BGRA_BU:
 	case UTVF_NFCC_BGRX_BU:
-		ConvertULRAToBGRA(pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth, g, b, r, a, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth, m_cbPlaneWidth[0]);
-		break;
 	case UTVF_NFCC_BGRA_TD:
-		ConvertULRAToBGRA(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertULRAToBGRA(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	case UTVF_NFCC_ARGB_TD:
-		ConvertULRAToARGB(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth, m_cbPlaneWidth[0]);
+		ConvertULRAToARGB(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_cbPlaneWidth[0]);
 		break;
 	}
 }
 
 bool CUMRACodec::EncodeDirect(uint32_t nBandIndex)
 {
-	uint8_t *g, *b, *r, *a;
-	const uint8_t *pSrcBegin, *pSrcEnd;
+	auto& [pRawBegin, pRawEnd, _] = CalcBandPosition<true>(m_pCurFrame.get(), nBandIndex);
 
-	pSrcBegin = ((uint8_t *)m_pInput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd = ((uint8_t *)m_pInput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pCurFrame->GetPlane(3) + m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
-
-	size_t cbPlane = (m_dwPlaneStripeEnd[nBandIndex] - m_dwPlaneStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[0];
+	size_t cbPlane = (m_dwStripeEnd[nBandIndex] - m_dwStripeBegin[nBandIndex]) * m_cbPlaneStripeSize[0];
 
 	if (m_nKeyFrameInterval <= 1)
 	{
@@ -137,17 +111,6 @@ bool CUMRACodec::EncodeDirect(uint32_t nBandIndex)
 		{
 		case UTVF_NFCC_BGRA_BU:
 		case UTVF_NFCC_BGRX_BU:
-			ConvertBGRAToULRA_Pack8SymAfterPredictPlanarGradient8(
-				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
-				m_pControlStream[0][nBandIndex],
-				m_pPackedStream[1][nBandIndex], &m_cbPackedStream[1][nBandIndex],
-				m_pControlStream[1][nBandIndex],
-				m_pPackedStream[2][nBandIndex], &m_cbPackedStream[2][nBandIndex],
-				m_pControlStream[2][nBandIndex],
-				m_pPackedStream[3][nBandIndex], &m_cbPackedStream[3][nBandIndex],
-				m_pControlStream[3][nBandIndex],
-				pSrcEnd - m_cbRawGrossWidth, pSrcBegin - m_cbRawGrossWidth, m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
-			return true;
 		case UTVF_NFCC_BGRA_TD:
 			ConvertBGRAToULRA_Pack8SymAfterPredictPlanarGradient8(
 				m_pPackedStream[0][nBandIndex], &m_cbPackedStream[0][nBandIndex],
@@ -158,7 +121,7 @@ bool CUMRACodec::EncodeDirect(uint32_t nBandIndex)
 				m_pControlStream[2][nBandIndex],
 				m_pPackedStream[3][nBandIndex], &m_cbPackedStream[3][nBandIndex],
 				m_pControlStream[3][nBandIndex],
-				pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+				pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
 			ConvertARGBToULRA_Pack8SymAfterPredictPlanarGradient8(
@@ -170,7 +133,7 @@ bool CUMRACodec::EncodeDirect(uint32_t nBandIndex)
 				m_pControlStream[2][nBandIndex],
 				m_pPackedStream[3][nBandIndex], &m_cbPackedStream[3][nBandIndex],
 				m_pControlStream[3][nBandIndex],
-				pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+				pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 	}
@@ -180,10 +143,7 @@ bool CUMRACodec::EncodeDirect(uint32_t nBandIndex)
 
 bool CUMRACodec::DecodeDirect(uint32_t nBandIndex)
 {
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwRawStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd = ((uint8_t *)m_pOutput) + m_dwRawStripeEnd[nBandIndex] * m_cbRawStripeSize;
+	auto& [pRawBegin, pRawEnd, _] = CalcBandPosition<false>(nBandIndex);
 
 	if (!(m_siDecode.siFlags & SI_FLAGS_USE_TEMPORAL_COMPRESSION))
 	{
@@ -191,31 +151,23 @@ bool CUMRACodec::DecodeDirect(uint32_t nBandIndex)
 		{
 		case UTVF_NFCC_BGRA_BU:
 		case UTVF_NFCC_BGRX_BU:
-			ConvertULRAToBGRA_Unpack8SymAndRestorePlanarGradient8(
-				pDstEnd - m_cbRawGrossWidth, pDstBegin - m_cbRawGrossWidth,
-				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
-				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
-				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
-				m_pPackedStream[3][nBandIndex], m_pControlStream[3][nBandIndex],
-				m_cbRawNetWidth, -(ssize_t)m_cbRawGrossWidth);
-			return true;
 		case UTVF_NFCC_BGRA_TD:
 			ConvertULRAToBGRA_Unpack8SymAndRestorePlanarGradient8(
-				pDstBegin, pDstEnd,
+				pRawBegin[0], pRawEnd[0],
 				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
 				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
 				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
 				m_pPackedStream[3][nBandIndex], m_pControlStream[3][nBandIndex],
-				m_cbRawNetWidth, m_cbRawGrossWidth);
+				m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
 			ConvertULRAToARGB_Unpack8SymAndRestorePlanarGradient8(
-				pDstBegin, pDstEnd,
+				pRawBegin[0], pRawEnd[0],
 				m_pPackedStream[0][nBandIndex], m_pControlStream[0][nBandIndex],
 				m_pPackedStream[1][nBandIndex], m_pControlStream[1][nBandIndex],
 				m_pPackedStream[2][nBandIndex], m_pControlStream[2][nBandIndex],
 				m_pPackedStream[3][nBandIndex], m_pControlStream[3][nBandIndex],
-				m_cbRawNetWidth, m_cbRawGrossWidth);
+				m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 	}

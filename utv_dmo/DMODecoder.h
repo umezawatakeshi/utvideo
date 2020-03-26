@@ -65,7 +65,8 @@ public:
 
 	size_t GetSize(utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height)
 	{
-		return m_pCodec->DecodeGetOutputSize(outfmt, width, height, CBGROSSWIDTH_WINDOWS);
+		size_t cbGrossWidth[4] = { CBGROSSWIDTH_WINDOWS, CBGROSSWIDTH_WINDOWS, CBGROSSWIDTH_WINDOWS, CBGROSSWIDTH_WINDOWS };
+		return m_pCodec->DecodeGetOutputSize(outfmt, width, height, cbGrossWidth);
 	}
 
 	int Query(utvf_t outfmt, utvf_t infmt, unsigned int width, unsigned int height, const void *pOutExtraData, size_t cbOutExtraData, const void *pInExtraData, size_t cbInExtraData)

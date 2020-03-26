@@ -20,7 +20,7 @@
 #pragma warning(pop)
 #endif
 
-CUM00Codec::CUM00Codec(const char *pszTinyName, const char *pszInterfaceName) : CCodecBase(pszTinyName, pszInterfaceName)
+CUM00Codec::CUM00Codec(const char *pszTinyName, const char *pszInterfaceName) : CBandParallelCodec(pszTinyName, pszInterfaceName)
 {
 	SetDefaultState();
 	LoadConfig();
@@ -267,40 +267,23 @@ size_t CUM00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	return pOutputEnd - ((uint8_t *)pOutput);
 }
 
-int CUM00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CUM00Codec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
 {
-//	const STREAMINFO *p = (const STREAMINFO *)pExtraData;
+	int ret;
+	ret = CBandParallelCodec::CalcFrameMetric(rawfmt, width, height, cbGrossWidth);
+	if (ret != 0)
+		return ret;
 
-	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
-	CalcPlaneSizes(width, height);
+	int nStripeScale = GetMacroPixelHeight() / m_fmRaw.nMacroPixelHeight;
+	for (int i = 0; i < m_fmRaw.nPlanes; ++i)
+		m_fmRaw.nStripeLines[i] *= nStripeScale;
 
-	m_dwNumStripes = height / GetMacroPixelHeight();
-	m_cbRawStripeSize = m_cbRawGrossWidth * GetMacroPixelHeight();
+	::FixStripeValues(&m_fmRaw);
 
 	return 0;
 }
 
-void CUM00Codec::CalcStripeMetric(void)
-{
-	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-	{
-		m_dwPlaneStripeBegin[nBandIndex] = m_dwNumStripes *  nBandIndex      / m_dwDivideCount;
-		m_dwPlaneStripeEnd[nBandIndex]   = m_dwNumStripes * (nBandIndex + 1) / m_dwDivideCount;
-
-		if (!m_bBottomUpFrame)
-		{
-			m_dwRawStripeBegin[nBandIndex] = m_dwPlaneStripeBegin[nBandIndex];
-			m_dwRawStripeEnd[nBandIndex]   = m_dwPlaneStripeEnd[nBandIndex];
-		}
-		else
-		{
-			m_dwRawStripeBegin[nBandIndex] = m_dwNumStripes - m_dwPlaneStripeEnd[nBandIndex];
-			m_dwRawStripeEnd[nBandIndex]   = m_dwNumStripes - m_dwPlaneStripeBegin[nBandIndex];
-		}
-	}
-}
-
-int CUM00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CUM00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
 {
 	int ret;
 	STREAMINFO si;
@@ -314,12 +297,12 @@ int CUM00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	m_nHeight = height;
 
 	EncodeGetExtraData(&si, sizeof(si), infmt, width, height);
-	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth, &si, sizeof(si));
+	ret = CalcFrameMetric(infmt, width, height, cbGrossWidth);
 	if (ret != 0)
 		return ret;
 	m_dwDivideCount = m_ec.ecDivideCountMinusOne + 1;
 	m_nKeyFrameInterval = (m_ec.ecFlags & EC_FLAGS_USE_TEMPORAL_COMPRESSION) ? (m_ec.ecKeyFrameIntervalMinusOne + 1) : 1;
-	CalcStripeMetric();
+	CalcBandMetric();
 
 	m_pCurFrame = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
@@ -338,10 +321,10 @@ int CUM00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	{
 		for (unsigned int j = 0; j < m_dwDivideCount; ++j)
 		{
-			m_pPackedStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]));
-			m_pControlStream[i][j] = (uint8_t*)malloc(LZ4_compressBound((int)(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4)));
+			m_pPackedStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwStripeEnd[j] - m_dwStripeBegin[j]));
+			m_pControlStream[i][j] = (uint8_t*)malloc(LZ4_compressBound((int)(m_cbPlaneStripeSize[i] * (m_dwStripeEnd[j] - m_dwStripeBegin[j]) / 64 * 4)));
 			if (m_nKeyFrameInterval > 1)
-				m_pTmpControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4);
+				m_pTmpControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwStripeEnd[j] - m_dwStripeBegin[j]) / 64 * 4);
 		}
 	}
 
@@ -442,8 +425,8 @@ void CUM00Codec::EncodeFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSr
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneEnd   = m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
 		if (m_nFrameNumber == 0)
 		{
@@ -475,10 +458,10 @@ size_t CUM00Codec::DecodeFrame(void *pOutput, const void *pInput)
 	m_fiDecode = (const FRAMEINFO*)pInput;
 
 	if (is_not_all_zero(m_fiDecode->fiReserved))
-		return m_cbRawSize;
+		return m_fmRaw.cbTotalSize;
 
 	if (m_fiDecode->fiFrameType != FI_FRAME_TYPE_INTRA && m_fiDecode->fiFrameType != FI_FRAME_TYPE_DELTA)
-		return m_cbRawSize;
+		return m_fmRaw.cbTotalSize;
 
 	const uint8_t *pPackedStreams = (const uint8_t *)pInput + sizeof(FRAMEINFO);
 	const uint32_t *pcbControlStreams = (const uint32_t*)(pPackedStreams + m_fiDecode->fiSizeArrayOffset);
@@ -509,7 +492,7 @@ size_t CUM00Codec::DecodeFrame(void *pOutput, const void *pInput)
 	if (m_siDecode.siFlags & SI_FLAGS_USE_TEMPORAL_COMPRESSION)
 		std::swap(m_pCurFrame, m_pPrevFrame);
 
-	return m_cbRawSize;
+	return m_fmRaw.cbTotalSize;
 }
 
 int CUM00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
@@ -518,7 +501,7 @@ int CUM00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
 	return 0;
 }
 
-int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
 	int ret;
 
@@ -526,7 +509,7 @@ int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	if (ret != 0)
 		return ret;
 
-	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
+	ret = CalcFrameMetric(outfmt, width, height, cbGrossWidth);
 	if (ret != 0)
 		return ret;
 
@@ -534,7 +517,7 @@ int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	memcpy(&m_siDecode, pExtraData, min(sizeof(STREAMINFO), cbExtraData));
 
 	m_dwDivideCount = m_siDecode.siDivideCountMinusOne + 1;
-	CalcStripeMetric();
+	CalcBandMetric();
 
 	m_utvfRaw = outfmt;
 	m_nWidth = width;
@@ -544,7 +527,7 @@ int CUM00Codec::InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned 
 	{
 		for (int i = 0; i < GetNumPlanes(); i++)
 			for (unsigned int j = 0; j < m_dwDivideCount; ++j)
-				m_pTmpControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwPlaneStripeEnd[j] - m_dwPlaneStripeBegin[j]) / 64 * 4);
+				m_pTmpControlStream[i][j] = (uint8_t*)malloc(m_cbPlaneStripeSize[i] * (m_dwStripeEnd[j] - m_dwStripeBegin[j]) / 64 * 4);
 	}
 
 	m_pCurFrame = std::make_unique<CFrameBuffer>();
@@ -578,17 +561,6 @@ int CUM00Codec::InternalDecodeEnd(void)
 	m_ptm.reset();
 
 	return 0;
-}
-
-size_t CUM00Codec::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
-{
-	int ret;
-
-	ret = CalcRawFrameMetric(outfmt, width, height, cbGrossWidth);
-	if (ret != 0)
-		return 0;
-
-	return m_cbRawSize;
 }
 
 int CUM00Codec::InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
@@ -649,8 +621,8 @@ void CUM00Codec::DecodeToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin, 
 {
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		size_t cbPlaneBegin = m_dwPlaneStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
-		size_t cbPlaneEnd   = m_dwPlaneStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
+		size_t cbPlaneEnd   = m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
 		uint8_t *pControl;
 		if (m_fiDecode->fiFlags & FI_FLAGS_CONTROL_COMPRESSED)

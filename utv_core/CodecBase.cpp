@@ -167,9 +167,9 @@ int CCodecBase::InternalSetStateWrapper(const void *pState, size_t cb)
 	return ret;
 }
 
-int CCodecBase::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CCodecBase::EncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
 {
-	LOGPRINTF("%p CCodecBase::EncodeBegin(infmt=%08X, width=%u, height=%u, cbGrossWidth=%" PRIdSZT ")", this, infmt, width, height, cbGrossWidth);
+	LOGPRINTF("%p CCodecBase::EncodeBegin(infmt=%08X, width=%u, height=%u, cbGrossWidth[0]=%" PRIdSZT ")", this, infmt, width, height, cbGrossWidth[0]);
 
 	int ret = InternalEncodeBegin(infmt, width, height, cbGrossWidth);
 	LOGPRINTF("%p CCodecBase::EncodeBegin return %d", this, ret);
@@ -192,13 +192,13 @@ int CCodecBase::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int heigh
 	return ret;
 }
 
-int CCodecBase::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData)
+int CCodecBase::DecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth, const void *pExtraData, size_t cbExtraData)
 {
 	if (IsLogWriterInitializedOrDebugBuild())
 	{
 		char buf[256];
 		FormatBinary(buf, pExtraData, cbExtraData, EncodeGetExtraDataSize());
-		LOGPRINTF("%p CCodecBase::DecodeBegin(outfmt=%08X, width=%u, height=%u, cbGrossWidth=%" PRIdSZT ", pExtraData=%s, cbExtraData=%" PRIuSZT ")", this, outfmt, width, height, cbGrossWidth, buf, cbExtraData);
+		LOGPRINTF("%p CCodecBase::DecodeBegin(outfmt=%08X, width=%u, height=%u, cbGrossWidth[0]=%" PRIdSZT ", pExtraData=%s, cbExtraData=%" PRIuSZT ")", this, outfmt, width, height, cbGrossWidth[0], buf, cbExtraData);
 	}
 
 	int ret = InternalDecodeBegin(outfmt, width, height, cbGrossWidth, pExtraData, cbExtraData);
@@ -211,6 +211,18 @@ int CCodecBase::DecodeEnd(void)
 	LOGPRINTF("%p CCodecBase::DecodeEnd()", this);
 
 	return InternalDecodeEnd();
+}
+
+size_t CCodecBase::DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
+{
+	int ret;
+	FRAME_METRIC fm;
+
+	ret = ::CalcRawFrameMetric(&fm, outfmt, width, height, cbGrossWidth);
+	if (ret != 0)
+		return 0;
+
+	return fm.cbTotalSize;
 }
 
 int CCodecBase::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData)
@@ -227,109 +239,267 @@ int CCodecBase::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int heig
 	return ret;
 }
 
-int CCodecBase::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth)
+int CalcRawFrameMetric(FRAME_METRIC* pfm, utvf_t rawfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
 {
-	m_bBottomUpFrame = false;
+	bool bBottomUp;
+
+	switch (rawfmt)
+	{
+	case UTVF_NFCC_BGR_BU:
+	case UTVF_NFCC_BGRX_BU:
+	case UTVF_NFCC_BGRA_BU:
+		bBottomUp = true;
+		break;
+
+	default:
+		bBottomUp = false;
+	}
+
 	switch (rawfmt)
 	{
 	case UTVF_YV24:
-		m_cbRawSize = (width * height * 3);
+		pfm->nPlanes = 3;
+		pfm->nMacroPixelWidth = 1;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = width;
+		pfm->cbLineWidth[1] = width;
+		pfm->cbLineWidth[2] = width;
+		pfm->nStripeLines[0] = 1;
+		pfm->nStripeLines[1] = 1;
+		pfm->nStripeLines[2] = 1;
 		break;
 	case UTVF_YV16:
-		m_cbRawSize = (width * height * 2);
+		pfm->nPlanes = 3;
+		pfm->nMacroPixelWidth = 2;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = width;
+		pfm->cbLineWidth[1] = width / 2;
+		pfm->cbLineWidth[2] = width / 2;
+		pfm->nStripeLines[0] = 1;
+		pfm->nStripeLines[1] = 1;
+		pfm->nStripeLines[2] = 1;
 		break;
 	case UTVF_YV12:
-		m_cbRawSize = (width * height * 3) / 2; // XXX 幅や高さが奇数の場合は考慮していない
+		pfm->nPlanes = 3;
+		pfm->nMacroPixelWidth = 2;
+		pfm->nMacroPixelHeight = 2;
+		pfm->cbLineWidth[0] = width;
+		pfm->cbLineWidth[1] = width / 2;
+		pfm->cbLineWidth[2] = width / 2;
+		pfm->nStripeLines[0] = 2;
+		pfm->nStripeLines[1] = 1;
+		pfm->nStripeLines[2] = 1;
 		break;
+
 	case UTVF_YUV444P10LE:
 	case UTVF_YUV444P16LE:
-		m_cbRawSize = (width * height * 6);
+		pfm->nPlanes = 3;
+		pfm->nMacroPixelWidth = 1;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = width * 2;
+		pfm->cbLineWidth[1] = width * 2;
+		pfm->cbLineWidth[2] = width * 2;
+		pfm->nStripeLines[0] = 1;
+		pfm->nStripeLines[1] = 1;
+		pfm->nStripeLines[2] = 1;
 		break;
 	case UTVF_YUV422P10LE:
 	case UTVF_YUV422P16LE:
-		m_cbRawSize = (width * height * 4);
+		pfm->nPlanes = 3;
+		pfm->nMacroPixelWidth = 2;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = width * 2;
+		pfm->cbLineWidth[1] = width;
+		pfm->cbLineWidth[2] = width;
+		pfm->nStripeLines[0] = 1;
+		pfm->nStripeLines[1] = 1;
+		pfm->nStripeLines[2] = 1;
 		break;
 	case UTVF_YUV420P10LE:
 	case UTVF_YUV420P16LE:
-		m_cbRawSize = (width * height * 3);
+		pfm->nPlanes = 3;
+		pfm->nMacroPixelWidth = 2;
+		pfm->nMacroPixelHeight = 2;
+		pfm->cbLineWidth[0] = width * 2;
+		pfm->cbLineWidth[1] = width;
+		pfm->cbLineWidth[2] = width;
+		pfm->nStripeLines[0] = 2;
+		pfm->nStripeLines[1] = 1;
+		pfm->nStripeLines[2] = 1;
 		break;
 
 	case UTVF_P210:
 	case UTVF_P216:
-		m_cbRawSize = width * height * 4;
+		pfm->nPlanes = 2;
+		pfm->nMacroPixelWidth = 2;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = width * 2;
+		pfm->cbLineWidth[1] = width * 2;
+		pfm->nStripeLines[0] = 1;
+		pfm->nStripeLines[1] = 1;
 		break;
 	case UTVF_P010:
 	case UTVF_P016:
-		m_cbRawSize = width * height * 3;
+		pfm->nPlanes = 2;
+		pfm->nMacroPixelWidth = 2;
+		pfm->nMacroPixelHeight = 2;
+		pfm->cbLineWidth[0] = width * 2;
+		pfm->cbLineWidth[1] = width * 2;
+		pfm->nStripeLines[0] = 2;
+		pfm->nStripeLines[1] = 1;
+		break;
+
+	case UTVF_NFCC_BGR_BU:
+	case UTVF_NFCC_BGR_TD:
+	case UTVF_NFCC_RGB_TD:
+		pfm->nPlanes = 1;
+		pfm->nMacroPixelWidth = 1;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = width * 3;
+		pfm->nStripeLines[0] = 1;
+		break;
+	case UTVF_NFCC_BGRX_BU:
+	case UTVF_NFCC_BGRA_BU:
+	case UTVF_NFCC_BGRX_TD:
+	case UTVF_NFCC_BGRA_TD:
+	case UTVF_NFCC_ARGB_TD:
+		pfm->nPlanes = 1;
+		pfm->nMacroPixelWidth = 1;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = width * 4;
+		pfm->nStripeLines[0] = 1;
+		break;
+
+	case UTVF_YUY2:
+	case UTVF_YUYV:
+	case UTVF_YUNV:
+	case UTVF_yuvs:
+	case UTVF_UYVY:
+	case UTVF_UYNV:
+	case UTVF_2vuy:
+	case UTVF_HDYC:
+		pfm->nPlanes = 1;
+		pfm->nMacroPixelWidth = 2;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = width * 2;
+		pfm->nStripeLines[0] = 1;
+		break;
+
+	case UTVF_v210:
+		pfm->nPlanes = 1;
+		pfm->nMacroPixelWidth = 2;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = ((width + 47) / 48) * 128;
+		pfm->nStripeLines[0] = 1;
+		break;
+
+	case UTVF_b64a:
+		pfm->nPlanes = 1;
+		pfm->nMacroPixelWidth = 1;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = width * 8;
+		pfm->nStripeLines[0] = 1;
+		break;
+	case UTVF_b48r:
+		pfm->nPlanes = 1;
+		pfm->nMacroPixelWidth = 1;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = width * 6;
+		pfm->nStripeLines[0] = 1;
+		break;
+
+	case UTVF_r210:
+		pfm->nPlanes = 1;
+		pfm->nMacroPixelWidth = 1;
+		pfm->nMacroPixelHeight = 1;
+		pfm->cbLineWidth[0] = ((width + 63) / 64) * 256;
+		pfm->nStripeLines[0] = 1;
 		break;
 
 	default:
-		switch (rawfmt)
-		{
-		case UTVF_NFCC_BGR_BU:
-		case UTVF_NFCC_BGRX_BU:
-		case UTVF_NFCC_BGRA_BU:
-			m_bBottomUpFrame = true;
-		}
-
-		switch (rawfmt)
-		{
-		case UTVF_NFCC_BGR_BU:
-		case UTVF_NFCC_BGR_TD:
-		case UTVF_NFCC_RGB_TD:
-			m_cbRawNetWidth = width * 3;
-			break;
-		case UTVF_NFCC_BGRX_BU:
-		case UTVF_NFCC_BGRA_BU:
-		case UTVF_NFCC_BGRX_TD:
-		case UTVF_NFCC_BGRA_TD:
-		case UTVF_NFCC_ARGB_TD:
-			m_cbRawNetWidth = width * 4;
-			break;
-		case UTVF_YUY2:
-		case UTVF_YUYV:
-		case UTVF_YUNV:
-		case UTVF_yuvs:
-		case UTVF_UYVY:
-		case UTVF_UYNV:
-		case UTVF_2vuy:
-		case UTVF_HDYC:
-			m_cbRawNetWidth = width * 2;
-			break;
-		case UTVF_v210:
-			m_cbRawNetWidth = ((width + 47) / 48) * 128;
-			break;
-		case UTVF_b64a:
-			m_cbRawNetWidth = width * 8;
-			break;
-		case UTVF_b48r:
-			m_cbRawNetWidth = width * 6;
-			break;
-		case UTVF_r210:
-			m_cbRawNetWidth = ((width + 63) / 64) * 256;
-			break;
-		default:
-			return -1;
-		}
-
-		switch (cbGrossWidth)
-		{
-		case CBGROSSWIDTH_NATURAL:
-			m_cbRawGrossWidth = m_cbRawNetWidth;
-			break;
-		case CBGROSSWIDTH_WINDOWS:
-			/*
-			 * BI_RGB の場合は4バイトアライメントであるが、
-			 * その他の場合に4バイトアライメントにすべきかどうかは実は不明確である。
-			 */
-			m_cbRawGrossWidth = ROUNDUP(m_cbRawNetWidth, 4);
-			break;
-		default:
-			m_cbRawGrossWidth = cbGrossWidth;
-		}
-
-		m_cbRawSize = m_cbRawGrossWidth * height;
+		return -1;
 	}
 
+	for (int i = 0; i < pfm->nPlanes; ++i)
+	{
+		pfm->nLines[i] = height / pfm->nMacroPixelHeight * pfm->nStripeLines[i];
+	}
+
+	pfm->nStripes = height / pfm->nMacroPixelHeight;
+
+	size_t cbPlaneOffset = 0;
+	for (int i = 0; i < pfm->nPlanes; ++i)
+	{
+		switch (cbGrossWidth[i])
+		{
+		case CBGROSSWIDTH_WINDOWS:
+			switch (rawfmt)
+			{
+			case UTVF_NFCC_BGR_BU:
+			case UTVF_NFCC_BGR_TD:
+			case UTVF_NFCC_RGB_TD:
+			case UTVF_NFCC_BGRX_BU:
+			case UTVF_NFCC_BGRA_BU:
+			case UTVF_NFCC_BGRX_TD:
+			case UTVF_NFCC_BGRA_TD:
+			case UTVF_NFCC_ARGB_TD:
+				// BI_RGB の場合は4バイトアライメントである
+				pfm->scbLineStride[i] = ROUNDUP(pfm->cbLineWidth[i], 4);
+				break;
+			default:
+				pfm->scbLineStride[i] = pfm->cbLineWidth[i];
+			}
+			break;
+		case CBGROSSWIDTH_NATURAL:
+			pfm->scbLineStride[i] = pfm->cbLineWidth[i];
+			break;
+		default:
+			pfm->scbLineStride[i] = cbGrossWidth[i];
+		}
+
+		pfm->cbPlaneOffset[i] = cbPlaneOffset;
+		pfm->cbFirstLineOffset[i] = pfm->cbPlaneOffset[i];
+		cbPlaneOffset += pfm->scbLineStride[i] * pfm->nLines[i];
+		// plane と plane の間に隙間のあるフォーマットの場合は、後で調整すること。
+	}
+	pfm->cbTotalSize = cbPlaneOffset;
+
+	// ボトムアップフォーマットのための調整
+	if (bBottomUp)
+	{
+		for (int i = 0; i < pfm->nPlanes; ++i)
+		{
+			pfm->cbFirstLineOffset[i] += pfm->scbLineStride[i] * (pfm->nLines[i] - 1);
+			pfm->scbLineStride[i] = -pfm->scbLineStride[i];
+		}
+	}
+
+	// データ上の plane の並び順が G B R (A) あるいは Y U V (A) あるいは Y (A) と一致していない場合は、ここで調整する。
+	switch (rawfmt)
+	{
+	case UTVF_YV24:
+	case UTVF_YV16:
+	case UTVF_YV12:
+		std::swap(pfm->cbPlaneOffset[1], pfm->cbPlaneOffset[2]);
+		std::swap(pfm->cbFirstLineOffset[1], pfm->cbFirstLineOffset[2]);
+		break;
+	}
+
+	FixStripeValues(pfm);
+
 	return 0;
+}
+
+void FixStripeValues(FRAME_METRIC* pfm)
+{
+	// エンコード処理の都合で必要な値の生成
+	for (int i = 0; i < pfm->nPlanes; ++i)
+	{
+		pfm->scbStripeStride[i] = pfm->scbLineStride[i] * pfm->nStripeLines[i];
+	}
+}
+
+int CCodecBase::CalcRawFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
+{
+	return ::CalcRawFrameMetric(&m_fmRaw, rawfmt, width, height, cbGrossWidth);
 }

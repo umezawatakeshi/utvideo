@@ -4,6 +4,7 @@
 #pragma once
 #include "Codec.h"
 #include "CodecBase.h"
+#include "BandParallelCodec.h"
 #include "FrameBuffer.h"
 #include "Thread.h"
 #include "HuffmanCode.h"
@@ -11,7 +12,7 @@
 
 
 class CUQ00Codec :
-	public CCodecBase
+	public CBandParallelCodec
 {
 protected:
 	struct ENCODERCONF
@@ -66,17 +67,9 @@ protected:
 	utvf_t m_utvfRaw;
 	unsigned int m_nWidth;
 	unsigned int m_nHeight;
-	const void *m_pInput;
-	void *m_pOutput;
-	uint32_t m_dwNumStripes;
-	uint32_t m_dwDivideCount;
-	size_t m_cbRawStripeSize;
 	size_t m_cbPlaneSize[4];
 	size_t m_cbPlaneWidth[4];
-	size_t m_cbPlaneStripeSize[4];
 	size_t m_cbPlanePredictStride[4];
-	uint32_t m_dwStripeBegin[256];
-	uint32_t m_dwStripeEnd[256];
 
 	std::unique_ptr<CThreadManager> m_ptm;
 	std::unique_ptr<CFrameBuffer> m_pCurFrame;
@@ -115,7 +108,7 @@ public:
 	virtual size_t GetStateSize(void);
 	virtual int GetState(void *pState, size_t cb);
 
-	virtual int InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
+	virtual int InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned int height, size_t* cbGrossWidth);
 	virtual size_t EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInput);
 	virtual int InternalEncodeEnd(void);
 	virtual size_t EncodeGetExtraDataSize(void);
@@ -123,18 +116,15 @@ public:
 	virtual size_t EncodeGetOutputSize(utvf_t infmt, unsigned int width, unsigned int height);
 	virtual int InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned int height);
 
-	virtual int InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
+	virtual int InternalDecodeBegin(utvf_t outfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth, const void *pExtraData, size_t cbExtraData);
 	virtual size_t DecodeFrame(void *pOutput, const void *pInput);
 	virtual int DecodeGetFrameType(bool *pbKeyFrame, const void *pInput);
 	virtual int InternalDecodeEnd(void);
-	virtual size_t DecodeGetOutputSize(utvf_t outfmt, unsigned int width, unsigned int height, size_t cbGrossWidth);
 	virtual int InternalDecodeQuery(utvf_t outfmt, unsigned int width, unsigned int height, const void *pExtraData, size_t cbExtraData);
 
 protected:
 	virtual int InternalSetState(const void *pState, size_t cb);
 	void SetDefaultState();
-	int CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t cbGrossWidth, const void *pExtraData, size_t cbExtraData);
-	void CalcStripeMetric(void);
 
 	virtual const char *GetColorFormatName(void) = 0;
 	virtual int GetRealBitCount(void) = 0;
@@ -148,14 +138,14 @@ protected:
 	virtual bool PredictDirect(uint32_t nBandIndex);
 	virtual void GenerateDecodeTable(uint32_t nPlaneIndex);
 	virtual bool DecodeDirect(uint32_t nBandIndex);
-	virtual void RestoreCustom(uint32_t nBandIndex, int nPlaneIndex, uint8_t* const* pDstBegin);
+	virtual void RestoreCustom(uint32_t nBandIndex, int nPlaneIndex);
 	virtual bool RestoreDirect(uint32_t nBandIndex);
 	virtual bool IsDirectRestorable();
 
 	void PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pSrcBegin);
 	void DecodeToPlanar(uint32_t nBandIndex);
 	void DecodeAndRestoreToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
-	void DecodeAndRestoreCustomToPlanar(uint32_t nBandIndex, uint8_t* const* pDstBegin);
+	void DecodeAndRestoreCustomToPlanar(uint32_t nBandIndex);
 	template<int RestoreType> void DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* const* pDstBegin);
 
 private:

@@ -53,60 +53,39 @@ void CUQRACodec::CalcPlaneSizes(unsigned int width, unsigned int height)
 
 void CUQRACodec::ConvertToPlanar(uint32_t nBandIndex)
 {
-	uint8_t *g, *b, *r, *a;
-	const uint8_t *pSrcBegin, *pSrcEnd;
-
-	pSrcBegin = ((uint8_t *)m_pInput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd   = ((uint8_t *)m_pInput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pCurFrame->GetPlane(3) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pCurFrame.get(), nBandIndex);
+	auto& [g, b, r, a] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_b64a:
-		ConvertB64aToUQRA(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertB64aToUQRA(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 		break;
 	}
 }
 
 void CUQRACodec::ConvertFromPlanar(uint32_t nBandIndex)
 {
-	const uint8_t *g, *b, *r, *a;
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd   = ((uint8_t *)m_pOutput) + m_dwStripeEnd[nBandIndex]   * m_cbRawStripeSize;
-	g = m_pCurFrame->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pCurFrame->GetPlane(3) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pCurFrame.get(), nBandIndex);
+	auto& [g, b, r, a] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_b64a:
-		ConvertUQRAToB64a(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertUQRAToB64a(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 		break;
 	}
 }
 
 bool CUQRACodec::PredictDirect(uint32_t nBandIndex)
 {
-	uint8_t *g, *b, *r, *a;
-	const uint8_t *pSrcBegin, *pSrcEnd;
-
-	pSrcBegin = ((uint8_t *)m_pInput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pSrcEnd = ((uint8_t *)m_pInput) + m_dwStripeEnd[nBandIndex] * m_cbRawStripeSize;
-	g = m_pPredicted->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pPredicted->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pPredicted->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pPredicted->GetPlane(3) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pPredicted.get(), nBandIndex);
+	auto& [g, b, r, a] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_b64a:
-		ConvertB64aToUQRA_PredictCylindricalLeftAndCount(g, b, r, a, pSrcBegin, pSrcEnd, m_cbRawNetWidth, m_cbRawGrossWidth, m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+		ConvertB64aToUQRA_PredictCylindricalLeftAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
 		return true;
 	}
 
@@ -115,20 +94,13 @@ bool CUQRACodec::PredictDirect(uint32_t nBandIndex)
 
 bool CUQRACodec::RestoreDirect(uint32_t nBandIndex)
 {
-	const uint8_t *g, *b, *r, *a;
-	uint8_t *pDstBegin, *pDstEnd;
-
-	pDstBegin = ((uint8_t *)m_pOutput) + m_dwStripeBegin[nBandIndex] * m_cbRawStripeSize;
-	pDstEnd = ((uint8_t *)m_pOutput) + m_dwStripeEnd[nBandIndex] * m_cbRawStripeSize;
-	g = m_pPredicted->GetPlane(0) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[0];
-	b = m_pPredicted->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-	r = m_pPredicted->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-	a = m_pPredicted->GetPlane(3) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[3];
+	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pPredicted.get(), nBandIndex);
+	auto& [g, b, r, a] = pPlaneBegin;
 
 	switch (m_utvfRaw)
 	{
 	case UTVF_b64a:
-		ConvertUQRAToB64a_RestoreCylindricalLeft(pDstBegin, pDstEnd, g, b, r, a, m_cbRawNetWidth, m_cbRawGrossWidth);
+		ConvertUQRAToB64a_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, a, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 		return true;
 	}
 
