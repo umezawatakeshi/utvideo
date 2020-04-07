@@ -272,24 +272,14 @@ bool CULYUV420Codec<C>::PredictDirect(uint32_t nBandIndex)
 		return true;
 	case UTVF_YV16:
 		{
-			const uint8_t *pSrcYBegin, *pSrcVBegin, *pSrcUBegin;
-
-			uint8_t *pDstUBegin = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-			uint8_t *pDstVBegin = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-
-			pSrcYBegin = ((uint8_t *)m_pInput);
-			pSrcVBegin = pSrcYBegin + m_nWidth * m_nHeight;
-			pSrcUBegin = pSrcVBegin + m_nWidth * m_nHeight / 2;
+			auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pCurFrame.get(), nBandIndex);
 
 			size_t cbChromaStride = m_nWidth / 2 * (m_bInterlace ? 2 : 1);
 
-			pSrcVBegin += m_dwStripeBegin[nBandIndex] * cbChromaStride * 2;
-			pSrcUBegin += m_dwStripeBegin[nBandIndex] * cbChromaStride * 2;
-
-			auto du = pDstUBegin;
-			auto dv = pDstVBegin;
-			auto su = pSrcUBegin;
-			auto sv = pSrcVBegin;
+			auto du = pPlaneBegin[1];
+			auto dv = pPlaneBegin[2];
+			auto su = pRawBegin[1];
+			auto sv = pRawBegin[2];
 			for (auto i = m_dwStripeBegin[nBandIndex]; i < m_dwStripeEnd[nBandIndex]; ++i)
 			{
 				for (size_t j = 0; j < cbChromaStride; ++j)
@@ -339,24 +329,14 @@ bool CULYUV420Codec<C>::DecodeDirect(uint32_t nBandIndex)
 
 			DecodeAndRestoreToPlanar(nBandIndex, pDstBegin);
 
-			uint8_t *pDstYBegin, *pDstVBegin, *pDstUBegin;
-
-			const uint8_t *pSrcUBegin = m_pCurFrame->GetPlane(1) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[1];
-			const uint8_t *pSrcVBegin = m_pCurFrame->GetPlane(2) + m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[2];
-
-			pDstYBegin = ((uint8_t *)m_pOutput);
-			pDstVBegin = pDstYBegin + m_nWidth * m_nHeight;
-			pDstUBegin = pDstVBegin + m_nWidth * m_nHeight / 2;
+			auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pCurFrame.get(), nBandIndex);
 
 			size_t cbChromaStride = m_nWidth / 2 * (m_bInterlace ? 2 : 1);
 
-			pDstVBegin += m_dwStripeBegin[nBandIndex] * cbChromaStride * 2;
-			pDstUBegin += m_dwStripeBegin[nBandIndex] * cbChromaStride * 2;
-
-			auto du = pDstUBegin;
-			auto dv = pDstVBegin;
-			auto su = pSrcUBegin;
-			auto sv = pSrcVBegin;
+			auto du = pRawBegin[1];
+			auto dv = pRawBegin[2];
+			auto su = pPlaneBegin[1];
+			auto sv = pPlaneBegin[2];
 			for (auto i = m_dwStripeBegin[nBandIndex]; i < m_dwStripeEnd[nBandIndex]; ++i)
 			{
 				memcpy(du, su, cbChromaStride);
