@@ -48,5 +48,13 @@ protected:
 	template<bool Encoding> BAND_POSITION<Encoding> CalcBandPosition(uint32_t nBandIndex);
 	template<bool Encoding> BAND_POSITION<Encoding> CalcBandPosition(CFrameBuffer* pFrameBuffer, uint32_t nBandIndex);
 
+	template<bool Encoding> struct PLANE_POSITION
+	{
+		using raw_t = std::conditional_t<Encoding, const uint8_t*, uint8_t*>;
+
+		raw_t pRawBegin[4];
+	};
+	template<bool Encoding> PLANE_POSITION<Encoding> CalcPlanePosition();
+
 	virtual void CalcPlaneSizes(unsigned int width, unsigned int height) = 0;
 };

@@ -41,6 +41,23 @@ CBandParallelCodec::BAND_POSITION<Encoding> CBandParallelCodec::CalcBandPosition
 template CBandParallelCodec::BAND_POSITION<true> CBandParallelCodec::CalcBandPosition<true>(CFrameBuffer* pFrameBuffer, uint32_t nBandIndex);
 template CBandParallelCodec::BAND_POSITION<false> CBandParallelCodec::CalcBandPosition<false>(CFrameBuffer* pFrameBuffer, uint32_t nBandIndex);
 
+template<bool Encoding>
+CBandParallelCodec::PLANE_POSITION<Encoding> CBandParallelCodec::CalcPlanePosition()
+{
+	PLANE_POSITION<Encoding> result;
+
+	auto pRaw = (BAND_POSITION<Encoding>::raw_t)(Encoding ? m_pInput : m_pOutput);
+	for (int i = 0; i < m_fmRaw.nPlanes; ++i)
+	{
+		result.pRawBegin[i] = pRaw + m_fmRaw.cbPlaneOffset[i];
+	}
+
+	return result;
+}
+
+template CBandParallelCodec::PLANE_POSITION<true> CBandParallelCodec::CalcPlanePosition<true>();
+template CBandParallelCodec::PLANE_POSITION<false> CBandParallelCodec::CalcPlanePosition<false>();
+
 int CBandParallelCodec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
 {
 	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
