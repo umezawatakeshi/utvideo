@@ -293,6 +293,8 @@ static inline FORCEINLINE UNPACK_FOR_DELTA_RESULT UnpackForDelta(const uint8_t*&
 template<>
 void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, size_t cbStride)
 {
+	static constexpr int F = CODEFEATURE_AVX2;
+
 	int shift = 0;
 	auto q = pPacked;
 	auto r = pControl;
@@ -302,19 +304,10 @@ void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pDstBe
 
 		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 32)
 		{
-			__m256i s0 = UnpackForIntra<CODEFEATURE_AVX2>(q, r, shift);
-
-			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 1));
-			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 2));
-			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 4));
-			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 8));
-			s0 = _mm256_add_epi8(s0, _mm256_shuffle_epi8(_mm256_broadcastsi128_si256(_mm256_castsi256_si128(s0)), _mm256_set_epi8(
-				15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-			)));
-			s0 = _mm256_add_epi8(s0, prev);
-			_mm256_storeu_si256((__m256i *)p, s0);
-			prev = _mm256_shuffle_epi8(_mm256_permute2x128_si256(s0, s0, 0x11), _mm256_set1_epi8(15));
+			__m256i s0 = UnpackForIntra<F>(q, r, shift);
+			auto value = tuned_RestoreLeft8Element<F>(prev, s0);
+			_mm256_storeu_si256((__m256i *)p, value.v0);
+			prev = value.v1;
 		}
 	}
 
@@ -324,19 +317,10 @@ void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pDstBe
 
 		for (auto p = pp; p != pp + cbStride; p += 32)
 		{
-			__m256i s0 = UnpackForIntra<CODEFEATURE_AVX2>(q, r, shift);
-
-			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 1));
-			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 2));
-			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 4));
-			s0 = _mm256_add_epi8(s0, _mm256_slli_si256(s0, 8));
-			s0 = _mm256_add_epi8(s0, _mm256_shuffle_epi8(_mm256_broadcastsi128_si256(_mm256_castsi256_si128(s0)), _mm256_set_epi8(
-				15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
-				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
-			)));
-			s0 = _mm256_add_epi8(s0, prev);
-			_mm256_storeu_si256((__m256i *)p, _mm256_add_epi8(s0, _mm256_loadu_si256((const __m256i *)(p - cbStride))));
-			prev = _mm256_shuffle_epi8(_mm256_permute2x128_si256(s0, s0, 0x11), _mm256_set1_epi8(15));
+			__m256i s0 = UnpackForIntra<F>(q, r, shift);
+			auto value = tuned_RestoreLeft8Element<F>(prev, s0);
+			_mm256_storeu_si256((__m256i*)p, _mm256_add_epi8(value.v0, _mm256_loadu_si256((const __m256i*)(p - cbStride))));
+			prev = value.v1;
 		}
 	}
 
