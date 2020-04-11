@@ -7,102 +7,106 @@
 #error
 #endif
 
-template<int F, int NTS /* num_tables scale */>
+template<int F, int NTS /* num_tables scale */, int TGI /* table group index */>
 static inline FORCEINLINE void IncrementCounters8(__m128i xmm, uint32_t pCountTable[][256])
 {
-	static constexpr int NT = NUM_COUNT_TABLES_PER_CHANNEL<8> < NTS ? 1 : NUM_COUNT_TABLES_PER_CHANNEL<8> / NTS;
+	static constexpr int TPC = NUM_COUNT_TABLES_PER_CHANNEL<8>;
+	static constexpr int NT = TPC < NTS ? 1 : TPC / NTS;
+	static constexpr int TO = NT * TGI % TPC;
 
 #ifdef __SSE4_1__
 #if defined(__i386__)
 	uint32_t x;
 
 	x = _mm_cvtsi128_si32(xmm);
-	++pCountTable[ 0 % NT][x & 0xff];
-	++pCountTable[ 1 % NT][(x >> 8) & 0xff];
-	++pCountTable[ 2 % NT][(x >> 16) & 0xff];
-	++pCountTable[ 3 % NT][(x >> 24) & 0xff];
+	++pCountTable[ 0 % NT + TO][x & 0xff];
+	++pCountTable[ 1 % NT + TO][(x >> 8) & 0xff];
+	++pCountTable[ 2 % NT + TO][(x >> 16) & 0xff];
+	++pCountTable[ 3 % NT + TO][(x >> 24) & 0xff];
 
 	x = _mm_extract_epi32(xmm, 1);
-	++pCountTable[ 4 % NT][x & 0xff];
-	++pCountTable[ 5 % NT][(x >> 8) & 0xff];
-	++pCountTable[ 6 % NT][(x >> 16) & 0xff];
-	++pCountTable[ 7 % NT][(x >> 24) & 0xff];
+	++pCountTable[ 4 % NT + TO][x & 0xff];
+	++pCountTable[ 5 % NT + TO][(x >> 8) & 0xff];
+	++pCountTable[ 6 % NT + TO][(x >> 16) & 0xff];
+	++pCountTable[ 7 % NT + TO][(x >> 24) & 0xff];
 
 	x = _mm_extract_epi32(xmm, 2);
-	++pCountTable[ 8 % NT][x & 0xff];
-	++pCountTable[ 9 % NT][(x >> 8) & 0xff];
-	++pCountTable[10 % NT][(x >> 16) & 0xff];
-	++pCountTable[11 % NT][(x >> 24) & 0xff];
+	++pCountTable[ 8 % NT + TO][x & 0xff];
+	++pCountTable[ 9 % NT + TO][(x >> 8) & 0xff];
+	++pCountTable[10 % NT + TO][(x >> 16) & 0xff];
+	++pCountTable[11 % NT + TO][(x >> 24) & 0xff];
 
 	x = _mm_extract_epi32(xmm, 3);
-	++pCountTable[12 % NT][x & 0xff];
-	++pCountTable[13 % NT][(x >> 8) & 0xff];
-	++pCountTable[14 % NT][(x >> 16) & 0xff];
-	++pCountTable[15 % NT][(x >> 24) & 0xff];
+	++pCountTable[12 % NT + TO][x & 0xff];
+	++pCountTable[13 % NT + TO][(x >> 8) & 0xff];
+	++pCountTable[14 % NT + TO][(x >> 16) & 0xff];
+	++pCountTable[15 % NT + TO][(x >> 24) & 0xff];
 #elif defined(__x86_64__)
 	uint64_t x;
 
 	x = _mm_cvtsi128_si64(xmm);
-	++pCountTable[ 0 % NT][x & 0xff];
-	++pCountTable[ 1 % NT][(x >> 8) & 0xff];
-	++pCountTable[ 2 % NT][(x >> 16) & 0xff];
-	++pCountTable[ 3 % NT][(x >> 24) & 0xff];
-	++pCountTable[ 4 % NT][(x >> 32) & 0xff];
-	++pCountTable[ 5 % NT][(x >> 40) & 0xff];
-	++pCountTable[ 6 % NT][(x >> 48) & 0xff];
-	++pCountTable[ 7 % NT][(x >> 56) & 0xff];
+	++pCountTable[ 0 % NT + TO][x & 0xff];
+	++pCountTable[ 1 % NT + TO][(x >> 8) & 0xff];
+	++pCountTable[ 2 % NT + TO][(x >> 16) & 0xff];
+	++pCountTable[ 3 % NT + TO][(x >> 24) & 0xff];
+	++pCountTable[ 4 % NT + TO][(x >> 32) & 0xff];
+	++pCountTable[ 5 % NT + TO][(x >> 40) & 0xff];
+	++pCountTable[ 6 % NT + TO][(x >> 48) & 0xff];
+	++pCountTable[ 7 % NT + TO][(x >> 56) & 0xff];
 
 	x = _mm_extract_epi64(xmm, 1);
-	++pCountTable[ 8 % NT][x & 0xff];
-	++pCountTable[ 9 % NT][(x >> 8) & 0xff];
-	++pCountTable[10 % NT][(x >> 16) & 0xff];
-	++pCountTable[11 % NT][(x >> 24) & 0xff];
-	++pCountTable[12 % NT][(x >> 32) & 0xff];
-	++pCountTable[13 % NT][(x >> 40) & 0xff];
-	++pCountTable[14 % NT][(x >> 48) & 0xff];
-	++pCountTable[15 % NT][(x >> 56) & 0xff];
+	++pCountTable[ 8 % NT + TO][x & 0xff];
+	++pCountTable[ 9 % NT + TO][(x >> 8) & 0xff];
+	++pCountTable[10 % NT + TO][(x >> 16) & 0xff];
+	++pCountTable[11 % NT + TO][(x >> 24) & 0xff];
+	++pCountTable[12 % NT + TO][(x >> 32) & 0xff];
+	++pCountTable[13 % NT + TO][(x >> 40) & 0xff];
+	++pCountTable[14 % NT + TO][(x >> 48) & 0xff];
+	++pCountTable[15 % NT + TO][(x >> 56) & 0xff];
 #endif
 #endif
 }
 
-template<int F, int NTS>
+template<int F, int NTS, int TGI>
 static inline FORCEINLINE void IncrementCounters10(__m128i xmm, uint32_t pCountTable[][1024])
 {
-	static constexpr int NT = NUM_COUNT_TABLES_PER_CHANNEL<10> < NTS ? 1 : NUM_COUNT_TABLES_PER_CHANNEL<10> / NTS;
+	static constexpr int TPC = NUM_COUNT_TABLES_PER_CHANNEL<10>;
+	static constexpr int NT = TPC < NTS ? 1 : TPC / NTS;
+	static constexpr int TO = NT * TGI % TPC;
 
 #ifdef __SSE4_1__
 #if defined(__i386__)
 	uint32_t x;
 
 	x = _mm_cvtsi128_si32(xmm);
-	++pCountTable[0 % NT][x & 0xffff];
-	++pCountTable[1 % NT][(x >> 16) & 0xffff];
+	++pCountTable[0 % NT + TO][x & 0xffff];
+	++pCountTable[1 % NT + TO][(x >> 16) & 0xffff];
 
 	x = _mm_extract_epi32(xmm, 1);
-	++pCountTable[2 % NT][x & 0xffff];
-	++pCountTable[3 % NT][(x >> 16) & 0xffff];
+	++pCountTable[2 % NT + TO][x & 0xffff];
+	++pCountTable[3 % NT + TO][(x >> 16) & 0xffff];
 
 	x = _mm_extract_epi32(xmm, 2);
-	++pCountTable[4 % NT][x & 0xffff];
-	++pCountTable[5 % NT][(x >> 16) & 0xffff];
+	++pCountTable[4 % NT + TO][x & 0xffff];
+	++pCountTable[5 % NT + TO][(x >> 16) & 0xffff];
 
 	x = _mm_extract_epi32(xmm, 3);
-	++pCountTable[6 % NT][x & 0xffff];
-	++pCountTable[7 % NT][(x >> 16) & 0xffff];
+	++pCountTable[6 % NT + TO][x & 0xffff];
+	++pCountTable[7 % NT + TO][(x >> 16) & 0xffff];
 #elif defined(__x86_64__)
 	uint64_t x;
 
 	x = _mm_cvtsi128_si64(xmm);
-	++pCountTable[0 % NT][x & 0xffff];
-	++pCountTable[1 % NT][(x >> 16) & 0xffff];
-	++pCountTable[2 % NT][(x >> 32) & 0xffff];
-	++pCountTable[3 % NT][(x >> 48) & 0xffff];
+	++pCountTable[0 % NT + TO][x & 0xffff];
+	++pCountTable[1 % NT + TO][(x >> 16) & 0xffff];
+	++pCountTable[2 % NT + TO][(x >> 32) & 0xffff];
+	++pCountTable[3 % NT + TO][(x >> 48) & 0xffff];
 
 	x = _mm_extract_epi64(xmm, 1);
-	++pCountTable[4 % NT][x & 0xffff];
-	++pCountTable[5 % NT][(x >> 16) & 0xffff];
-	++pCountTable[6 % NT][(x >> 32) & 0xffff];
-	++pCountTable[7 % NT][(x >> 48) & 0xffff];
+	++pCountTable[4 % NT + TO][x & 0xffff];
+	++pCountTable[5 % NT + TO][(x >> 16) & 0xffff];
+	++pCountTable[6 % NT + TO][(x >> 32) & 0xffff];
+	++pCountTable[7 % NT + TO][(x >> 48) & 0xffff];
 #endif
 #endif
 }
@@ -123,12 +127,12 @@ static inline FORCEINLINE __m256i tuned_PredictLeft8Element(__m256i prev, __m256
 	return residual;
 }
 
-template<int F, bool DoCount, int NTS>
+template<int F, bool DoCount, int NTS, int TGI>
 static inline FORCEINLINE __m128i tuned_PredictLeftAndCount8Element(__m128i prev, __m128i value, uint32_t pCountTable[][256])
 {
 	__m128i residual = tuned_PredictLeft8Element<F>(prev, value);
 	if (DoCount)
-		IncrementCounters8<F, NTS>(residual, pCountTable);
+		IncrementCounters8<F, NTS, TGI>(residual, pCountTable);
 	return residual;
 }
 
@@ -144,7 +148,7 @@ void tuned_PredictCylindricalLeftAndCount8(uint8_t *pDst, const uint8_t *pSrcBeg
 	for (; p <= pSrcEnd - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
-		__m128i residual = tuned_PredictLeftAndCount8Element<F, true, 1>(prev, value, pCountTable);
+		__m128i residual = tuned_PredictLeftAndCount8Element<F, true, 1, 0>(prev, value, pCountTable);
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 	}
@@ -250,12 +254,12 @@ static inline FORCEINLINE __m128i tuned_PredictLeft10Element(__m128i prev, __m12
 	return residual;
 }
 
-template<int F, bool DoCount, int NTS>
+template<int F, bool DoCount, int NTS, int TGI>
 static inline FORCEINLINE __m128i tuned_PredictLeftAndCount10Element(__m128i prev, __m128i value, uint32_t pCountTable[][1024])
 {
 	__m128i residual = tuned_PredictLeft10Element<F>(prev, value);
 	if (DoCount)
-		IncrementCounters10<F, NTS>(residual, pCountTable);
+		IncrementCounters10<F, NTS, TGI>(residual, pCountTable);
 	return residual;
 }
 
@@ -271,7 +275,7 @@ void tuned_PredictCylindricalLeftAndCount10(uint16_t *pDst, const uint16_t *pSrc
 	for (; p <= pSrcEnd - 8; p += 8, q += 8)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
-		__m128i residual = tuned_PredictLeftAndCount10Element<F, true, 1>(prev, value, pCountTable);
+		__m128i residual = tuned_PredictLeftAndCount10Element<F, true, 1, 0>(prev, value, pCountTable);
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 	}
@@ -376,12 +380,12 @@ static inline FORCEINLINE __m128i VECTORCALL tuned_PredictWrongMedian8Element(__
 	return residual;
 }
 
-template<int F, bool DoCount, int NTS>
+template<int F, bool DoCount, int NTS, int TGI>
 static inline FORCEINLINE __m128i VECTORCALL tuned_PredictWrongMedianAndCount8Element(__m128i topprev, __m128i top, __m128i prev, __m128i value, uint32_t pCountTable[][256])
 {
 	__m128i residual = tuned_PredictWrongMedian8Element<F>(topprev, top, prev, value);
 	if (DoCount)
-		IncrementCounters8<F, NTS>(residual, pCountTable);
+		IncrementCounters8<F, NTS, TGI>(residual, pCountTable);
 	return residual;
 }
 
@@ -398,7 +402,7 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 	for (; p <= pSrcBegin + cbStride - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
-		__m128i residual = tuned_PredictLeftAndCount8Element<F, true, 1>(prev, value, pCountTable);
+		__m128i residual = tuned_PredictLeftAndCount8Element<F, true, 1, 0>(prev, value, pCountTable);
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 	}
@@ -417,7 +421,7 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
 		__m128i top = _mm_loadu_si128((const __m128i *)(p - cbStride));
-		__m128i residual = tuned_PredictWrongMedianAndCount8Element<F, true, 1>(topprev, top, prev, value, pCountTable);
+		__m128i residual = tuned_PredictWrongMedianAndCount8Element<F, true, 1, 0>(topprev, top, prev, value, pCountTable);
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 		topprev = top;
@@ -499,7 +503,7 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 	for (; p <= pSrcBegin + cbStride - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
-		__m128i residual = tuned_PredictLeftAndCount8Element<F, DoCount, 1>(prev, value, pCountTable);
+		__m128i residual = tuned_PredictLeftAndCount8Element<F, DoCount, 1, 0>(prev, value, pCountTable);
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 	}
@@ -519,7 +523,7 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 		for (; p <= pp + cbStride - 16; p += 16, q += 16)
 		{
 			__m128i value = _mm_sub_epi8(_mm_loadu_si128((const __m128i *)p), _mm_loadu_si128((const __m128i *)(p - cbStride)));
-			__m128i residual = tuned_PredictLeftAndCount8Element<F, DoCount, 1>(prev, value, pCountTable);
+			__m128i residual = tuned_PredictLeftAndCount8Element<F, DoCount, 1, 0>(prev, value, pCountTable);
 			_mm_storeu_si128((__m128i *)q, residual);
 			prev = value;
 		}
