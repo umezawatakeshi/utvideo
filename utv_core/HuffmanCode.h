@@ -61,6 +61,7 @@ struct HUFFMAN_DECODE_TABLE
 #else
 	using combined_t = uint32_t;
 #endif
+	static constexpr int NSYM = sizeof(combined_t) / sizeof(symbol_t<B>);
 
 	static constexpr int LOOKUP_BITS = 12;
 
@@ -72,17 +73,13 @@ struct HUFFMAN_DECODE_TABLE
 	union
 	{
 		combined_t combined;
-		symbol_t<B> symbols[sizeof(combined_t) / sizeof(symbol_t<B>)];
+		symbol_t<B> symbols[NSYM];
 	} MultiSpeedTable_sym[1 << LOOKUP_BITS];
-
-	uint8_t nCodeShift[32];
-	uint32_t dwSymbolBase[32];
-	SYMBOL_AND_CODELEN<B> SymbolAndCodeLength[(B == 8) ? 1024 : 4096*4 /* XXX */];
 };
 
 template<int B> void GenerateHuffmanCodeLengthTable(HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable, const uint32_t *pCountTable);
 template<int B> void GenerateHuffmanEncodeTable(HUFFMAN_ENCODE_TABLE<B> *pEncodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable);
-template<int B, int shift = 0> void GenerateHuffmanDecodeTable(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable);
+template<int B, int shift = 0> void GenerateHuffmanDecodeTable(std::vector<HUFFMAN_DECODE_TABLE<B>>& vecDecodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable);
 
 template<int B> size_t cpp_HuffmanEncode(uint8_t *pDstBegin, const symbol_t<B> *pSrcBegin, const symbol_t<B> *pSrcEnd, const HUFFMAN_ENCODE_TABLE<B> *pEncodeTable);
 template<int B> symbol_t<B> *cpp_HuffmanDecode(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<B> *pDecodeTable);

@@ -84,7 +84,7 @@ protected:
 	uint8_t *m_pEncodedBits[4];
 
 	FRAMEINFO m_fi;
-	HUFFMAN_DECODE_TABLE<10> m_hdt[4];
+	std::vector<HUFFMAN_DECODE_TABLE<10>> m_hdt[4];
 
 	STREAMINFO m_si;
 

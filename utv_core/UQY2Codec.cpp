@@ -141,7 +141,7 @@ void CUQY2Codec::GenerateDecodeTable(uint32_t nPlaneIndex)
 	case UTVF_YUV422P16LE:
 	case UTVF_P210:
 	case UTVF_P216:
-		GenerateHuffmanDecodeTable<10, 6>(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
+		GenerateHuffmanDecodeTable<10, 6>(m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 		break;
 
 	default:

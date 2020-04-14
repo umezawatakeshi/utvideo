@@ -508,7 +508,7 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput)
 
 void CUL00Codec::GenerateDecodeTableProc(uint32_t nPlaneIndex)
 {
-	GenerateHuffmanDecodeTable(&m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
+	GenerateHuffmanDecodeTable(m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
 }
 
 int CUL00Codec::DecodeGetFrameType(bool *pbKeyFrame, const void *pInput)
@@ -635,7 +635,7 @@ void CUL00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* cons
 		uint8_t *pRetExpected = m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd;
 		uint8_t *pRetActual =
 #endif
-		HuffmanDecode<8>(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex]);
+		HuffmanDecode<8>(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex][0]);
 		_ASSERT(pRetActual == pRetExpected);
 
 		if (DoRestore)

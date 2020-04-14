@@ -22,8 +22,11 @@
 	mov			cl, 32
 	mov			edx, dword ptr [rsi]
 	add			rsi, 4
+	mov			r12, rbx
+	mov			r15, %c[sizeof_decodetable_t]
 
 .irp persym, 0, 1
+	sub			rbx, r15
 .if !\persym
 	sub			r8, %c[sizeof_combined_t]
 .else
@@ -31,6 +34,8 @@
 .endif
 
 	.balign		64
+0:
+	add			rbx, r15
 1:
 	cmp			rdi, r8
 	jae			3f
@@ -59,43 +64,11 @@
 .err
 .endif
 	movzx		eax, word ptr [rbx + %c[offsetof_multispeedtable_cs] + rax*2]
-	cmp			ah, 255
-	jne			0f
 
-.if \bmi2
-	shlx		rax, rdx, rcx
-.else
-	mov			rax, rdx
-	shl			rax, cl
-	mov			r15d, ecx
-.endif
-	shr			rax, 32
-	or			eax, 1
-	bsr			r10, rax
-.if \bmi2
-	movzx		r13d, byte ptr [rbx + %c[offsetof_codeshift] + r10]
-	shrx		eax, eax, r13d
-.else
-	mov			cl, byte ptr [rbx + %c[offsetof_codeshift] + r10]
-	shr			eax, cl
-	mov			ecx, r15d
-.endif
-	mov			r10d, dword ptr [rbx + %c[offsetof_symbolbase] + r10*4]
-	add			r10, rax
-.if %c[sizeof_sym_t] == 1
-	mov			eax, dword ptr [rbx + %c[offsetof_symbolandcodelength] + r10*2]
-	mov			r11d, eax
-.elseif %c[sizeof_sym_t] == 2
-	mov			eax, dword ptr [rbx + %c[offsetof_symbolandcodelength] + r10*4]
-	mov			r11d, eax
-	shr			eax, 8
-.else
-.err
-.endif
-	mov			al, 1
-
-0:
 	add			cl, ah
+	cmp			al, 0
+	je			0b
+	mov			rbx, r12
 
 .if !\persym
 .if %c[sizeof_combined_t] == 4
@@ -145,11 +118,9 @@
 		  [lookup_bits]"i"(decodetable_t::LOOKUP_BITS),
 		  [offsetof_multispeedtable_cs]"i"(offsetof(decodetable_t, MultiSpeedTable_cs)),
 		  [offsetof_multispeedtable_sym]"i"(offsetof(decodetable_t, MultiSpeedTable_sym)),
-		  [offsetof_codeshift]"i"(offsetof(decodetable_t, nCodeShift)),
-		  [offsetof_symbolbase]"i"(offsetof(decodetable_t, dwSymbolBase)),
-		  [offsetof_symbolandcodelength]"i"(offsetof(decodetable_t, SymbolAndCodeLength)),
 		  [sizeof_sym_t]"i"(sizeof(sym_t)),
-		  [sizeof_combined_t]"i"(sizeof(decodetable_t::combined_t))
+		  [sizeof_combined_t]"i"(sizeof(decodetable_t::combined_t)),
+		  [sizeof_decodetable_t]"i"(sizeof(decodetable_t))
 		: "rcx", "rdx", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15");
 #endif
 	return ret;
