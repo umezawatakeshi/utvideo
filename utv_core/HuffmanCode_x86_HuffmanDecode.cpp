@@ -49,11 +49,11 @@
 	shld		eax, ebp, cl
 	shr			eax, 32 - %c[lookup_bits]
 .if %c[sizeof_combined_t] == 4
-	mov			edx, dword ptr [ebx + %c[offsetof_multispeedtable_sym] + eax*4]
+	mov			edx, dword ptr [ebx + %c[offsetof_sym] + eax*4]
 .else
 .err
 .endif
-	movzx		eax, word ptr [ebx + %c[offsetof_multispeedtable_cs] + eax*2]
+	movzx		eax, word ptr [ebx + %c[offsetof_cslen] + eax*2]
 
 	add			cl, ah
 	cmp			al, 0
@@ -109,8 +109,8 @@
 		: "=a"(ret), "=D"(clobber), "=S"(clobber), "=b"(clobber)
 		: "D"(pDstBegin), "a"(pDstEnd), "S"(pSrcBegin), "b"(pDecodeTable),
 		  [lookup_bits]"i"(decodetable_t::LOOKUP_BITS),
-		  [offsetof_multispeedtable_cs]"i"(offsetof(decodetable_t, MultiSpeedTable_cs)),
-		  [offsetof_multispeedtable_sym]"i"(offsetof(decodetable_t, MultiSpeedTable_sym)),
+		  [offsetof_cslen]"i"(offsetof(decodetable_t, cslen)),
+		  [offsetof_sym]"i"(offsetof(decodetable_t, sym)),
 		  [sizeof_sym_t]"i"(sizeof(sym_t)),
 		  [sizeof_combined_t]"i"(sizeof(decodetable_t::combined_t)),
 		  [sizeof_decodetable_t]"i"(sizeof(decodetable_t))

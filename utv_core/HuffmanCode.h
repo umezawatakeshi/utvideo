@@ -69,12 +69,12 @@ struct HUFFMAN_DECODE_TABLE
 	{
 		uint8_t symlen;
 		uint8_t codelen;
-	} MultiSpeedTable_cs[1 << LOOKUP_BITS];
+	} cslen[1 << LOOKUP_BITS];
 	union
 	{
 		combined_t combined;
 		symbol_t<B> symbols[NSYM];
-	} MultiSpeedTable_sym[1 << LOOKUP_BITS];
+	} sym[1 << LOOKUP_BITS];
 };
 
 template<int B> void GenerateHuffmanCodeLengthTable(HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable, const uint32_t *pCountTable);

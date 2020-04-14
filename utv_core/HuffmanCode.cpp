@@ -181,7 +181,7 @@ static inline int lzcnt32(uint32_t x)
 }
 
 template<int B, int syms>
-int GenerateMultiSpeedTable0(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const SYMBOL_AND_CODELEN<B> *cls, const int *clsidx, const uint32_t *codes, uint32_t prefix, int preflen, int nFirstIndex, typename HUFFMAN_DECODE_TABLE<B>::combined_t cursym)
+int GenerateHuffmanDecodeTable0(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const SYMBOL_AND_CODELEN<B> *cls, const int *clsidx, const uint32_t *codes, uint32_t prefix, int preflen, int nFirstIndex, typename HUFFMAN_DECODE_TABLE<B>::combined_t cursym)
 {
 	// syms == 0 の場合、preflen は 0 以下である。
 	// syms >  0 の場合、preflen は 0 より大きい。
@@ -211,9 +211,9 @@ int GenerateMultiSpeedTable0(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const SYMBOL
 	_ASSERT(codes[i] == 0 /* i.e. どの符号ビット列パターンでも次のシンボルが決まる */ || curcodelen >= 0);
 	for (int j = prefix >> (32 - HUFFMAN_DECODE_TABLE<B>::LOOKUP_BITS); j < selffilllastidx; ++j)
 	{
-		pDecodeTable->MultiSpeedTable_cs[j].codelen = curcodelen;
-		pDecodeTable->MultiSpeedTable_cs[j].symlen = syms;
-		pDecodeTable->MultiSpeedTable_sym[j].combined = cursym;
+		pDecodeTable->cslen[j].codelen = curcodelen;
+		pDecodeTable->cslen[j].symlen = syms;
+		pDecodeTable->sym[j].combined = cursym;
 	}
 
 	if constexpr (syms < HUFFMAN_DECODE_TABLE<B>::NSYM)
@@ -228,20 +228,50 @@ int GenerateMultiSpeedTable0(HUFFMAN_DECODE_TABLE<B> *pDecodeTable, const SYMBOL
 			int newpreflen = preflen + cls[i].codelen;
 			_ASSERT(newpreflen > 0);
 			combined_t newsym = cursym | ((combined_t)cls[i].symbol << (sizeof(symbol_t<B>) * 8 * syms)); // XXX endian
-			GenerateMultiSpeedTable0<B, syms + 1>(pDecodeTable, cls, clsidx, codes, newprefix, newpreflen, 0, newsym);
+			GenerateHuffmanDecodeTable0<B, syms + 1>(pDecodeTable, cls, clsidx, codes, newprefix, newpreflen, 0, newsym);
 		}
 	}
 	
 	return nNextFirstIndex;
 }
 
-template<int B>
-void GenerateMultiSpeedTable(std::vector<HUFFMAN_DECODE_TABLE<B>>& vecDecodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable, const SYMBOL_AND_CODELEN<B> *cls, int nLastIndex)
+template<int B, int shift>
+void GenerateHuffmanDecodeTable(std::vector<HUFFMAN_DECODE_TABLE<B>>& vecDecodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable)
 {
+	static_assert(sizeof(symbol_t<B>) * 8 >= B + shift, "");
+
+	struct SYMBOL_AND_CODELEN<B> cls[1 << B];
+	int nLastIndex;
+
 	uint32_t codes[1 << B];
 	uint32_t curcode;
 	int clsidx[64]; // 実際にいくつあればいいのか真面目に考察していない
 	int previdx;
+
+	for (int i = 0; i < (1 << B); i++)
+	{
+		cls[i].symbol = i << shift;
+		cls[i].codelen = pCodeLengthTable->codelen[i];
+	}
+
+	std::sort(cls, cls + (1 << B), cls_less<B>);
+
+	// 出現するシンボルが１種類しかない場合の処理
+	if (cls[0].codelen == 0)
+	{
+		if (vecDecodeTable.empty())
+			vecDecodeTable.resize(1);
+		vecDecodeTable[0].cslen[0].codelen = 0;
+		vecDecodeTable[0].sym[0].symbols[0] = cls[0].symbol;
+		return;
+	}
+
+	// 最も長い符号長を持つシンボルの cls 上での位置を求める
+	for (nLastIndex = (1 << B) - 1; nLastIndex >= 0; nLastIndex--)
+	{
+		if (cls[nLastIndex].codelen != 255)
+			break;
+	}
 
 	// cls[0] が、最も符号語長の短いシンボル
 	// cls[nLastIndex-1] が、最も符号語長の長いシンボル
@@ -271,49 +301,13 @@ void GenerateMultiSpeedTable(std::vector<HUFFMAN_DECODE_TABLE<B>>& vecDecodeTabl
 	}
 
 	int nFirstIndex = 0;
-	for (int i = 0; nFirstIndex < nLastIndex; ++i)
+	for (unsigned i = 0; nFirstIndex < nLastIndex; ++i)
 	{
 		int skipbits = lzcnt32(codes[nFirstIndex]);
 		if (vecDecodeTable.size() < i + 1)
 			vecDecodeTable.resize(i + 1);
-		nFirstIndex = GenerateMultiSpeedTable0<B, 0>(&vecDecodeTable[i], cls, clsidx, codes, 0, -skipbits, nFirstIndex, 0);
+		nFirstIndex = GenerateHuffmanDecodeTable0<B, 0>(&vecDecodeTable[i], cls, clsidx, codes, 0, -skipbits, nFirstIndex, 0);
 	}
-}
-
-template<int B, int shift>
-void GenerateHuffmanDecodeTable(std::vector<HUFFMAN_DECODE_TABLE<B>>& vecDecodeTable, const HUFFMAN_CODELEN_TABLE<B> *pCodeLengthTable)
-{
-	static_assert(sizeof(symbol_t<B>) * 8 >= B + shift, "");
-
-	struct SYMBOL_AND_CODELEN<B> cls[1 << B];
-	int nLastIndex;
-
-	for (int i = 0; i < (1 << B); i++)
-	{
-		cls[i].symbol = i << shift;
-		cls[i].codelen = pCodeLengthTable->codelen[i];
-	}
-
-	std::sort(cls, cls + (1 << B), cls_less<B>);
-
-	// 出現するシンボルが１種類しかない場合の処理
-	if (cls[0].codelen == 0)
-	{
-		if (vecDecodeTable.empty())
-			vecDecodeTable.resize(1);
-		vecDecodeTable[0].MultiSpeedTable_cs[0].codelen = 0;
-		vecDecodeTable[0].MultiSpeedTable_sym[0].symbols[0] = cls[0].symbol;
-		return;
-	}
-
-	// 最も長い符号長を持つシンボルの cls 上での位置を求める
-	for (nLastIndex = (1 << B) - 1; nLastIndex >= 0; nLastIndex--)
-	{
-		if (cls[nLastIndex].codelen != 255)
-			break;
-	}
-
-	GenerateMultiSpeedTable(vecDecodeTable, pCodeLengthTable, cls, nLastIndex);
 }
 
 template void GenerateHuffmanDecodeTable<8>(std::vector<HUFFMAN_DECODE_TABLE<8>>& vecDecodeTable, const HUFFMAN_CODELEN_TABLE<8> *pCodeLengthTable);
@@ -400,9 +394,9 @@ symbol_t<B> * cpp_HuffmanDecode(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, co
 
 		const HUFFMAN_DECODE_TABLE<B>* pDecodeTable = pDecodeTableHead + tablenum;
 		int tableidx = code >> (32 - HUFFMAN_DECODE_TABLE<B>::LOOKUP_BITS);
-		combined = pDecodeTable->MultiSpeedTable_sym[tableidx].combined;
-		codelen = pDecodeTable->MultiSpeedTable_cs[tableidx].codelen;
-		symlen = pDecodeTable->MultiSpeedTable_cs[tableidx].symlen;
+		combined = pDecodeTable->sym[tableidx].combined;
+		codelen = pDecodeTable->cslen[tableidx].codelen;
+		symlen = pDecodeTable->cslen[tableidx].symlen;
 		if (symlen == 0)
 			++tablenum;
 		else
@@ -456,9 +450,9 @@ struct tfnHuffmanDecode<10>
 template<int B>
 symbol_t<B> *HuffmanDecode(symbol_t<B> *pDstBegin, symbol_t<B> *pDstEnd, const uint8_t *pSrcBegin, const HUFFMAN_DECODE_TABLE<B> *pDecodeTable)
 {
-	if (pDecodeTable->MultiSpeedTable_cs[0].codelen == 0)
+	if (pDecodeTable->cslen[0].codelen == 0)
 	{
-		std::fill(pDstBegin, pDstEnd, pDecodeTable->MultiSpeedTable_sym[0].symbols[0]);
+		std::fill(pDstBegin, pDstEnd, pDecodeTable->sym[0].symbols[0]);
 		return pDstEnd;
 	}
 	else

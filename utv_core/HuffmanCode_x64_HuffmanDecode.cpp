@@ -57,13 +57,13 @@
 .endif
 	shr			rax, 64 - %c[lookup_bits]
 .if %c[sizeof_combined_t] == 4
-	mov			r11d, dword ptr [rbx + %c[offsetof_multispeedtable_sym] + rax*4]
+	mov			r11d, dword ptr [rbx + %c[offsetof_sym] + rax*4]
 .elseif %c[sizeof_combined_t] == 8
-	mov			r11, qword ptr [rbx + %c[offsetof_multispeedtable_sym] + rax*8]
+	mov			r11, qword ptr [rbx + %c[offsetof_sym] + rax*8]
 .else
 .err
 .endif
-	movzx		eax, word ptr [rbx + %c[offsetof_multispeedtable_cs] + rax*2]
+	movzx		eax, word ptr [rbx + %c[offsetof_cslen] + rax*2]
 
 	add			cl, ah
 	cmp			al, 0
@@ -116,8 +116,8 @@
 		: "=a"(ret), "=D"(clobber), "=S"(clobber), "=b"(clobber)
 		: "D"(pDstBegin), "a"(pDstEnd), "S"(pSrcBegin), "b"(pDecodeTable),
 		  [lookup_bits]"i"(decodetable_t::LOOKUP_BITS),
-		  [offsetof_multispeedtable_cs]"i"(offsetof(decodetable_t, MultiSpeedTable_cs)),
-		  [offsetof_multispeedtable_sym]"i"(offsetof(decodetable_t, MultiSpeedTable_sym)),
+		  [offsetof_cslen]"i"(offsetof(decodetable_t, cslen)),
+		  [offsetof_sym]"i"(offsetof(decodetable_t, sym)),
 		  [sizeof_sym_t]"i"(sizeof(sym_t)),
 		  [sizeof_combined_t]"i"(sizeof(decodetable_t::combined_t)),
 		  [sizeof_decodetable_t]"i"(sizeof(decodetable_t))
