@@ -222,6 +222,7 @@
     <ClInclude Include="utvideo.h" />
     <ClInclude Include="utv_core.h" />
     <ClInclude Include="version.h" />
+    <ClInclude Include="WindowsDialogUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BandParallelCodec.cpp" />
@@ -389,6 +390,7 @@
     <ClCompile Include="UQY0Codec.cpp" />
     <ClCompile Include="UQY2Codec.cpp" />
     <ClCompile Include="utv_core.cpp" />
+    <ClCompile Include="WindowsDialogUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="utv_core.rc" />

@@ -9,6 +9,7 @@
 #include "TunedFunc.h"
 #include "ByteOrder.h"
 #include "resource.h"
+#include "WindowsDialogUtil.h"
 
 CUQ00Codec::CUQ00Codec(const char *pszTinyName, const char *pszInterfaceName) : CBandParallelCodec(pszTinyName, pszInterfaceName)
 {
@@ -68,6 +69,7 @@ INT_PTR CALLBACK CUQ00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS, BST_CHECKED);
 			EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, FALSE);
 		}
+		AddToolTips(hwnd);
 		return TRUE;
 	case WM_COMMAND:
 		switch(LOWORD(wParam))
