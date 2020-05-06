@@ -158,14 +158,26 @@ void tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX512_ICL>(uint8_t *
 	*cbPacked = q - pPacked;
 }
 
-
-template<int F>
-static inline FORCEINLINE __m512i UnpackForIntra(const uint8_t*& q, const uint8_t *& r)
+struct UNPACK_FOR_DELTA_RESULT
 {
-	uint32_t modes = *(uint32_t*)r;
-	r += 3;
+	__m512i s;
+	__mmask8 ktemporalq;
+};
 
-	__m128i vmodes = _mm_cvtsi64_si128(_pdep_u64(modes, 0x0707070707070707ULL));
+template<int F, bool Delta>
+static inline FORCEINLINE auto UnpackElement(const uint8_t*& q, const uint8_t *& r)
+{
+	static constexpr int MODEBITS = Delta ? 4 : 3;
+	static constexpr uint32_t MODEPEXT32 = Delta ? 0x0f0f0f0f : 0x07070707;
+	static constexpr uint64_t MODEPEXT64 = Delta ? 0x0f0f0f0f0f0f0f0fULL : 0x0707070707070707ULL;
+
+	uint32_t modes = *(uint32_t*)r;
+	r += MODEBITS;
+
+	__mmask8 ktemporalq = _pext_u32(modes, 0x88888888);
+	if (Delta)
+		modes &= 0x77777777;
+	__m128i vmodes = _mm_cvtsi64_si128(_pdep_u64(modes, MODEPEXT64));
 	__m128i vmask = _mm_shuffle_epi8(_mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, (char)0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x00), vmodes);
 	__mmask64 kmask = _mm_cvtsi128_si64(vmask);
 	__m512i w = _mm512_maskz_expandloadu_epi8(kmask, q);
@@ -197,7 +209,22 @@ static inline FORCEINLINE __m512i UnpackForIntra(const uint8_t*& q, const uint8_
 	w = _mm512_and_si512(w, _mm512_shuffle_epi8(_mm512_set16_epi8(0, 0, 0, 0, 0, 0, 0, 0, (char)0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0x00), vmodes512));
 	w = _mm512_sub_epi8(w, _mm512_shuffle_epi8(_mm512_set16_epi8(0, 0, 0, 0, 0, 0, 0, 0, (char)0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x00), vmodes512));
 
-	return w;
+	if constexpr (!Delta)
+		return w;
+	else
+		return UNPACK_FOR_DELTA_RESULT{ w, ktemporalq };
+}
+
+template<int F>
+static inline FORCEINLINE __m512i UnpackForIntra(const uint8_t*& q, const uint8_t*& r)
+{
+	return UnpackElement<F, false>(q, r);
+}
+
+template<int F>
+static inline FORCEINLINE UNPACK_FOR_DELTA_RESULT UnpackForDelta(const uint8_t*& q, const uint8_t*& r)
+{
+	return UnpackElement<F, true>(q, r);
 }
 
 template<>
@@ -277,4 +304,239 @@ void tuned_Pack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pPacked, size_t* c
 	}
 
 	*cbPacked = q - pPacked;
+}
+
+template<>
+void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pPacked, const uint8_t* pControl, const uint8_t* pPrevBegin, size_t cbStride)
+{
+	auto q = pPacked;
+	auto r = pControl;
+
+	// 分かりやすいけど恐らく遅いコード
+
+	__m512i prevmask = _mm512_set_epi8(
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)0xff);
+
+	{
+		__m512i prev = _mm512_set_epi8(
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)0x80);
+
+		auto t = pPrevBegin;
+		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 64, t += 64)
+		{
+			auto [s0, ktemporalq] = UnpackForDelta<CODEFEATURE_AVX512_ICL>(q, r);
+
+			auto kspacialb = ~_mm512_movepi8_mask(_mm512_movm_epi64(ktemporalq));
+
+			__m512i t0 = _mm512_add_epi8(s0, _mm512_loadu_si512((const __m256i*)t));
+			s0 = _mm512_mask_add_epi8(t0, kspacialb, s0, prev);
+
+			kspacialb &= ~1ULL;
+			__m512i stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				62, 61, 60, 59, 58, 57, 56, 55,
+				54, 53, 52, 51, 50, 49, 48, 47,
+				46, 45, 44, 43, 42, 41, 40, 39,
+				38, 37, 36, 35, 34, 33, 32, 31,
+				30, 29, 28, 27, 26, 25, 24, 23,
+				22, 21, 20, 19, 18, 17, 16, 15,
+				14, 13, 12, 11, 10,  9,  8,  7,
+				 6,  5,  4,  3,  2,  1,  0, -1
+			), s0); // 1バイトシフト
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			kspacialb &= kspacialb << 1;
+			stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				61, 60, 59, 58, 57, 56, 55, 54,
+				53, 52, 51, 50, 49, 48, 47, 46,
+				45, 44, 43, 42, 41, 40, 39, 38,
+				37, 36, 35, 34, 33, 32, 31, 30,
+				29, 28, 27, 26, 25, 24, 23, 22,
+				21, 20, 19, 18, 17, 16, 15, 14,
+				13, 12, 11, 10,  9,  8,  7,  6,
+				 5,  4,  3,  2,  1,  0, -1, -1
+			), s0); // 2バイトシフト
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			kspacialb &= kspacialb << 2;
+			stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				59, 58, 57, 56, 55, 54, 53, 52,
+				51, 50, 49, 48, 47, 46, 45, 44,
+				43, 42, 41, 40, 39, 38, 37, 36,
+				35, 34, 33, 32, 31, 30, 29, 28,
+				27, 26, 25, 24, 23, 22, 21, 20,
+				19, 18, 17, 16, 15, 14, 13, 12,
+				11, 10,  9,  8,  7,  6,  5,  4,
+				 3,  2,  1,  0, -1, -1, -1, -1
+			), s0); // 4バイトシフト 以下同様
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			kspacialb &= kspacialb << 4;
+			stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				55, 54, 53, 52, 51, 50, 49, 48,
+				47, 46, 45, 44, 43, 42, 41, 40,
+				39, 38, 37, 36, 35, 34, 33, 32,
+				31, 30, 29, 28, 27, 26, 25, 24,
+				23, 22, 21, 20, 19, 18, 17, 16,
+				15, 14, 13, 12, 11, 10,  9,  8,
+				 7,  6,  5,  4,  3,  2,  1,  0,
+				-1, -1, -1, -1, -1, -1, -1, -1
+			), s0);
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			kspacialb &= kspacialb << 8;
+			stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				47, 46, 45, 44, 43, 42, 41, 40,
+				39, 38, 37, 36, 35, 34, 33, 32,
+				31, 30, 29, 28, 27, 26, 25, 24,
+				23, 22, 21, 20, 19, 18, 17, 16,
+				15, 14, 13, 12, 11, 10,  9,  8,
+				 7,  6,  5,  4,  3,  2,  1,  0,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1
+			), s0);
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			kspacialb &= kspacialb << 16;
+			stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				31, 30, 29, 28, 27, 26, 25, 24,
+				23, 22, 21, 20, 19, 18, 17, 16,
+				15, 14, 13, 12, 11, 10,  9,  8,
+				 7,  6,  5,  4,  3,  2,  1,  0,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1
+			), s0);
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			_mm512_storeu_si512((__m512i*)p, s0);
+
+			prev = _mm512_and_epi32(_mm512_permutexvar_epi8(_mm512_set_epi8(
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, 63
+			), s0), prevmask);
+		}
+	}
+
+	int shift = 0;
+	auto tt = pPrevBegin + cbStride;
+	for (auto pp = pDstBegin + cbStride; pp != pDstEnd; pp += cbStride, tt += cbStride)
+	{
+		__m512i prev = _mm512_set1_epi8((char)0);
+
+		auto t = tt;
+		for (auto p = pp; p != pp + cbStride; p += 64, t += 64)
+		{
+			auto [s0, ktemporalq] = UnpackForDelta<CODEFEATURE_AVX512_ICL>(q, r);
+
+			auto kspacialb = ~_mm512_movepi8_mask(_mm512_movm_epi64(ktemporalq));
+
+			__m512i top = _mm512_loadu_si512((const __m512i*)(p - cbStride));
+			__m512i t0 = _mm512_sub_epi8(_mm512_add_epi8(s0, _mm512_loadu_si512((const __m512i*)t)), top);
+			s0 = _mm512_mask_add_epi8(t0, kspacialb, s0, prev);
+
+			kspacialb &= ~1ULL;
+			__m512i stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				62, 61, 60, 59, 58, 57, 56, 55,
+				54, 53, 52, 51, 50, 49, 48, 47,
+				46, 45, 44, 43, 42, 41, 40, 39,
+				38, 37, 36, 35, 34, 33, 32, 31,
+				30, 29, 28, 27, 26, 25, 24, 23,
+				22, 21, 20, 19, 18, 17, 16, 15,
+				14, 13, 12, 11, 10,  9,  8,  7,
+				 6,  5,  4,  3,  2,  1,  0, -1
+			), s0);
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			kspacialb &= kspacialb << 1;
+			stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				61, 60, 59, 58, 57, 56, 55, 54,
+				53, 52, 51, 50, 49, 48, 47, 46,
+				45, 44, 43, 42, 41, 40, 39, 38,
+				37, 36, 35, 34, 33, 32, 31, 30,
+				29, 28, 27, 26, 25, 24, 23, 22,
+				21, 20, 19, 18, 17, 16, 15, 14,
+				13, 12, 11, 10,  9,  8,  7,  6,
+				 5,  4,  3,  2,  1,  0, -1, -1
+			), s0);
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			kspacialb &= kspacialb << 2;
+			stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				59, 58, 57, 56, 55, 54, 53, 52,
+				51, 50, 49, 48, 47, 46, 45, 44,
+				43, 42, 41, 40, 39, 38, 37, 36,
+				35, 34, 33, 32, 31, 30, 29, 28,
+				27, 26, 25, 24, 23, 22, 21, 20,
+				19, 18, 17, 16, 15, 14, 13, 12,
+				11, 10,  9,  8,  7,  6,  5,  4,
+				 3,  2,  1,  0, -1, -1, -1, -1
+			), s0);
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			kspacialb &= kspacialb << 4;
+			stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				55, 54, 53, 52, 51, 50, 49, 48,
+				47, 46, 45, 44, 43, 42, 41, 40,
+				39, 38, 37, 36, 35, 34, 33, 32,
+				31, 30, 29, 28, 27, 26, 25, 24,
+				23, 22, 21, 20, 19, 18, 17, 16,
+				15, 14, 13, 12, 11, 10,  9,  8,
+				 7,  6,  5,  4,  3,  2,  1,  0,
+				-1, -1, -1, -1, -1, -1, -1, -1
+			), s0);
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			kspacialb &= kspacialb << 8;
+			stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				47, 46, 45, 44, 43, 42, 41, 40,
+				39, 38, 37, 36, 35, 34, 33, 32,
+				31, 30, 29, 28, 27, 26, 25, 24,
+				23, 22, 21, 20, 19, 18, 17, 16,
+				15, 14, 13, 12, 11, 10,  9,  8,
+				 7,  6,  5,  4,  3,  2,  1,  0,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1
+			), s0);
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			kspacialb &= kspacialb << 16;
+			stmp = _mm512_permutexvar_epi8(_mm512_set_epi8(
+				31, 30, 29, 28, 27, 26, 25, 24,
+				23, 22, 21, 20, 19, 18, 17, 16,
+				15, 14, 13, 12, 11, 10,  9,  8,
+				 7,  6,  5,  4,  3,  2,  1,  0,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1
+			), s0);
+			s0 = _mm512_mask_add_epi8(s0, kspacialb, s0, stmp);
+
+			_mm512_storeu_si512((__m512i*)p, _mm512_add_epi8(s0, top));
+
+			prev = _mm512_and_epi32(_mm512_permutexvar_epi8(_mm512_set_epi8(
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, 63
+			), s0), prevmask);
+		}
+	}
 }

@@ -558,7 +558,7 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackAVX512ICL = {
 	tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX512_ICL>,
 	tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX512_ICL>,
 	tuned_Pack8SymWithDiff8<CODEFEATURE_AVX512_ICL>,
-	tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>,
+	tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>,
 };
 
 

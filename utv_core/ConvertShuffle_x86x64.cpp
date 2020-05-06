@@ -85,8 +85,58 @@ static inline void print_zmm(const char* s, __m512i x)
 	};
 	zmm = x;
 	printf("%s =", s);
-	for (int i = 0; i < 64; ++i)
-		printf(" %02X", b[i]);
+	for (int i = 0; i < 64; i += 8)
+	{
+		for (int j = 0; j < 8; ++j)
+			printf(" %02X", b[i+j]);
+		printf(" ");
+	}
+	printf("\n");
+}
+
+static inline void print_ymm(const char* s, __m256i x)
+{
+	union {
+		__m256i ymm;
+		uint8_t b[32];
+	};
+	ymm = x;
+	printf("%s =", s);
+	for (int i = 0; i < 32; i += 8)
+	{
+		for (int j = 0; j < 8; ++j)
+			printf(" %02X", b[i + j]);
+		printf(" ");
+	}
+	printf("\n");
+}
+
+static inline void print_xmm(const char* s, __m128i x)
+{
+	union {
+		__m128i xmm;
+		uint8_t b[16];
+	};
+	xmm = x;
+	printf("%s =", s);
+	for (int i = 0; i < 16; i += 8)
+	{
+		for (int j = 0; j < 8; ++j)
+			printf(" %02X", b[i + j]);
+		printf(" ");
+	}
+	printf("\n");
+}
+
+static inline void print_mask64(const char* s, __mmask64 x)
+{
+	printf("%s =", s);
+	for (int i = 0; i < 64; i += 8)
+	{
+		printf(" ");
+		for (int j = 0; j < 8; ++j)
+			printf("%d", (int)(x >> (i+j)) & 1);
+	}
 	printf("\n");
 }
 
