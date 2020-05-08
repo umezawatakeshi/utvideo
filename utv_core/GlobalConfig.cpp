@@ -5,6 +5,7 @@
 #include "utvideo.h"
 #include "utv_core.h"
 #include "GlobalConfig.h"
+#include "WindowsDialogUtil.h"
 
 #ifdef _WIN32
 
@@ -75,6 +76,8 @@ void OnInitDialog(HWND hWnd)
 	}
 
 	RegCloseKey(hkUtVideo);
+
+	AddToolTips(hWnd);
 }
 
 void OnOK(HWND hWnd)

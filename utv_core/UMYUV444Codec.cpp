@@ -186,13 +186,9 @@ bool CUMYUV444Codec<C>::EncodeDirect(uint32_t nBandIndex)
 	{
 		if (m_utvfRaw == UTVF_YV24 && (m_nWidth % 64) == 0)
 		{
-			const uint8_t *pSrcBegin[3];
+			auto [pRawPlaneBegin] = CalcPlanePosition<true>();
 
-			pSrcBegin[0] = ((const uint8_t *)m_pInput);
-			pSrcBegin[2] = pSrcBegin[0] + m_nWidth * m_nHeight;
-			pSrcBegin[1] = pSrcBegin[2] + m_nWidth * m_nHeight;
-
-			EncodeFromPlanar(nBandIndex, pSrcBegin);
+			EncodeFromPlanar(nBandIndex, pRawPlaneBegin);
 
 			return true;
 		}
@@ -208,13 +204,9 @@ bool CUMYUV444Codec<C>::DecodeDirect(uint32_t nBandIndex)
 	{
 		if (m_utvfRaw == UTVF_YV24 && (m_nWidth % 64) == 0)
 		{
-			uint8_t *pDstBegin[3];
+			auto [pRawPlaneBegin] = CalcPlanePosition<false>();
 
-			pDstBegin[0] = ((uint8_t *)m_pOutput);
-			pDstBegin[2] = pDstBegin[0] + m_nWidth * m_nHeight;
-			pDstBegin[1] = pDstBegin[2] + m_nWidth * m_nHeight;
-
-			DecodeToPlanar(nBandIndex, pDstBegin);
+			DecodeToPlanar(nBandIndex, pRawPlaneBegin);
 
 			return true;
 		}

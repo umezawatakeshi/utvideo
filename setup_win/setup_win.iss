@@ -18,7 +18,8 @@ OutputBaseFilename="utvideo-{#UTVIDEO_VERSION_MAJOR}.{#UTVIDEO_VERSION_MINOR}.{#
 ArchitecturesInstallIn64BitMode=x64
 LicenseFile=..\gplv2.rtf
 InfoBeforeFile=before.en.rtf
-InfoAfterFile=info.en.rtfDisableWelcomePage=no
+InfoAfterFile=info.en.rtf
+DisableWelcomePage=no
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl";
@@ -28,7 +29,6 @@ Name: "ja"; MessagesFile: "compiler:Languages\Japanese.isl"; InfoBeforeFile: "be
 Source: "..\Release\utv_core.dll";     DestDir: "{sys}"; Flags: ignoreversion 32bit;
 Source: "..\Release\utv_vcm.dll";      DestDir: "{sys}"; Flags: ignoreversion 32bit;
 Source: "..\Release\utv_dmo.dll";      DestDir: "{sys}"; Flags: ignoreversion 32bit regserver;
-Source: "..\Release\utv_logc.exe";     DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\x64\Release\utv_core.dll"; DestDir: "{sys}"; Flags: ignoreversion 64bit;           Check: Is64BitInstallMode
 Source: "..\x64\Release\utv_vcm.dll";  DestDir: "{sys}"; Flags: ignoreversion 64bit;           Check: Is64BitInstallMode
 Source: "..\x64\Release\utv_dmo.dll";  DestDir: "{sys}"; Flags: ignoreversion 64bit regserver; Check: Is64BitInstallMode
@@ -38,11 +38,10 @@ Source: "..\gplv2.ja.sjis.txt";        DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\style.css";                DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\readme.en.html";           DestDir: "{app}"; Flags: ignoreversion;
 Source: "..\readme.ja.html";           DestDir: "{app}"; Flags: ignoreversion;
-Source: "utvideo-x86.reg";             DestDir: "{app}"; Flags: ignoreversion 32bit; DestName: "utvideo.reg"; Check: not Is64BitInstallMode
-Source: "utvideo-x64.reg";             DestDir: "{app}"; Flags: ignoreversion 64bit; DestName: "utvideo.reg"; Check:     Is64BitInstallMode
 
 [InstallDelete]
 Name: "{app}\utv_cfg.exe"; Type: files
+Name: "{app}\utvideo.reg"; Type: files
 
 [Registry]
 Root: HKLM32; Subkey: "Software\Microsoft\Windows NT\CurrentVersion\Drivers32"; ValueName: "VIDC.ULRA"; ValueType: string; ValueData: "{sys}\utv_vcm.dll"; Flags: uninsdeletevalue

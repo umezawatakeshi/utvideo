@@ -167,6 +167,37 @@ BEGIN
     0
 END
 
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDC_DIVIDE_COUNT_EDIT   "フレームを分割して処理する際の分割数を指定します。\n※ スレッド数とは異なります。"
+    IDC_ASSUME_INTERLACE_CHECK 
+                            "インターレース映像とみなしてエンコードします。\n映像が実際にインターレースである場合、圧縮比が高くなります。\n映像が実際にはプログレッシブである場合、圧縮比は逆に低くなります。\n※ 内部保持形式が YUV420 の場合は、正しく設定しないとピクセルフォーマット間の変換が適切に行われません。"
+    IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO 
+                            """Predict Median"" フレーム内予測を行います。\n大抵の場合は圧縮比は最も高くなりますが、デコードは遅くなります。"
+    IDC_INTRAFRAME_PREDICT_LEFT_RADIO 
+                            """Predict Left"" フレーム内予測を行います。\n大抵の場合は圧縮比は最も低くなります。"
+    IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS "フレーム分割数を自動的に設定します。"
+    IDC_WORKER_THREAD_PRIORITY_SLIDER 
+                            "ワーカースレッドのスレッド優先度を指定します。\n中央で通常の優先度になります。"
+    IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO 
+                            """Predict Gradient"" フレーム内予測を行います。\n圧縮比と処理速度のバランスが良く、大抵の場合に適切な設定となります。"
+END
+
+STRINGTABLE
+BEGIN
+    IDC_USE_TEMPORAL_COMPRESSION_CHECK "フレーム間圧縮を有効にします。"
+    IDC_KEY_FRAME_INTERVAL_EDIT 
+                            "キーフレーム間隔を指定します。\n30 を指定すると、キーフレームの後に 29 個のデルタフレームが続きます。\n1 を指定すると、全てのフレームがキーフレームになります。"
+    IDC_SAVE_CONFIG_CHECK   "コーデックの設定がグローバルに共有されるようにします。"
+    IDC_IGNORE_SET_CONFIG_CHECK "コーデッククライアントからプログラム的に行われたコーデックの設定を無視します。"
+END
+
 #endif    // 日本語 (日本) resources
 /////////////////////////////////////////////////////////////////////////////
 
@@ -292,6 +323,40 @@ END
 IDD_UM00_CONFIG AFX_DIALOG_LAYOUT
 BEGIN
     0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDC_DIVIDE_COUNT_EDIT   "Specify the number of frame divisions.\nNote: It is different from the number of worker threads."
+    IDC_ASSUME_INTERLACE_CHECK 
+                            "Encode input video as interlaced.\nIf the input video is really interlaced, the compression ratio will be higher.\nIf the input video is actually progressive, the compression ratio will be lower.\nNote: If the internal format is YUV420, the conversion from/to external formats will not be done properly unless this option set correctly."
+    IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO 
+                            "Use ""Predict Median"" intra-frame prediction method.\nIt makes compression ratio highest and decoding speed lowest in most cases."
+    IDC_INTRAFRAME_PREDICT_LEFT_RADIO 
+                            "Use ""Predict Left"" intra-frame prediction method.\nIt makes compression ratio lowest in most cases."
+    IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS 
+                            "Configure frame divide count automatically."
+    IDC_WORKER_THREAD_PRIORITY_SLIDER 
+                            "Specify the thread priority of worker threads.\nIf you center the slider, worker threads will run at normal priority."
+    IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO 
+                            "Use ""Predict Gradient"" intra-frame prediction method.\nIt has a good balance of compression ratio and processing speed, and is the right setting in most cases."
+END
+
+STRINGTABLE
+BEGIN
+    IDC_USE_TEMPORAL_COMPRESSION_CHECK 
+                            "Enable temporal (inter-frame) compression."
+    IDC_KEY_FRAME_INTERVAL_EDIT 
+                            "Specify key frame interval.\nIf it is set to 30, 29 delta frames will follow a key frame.\nIf it is set to 1, all frames will be key frames."
+    IDC_SAVE_CONFIG_CHECK   "Share codec configuration globally."
+    IDC_IGNORE_SET_CONFIG_CHECK 
+                            "Ignore codec configuration made programmatically by codec clients."
 END
 
 #endif    // 英語 (米国) resources

@@ -10,6 +10,7 @@
 #include "ByteOrder.h"
 #include "SymPack.h"
 #include "resource.h"
+#include "WindowsDialogUtil.h"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -70,6 +71,7 @@ INT_PTR CALLBACK CUM00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			EnableDlgItem(hwnd, IDC_KEY_FRAME_INTERVAL_EDIT, FALSE);
 		wsprintf(buf, "%d", pThis->m_ec.ecKeyFrameIntervalMinusOne + 1);
 		SetDlgItemText(hwnd, IDC_KEY_FRAME_INTERVAL_EDIT, buf);
+		AddToolTips(hwnd);
 		return TRUE;
 	case WM_COMMAND:
 		switch(LOWORD(wParam))

@@ -89,7 +89,7 @@ protected:
 	HUFFMAN_ENCODE_TABLE<8> m_het[4];
 
 	FRAMEINFO m_fi;
-	HUFFMAN_DECODE_TABLE<8> m_hdt[4];
+	std::vector<HUFFMAN_DECODE_TABLE<8>> m_hdt[4];
 	const uint8_t *m_pDecodeCode[4][256];
 
 	EXTRADATA m_ed;
