@@ -18,7 +18,8 @@ OutputBaseFilename="utvideo-{#UTVIDEO_VERSION_MAJOR}.{#UTVIDEO_VERSION_MINOR}.{#
 ArchitecturesInstallIn64BitMode=x64
 LicenseFile=..\gplv2.rtf
 InfoBeforeFile=before.en.rtf
-InfoAfterFile=info.en.rtfDisableWelcomePage=no
+InfoAfterFile=info.en.rtf
+DisableWelcomePage=no
 
 [Languages]
 Name: "en"; MessagesFile: "compiler:Default.isl";
