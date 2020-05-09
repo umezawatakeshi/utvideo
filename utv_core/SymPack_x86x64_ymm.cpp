@@ -388,13 +388,17 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 	auto r = pControl;
 
 	{
-		__m256i prev = _mm256_set1_epi8((char)0x80);
+//		__m256i prev = _mm256_set1_epi8((char)0x80);
+		__m256i prev = _mm256_set_epi8(
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)0x80);
 
 		auto t = pPrevBegin;
 		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 32, t += 32)
 		{
 			auto [s0, m0] = UnpackForDelta<CODEFEATURE_AVX2>(q, r, shift);
 
+#if 0
 			__m256i t0 = _mm256_add_epi8(s0, _mm256_loadu_si256((const __m256i*)t));
 			__m256i t0masked = _mm256_and_si256(t0, m0);
 			__m256i atmp = _mm256_permute2x128_si256(t0masked, prev, 0x03);
@@ -410,8 +414,38 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 			)));
 			s0 = _mm256_blendv_epi8(s0, t0, m0);
-			_mm256_storeu_si256((__m256i *)p, s0);
 			prev = s0;
+#else
+			__m256i t0 = _mm256_add_epi8(s0, _mm256_loadu_si256((const __m256i*)t));
+			s0 = _mm256_add_epi8(s0, prev);
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 8));
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 16));
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 32));
+			s0 = _mm256_blendv_epi8(s0, t0, m0);
+			__m256i stmp = _mm256_permutex_epi64(_mm256_shuffle_epi8(s0, _mm256_set_epi8(
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				 7,  7,  7,  7,  7,  7,  7,  7,
+				15, 15, 15, 15, 15, 15, 15, 15,
+				 7,  7,  7,  7,  7,  7,  7,  7
+			)), _MM_SHUFFLE(2, 1, 0, 3));
+			s0 = _mm256_add_epi8(s0, _mm256_andnot_si256(m0, stmp));
+			stmp = _mm256_permutex_epi64(_mm256_shuffle_epi8(s0, _mm256_set_epi8(
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				15, 15, 15, 15, 15, 15, 15, 15,
+				 7,  7,  7,  7,  7,  7,  7,  7
+			)), _MM_SHUFFLE(1, 0, 3, 3));
+			m0 = _mm256_or_si256(m0, _mm256_permutex_epi64(m0, _MM_SHUFFLE(2, 1, 0, 3)));
+			s0 = _mm256_add_epi8(s0, _mm256_andnot_si256(m0, stmp));
+
+			prev = _mm256_shuffle_epi8(_mm256_permutex_epi64(s0, _MM_SHUFFLE(3, 3, 3, 3)), _mm256_set_epi8(
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, 15
+			));
+#endif
+			_mm256_storeu_si256((__m256i *)p, s0);
 		}
 	}
 
@@ -425,6 +459,7 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 		{
 			auto [s0, m0] = UnpackForDelta<CODEFEATURE_AVX2>(q, r, shift);
 
+#if 0
 			__m256i top = _mm256_loadu_si256((const __m256i*)(p - cbStride));
 			__m256i t0 = _mm256_add_epi8(s0, _mm256_loadu_si256((const __m256i*)t));
 			__m256i t0masked = _mm256_and_si256(_mm256_sub_epi8(t0, top), m0);
@@ -442,8 +477,40 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 			)));
 			s0 = _mm256_add_epi8(s0, top);
 			s0 = _mm256_blendv_epi8(s0, t0, m0);
-			_mm256_storeu_si256((__m256i *)p, s0);
 			prev = _mm256_sub_epi8(s0, top);
+#else
+			__m256i top = _mm256_loadu_si256((const __m256i*)(p - cbStride));
+			__m256i t0 = _mm256_sub_epi8(_mm256_add_epi8(s0, _mm256_loadu_si256((const __m256i*)t)), top);
+			s0 = _mm256_add_epi8(s0, prev);
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 8));
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 16));
+			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 32));
+			s0 = _mm256_blendv_epi8(s0, t0, m0);
+			__m256i stmp = _mm256_permutex_epi64(_mm256_shuffle_epi8(s0, _mm256_set_epi8(
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				7, 7, 7, 7, 7, 7, 7, 7,
+				15, 15, 15, 15, 15, 15, 15, 15,
+				7, 7, 7, 7, 7, 7, 7, 7
+			)), _MM_SHUFFLE(2, 1, 0, 3));
+			s0 = _mm256_add_epi8(s0, _mm256_andnot_si256(m0, stmp));
+			stmp = _mm256_permutex_epi64(_mm256_shuffle_epi8(s0, _mm256_set_epi8(
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				15, 15, 15, 15, 15, 15, 15, 15,
+				7, 7, 7, 7, 7, 7, 7, 7
+			)), _MM_SHUFFLE(1, 0, 3, 3));
+			m0 = _mm256_or_si256(m0, _mm256_permutex_epi64(m0, _MM_SHUFFLE(2, 1, 0, 3)));
+			s0 = _mm256_add_epi8(s0, _mm256_andnot_si256(m0, stmp));
+
+			prev = _mm256_shuffle_epi8(_mm256_permutex_epi64(s0, _MM_SHUFFLE(3, 3, 3, 3)), _mm256_set_epi8(
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, -1,
+				-1, -1, -1, -1, -1, -1, -1, 15
+			));
+			s0 = _mm256_add_epi8(s0, top);
+#endif
+			_mm256_storeu_si256((__m256i *)p, s0);
 		}
 	}
 
