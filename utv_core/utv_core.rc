@@ -57,8 +57,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "フレーム分割数",IDC_STATIC,7,7,50,8
     EDITTEXT        IDC_DIVIDE_COUNT_EDIT,67,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
-    CONTROL         "論理プロセッサ数と同じにする",IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,20,108,10
+    CONTROL         "自動で分割する",IDC_DIVIDE_COUNT_AUTO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,20,108,10
     GROUPBOX        "フレーム内予測方式",IDC_STATIC,7,34,100,50
     CONTROL         "Predict Median",IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP,14,44,63,10
@@ -94,8 +93,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "フレーム分割数",IDC_STATIC,7,7,50,8
     EDITTEXT        IDC_DIVIDE_COUNT_EDIT,67,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
-    CONTROL         "論理プロセッサ数と同じにする",IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,20,108,10
+    CONTROL         "自動で分割する",IDC_DIVIDE_COUNT_AUTO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,20,108,10
     DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
     PUSHBUTTON      "キャンセル",IDCANCEL,129,24,50,14
 END
@@ -182,7 +180,7 @@ BEGIN
                             """Predict Median"" フレーム内予測を行います。\n大抵の場合は圧縮比は最も高くなりますが、デコードは遅くなります。"
     IDC_INTRAFRAME_PREDICT_LEFT_RADIO 
                             """Predict Left"" フレーム内予測を行います。\n大抵の場合は圧縮比は最も低くなります。"
-    IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS "フレーム分割数を自動的に設定します。"
+    IDC_DIVIDE_COUNT_AUTO   "フレーム分割数を自動的に設定します。"
     IDC_WORKER_THREAD_PRIORITY_SLIDER 
                             "ワーカースレッドのスレッド優先度を指定します。\n中央で通常の優先度になります。"
     IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO 
@@ -221,8 +219,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Frame divide count",IDC_STATIC,7,7,62,8
     EDITTEXT        IDC_DIVIDE_COUNT_EDIT,75,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
-    CONTROL         "Same as # of logical processors",IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,20,117,10
+    CONTROL         "Autmatic division",IDC_DIVIDE_COUNT_AUTO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,20,117,10
     GROUPBOX        "Intra-frame prediction type",IDC_STATIC,7,34,100,50
     CONTROL         "Predict Median",IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO,
                     "Button",BS_AUTORADIOBUTTON | WS_GROUP,14,44,63,10
@@ -259,8 +256,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     LTEXT           "Frame divide count",IDC_STATIC,7,7,62,8
     EDITTEXT        IDC_DIVIDE_COUNT_EDIT,75,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
-    CONTROL         "Same as # of logical processors",IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,20,117,10
+    CONTROL         "Autmatic division",IDC_DIVIDE_COUNT_AUTO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,20,117,10
     DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
     PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
 END
@@ -340,8 +336,7 @@ BEGIN
                             "Use ""Predict Median"" intra-frame prediction method.\nIt makes compression ratio highest and decoding speed lowest in most cases."
     IDC_INTRAFRAME_PREDICT_LEFT_RADIO 
                             "Use ""Predict Left"" intra-frame prediction method.\nIt makes compression ratio lowest in most cases."
-    IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS 
-                            "Configure frame divide count automatically."
+    IDC_DIVIDE_COUNT_AUTO   "Configure frame divide count automatically."
     IDC_WORKER_THREAD_PRIORITY_SLIDER 
                             "Specify the thread priority of worker threads.\nIf you center the slider, worker threads will run at normal priority."
     IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO 

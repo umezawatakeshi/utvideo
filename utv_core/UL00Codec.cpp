@@ -68,7 +68,7 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		CheckDlgButton(hwnd, IDC_ASSUME_INTERLACE_CHECK, pThis->m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE);
 		if (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS)
 		{
-			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS, BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_AUTO, BST_CHECKED);
 			EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, FALSE);
 		}
 		AddToolTips(hwnd);
@@ -78,7 +78,7 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		{
 		case IDOK:
 			memset(&pThis->m_ec, 0, sizeof(ENCODERCONF));
-			if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS))
+			if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_AUTO))
 			{
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS;
 				pThis->m_ec.dwFlags0 |= (CThreadManager::GetNumProcessors() - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
@@ -107,11 +107,11 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		case IDCANCEL:
 			EndDialog(hwnd, 0);
 			return TRUE;
-		case IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS:
+		case IDC_DIVIDE_COUNT_AUTO:
 			if (HIWORD(wParam) == BN_CLICKED)
 			{
-				EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, !IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS));
-				if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS))
+				EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, !IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_AUTO));
+				if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_AUTO))
 				{
 					wsprintf(buf, "%d", CThreadManager::GetNumProcessors());
 					SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);

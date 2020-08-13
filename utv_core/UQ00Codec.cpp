@@ -66,7 +66,7 @@ INT_PTR CALLBACK CUQ00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 #endif
 		if (pThis->m_ec.ecFlags & EC_FLAGS_DIVIDE_COUNT_IS_NUM_PROCESSORS)
 		{
-			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS, BST_CHECKED);
+			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_AUTO, BST_CHECKED);
 			EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, FALSE);
 		}
 		AddToolTips(hwnd);
@@ -76,7 +76,7 @@ INT_PTR CALLBACK CUQ00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		{
 		case IDOK:
 			memset(&pThis->m_ec, 0, sizeof(ENCODERCONF));
-			if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS))
+			if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_AUTO))
 			{
 				pThis->m_ec.ecFlags |= EC_FLAGS_DIVIDE_COUNT_IS_NUM_PROCESSORS;
 				pThis->m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
@@ -103,11 +103,11 @@ INT_PTR CALLBACK CUQ00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		case IDCANCEL:
 			EndDialog(hwnd, 0);
 			return TRUE;
-		case IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS:
+		case IDC_DIVIDE_COUNT_AUTO:
 			if (HIWORD(wParam) == BN_CLICKED)
 			{
-				EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, !IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS));
-				if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_IS_NUM_PROCESSORS))
+				EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, !IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_AUTO));
+				if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_AUTO))
 				{
 					wsprintf(buf, "%d", CThreadManager::GetNumProcessors());
 					SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
