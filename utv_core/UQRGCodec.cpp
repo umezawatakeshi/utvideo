@@ -94,14 +94,19 @@ bool CUQRGCodec::PredictDirect(uint32_t nBandIndex)
 	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pPredicted.get(), nBandIndex);
 	auto& [g, b, r, _] = pPlaneBegin;
 
-	switch (m_utvfRaw)
+	switch (m_ec.ecFlags & EC_FLAGS_PREDICT_MASK)
 	{
-	case UTVF_b64a:
-		ConvertB64aToUQRG_PredictCylindricalLeftAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-		return true;
-	case UTVF_r210:
-		ConvertR210ToUQRG_PredictCylindricalLeftAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_nWidth, m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-		return true;
+	case EC_FLAGS_PREDICT_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_b64a:
+			ConvertB64aToUQRG_PredictCylindricalLeftAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		case UTVF_r210:
+			ConvertR210ToUQRG_PredictCylindricalLeftAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_nWidth, m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		}
+		break;
 	}
 
 	return false;
@@ -112,14 +117,19 @@ bool CUQRGCodec::RestoreDirect(uint32_t nBandIndex)
 	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pPredicted.get(), nBandIndex);
 	auto& [g, b, r, _] = pPlaneBegin;
 
-	switch (m_utvfRaw)
+	switch (m_byPredictionType)
 	{
-	case UTVF_b64a:
-		ConvertUQRGToB64a_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
-		return true;
-	case UTVF_r210:
-		ConvertUQRGToR210_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, m_nWidth, m_fmRaw.scbLineStride[0]);
-		return true;
+	case PREDICT_CYLINDRICAL_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_b64a:
+			ConvertUQRGToB64a_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
+			return true;
+		case UTVF_r210:
+			ConvertUQRGToR210_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], g, b, r, m_nWidth, m_fmRaw.scbLineStride[0]);
+			return true;
+		}
+		break;
 	}
 
 	return false;
@@ -127,11 +137,16 @@ bool CUQRGCodec::RestoreDirect(uint32_t nBandIndex)
 
 bool CUQRGCodec::IsDirectRestorable()
 {
-	switch (m_utvfRaw)
+	switch (m_byPredictionType)
 	{
-	case UTVF_b64a:
-	case UTVF_r210:
-		return true;
+	case PREDICT_CYLINDRICAL_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_b64a:
+		case UTVF_r210:
+			return true;
+		}
+		break;
 	}
 
 	return false;

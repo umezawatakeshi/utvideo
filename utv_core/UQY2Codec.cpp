@@ -112,23 +112,28 @@ bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
 	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pPredicted.get(), nBandIndex);
 	auto& [y, u, v, _] = pPlaneBegin;
 
-	switch (m_utvfRaw)
+	switch (m_ec.ecFlags & EC_FLAGS_PREDICT_MASK)
 	{
-	case UTVF_YUV422P16LE:
-		ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
-		ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(u, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1]);
-		ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(v, pRawBegin[2], pRawEnd[2], m_fmRaw.cbLineWidth[2], m_fmRaw.scbLineStride[2], m_counts[nBandIndex].dwCount[2]);
-		return true;
+	case EC_FLAGS_PREDICT_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUV422P16LE:
+			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(u, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1]);
+			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(v, pRawBegin[2], pRawEnd[2], m_fmRaw.cbLineWidth[2], m_fmRaw.scbLineStride[2], m_counts[nBandIndex].dwCount[2]);
+			return true;
 
-	case UTVF_P210:
-		ConvertLittleEndian16ToHostEndian10Noround_PredictCylindricalLeftAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
-		ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround_PredictCylindricalLeftAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-		return true;
+		case UTVF_P210:
+			ConvertLittleEndian16ToHostEndian10Noround_PredictCylindricalLeftAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround_PredictCylindricalLeftAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
 
-	case UTVF_P216:
-		ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
-		ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited_PredictCylindricalLeftAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
-		return true;
+		case UTVF_P216:
+			ConvertLittleEndian16ToHostEndian10Limited_PredictCylindricalLeftAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited_PredictCylindricalLeftAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		}
+		break;
 	}
 
 	return false;
@@ -136,28 +141,37 @@ bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
 
 void CUQY2Codec::GenerateDecodeTable(uint32_t nPlaneIndex)
 {
-	switch (m_utvfRaw)
+	switch (m_byPredictionType)
 	{
-	case UTVF_YUV422P16LE:
-	case UTVF_P210:
-	case UTVF_P216:
-		GenerateHuffmanDecodeTable<10, 6>(m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
+	case PREDICT_CYLINDRICAL_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUV422P16LE:
+		case UTVF_P210:
+		case UTVF_P216:
+			GenerateHuffmanDecodeTable<10, 6>(m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
+			return;
+		}
 		break;
-
-	default:
-		CUQ00Codec::GenerateDecodeTable(nPlaneIndex);
 	}
+
+	CUQ00Codec::GenerateDecodeTable(nPlaneIndex);
 }
 
 bool CUQY2Codec::DecodeDirect(uint32_t nBandIndex)
 {
-	switch (m_utvfRaw)
+	switch (m_byPredictionType)
 	{
-	case UTVF_YUV422P16LE:
-	case UTVF_P210:
-	case UTVF_P216:
-		DecodeAndRestoreCustomToPlanar(nBandIndex);
-		return true;
+	case PREDICT_CYLINDRICAL_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUV422P16LE:
+		case UTVF_P210:
+		case UTVF_P216:
+			DecodeAndRestoreCustomToPlanar(nBandIndex);
+			return true;
+		}
+		break;
 	}
 
 	return false;
@@ -168,18 +182,22 @@ void CUQY2Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex)
 	auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pPredicted.get(), nBandIndex);
 	auto& [y, u, v, _] = pPlaneBegin;
 
-	switch (m_utvfRaw)
+	switch (m_byPredictionType)
 	{
-	case UTVF_YUV422P16LE:
-		ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pRawBegin[nPlaneIndex], pRawEnd[nPlaneIndex], pPlaneBegin[nPlaneIndex], m_fmRaw.cbLineWidth[nPlaneIndex], m_fmRaw.scbLineStride[nPlaneIndex]);
-		break;
+	case PREDICT_CYLINDRICAL_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUV422P16LE:
+			ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pRawBegin[nPlaneIndex], pRawEnd[nPlaneIndex], pPlaneBegin[nPlaneIndex], m_fmRaw.cbLineWidth[nPlaneIndex], m_fmRaw.scbLineStride[nPlaneIndex]);
+			break;
 
-	case UTVF_P210:
-	case UTVF_P216:
-		if (nPlaneIndex == 0)
-			ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], y, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
-		else if (nPlaneIndex == 2)
-			ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
-		break;
+		case UTVF_P210:
+		case UTVF_P216:
+			if (nPlaneIndex == 0)
+				ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(pRawBegin[0], pRawEnd[0], y, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
+			else if (nPlaneIndex == 2)
+				ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
+			break;
+		}
 	}
 }

@@ -24,7 +24,10 @@ protected:
 	};
 
 	static const uint8_t EC_FLAGS_DIVIDE_COUNT_AUTO = 0x01;
-	static const uint8_t EC_FLAGS_RESERVED          = 0xfe;
+	static const uint8_t EC_FLAGS_PREDICT_MASK      = 0x06;
+	static const uint8_t EC_FLAGS_PREDICT_LEFT      = 0x02;
+	static const uint8_t EC_FLAGS_PREDICT_GRADIENT  = 0x04;
+	static const uint8_t EC_FLAGS_RESERVED          = 0xf8;
 
 	struct STREAMINFO
 	{
@@ -55,11 +58,8 @@ protected:
 		uint8_t fiReserved; /* == 0 */
 	};
 
-	static const uint8_t PREDICT_CYLINDRICAL_LEFT   = 1;
-	//static const uint8_t PREDICT_CYLINDRICAL_MEDIAN = 3;
-	//static const uint8_t PREDICT_ABOVE              = 4;
-	//static const uint8_t PREDICT_PLANAR_LEFT        = 5;
-	//static const uint8_t PREDICT_PLANAR_MEDIAN      = 7;
+	static const uint8_t PREDICT_CYLINDRICAL_LEFT = 1;
+	static const uint8_t PREDICT_PLANAR_GRADIENT  = 2;
 
 protected:
 	ENCODERCONF m_ec;
@@ -67,6 +67,7 @@ protected:
 	utvf_t m_utvfRaw;
 	unsigned int m_nWidth;
 	unsigned int m_nHeight;
+	uint8_t m_byPredictionType;
 	size_t m_cbPlaneSize[4];
 	size_t m_cbPlaneWidth[4];
 	size_t m_cbPlanePredictStride[4];

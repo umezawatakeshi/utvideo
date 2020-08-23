@@ -50,20 +50,19 @@ INT_PTR CALLBACK CUQ00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		SetWindowText(hwnd, buf);
 		wsprintf(buf, "%d", pThis->m_ec.ecDivideCountMinusOne + 1);
 		SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
-#if 0
-		switch (pThis->m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
+		switch (pThis->m_ec.ecFlags & EC_FLAGS_PREDICT_MASK)
 		{
 		default:
 			_ASSERT(false);
 			/* FALLTHROUGH */
-		case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+		case 0:
+		case EC_FLAGS_PREDICT_LEFT:
 			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO, BST_CHECKED);
 			break;
-		case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO, BST_CHECKED);
+		case EC_FLAGS_PREDICT_GRADIENT:
+			CheckDlgButton(hwnd, IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO, BST_CHECKED);
 			break;
 		}
-#endif
 		if (pThis->m_ec.ecFlags & EC_FLAGS_DIVIDE_COUNT_AUTO)
 		{
 			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_AUTO, BST_CHECKED);
@@ -92,12 +91,10 @@ INT_PTR CALLBACK CUQ00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 				}
 				pThis->m_ec.ecDivideCountMinusOne = n - 1;
 			}
-#if 0
 			if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO))
-				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
-			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO))
-				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
-#endif
+				pThis->m_ec.ecFlags |= EC_FLAGS_PREDICT_LEFT;
+			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO))
+				pThis->m_ec.ecFlags |= EC_FLAGS_PREDICT_GRADIENT;
 			pThis->SaveConfig();
 			/* FALLTHROUGH */
 		case IDCANCEL:
@@ -195,7 +192,16 @@ size_t CUQ00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 	m_ptm->WaitForJobCompletion();
 
 	fi.fiEncodingMode = 0;
-	fi0.fiPredictionType = PREDICT_CYLINDRICAL_LEFT;
+	switch (m_ec.ecFlags & EC_FLAGS_PREDICT_MASK)
+	{
+	default:
+	case EC_FLAGS_PREDICT_LEFT:
+		fi0.fiPredictionType = PREDICT_CYLINDRICAL_LEFT;
+		break;
+	case EC_FLAGS_PREDICT_GRADIENT:
+		fi0.fiPredictionType = PREDICT_PLANAR_GRADIENT;
+		break;
+	}
 	fi0.fiDivideCountMinusOne = m_ec.ecDivideCountMinusOne;
 
 	p = (uint8_t *)pOutput;
@@ -366,7 +372,17 @@ void CUQ00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
-		PredictCylindricalLeftAndCount10((uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(pSrcBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t *)(pSrcBegin[nPlaneIndex] + cbPlaneEnd), m_counts[nBandIndex].dwCount[nPlaneIndex]);
+		switch (m_ec.ecFlags & EC_FLAGS_PREDICT_MASK)
+		{
+		default:
+			_ASSERT(false);
+		case EC_FLAGS_PREDICT_LEFT:
+			PredictCylindricalLeftAndCount10((uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(pSrcBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t*)(pSrcBegin[nPlaneIndex] + cbPlaneEnd), m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			break;
+		case EC_FLAGS_PREDICT_GRADIENT:
+			cpp_PredictPlanarGradientAndCount<10>((uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(pSrcBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t*)(pSrcBegin[nPlaneIndex] + cbPlaneEnd), m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			break;
+		}
 	}
 }
 
@@ -421,10 +437,16 @@ size_t CUQ00Codec::DecodeFrame(void *pOutput, const void *pInput)
 	else
 		return -1;
 
-	if (fi0->fiPredictionType != PREDICT_CYLINDRICAL_LEFT)
-		return -1;
-
 	m_dwDivideCount = fi0->fiDivideCountMinusOne + 1;
+	m_byPredictionType = fi0->fiPredictionType;
+	switch (m_byPredictionType)
+	{
+	case PREDICT_CYLINDRICAL_LEFT:
+	case PREDICT_PLANAR_GRADIENT:
+		break;
+	default:
+		return -1;
+	}
 	CalcBandMetric();
 
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
@@ -572,7 +594,18 @@ void CUQ00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* cons
 		_ASSERT(pRetActual == pRetExpected);
 
 		if (RestoreType == RESTORE_DEFAULT)
-			RestoreCylindricalLeft10((uint16_t *)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t *)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
+		{
+			switch (m_byPredictionType)
+			{
+			default:
+			case PREDICT_CYLINDRICAL_LEFT:
+				RestoreCylindricalLeft10((uint16_t*)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
+				break;
+			case PREDICT_PLANAR_GRADIENT:
+				cpp_RestorePlanarGradient<10>((uint16_t*)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), m_cbPlanePredictStride[nPlaneIndex]);
+				break;
+			}
+		}
 		else if (RestoreType == RESTORE_CUSTOM)
 			RestoreCustom(nBandIndex, nPlaneIndex);
 	}

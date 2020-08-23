@@ -168,7 +168,8 @@ static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>>
 static const vector<pair<int, int>> sizes_clip000_uqxx = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
 
 static const vector<pair<string, vector<uint8_t>>> preds_uqxx = {
-	{ "left",{ 0x00, 0x00, 0x00, 0x00, } },
+	{ "left",{ 0x00, 0x00, 0x00, 0x02, } },
+	{ "gradient",{ 0x00, 0x00, 0x00, 0x04, } },
 };
 
 static const vector<pair<string, vector<uint8_t>>> divs_uqxx = {
