@@ -23,8 +23,8 @@ protected:
 		uint8_t ecFlags;
 	};
 
-	static const uint8_t EC_FLAGS_DIVIDE_COUNT_IS_NUM_PROCESSORS = 0x01;
-	static const uint8_t EC_FLAGS_RESERVED                       = 0xfe;
+	static const uint8_t EC_FLAGS_DIVIDE_COUNT_AUTO = 0x01;
+	static const uint8_t EC_FLAGS_RESERVED          = 0xfe;
 
 	struct STREAMINFO
 	{

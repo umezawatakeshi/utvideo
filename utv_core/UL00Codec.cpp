@@ -66,7 +66,7 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			break;
 		}
 		CheckDlgButton(hwnd, IDC_ASSUME_INTERLACE_CHECK, pThis->m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE);
-		if (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS)
+		if (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_AUTO)
 		{
 			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_AUTO, BST_CHECKED);
 			EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, FALSE);
@@ -80,7 +80,7 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			memset(&pThis->m_ec, 0, sizeof(ENCODERCONF));
 			if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_AUTO))
 			{
-				pThis->m_ec.dwFlags0 |= EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS;
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_DIVIDE_COUNT_AUTO;
 				pThis->m_ec.dwFlags0 |= (CThreadManager::GetNumProcessors() - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
 			}
 			else
@@ -166,7 +166,7 @@ int CUL00Codec::InternalSetState(const void *pState, size_t cb)
 
 	if ((m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK) == EC_FLAGS0_INTRAFRAME_PREDICT_RESERVED)
 		m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
-	if (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS)
+	if (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_AUTO)
 	{
 		m_ec.dwFlags0 &= ~EC_FLAGS0_DIVIDE_COUNT_MASK;
 		m_ec.dwFlags0 |= (CThreadManager::GetNumProcessors() - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;

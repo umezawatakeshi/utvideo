@@ -64,7 +64,7 @@ INT_PTR CALLBACK CUQ00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			break;
 		}
 #endif
-		if (pThis->m_ec.ecFlags & EC_FLAGS_DIVIDE_COUNT_IS_NUM_PROCESSORS)
+		if (pThis->m_ec.ecFlags & EC_FLAGS_DIVIDE_COUNT_AUTO)
 		{
 			CheckDlgButton(hwnd, IDC_DIVIDE_COUNT_AUTO, BST_CHECKED);
 			EnableDlgItem(hwnd, IDC_DIVIDE_COUNT_EDIT, FALSE);
@@ -78,7 +78,7 @@ INT_PTR CALLBACK CUQ00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 			memset(&pThis->m_ec, 0, sizeof(ENCODERCONF));
 			if (IsDlgButtonChecked(hwnd, IDC_DIVIDE_COUNT_AUTO))
 			{
-				pThis->m_ec.ecFlags |= EC_FLAGS_DIVIDE_COUNT_IS_NUM_PROCESSORS;
+				pThis->m_ec.ecFlags |= EC_FLAGS_DIVIDE_COUNT_AUTO;
 				pThis->m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
 			}
 			else
@@ -165,7 +165,7 @@ int CUQ00Codec::InternalSetState(const void *pState, size_t cb)
 
 	memcpy(&m_ec, &ec, sizeof(ENCODERCONF));
 
-	if (m_ec.ecFlags & EC_FLAGS_DIVIDE_COUNT_IS_NUM_PROCESSORS)
+	if (m_ec.ecFlags & EC_FLAGS_DIVIDE_COUNT_AUTO)
 	{
 		m_ec.ecDivideCountMinusOne = CThreadManager::GetNumProcessors() - 1;
 	}

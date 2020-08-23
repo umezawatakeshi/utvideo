@@ -63,7 +63,7 @@ protected:
 	static const uint32_t EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN = 0x00000300;
 
 	static const uint32_t EC_FLAGS0_ASSUME_INTERLACE                = 0x00000800;
-	static const uint32_t EC_FLAGS0_DIVIDE_COUNT_IS_NUM_PROCESSORS  = 0x00001000;
+	static const uint32_t EC_FLAGS0_DIVIDE_COUNT_AUTO               = 0x00001000;
 
 	static const uint32_t EC_FLAGS0_RESERVED                        = 0xffffe400;
 
