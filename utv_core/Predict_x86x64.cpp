@@ -296,18 +296,19 @@ template void tuned_PredictCylindricalLeftAndCount10<CODEFEATURE_AVX1>(uint16_t 
 #endif
 
 
-template<int F>
+template<int F, bool NeedMask = true>
 static inline FORCEINLINE VECTOR2<__m128i> /* value0, nextprev */ tuned_RestoreLeft10Element(__m128i prev, __m128i s0)
 {
 	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 2));
 	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 4));
 	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 8));
 	s0 = _mm_add_epi16(s0, prev);
-	s0 = _mm_and_si128(s0, _mm_set1_epi16(CSymbolBits<10>::maskval));
+	if (NeedMask)
+		s0 = _mm_and_si128(s0, _mm_set1_epi16(CSymbolBits<10>::maskval));
 	return { s0, _mm_shuffle_epi8(s0, _mm_set2_epi8(15, 14)) };
 }
 
-template<int F>
+template<int F, bool NeedMask = true>
 static inline FORCEINLINE VECTOR3<__m128i> /* value0, value1, nextprev */ tuned_RestoreLeft10Element(__m128i prev, __m128i s0, __m128i s1)
 {
 	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 2));
@@ -318,8 +319,11 @@ static inline FORCEINLINE VECTOR3<__m128i> /* value0, value1, nextprev */ tuned_
 	s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 8));
 	s0 = _mm_add_epi16(s0, prev);
 	s1 = _mm_add_epi16(s1, _mm_shuffle_epi8(s0, _mm_set2_epi8(15, 14)));
-	s0 = _mm_and_si128(s0, _mm_set1_epi16(CSymbolBits<10>::maskval));
-	s1 = _mm_and_si128(s1, _mm_set1_epi16(CSymbolBits<10>::maskval));
+	if (NeedMask)
+	{
+		s0 = _mm_and_si128(s0, _mm_set1_epi16(CSymbolBits<10>::maskval));
+		s1 = _mm_and_si128(s1, _mm_set1_epi16(CSymbolBits<10>::maskval));
+	}
 	return { s0, s1, _mm_shuffle_epi8(s1, _mm_set2_epi8(15, 14)) };
 }
 
@@ -612,4 +616,130 @@ template void tuned_RestorePlanarGradient8<CODEFEATURE_SSSE3>(uint8_t *pDst, con
 
 #ifdef GENERATE_AVX1
 template void tuned_RestorePlanarGradient8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride);
+#endif
+
+
+template<int F, bool DoCount>
+static inline void tuned_PredictPlanarGradientAndMayCount10(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride, uint32_t pCountTable[][1024])
+{
+	auto p = pSrcBegin;
+	auto q = pDst;
+	auto nStride = cbStride / 2;
+
+	__m128i prev = _mm_set1_epi16(CSymbolBits<10>::midval);
+
+#ifdef __SSSE3__
+	for (; p <= pSrcBegin + nStride - 8; p += 8, q += 8)
+	{
+		__m128i value = _mm_loadu_si128((const __m128i*)p);
+		__m128i residual = tuned_PredictLeftAndCount10Element<F, DoCount, 1, 0>(prev, value, pCountTable);
+		_mm_storeu_si128((__m128i*)q, residual);
+		prev = value;
+	}
+#endif
+	for (; p < pSrcBegin + nStride; p++, q++)
+	{
+		*q = (*p - *(p - 1)) & CSymbolBits<10>::maskval;
+		if (DoCount)
+			++pCountTable[0][*q];
+	}
+
+	for (auto pp = pSrcBegin + nStride; pp != pSrcEnd; pp += nStride)
+	{
+		prev = _mm_setzero_si128();
+
+#ifdef __SSSE3__
+		for (; p <= pp + nStride - 8; p += 8, q += 8)
+		{
+			__m128i value = _mm_sub_epi16(_mm_loadu_si128((const __m128i*)p), _mm_loadu_si128((const __m128i*)(p - nStride)));
+			__m128i residual = tuned_PredictLeftAndCount10Element<F, DoCount, 1, 0>(prev, value, pCountTable);
+			_mm_storeu_si128((__m128i*)q, residual);
+			prev = value;
+		}
+#endif
+		for (; p < pp + nStride; p++, q++)
+		{
+			*q = (*p - (*(p - 1) + *(p - nStride) - *(p - nStride - 1))) & CSymbolBits<10>::maskval;
+			if (DoCount)
+				++pCountTable[0][*q];
+		}
+	}
+}
+
+template<int F>
+void tuned_PredictPlanarGradientAndCount10(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride, uint32_t pCountTable[][1024])
+{
+	tuned_PredictPlanarGradientAndMayCount10<F, true>(pDst, pSrcBegin, pSrcEnd, cbStride, pCountTable);
+}
+
+template<int F>
+void tuned_PredictPlanarGradient10(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride)
+{
+	tuned_PredictPlanarGradientAndMayCount10<F, false>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
+}
+
+#ifdef GENERATE_SSE41
+template void tuned_PredictPlanarGradientAndCount10<CODEFEATURE_SSE41>(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride, uint32_t pCountTable[][1024]);
+template void tuned_PredictPlanarGradient10<CODEFEATURE_SSE41>(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_PredictPlanarGradientAndCount10<CODEFEATURE_AVX1>(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride, uint32_t pCountTable[][1024]);
+template void tuned_PredictPlanarGradient10<CODEFEATURE_AVX1>(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride);
+#endif
+
+
+template<int F>
+void tuned_RestorePlanarGradient10(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride)
+{
+	auto p = pSrcBegin;
+	auto q = pDst;
+	auto nStride = cbStride / 2;
+
+	__m128i prev = _mm_set1_epi16(CSymbolBits<10>::midval);
+
+#ifdef __SSSE3__
+	for (; p <= pSrcBegin + nStride - 16; p += 16, q += 16)
+	{
+		__m128i s0 = _mm_loadu_si128((const __m128i*)p);
+		__m128i s1 = _mm_loadu_si128((const __m128i*)(p + 8));
+		auto result = tuned_RestoreLeft10Element<F>(prev, s0, s1);
+		_mm_storeu_si128((__m128i*)q, result.v0);
+		_mm_storeu_si128((__m128i*)(q + 8), result.v1);
+		prev = result.v2;
+	}
+#endif
+	for (; p < pSrcBegin + nStride; p++, q++)
+	{
+		*q = (*(q - 1) + *p) & CSymbolBits<10>::maskval;
+	}
+
+	for (auto pp = pSrcBegin + nStride; pp != pSrcEnd; pp += nStride)
+	{
+		prev = _mm_set1_epi16((char)0);
+
+#ifdef __SSSE3__
+		for (; p <= pp + nStride - 16; p += 16, q += 16)
+		{
+			__m128i s0 = _mm_loadu_si128((const __m128i*)p);
+			__m128i s1 = _mm_loadu_si128((const __m128i*)(p + 8));
+			auto result = tuned_RestoreLeft10Element<F, false>(prev, s0, s1);
+			_mm_storeu_si128((__m128i*)q, _mm_and_si128(_mm_add_epi16(result.v0, _mm_loadu_si128((const __m128i*)(q - nStride))), _mm_set1_epi16(CSymbolBits<10>::maskval)));
+			_mm_storeu_si128((__m128i*)(q + 8), _mm_and_si128(_mm_add_epi16(result.v1, _mm_loadu_si128((const __m128i*)(q - nStride + 8))), _mm_set1_epi16(CSymbolBits<10>::maskval)));
+			prev = result.v2;
+		}
+#endif
+		for (; p < pp + nStride; p++, q++)
+		{
+			*q = (*p + (*(q - 1) + *(q - nStride) - *(q - nStride - 1))) & CSymbolBits<10>::maskval;
+		}
+	}
+}
+
+#ifdef GENERATE_SSSE3
+template void tuned_RestorePlanarGradient10<CODEFEATURE_SSSE3>(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride);
+#endif
+
+#ifdef GENERATE_AVX1
+template void tuned_RestorePlanarGradient10<CODEFEATURE_AVX1>(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride);
 #endif
