@@ -380,7 +380,7 @@ void CUQ00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 			PredictCylindricalLeftAndCount10((uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(pSrcBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t*)(pSrcBegin[nPlaneIndex] + cbPlaneEnd), m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		case EC_FLAGS_PREDICT_GRADIENT:
-			cpp_PredictPlanarGradientAndCount<10>((uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(pSrcBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t*)(pSrcBegin[nPlaneIndex] + cbPlaneEnd), m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			PredictPlanarGradientAndCount10((uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(pSrcBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t*)(pSrcBegin[nPlaneIndex] + cbPlaneEnd), m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		}
 	}
@@ -602,7 +602,7 @@ void CUQ00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* cons
 				RestoreCylindricalLeft10((uint16_t*)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd));
 				break;
 			case PREDICT_PLANAR_GRADIENT:
-				cpp_RestorePlanarGradient<10>((uint16_t*)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), m_cbPlanePredictStride[nPlaneIndex]);
+				RestorePlanarGradient10((uint16_t*)(pDstBegin[nPlaneIndex] + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin), (uint16_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd), m_cbPlanePredictStride[nPlaneIndex]);
 				break;
 			}
 		}

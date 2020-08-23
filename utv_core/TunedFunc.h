@@ -32,6 +32,8 @@ struct TUNEDFUNC_PREDICT
 	void(*pfnPredictPlanarGradientAndCount8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256]);
 	void(*pfnPredictPlanarGradient8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride);
 	void(*pfnRestorePlanarGradient8)(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride);
+	void(*pfnPredictPlanarGradientAndCount10)(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride, uint32_t pCountTable[][1024]);
+	void(*pfnRestorePlanarGradient10)(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride);
 };
 
 struct TUNEDFUNC_HUFFMAN_ENCODE
@@ -254,6 +256,8 @@ public:
 #define PredictPlanarGradientAndCount8 tfn.pPredict->pfnPredictPlanarGradientAndCount8
 #define PredictPlanarGradient8 tfn.pPredict->pfnPredictPlanarGradient8
 #define RestorePlanarGradient8 tfn.pPredict->pfnRestorePlanarGradient8
+#define PredictPlanarGradientAndCount10 tfn.pPredict->pfnPredictPlanarGradientAndCount10
+#define RestorePlanarGradient10 tfn.pPredict->pfnRestorePlanarGradient10
 
 #define HuffmanEncode8 tfn.pHuffmanEncode->pfnHuffmanEncode8
 #define HuffmanEncode10 tfn.pHuffmanEncode->pfnHuffmanEncode10
