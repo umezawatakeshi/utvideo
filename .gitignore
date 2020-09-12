@@ -24,4 +24,5 @@ utvideo.xcodeproj/xcuserdata
 /test*.xml
 *.vcxproj.user
 distrib/win/zip/zip
+distrib/win/zip/log
 distrib/win/zip/output
