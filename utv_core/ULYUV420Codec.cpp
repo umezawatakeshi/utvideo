@@ -305,19 +305,19 @@ bool CULYUV420Codec<C>::PredictDirect(uint32_t nBandIndex)
 			{
 			case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
 				PredictCylindricalLeftAndCount8(y, pRawBegin[0], pRawEnd[0], m_counts[nBandIndex].dwCount[0]);
-				cpp_ConvertPackedUVToPlanar_PredictCylindricalLeftAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+				ConvertPackedUVToPlanar_PredictCylindricalLeftAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 				return true;
 			case EC_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
 				if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE)
 					return false;
 				PredictPlanarGradientAndCount8(y, pRawBegin[0], pRawEnd[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
-				cpp_ConvertPackedUVToPlanar_PredictPlanarGradientAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+				ConvertPackedUVToPlanar_PredictPlanarGradientAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 				return true;
 			case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
 				if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE)
 					return false;
 				PredictCylindricalWrongMedianAndCount8(y, pRawBegin[0], pRawEnd[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
-				cpp_ConvertPackedUVToPlanar_PredictCylindricalWrongMedianAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+				ConvertPackedUVToPlanar_PredictCylindricalWrongMedianAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
 				return true;
 			}
 		}
@@ -422,19 +422,19 @@ bool CULYUV420Codec<C>::RestoreDirect(uint32_t nBandIndex)
 			case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
 			case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
 				RestoreCylindricalLeft8(pRawBegin[0], y, y + (pRawEnd[0] - pRawBegin[0]));
-				cpp_ConvertPlanarToPackedUV_RestoreCylindricalLeft(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
+				ConvertPlanarToPackedUV_RestoreCylindricalLeft(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
 				return true;
 			case FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
 				if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
 					return false;
 				RestorePlanarGradient8(pRawBegin[0], y, y + (pRawEnd[0] - pRawBegin[0]), m_fmRaw.scbLineStride[0]);
-				cpp_ConvertPlanarToPackedUV_RestorePlanarGradient(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
+				ConvertPlanarToPackedUV_RestorePlanarGradient(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
 				return true;
 			case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
 				if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
 					return false;
 				RestoreCylindricalWrongMedian8(pRawBegin[0], y, y + (pRawEnd[0] - pRawBegin[0]), m_fmRaw.scbLineStride[0]);
-				cpp_ConvertPlanarToPackedUV_RestoreCylindricalWrongMedian(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
+				ConvertPlanarToPackedUV_RestoreCylindricalWrongMedian(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
 				return true;
 			}
 		}

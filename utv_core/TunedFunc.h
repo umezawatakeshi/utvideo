@@ -174,6 +174,12 @@ struct TUNEDFUNC_CONVERT_PREDICT
 	void (*pfnConvertULY2ToUYVY_RestorePlanarGradient)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertULY2ToYUYV_RestoreCylindricalWrongMedian)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertULY2ToUYVY_RestoreCylindricalWrongMedian)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertPackedUVToPlanar_PredictCylindricalLeftAndCount)(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][256], uint32_t pVCountTable[][256]);
+	void (*pfnConvertPackedUVToPlanar_PredictPlanarGradientAndCount)(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][256], uint32_t pVCountTable[][256]);
+	void (*pfnConvertPackedUVToPlanar_PredictCylindricalWrongMedianAndCount)(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][256], uint32_t pVCountTable[][256]);
+	void (*pfnConvertPlanarToPackedUV_RestoreCylindricalLeft)(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertPlanarToPackedUV_RestorePlanarGradient)(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride);
+	void (*pfnConvertPlanarToPackedUV_RestoreCylindricalWrongMedian)(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride);
 	void (*pfnConvertB64aToUQRG_PredictCylindricalLeftAndCount)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
 	void (*pfnConvertB64aToUQRA_PredictCylindricalLeftAndCount)(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024]);
 	void (*pfnConvertUQRGToB64a_RestoreCylindricalLeft)(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
@@ -377,6 +383,12 @@ public:
 #define ConvertULY2ToUYVY_RestorePlanarGradient tfn.pConvertPredict->pfnConvertULY2ToUYVY_RestorePlanarGradient
 #define ConvertULY2ToYUYV_RestoreCylindricalWrongMedian tfn.pConvertPredict->pfnConvertULY2ToYUYV_RestoreCylindricalWrongMedian
 #define ConvertULY2ToUYVY_RestoreCylindricalWrongMedian tfn.pConvertPredict->pfnConvertULY2ToUYVY_RestoreCylindricalWrongMedian
+#define ConvertPackedUVToPlanar_PredictCylindricalLeftAndCount tfn.pConvertPredict->pfnConvertPackedUVToPlanar_PredictCylindricalLeftAndCount
+#define ConvertPackedUVToPlanar_PredictPlanarGradientAndCount tfn.pConvertPredict->pfnConvertPackedUVToPlanar_PredictPlanarGradientAndCount
+#define ConvertPackedUVToPlanar_PredictCylindricalWrongMedianAndCount tfn.pConvertPredict->pfnConvertPackedUVToPlanar_PredictCylindricalWrongMedianAndCount
+#define ConvertPlanarToPackedUV_RestoreCylindricalLeft tfn.pConvertPredict->pfnConvertPlanarToPackedUV_RestoreCylindricalLeft
+#define ConvertPlanarToPackedUV_RestorePlanarGradient tfn.pConvertPredict->pfnConvertPlanarToPackedUV_RestorePlanarGradient
+#define ConvertPlanarToPackedUV_RestoreCylindricalWrongMedian tfn.pConvertPredict->pfnConvertPlanarToPackedUV_RestoreCylindricalWrongMedian
 #define ConvertB64aToUQRG_PredictCylindricalLeftAndCount tfn.pConvertPredict->pfnConvertB64aToUQRG_PredictCylindricalLeftAndCount
 #define ConvertB64aToUQRA_PredictCylindricalLeftAndCount tfn.pConvertPredict->pfnConvertB64aToUQRA_PredictCylindricalLeftAndCount
 #define ConvertUQRGToB64a_RestoreCylindricalLeft tfn.pConvertPredict->pfnConvertUQRGToB64a_RestoreCylindricalLeft
