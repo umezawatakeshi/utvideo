@@ -17,6 +17,7 @@ extern const vector<vector<LONG>> vecSupportedWidth;
 extern const vector<vector<LONG>> vecSupportedHeight;
 extern const vector<vector<LONG>> vecUnsupportedWidth;
 extern const vector<vector<LONG>> vecUnsupportedHeight;
+extern const vector<tuple<DWORD, DWORD, DWORD, LONG, LONG>> vecUnsupportedCombination;
 extern const vector<BOOL> vecTemporalCompressionSupported; // vector<bool> ‚¾‚ÆƒNƒ\‚È“ÁŽê‰»‚ªŽg‚í‚ê‚Ä‚µ‚Ü‚¤
 
 #define TEST_WIDTH ((LONG)1920)

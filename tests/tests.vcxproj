@@ -197,6 +197,7 @@
     <ClCompile Include="test_vcm_encode.cpp" />
     <ClCompile Include="test_vcm_ICCompressQuery.cpp" />
     <ClCompile Include="test_vcm_ICDecompressGetFormat.cpp" />
+    <ClCompile Include="test_vcm_ICDecompressQuery.cpp" />
     <ClCompile Include="test_vcm_ICGetStateSize.cpp" />
     <ClCompile Include="test_vcm_ICInfo.cpp" />
     <ClCompile Include="test_vcm_ICCompressGetFormat.cpp" />

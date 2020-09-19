@@ -219,6 +219,16 @@ const vector<vector<LONG>> vecUnsupportedHeight = {
 	{ -1080, 0 },
 };
 
+/*
+ * 本来なら vecTopPriorityRawFcc を使うことで fccPrimary を得たいが、
+ * vec の中身が DWORD, DWORD, tuple<DWORD, LONG, LONG> だと
+ * zip した後に expand する際にうまく処理できなかった（テンプレート力不足）
+ */
+const vector<tuple<DWORD, DWORD, DWORD, LONG, LONG>> vecUnsupportedCombination = {
+	{FCC('ULY0'), FCC('YV12'), FCC('NV12'), 1922, 1080},
+	{FCC('ULH0'), FCC('YV12'), FCC('NV12'), 1922, 1080},
+};
+
 const vector<DWORD> vecTopPriorityRawFcc = {
 	24,
 	32,

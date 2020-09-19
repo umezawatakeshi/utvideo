@@ -92,3 +92,9 @@ BOOST_DATA_TEST_CASE(vcm_ICCompressQuery_anyout_biHeight_ng, expand(data::make(v
 {
 	vcm_ICCompressQuery_anyout_ng(fccCodec, fccRaw, TEST_WIDTH, height);
 }
+
+BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder"))
+BOOST_DATA_TEST_CASE(vcm_ICCompressQuery_anyout_combination_ng, data::make(vecUnsupportedCombination), fccCodec, fccPrimary /* notused */, fccRaw, width, height)
+{
+	vcm_ICCompressQuery_anyout_ng(fccCodec, fccRaw, width, height);
+}
