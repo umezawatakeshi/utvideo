@@ -32,6 +32,11 @@ struct VECTOR_YUV422
 	T y0, y1, u, v;
 };
 
+template<typename T>
+struct VECTOR_UV
+{
+	T u, v;
+};
 
 template<typename T>
 struct VECTOR2

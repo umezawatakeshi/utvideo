@@ -825,6 +825,67 @@ template void tuned_ConvertULRAToRGBA<CODEFEATURE_AVX2, CARGBColorOrder>(uint8_t
 
 //
 
+template<int F, typename VT, typename std::enable_if_t<std::is_same_v<VT, __m128i>>*& = enabler>
+static inline FORCEINLINE VECTOR_UV<VT>  VECTORCALL tuned_ConvertPackedUVToPlanarElement(__m128i m0, __m128i m1)
+{
+	__m128i ctl = _mm_set_epi8(15, 13, 11, 9, 7, 5, 3, 1, 14, 12, 10, 8, 6, 4, 2, 0);
+
+	m0 = _mm_shuffle_epi8(m0, ctl);
+	m1 = _mm_shuffle_epi8(m1, ctl);
+
+	__m128i uu = _mm_unpacklo_epi64(m0, m1);
+	__m128i vv = _mm_unpackhi_epi64(m0, m1);
+
+	return { uu, vv };
+}
+
+template<int F, typename VT>
+static inline FORCEINLINE VECTOR_UV<VT> tuned_ConvertPackedUVToPlanarElement(const uint8_t* pp)
+{
+	return tuned_ConvertPackedUVToPlanarElement<F, VT>(
+		_mmt_loadu<VT>(pp),
+		_mmt_loadu<VT>(pp + sizeof(VT))
+	);
+}
+
+template<int F, typename VT>
+static inline FORCEINLINE VECTOR_UV<VT> tuned_ConvertPackedUVToPlanarElement(const uint8_t* pp, ssize_t scbStride)
+{
+	return tuned_ConvertPackedUVToPlanarElement<F, VT>(
+		_mmt_sub_epi8<VT>(_mmt_loadu<VT>(pp), _mmt_loadu<VT>(pp - scbStride)),
+		_mmt_sub_epi8<VT>(_mmt_loadu<VT>(pp + sizeof(VT)), _mmt_loadu<VT>(pp - scbStride + sizeof(VT)))
+	);
+}
+
+//
+
+template<int F, typename VT, typename std::enable_if_t<std::is_same_v<VT, __m128i>>*& = enabler>
+static inline FORCEINLINE VECTOR2<__m128i> VECTORCALL tuned_ConvertPlanarToPackedUVElement(__m128i uu, __m128i vv)
+{
+	return {
+		_mm_unpacklo_epi8(uu, vv),
+		_mm_unpackhi_epi8(uu, vv)
+	};
+}
+
+template<int F, typename VT>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarToPackedUVElement(uint8_t* pp, VT uu, VT vv)
+{
+	auto result = tuned_ConvertPlanarToPackedUVElement<F, VT>(uu, vv);
+	_mmt_storeu<VT>(pp, result.v0);
+	_mmt_storeu<VT>(pp + sizeof(VT), result.v1);
+}
+
+template<int F, typename VT>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarToPackedUVElement(uint8_t* pp, VT uu, VT vv, ssize_t scbStride)
+{
+	auto result = tuned_ConvertPlanarToPackedUVElement<F, VT>(uu, vv);
+	_mmt_storeu<VT>(pp, _mmt_add_epi8<VT>(result.v0, _mmt_loadu<VT>(pp - scbStride)));
+	_mmt_storeu<VT>(pp + sizeof(VT), _mmt_add_epi8<VT>(result.v1, _mmt_loadu<VT>(pp - scbStride + sizeof(VT))));
+}
+
+//
+
 template<VALUERANGE VR> static inline FORCEINLINE __m128i _mm_Convert16To10(__m128i x);
 template<VALUERANGE VR> static inline FORCEINLINE __m128i _mm_Convert10To16(__m128i x);
 
