@@ -9,6 +9,8 @@ struct FRAME_METRIC
 	int nPlanes;
 	int nMacroPixelWidth;
 	int nMacroPixelHeight;
+	int nWidthStep;
+	int nHeightStep;
 	int nStripes;
 	size_t cbTotalSize;
 	int nLines[4];

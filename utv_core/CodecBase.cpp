@@ -243,6 +243,8 @@ int CalcRawFrameMetric(FRAME_METRIC* pfm, utvf_t rawfmt, unsigned int width, uns
 {
 	bool bBottomUp;
 
+	memset(pfm, 0, sizeof(FRAME_METRIC));
+
 	switch (rawfmt)
 	{
 	case UTVF_NFCC_BGR_BU:
@@ -326,6 +328,17 @@ int CalcRawFrameMetric(FRAME_METRIC* pfm, utvf_t rawfmt, unsigned int width, uns
 		pfm->nStripeLines[0] = 2;
 		pfm->nStripeLines[1] = 1;
 		pfm->nStripeLines[2] = 1;
+		break;
+
+	case UTVF_NV12:
+		pfm->nPlanes = 2;
+		pfm->nMacroPixelWidth = 2;
+		pfm->nMacroPixelHeight = 2;
+		pfm->nWidthStep = 4;
+		pfm->cbLineWidth[0] = width;
+		pfm->cbLineWidth[1] = width;
+		pfm->nStripeLines[0] = 2;
+		pfm->nStripeLines[1] = 1;
 		break;
 
 	case UTVF_P210:
@@ -419,6 +432,16 @@ int CalcRawFrameMetric(FRAME_METRIC* pfm, utvf_t rawfmt, unsigned int width, uns
 	default:
 		return -1;
 	}
+
+	if (pfm->nWidthStep == 0)
+		pfm->nWidthStep = pfm->nMacroPixelWidth;
+	if (pfm->nHeightStep == 0)
+		pfm->nHeightStep = pfm->nMacroPixelHeight;
+
+	if (width % pfm->nWidthStep != 0)
+		return -1;
+	if (height % pfm->nHeightStep != 0)
+		return -1;
 
 	for (int i = 0; i < pfm->nPlanes; ++i)
 	{
