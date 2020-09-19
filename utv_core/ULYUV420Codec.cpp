@@ -7,6 +7,8 @@
 #include "Predict.h"
 #include "TunedFunc.h"
 #include "ColorOrder.h"
+#include "Convert.h"
+#include "ConvertPredict.h"
 
 template<>
 const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfEncoderInput[] = {
@@ -294,6 +296,32 @@ bool CULYUV420Codec<C>::PredictDirect(uint32_t nBandIndex)
 			PredictFromPlanar(nBandIndex, pRawPlaneBegin);
 		}
 		return true;
+	case UTVF_NV12:
+		{
+			auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pPredicted.get(), nBandIndex);
+			auto& [y, u, v, _] = pPlaneBegin;
+
+			switch (m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
+			{
+			case EC_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+				PredictCylindricalLeftAndCount8(y, pRawBegin[0], pRawEnd[0], m_counts[nBandIndex].dwCount[0]);
+				cpp_ConvertPackedUVToPlanar_PredictCylindricalLeftAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+				return true;
+			case EC_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+				if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE)
+					return false;
+				PredictPlanarGradientAndCount8(y, pRawBegin[0], pRawEnd[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+				cpp_ConvertPackedUVToPlanar_PredictPlanarGradientAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+				return true;
+			case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+				if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE)
+					return false;
+				PredictCylindricalWrongMedianAndCount8(y, pRawBegin[0], pRawEnd[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+				cpp_ConvertPackedUVToPlanar_PredictCylindricalWrongMedianAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+				return true;
+			}
+		}
+		break;
 	case UTVF_YV16:
 		{
 			auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<true>(m_pCurFrame.get(), nBandIndex);
@@ -374,6 +402,79 @@ bool CULYUV420Codec<C>::DecodeDirect(uint32_t nBandIndex)
 			}
 		}
 		return true;
+	}
+
+	return false;
+}
+
+template<class C>
+bool CULYUV420Codec<C>::RestoreDirect(uint32_t nBandIndex)
+{
+	switch (m_utvfRaw)
+	{
+	case UTVF_NV12:
+		{
+			auto& [pRawBegin, pRawEnd, pPlaneBegin] = CalcBandPosition<false>(m_pPredicted.get(), nBandIndex);
+			auto& [y, u, v, _] = pPlaneBegin;
+
+			switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+			{
+			case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
+			case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+				RestoreCylindricalLeft8(pRawBegin[0], y, y + (pRawEnd[0] - pRawBegin[0]));
+				cpp_ConvertPlanarToPackedUV_RestoreCylindricalLeft(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
+				return true;
+			case FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+				if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+					return false;
+				RestorePlanarGradient8(pRawBegin[0], y, y + (pRawEnd[0] - pRawBegin[0]), m_fmRaw.scbLineStride[0]);
+				cpp_ConvertPlanarToPackedUV_RestorePlanarGradient(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
+				return true;
+			case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+				if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+					return false;
+				RestoreCylindricalWrongMedian8(pRawBegin[0], y, y + (pRawEnd[0] - pRawBegin[0]), m_fmRaw.scbLineStride[0]);
+				cpp_ConvertPlanarToPackedUV_RestoreCylindricalWrongMedian(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
+				return true;
+			}
+		}
+		break;
+	}
+
+	return false;
+}
+
+template<class C>
+bool CULYUV420Codec<C>::IsDirectRestorable()
+{
+	switch (m_fi.dwFlags0 & FI_FLAGS0_INTRAFRAME_PREDICT_MASK)
+	{
+	case FI_FLAGS0_INTRAFRAME_PREDICT_NONE:
+	case FI_FLAGS0_INTRAFRAME_PREDICT_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_NV12:
+			return true;
+		}
+		break;
+	case FI_FLAGS0_INTRAFRAME_PREDICT_GRADIENT:
+		if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_NV12:
+			return true;
+		}
+		break;
+	case FI_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
+		if (m_ed.flags0 & BIE_FLAGS0_ASSUME_INTERLACE)
+			return false;
+		switch (m_utvfRaw)
+		{
+		case UTVF_NV12:
+			return true;
+		}
+		break;
 	}
 
 	return false;

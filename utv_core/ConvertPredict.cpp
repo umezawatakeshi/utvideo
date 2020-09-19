@@ -640,6 +640,184 @@ template void cpp_ConvertULY2ToPackedYUV422_RestoreCylindricalWrongMedian<CUYVYC
 
 //
 
+template<PREDICTION_TYPE Pred>
+static inline void cpp_ConvertPackedUVToPlanar_PredictAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][256], uint32_t pVCountTable[][256])
+{
+	uint8_t uprev = 0x80;
+	uint8_t vprev = 0x80;
+
+	auto u = pUBegin;
+	auto v = pVBegin;
+
+	for (auto p = pSrcBegin; p != (Pred != CYLINDRICAL_LEFT ? pSrcBegin + scbStride : pSrcEnd); p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp < p + cbWidth; pp += 2, ++u, ++v)
+		{
+			auto uu = pp[0];
+			*u = uu - uprev;
+			++pUCountTable[0][*u];
+			uprev = uu;
+			auto vv = pp[1];
+			*v = vv - vprev;
+			++pVCountTable[0][*v];
+			vprev = vv;
+		}
+	}
+
+	if (Pred == PLANAR_GRADIENT) for (auto p = pSrcBegin + scbStride; p != pSrcEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		uprev = 0;
+		vprev = 0;
+
+		for (; pp < p + cbWidth; pp += 2, ++u, ++v)
+		{
+			auto uu = pp[0] - (pp - scbStride)[0];
+			*u = uu - uprev;
+			++pUCountTable[0][*u];
+			uprev = uu;
+			auto vv = pp[1] - (pp - scbStride)[1];
+			*v = vv - vprev;
+			++pVCountTable[0][*v];
+			vprev = vv;
+		}
+	}
+
+	uprev = 0;
+	vprev = 0;
+
+	uint8_t utopprev = 0;
+	uint8_t vtopprev = 0;
+
+	if (Pred == CYLINDRICAL_WRONG_MEDIAN) for (auto p = pSrcBegin + scbStride; p != pSrcEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp < p + cbWidth; pp += 2, ++u, ++v)
+		{
+			auto uu = pp[0];
+			auto utop = (pp - scbStride)[0];
+			*u = uu - median<uint8_t>(uprev, utop, uprev + utop - utopprev);
+			++pUCountTable[0][*u];
+			uprev = uu;
+			utopprev = utop;
+			auto vv = pp[1];
+			auto vtop = (pp - scbStride)[1];
+			*v = vv - median<uint8_t>(vprev, vtop, vprev + vtop - vtopprev);
+			++pVCountTable[0][*v];
+			vprev = vv;
+			vtopprev = vtop;
+		}
+	}
+}
+
+void cpp_ConvertPackedUVToPlanar_PredictCylindricalLeftAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][256], uint32_t pVCountTable[][256])
+{
+	cpp_ConvertPackedUVToPlanar_PredictAndCount<CYLINDRICAL_LEFT>(pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pUCountTable, pVCountTable);
+}
+
+void cpp_ConvertPackedUVToPlanar_PredictPlanarGradientAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][256], uint32_t pVCountTable[][256])
+{
+	cpp_ConvertPackedUVToPlanar_PredictAndCount<PLANAR_GRADIENT>(pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pUCountTable, pVCountTable);
+}
+
+void cpp_ConvertPackedUVToPlanar_PredictCylindricalWrongMedianAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][256], uint32_t pVCountTable[][256])
+{
+	cpp_ConvertPackedUVToPlanar_PredictAndCount<CYLINDRICAL_WRONG_MEDIAN>(pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pUCountTable, pVCountTable);
+}
+
+//
+
+template<PREDICTION_TYPE Pred>
+static inline void cpp_ConvertPlanarToPackedUV_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	uint8_t uprev = 0x80;
+	uint8_t vprev = 0x80;
+
+	auto u = pUBegin;
+	auto v = pVBegin;
+
+	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp < p + cbWidth; pp += 2)
+		{
+			pp[0] = uprev += *u;
+			pp[1] = vprev += *v;
+
+			++u;
+			++v;
+		}
+	}
+
+	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		uprev = 0;
+		vprev = 0;
+
+		for (; pp < p + cbWidth; pp += 2)
+		{
+			pp[0] = (uprev += *u) + (pp - scbStride)[0];
+			pp[1] = (vprev += *v) + (pp - scbStride)[1];
+
+			++u;
+			++v;
+		}
+	}
+
+	uprev = 0;
+	vprev = 0;
+
+	uint8_t utopprev = 0;
+	uint8_t vtopprev = 0;
+
+	if (Pred == CYLINDRICAL_WRONG_MEDIAN) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+
+		for (; pp < p + cbWidth; pp += 2)
+		{
+			uint8_t utop = (pp - scbStride)[0];
+			uint8_t uu = *u + median<uint8_t>(uprev, utop, uprev + utop - utopprev);
+			pp[0] = uu;
+			uint8_t vtop = (pp - scbStride)[1];
+			uint8_t vv = *v + median<uint8_t>(vprev, vtop, vprev + vtop - vtopprev);
+			pp[1] = vv;
+
+			uprev = uu;
+			utopprev = utop;
+			vprev = vv;
+			vtopprev = vtop;
+
+			++u;
+			++v;
+		}
+	}
+}
+
+void cpp_ConvertPlanarToPackedUV_RestoreCylindricalLeft(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	cpp_ConvertPlanarToPackedUV_Restore<CYLINDRICAL_LEFT>(pDstBegin, pDstEnd, pUBegin, pVBegin, cbWidth, scbStride);
+}
+
+void cpp_ConvertPlanarToPackedUV_RestorePlanarGradient(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	cpp_ConvertPlanarToPackedUV_Restore<PLANAR_GRADIENT>(pDstBegin, pDstEnd, pUBegin, pVBegin, cbWidth, scbStride);
+}
+
+void cpp_ConvertPlanarToPackedUV_RestoreCylindricalWrongMedian(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	cpp_ConvertPlanarToPackedUV_Restore<CYLINDRICAL_WRONG_MEDIAN>(pDstBegin, pDstEnd, pUBegin, pVBegin, cbWidth, scbStride);
+}
+
+//
+
 template<bool A>
 static inline void cpp_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024])
 {
