@@ -60,7 +60,12 @@ template CBandParallelCodec::PLANE_POSITION<false> CBandParallelCodec::CalcPlane
 
 int CBandParallelCodec::CalcFrameMetric(utvf_t rawfmt, unsigned int width, unsigned int height, size_t* cbGrossWidth)
 {
-	CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
+	int ret;
+
+	ret = CalcRawFrameMetric(rawfmt, width, height, cbGrossWidth);
+	if (ret != 0)
+		return ret;
+
 	CalcPlaneSizes(width, height);
 
 	m_dwNumStripes = height / GetMacroPixelHeight();
