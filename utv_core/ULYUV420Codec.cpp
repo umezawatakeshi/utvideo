@@ -11,6 +11,7 @@
 template<>
 const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfEncoderInput[] = {
 	UTVF_YV12,
+	UTVF_NV12,
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
 	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
 	UTVF_YV16,
@@ -26,6 +27,7 @@ const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfEncoderInput[] = {
 template<>
 const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfDecoderOutput[] = {
 	UTVF_YV12,
+	UTVF_NV12,
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
 	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
 	UTVF_YV16,
@@ -41,6 +43,7 @@ const utvf_t CULYUV420Codec<CBT601Coefficient>::m_utvfDecoderOutput[] = {
 template<>
 const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfEncoderInput[] = {
 	UTVF_YV12,
+	UTVF_NV12,
 	UTVF_HDYC,
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
 	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
@@ -57,6 +60,7 @@ const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfEncoderInput[] = {
 template<>
 const utvf_t CULYUV420Codec<CBT709Coefficient>::m_utvfDecoderOutput[] = {
 	UTVF_YV12,
+	UTVF_NV12,
 	UTVF_HDYC,
 	UTVF_YUY2, UTVF_YUYV, UTVF_YUNV, UTVF_yuvs,
 	UTVF_UYVY, UTVF_UYNV, UTVF_2vuy,
@@ -158,6 +162,16 @@ void CULYUV420Codec<C>::ConvertToPlanar(uint32_t nBandIndex)
 
 	switch (m_utvfRaw)
 	{
+	case UTVF_NV12:
+		{
+			memcpy(y, pRawBegin[0], pRawEnd[0] - pRawBegin[0]);
+			for (auto p = pRawBegin[1]; p < pRawEnd[1]; p += 2)
+			{
+				*u++ = p[0];
+				*v++ = p[1];
+			}
+		}
+		break;
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
@@ -229,6 +243,16 @@ void CULYUV420Codec<C>::ConvertFromPlanar(uint32_t nBandIndex)
 
 	switch (m_utvfRaw)
 	{
+	case UTVF_NV12:
+	{
+		memcpy(pRawBegin[0], y, pRawEnd[0] - pRawBegin[0]);
+		for (auto p = pRawBegin[1]; p < pRawEnd[1]; p += 2)
+		{
+			p[0] = *u++;
+			p[1] = *v++;
+		}
+	}
+	break;
 	case UTVF_YUY2:
 	case UTVF_YUYV:
 	case UTVF_YUNV:
