@@ -187,7 +187,17 @@ int CCodecBase::EncodeQuery(utvf_t infmt, unsigned int width, unsigned int heigh
 {
 	LOGPRINTF("%p CCodecBase::EncodeQuery(infmt=%08X, width=%u, height=%u)", this, infmt, width, height);
 
-	int ret = InternalEncodeQuery(infmt, width, height);
+	int ret;
+	size_t cbGrossWidth[4] = { CBGROSSWIDTH_NATURAL, CBGROSSWIDTH_NATURAL, CBGROSSWIDTH_NATURAL, CBGROSSWIDTH_NATURAL };
+	FRAME_METRIC fm;
+
+	ret = ::CalcRawFrameMetric(&fm, infmt, width, height, cbGrossWidth);
+	if (ret != 0)
+		goto bail;
+
+	ret = InternalEncodeQuery(infmt, width, height);
+
+bail:
 	LOGPRINTF("%p CCodecBase::EncodeQuery return %d", this, ret);
 	return ret;
 }
@@ -234,7 +244,20 @@ int CCodecBase::DecodeQuery(utvf_t outfmt, unsigned int width, unsigned int heig
 		LOGPRINTF("%p CCodecBase::DecodeQuery(outfmt=%08X, width=%u, height=%u, pExtraData=%s, cbExtraData=%" PRIuSZT ")", this, outfmt, width, height, buf, cbExtraData);
 	}
 
-	int ret = InternalDecodeQuery(outfmt, width, height, pExtraData, cbExtraData);
+	int ret;
+	size_t cbGrossWidth[4] = { CBGROSSWIDTH_NATURAL, CBGROSSWIDTH_NATURAL, CBGROSSWIDTH_NATURAL, CBGROSSWIDTH_NATURAL };
+	FRAME_METRIC fm;
+
+	if (outfmt)
+	{
+		ret = ::CalcRawFrameMetric(&fm, outfmt, width, height, cbGrossWidth);
+		if (ret != 0)
+			goto bail;
+	}
+
+	ret = InternalDecodeQuery(outfmt, width, height, pExtraData, cbExtraData);
+
+bail:
 	LOGPRINTF("%p CCodecBase::DecodeQuery return %d", this, ret);
 	return ret;
 }
