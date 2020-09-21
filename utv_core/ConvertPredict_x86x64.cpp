@@ -1742,16 +1742,16 @@ static inline void tuned_ConvertUQRXToB64a_RestoreCylindricalLeft(uint8_t *pDstB
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
 			__m128i gg = _mm_loadu_si128((const __m128i *)g);
-			auto gvalue = tuned_RestoreLeft10Element<F>(gprev, gg);
+			auto gvalue = tuned_RestoreLeft10Element<F, false>(gprev, gg);
 			__m128i bb = _mm_loadu_si128((const __m128i *)b);
-			auto bvalue = tuned_RestoreLeft10Element<F>(bprev, bb);
+			auto bvalue = tuned_RestoreLeft10Element<F, false>(bprev, bb);
 			__m128i rr = _mm_loadu_si128((const __m128i *)r);
-			auto rvalue = tuned_RestoreLeft10Element<F>(rprev, rr);
+			auto rvalue = tuned_RestoreLeft10Element<F, false>(rprev, rr);
 			__m128i avalue_v0;
 			if (A)
 			{
 				__m128i aa = _mm_loadu_si128((const __m128i *)a);
-				auto avalue = tuned_RestoreLeft10Element<F>(aprev, aa);
+				auto avalue = tuned_RestoreLeft10Element<F, false>(aprev, aa);
 				aprev = avalue.v1;
 				avalue_v0 = avalue.v0;
 			}
