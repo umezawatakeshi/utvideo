@@ -5,10 +5,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" type="text/css" href="style.css">
-<title>Ut Video Codec Suite 22.0.0 readme （日本語）</title>
+<title>Ut Video Codec Suite 22.1.0 readme （日本語）</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 22.0.0 readme （日本語）</h1>
+<h1>Ut Video Codec Suite 22.1.0 readme （日本語）</h1>
 <hr>
 <h2 id="copyright_notice">著作権表示</h2>
 <h3>英語</h3>
@@ -95,12 +95,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <tr><td>UMY4</td><td>UtVideo T2 YUV444 BT.601</td></tr>
 <tr><td>ULY2</td><td>UtVideo YUV422 BT.601</td><td rowspan="2">YCbCr (BT.601) 4:2:2 8bit リミテッド</td><td rowspan="2"><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td></tr>
 <tr><td>UMY2</td><td>UtVideo T2 YUV422 BT.601</td></tr>
-<tr><td>ULY0</td><td>UtVideo YUV420 BT.601</td><td>YCbCr (BT.601) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td></tr>
+<tr><td>ULY0</td><td>UtVideo YUV420 BT.601</td><td>YCbCr (BT.601) 4:2:0 8bit リミテッド</td><td><strong>YV12<br>NV12<sup>*1</sup></strong><br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td></tr>
 <tr><td>ULH4</td><td>UtVideo YUV444 BT.709</td><td rowspan="2">YCbCr (BT.709) 4:4:4 8bit リミテッド</td><td rowspan="2"><strong>YV24</strong><br>RGB24<br>RGB32</td></tr>
 <tr><td>UMH4</td><td>UtVideo T2 YUV444 BT.709</td></tr>
 <tr><td>ULH2</td><td>UtVideo YUV422 BT.709</td><td rowspan="2">YCbCr (BT.709) 4:2:2 8bit リミテッド</td><td rowspan="2"><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td></tr>
 <tr><td>UMH2</td><td>UtVideo T2 YUV422 BT.709</td></tr>
-<tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit リミテッド</td><td><strong>YV12</strong><br>HDYC<br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td></tr>
+<tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit リミテッド</td><td><strong>YV12<br>NV12<sup>*1</sup></strong><br>HDYC<br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td></tr>
 <tr><td>UQRA</td><td>UtVideo Pro RGBA 10bit</td><td>RGBA 4:4:4:4 10bit フルレンジ</td><td>b64a</td></tr>
 <tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit フルレンジ</td><td><strong>r210</strong><br>b48r<br>b64a</td></tr>
 <tr><td>UQY2</td><td>UtVideo Pro YUV422 10bit</td><td>YCbCr 4:2:2 10bit リミテッド</td><td><strong>P210</strong><br>P216<br>YUV422P16<br><strong>v210</strong></td></tr>
@@ -109,12 +109,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <ul>
 <li><strong>太字</strong>はネイティブな（=色空間の変換が発生しない）フォーマットです。可能な限りこのフォーマットで入出力することが推奨されます。</li>
 <li>カッコ内は、その前に書いてあるものと FourCC が異なるだけで中身が同じフォーマットです。例えば、YUY2 と YUYV と YUNV は中身が同じフォーマットです。</li>
+<li>*1 NV12 は幅が4の倍数である必要があります。</li>
 </ul>
 <h2 id="donations">寄付について</h2>
 <p>Ut Video Codec Suite はフリーソフトウェアです。開発を支援するための寄付は常に歓迎しております。詳細は作者のblogの<a href="http://umezawa.dyndns.info/wordpress/?page_id=1565">「寄付について」ページ</a>をご覧ください。</p>
 <h2 id="nicovideo">ニコニコ動画のコンテンツツリーについて</h2>
 <p>ニコニコ動画において、コンテンツツリーの親作品として指定するために、<a href="http://seiga.nicovideo.jp/seiga/im1922939">静画</a>を投稿してあります（2012年4月2日に再投稿しました）。Ut Video Codec Suite を使用して作成された動画を投稿の際は、親作品として指定していただけると励みになります。</p>
 <h2 id="history">改版履歴</h2>
+<h3>バージョン 22.1.0</h3>
+<dl>
+<dt>機能追加</dt><dd><ul>
+<li>ULY0, ULH0: NV12 での入出力を追加した。</li>
+</ul></dd>
+<dt>性能向上</dt><dd><ul>
+<li>RGB32/RGBA, YUY2/UYVY へのネイティブな内部保持形式からのデコードを若干高速化した。</li>
+</ul></dd>
+</dl>
 <h3>バージョン 22.0.0</h3>
 <dl>
 <dt>機能追加</dt><dd><ul>
