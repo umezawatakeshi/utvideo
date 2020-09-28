@@ -1266,6 +1266,7 @@ template<int F, typename VT, bool NeedOffset, typename std::enable_if_t<std::is_
 static inline FORCEINLINE VECTOR2<__m128i> VECTORCALL tuned_ConvertPlanarRGBXToR210Element10(__m128i gg, __m128i bb, __m128i rr)
 {
 	__m128i ggtmp = NeedOffset ? _mm_add_epi16(gg, _mm_set1_epi16(0x200)) : gg;
+	gg = _mm_and_si128(gg, _mm_set1_epi16(0x3ff));
 	bb = _mm_and_si128(_mm_add_epi16(bb, ggtmp), _mm_set1_epi16(0x3ff));
 	rr = _mm_and_si128(_mm_add_epi16(rr, ggtmp), _mm_set1_epi16(0x3ff));
 	rr = _mm_slli_epi16(rr, 4);

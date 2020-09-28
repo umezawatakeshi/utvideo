@@ -1608,8 +1608,8 @@ template void tuned_ConvertPlanarToPackedUV_RestoreCylindricalWrongMedian<CODEFE
 
 //
 
-template<int F, bool A>
-static inline void tuned_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024])
+template<int F, bool A, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertB64aToUQRX_PredictAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024])
 {
 	uint16_t gprevb = 0x200;
 	uint16_t bprevb = 0;
@@ -1621,9 +1621,14 @@ static inline void tuned_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_
 	uint16_t *b = (uint16_t *)pBBegin;
 	uint16_t *a = (uint16_t *)pABegin;
 
-	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride)
+	uint16_t* topbuf = NULL;
+	if (Pred != CYLINDRICAL_LEFT)
+		topbuf = (uint16_t*)_aligned_malloc(A ? cbWidth : cbWidth / 4 * 3, 16);
+
+	for (auto p = pSrcBegin; p != (Pred != CYLINDRICAL_LEFT ? pSrcBegin + scbStride : pSrcEnd); p += scbStride)
 	{
 		auto pp = p;
+		auto tt = topbuf;
 
 		__m128i gprev = _mm_slli_si128(_mm_cvtsi32_si128(gprevb), 14);
 		__m128i bprev = _mm_slli_si128(_mm_cvtsi32_si128(bprevb), 14);
@@ -1640,6 +1645,15 @@ static inline void tuned_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_
 			_mm_storeu_si128((__m128i *)r, tuned_PredictLeftAndCount10Element<F, true, 4, 3>(rprev, planar.r, pRCountTable));
 			if (A)
 				_mm_storeu_si128((__m128i *)a, tuned_PredictLeftAndCount10Element<F, true, 4, 1>(aprev, planar.a, pACountTable));
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				_mm_store_si128((__m128i*)tt, planar.g);
+				_mm_store_si128((__m128i*)(tt + 8), planar.b);
+				_mm_store_si128((__m128i*)(tt + 16), planar.r);
+				if (A)
+					_mm_store_si128((__m128i*)(tt + 24), planar.a);
+				tt += A ? 32 : 24;
+			}
 
 			bprev = planar.b;
 			gprev = planar.g;
@@ -1663,12 +1677,19 @@ static inline void tuned_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_
 		for (; pp < p + cbWidth; pp += 8)
 		{
 			uint16_t gg = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[2]));
+			uint16_t bb = Convert16To10Fullrange(btoh16(((uint16_t*)pp)[3])) - gg;
+			uint16_t rr = Convert16To10Fullrange(btoh16(((uint16_t*)pp)[1])) - gg;
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				tt[0] = gg;
+				tt[1] = bb;
+				tt[2] = rr;
+			}
+
 			*g = (gg - gprevb) & 0x3ff;
 			++pGCountTable[0][*g];
-			uint16_t bb = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[3])) - gg;
 			*b = (bb - bprevb) & 0x3ff;
 			++pBCountTable[0][*b];
-			uint16_t rr = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[1])) - gg;
 			*r = (rr - rprevb) & 0x3ff;
 			++pRCountTable[0][*r];
 
@@ -1677,10 +1698,14 @@ static inline void tuned_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_
 			rprevb = rr;
 			if (A) {
 				uint16_t aa = Convert16To10Fullrange(btoh16(((uint16_t *)pp)[0]));
+				if (Pred != CYLINDRICAL_LEFT)
+					tt[3] = aa;
 				*a = (aa - aprevb) & 0x3ff;
 				++pACountTable[0][*a];
 				aprevb = aa;
 			}
+			if (Pred != CYLINDRICAL_LEFT)
+				tt += A ? 4 : 3;
 
 			b += 1;
 			g += 1;
@@ -1689,34 +1714,160 @@ static inline void tuned_ConvertB64aToUQRX_PredictCylindricalLeftAndCount(uint8_
 				a += 1;
 		}
 	}
+
+	if (Pred == PLANAR_GRADIENT) for (auto p = pSrcBegin + scbStride; p != pSrcEnd; p += scbStride)
+	{
+		auto pp = p;
+		auto tt = topbuf;
+
+		__m128i gprev = _mm_setzero_si128();
+		__m128i bprev = _mm_setzero_si128();
+		__m128i rprev = _mm_setzero_si128();
+		__m128i aprev;
+		if (A)
+			aprev = _mm_slli_si128(_mm_cvtsi32_si128(aprevb), 14);
+
+		for (; pp <= p + cbWidth - 64; pp += 64)
+		{
+			auto planar = tuned_ConvertB64aToPlanarElement10<F, __m128i, false>(pp);
+			auto memo = planar;
+			planar.g = _mm_sub_epi16(planar.g, _mm_load_si128((const __m128i*)tt));
+			planar.b = _mm_sub_epi16(planar.b, _mm_load_si128((const __m128i*)(tt + 8)));
+			planar.r = _mm_sub_epi16(planar.r, _mm_load_si128((const __m128i*)(tt + 16)));
+			_mm_storeu_si128((__m128i*)g, tuned_PredictLeftAndCount10Element<F, true, A ? 4 : 2, 0>(gprev, planar.g, pGCountTable));
+			_mm_storeu_si128((__m128i*)b, tuned_PredictLeftAndCount10Element<F, true, 4, 2>(bprev, planar.b, pBCountTable));
+			_mm_storeu_si128((__m128i*)r, tuned_PredictLeftAndCount10Element<F, true, 4, 3>(rprev, planar.r, pRCountTable));
+			if (A)
+			{
+				planar.a = _mm_sub_epi16(planar.a, _mm_load_si128((const __m128i*)(tt + 24)));
+				_mm_storeu_si128((__m128i*)a, tuned_PredictLeftAndCount10Element<F, true, 4, 1>(aprev, planar.a, pACountTable));
+			}
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				_mm_store_si128((__m128i*)tt, memo.g);
+				_mm_store_si128((__m128i*)(tt + 8), memo.b);
+				_mm_store_si128((__m128i*)(tt + 16), memo.r);
+				if (A)
+					_mm_store_si128((__m128i*)(tt + 24), memo.a);
+				tt += A ? 32 : 24;
+			}
+
+			bprev = planar.b;
+			gprev = planar.g;
+			rprev = planar.r;
+			if (A)
+				aprev = planar.a;
+
+			b += 8;
+			g += 8;
+			r += 8;
+			if (A)
+				a += 8;
+		}
+
+		gprevb = _mm_cvtsi128_si32(_mm_srli_si128(gprev, 14));
+		bprevb = _mm_cvtsi128_si32(_mm_srli_si128(bprev, 14));
+		rprevb = _mm_cvtsi128_si32(_mm_srli_si128(rprev, 14));
+		if (A)
+			aprevb = _mm_cvtsi128_si32(_mm_srli_si128(aprev, 14));
+
+		for (; pp < p + cbWidth; pp += 8)
+		{
+			uint16_t gg = Convert16To10Fullrange(btoh16(((uint16_t*)pp)[2]));
+			uint16_t bb = Convert16To10Fullrange(btoh16(((uint16_t*)pp)[3])) - gg;
+			uint16_t rr = Convert16To10Fullrange(btoh16(((uint16_t*)pp)[1])) - gg;
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				auto gmemo = gg;
+				gg -= tt[0];
+				tt[0] = gmemo;
+				auto bmemo = bb;
+				bb -= tt[1];
+				tt[1] = bmemo;
+				auto rmemo = rr;
+				rr -= tt[2];
+				tt[2] = rmemo;
+			}
+
+			*g = (gg - gprevb) & 0x3ff;
+			++pGCountTable[0][*g];
+			*b = (bb - bprevb) & 0x3ff;
+			++pBCountTable[0][*b];
+			*r = (rr - rprevb) & 0x3ff;
+			++pRCountTable[0][*r];
+
+			gprevb = gg;
+			bprevb = bb;
+			rprevb = rr;
+			if (A) {
+				uint16_t aa = Convert16To10Fullrange(btoh16(((uint16_t*)pp)[0]));
+				if (Pred != CYLINDRICAL_LEFT)
+				{
+					auto amemo = aa;
+					aa -= tt[3];
+					tt[3] = amemo;
+				}
+				*a = (aa - aprevb) & 0x3ff;
+				++pACountTable[0][*a];
+				aprevb = aa;
+			}
+			if (Pred != CYLINDRICAL_LEFT)
+				tt += A ? 4 : 3;
+
+			b += 1;
+			g += 1;
+			r += 1;
+			if (A)
+				a += 1;
+		}
+	}
+
+	if (Pred != CYLINDRICAL_LEFT)
+		_aligned_free(topbuf);
 }
 
 template<int F>
 void tuned_ConvertB64aToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024])
 {
-	tuned_ConvertB64aToUQRX_PredictCylindricalLeftAndCount<F, false>(pGBegin, pBBegin, pRBegin, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, NULL);
+	tuned_ConvertB64aToUQRX_PredictAndCount<F, false, CYLINDRICAL_LEFT>(pGBegin, pBBegin, pRBegin, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, NULL);
 }
 
 template<int F>
 void tuned_ConvertB64aToUQRA_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024])
 {
-	tuned_ConvertB64aToUQRX_PredictCylindricalLeftAndCount<F, true>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, pACountTable);
+	tuned_ConvertB64aToUQRX_PredictAndCount<F, true, CYLINDRICAL_LEFT>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, pACountTable);
+}
+
+template<int F>
+void tuned_ConvertB64aToUQRG_PredictPlanarGradientAndCount(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024])
+{
+	tuned_ConvertB64aToUQRX_PredictAndCount<F, false, PLANAR_GRADIENT>(pGBegin, pBBegin, pRBegin, NULL, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, NULL);
+}
+
+template<int F>
+void tuned_ConvertB64aToUQRA_PredictPlanarGradientAndCount(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, uint8_t* pABegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024])
+{
+	tuned_ConvertB64aToUQRX_PredictAndCount<F, true, PLANAR_GRADIENT>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pGCountTable, pBCountTable, pRCountTable, pACountTable);
 }
 
 #ifdef GENERATE_SSE41
 template void tuned_ConvertB64aToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
 template void tuned_ConvertB64aToUQRA_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024]);
+template void tuned_ConvertB64aToUQRG_PredictPlanarGradientAndCount<CODEFEATURE_SSE41>(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
+template void tuned_ConvertB64aToUQRA_PredictPlanarGradientAndCount<CODEFEATURE_SSE41>(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, uint8_t* pABegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024]);
 #endif
 
 #ifdef GENERATE_AVX1
 template void tuned_ConvertB64aToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
 template void tuned_ConvertB64aToUQRA_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024]);
+template void tuned_ConvertB64aToUQRG_PredictPlanarGradientAndCount<CODEFEATURE_AVX1>(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
+template void tuned_ConvertB64aToUQRA_PredictPlanarGradientAndCount<CODEFEATURE_AVX1>(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, uint8_t* pABegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024], uint32_t pACountTable[][1024]);
 #endif
 
 //
 
-template<int F, bool A>
-static inline void tuned_ConvertUQRXToB64a_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+template<int F, bool A, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint16_t gprevb = 0x200;
 	uint16_t bprevb = 0;
@@ -1728,9 +1879,14 @@ static inline void tuned_ConvertUQRXToB64a_RestoreCylindricalLeft(uint8_t *pDstB
 	uint16_t *r = (uint16_t *)pRBegin;
 	uint16_t *a = (uint16_t *)pABegin;
 
-	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	uint16_t* topbuf = NULL;
+	if (Pred != CYLINDRICAL_LEFT)
+		topbuf = (uint16_t*)_aligned_malloc(A ? cbWidth : cbWidth / 4 * 3, 16);
+
+	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pp = p;
+		auto tt = topbuf;
 
 		__m128i gprev = _mm_set1_epi16(gprevb);
 		__m128i bprev = _mm_set1_epi16(bprevb);
@@ -1747,6 +1903,12 @@ static inline void tuned_ConvertUQRXToB64a_RestoreCylindricalLeft(uint8_t *pDstB
 			auto bvalue = tuned_RestoreLeft10Element<F, false>(bprev, bb);
 			__m128i rr = _mm_loadu_si128((const __m128i *)r);
 			auto rvalue = tuned_RestoreLeft10Element<F, false>(rprev, rr);
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				_mm_store_si128((__m128i*)tt, gvalue.v0);
+				_mm_store_si128((__m128i*)(tt + 8), bvalue.v0);
+				_mm_store_si128((__m128i*)(tt + 16), rvalue.v0);
+			}
 			__m128i avalue_v0;
 			if (A)
 			{
@@ -1754,13 +1916,16 @@ static inline void tuned_ConvertUQRXToB64a_RestoreCylindricalLeft(uint8_t *pDstB
 				auto avalue = tuned_RestoreLeft10Element<F, false>(aprev, aa);
 				aprev = avalue.v1;
 				avalue_v0 = avalue.v0;
+				if (Pred != CYLINDRICAL_LEFT)
+					_mm_store_si128((__m128i*)(tt + 24), avalue.v0);
 			}
 			else
 			{
 				avalue_v0 = _mm_set1_epi16((short)0xffff);
 			}
 			tuned_ConvertPlanarRGBXToB64aElement10<F, __m128i, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
-
+			if (Pred != CYLINDRICAL_LEFT)
+				tt += A ? 32 : 24;
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -1781,13 +1946,30 @@ static inline void tuned_ConvertUQRXToB64a_RestoreCylindricalLeft(uint8_t *pDstB
 
 		for (; pp < p + cbWidth; pp += 8)
 		{
-			((uint16_t *)pp)[2] = htob16(Convert10To16Fullrange(gprevb += g[0]));
-			((uint16_t *)pp)[3] = htob16(Convert10To16Fullrange((bprevb += b[0]) + gprevb));
-			((uint16_t *)pp)[1] = htob16(Convert10To16Fullrange((rprevb += r[0]) + gprevb));
+			
+			auto gg = gprevb += g[0];
+			auto bb = (bprevb += b[0]) + gprevb;
+			auto rr = (rprevb += r[0]) + gprevb;
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				tt[0] = gg;
+				tt[1] = bb;
+				tt[2] = rr;
+			}
+			((uint16_t*)pp)[2] = htob16(Convert10To16Fullrange(gg));
+			((uint16_t*)pp)[3] = htob16(Convert10To16Fullrange(bb));
+			((uint16_t*)pp)[1] = htob16(Convert10To16Fullrange(rr));
 			if (A)
-				((uint16_t *)pp)[0] = htob16(Convert10To16Fullrange(aprevb += a[0]));
+			{
+				auto aa = aprevb += a[0];
+				if (Pred != CYLINDRICAL_LEFT)
+					tt[3] = aa;
+				((uint16_t*)pp)[0] = htob16(Convert10To16Fullrange(aa));
+			}
 			else
 				((uint16_t *)pp)[0] = 0xffff;
+			if (Pred != CYLINDRICAL_LEFT)
+				tt += A ? 4 : 3;
 
 			g += 1;
 			b += 1;
@@ -1796,34 +1978,161 @@ static inline void tuned_ConvertUQRXToB64a_RestoreCylindricalLeft(uint8_t *pDstB
 				a += 1;
 		}
 	}
+
+	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pp = p;
+		auto tt = topbuf;
+
+		__m128i gprev = _mm_setzero_si128();
+		__m128i bprev = _mm_setzero_si128();
+		__m128i rprev = _mm_setzero_si128();
+		__m128i aprev;
+		if (A)
+			aprev = _mm_setzero_si128();
+
+		for (; pp <= p + cbWidth - 64; pp += 64)
+		{
+			__m128i gg = _mm_loadu_si128((const __m128i*)g);
+			auto gvalue = tuned_RestoreLeft10Element<F, false>(gprev, gg);
+			__m128i bb = _mm_loadu_si128((const __m128i*)b);
+			auto bvalue = tuned_RestoreLeft10Element<F, false>(bprev, bb);
+			__m128i rr = _mm_loadu_si128((const __m128i*)r);
+			auto rvalue = tuned_RestoreLeft10Element<F, false>(rprev, rr);
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				gvalue.v0 = _mm_add_epi16(gvalue.v0, _mm_load_si128((const __m128i*)tt));
+				bvalue.v0 = _mm_add_epi16(bvalue.v0, _mm_load_si128((const __m128i*)(tt + 8)));
+				rvalue.v0 = _mm_add_epi16(rvalue.v0, _mm_load_si128((const __m128i*)(tt + 16)));
+				_mm_store_si128((__m128i*)tt, gvalue.v0);
+				_mm_store_si128((__m128i*)(tt + 8), bvalue.v0);
+				_mm_store_si128((__m128i*)(tt + 16), rvalue.v0);
+			}
+			__m128i avalue_v0;
+			if (A)
+			{
+				__m128i aa = _mm_loadu_si128((const __m128i*)a);
+				auto avalue = tuned_RestoreLeft10Element<F, false>(aprev, aa);
+				aprev = avalue.v1;
+				avalue_v0 = avalue.v0;
+				if (Pred != CYLINDRICAL_LEFT)
+				{
+					avalue.v0 = _mm_add_epi16(avalue.v0, _mm_load_si128((const __m128i*)(tt + 16)));
+					_mm_store_si128((__m128i*)(tt + 24), avalue.v0);
+				}
+			}
+			else
+			{
+				avalue_v0 = _mm_set1_epi16((short)0xffff);
+			}
+			tuned_ConvertPlanarRGBXToB64aElement10<F, __m128i, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
+			if (Pred != CYLINDRICAL_LEFT)
+				tt += A ? 32 : 24;
+
+			gprev = gvalue.v1;
+			bprev = bvalue.v1;
+			rprev = rvalue.v1;
+
+			g += 8;
+			b += 8;
+			r += 8;
+			if (A)
+				a += 8;
+		}
+
+		gprevb = _mm_cvtsi128_si32(gprev);
+		bprevb = _mm_cvtsi128_si32(bprev);
+		rprevb = _mm_cvtsi128_si32(rprev);
+		if (A)
+			aprevb = _mm_cvtsi128_si32(aprev);
+
+		for (; pp < p + cbWidth; pp += 8)
+		{
+
+			auto gg = gprevb += g[0];
+			auto bb = (bprevb += b[0]) + gprevb;
+			auto rr = (rprevb += r[0]) + gprevb;
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				gg += tt[0];
+				bb += tt[1];
+				rr += tt[2];
+				tt[0] = gg;
+				tt[1] = bb;
+				tt[2] = rr;
+			}
+			((uint16_t*)pp)[2] = htob16(Convert10To16Fullrange(gg));
+			((uint16_t*)pp)[3] = htob16(Convert10To16Fullrange(bb));
+			((uint16_t*)pp)[1] = htob16(Convert10To16Fullrange(rr));
+			if (A)
+			{
+				auto aa = aprevb += a[0];
+				if (Pred != CYLINDRICAL_LEFT)
+				{
+					aa += tt[3];
+					tt[3] = aa;
+				}
+				((uint16_t*)pp)[0] = htob16(Convert10To16Fullrange(aa));
+			}
+			else
+				((uint16_t*)pp)[0] = 0xffff;
+			if (Pred != CYLINDRICAL_LEFT)
+				tt += A ? 4 : 3;
+
+			g += 1;
+			b += 1;
+			r += 1;
+			if (A)
+				a += 1;
+		}
+	}
+
+	if (Pred != CYLINDRICAL_LEFT)
+		_aligned_free(topbuf);
 }
 
 template<int F>
 void tuned_ConvertUQRGToB64a_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride)
 {
-	tuned_ConvertUQRXToB64a_RestoreCylindricalLeft<F, false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, NULL, cbWidth, scbStride);
+	tuned_ConvertUQRXToB64a_Restore<F, false, CYLINDRICAL_LEFT>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, NULL, cbWidth, scbStride);
 }
 
 template<int F>
 void tuned_ConvertUQRAToB64a_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
-	tuned_ConvertUQRXToB64a_RestoreCylindricalLeft<F, true>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
+	tuned_ConvertUQRXToB64a_Restore<F, true, CYLINDRICAL_LEFT>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
+}
+
+template<int F>
+void tuned_ConvertUQRGToB64a_RestorePlanarGradient(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, size_t cbWidth, ssize_t scbStride)
+{
+	tuned_ConvertUQRXToB64a_Restore<F, false, PLANAR_GRADIENT>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, NULL, cbWidth, scbStride);
+}
+
+template<int F>
+void tuned_ConvertUQRAToB64a_RestorePlanarGradient(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, const uint8_t* pABegin, size_t cbWidth, ssize_t scbStride)
+{
+	tuned_ConvertUQRXToB64a_Restore<F, true, PLANAR_GRADIENT>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
 }
 
 #ifdef GENERATE_SSE41
 template void tuned_ConvertUQRGToB64a_RestoreCylindricalLeft<CODEFEATURE_SSE41>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertUQRAToB64a_RestoreCylindricalLeft<CODEFEATURE_SSE41>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertUQRGToB64a_RestorePlanarGradient<CODEFEATURE_SSE41>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertUQRAToB64a_RestorePlanarGradient<CODEFEATURE_SSE41>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, const uint8_t* pABegin, size_t cbWidth, ssize_t scbStride);
 #endif
 
 #ifdef GENERATE_AVX1
 template void tuned_ConvertUQRGToB64a_RestoreCylindricalLeft<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
 template void tuned_ConvertUQRAToB64a_RestoreCylindricalLeft<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertUQRGToB64a_RestorePlanarGradient<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertUQRAToB64a_RestorePlanarGradient<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, const uint8_t* pABegin, size_t cbWidth, ssize_t scbStride);
 #endif
 
 //
 
-template<int F>
-void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024])
+template<int F, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertR210ToUQRG_PredictAndCount(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024])
 {
 	uint16_t gprevb = 0x200;
 	uint16_t bprevb = 0;
@@ -1833,10 +2142,15 @@ void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, ui
 	uint16_t *g = (uint16_t *)pGBegin;
 	uint16_t *b = (uint16_t *)pBBegin;
 
-	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride)
+	uint16_t* topbuf = NULL;
+	if (Pred != CYLINDRICAL_LEFT)
+		topbuf = (uint16_t*)_aligned_malloc(nWidth * 6, 16);
+
+	for (auto p = pSrcBegin; p != (Pred != CYLINDRICAL_LEFT ? pSrcBegin + scbStride : pSrcEnd); p += scbStride)
 	{
 		const uint8_t *pStrideEnd = p + nWidth * 4;
 		auto pp = p;
+		auto tt = topbuf;
 
 		__m128i gprev = _mm_slli_si128(_mm_cvtsi32_si128(gprevb), 14);
 		__m128i bprev = _mm_slli_si128(_mm_cvtsi32_si128(bprevb), 14);
@@ -1848,6 +2162,13 @@ void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, ui
 			_mm_storeu_si128((__m128i *)g, tuned_PredictLeftAndCount10Element<F, true, 2, 0>(gprev, planar.g, pGCountTable));
 			_mm_storeu_si128((__m128i *)b, tuned_PredictLeftAndCount10Element<F, true, 4, 2>(bprev, planar.b, pBCountTable));
 			_mm_storeu_si128((__m128i *)r, tuned_PredictLeftAndCount10Element<F, true, 4, 3>(rprev, planar.r, pRCountTable));
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				_mm_store_si128((__m128i*)tt, planar.g);
+				_mm_store_si128((__m128i*)(tt + 8), planar.b);
+				_mm_store_si128((__m128i*)(tt + 16), planar.r);
+				tt += 24;
+			}
 
 			bprev = planar.b;
 			gprev = planar.g;
@@ -1867,12 +2188,93 @@ void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, ui
 			uint32_t val = btoh32(*(const uint32_t *)pp);
 
 			uint16_t gg = val >> 10;
+			uint16_t bb = val - gg;
+			uint16_t rr = (val >> 20) - gg;
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				tt[0] = gg;
+				tt[1] = bb;
+				tt[2] = rr;
+				tt += 3;
+			}
+
+			*g = (gg - gprevb) & 0x3ff;
+			*b = (bb - bprevb) & 0x3ff;
+			*r = (rr - rprevb) & 0x3ff;
+			++pGCountTable[0][*g];
+			++pBCountTable[0][*b];
+			++pRCountTable[0][*r];
+			gprevb = gg;
+			bprevb = bb;
+			rprevb = rr;
+
+			b += 1;
+			g += 1;
+			r += 1;
+		}
+	}
+
+	if (Pred == PLANAR_GRADIENT) for (auto p = pSrcBegin + scbStride; p != pSrcEnd; p += scbStride)
+	{
+		const uint8_t* pStrideEnd = p + nWidth * 4;
+		auto pp = p;
+		auto tt = topbuf;
+
+		__m128i gprev = _mm_setzero_si128();
+		__m128i bprev = _mm_setzero_si128();
+		__m128i rprev = _mm_setzero_si128();
+
+		for (; pp <= pStrideEnd - 32; pp += 32)
+		{
+			auto planar = tuned_ConvertR210ToPlanarElement10<F, __m128i, false>(pp);
+			auto memo = planar;
+			planar.g = _mm_sub_epi16(planar.g, _mm_load_si128((const __m128i*)tt));
+			planar.b = _mm_sub_epi16(planar.b, _mm_load_si128((const __m128i*)(tt + 8)));
+			planar.r = _mm_sub_epi16(planar.r, _mm_load_si128((const __m128i*)(tt + 16)));
+			_mm_storeu_si128((__m128i*)g, tuned_PredictLeftAndCount10Element<F, true, 2, 0>(gprev, planar.g, pGCountTable));
+			_mm_storeu_si128((__m128i*)b, tuned_PredictLeftAndCount10Element<F, true, 4, 2>(bprev, planar.b, pBCountTable));
+			_mm_storeu_si128((__m128i*)r, tuned_PredictLeftAndCount10Element<F, true, 4, 3>(rprev, planar.r, pRCountTable));
+
+			_mm_store_si128((__m128i*)tt, memo.g);
+			_mm_store_si128((__m128i*)(tt + 8), memo.b);
+			_mm_store_si128((__m128i*)(tt + 16), memo.r);
+			tt += 24;
+
+			bprev = planar.b;
+			gprev = planar.g;
+			rprev = planar.r;
+
+			b += 8;
+			g += 8;
+			r += 8;
+		}
+
+		gprevb = _mm_cvtsi128_si32(_mm_srli_si128(gprev, 14));
+		bprevb = _mm_cvtsi128_si32(_mm_srli_si128(bprev, 14));
+		rprevb = _mm_cvtsi128_si32(_mm_srli_si128(rprev, 14));
+
+		for (; pp < pStrideEnd; pp += 4)
+		{
+			uint32_t val = btoh32(*(const uint32_t*)pp);
+
+			uint16_t gg = val >> 10;
+			uint16_t bb = val - gg;
+			uint16_t rr = (val >> 20) - gg;
+			auto gmemo = gg;
+			gg -= tt[0];
+			tt[0] = gmemo;
+			auto bmemo = bb;
+			bb -= tt[1];
+			tt[1] = bmemo;
+			auto rmemo = rr;
+			rr -= tt[2];
+			tt[2] = rmemo;
+			tt += 3;
+
 			*g = (gg - gprevb) & 0x3ff;
 			++pGCountTable[0][*g];
-			uint16_t bb = val - gg;
 			*b = (bb - bprevb) & 0x3ff;
 			++pBCountTable[0][*b];
-			uint16_t rr = (val >> 20) - gg;
 			*r = (rr - rprevb) & 0x3ff;
 			++pRCountTable[0][*r];
 
@@ -1885,20 +2287,37 @@ void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t *pGBegin, ui
 			r += 1;
 		}
 	}
+
+	if (Pred != CYLINDRICAL_LEFT)
+		_aligned_free(topbuf);
+}
+
+template<int F>
+void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024])
+{
+	tuned_ConvertR210ToUQRG_PredictAndCount<F, CYLINDRICAL_LEFT>(pGBegin, pBBegin, pRBegin,  pSrcBegin, pSrcEnd, nWidth, scbStride, pGCountTable, pBCountTable, pRCountTable);
+}
+
+template<int F>
+void tuned_ConvertR210ToUQRG_PredictPlanarGradientAndCount(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024])
+{
+	tuned_ConvertR210ToUQRG_PredictAndCount<F, PLANAR_GRADIENT>(pGBegin, pBBegin, pRBegin, pSrcBegin, pSrcEnd, nWidth, scbStride, pGCountTable, pBCountTable, pRCountTable);
 }
 
 #ifdef GENERATE_SSE41
-template void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
+template void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41>(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
+template void tuned_ConvertR210ToUQRG_PredictPlanarGradientAndCount<CODEFEATURE_SSE41>(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
 #endif
 
 #ifdef GENERATE_AVX1
-template void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
+template void tuned_ConvertR210ToUQRG_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1>(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
+template void tuned_ConvertR210ToUQRG_PredictPlanarGradientAndCount<CODEFEATURE_AVX1>(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, unsigned int nWidth, ssize_t scbStride, uint32_t pGCountTable[][1024], uint32_t pBCountTable[][1024], uint32_t pRCountTable[][1024]);
 #endif
 
 //
 
-template<int F>
-void tuned_ConvertUQRGToR210_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
+template<int F, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertUQRGToR210_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
 {
 	uint16_t gprevb = 0x200;
 	uint16_t bprevb = 0;
@@ -1908,10 +2327,15 @@ void tuned_ConvertUQRGToR210_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t 
 	uint16_t *b = (uint16_t *)pBBegin;
 	uint16_t *r = (uint16_t *)pRBegin;
 
-	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	uint16_t* topbuf = NULL;
+	if (Pred != CYLINDRICAL_LEFT)
+		topbuf = (uint16_t*)_aligned_malloc(nWidth * 6, 16);
+
+	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		uint8_t *pStrideEnd = p + nWidth * 4;
 		auto pp = p;
+		auto tt = topbuf;
 
 		__m128i gprev = _mm_set1_epi16(gprevb);
 		__m128i bprev = _mm_set1_epi16(bprevb);
@@ -1926,7 +2350,13 @@ void tuned_ConvertUQRGToR210_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t 
 			__m128i rr = _mm_loadu_si128((const __m128i *)r);
 			auto rvalue = tuned_RestoreLeft10Element<F>(rprev, rr);
 			tuned_ConvertPlanarRGBXToR210Element10<F, __m128i, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0);
-
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				_mm_store_si128((__m128i*)tt, gvalue.v0);
+				_mm_store_si128((__m128i*)(tt + 8), bvalue.v0);
+				_mm_store_si128((__m128i*)(tt + 16), rvalue.v0);
+				tt += 24;
+			}
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -1947,32 +2377,131 @@ void tuned_ConvertUQRGToR210_RestoreCylindricalLeft(uint8_t *pDstBegin, uint8_t 
 			uint32_t bb = ((bprevb += b[0]) + gprevb) & 0x3ff;
 			uint32_t rr = ((rprevb += r[0]) + gprevb) & 0x3ff;
 			*(uint32_t *)pp = htob32((rr << 20) | (gg << 10) | bb);
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				tt[0] = gg;
+				tt[1] = bb;
+				tt[2] = rr;
+				tt += 3;
+			}
 
 			g += 1;
 			b += 1;
 			r += 1;
 		}
 	}
+
+	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		uint8_t* pStrideEnd = p + nWidth * 4;
+		auto pp = p;
+		auto tt = topbuf;
+
+		__m128i gprev = _mm_setzero_si128();
+		__m128i bprev = _mm_setzero_si128();
+		__m128i rprev = _mm_setzero_si128();
+
+		for (; pp <= pStrideEnd - 32; pp += 32)
+		{
+			__m128i gg = _mm_loadu_si128((const __m128i*)g);
+			auto gvalue = tuned_RestoreLeft10Element<F>(gprev, gg);
+			__m128i bb = _mm_loadu_si128((const __m128i*)b);
+			auto bvalue = tuned_RestoreLeft10Element<F>(bprev, bb);
+			__m128i rr = _mm_loadu_si128((const __m128i*)r);
+			auto rvalue = tuned_RestoreLeft10Element<F>(rprev, rr);
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				gvalue.v0 = _mm_add_epi16(gvalue.v0, _mm_load_si128((const __m128i*)tt));
+				bvalue.v0 = _mm_add_epi16(bvalue.v0, _mm_load_si128((const __m128i*)(tt + 8)));
+				rvalue.v0 = _mm_add_epi16(rvalue.v0, _mm_load_si128((const __m128i*)(tt + 16)));
+			}
+			tuned_ConvertPlanarRGBXToR210Element10<F, __m128i, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0);
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				_mm_store_si128((__m128i*)tt, gvalue.v0);
+				_mm_store_si128((__m128i*)(tt + 8), bvalue.v0);
+				_mm_store_si128((__m128i*)(tt + 16), rvalue.v0);
+				tt += 24;
+			}
+
+			gprev = gvalue.v1;
+			bprev = bvalue.v1;
+			rprev = rvalue.v1;
+
+			g += 8;
+			b += 8;
+			r += 8;
+		}
+
+		gprevb = _mm_cvtsi128_si32(gprev);
+		bprevb = _mm_cvtsi128_si32(bprev);
+		rprevb = _mm_cvtsi128_si32(rprev);
+
+		for (; pp < pStrideEnd; pp += 4)
+		{
+			uint32_t gg = (gprevb += g[0]);
+			uint32_t bb = ((bprevb += b[0]) + gprevb);
+			uint32_t rr = ((rprevb += r[0]) + gprevb);
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				gg += tt[0];
+				bb += tt[1];
+				rr += tt[2];
+			}
+			gg &= 0x3ff;
+			bb &= 0x3ff;
+			rr &= 0x3ff;
+			*(uint32_t*)pp = htob32((rr << 20) | (gg << 10) | bb);
+			if (Pred != CYLINDRICAL_LEFT)
+			{
+				tt[0] = gg;
+				tt[1] = bb;
+				tt[2] = rr;
+				tt += 3;
+			}
+
+			g += 1;
+			b += 1;
+			r += 1;
+		}
+	}
+
+	if (Pred != CYLINDRICAL_LEFT)
+		_aligned_free(topbuf);
+}
+
+template<int F>
+void tuned_ConvertUQRGToR210_RestoreCylindricalLeft(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, unsigned int nWidth, ssize_t scbStride)
+{
+	tuned_ConvertUQRGToR210_Restore<F, CYLINDRICAL_LEFT>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, nWidth, scbStride);
+}
+
+template<int F>
+void tuned_ConvertUQRGToR210_RestorePlanarGradient(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, unsigned int nWidth, ssize_t scbStride)
+{
+	tuned_ConvertUQRGToR210_Restore<F, PLANAR_GRADIENT>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, nWidth, scbStride);
 }
 
 #ifdef GENERATE_SSE41
-template void tuned_ConvertUQRGToR210_RestoreCylindricalLeft<CODEFEATURE_SSE41>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride);
+template void tuned_ConvertUQRGToR210_RestoreCylindricalLeft<CODEFEATURE_SSE41>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, unsigned int nWidth, ssize_t scbStride);
+template void tuned_ConvertUQRGToR210_RestorePlanarGradient<CODEFEATURE_SSE41>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, unsigned int nWidth, ssize_t scbStride);
 #endif
 
 #ifdef GENERATE_AVX1
 template void tuned_ConvertUQRGToR210_RestoreCylindricalLeft<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride);
+template void tuned_ConvertUQRGToR210_RestorePlanarGradient<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, unsigned int nWidth, ssize_t scbStride);
 #endif
 
 //
 
-template<int F, VALUERANGE VR>
-void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024])
+template<int F, VALUERANGE VR, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertLittleEndian16ToHostEndian10_PredictAndCount(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024])
 {
 	uint16_t prev = 0x200;
 
 	auto q = (uint16_t*)pDstBegin;
 
-	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride)
+	for (auto p = pSrcBegin; p != (Pred != CYLINDRICAL_LEFT ? pSrcBegin + scbStride : pSrcEnd); p += scbStride)
 	{
 		auto pStrideEnd = (const uint16_t*)(p + cbWidth);
 		auto pp = (const uint16_t*)p;
@@ -1998,28 +2527,80 @@ void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount(ui
 			++q;
 		}
 	}
+
+	if (Pred == PLANAR_GRADIENT) for (auto p = pSrcBegin + scbStride; p != pSrcEnd; p += scbStride)
+	{
+		auto pStrideEnd = (uint16_t*)(p + cbWidth);
+		auto pp = (uint16_t*)p;
+
+		__m128i prevv = _mm_setzero_si128();
+
+		for (; pp <= pStrideEnd - 8; pp += 8)
+		{
+			__m128i value = _mm_loadu_si128((const __m128i*)pp);
+			if (VR == VALUERANGE::NOROUND)
+				value = _mm_Convert16To10<VR>(_mm_sub_epi16(value, _mm_loadu_si128((const __m128i*)(pp - scbStride / 2))));
+			else
+				value = _mm_sub_epi16(_mm_Convert16To10<VR>(value), _mm_Convert16To10<VR>(_mm_loadu_si128((const __m128i*)(pp - scbStride / 2))));
+			_mm_storeu_si128((__m128i*)q, tuned_PredictLeftAndCount10Element<F, true, 1, 0>(prevv, value, pCountTable));
+			prevv = value;
+
+			q += 8;
+		}
+		prev = _mm_cvtsi128_si32(_mm_srli_si128(prevv, 14));
+
+		for (; pp < pStrideEnd; ++pp)
+		{
+			uint16_t cur = ltoh16(*pp);
+			if (VR == VALUERANGE::NOROUND)
+				cur = Convert16To10<VR>(cur - ltoh16(*(pp - scbStride / 2)));
+			else
+				cur = Convert16To10<VR>(cur) - Convert16To10<VR>(ltoh16(*(pp - scbStride / 2)));
+			*q = (cur - prev) & 0x3ff;
+			++pCountTable[0][*q];
+			prev = cur;
+
+			++q;
+		}
+	}
+}
+
+template<int F, VALUERANGE VR>
+void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024])
+{
+	tuned_ConvertLittleEndian16ToHostEndian10_PredictAndCount<F, VR, CYLINDRICAL_LEFT>(pDstBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pCountTable);
+}
+
+template<int F, VALUERANGE VR>
+void tuned_ConvertLittleEndian16ToHostEndian10_PredictPlanarGradientAndCount(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024])
+{
+	tuned_ConvertLittleEndian16ToHostEndian10_PredictAndCount<F, VR, PLANAR_GRADIENT>(pDstBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pCountTable); 
 }
 
 #ifdef GENERATE_SSE41
 template void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::LIMITED>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024]);
 template void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::NOROUND>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024]);
+template void tuned_ConvertLittleEndian16ToHostEndian10_PredictPlanarGradientAndCount<CODEFEATURE_SSE41, VALUERANGE::LIMITED>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024]);
+template void tuned_ConvertLittleEndian16ToHostEndian10_PredictPlanarGradientAndCount<CODEFEATURE_SSE41, VALUERANGE::NOROUND>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024]);
 #endif
 
 #ifdef GENERATE_AVX1
 template void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024]);
 template void tuned_ConvertLittleEndian16ToHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::NOROUND>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024]);
+template void tuned_ConvertLittleEndian16ToHostEndian10_PredictPlanarGradientAndCount<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024]);
+template void tuned_ConvertLittleEndian16ToHostEndian10_PredictPlanarGradientAndCount<CODEFEATURE_AVX1, VALUERANGE::NOROUND>(uint8_t* pDstBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pCountTable[][1024]);
 #endif
 
 //
 
-template<int F>
-void tuned_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride)
+template<int F, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertHostEndian16ToLittleEndian16_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint16_t prev = 0x8000;
 
 	auto q = (const uint16_t*)pSrcBegin;
 
-	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pStrideEnd = (uint16_t*)(p + cbWidth);
 		auto pp = (uint16_t*)p;
@@ -2044,20 +2625,60 @@ void tuned_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(uint8_t* p
 			++q;
 		}
 	}
+
+	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pStrideEnd = (uint16_t*)(p + cbWidth);
+		auto pp = (uint16_t*)p;
+
+		__m128i prevv = _mm_setzero_si128();
+		for (; pp <= pStrideEnd - 8; pp += 8)
+		{
+			__m128i s0 = _mm_loadu_si128((const __m128i*)q);
+			auto value = tuned_RestoreLeft16Element<F>(prevv, s0);
+			_mm_storeu_si128((__m128i*)pp, _mm_add_epi16(value.v0, _mm_loadu_si128((const __m128i*)(pp - scbStride / 2))));
+			prevv = value.v1;
+
+			q += 8;
+		}
+		prev = _mm_cvtsi128_si32(prevv);
+
+		for (; pp < pStrideEnd; ++pp)
+		{
+			uint16_t cur = *q;
+			*pp = htol16((prev += cur) + ltoh16(*(pp - scbStride / 2)));
+
+			++q;
+		}
+	}
+}
+
+template<int F>
+void tuned_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride)
+{
+	tuned_ConvertHostEndian16ToLittleEndian16_Restore<F, CYLINDRICAL_LEFT>(pDstBegin, pDstEnd, pSrcBegin, cbWidth, scbStride);
+}
+
+template<int F>
+void tuned_ConvertHostEndian16ToLittleEndian16_RestorePlanarGradient(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride)
+{
+	tuned_ConvertHostEndian16ToLittleEndian16_Restore<F, PLANAR_GRADIENT>(pDstBegin, pDstEnd, pSrcBegin, cbWidth, scbStride);
 }
 
 #ifdef GENERATE_SSE41
 template void tuned_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft<CODEFEATURE_SSE41>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertHostEndian16ToLittleEndian16_RestorePlanarGradient<CODEFEATURE_SSE41>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride);
 #endif
 
 #ifdef GENERATE_AVX1
 template void tuned_ConvertHostEndian16ToLittleEndian16_RestoreCylindricalLeft<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertHostEndian16ToLittleEndian16_RestorePlanarGradient<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride);
 #endif
 
 //
 
-template<int F, VALUERANGE VR>
-void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024])
+template<int F, VALUERANGE VR, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024])
 {
 	uint16_t uprev = 0x200;
 	uint16_t vprev = 0x200;
@@ -2065,7 +2686,7 @@ void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalL
 	auto u = (uint16_t*)pUBegin;
 	auto v = (uint16_t*)pVBegin;
 
-	for (auto p = pSrcBegin; p != pSrcEnd; p += scbStride)
+	for (auto p = pSrcBegin; p != (Pred != CYLINDRICAL_LEFT ? pSrcBegin + scbStride : pSrcEnd); p += scbStride)
 	{
 		auto pStrideEnd = (const uint16_t*)(p + cbWidth);
 		auto pp = (const uint16_t*)p;
@@ -2105,22 +2726,95 @@ void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalL
 			vprev = vv;
 		}
 	}
+
+	if (Pred == PLANAR_GRADIENT) for (auto p = pSrcBegin + scbStride; p != pSrcEnd; p += scbStride)
+	{
+		auto pStrideEnd = (uint16_t*)(p + cbWidth);
+		auto pp = (uint16_t*)p;
+
+		__m128i uprevv = _mm_setzero_si128();
+		__m128i vprevv = _mm_setzero_si128();
+		for (; pp <= pStrideEnd - 16; pp += 16)
+		{
+			auto m0 = _mm_loadu_si128((const __m128i*)pp);
+			auto m1 = _mm_loadu_si128((const __m128i*)(pp + 8));
+			if (VR == VALUERANGE::NOROUND)
+			{
+				m0 = _mm_Convert16To10<VR>(_mm_sub_epi16(m0, _mm_loadu_si128((const __m128i*)(pp - scbStride / 2))));
+				m1 = _mm_Convert16To10<VR>(_mm_sub_epi16(m1, _mm_loadu_si128((const __m128i*)(pp + 8 - scbStride / 2))));
+			}
+			else
+			{
+				m0 = _mm_sub_epi16(_mm_Convert16To10<VR>(m0), _mm_Convert16To10<VR>(_mm_loadu_si128((const __m128i*)(pp - scbStride / 2))));
+				m1 = _mm_sub_epi16(_mm_Convert16To10<VR>(m1), _mm_Convert16To10<VR>(_mm_loadu_si128((const __m128i*)(pp + 8 - scbStride / 2))));
+			}
+			m0 = _mm_shuffle_epi8(m0, _mm_set_epi8(15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0));
+			m1 = _mm_shuffle_epi8(m1, _mm_set_epi8(15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0));
+			auto uu = _mm_unpacklo_epi64(m0, m1);
+			auto vv = _mm_unpackhi_epi64(m0, m1);
+			_mm_storeu_si128((__m128i*)u, tuned_PredictLeftAndCount10Element<F, true, 2, 0>(uprevv, uu, pUCountTable));
+			_mm_storeu_si128((__m128i*)v, tuned_PredictLeftAndCount10Element<F, true, 2, 1>(vprevv, vv, pVCountTable));
+			uprevv = uu;
+			vprevv = vv;
+
+			u += 8;
+			v += 8;
+		}
+		uprev = _mm_cvtsi128_si32(_mm_srli_si128(uprevv, 14));
+		vprev = _mm_cvtsi128_si32(_mm_srli_si128(vprevv, 14));
+
+		for (; pp < pStrideEnd; pp += 2, ++u, ++v)
+		{
+			auto uu = ltoh16(pp[0]);
+			if (VR == VALUERANGE::NOROUND)
+				uu = Convert16To10<VR>(uu - ltoh16(pp[-scbStride / 2]));
+			else
+				uu = Convert16To10<VR>(uu) - Convert16To10<VR>(ltoh16(pp[-scbStride / 2]));
+			*u = (uu - uprev) & 0x3ff;
+			++pUCountTable[0][*u];
+			uprev = uu;
+			auto vv = ltoh16(pp[1]);
+			if (VR == VALUERANGE::NOROUND)
+				vv = Convert16To10<VR>(vv - ltoh16(pp[1 - scbStride / 2]));
+			else
+				vv = Convert16To10<VR>(vv) - Convert16To10<VR>(ltoh16(pp[1 - scbStride / 2]));
+			*v = (vv - vprev) & 0x3ff;
+			++pVCountTable[0][*v];
+			vprev = vv;
+		}
+	}
+}
+
+template<int F, VALUERANGE VR>
+void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024])
+{
+	tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictAndCount<F, VR, CYLINDRICAL_LEFT>(pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pUCountTable, pVCountTable);
+}
+
+template<int F, VALUERANGE VR>
+void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictPlanarGradientAndCount(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024])
+{
+	tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictAndCount<F, VR, PLANAR_GRADIENT>(pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, pUCountTable, pVCountTable);
 }
 
 #ifdef GENERATE_SSE41
 template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024]);
 template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_SSE41, VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024]);
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictPlanarGradientAndCount<CODEFEATURE_SSE41, VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024]);
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictPlanarGradientAndCount<CODEFEATURE_SSE41, VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024]);
 #endif
 
 #ifdef GENERATE_AVX1
 template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024]);
 template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictCylindricalLeftAndCount<CODEFEATURE_AVX1, VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024]);
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictPlanarGradientAndCount<CODEFEATURE_AVX1, VALUERANGE::LIMITED>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024]);
+template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictPlanarGradientAndCount<CODEFEATURE_AVX1, VALUERANGE::NOROUND>(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, uint32_t pUCountTable[][1024], uint32_t pVCountTable[][1024]);
 #endif
 
 //
 
-template<int F>
-void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+template<int F, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint16_t uprev = 0x8000;
 	uint16_t vprev = 0x8000;
@@ -2128,7 +2822,7 @@ void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalL
 	auto u = (const uint16_t*)pUBegin;
 	auto v = (const uint16_t*)pVBegin;
 
-	for (auto p = pDstBegin; p != pDstEnd; p += scbStride)
+	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pStrideEnd = (uint16_t*)(p + cbWidth);
 		auto pp = (uint16_t*)p;
@@ -2163,12 +2857,63 @@ void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalL
 			++v;
 		}
 	}
+
+	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
+	{
+		auto pStrideEnd = (uint16_t*)(p + cbWidth);
+		auto pp = (uint16_t*)p;
+
+		__m128i uprevv = _mm_setzero_si128();
+		__m128i vprevv = _mm_setzero_si128();
+
+		for (; pp <= pStrideEnd - 16; pp += 16)
+		{
+			__m128i uu = _mm_loadu_si128((const __m128i*)u);
+			auto uvalue = tuned_RestoreLeft16Element<F>(uprevv, uu);
+			__m128i vv = _mm_loadu_si128((const __m128i*)v);
+			auto vvalue = tuned_RestoreLeft16Element<F>(vprevv, vv);
+			auto m0 = _mm_unpacklo_epi16(uvalue.v0, vvalue.v0);
+			auto m1 = _mm_unpackhi_epi16(uvalue.v0, vvalue.v0);
+			_mm_storeu_si128((__m128i*)pp, _mm_add_epi16(m0, _mm_loadu_si128((const __m128i*)(pp - scbStride / 2))));
+			_mm_storeu_si128((__m128i*)(pp + 8), _mm_add_epi16(m1, _mm_loadu_si128((const __m128i*)(pp + 8 - scbStride / 2))));
+			uprevv = uvalue.v1;
+			vprevv = vvalue.v1;
+
+			u += 8;
+			v += 8;
+		}
+		uprev = _mm_cvtsi128_si32(uprevv);
+		vprev = _mm_cvtsi128_si32(vprevv);
+
+		for (; pp < pStrideEnd; pp += 2)
+		{
+			pp[0] = htol16((uprev += *u) + ltoh16(pp[0 - scbStride / 2]));
+			pp[1] = htol16((vprev += *v) + ltoh16(pp[1 - scbStride / 2]));
+
+			++u;
+			++v;
+		}
+	}
+}
+
+template<int F>
+void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_Restore<F, CYLINDRICAL_LEFT>(pDstBegin, pDstEnd, pUBegin, pVBegin, cbWidth, scbStride);
+}
+
+template<int F>
+void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestorePlanarGradient(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_Restore<F, PLANAR_GRADIENT>(pDstBegin, pDstEnd, pUBegin, pVBegin, cbWidth, scbStride);
 }
 
 #ifdef GENERATE_SSE41
 template void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft<CODEFEATURE_SSE41>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestorePlanarGradient<CODEFEATURE_SSE41>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride);
 #endif
 
 #ifdef GENERATE_AVX1
 template void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride);
+template void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestorePlanarGradient<CODEFEATURE_AVX1>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride);
 #endif

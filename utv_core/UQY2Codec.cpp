@@ -134,6 +134,26 @@ bool CUQY2Codec::PredictDirect(uint32_t nBandIndex)
 			return true;
 		}
 		break;
+	case EC_FLAGS_PREDICT_GRADIENT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUV422P16LE:
+			ConvertLittleEndian16ToHostEndian10Limited_PredictPlanarGradientAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+			ConvertLittleEndian16ToHostEndian10Limited_PredictPlanarGradientAndCount(u, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1]);
+			ConvertLittleEndian16ToHostEndian10Limited_PredictPlanarGradientAndCount(v, pRawBegin[2], pRawEnd[2], m_fmRaw.cbLineWidth[2], m_fmRaw.scbLineStride[2], m_counts[nBandIndex].dwCount[2]);
+			return true;
+
+		case UTVF_P210:
+			ConvertLittleEndian16ToHostEndian10Noround_PredictPlanarGradientAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Noround_PredictPlanarGradientAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+
+		case UTVF_P216:
+			ConvertLittleEndian16ToHostEndian10Limited_PredictPlanarGradientAndCount(y, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+			ConvertPackedUVLittleEndian16ToPlanarHostEndian10Limited_PredictPlanarGradientAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			return true;
+		}
+		break;
 	}
 
 	return false;
@@ -153,6 +173,16 @@ void CUQY2Codec::GenerateDecodeTable(uint32_t nPlaneIndex)
 			return;
 		}
 		break;
+	case PREDICT_PLANAR_GRADIENT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUV422P16LE:
+		case UTVF_P210:
+		case UTVF_P216:
+			GenerateHuffmanDecodeTable<10, 6>(m_hdt[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
+			return;
+		}
+		break;
 	}
 
 	CUQ00Codec::GenerateDecodeTable(nPlaneIndex);
@@ -163,6 +193,16 @@ bool CUQY2Codec::DecodeDirect(uint32_t nBandIndex)
 	switch (m_byPredictionType)
 	{
 	case PREDICT_CYLINDRICAL_LEFT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUV422P16LE:
+		case UTVF_P210:
+		case UTVF_P216:
+			DecodeAndRestoreCustomToPlanar(nBandIndex);
+			return true;
+		}
+		break;
+	case PREDICT_PLANAR_GRADIENT:
 		switch (m_utvfRaw)
 		{
 		case UTVF_YUV422P16LE:
@@ -199,5 +239,22 @@ void CUQY2Codec::RestoreCustom(uint32_t nBandIndex, int nPlaneIndex)
 				ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreCylindricalLeft(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
 			break;
 		}
+		break;
+	case PREDICT_PLANAR_GRADIENT:
+		switch (m_utvfRaw)
+		{
+		case UTVF_YUV422P16LE:
+			ConvertHostEndian16ToLittleEndian16_RestorePlanarGradient(pRawBegin[nPlaneIndex], pRawEnd[nPlaneIndex], pPlaneBegin[nPlaneIndex], m_fmRaw.cbLineWidth[nPlaneIndex], m_fmRaw.scbLineStride[nPlaneIndex]);
+			break;
+
+		case UTVF_P210:
+		case UTVF_P216:
+			if (nPlaneIndex == 0)
+				ConvertHostEndian16ToLittleEndian16_RestorePlanarGradient(pRawBegin[0], pRawEnd[0], y, m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
+			else if (nPlaneIndex == 2)
+				ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestorePlanarGradient(pRawBegin[1], pRawEnd[1], u, v, m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
+			break;
+		}
+		break;
 	}
 }
