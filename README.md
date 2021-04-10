@@ -30,7 +30,7 @@ The following interfaces are supported.
 
 ## Copyright Notice and License
 
-Copyright &copy; 2008-2020 UMEZAWA Takeshi
+Copyright &copy; 2008-2021 UMEZAWA Takeshi
 
 **Ut Video Codec Suite** is licensed under [GNU General Public License (GNU GPL) version 2](gplv2.txt) or later. See [LICENSE](LICENSE) for more information.
 
