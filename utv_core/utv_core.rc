@@ -64,8 +64,7 @@ BEGIN
     CONTROL         "Predict Gradient",IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO,
                     "Button",BS_AUTORADIOBUTTON,14,56,67,10
     CONTROL         "Predict Left",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,"Button",BS_AUTORADIOBUTTON,14,68,53,10
-    CONTROL         "インターレース映像としてエンコード（非推奨）",IDC_ASSUME_INTERLACE_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,171,10
+    CONTROL         "インターレース映像としてエンコード",IDC_ASSUME_INTERLACE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,171,10
     DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
     PUSHBUTTON      "キャンセル",IDCANCEL,129,24,50,14
 END
@@ -230,8 +229,8 @@ BEGIN
     CONTROL         "Predict Gradient",IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO,
                     "Button",BS_AUTORADIOBUTTON,14,56,67,10
     CONTROL         "Predict Left",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,"Button",BS_AUTORADIOBUTTON,14,68,53,10
-    CONTROL         "Assume interlace video (Not recommended)",IDC_ASSUME_INTERLACE_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,155,10
+    CONTROL         "Assume interlace video",IDC_ASSUME_INTERLACE_CHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,89,10
     DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
     PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
 END
