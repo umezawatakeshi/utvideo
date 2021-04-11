@@ -3,10 +3,6 @@
 
 #include <myintrin_x86x64.h>
 
-#if !defined(GENERATE_SSE2) && !defined(GENERATE_SSSE3) && !defined(GENERATE_SSE41) && !defined(GENERATE_AVX1) && !defined(GENERATE_AVX2)
-#error
-#endif
-
 template<int F, int NTS /* num_tables scale */, int TGI /* table group index */>
 static inline FORCEINLINE void IncrementCounters8(__m128i xmm, uint32_t pCountTable[][256])
 {
@@ -14,7 +10,6 @@ static inline FORCEINLINE void IncrementCounters8(__m128i xmm, uint32_t pCountTa
 	static constexpr int NT = TPC < NTS ? 1 : TPC / NTS;
 	static constexpr int TO = NT * TGI % TPC;
 
-#ifdef __SSE4_1__
 #if defined(__i386__)
 	uint32_t x;
 
@@ -64,7 +59,6 @@ static inline FORCEINLINE void IncrementCounters8(__m128i xmm, uint32_t pCountTa
 	++pCountTable[14 % NT + TO][(x >> 48) & 0xff];
 	++pCountTable[15 % NT + TO][(x >> 56) & 0xff];
 #endif
-#endif
 }
 
 template<int F, int NTS, int TGI>
@@ -74,7 +68,6 @@ static inline FORCEINLINE void IncrementCounters10(__m128i xmm, uint32_t pCountT
 	static constexpr int NT = TPC < NTS ? 1 : TPC / NTS;
 	static constexpr int TO = NT * TGI % TPC;
 
-#ifdef __SSE4_1__
 #if defined(__i386__)
 	uint32_t x;
 
@@ -107,7 +100,6 @@ static inline FORCEINLINE void IncrementCounters10(__m128i xmm, uint32_t pCountT
 	++pCountTable[5 % NT + TO][(x >> 16) & 0xffff];
 	++pCountTable[6 % NT + TO][(x >> 32) & 0xffff];
 	++pCountTable[7 % NT + TO][(x >> 48) & 0xffff];
-#endif
 #endif
 }
 
@@ -144,7 +136,6 @@ void tuned_PredictCylindricalLeftAndCount8(uint8_t *pDst, const uint8_t *pSrcBeg
 
 	__m128i prev = _mm_set1_epi8((char)0x80);
 
-#ifdef __SSSE3__
 	for (; p <= pSrcEnd - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
@@ -152,7 +143,7 @@ void tuned_PredictCylindricalLeftAndCount8(uint8_t *pDst, const uint8_t *pSrcBeg
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 	}
-#endif
+
 	for (; p < pSrcEnd; p++, q++)
 	{
 		*q = *p - *(p - 1);
@@ -220,7 +211,6 @@ void tuned_RestoreCylindricalLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, cons
 
 	__m128i prev = _mm_set1_epi8((char)0x80);
 
-#ifdef __SSSE3__
 	for (; p <= pSrcEnd - 32; p += 32, q += 32)
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
@@ -230,15 +220,15 @@ void tuned_RestoreCylindricalLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, cons
 		_mm_storeu_si128((__m128i *)(q+16), result.v1);
 		prev = result.v2;
 	}
-#endif
+
 	for (; p < pSrcEnd; p++, q++)
 	{
 		*q = *(q - 1) + *p;
 	}
 }
 
-#ifdef GENERATE_SSSE3
-template void tuned_RestoreCylindricalLeft8<CODEFEATURE_SSSE3>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
+#ifdef GENERATE_SSE41
+template void tuned_RestoreCylindricalLeft8<CODEFEATURE_SSE41>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd);
 #endif
 
 #ifdef GENERATE_AVX1
@@ -271,7 +261,6 @@ void tuned_PredictCylindricalLeftAndCount10(uint16_t *pDst, const uint16_t *pSrc
 
 	__m128i prev = _mm_set1_epi16(CSymbolBits<10>::midval);
 
-#ifdef __SSSE3__
 	for (; p <= pSrcEnd - 8; p += 8, q += 8)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
@@ -279,7 +268,7 @@ void tuned_PredictCylindricalLeftAndCount10(uint16_t *pDst, const uint16_t *pSrc
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 	}
-#endif
+
 	for (; p < pSrcEnd; p++, q++)
 	{
 		*q = (*p - *(p - 1)) & CSymbolBits<10>::maskval;
@@ -335,7 +324,6 @@ void tuned_RestoreCylindricalLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, c
 
 	__m128i prev = _mm_set1_epi16(CSymbolBits<10>::midval);
 
-#ifdef __SSSE3__
 	for (; p <= pSrcEnd - 16; p += 16, q += 16)
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
@@ -345,15 +333,15 @@ void tuned_RestoreCylindricalLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, c
 		_mm_storeu_si128((__m128i *)(q + 8), result.v1);
 		prev = result.v2;
 	}
-#endif
+
 	for (; p < pSrcEnd; p++, q++)
 	{
 		*q = (*(q - 1) + *p) & CSymbolBits<10>::maskval;
 	}
 }
 
-#ifdef GENERATE_SSSE3
-template void tuned_RestoreCylindricalLeft10<CODEFEATURE_SSSE3>(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);
+#ifdef GENERATE_SSE41
+template void tuned_RestoreCylindricalLeft10<CODEFEATURE_SSE41>(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd);
 #endif
 
 #ifdef GENERATE_AVX1
@@ -402,7 +390,6 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 	__m128i prev = _mm_set1_epi8((char)0x80);
 	__m128i topprev;
 
-#ifdef __SSSE3__
 	for (; p <= pSrcBegin + cbStride - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
@@ -410,7 +397,7 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 	}
-#endif
+
 	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = *p - *(p - 1);
@@ -420,7 +407,6 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 	prev = _mm_set1_epi8((char)0x80);
 	topprev = _mm_set1_epi8((char)0x80);
 
-#ifdef __SSSE3__
 	for (; p <= pSrcEnd - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
@@ -430,7 +416,7 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 		prev = value;
 		topprev = top;
 	}
-#endif
+
 	for (; p < pSrcEnd; p++, q++)
 	{
 		*q = *p - median<uint8_t>(*(p - 1), *(p - cbStride), *(p - 1) + *(p - cbStride) - *(p - cbStride - 1));
@@ -455,7 +441,6 @@ void tuned_RestoreCylindricalWrongMedian8(uint8_t *pDst, const uint8_t *pSrcBegi
 
 	__m128i prev = _mm_set1_epi8((char)0x80);
 
-#ifdef __SSSE3__
 	for (; p <= pSrcBegin + cbStride - 32; p += 32, q += 32)
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
@@ -465,7 +450,7 @@ void tuned_RestoreCylindricalWrongMedian8(uint8_t *pDst, const uint8_t *pSrcBegi
 		_mm_storeu_si128((__m128i *)(q + 16), result.v1);
 		prev = result.v2;
 	}
-#endif
+
 	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = *(q - 1) + *p;
@@ -486,8 +471,8 @@ void tuned_RestoreCylindricalWrongMedian8(uint8_t *pDst, const uint8_t *pSrcBegi
 	}
 }
 
-#ifdef GENERATE_SSSE3
-template void tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_SSSE3>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride);
+#ifdef GENERATE_SSE41
+template void tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_SSE41>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride);
 #endif
 
 #ifdef GENERATE_AVX1
@@ -503,7 +488,6 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 
 	__m128i prev = _mm_set1_epi8((char)0x80);
 
-#ifdef __SSSE3__
 	for (; p <= pSrcBegin + cbStride - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
@@ -511,7 +495,7 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 	}
-#endif
+
 	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = *p - *(p - 1);
@@ -523,7 +507,6 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 	{
 		prev = _mm_setzero_si128();
 
-#ifdef __SSSE3__
 		for (; p <= pp + cbStride - 16; p += 16, q += 16)
 		{
 			__m128i value = _mm_sub_epi8(_mm_loadu_si128((const __m128i *)p), _mm_loadu_si128((const __m128i *)(p - cbStride)));
@@ -531,7 +514,7 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 			_mm_storeu_si128((__m128i *)q, residual);
 			prev = value;
 		}
-#endif
+
 		for (; p < pp + cbStride; p++, q++)
 		{
 			*q = *p - (*(p - 1) + *(p - cbStride) - *(p - cbStride - 1));
@@ -572,7 +555,6 @@ void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const
 
 	__m128i prev = _mm_set1_epi8((char)0x80);
 
-#ifdef __SSSE3__
 	for (; p <= pSrcBegin + cbStride - 32; p += 32, q += 32)
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
@@ -582,7 +564,7 @@ void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const
 		_mm_storeu_si128((__m128i *)(q + 16), result.v1);
 		prev = result.v2;
 	}
-#endif
+
 	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = *(q - 1) + *p;
@@ -592,7 +574,6 @@ void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const
 	{
 		prev = _mm_set1_epi8((char)0);
 
-#ifdef __SSSE3__
 		for (; p <= pp + cbStride - 32; p += 32, q += 32)
 		{
 			__m128i s0 = _mm_loadu_si128((const __m128i *)p);
@@ -602,7 +583,7 @@ void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const
 			_mm_storeu_si128((__m128i *)(q + 16), _mm_add_epi8(result.v1, _mm_loadu_si128((const __m128i *)(q - cbStride + 16))));
 			prev = result.v2;
 		}
-#endif
+
 		for (; p < pp + cbStride; p++, q++)
 		{
 			*q = *p + (*(q - 1) + *(q - cbStride) - *(q - cbStride - 1));
@@ -610,8 +591,8 @@ void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const
 	}
 }
 
-#ifdef GENERATE_SSSE3
-template void tuned_RestorePlanarGradient8<CODEFEATURE_SSSE3>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride);
+#ifdef GENERATE_SSE41
+template void tuned_RestorePlanarGradient8<CODEFEATURE_SSE41>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride);
 #endif
 
 #ifdef GENERATE_AVX1
@@ -628,7 +609,6 @@ static inline void tuned_PredictPlanarGradientAndMayCount10(uint16_t* pDst, cons
 
 	__m128i prev = _mm_set1_epi16(CSymbolBits<10>::midval);
 
-#ifdef __SSSE3__
 	for (; p <= pSrcBegin + nStride - 8; p += 8, q += 8)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i*)p);
@@ -636,7 +616,7 @@ static inline void tuned_PredictPlanarGradientAndMayCount10(uint16_t* pDst, cons
 		_mm_storeu_si128((__m128i*)q, residual);
 		prev = value;
 	}
-#endif
+
 	for (; p < pSrcBegin + nStride; p++, q++)
 	{
 		*q = (*p - *(p - 1)) & CSymbolBits<10>::maskval;
@@ -648,7 +628,6 @@ static inline void tuned_PredictPlanarGradientAndMayCount10(uint16_t* pDst, cons
 	{
 		prev = _mm_setzero_si128();
 
-#ifdef __SSSE3__
 		for (; p <= pp + nStride - 8; p += 8, q += 8)
 		{
 			__m128i value = _mm_sub_epi16(_mm_loadu_si128((const __m128i*)p), _mm_loadu_si128((const __m128i*)(p - nStride)));
@@ -656,7 +635,7 @@ static inline void tuned_PredictPlanarGradientAndMayCount10(uint16_t* pDst, cons
 			_mm_storeu_si128((__m128i*)q, residual);
 			prev = value;
 		}
-#endif
+
 		for (; p < pp + nStride; p++, q++)
 		{
 			*q = (*p - (*(p - 1) + *(p - nStride) - *(p - nStride - 1))) & CSymbolBits<10>::maskval;
@@ -698,7 +677,6 @@ void tuned_RestorePlanarGradient10(uint16_t* pDst, const uint16_t* pSrcBegin, co
 
 	__m128i prev = _mm_set1_epi16(CSymbolBits<10>::midval);
 
-#ifdef __SSSE3__
 	for (; p <= pSrcBegin + nStride - 16; p += 16, q += 16)
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i*)p);
@@ -708,7 +686,7 @@ void tuned_RestorePlanarGradient10(uint16_t* pDst, const uint16_t* pSrcBegin, co
 		_mm_storeu_si128((__m128i*)(q + 8), result.v1);
 		prev = result.v2;
 	}
-#endif
+
 	for (; p < pSrcBegin + nStride; p++, q++)
 	{
 		*q = (*(q - 1) + *p) & CSymbolBits<10>::maskval;
@@ -718,7 +696,6 @@ void tuned_RestorePlanarGradient10(uint16_t* pDst, const uint16_t* pSrcBegin, co
 	{
 		prev = _mm_set1_epi16((char)0);
 
-#ifdef __SSSE3__
 		for (; p <= pp + nStride - 16; p += 16, q += 16)
 		{
 			__m128i s0 = _mm_loadu_si128((const __m128i*)p);
@@ -728,7 +705,7 @@ void tuned_RestorePlanarGradient10(uint16_t* pDst, const uint16_t* pSrcBegin, co
 			_mm_storeu_si128((__m128i*)(q + 8), _mm_and_si128(_mm_add_epi16(result.v1, _mm_loadu_si128((const __m128i*)(q - nStride + 8))), _mm_set1_epi16(CSymbolBits<10>::maskval)));
 			prev = result.v2;
 		}
-#endif
+
 		for (; p < pp + nStride; p++, q++)
 		{
 			*q = (*p + (*(q - 1) + *(q - nStride) - *(q - nStride - 1))) & CSymbolBits<10>::maskval;
@@ -736,8 +713,8 @@ void tuned_RestorePlanarGradient10(uint16_t* pDst, const uint16_t* pSrcBegin, co
 	}
 }
 
-#ifdef GENERATE_SSSE3
-template void tuned_RestorePlanarGradient10<CODEFEATURE_SSSE3>(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride);
+#ifdef GENERATE_SSE41
+template void tuned_RestorePlanarGradient10<CODEFEATURE_SSE41>(uint16_t* pDst, const uint16_t* pSrcBegin, const uint16_t* pSrcEnd, size_t cbStride);
 #endif
 
 #ifdef GENERATE_AVX1

@@ -4,10 +4,6 @@
 #include <myintrin_x86x64.h>
 #include "SymPack_x86x64.h"
 
-#if !defined(GENERATE_SSE2) && !defined(GENERATE_SSSE3) && !defined(GENERATE_SSE41) && !defined(GENERATE_AVX1)
-#error
-#endif
-
 struct VBITS_RESULT
 {
 	__m128i vbits;
