@@ -21,10 +21,11 @@ The following interfaces are supported.
 - [vcpkg](https://github.com/microsoft/vcpkg) (integrated with Visual Studio)
   - lz4:x86-windows-static
   - lz4:x64-windows-static
-  - boost:x86-windows
-  - boost:x64-windows
-  - ffmpeg:x86-windows
-  - ffmpeg:x64-windows
+  - The following packages are required to build test code
+    - boost-test:x86-windows
+    - boost-test:x64-windows
+    - ffmpeg:x86-windows
+    - ffmpeg:x64-windows
 - [Inno Setup](http://www.jrsoftware.org/isinfo.php)
 
 

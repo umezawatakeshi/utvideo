@@ -21,10 +21,11 @@
 - [vcpkg](https://github.com/microsoft/vcpkg) （Visual Studio に integrate されていること）
   - lz4:x86-windows-static
   - lz4:x64-windows-static
-  - boost:x86-windows
-  - boost:x64-windows
-  - ffmpeg:x86-windows
-  - ffmpeg:x64-windows
+  - 以下のパッケージはテストコードのビルドに必要です
+    - boost-test:x86-windows
+    - boost-test:x64-windows
+    - ffmpeg:x86-windows
+    - ffmpeg:x64-windows
 - [Inno Setup](http://www.jrsoftware.org/isinfo.php)
 
 
