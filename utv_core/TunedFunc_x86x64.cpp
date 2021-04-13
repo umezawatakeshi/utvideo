@@ -456,6 +456,15 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackAVX2 = {
 	tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>,
 };
 
+extern const TUNEDFUNC_SYMPACK tfnSymPackAVX512ICL = {
+	&tfnSymPackAVX2,
+	{ FEATURE0_AVX512F | FEATURE0_AVX512_VBMI2, FEATURE1_BMI2 },
+	tuned_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX512_ICL>,
+	tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX512_ICL>,
+	tuned_Pack8SymWithDiff8<CODEFEATURE_AVX512_ICL>,
+	tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>,
+};
+
 
 const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictSSE41 = {
 	&tfnConvertPredictCPP,
@@ -680,7 +689,7 @@ const TUNEDFUNC tfnRoot = {
 #endif
 	&tfnConvertYUVRGBAVX2,
 	&tfnConvertShuffleAVX2,
-	&tfnSymPackAVX2,
+	&tfnSymPackAVX512ICL,
 	&tfnConvertPredictAVX1,
 	&tfnConvertSymPackAVX2,
 };

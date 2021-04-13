@@ -2,6 +2,9 @@
 /* $Id$ */
 
 #include <myintrin_x86x64.h>
+#include "POD.h"
+
+extern void* enabler;
 
 template<int F, int NTS /* num_tables scale */, int TGI /* table group index */>
 static inline FORCEINLINE void IncrementCounters8(__m128i xmm, uint32_t pCountTable[][256])
@@ -119,6 +122,23 @@ static inline FORCEINLINE __m256i tuned_PredictLeft8Element(__m256i prev, __m256
 	return residual;
 }
 
+template<int F>
+static inline FORCEINLINE __m512i tuned_PredictLeft8Element(__m512i prev, __m512i value)
+{
+	__m512i left = _mm512_permutex2var_epi8(prev, _mm512_set_epi8(
+		126, 125, 124, 123, 122, 121, 120, 119,
+		118, 117, 116, 115, 114, 113, 112, 111,
+		110, 109, 108, 107, 106, 105, 104, 103,
+		102, 101, 100,  99,  98,  97,  96,  95,
+		 94,  93,  92,  91,  90,  89,  88,  87,
+		 86,  85,  84,  83,  82,  81,  80,  79,
+		 78,  77,  76,  75,  74,  73,  72,  71,
+		 70,  69,  68,  67,  66,  65,  64,  63
+	), value); // prev はこの後は使われないので、VPERMT2B で prev の方が dst になって上書きされることを期待している。
+	__m512i residual = _mm512_sub_epi8(value, left);
+	return residual;
+}
+
 template<int F, bool DoCount, int NTS, int TGI>
 static inline FORCEINLINE __m128i tuned_PredictLeftAndCount8Element(__m128i prev, __m128i value, uint32_t pCountTable[][256])
 {
@@ -184,6 +204,41 @@ static inline FORCEINLINE VECTOR2<__m256i> /* value0, nextprev */ tuned_RestoreL
 	)));
 	s0 = _mm256_add_epi8(s0, prev);
 	prev = _mm256_shuffle_epi8(_mm256_permute2x128_si256(s0, s0, 0x11), _mm256_set1_epi8(15));
+	return { s0, prev };
+}
+
+template<int F, typename std::enable_if<F == CODEFEATURE_AVX512_ICL>::type*& = enabler>
+static inline FORCEINLINE VECTOR2<__m512i> /* value0, nextprev */ tuned_RestoreLeft8Element(__m512i prev, __m512i s0)
+{
+	s0 = _mm512_add_epi8(s0, _mm512_bslli_epi128(s0, 1));
+	s0 = _mm512_add_epi8(s0, _mm512_bslli_epi128(s0, 2));
+	s0 = _mm512_add_epi8(s0, _mm512_bslli_epi128(s0, 4));
+	s0 = _mm512_add_epi8(s0, _mm512_bslli_epi128(s0, 8));
+	__m512i stmp;
+	// VPERMB は PSHUFB と違って不要な要素に 0 を埋めることは命令単体ではできない（zeroing-mask を使えば一応できるが）ため、
+	// permutexvar (VPERMB) して add した後にマスクで加算をキャンセルする処理を行っている。
+	//
+	// 代わりに permute2xvar (VPERMT2B) を使って 0 を埋めて add するのとどっちが速いだろうか？
+	//
+	// icl では VPERMB は T/L1/L2 = 1/3/3 なのに対して VPERMT2B は 2/4/5/4 で、マスクを考慮すると VPERMT2B に優位性はない（同等）。
+	// マスクでキャンセルするとオペランド依存グラフ（＝命令スケジューリング）に自由度が生まれる（実際その自由度を生かして記述している）一方、
+	// 命令数が増えるためデコーダや命令キャッシュに負荷がかかる。よってどちらが速いかは場合による（＝計測しないと分からない）。
+	stmp = _mm512_add_epi8(s0, _mm512_permutexvar_epi8(_mm512_set_epi8(
+		47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+	), s0));
+	s0 = _mm512_mask_mov_epi64(s0, 0xcc, stmp);
+	stmp = _mm512_add_epi8(s0, _mm512_permutexvar_epi8(_mm512_set_epi8(
+		31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31,
+		31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31, 31,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+	), stmp));
+	s0 = _mm512_mask_mov_epi64(s0, 0xf0, stmp);
+	s0 = _mm512_add_epi8(s0, prev);
+	prev = _mm512_permutexvar_epi8(_mm512_set1_epi8(63), s0);
 	return { s0, prev };
 }
 
