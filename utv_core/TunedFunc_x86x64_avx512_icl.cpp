@@ -12,5 +12,7 @@
 #include "Coefficient.h"
 
 #define GENERATE_AVX512_ICL 1
+#include "ConvertShuffle_x86x64.cpp"
 #include "Predict_x86x64.cpp"
 #include "SymPack_x86x64_zmm.cpp"
+#include "ConvertSymPack_x86x64_zmm.cpp"

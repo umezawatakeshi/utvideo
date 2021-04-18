@@ -678,6 +678,25 @@ const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX2 = {
 	tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CODEFEATURE_AVX2, CUYVYColorOrder>,
 };
 
+const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX512ICL = {
+	&tfnConvertSymPackAVX2,
+	{ FEATURE0_AVX512F | FEATURE0_AVX512_VBMI2, 0 },
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CBGRColorOrder>,
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>,
+	tuned_ConvertRGBToULRG_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CARGBColorOrder>,
+	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>,
+	tuned_ConvertRGBAToULRA_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CARGBColorOrder>,
+	tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX512_ICL, CBGRColorOrder>,
+	tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>,
+	tuned_ConvertULRGToRGB_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX512_ICL, CARGBColorOrder>,
+	tuned_ConvertULRAToRGBA_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX512_ICL, CBGRAColorOrder>,
+	tuned_ConvertULRAToRGBA_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX512_ICL, CARGBColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CYUYVColorOrder>,
+	tuned_ConvertPackedYUV422ToULY2_Pack8SymAfterPredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CUYVYColorOrder>,
+	tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CYUYVColorOrder>,
+	tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CUYVYColorOrder>,
+};
+
 
 const TUNEDFUNC tfnRoot = {
 	&tfnPredictAVX1,
@@ -691,7 +710,7 @@ const TUNEDFUNC tfnRoot = {
 	&tfnConvertShuffleAVX2,
 	&tfnSymPackAVX512ICL,
 	&tfnConvertPredictAVX1,
-	&tfnConvertSymPackAVX2,
+	&tfnConvertSymPackAVX512ICL,
 };
 
 uint32_t dwSupportedFeatures[FEATURESIZE];
