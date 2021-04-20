@@ -456,6 +456,7 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackAVX2 = {
 	tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>,
 };
 
+#ifdef __x86_64__
 extern const TUNEDFUNC_SYMPACK tfnSymPackAVX512ICL = {
 	&tfnSymPackAVX2,
 	{ FEATURE0_AVX512F | FEATURE0_AVX512_VBMI2, FEATURE1_BMI2 },
@@ -464,6 +465,7 @@ extern const TUNEDFUNC_SYMPACK tfnSymPackAVX512ICL = {
 	tuned_Pack8SymWithDiff8<CODEFEATURE_AVX512_ICL>,
 	tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>,
 };
+#endif
 
 
 const TUNEDFUNC_CONVERT_PREDICT tfnConvertPredictSSE41 = {
@@ -678,6 +680,7 @@ const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX2 = {
 	tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CODEFEATURE_AVX2, CUYVYColorOrder>,
 };
 
+#ifdef __x86_64__
 const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX512ICL = {
 	&tfnConvertSymPackAVX2,
 	{ FEATURE0_AVX512F | FEATURE0_AVX512_VBMI2, 0 },
@@ -696,6 +699,7 @@ const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX512ICL = {
 	tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CYUYVColorOrder>,
 	tuned_ConvertULY2ToPackedYUV422_Unpack8SymAndRestorePredictPlanarGradient8<CODEFEATURE_AVX512_ICL, CUYVYColorOrder>,
 };
+#endif
 
 
 const TUNEDFUNC tfnRoot = {
@@ -708,9 +712,17 @@ const TUNEDFUNC tfnRoot = {
 #endif
 	&tfnConvertYUVRGBAVX2,
 	&tfnConvertShuffleAVX2,
+#ifdef __x86_64__
 	&tfnSymPackAVX512ICL,
+#else
+	&tfnSymPackAVX2,
+#endif
 	&tfnConvertPredictAVX1,
+#ifdef __x86_64__
 	&tfnConvertSymPackAVX512ICL,
+#else
+	&tfnConvertSymPackAVX2,
+#endif
 };
 
 uint32_t dwSupportedFeatures[FEATURESIZE];
