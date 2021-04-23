@@ -694,35 +694,35 @@ static const vector<tuple<vector<string>, vector<string>, uint32_t, vector<uint8
 	{{ "clip201-raw-rgb24", "clip201-raw-rgb32" },{ "clip201-raw-yv12-bt709" }, 'ULH0', ulxx_config_progressive, 2, 2, 1},
 	{{ "clip201-raw-rgb24", "clip201-raw-rgb32" },{ "clip201-raw-yv12-bt709" }, 'ULH0', ulxx_config_interlace, 2, 4, 1},
 
-	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb24-bt601" }, 'ULY4', ulxx_config_progressive, 1, 1, 1},
-	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb24-bt601" }, 'ULY4', ulxx_config_interlace, 1, 2, 1},
-	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb24-bt709" }, 'ULH4', ulxx_config_progressive, 1, 1, 1},
-	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb24-bt709" }, 'ULH4', ulxx_config_interlace, 1, 2, 1},
+	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb32-bt601" }, 'ULY4', ulxx_config_progressive, 1, 1, 1},
+	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb32-bt601" }, 'ULY4', ulxx_config_interlace, 1, 2, 1},
+	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb32-bt709" }, 'ULH4', ulxx_config_progressive, 1, 1, 1},
+	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb32-bt709" }, 'ULH4', ulxx_config_interlace, 1, 2, 1},
 
-	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb24-bt601" }, 'ULY2', ulxx_config_progressive, 2, 1, 1},
-	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb24-bt601" }, 'ULY2', ulxx_config_interlace, 2, 2, 1},
-	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb24-bt709" }, 'ULH2', ulxx_config_progressive, 2, 1, 1},
-	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb24-bt709" }, 'ULH2', ulxx_config_interlace, 2, 2, 1},
+	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb32-bt601" }, 'ULY2', ulxx_config_progressive, 2, 1, 1},
+	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb32-bt601" }, 'ULY2', ulxx_config_interlace, 2, 2, 1},
+	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb32-bt709" }, 'ULH2', ulxx_config_progressive, 2, 1, 1},
+	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb32-bt709" }, 'ULH2', ulxx_config_interlace, 2, 2, 1},
 
-	{{ "clip202-raw-yv12" },{ "clip202-raw-yv12-rgb24-bt601-progressive", "clip202-raw-yv12-rgb24-bt601-progressive" }, 'ULY0', ulxx_config_progressive, 2, 2, 1},
-	{{ "clip202-raw-yv12" },{ "clip202-raw-yv12-rgb24-bt601-interlace", "clip202-raw-yv12-rgb24-bt601-interlace" }, 'ULY0', ulxx_config_interlace, 2, 4, 1},
-	{{ "clip202-raw-yv12" },{ "clip202-raw-yv12-rgb24-bt709-progressive", "clip202-raw-yv12-rgb24-bt709-progressive" }, 'ULH0', ulxx_config_progressive, 2, 2, 1},
-	{{ "clip202-raw-yv12" },{ "clip202-raw-yv12-rgb24-bt709-interlace", "clip202-raw-yv12-rgb24-bt709-interlace" }, 'ULH0', ulxx_config_interlace, 2, 4, 1},
+	{{ "clip202-raw-yv12" },{ "clip202-raw-yv12-rgb24-bt601-progressive", "clip202-raw-yv12-rgb32-bt601-progressive" }, 'ULY0', ulxx_config_progressive, 2, 2, 1},
+	{{ "clip202-raw-yv12" },{ "clip202-raw-yv12-rgb24-bt601-interlace", "clip202-raw-yv12-rgb32-bt601-interlace" }, 'ULY0', ulxx_config_interlace, 2, 4, 1},
+	{{ "clip202-raw-yv12" },{ "clip202-raw-yv12-rgb24-bt709-progressive", "clip202-raw-yv12-rgb32-bt709-progressive" }, 'ULH0', ulxx_config_progressive, 2, 2, 1},
+	{{ "clip202-raw-yv12" },{ "clip202-raw-yv12-rgb24-bt709-interlace", "clip202-raw-yv12-rgb32-bt709-interlace" }, 'ULH0', ulxx_config_interlace, 2, 4, 1},
 
-	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt601", "clip203-raw-yv24-rgb24-bt601" }, 'ULY4', ulxx_config_progressive, 1, 1, 1},
-	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt601", "clip203-raw-yv24-rgb24-bt601" }, 'ULY4', ulxx_config_interlace, 1, 2, 1},
-	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt709", "clip203-raw-yv24-rgb24-bt709" }, 'ULH4', ulxx_config_progressive, 1, 1, 1},
-	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt709", "clip203-raw-yv24-rgb24-bt709" }, 'ULH4', ulxx_config_interlace, 1, 2, 1},
+	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt601", "clip203-raw-yv24-rgb32-bt601" }, 'ULY4', ulxx_config_progressive, 1, 1, 1},
+	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt601", "clip203-raw-yv24-rgb32-bt601" }, 'ULY4', ulxx_config_interlace, 1, 2, 1},
+	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt709", "clip203-raw-yv24-rgb32-bt709" }, 'ULH4', ulxx_config_progressive, 1, 1, 1},
+	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt709", "clip203-raw-yv24-rgb32-bt709" }, 'ULH4', ulxx_config_interlace, 1, 2, 1},
 
-	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt601", "clip203-raw-yuy2-rgb24-bt601" }, 'ULY2', ulxx_config_progressive, 2, 1, 1},
-	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt601", "clip203-raw-yuy2-rgb24-bt601" }, 'ULY2', ulxx_config_interlace, 2, 2, 1},
-	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt709", "clip203-raw-yuy2-rgb24-bt709" }, 'ULH2', ulxx_config_progressive, 2, 1, 1},
-	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt709", "clip203-raw-yuy2-rgb24-bt709" }, 'ULH2', ulxx_config_interlace, 2, 2, 1},
+	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt601", "clip203-raw-yuy2-rgb32-bt601" }, 'ULY2', ulxx_config_progressive, 2, 1, 1},
+	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt601", "clip203-raw-yuy2-rgb32-bt601" }, 'ULY2', ulxx_config_interlace, 2, 2, 1},
+	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt709", "clip203-raw-yuy2-rgb32-bt709" }, 'ULH2', ulxx_config_progressive, 2, 1, 1},
+	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt709", "clip203-raw-yuy2-rgb32-bt709" }, 'ULH2', ulxx_config_interlace, 2, 2, 1},
 
-	{{ "clip203-raw-yv12" },{ "clip203-raw-yuy2-rgb24-bt601", "clip203-raw-yuy2-rgb24-bt601" }, 'ULY0', ulxx_config_progressive, 2, 2, 1},
-	{{ "clip203-raw-yv12" },{ "clip203-raw-yuy2-rgb24-bt601", "clip203-raw-yuy2-rgb24-bt601" }, 'ULY0', ulxx_config_interlace, 2, 4, 1},
-	{{ "clip203-raw-yv12" },{ "clip203-raw-yuy2-rgb24-bt709", "clip203-raw-yuy2-rgb24-bt709" }, 'ULH0', ulxx_config_progressive, 2, 2, 1},
-	{{ "clip203-raw-yv12" },{ "clip203-raw-yuy2-rgb24-bt709", "clip203-raw-yuy2-rgb24-bt709" }, 'ULH0', ulxx_config_interlace, 2, 4, 1},
+	{{ "clip203-raw-yv12" },{ "clip203-raw-yuy2-rgb24-bt601", "clip203-raw-yuy2-rgb32-bt601" }, 'ULY0', ulxx_config_progressive, 2, 2, 1},
+	{{ "clip203-raw-yv12" },{ "clip203-raw-yuy2-rgb24-bt601", "clip203-raw-yuy2-rgb32-bt601" }, 'ULY0', ulxx_config_interlace, 2, 4, 1},
+	{{ "clip203-raw-yv12" },{ "clip203-raw-yuy2-rgb24-bt709", "clip203-raw-yuy2-rgb32-bt709" }, 'ULH0', ulxx_config_progressive, 2, 2, 1},
+	{{ "clip203-raw-yv12" },{ "clip203-raw-yuy2-rgb24-bt709", "clip203-raw-yuy2-rgb32-bt709" }, 'ULH0', ulxx_config_interlace, 2, 4, 1},
 };
 
 vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> conv_encdec_clip200_ulxx(const vector<tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>> &v, const vector<pair<int, int>>& sz, bool srcprop, bool dstprop)
@@ -785,17 +785,17 @@ static const vector<tuple<vector<string>, vector<string>, uint32_t, vector<uint8
 	{{ "clip201-raw-rgb24", "clip201-raw-rgb32" },{ "clip201-raw-yv24-bt601" }, 'UMY4', umxx_config_none, 1, 1, 1},
 	{{ "clip201-raw-rgb24", "clip201-raw-rgb32" },{ "clip201-raw-yv24-bt709" }, 'UMH4', umxx_config_none, 1, 1, 1},
 
-	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb24-bt601" }, 'UMY4', umxx_config_none, 1, 1, 1},
-	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb24-bt709" }, 'UMH4', umxx_config_none, 1, 1, 1},
+	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb32-bt601" }, 'UMY4', umxx_config_none, 1, 1, 1},
+	{{ "clip202-raw-yv24" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb32-bt709" }, 'UMH4', umxx_config_none, 1, 1, 1},
 
-	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb24-bt601" }, 'UMY2', umxx_config_none, 2, 1, 1},
-	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb24-bt709" }, 'UMH2', umxx_config_none, 2, 1, 1},
+	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt601", "clip202-raw-yv24-rgb32-bt601" }, 'UMY2', umxx_config_none, 2, 1, 1},
+	{{ "clip202-raw-yuy2" },{ "clip202-raw-yv24-rgb24-bt709", "clip202-raw-yv24-rgb32-bt709" }, 'UMH2', umxx_config_none, 2, 1, 1},
 
-	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt601", "clip203-raw-yv24-rgb24-bt601" }, 'UMY4', umxx_config_none, 1, 1, 1},
-	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt709", "clip203-raw-yv24-rgb24-bt709" }, 'UMH4', umxx_config_none, 1, 1, 1},
+	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt601", "clip203-raw-yv24-rgb32-bt601" }, 'UMY4', umxx_config_none, 1, 1, 1},
+	{{ "clip203-raw-yv24" },{ "clip203-raw-yv24-rgb24-bt709", "clip203-raw-yv24-rgb32-bt709" }, 'UMH4', umxx_config_none, 1, 1, 1},
 
-	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt601", "clip203-raw-yuy2-rgb24-bt601" }, 'UMY2', umxx_config_none, 2, 1, 1},
-	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt709", "clip203-raw-yuy2-rgb24-bt709" }, 'UMH2', umxx_config_none, 2, 1, 1},
+	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt601", "clip203-raw-yuy2-rgb32-bt601" }, 'UMY2', umxx_config_none, 2, 1, 1},
+	{{ "clip203-raw-yuy2" },{ "clip203-raw-yuy2-rgb24-bt709", "clip203-raw-yuy2-rgb32-bt709" }, 'UMH2', umxx_config_none, 2, 1, 1},
 };
 
 vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> conv_encdec_clip200_umxx(const vector<tuple<vector<string>, vector<string>, uint32_t, vector<uint8_t>, int, int, unsigned int>> &v, const vector<pair<int, int>>& sz, bool srcprop, bool dstprop)
