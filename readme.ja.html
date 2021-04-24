@@ -5,10 +5,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" type="text/css" href="style.css">
-<title>Ut Video Codec Suite 22.2.0 readme （日本語）</title>
+<title>Ut Video Codec Suite 22.3.0 readme （日本語）</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 22.2.0 readme （日本語）</h1>
+<h1>Ut Video Codec Suite 22.3.0 readme （日本語）</h1>
 <hr>
 <h2 id="copyright_notice">著作権表示</h2>
 <h3>英語</h3>
@@ -70,14 +70,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <h2 id="overview">概要</h2>
 <p>Ut Video Codec Suite は、複数のインターフェースをサポートするロスレス映像コーデックです。インターフェースは VCM、DMO をサポートします。内部保持形式は RGB、RGBA、YUV444、YUV422、YUV420 をサポートします。</p>
 <h2 id="environment">動作環境</h2>
-<h3>必須環境 (Windows x64)</h3>
+<h3>サポート環境 (Windows)</h3>
 <dl>
 <dt>OS</dt><dd>Windows 8.1 (x64) 以降</dd>
-<dt>CPU</dt><dd>AMD64 あるいは Intel 64（旧称 EM64T）をサポートする CPU</dd>
+<dt>CPU</dt><dd>SSE4.1 をサポートする CPU</dd>
 </dl>
 <h3>推奨環境</h3>
 <dl>
-<dt>CPU</dt><dd>第1世代 Intel Core i シリーズ (Nehalem) 以降</dd>
+<dt>CPU</dt><dd>第4世代 Intel Core i シリーズ (Haswell) 以降</dd>
 </dl>
 <h2 id="installation">インストールに関する注意</h2>
 <h3>Windows</h3>
@@ -116,6 +116,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <h2 id="nicovideo">ニコニコ動画のコンテンツツリーについて</h2>
 <p>ニコニコ動画において、コンテンツツリーの親作品として指定するために、<a href="http://seiga.nicovideo.jp/seiga/im1922939">静画</a>を投稿してあります（2012年4月2日に再投稿しました）。Ut Video Codec Suite を使用して作成された動画を投稿の際は、親作品として指定していただけると励みになります。</p>
 <h2 id="history">改版履歴</h2>
+<h3>バージョン 22.3.0</h3>
+<dl>
+<dt>性能向上</dt><dd><ul>
+<li>UMxx: AVX512-VBMI2 が使える環境での入出力を高速化した。</li>
+</ul></dd>
+<dt>その他</dt><dd><ul>
+<li>サポート環境および推奨環境を更新した。</li>
+</ul></dd>
+</dl>
 <h3>バージョン 22.2.0</h3>
 <dl>
 <dt>性能向上</dt><dd><ul>
