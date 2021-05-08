@@ -8,8 +8,6 @@
 #error
 #endif
 
-// 正しく動くことは SDE で確認してある。（実機がないので速度は不明）
-
 struct VREMBITS_RESULT
 {
 	__m512i rembits;
