@@ -8,28 +8,22 @@
 #error
 #endif
 
-struct VREMBITS_RESULT
-{
-	__m512i rembits;
-	__mmask8 kiszero;
-};
-
 template<int F>
-static inline FORCEINLINE VREMBITS_RESULT VECTORCALL GetVRemBits(__m512i x)
+static inline FORCEINLINE __m512i VECTORCALL GetVRemBits(__m512i x)
 {
-	__mmask8 kiszero = _mm512_cmpeq_epi64_mask(x, _mm512_set1_epi8(0));
-	__mmask64 knegative = _mm512_cmplt_epi8_mask(x, _mm512_set1_epi8(0));
-	__m512i notw = _mm512_xor_si512(x, _mm512_set1_epi8(-1));
-	__m512i z = _mm512_mask_mov_epi8(x, knegative, notw);
+	__mmask8 kisnotzero = _mm512_cmpneq_epi64_mask(x, _mm512_set1_epi8(0));
+	__m512i tmp = _mm512_and_si512(x, _mm512_set1_epi8((char)0x80)); // xが0以上なら0、0未満なら0x80
+	__m512i negative = _mm512_adds_epu8(tmp, tmp); // xが0以上なら0、0未満なら0xff
+	__m512i z = _mm512_xor_si512(x, negative);
 
 	z = _mm512_or_si512(z, _mm512_slli_epi64(z, 32));
 	z = _mm512_or_si512(z, _mm512_slli_epi64(z, 16));
 	z = _mm512_or_si512(_mm512_or_si512(z, _mm512_set1_epi64(1ULL << 56)), _mm512_slli_epi64(z, 8));
 	__m512i lz = _mm512_lzcnt_epi64(z);
 
-	__m512i rembits = _mm512_sub_epi64(lz, _mm512_set1_epi64(1));
+	__m512i rembits = _mm512_mask_sub_epi64(_mm512_set1_epi64(8), kisnotzero, lz, _mm512_set1_epi64(1));
 
-	return { rembits, kiszero };
+	return rembits;
 };
 
 template<int F, bool Delta>
@@ -39,29 +33,24 @@ static inline FORCEINLINE void VECTORCALL PackElement(uint8_t*& q, uint8_t*& r, 
 	static constexpr uint32_t MODEPEXT32 = Delta ? 0x0f0f0f0f : 0x07070707;
 	static constexpr uint64_t MODEPEXT64 = Delta ? 0x0f0f0f0f0f0f0f0fULL : 0x0707070707070707ULL;
 
-	auto [rembitsw, kiszerow] = GetVRemBits<F>(w);
+	auto rembitsw = GetVRemBits<F>(w);
 	__m512i rembits;
-	__m512i rembitszeroed;
 	__mmask8 ktemporal;
 	if (!Delta)
 	{
 		rembits = rembitsw;
-		rembitszeroed = _mm512_mask_mov_epi64(rembitsw, kiszerow, _mm512_set1_epi64(8));;
 	}
 	else
 	{
-		auto [rembitst, kiszerot] = GetVRemBits<F>(t);
-		rembitsw = _mm512_mask_mov_epi64(rembitsw, kiszerow, _mm512_set1_epi64(8));
-		rembitst = _mm512_mask_mov_epi64(rembitst, kiszerot, _mm512_set1_epi64(8));
+		auto rembitst = GetVRemBits<F>(t);
 		ktemporal = _mm512_cmpge_epi64_mask(rembitst, rembitsw);
 
 		w = _mm512_mask_mov_epi64(w, ktemporal, t);
 		rembits = _mm512_mask_mov_epi64(rembitsw, ktemporal, rembitst);
-		rembitszeroed = rembits;
 	}
 #if 1
 	// こう書き換えると下で言っているような無駄な kmov が発生しない分だけ命令が減るが、128bitでやっていた計算を一部512bitで行うことになるので、実行ユニットが混むかもしれない
-	__m512i vmodes = _mm512_subs_epu8(_mm512_set1_epi64(7), rembitszeroed);
+	__m512i vmodes = _mm512_subs_epu8(_mm512_set1_epi64(7), rembits);
 	if (Delta)
 		vmodes = _mm512_mask_or_epi64(vmodes, ktemporal, vmodes, _mm512_set1_epi64(8));
 	__m128i vmodes64 = _mm512_castsi512_si128(_mm512_permutexvar_epi8(_mm512_set8_epi8(56, 48, 40, 32, 24, 16, 8, 0), vmodes));
