@@ -48,35 +48,27 @@ static inline FORCEINLINE void VECTORCALL PackElement(uint8_t*& q, uint8_t*& r, 
 		w = _mm512_mask_mov_epi64(w, ktemporal, t);
 		rembits = _mm512_mask_mov_epi64(rembitsw, ktemporal, rembitst);
 	}
-#if 1
-	// こう書き換えると下で言っているような無駄な kmov が発生しない分だけ命令が減るが、128bitでやっていた計算を一部512bitで行うことになるので、実行ユニットが混むかもしれない
-	__m512i vmodes = _mm512_subs_epu8(_mm512_set1_epi64(7), rembits);
-	if (Delta)
-		vmodes = _mm512_mask_or_epi64(vmodes, ktemporal, vmodes, _mm512_set1_epi64(8));
-	__m128i vmodes64 = _mm512_castsi512_si128(_mm512_permutexvar_epi8(_mm512_set8_epi8(56, 48, 40, 32, 24, 16, 8, 0), vmodes));
-	uint32_t modes = (uint32_t)_pext_u64(_mm_cvtsi128_si64(vmodes64), MODEPEXT64);
 
-	__m128i vmask = _mm_shuffle_epi8(_mm_set8_epi8((char)0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0), vmodes64);
-#else
-	__m128i rembits64 = _mm512_castsi512_si128(_mm512_permutexvar_epi8(_mm512_set8_epi8(56, 48, 40, 32, 24, 16, 8, 0), rembitszeroed));
-	__m128i vmodes = _mm_subs_epu8(_mm_set1_epi8(7), rembits64);
+	uint32_t modes;
+	__m128i vmask;
 	if (Delta)
 	{
-		/*
-		 * コンパイラの最適化が甘いせいで、下で __mmask8 の ktemporal を _mm_maskz_mov_epi8 に渡すために __mmask16 にしようとして
-		 * 無意味に汎用レジスタに kmovb した後 kmovw で戻す（本来はそんなことしなくても直接渡して同じ結果になる）が、
-		 * それでも pdep で modes の方にビットを埋めるのと同じか速い…はず。
-		 * modes はメモリに書くだけで他の処理に依存性がないので、スループットの方が重要かもしれない（どっちも1だが）。
-		 */
-		vmodes = _mm_or_si128(vmodes, _mm_maskz_mov_epi8(ktemporal, _mm_set1_epi8(8)));
+		__m512i vmodes = _mm512_subs_epu8(_mm512_set1_epi64(7), rembits);
+		vmodes = _mm512_mask_or_epi64(vmodes, ktemporal, vmodes, _mm512_set1_epi64(8));
+		__m128i vmodes64 = _mm512_castsi512_si128(_mm512_permutexvar_epi8(_mm512_set8_epi8(56, 48, 40, 32, 24, 16, 8, 0), vmodes));
+		modes = (uint32_t)_pext_u64(_mm_cvtsi128_si64(vmodes64), MODEPEXT64);
 
-		// 「pdep で modes の方にビットを埋める」というのはこういうコード。
-		//uint32_t modes = (uint32_t)_pext_u64(_mm_cvtsi128_si64(vmodes), 0x0f0f0f0f0f0f0f0fULL) | _pdep_u32(ktemporal, 0x88888888);
+		vmask = _mm_shuffle_epi8(_mm_set8_epi8((char)0xff, 0x7f, 0x3f, 0x1f, 0x0f, 0x07, 0x03, 0), vmodes64);
 	}
-	uint32_t modes = (uint32_t)_pext_u64(_mm_cvtsi128_si64(vmodes), MODEPEXT64);
+	else
+	{
+		__m128i rembits64 = _mm512_castsi512_si128(_mm512_permutexvar_epi8(_mm512_set8_epi8(56, 48, 40, 32, 24, 16, 8, 0), rembits));
+		__m128i vmodes = _mm_subs_epu8(_mm_set1_epi8(7), rembits64);
+		modes = (uint32_t)_pext_u64(_mm_cvtsi128_si64(vmodes), MODEPEXT64);
 
-	__m128i vmask = _mm_shuffle_epi8(_mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, (char)0xff), rembits64);
-#endif
+		vmask = _mm_shuffle_epi8(_mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f, (char)0xff), rembits64);
+	}
+
 	uint64_t mask = _mm_cvtsi128_si64(vmask);
 	__mmask64 kmask = mask;
 	// ↑VPSHUFBITQMB を使うと1命令少なくなるが、その場合でも後で POPCNT に渡すために KMOV が現れるので意味がない
