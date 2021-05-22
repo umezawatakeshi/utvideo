@@ -423,6 +423,12 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 
 			_mm512_storeu_si512((__m512i*)p, s0);
 
+			/*
+			 * この maskz による追加のレイテンシ (2clk) は UnpackForDelta によって完全に隠蔽されるので、
+			 *   - VPERMB してから VPAND
+			 *   - VMOVDQU64 してから VPERMB
+			 * などに置き換えると逆に遅くなる。
+			 */
 			prev = _mm512_maskz_permutexvar_epi8(1, _mm512_set_epi8(
 				-1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1,
