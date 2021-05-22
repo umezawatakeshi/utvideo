@@ -382,7 +382,7 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)0x80);
+			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)0x80, (char)0x80);
 
 		auto t = pPrevBegin;
 		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 64, t += 64)
@@ -391,19 +391,16 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 
 			__m512i t0 = _mm512_add_epi8(s0, _mm512_loadu_si512((const __m256i*)t));
 			uint32_t mm = addmask[ktemporalq];
+			__m512i ctl8 = _mm512_mask_mov_epi64(_mm512_set16_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1), mm, _mm512_set1_epi8(-1));
 
-			s0 = _mm512_add_epi8(s0, prev);
-			s0 = _mm512_add_epi8(s0, _mm512_slli_epi64(s0, 8));
+			s0 = _mm512_add_epi8(_mm512_add_epi8(s0, prev), _mm512_slli_epi64(s0, 8));
 			s0 = _mm512_add_epi8(s0, _mm512_slli_epi64(s0, 16));
 			s0 = _mm512_add_epi8(s0, _mm512_slli_epi64(s0, 32));
 			s0 = _mm512_mask_mov_epi64(s0, ktemporalq, t0);
 
 			__m512i stmp;
 
-			stmp = _mm512_add_epi8(s0, _mm512_shuffle_epi8(s0, _mm512_set16_epi8(
-				7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1
-			)));
-			s0 = _mm512_mask_mov_epi64(stmp, mm, s0);
+			s0 = _mm512_add_epi8(s0, _mm512_shuffle_epi8(s0, ctl8));
 
 			stmp = _mm512_add_epi8(s0, _mm512_permutexvar_epi8(_mm512_set_epi8(
 				47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
@@ -429,7 +426,7 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 			 *   - VMOVDQU64 ÇµÇƒÇ©ÇÁ VPERMB
 			 * Ç»Ç«Ç…íuÇ´ä∑Ç¶ÇÈÇ∆ãtÇ…íxÇ≠Ç»ÇÈÅB
 			 */
-			prev = _mm512_maskz_permutexvar_epi8(1, _mm512_set_epi8(
+			prev = _mm512_maskz_permutexvar_epi8(3, _mm512_set_epi8(
 				-1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1,
@@ -437,7 +434,7 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 				-1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1,
-				-1, -1, -1, -1, -1, -1, -1, 63
+				-1, -1, -1, -1, -1, -1, 63, 63
 			), s0);
 		}
 	}
@@ -456,19 +453,16 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 			__m512i top = _mm512_loadu_si512((const __m512i*)(p - cbStride));
 			__m512i t0 = _mm512_sub_epi8(_mm512_add_epi8(s0, _mm512_loadu_si512((const __m512i*)t)), top);
 			uint32_t mm = addmask[ktemporalq];
+			__m512i ctl8 = _mm512_mask_mov_epi64(_mm512_set16_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1), mm, _mm512_set1_epi8(-1));
 
-			s0 = _mm512_add_epi8(s0, prev);
-			s0 = _mm512_add_epi8(s0, _mm512_slli_epi64(s0, 8));
+			s0 = _mm512_add_epi8(_mm512_add_epi8(s0, prev), _mm512_slli_epi64(s0, 8));
 			s0 = _mm512_add_epi8(s0, _mm512_slli_epi64(s0, 16));
 			s0 = _mm512_add_epi8(s0, _mm512_slli_epi64(s0, 32));
 			s0 = _mm512_mask_mov_epi64(s0, ktemporalq, t0);
 
 			__m512i stmp;
 
-			stmp = _mm512_add_epi8(s0, _mm512_shuffle_epi8(s0, _mm512_set16_epi8(
-				7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1
-			)));
-			s0 = _mm512_mask_mov_epi64(stmp, mm, s0);
+			s0 = _mm512_add_epi8(s0, _mm512_shuffle_epi8(s0, ctl8));
 
 			stmp = _mm512_add_epi8(s0, _mm512_permutexvar_epi8(_mm512_set_epi8(
 				47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47,
@@ -488,7 +482,7 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 
 			_mm512_storeu_si512((__m512i*)p, _mm512_add_epi8(s0, top));
 
-			prev = _mm512_maskz_permutexvar_epi8(1, _mm512_set_epi8(
+			prev = _mm512_maskz_permutexvar_epi8(3, _mm512_set_epi8(
 				-1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1,
@@ -496,7 +490,7 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 				-1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1,
-				-1, -1, -1, -1, -1, -1, -1, 63
+				-1, -1, -1, -1, -1, -1, 63, 63
 			), s0);
 		}
 	}
