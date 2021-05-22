@@ -123,15 +123,10 @@ static inline FORCEINLINE VECTOR_YUV422<__m512i> VECTORCALL tuned_ConvertPackedY
 	__m512i yy0 = _mm512_permutex2var_epi8(m0, ctly, m1);
 	__m512i yy1 = _mm512_permutex2var_epi8(m2, ctly, m3);
 	__m512i uv0 = _mm512_permutex2var_epi8(m0, ctluv0, m1);
-//	__m512i uv1 = _mm512_permutex2var_epi8(m2, ctluv, m3);
 	__m512i uv1 = _mm512_permutex2var_epi8(m2, ctluv1, m3);
 
-//	__m512i uu = _mm512_inserti64x4(uv0, _mm512_castsi512_si256(uv1), 1);
-//	__m512i vv = _mm512_permutex2var_epi64(uv0, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), uv1);
 	__m512i uu = _mm512_mask_mov_epi64(uv0, 0xf0, uv1);
 	__m512i vv = _mm512_permutex2var_epi64(uv0, _mm512_set_epi64(11, 10, 9, 8, 7, 6, 5, 4), uv1);
-
-// ↑どっちが速いかは不明
 
 	return { yy0, yy1, uu, vv };
 }
@@ -279,47 +274,32 @@ static inline FORCEINLINE VECTOR4<__m256i> VECTORCALL tuned_ConvertPlanarYUV422T
 template<int F, typename VT, class T, typename std::enable_if_t<std::is_same_v<VT, __m512i>>*& = enabler>
 static inline FORCEINLINE VECTOR4<__m512i> VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(__m512i yy0, __m512i yy1, __m512i uu, __m512i vv)
 {
-	__m512i ctl0, ctl1;
+	yy0 = _mm512_permutexvar_epi64(_mm512_set_epi64(7, 3, 6, 2, 5, 1, 4, 0), yy0);
+	yy1 = _mm512_permutexvar_epi64(_mm512_set_epi64(7, 3, 6, 2, 5, 1, 4, 0), yy1);
+	uu = _mm512_permutexvar_epi32(_mm512_set_epi32(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0), uu);
+	vv = _mm512_permutexvar_epi32(_mm512_set_epi32(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0), vv);
+
+	__m512i uv0 = _mm512_unpacklo_epi8(uu, vv);
+	__m512i uv1 = _mm512_unpackhi_epi8(uu, vv);
+
 	if (std::is_same<T, CYUYVColorOrder>::value)
 	{
-		ctl0 = _mm512_set_epi8(
-			111,  31,  79,  30, 110,  29,  78,  28, 109,  27,  77,  26, 108,  25,  76,  24,
-			107,  23,  75,  22, 106,  21,  74,  20, 105,  19,  73,  18, 104,  17,  72,  16,
-			103,  15,  71,  14, 102,  13,  70,  12, 101,  11,  69,  10, 100,   9,  68,   8,
-			 99,   7,  67,   6,  98,   5,  66,   4,  97,   3,  65,   2,  96,   1,  64,   0
-		);
-		ctl1 = _mm512_set_epi8(
-			127,  63,  95,  62, 126,  61,  94,  60, 125,  59,  93,  58, 124,  57,  92,  56,
-			123,  55,  91,  54, 122,  53,  90,  52, 121,  51,  89,  50, 120,  49,  88,  48,
-			119,  47,  87,  46, 118,  45,  86,  44, 117,  43,  85,  42, 116,  41,  84,  40,
-			115,  39,  83,  38, 114,  37,  82,  36, 113,  35,  81,  34, 112,  33,  80,  32
-		);
+		return {
+			_mm512_unpacklo_epi8(yy0, uv0),
+			_mm512_unpackhi_epi8(yy0, uv0),
+			_mm512_unpacklo_epi8(yy1, uv1),
+			_mm512_unpackhi_epi8(yy1, uv1)
+		};
 	}
 	else
 	{
-		ctl0 = _mm512_set_epi8(
-			 31, 111,  30,  79,  29, 110,  28,  78,  27, 109,  26,  77,  25, 108,  24,  76,
-			 23, 107,  22,  75,  21, 106,  20,  74,  19, 105,  18,  73,  17, 104,  16,  72,
-			 15, 103,  14,  71,  13, 102,  12,  70,  11, 101,  10,  69,   9, 100,   8,  68,
-			  7,  99,   6,  67,   5,  98,   4,  66,   3,  97,   2,  65,   1,  96,   0,  64
-		);
-		ctl1 = _mm512_set_epi8(
-			 63, 127,  62,  95,  61, 126,  60,  94,  59, 125,  58,  93,  57, 124,  56,  92,
-			 55, 123,  54,  91,  53, 122,  52,  90,  51, 121,  50,  89,  49, 120,  48,  88,
-			 47, 119,  46,  87,  45, 118,  44,  86,  43, 117,  42,  85,  41, 116,  40,  84,
-			 39, 115,  38,  83,  37, 114,  36,  82,  35, 113,  34,  81,  33, 112,  32,  80
-		);
+		return {
+			_mm512_unpacklo_epi8(uv0, yy0),
+			_mm512_unpackhi_epi8(uv0, yy0),
+			_mm512_unpacklo_epi8(uv1, yy1),
+			_mm512_unpackhi_epi8(uv1, yy1)
+		};
 	}
-
-	__m512i uv0 = _mm512_inserti64x4(uu, _mm512_castsi512_si256(vv), 1);
-	__m512i uv1 = _mm512_permutex2var_epi64(uu, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), vv);
-
-	__m512i m0 = _mm512_permutex2var_epi8(yy0, ctl0, uv0);
-	__m512i m1 = _mm512_permutex2var_epi8(yy0, ctl1, uv0);
-	__m512i m2 = _mm512_permutex2var_epi8(yy1, ctl0, uv1);
-	__m512i m3 = _mm512_permutex2var_epi8(yy1, ctl1, uv1);
-
-	return { m0, m1, m2, m3 };
 }
 
 template<int F, typename VT, class T>
@@ -629,22 +609,14 @@ static inline FORCEINLINE VECTOR_RGBA<__m512i> VECTORCALL tuned_ConvertPackedRGB
 	}
 
 	__m512i gb0 = _mm512_permutex2var_epi8(m0, ctlgb0, m1);
-//	__m512i gb1 = _mm512_permutex2var_epi8(m2, ctlgb, m3);
 	__m512i gb1 = _mm512_permutex2var_epi8(m2, ctlgb1, m3);
 	__m512i ar0 = _mm512_permutex2var_epi8(m0, ctlar0, m1);
-//	__m512i ar1 = _mm512_permutex2var_epi8(m2, ctlar, m3);
 	__m512i ar1 = _mm512_permutex2var_epi8(m2, ctlar1, m3);
 
-//	__m512i bb = _mm512_inserti64x4(gb0, _mm512_castsi512_si256(gb1), 1);
-//	__m512i gg = _mm512_permutex2var_epi64(gb0, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), gb1);
-//	__m512i rr = _mm512_inserti64x4(ar0, _mm512_castsi512_si256(ar1), 1);
-//	__m512i aa = _mm512_permutex2var_epi64(ar0, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), ar1);
 	__m512i bb = _mm512_mask_mov_epi64(gb0, 0xf0, gb1);
 	__m512i gg = _mm512_permutex2var_epi64(gb0, _mm512_set_epi64(11, 10, 9, 8, 7, 6, 5, 4), gb1);
 	__m512i rr = _mm512_mask_mov_epi64(ar0, 0xf0, ar1);
 	__m512i aa = _mm512_permutex2var_epi64(ar0, _mm512_set_epi64(11, 10, 9, 8, 7, 6, 5, 4), ar1);
-
-// ↑どっちが速いかは不明
 
 	__m512i ggtmp = NeedOffset ? _mm512_add_epi8(gg, _mm512_set1_epi8((char)0x80)) : gg;
 	bb = _mm512_sub_epi8(bb, ggtmp);
@@ -959,53 +931,38 @@ static inline FORCEINLINE VECTOR4<__m256i> VECTORCALL tuned_ConvertPlanarRGBXToP
 template<int F, typename VT, class T, bool NeedOffset, typename std::enable_if_t<std::is_same_v<VT, __m512i>>*& = enabler>
 static inline FORCEINLINE VECTOR4<__m512i> VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(__m512i gg, __m512i bb, __m512i rr, __m512i aa)
 {
-	__m512i ctl0, ctl1;
-	if (std::is_same<T, CBGRAColorOrder>::value)
-	{
-		ctl0 = _mm512_set_epi8(
-			111,  79,  47,  15, 110,  78,  46,  14, 109,  77,  45,  13, 108,  76,  44,  12,
-			107,  75,  43,  11, 106,  74,  42,  10, 105,  73,  41,   9, 104,  72,  40,   8,
-			103,  71,  39,   7, 102,  70,  38,   6, 101,  69,  37,   5, 100,  68,  36,   4,
-			 99,  67,  35,   3,  98,  66,  34,   2,  97,  65,  33,   1,  96,  64,  32,   0
-		);
-		ctl1 = _mm512_set_epi8(
-			127,  95,  63,  31, 126,  94,  62,  30, 125,  93,  61,  29, 124,  92,  60,  28,
-			123,  91,  59,  27, 122,  90,  58,  26, 121,  89,  57,  25, 120,  88,  56,  24,
-			119,  87,  55,  23, 118,  86,  54,  22, 117,  85,  53,  21, 116,  84,  52,  20,
-			115,  83,  51,  19, 114,  82,  50,  18, 113,  81,  49,  17, 112,  80,  48,  16
-		);
-	}
-	else
-	{
-		ctl0 = _mm512_set_epi8(
-			 15,  47,  79, 111,  14,  46,  78, 110,  13,  45,  77, 109,  12,  44,  76, 108,
-			 11,  43,  75, 107,  10,  42,  74, 106,   9,  41,  73, 105,   8,  40,  72, 104,
-			  7,  39,  71, 103,   6,  38,  70, 102,   5,  37,  69, 101,   4,  36,  68, 100,
-			  3,  35,  67,  99,   2,  34,  66,  98,   1,  33,  65,  97,   0,  32,  64,  96
-		);
-		ctl1 = _mm512_set_epi8(
-			 31,  63,  95, 127,  30,  62,  94, 126,  29,  61,  93, 125,  28,  60,  92, 124,
-			 27,  59,  91, 123,  26,  58,  90, 122,  25,  57,  89, 121,  24,  56,  88, 120,
-			 23,  55,  87, 119,  22,  54,  86, 118,  21,  53,  85, 117,  20,  52,  84, 116,
-			 19,  51,  83, 115,  18,  50,  82, 114,  17,  49,  81, 113,  16,  48,  80, 112
-		);
-	}
-
 	__m512i ggtmp = NeedOffset ? _mm512_add_epi8(gg, _mm512_set1_epi8((char)0x80)) : gg;
 	bb = _mm512_add_epi8(bb, ggtmp);
 	rr = _mm512_add_epi8(rr, ggtmp);
 
-	__m512i gb0 = _mm512_inserti64x4(bb, _mm512_castsi512_si256(gg), 1);
-	__m512i gb1 = _mm512_permutex2var_epi64(bb, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), gg);
-	__m512i ar0 = _mm512_inserti64x4(rr, _mm512_castsi512_si256(aa), 1);
-	__m512i ar1 = _mm512_permutex2var_epi64(rr, _mm512_set_epi64(15, 14, 13, 12, 7, 6, 5, 4), aa);
+	bb = _mm512_permutexvar_epi32(_mm512_set_epi32(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0), bb);
+	gg = _mm512_permutexvar_epi32(_mm512_set_epi32(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0), gg);
+	rr = _mm512_permutexvar_epi32(_mm512_set_epi32(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0), rr);
+	aa = _mm512_permutexvar_epi32(_mm512_set_epi32(15, 11, 7, 3, 14, 10, 6, 2, 13, 9, 5, 1, 12, 8, 4, 0), aa);
 
-	__m512i m0 = _mm512_permutex2var_epi8(gb0, ctl0, ar0);
-	__m512i m1 = _mm512_permutex2var_epi8(gb0, ctl1, ar0);
-	__m512i m2 = _mm512_permutex2var_epi8(gb1, ctl0, ar1);
-	__m512i m3 = _mm512_permutex2var_epi8(gb1, ctl1, ar1);
+	__m512i m0, m1, n0, n1;
 
-	return { m0, m1, m2, m3 };
+	if (std::is_same<T, CBGRAColorOrder>::value)
+	{
+		m0 = _mm512_unpacklo_epi8(bb, rr);
+		m1 = _mm512_unpackhi_epi8(bb, rr);
+		n0 = _mm512_unpacklo_epi8(gg, aa);
+		n1 = _mm512_unpackhi_epi8(gg, aa);
+	}
+	else
+	{
+		m0 = _mm512_unpacklo_epi8(aa, gg);
+		m1 = _mm512_unpackhi_epi8(aa, gg);
+		n0 = _mm512_unpacklo_epi8(rr, bb);
+		n1 = _mm512_unpackhi_epi8(rr, bb);
+	}
+
+	return {
+		_mm512_unpacklo_epi8(m0, n0),
+		_mm512_unpackhi_epi8(m0, n0),
+		_mm512_unpacklo_epi8(m1, n1),
+		_mm512_unpackhi_epi8(m1, n1)
+	};
 }
 
 template<int F, typename VT, class T, bool NeedOffset, typename std::enable_if<T::BYPP == 4>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
