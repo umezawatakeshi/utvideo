@@ -384,7 +384,7 @@ void tuned_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8
 	auto r = pControl;
 
 	{
-		__m128i prev = _mm_set1_epi8((char)0x80);
+		__m128i prev = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)0x80, (char)0x80);
 
 		auto t = pPrevBegin;
 		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 16, t += 16)
@@ -392,15 +392,13 @@ void tuned_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8
 			auto [s0, m0] = UnpackForDelta<F>(q, r, shift);
 
 			auto t0 = _mm_add_epi8(s0, _mm_loadu_si128((const __m128i*)t));
-			auto a = _mm_alignr_epi8(_mm_and_si128(t0, m0), prev, 15);
-			s0 = _mm_andnot_si128(m0, _mm_add_epi8(s0, a));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
-			s0 = _mm_add_epi8(s0, _mm_andnot_si128(m0, _mm_slli_si128(s0, 8)));
+			s0 = _mm_add_epi8(_mm_add_epi8(s0, prev), _mm_slli_epi64(s0, 8));
+			s0 = _mm_add_epi8(s0, _mm_slli_epi64(s0, 16));
+			s0 = _mm_add_epi8(s0, _mm_slli_epi64(s0, 32));
 			s0 = _mm_blendv_epi8(s0, t0, m0);
-			_mm_storeu_si128((__m128i *)p, s0);
-			prev = s0;
+			s0 = _mm_add_epi8(s0, _mm_shuffle_epi8(s0, _mm_or_si128(_mm_set_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1), m0)));
+			_mm_storeu_si128((__m128i*)p, s0);
+			prev = _mm_shuffle_epi8(s0, _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15, 15));
 		}
 	}
 
@@ -415,17 +413,14 @@ void tuned_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8
 			auto [s0, m0] = UnpackForDelta<F>(q, r, shift);
 
 			__m128i top = _mm_loadu_si128((const __m128i*)(p - cbStride));
-			auto t0 = _mm_add_epi8(s0, _mm_loadu_si128((const __m128i*)t));
-			auto a = _mm_alignr_epi8(_mm_and_si128(_mm_sub_epi8(t0, top), m0), prev, 15);
-			s0 = _mm_andnot_si128(m0, _mm_add_epi8(s0, a));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
-			s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
-			s0 = _mm_add_epi8(s0, _mm_andnot_si128(m0, _mm_slli_si128(s0, 8)));
-			s0 = _mm_add_epi8(s0, top);
+			auto t0 = _mm_sub_epi8(_mm_add_epi8(s0, _mm_loadu_si128((const __m128i*)t)), top);
+			s0 = _mm_add_epi8(_mm_add_epi8(s0, prev), _mm_slli_epi64(s0, 8));
+			s0 = _mm_add_epi8(s0, _mm_slli_epi64(s0, 16));
+			s0 = _mm_add_epi8(s0, _mm_slli_epi64(s0, 32));
 			s0 = _mm_blendv_epi8(s0, t0, m0);
-			_mm_storeu_si128((__m128i *)p, s0);
-			prev = _mm_sub_epi8(s0, top);
+			s0 = _mm_add_epi8(s0, _mm_shuffle_epi8(s0, _mm_or_si128(_mm_set_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1), m0)));
+			_mm_storeu_si128((__m128i*)p, _mm_add_epi8(s0, top));
+			prev = _mm_shuffle_epi8(s0, _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15, 15));
 		}
 	}
 }
