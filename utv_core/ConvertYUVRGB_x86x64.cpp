@@ -18,7 +18,12 @@ void tuned_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 	__m128i vu2g = _mm_set2_epi16_shift(C::V2G, C::U2G, shift);
 	__m128i vu2b = _mm_set2_epi16_shift(0, C::U2B, shift);
 
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+	__m512i xy2rgb512 = _mm512_set2_epi16_shift((-16 * C::Y2RGB + 0.5) / 0xff, C::Y2RGB, shift);
+	__m512i vu2r512 = _mm512_set2_epi16_shift(C::V2R, 0, shift);
+	__m512i vu2g512 = _mm512_set2_epi16_shift(C::V2G, C::U2G, shift);
+	__m512i vu2b512 = _mm512_set2_epi16_shift(0, C::U2B, shift);
+#elif defined(__AVX2__)
 	__m256i xy2rgb256 = _mm256_set2_epi16_shift((-16 * C::Y2RGB + 0.5) / 0xff, C::Y2RGB, shift);
 	__m256i vu2r256 = _mm256_set2_epi16_shift(C::V2R, 0, shift);
 	__m256i vu2g256 = _mm256_set2_epi16_shift(C::V2G, C::U2G, shift);
@@ -33,7 +38,76 @@ void tuned_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 
 		auto pp = p;
 
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		for (; pp <= p + cbWidth - 64; pp += T::BYPP * 16)
+		{
+			__m128i yy = _mm_loadu_si128((const __m128i*)y);
+			__m512i uu = _mm512_zextsi128_si512(_mm_loadu_si128((const __m128i*)u));
+			__m512i vv = _mm512_zextsi128_si512(_mm_loadu_si128((const __m128i*)v));
+
+			__m512i xy = _mm512_or_si512(_mm512_cvtepu8_epi32(yy), _mm512_set1_epi32(0x00ff0000));
+			__m512i ctl = _mm512_set_epi8(
+				-1, 79, -1, 15, -1, 78, -1, 14, -1, 77, -1, 13, -1, 76, -1, 12,
+				-1, 75, -1, 11, -1, 74, -1, 10, -1, 73, -1,  9, -1, 72, -1,  8,
+				-1, 71, -1,  7, -1, 70, -1,  6, -1, 69, -1,  5, -1, 68, -1,  4,
+				-1, 67, -1,  3, -1, 66, -1,  2, -1, 65, -1,  1, -1, 64, -1,  0
+			);
+			__m512i vu = _mm512_permutex2var_epi8(uu, ctl, vv); // 00 V3 00 U3 00 V2 00 U2 00 V1 00 U1 00 V0 00 U0
+			vu = _mm512_sub_epi16(vu, _mm512_set1_epi16(128));
+
+			__m512i rgbtmp = _mm512_madd_epi16(xy, xy2rgb512);
+
+			auto xyuv2rgb = [rgbtmp, vu, shift](__m512i vu2rgb) -> __m512i {
+				__m512i rgb = _mm512_dpwssd_epi32(rgbtmp, vu, vu2rgb);
+				rgb = _mm512_srai_epi32(rgb, shift);
+				rgb = _mm512_packs_epi32(rgb, rgb);
+				rgb = _mm512_packus_epi16(rgb, rgb);
+				return rgb;
+			};
+			__m512i rr = xyuv2rgb(vu2r512);
+			__m512i gg = xyuv2rgb(vu2g512);
+			__m512i bb = xyuv2rgb(vu2b512);
+
+			if (std::is_same<T, CBGRAColorOrder>::value)
+			{
+				__m512i bgrx = _mm512_unpacklo_epi16(_mm512_unpacklo_epi8(bb, gg), _mm512_unpacklo_epi8(rr, _mm512_setone_si512()));
+				_mm512_storeu_si512((__m512i*)pp, bgrx);
+			}
+			else if (std::is_same<T, CBGRColorOrder>::value)
+			{
+				__m512i bgrx = _mm512_unpacklo_epi16(_mm512_unpacklo_epi8(bb, gg), _mm512_unpacklo_epi8(rr, rr));
+				__m512i bgr = _mm512_permutexvar_epi8(_mm512_set_epi8(
+					-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+					62, 61, 60, 58, 57, 56, 54, 53, 52, 50, 49, 48,
+					46, 45, 44, 42, 41, 40, 38, 37, 36, 34, 33, 32,
+					30, 29, 28, 26, 25, 24, 22, 21, 20, 18, 17, 16,
+					14, 13, 12, 10,  9,  8,  6,  5,  4,  2,  1,  0
+				), bgrx);
+				_mm512_storeu_si512((__m512i*)pp, bgr);
+			}
+			else if (std::is_same<T, CARGBColorOrder>::value)
+			{
+				__m512i xrgb = _mm512_unpacklo_epi16(_mm512_unpacklo_epi8(_mm512_setone_si512(), rr), _mm512_unpacklo_epi8(gg, bb));
+				_mm512_storeu_si512((__m512i*)pp, xrgb);
+			}
+			else if (std::is_same<T, CRGBColorOrder>::value)
+			{
+				__m512i xrgb = _mm512_unpacklo_epi16(_mm512_unpacklo_epi8(rr, rr), _mm512_unpacklo_epi8(gg, bb));
+				__m512i rgb = _mm512_permutexvar_epi8(_mm512_set_epi8(
+					-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+					63, 62, 61, 59, 58, 57, 55, 54, 53, 51, 50, 49,
+					47, 46, 45, 43, 42, 41, 39, 38, 37, 35, 34, 33,
+					31, 30, 29, 27, 26, 25, 23, 22, 21, 19, 18, 17,
+					15, 14, 13, 11, 10,  9,  7,  6,  5,  3,  2,  1
+				), xrgb);
+				_mm512_storeu_si512((__m512i*)pp, rgb);
+			}
+
+			y += 16;
+			u += 16;
+			v += 16;
+		}
+#elif defined(__AVX2__)
 		for (; pp <= p + cbWidth - 32; pp += T::BYPP * 8)
 		{
 			__m128i yy = _mm_loadl_epi64((const __m128i *)y);
@@ -218,6 +292,17 @@ template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CRGBCo
 template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 #endif
 
+#ifdef GENERATE_AVX512_ICL
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRAColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CRGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CARGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CBGRColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CBGRAColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CRGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CARGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+#endif
+
 //
 
 template<int F, class C, class T>
@@ -226,7 +311,9 @@ void tuned_ConvertRGBToULY4(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 	const int shift = 14;
 
 	__m128i rb2y, xg2y, rb2u, xg2u, rb2v, xg2v;
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+	__m512i rb2y512, xg2y512, rb2u512, xg2u512, rb2v512, xg2v512;
+#elif defined(__AVX2__)
 	__m256i rb2y256, xg2y256, rb2u256, xg2u256, rb2v256, xg2v256;
 #endif
 
@@ -238,7 +325,14 @@ void tuned_ConvertRGBToULY4(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 		xg2u = _mm_set2_epi16_shift(128.5 / 0xff, C::G2U, shift);
 		rb2v = _mm_set2_epi16_shift(C::R2V, C::B2V, shift);
 		xg2v = _mm_set2_epi16_shift(128.5 / 0xff, C::G2V, shift);
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		rb2y512 = _mm512_set2_epi16_shift(C::R2Y, C::B2Y, shift);
+		xg2y512 = _mm512_set2_epi16_shift(16.5 / 0xff, C::G2Y, shift);
+		rb2u512 = _mm512_set2_epi16_shift(C::R2U, C::B2U, shift);
+		xg2u512 = _mm512_set2_epi16_shift(128.5 / 0xff, C::G2U, shift);
+		rb2v512 = _mm512_set2_epi16_shift(C::R2V, C::B2V, shift);
+		xg2v512 = _mm512_set2_epi16_shift(128.5 / 0xff, C::G2V, shift);
+#elif defined(__AVX2__)
 		rb2y256 = _mm256_set2_epi16_shift(C::R2Y, C::B2Y, shift);
 		xg2y256 = _mm256_set2_epi16_shift(16.5 / 0xff, C::G2Y, shift);
 		rb2u256 = _mm256_set2_epi16_shift(C::R2U, C::B2U, shift);
@@ -255,7 +349,14 @@ void tuned_ConvertRGBToULY4(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 		xg2u = _mm_set2_epi16_shift(C::G2U, 128.5 / 0xff, shift);
 		rb2v = _mm_set2_epi16_shift(C::B2V, C::R2V, shift);
 		xg2v = _mm_set2_epi16_shift(C::G2V, 128.5 / 0xff, shift);
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		rb2y512 = _mm512_set2_epi16_shift(C::B2Y, C::R2Y, shift);
+		xg2y512 = _mm512_set2_epi16_shift(C::G2Y, 16.5 / 0xff, shift);
+		rb2u512 = _mm512_set2_epi16_shift(C::B2U, C::R2U, shift);
+		xg2u512 = _mm512_set2_epi16_shift(C::G2U, 128.5 / 0xff, shift);
+		rb2v512 = _mm512_set2_epi16_shift(C::B2V, C::R2V, shift);
+		xg2v512 = _mm512_set2_epi16_shift(C::G2V, 128.5 / 0xff, shift);
+#elif defined(__AVX2__)
 		rb2y256 = _mm256_set2_epi16_shift(C::B2Y, C::R2Y, shift);
 		xg2y256 = _mm256_set2_epi16_shift(C::G2Y, 16.5 / 0xff, shift);
 		rb2u256 = _mm256_set2_epi16_shift(C::B2U, C::R2U, shift);
@@ -273,7 +374,63 @@ void tuned_ConvertRGBToULY4(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 
 		auto pp = p;
 
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		for (; pp <= p + cbWidth - 64; pp += T::BYPP * 16)
+		{
+			__m512i m = _mm512_loadu_si512((const __m512i*)pp);
+			__m512i rb, xg;
+			if (std::is_same<T, CBGRAColorOrder>::value)
+			{
+				// m = XX R3 G3 B3 XX R2 G2 B2 XX R1 G1 B1 XX R0 G0 B0
+				rb = _mm512_and_si512(m, _mm512_set1_epi16(0x00ff)); // 00 R3 00 B3 00 R2 00 B2 00 R1 00 B1 00 R0 00 B0
+				xg = _mm512_or_si512(_mm512_srli_epi16(m, 8), _mm512_set1_epi32(0x00ff0000)); // 00 ff 00 G3 00 ff 00 G2 00 ff 00 G1 00 ff 00 G0
+			}
+			else if (std::is_same<T, CBGRColorOrder>::value)
+			{
+				m = _mm512_permutex2var_epi8(m, _mm512_set_epi8(
+					-1, 47, 46, 45, -1, 44, 43, 42, -1, 41, 40, 39, -1, 38, 37, 36,
+					-1, 35, 34, 33, -1, 32, 31, 30, -1, 29, 28, 27, -1, 26, 25, 24,
+					-1, 23, 22, 21, -1, 20, 19, 18, -1, 17, 16, 15, -1, 14, 13, 12,
+					-1, 11, 10,  9, -1,  8,  7,  6, -1,  5,  4,  3, -1,  2,  1,  0
+				), _mm512_set1_epi8(-1));
+				// m = XX XX XX XX R3 G3 B3 R2 G2 B2 R1 G1 B1 R0 G0 B0
+				rb = _mm512_and_si512(m, _mm512_set1_epi16(0x00ff)); // 00 R3 00 B3 00 R2 00 B2 00 R1 00 B1 00 R0 00 B0
+				xg = _mm512_srli_epi16(m, 8); // 00 ff 00 G3 00 ff 00 G2 00 ff 00 G1 00 ff 00 G0
+			}
+			else if (std::is_same<T, CARGBColorOrder>::value)
+			{
+				// m = B3 G3 R3 XX B2 G2 R2 XX B1 G1 R1 XX B0 G0 R0 XX
+				rb = _mm512_srli_epi16(m, 8); // 00 B3 00 R3 00 B2 00 R2 00 B1 00 R1 00 B0 00 R0
+				xg = _mm512_or_si512(_mm512_and_si512(m, _mm512_set1_epi32(0x00ff0000)), _mm512_set1_epi32(0x000000ff)); // 00 G3 00 ff 00 G2 00 ff 00 G1 00 ff 00 G0 00 ff
+			}
+			else if (std::is_same<T, CRGBColorOrder>::value)
+			{
+				m = _mm512_permutex2var_epi8(m, _mm512_set_epi8(
+					47, 46, 45, -1, 44, 43, 42, -1, 41, 40, 39, -1, 38, 37, 36, -1,
+					35, 34, 33, -1, 32, 31, 30, -1, 29, 28, 27, -1, 26, 25, 24, -1,
+					23, 22, 21, -1, 20, 19, 18, -1, 17, 16, 15, -1, 14, 13, 12, -1,
+					11, 10,  9, -1,  8,  7,  6, -1,  5,  4,  3, -1,  2,  1,  0, -1
+				), _mm512_set1_epi8(-1));
+				rb = _mm512_srli_epi16(m, 8); // 00 B3 00 R3 00 B2 00 R2 00 B1 00 R1 00 B0 00 R0
+				xg = _mm512_and_si512(m, _mm512_set1_epi16(0x00ff)); // 00 G3 00 ff 00 G2 00 ff 00 G1 00 ff 00 G0 00 ff
+			}
+
+			auto xrgb2yuv = [rb, xg, shift](__m512i rb2yuv, __m512i xg2yuv) -> __m128i {
+				__m512i yuv = _mm512_dpwssd_epi32(_mm512_madd_epi16(rb, rb2yuv), xg, xg2yuv);
+				yuv = _mm512_srli_epi32(yuv, shift);
+				return _mm512_castsi512_si128(_mm512_permutexvar_epi8(_mm512_castsi128_si512(_mm_set_epi8(
+					60, 56, 52, 48, 44, 40, 36, 32, 28, 24, 20, 16, 12,  8,  4,  0
+				)), yuv));
+			};
+			_mm_storeu_si128((__m128i*)y, xrgb2yuv(rb2y512, xg2y512));
+			_mm_storeu_si128((__m128i*)u, xrgb2yuv(rb2u512, xg2u512));
+			_mm_storeu_si128((__m128i*)v, xrgb2yuv(rb2v512, xg2v512));
+
+			y += 16;
+			u += 16;
+			v += 16;
+		}
+#elif defined(__AVX2__)
 		for (; pp <= p + cbWidth - 32; pp += T::BYPP * 8)
 		{
 			__m256i m = _mm256_loadu_si256((const __m256i *)pp);
@@ -451,6 +608,17 @@ template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2, CBT709Coefficient, CRGBCo
 template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2, CBT709Coefficient, CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 #endif
 
+#ifdef GENERATE_AVX512_ICL
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRAColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CRGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CARGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CBGRColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CBGRAColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CRGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CARGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+#endif
+
 //
 
 // èàóùÇ™ ULY4 Ç∆ÇŸÇ⁄ìØÇ∂Ç»ÇÃÇÇ»ÇÒÇ∆Ç©ÇµÇΩÇ¢
@@ -464,7 +632,12 @@ void tuned_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 	__m128i vu2g = _mm_set2_epi16_shift(C::V2G, C::U2G, shift);
 	__m128i vu2b = _mm_set2_epi16_shift(0, C::U2B, shift);
 
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+	__m512i xy2rgb512 = _mm512_set2_epi16_shift((-16 * C::Y2RGB + 0.5) / 0xff, C::Y2RGB, shift);
+	__m512i vu2r512 = _mm512_set2_epi16_shift(C::V2R, 0, shift);
+	__m512i vu2g512 = _mm512_set2_epi16_shift(C::V2G, C::U2G, shift);
+	__m512i vu2b512 = _mm512_set2_epi16_shift(0, C::U2B, shift);
+#elif defined(__AVX2__)
 	__m256i xy2rgb256 = _mm256_set2_epi16_shift((-16 * C::Y2RGB + 0.5) / 0xff, C::Y2RGB, shift);
 	__m256i vu2r256 = _mm256_set2_epi16_shift(C::V2R, 0, shift);
 	__m256i vu2g256 = _mm256_set2_epi16_shift(C::V2G, C::U2G, shift);
@@ -479,7 +652,76 @@ void tuned_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 
 		auto pp = p;
 
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		for (; pp <= p + cbWidth - 64; pp += T::BYPP * 16)
+		{
+			__m128i yy = _mm_loadu_si128((const __m128i*)y);
+			__m512i uu = _mm512_zextsi128_si512(_mm_loadl_epi64((const __m128i*)u));
+			__m512i vv = _mm512_zextsi128_si512(_mm_loadl_epi64((const __m128i*)v));
+
+			__m512i xy = _mm512_or_si512(_mm512_cvtepu8_epi32(yy), _mm512_set1_epi32(0x00ff0000));
+			__m512i ctl = _mm512_set_epi8(
+				-1, 71, -1,  7, -1, 71, -1,  7, -1, 70, -1,  6, -1, 70, -1,  6,
+				-1, 69, -1,  5, -1, 69, -1,  5, -1, 68, -1,  4, -1, 68, -1,  4,
+				-1, 67, -1,  3, -1, 67, -1,  3, -1, 66, -1,  2, -1, 66, -1,  2,
+				-1, 65, -1,  1, -1, 65, -1,  1, -1, 64, -1,  0, -1, 64, -1,  0
+			);
+			__m512i vu = _mm512_permutex2var_epi8(uu, ctl, vv); // 00 V2 00 U2 00 V2 00 U2 00 V0 00 U0 00 V0 00 U0
+			vu = _mm512_sub_epi16(vu, _mm512_set1_epi16(128));
+
+			__m512i rgbtmp = _mm512_madd_epi16(xy, xy2rgb512);
+
+			auto xyuv2rgb = [rgbtmp, vu, shift](__m512i vu2rgb) -> __m512i {
+				__m512i rgb = _mm512_dpwssd_epi32(rgbtmp, vu, vu2rgb);
+				rgb = _mm512_srai_epi32(rgb, shift);
+				rgb = _mm512_packs_epi32(rgb, rgb);
+				rgb = _mm512_packus_epi16(rgb, rgb);
+				return rgb;
+			};
+			__m512i rr = xyuv2rgb(vu2r512);
+			__m512i gg = xyuv2rgb(vu2g512);
+			__m512i bb = xyuv2rgb(vu2b512);
+
+			if (std::is_same<T, CBGRAColorOrder>::value)
+			{
+				__m512i bgrx = _mm512_unpacklo_epi16(_mm512_unpacklo_epi8(bb, gg), _mm512_unpacklo_epi8(rr, _mm512_setone_si512()));
+				_mm512_storeu_si512((__m512i*)pp, bgrx);
+			}
+			else if (std::is_same<T, CBGRColorOrder>::value)
+			{
+				__m512i bgrx = _mm512_unpacklo_epi16(_mm512_unpacklo_epi8(bb, gg), _mm512_unpacklo_epi8(rr, rr));
+				__m512i bgr = _mm512_permutexvar_epi8(_mm512_set_epi8(
+					-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+					62, 61, 60, 58, 57, 56, 54, 53, 52, 50, 49, 48,
+					46, 45, 44, 42, 41, 40, 38, 37, 36, 34, 33, 32,
+					30, 29, 28, 26, 25, 24, 22, 21, 20, 18, 17, 16,
+					14, 13, 12, 10,  9,  8,  6,  5,  4,  2,  1,  0
+				), bgrx);
+				_mm512_storeu_si512((__m512i*)pp, bgr);
+			}
+			else if (std::is_same<T, CARGBColorOrder>::value)
+			{
+				__m512i xrgb = _mm512_unpacklo_epi16(_mm512_unpacklo_epi8(_mm512_setone_si512(), rr), _mm512_unpacklo_epi8(gg, bb));
+				_mm512_storeu_si512((__m512i*)pp, xrgb);
+			}
+			else if (std::is_same<T, CRGBColorOrder>::value)
+			{
+				__m512i xrgb = _mm512_unpacklo_epi16(_mm512_unpacklo_epi8(rr, rr), _mm512_unpacklo_epi8(gg, bb));
+				__m512i rgb = _mm512_permutexvar_epi8(_mm512_set_epi8(
+					-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+					63, 62, 61, 59, 58, 57, 55, 54, 53, 51, 50, 49,
+					47, 46, 45, 43, 42, 41, 39, 38, 37, 35, 34, 33,
+					31, 30, 29, 27, 26, 25, 23, 22, 21, 19, 18, 17,
+					15, 14, 13, 11, 10,  9,  7,  6,  5,  3,  2,  1
+				), xrgb);
+				_mm512_storeu_si512((__m512i*)pp, rgb);
+			}
+
+			y += 16;
+			u += 8;
+			v += 8;
+		}
+#elif defined(__AVX2__)
 		for (; pp <= p + cbWidth - 32; pp += T::BYPP * 8)
 		{
 			__m128i yy = _mm_loadl_epi64((const __m128i *)y);
@@ -674,6 +916,17 @@ template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CRGBCo
 template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 #endif
 
+#ifdef GENERATE_AVX512_ICL
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRAColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CRGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CARGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CBGRColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CBGRAColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CRGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CARGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+#endif
+
 //
 
 // ULY2ToRGB ÇŸÇ«Ç≈ÇÕÇ»Ç¢Ç™ ULY4 Ç∆Ç©Ç»ÇËãﬂÇ¢ÇÃÇà»â∫ó™
@@ -683,7 +936,9 @@ void tuned_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 	const int shift = 14;
 
 	__m128i rb2y, xg2y, rb2u, xg2u, rb2v, xg2v;
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+	__m512i rb2y512, xg2y512, rb2u512, xg2u512, rb2v512, xg2v512;
+#elif defined(__AVX2__)
 	__m256i rb2y256, xg2y256, rb2u256, xg2u256, rb2v256, xg2v256;
 #endif
 
@@ -695,7 +950,14 @@ void tuned_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 		xg2u = _mm_set4_epi16_shift(0, 0, 128.5 / 0xff, C::G2U, shift);
 		rb2v = _mm_set4_epi16_shift(0, 0, C::R2V, C::B2V, shift);
 		xg2v = _mm_set4_epi16_shift(0, 0, 128.5 / 0xff, C::G2V, shift);
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		rb2y512 = _mm512_set2_epi16_shift(C::R2Y, C::B2Y, shift);
+		xg2y512 = _mm512_set2_epi16_shift(16.5 / 0xff, C::G2Y, shift);
+		rb2u512 = _mm512_set4_epi16_shift(0, 0, C::R2U, C::B2U, shift);
+		xg2u512 = _mm512_set4_epi16_shift(0, 0, 128.5 / 0xff, C::G2U, shift);
+		rb2v512 = _mm512_set4_epi16_shift(0, 0, C::R2V, C::B2V, shift);
+		xg2v512 = _mm512_set4_epi16_shift(0, 0, 128.5 / 0xff, C::G2V, shift);
+#elif defined(__AVX2__)
 		rb2y256 = _mm256_set2_epi16_shift(C::R2Y, C::B2Y, shift);
 		xg2y256 = _mm256_set2_epi16_shift(16.5 / 0xff, C::G2Y, shift);
 		rb2u256 = _mm256_set4_epi16_shift(0, 0, C::R2U, C::B2U, shift);
@@ -712,7 +974,14 @@ void tuned_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 		xg2u = _mm_set4_epi16_shift(0, 0, C::G2U, 128.5 / 0xff, shift);
 		rb2v = _mm_set4_epi16_shift(0, 0, C::B2V, C::R2V, shift);
 		xg2v = _mm_set4_epi16_shift(0, 0, C::G2V, 128.5 / 0xff, shift);
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		rb2y512 = _mm512_set2_epi16_shift(C::B2Y, C::R2Y, shift);
+		xg2y512 = _mm512_set2_epi16_shift(C::G2Y, 16.5 / 0xff, shift);
+		rb2u512 = _mm512_set4_epi16_shift(0, 0, C::B2U, C::R2U, shift);
+		xg2u512 = _mm512_set4_epi16_shift(0, 0, C::G2U, 128.5 / 0xff, shift);
+		rb2v512 = _mm512_set4_epi16_shift(0, 0, C::B2V, C::R2V, shift);
+		xg2v512 = _mm512_set4_epi16_shift(0, 0, C::G2V, 128.5 / 0xff, shift);
+#elif defined(__AVX2__)
 		rb2y256 = _mm256_set2_epi16_shift(C::B2Y, C::R2Y, shift);
 		xg2y256 = _mm256_set2_epi16_shift(C::G2Y, 16.5 / 0xff, shift);
 		rb2u256 = _mm256_set4_epi16_shift(0, 0, C::B2U, C::R2U, shift);
@@ -730,7 +999,72 @@ void tuned_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 
 		auto pp = p;
 
-#if defined(__AVX2__)
+#if defined(__AVX512F__)
+		for (; pp <= p + cbWidth - 64; pp += T::BYPP * 16)
+		{
+			__m512i m = _mm512_loadu_si512((const __m512i*)pp);
+			__m512i rb, xg;
+			if (std::is_same<T, CBGRAColorOrder>::value)
+			{
+				// m = XX R3 G3 B3 XX R2 G2 B2 XX R1 G1 B1 XX R0 G0 B0
+				rb = _mm512_and_si512(m, _mm512_set1_epi16(0x00ff)); // 00 R3 00 B3 00 R2 00 B2 00 R1 00 B1 00 R0 00 B0
+				xg = _mm512_or_si512(_mm512_srli_epi16(m, 8), _mm512_set1_epi32(0x00ff0000)); // 00 ff 00 G3 00 ff 00 G2 00 ff 00 G1 00 ff 00 G0
+			}
+			else if (std::is_same<T, CBGRColorOrder>::value)
+			{
+				m = _mm512_permutex2var_epi8(m, _mm512_set_epi8(
+					-1, 47, 46, 45, -1, 44, 43, 42, -1, 41, 40, 39, -1, 38, 37, 36,
+					-1, 35, 34, 33, -1, 32, 31, 30, -1, 29, 28, 27, -1, 26, 25, 24,
+					-1, 23, 22, 21, -1, 20, 19, 18, -1, 17, 16, 15, -1, 14, 13, 12,
+					-1, 11, 10,  9, -1,  8,  7,  6, -1,  5,  4,  3, -1,  2,  1,  0
+				), _mm512_set1_epi8(-1));
+				// m = XX XX XX XX R3 G3 B3 R2 G2 B2 R1 G1 B1 R0 G0 B0
+				rb = _mm512_and_si512(m, _mm512_set1_epi16(0x00ff)); // 00 R3 00 B3 00 R2 00 B2 00 R1 00 B1 00 R0 00 B0
+				xg = _mm512_srli_epi16(m, 8); // 00 ff 00 G3 00 ff 00 G2 00 ff 00 G1 00 ff 00 G0
+			}
+			else if (std::is_same<T, CARGBColorOrder>::value)
+			{
+				// m = B3 G3 R3 XX B2 G2 R2 XX B1 G1 R1 XX B0 G0 R0 XX
+				rb = _mm512_srli_epi16(m, 8); // 00 B3 00 R3 00 B2 00 R2 00 B1 00 R1 00 B0 00 R0
+				xg = _mm512_or_si512(_mm512_and_si512(m, _mm512_set1_epi32(0x00ff0000)), _mm512_set1_epi32(0x000000ff)); // 00 G3 00 ff 00 G2 00 ff 00 G1 00 ff 00 G0 00 ff
+			}
+			else if (std::is_same<T, CRGBColorOrder>::value)
+			{
+				m = _mm512_permutex2var_epi8(m, _mm512_set_epi8(
+					47, 46, 45, -1, 44, 43, 42, -1, 41, 40, 39, -1, 38, 37, 36, -1,
+					35, 34, 33, -1, 32, 31, 30, -1, 29, 28, 27, -1, 26, 25, 24, -1,
+					23, 22, 21, -1, 20, 19, 18, -1, 17, 16, 15, -1, 14, 13, 12, -1,
+					11, 10,  9, -1,  8,  7,  6, -1,  5,  4,  3, -1,  2,  1,  0, -1
+				), _mm512_set1_epi8(-1));
+				rb = _mm512_srli_epi16(m, 8); // 00 B3 00 R3 00 B2 00 R2 00 B1 00 R1 00 B0 00 R0
+				xg = _mm512_and_si512(m, _mm512_set1_epi16(0x00ff)); // 00 G3 00 ff 00 G2 00 ff 00 G1 00 ff 00 G0 00 ff
+			}
+
+			__m512i yy = _mm512_dpwssd_epi32(_mm512_madd_epi16(rb, rb2y512), xg, xg2y512);
+			yy = _mm512_srli_epi32(yy, shift);
+			yy = _mm512_permutexvar_epi8(_mm512_castsi128_si512(_mm_set_epi8(
+				60, 56, 52, 48, 44, 40, 36, 32, 28, 24, 20, 16, 12,  8,  4,  0
+			)), yy);
+			_mm_storeu_si128((__m128i*)y, _mm512_castsi512_si128(yy));
+
+			rb = _mm512_add_epi16(rb, _mm512_srli_epi64(rb, 32));
+			xg = _mm512_add_epi16(xg, _mm512_srli_epi64(xg, 32));
+			auto xrgb2uv = [rb, xg, shift](__m512i rb2uv, __m512i xg2uv) -> __m128i {
+				__m512i uv = _mm512_dpwssd_epi32(_mm512_madd_epi16(rb, rb2uv), xg, xg2uv);
+				uv = _mm512_srli_epi32(uv, shift + 1);
+				uv = _mm512_permutexvar_epi8(_mm512_castsi128_si512(_mm_set_epi8(
+					-1, -1, -1, -1, -1, -1, -1, -1, 56, 48, 40, 32, 24, 16,  8,  0
+				)), uv);
+				return _mm512_castsi512_si128(uv);
+			};
+			_mm_storel_epi64((__m128i*)u, xrgb2uv(rb2u512, xg2u512));
+			_mm_storel_epi64((__m128i*)v, xrgb2uv(rb2v512, xg2v512));
+
+			y += 16;
+			u += 8;
+			v += 8;
+		}
+#elif defined(__AVX2__)
 		for (; pp <= p + cbWidth - 32; pp += T::BYPP * 8)
 		{
 			__m256i m = _mm256_loadu_si256((const __m256i *)pp);
@@ -926,6 +1260,17 @@ template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2, CBT709Coefficient, CBGRCo
 template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2, CBT709Coefficient, CBGRAColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2, CBT709Coefficient, CRGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2, CBT709Coefficient, CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+#endif
+
+#ifdef GENERATE_AVX512_ICL
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRAColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CRGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CARGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CBGRColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CBGRAColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CRGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX512_ICL, CBT709Coefficient, CARGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 #endif
 
 //

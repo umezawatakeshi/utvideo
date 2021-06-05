@@ -186,6 +186,43 @@ template<> static inline FORCEINLINE __m256i _mmt_sub_epi8<__m256i>(__m256i v0, 
 
 #if defined(__AVX512F__)
 
+static inline FORCEINLINE __m512i _mm512_setone_si512()
+{
+	return _mm512_set1_epi8(-1);
+}
+
+static inline FORCEINLINE __m512i _mm512_set2_epi16(short a, short b)
+{
+	return _mm512_set_epi16(
+		a, b, a, b, a, b, a, b, a, b, a, b, a, b, a, b,
+		a, b, a, b, a, b, a, b, a, b, a, b, a, b, a, b
+	);
+}
+
+static inline FORCEINLINE __m512i _mm512_set4_epi16(short a, short b, short c, short d)
+{
+	return _mm512_set_epi16(
+		a, b, c, d, a, b, c, d, a, b, c, d, a, b, c, d,
+		a, b, c, d, a, b, c, d, a, b, c, d, a, b, c, d
+	);
+}
+
+static inline FORCEINLINE __m512i _mm512_set2_epi16_shift(double a, double b, int shift)
+{
+	short aa = short(a * (1 << shift));
+	short bb = short(b * (1 << shift));
+	return _mm512_set2_epi16(aa, bb);
+}
+
+static inline FORCEINLINE __m512i _mm512_set4_epi16_shift(double a, double b, double c, double d, int shift)
+{
+	short aa = short(a * (1 << shift));
+	short bb = short(b * (1 << shift));
+	short cc = short(c * (1 << shift));
+	short dd = short(d * (1 << shift));
+	return _mm512_set4_epi16(aa, bb, cc, dd);
+}
+
 static inline FORCEINLINE __m512i _mm512_set8_epi8(char e7, char e6, char e5, char e4, char e3, char e2, char e1, char e0)
 {
 	return _mm512_set_epi8(
