@@ -40,7 +40,7 @@ void tuned_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 			__m128i uu = _mm_loadl_epi64((const __m128i *)u);
 			__m128i vv = _mm_loadl_epi64((const __m128i *)v);
 
-			__m256i xy = _mm256_cvtepu8_epi16(_mm_unpacklo_epi8(yy, _mm_setone_si128())); // 00 ff 00 Y3 00 ff 00 Y2 00 ff 00 Y1 00 ff 00 Y0
+			__m256i xy = _mm256_or_si256(_mm256_cvtepu8_epi32(yy), _mm256_set1_epi32(0x00ff0000)); // 00 ff 00 Y3 00 ff 00 Y2 00 ff 00 Y1 00 ff 00 Y0
 			__m256i vu = _mm256_cvtepu8_epi16(_mm_unpacklo_epi8(uu, vv)); // 00 V3 00 U3 00 V2 00 U2 00 V1 00 U1 00 V0 00 U0
 			vu = _mm256_sub_epi16(vu, _mm256_set1_epi16(128));
 
@@ -486,7 +486,7 @@ void tuned_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 			__m128i uu = _mm_cvtsi32_si128(*(const int *)u);
 			__m128i vv = _mm_cvtsi32_si128(*(const int *)v);
 
-			__m256i xy = _mm256_cvtepu8_epi16(_mm_unpacklo_epi8(yy, _mm_setone_si128())); // 00 ff 00 Y3 00 ff 00 Y2 00 ff 00 Y1 00 ff 00 Y0
+			__m256i xy = _mm256_or_si256(_mm256_cvtepu8_epi32(yy), _mm256_set1_epi32(0x00ff0000)); // 00 ff 00 Y3 00 ff 00 Y2 00 ff 00 Y1 00 ff 00 Y0
 			__m128i vutmp = _mm_unpacklo_epi8(uu, vv); // XX XX XX XX XX XX XX XX V6 U6 V4 U4 V2 U2 V0 U0
 			__m256i vu = _mm256_cvtepu8_epi16(_mm_unpacklo_epi16(vutmp, vutmp)); // 00 V2 00 U2 00 V2 00 U2 00 V0 00 U0 00 V0 00 U0
 			vu = _mm256_sub_epi16(vu, _mm256_set1_epi16(128));
