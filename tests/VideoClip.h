@@ -24,7 +24,6 @@ class VideoClip
 private:
 	AVFormatContext *m_pFormatCtx;
 	AVCodecParameters *m_pCodecParam;
-	AVPacket m_packet;
 	unsigned int m_nStreamIndex;
 
 public:
@@ -35,5 +34,6 @@ public:
 	unsigned int GetWidth() const;
 	unsigned int GetHeight() const;
 	size_t GetExtraData(void *buf, size_t len) const;
-	int GetNextFrame(void **bufp, size_t *lenp, bool *keyp);
+	int GetNextFrame(void **bufp, size_t *lenp, bool *keyp, size_t alignment = 0);
+	static void ReleaseFrame(void** bufp);
 };

@@ -78,8 +78,8 @@ BOOST_DATA_TEST_CASE(vcm_encdec, make_data_from_tuple_container(vecEncDecClips),
 	lr = ICDecompressBegin(hicDecode, &bihCompressed, &bihDst);
 	BOOST_REQUIRE_EQUAL(lr, ICERR_OK);
 
-	void *pSrcData;
-	void *pDstData;
+	void *pSrcData = NULL;
+	void *pDstData = NULL;
 	void *pEncoderOut = malloc(cbCompressedData);
 	void *pDecoderOut = NULL;
 	int retSrc, retDst;
@@ -100,6 +100,8 @@ BOOST_DATA_TEST_CASE(vcm_encdec, make_data_from_tuple_container(vecEncDecClips),
 		BOOST_CHECK(bihDst.biSizeImage == cbDstData);
 		BOOST_CHECK(CompareFrame(pDstData, pDecoderOut, nWidth, cbDstData, fccDst, tolerance) == 0);
 	}
+	VideoClip::ReleaseFrame(&pSrcData);
+	VideoClip::ReleaseFrame(&pDstData);
 
 	BOOST_CHECK(retSrc != 0 && retDst != 0);
 	if (pDecoderOut != NULL)

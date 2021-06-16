@@ -41,8 +41,8 @@ BOOST_DATA_TEST_CASE(vcm_encode, make_data_from_tuple_container(vecEncodeClips),
 	unsigned int nWidth = comClip.GetWidth();
 	unsigned int nHeight = comClip.GetHeight();
 
-	void *pCompressedData;
-	void *pRawData;
+	void *pCompressedData = NULL;
+	void *pRawData = NULL;
 	size_t cbCompressedData;
 	size_t cbRawData;
 	bool bKeyFrame;
@@ -104,6 +104,8 @@ BOOST_DATA_TEST_CASE(vcm_encode, make_data_from_tuple_container(vecEncodeClips),
 		BOOST_CHECK(bihCompressed.biSizeImage == cbCompressedData);
 		BOOST_CHECK(memcmp(pEncoderOut, pCompressedData, cbCompressedData) == 0);
 	}
+	VideoClip::ReleaseFrame(&pCompressedData);
+	VideoClip::ReleaseFrame(&pRawData);
 
 	BOOST_CHECK(retCompressed != 0 && retRaw != 0);
 	if (pEncoderOut != NULL)

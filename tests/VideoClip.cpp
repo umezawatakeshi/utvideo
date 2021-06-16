@@ -9,8 +9,6 @@ VideoClip::VideoClip(string filename) : m_pFormatCtx(NULL)
 	int err;
 	char buf[256];
 
-	memset(&m_packet, 0, sizeof(m_packet));
-
 	if ((err = avformat_open_input(&m_pFormatCtx, ("testclip/" + filename).c_str(), NULL, NULL)) != 0)
 	{
 		av_strerror(err, buf, sizeof(buf));
@@ -44,8 +42,6 @@ VideoClip::VideoClip(string filename) : m_pFormatCtx(NULL)
 
 VideoClip::~VideoClip()
 {
-	av_packet_unref(&m_packet);
-
 	if (m_pFormatCtx != NULL)
 		avformat_close_input(&m_pFormatCtx);
 }
@@ -85,25 +81,38 @@ size_t VideoClip::GetExtraData(void *buf, size_t len) const
 	return m_pCodecParam->extradata_size;
 }
 
-int VideoClip::GetNextFrame(void **bufp, size_t *lenp, bool *keyp)
-{
-	av_packet_unref(&m_packet);
+#define ALLOCATE_ALIGNMENT 4096
 
-	while (av_read_frame(m_pFormatCtx, &m_packet) >= 0)
+int VideoClip::GetNextFrame(void **bufp, size_t *lenp, bool *keyp, size_t alignment)
+{
+	AVPacket packet;
+
+	ReleaseFrame(bufp);
+
+	while (av_read_frame(m_pFormatCtx, &packet) >= 0)
 	{
-		if (m_packet.stream_index == m_nStreamIndex && m_packet.buf != NULL)
+		if (packet.stream_index == m_nStreamIndex && packet.buf != NULL)
 		{
-			*bufp = m_packet.data;
-			*lenp = m_packet.size;
+			*bufp = (char*)_aligned_malloc(packet.size + alignment, ALLOCATE_ALIGNMENT) + alignment;
+			memcpy(*bufp, packet.data, packet.size);
+			*lenp = packet.size;
 			if (keyp != NULL)
-				*keyp = (m_packet.flags & AV_PKT_FLAG_KEY);
+				*keyp = (packet.flags & AV_PKT_FLAG_KEY);
+			av_packet_unref(&packet);
 			return 0;
 		}
 
-		av_packet_unref(&m_packet);
+		av_packet_unref(&packet);
 	}
 
 	return -1;
+}
+
+void VideoClip::ReleaseFrame(void** bufp)
+{
+	if (*bufp != NULL)
+		_aligned_free((void*)((uintptr_t)*bufp & ~(uintptr_t)(ALLOCATE_ALIGNMENT-1)));
+	*bufp = NULL;
 }
 
 #if 0
