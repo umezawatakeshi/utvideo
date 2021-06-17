@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "VideoClip.h"
+#include "aligned_malloc.h"
 
 VideoClip::VideoClip(string filename) : m_pFormatCtx(NULL)
 {
@@ -81,8 +82,6 @@ size_t VideoClip::GetExtraData(void *buf, size_t len) const
 	return m_pCodecParam->extradata_size;
 }
 
-#define ALLOCATE_ALIGNMENT 4096
-
 int VideoClip::GetNextFrame(void **bufp, size_t *lenp, bool *keyp, size_t alignment)
 {
 	AVPacket packet;
@@ -93,7 +92,7 @@ int VideoClip::GetNextFrame(void **bufp, size_t *lenp, bool *keyp, size_t alignm
 	{
 		if (packet.stream_index == m_nStreamIndex && packet.buf != NULL)
 		{
-			*bufp = (char*)_aligned_malloc(packet.size + alignment, ALLOCATE_ALIGNMENT) + alignment;
+			*bufp = aligned_malloc(packet.size, alignment);
 			memcpy(*bufp, packet.data, packet.size);
 			*lenp = packet.size;
 			if (keyp != NULL)
@@ -111,7 +110,7 @@ int VideoClip::GetNextFrame(void **bufp, size_t *lenp, bool *keyp, size_t alignm
 void VideoClip::ReleaseFrame(void** bufp)
 {
 	if (*bufp != NULL)
-		_aligned_free((void*)((uintptr_t)*bufp & ~(uintptr_t)(ALLOCATE_ALIGNMENT-1)));
+		aligned_free(*bufp);
 	*bufp = NULL;
 }
 

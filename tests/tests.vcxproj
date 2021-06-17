@@ -150,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="aligned_malloc.h" />
     <ClInclude Include="Compare.h" />
     <ClInclude Include="expand.h" />
     <ClInclude Include="ICCloser.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="VideoClip.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="aligned_malloc.cpp" />
     <ClCompile Include="Compare.cpp" />
     <ClCompile Include="KeepLibrary.cpp" />
     <ClCompile Include="stdafx.cpp">
