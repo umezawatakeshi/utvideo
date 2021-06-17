@@ -5,3 +5,5 @@
 
 void* aligned_malloc(size_t sz, size_t alignment);
 void aligned_free(void* p);
+
+extern const std::vector<size_t> vecAlignments;
