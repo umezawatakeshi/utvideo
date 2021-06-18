@@ -8,6 +8,7 @@
 #include "tuple_container.h"
 #include "VideoClip.h"
 #include "ICCloser.h"
+#include "aligned_malloc.h"
 
 int CompareExtraDataWithMask(const void *p, size_t szp, const void *q, size_t szq, const void *m, size_t szm)
 {
@@ -28,7 +29,7 @@ int CompareExtraDataWithMask(const void *p, size_t szp, const void *q, size_t sz
 }
 
 BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder"))
-BOOST_DATA_TEST_CASE(vcm_encode, make_data_from_tuple_container(vecEncodeClips), rawfilename, comfilename, config, mask)
+BOOST_DATA_TEST_CASE(vcm_encode, make_data_from_tuple_container(vecEncodeClips) * data::make(vecAlignments), rawfilename, comfilename, config, mask, alignment)
 {
 	VideoClip comClip(comfilename);
 	VideoClip rawClip(rawfilename);
@@ -80,15 +81,15 @@ BOOST_DATA_TEST_CASE(vcm_encode, make_data_from_tuple_container(vecEncodeClips),
 	BOOST_REQUIRE(CompareExtraDataWithMask(&bihCompressed + 1, bihCompressed.biSize - sizeof(BITMAPINFOHEADER), byExtraData, cbExtraData, &mask.front(), mask.size()) == 0);
 
 	size_t cbEncoderOut = ICCompressGetSize(hic, &bihEncoderIn, &bihCompressed);
-	void *pEncoderOut = malloc(cbEncoderOut);
+	void *pEncoderOut = aligned_malloc(cbEncoderOut, alignment);
 
 	lr = ICCompressBegin(hic, &bihEncoderIn, &bihCompressed);
 	BOOST_REQUIRE_EQUAL(lr, ICERR_OK);
 
 	int retCompressed, retRaw;
 	LONG lFrameNum = 0;
-	while ((retCompressed = comClip.GetNextFrame(&pCompressedData, &cbCompressedData, &bKeyFrame)) == 0 &&
-		(retRaw = rawClip.GetNextFrame(&pRawData, &cbRawData, NULL) == 0))
+	while ((retCompressed = comClip.GetNextFrame(&pCompressedData, &cbCompressedData, &bKeyFrame, alignment)) == 0 &&
+		(retRaw = rawClip.GetNextFrame(&pRawData, &cbRawData, NULL, alignment) == 0))
 	{
 		DWORD dwFlags = 0;
 		lr = ICCompress(hic, 0, &bihCompressed, pEncoderOut, &bihEncoderIn, pRawData, NULL, &dwFlags, lFrameNum++, 0, 0, &bihEncoderIn, NULL);
@@ -109,7 +110,7 @@ BOOST_DATA_TEST_CASE(vcm_encode, make_data_from_tuple_container(vecEncodeClips),
 
 	BOOST_CHECK(retCompressed != 0 && retRaw != 0);
 	if (pEncoderOut != NULL)
-		free(pEncoderOut);
+		aligned_free(pEncoderOut);
 
 	lr = ICCompressEnd(hic);
 	BOOST_CHECK(lr == ICERR_OK);

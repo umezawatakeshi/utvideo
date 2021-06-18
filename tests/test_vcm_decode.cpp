@@ -9,9 +9,10 @@
 #include "VideoClip.h"
 #include "ICCloser.h"
 #include "Compare.h"
+#include "aligned_malloc.h"
 
 BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_decoder"))
-BOOST_DATA_TEST_CASE(vcm_decode, make_data_from_tuple_container(vecDecodeClips), compressed, decoded, tolerance)
+BOOST_DATA_TEST_CASE(vcm_decode, make_data_from_tuple_container(vecDecodeClips)* data::make(vecAlignments), compressed, decoded, tolerance, alignment)
 {
 	VideoClip comClip(compressed);
 	VideoClip decClip(decoded);
@@ -69,11 +70,11 @@ BOOST_DATA_TEST_CASE(vcm_decode, make_data_from_tuple_container(vecDecodeClips),
 
 	void *pDecoderOut = NULL;
 	int retCompressed, retDecoded;
-	while ((retCompressed = comClip.GetNextFrame(&pCompressedData, &cbCompressedData, &bKeyFrame)) == 0 &&
-		(retDecoded = decClip.GetNextFrame(&pDecodedData, &cbDecodedData, NULL) == 0))
+	while ((retCompressed = comClip.GetNextFrame(&pCompressedData, &cbCompressedData, &bKeyFrame, alignment)) == 0 &&
+		(retDecoded = decClip.GetNextFrame(&pDecodedData, &cbDecodedData, NULL, alignment) == 0))
 	{
 		if (pDecoderOut == NULL)
-			pDecoderOut = malloc(cbDecodedData);
+			pDecoderOut = aligned_malloc(cbDecodedData, alignment);
 
 		lr = ICDecompress(hic, bKeyFrame ? 0 : ICDECOMPRESS_NOTKEYFRAME, &bihCompressed, pCompressedData, &bihDecoderOut, pDecoderOut);
 		BOOST_REQUIRE(lr == ICERR_OK);
@@ -86,7 +87,7 @@ BOOST_DATA_TEST_CASE(vcm_decode, make_data_from_tuple_container(vecDecodeClips),
 
 	BOOST_CHECK(retCompressed != 0 && retDecoded != 0);
 	if (pDecoderOut != NULL)
-		free(pDecoderOut);
+		aligned_free(pDecoderOut);
 
 	lr = ICDecompressEnd(hic);
 	BOOST_CHECK(lr == ICERR_OK);

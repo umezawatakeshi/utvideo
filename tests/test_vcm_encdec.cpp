@@ -9,9 +9,10 @@
 #include "VideoClip.h"
 #include "ICCloser.h"
 #include "Compare.h"
+#include "aligned_malloc.h"
 
 BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_decoder")*depends_on("vcm_ICOpen_encoder"))
-BOOST_DATA_TEST_CASE(vcm_encdec, make_data_from_tuple_container(vecEncDecClips), src, dst, fmt, config, tolerance)
+BOOST_DATA_TEST_CASE(vcm_encdec, make_data_from_tuple_container(vecEncDecClips)* data::make(vecAlignments), src, dst, fmt, config, tolerance, alignment)
 {
 	VideoClip srcClip(src);
 	VideoClip dstClip(dst);
@@ -80,19 +81,19 @@ BOOST_DATA_TEST_CASE(vcm_encdec, make_data_from_tuple_container(vecEncDecClips),
 
 	void *pSrcData = NULL;
 	void *pDstData = NULL;
-	void *pEncoderOut = malloc(cbCompressedData);
+	void *pEncoderOut = aligned_malloc(cbCompressedData, alignment);
 	void *pDecoderOut = NULL;
 	int retSrc, retDst;
 	LONG lFrameNum = 0;
-	while ((retSrc = srcClip.GetNextFrame(&pSrcData, &cbSrcData, NULL)) == 0 &&
-		(retDst = dstClip.GetNextFrame(&pDstData, &cbDstData, NULL) == 0))
+	while ((retSrc = srcClip.GetNextFrame(&pSrcData, &cbSrcData, NULL, alignment)) == 0 &&
+		(retDst = dstClip.GetNextFrame(&pDstData, &cbDstData, NULL, alignment) == 0))
 	{
 		DWORD dwFlags = 0;
 		lr = ICCompress(hicEncode, 0, &bihCompressed, pEncoderOut, &bihSrc, pSrcData, NULL, &dwFlags, lFrameNum++, 0, 0, &bihSrc, NULL);
 		BOOST_REQUIRE(lr == ICERR_OK);
 
 		if (pDecoderOut == NULL)
-			pDecoderOut = malloc(cbDstData);
+			pDecoderOut = aligned_malloc(cbDstData, alignment);
 
 		lr = ICDecompress(hicDecode, (dwFlags & AVIIF_KEYFRAME) ? 0 : ICDECOMPRESS_NOTKEYFRAME, &bihCompressed, pEncoderOut, &bihDst, pDecoderOut);
 		BOOST_REQUIRE(lr == ICERR_OK);
@@ -105,8 +106,8 @@ BOOST_DATA_TEST_CASE(vcm_encdec, make_data_from_tuple_container(vecEncDecClips),
 
 	BOOST_CHECK(retSrc != 0 && retDst != 0);
 	if (pDecoderOut != NULL)
-		free(pDecoderOut);
-	free(pEncoderOut);
+		aligned_free(pDecoderOut);
+	aligned_free(pEncoderOut);
 
 	lr = ICDecompressEnd(hicDecode);
 	BOOST_CHECK(lr == ICERR_OK);
