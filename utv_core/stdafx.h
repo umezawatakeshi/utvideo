@@ -82,15 +82,10 @@ static inline unsigned long long ROUNDUP(unsigned long long a, unsigned long lon
 	return ((a + b - 1) / b) * b;
 }
 
-static inline bool IS_ALIGNED(uintptr_t v, uintptr_t a)
-{
-	_ASSERT(a > 0 && (a & (a - 1)) == 0); // a は 2 の累乗である。
-	return (v & (a - 1)) == 0; // v は a の倍数である。
-}
-
 static inline bool IS_ALIGNED(const void *p, uintptr_t a)
 {
-	return IS_ALIGNED((uintptr_t)p, a);
+	_ASSERT(a > 0 && (a & (a - 1)) == 0); // a は 2 の累乗である。
+	return (((uintptr_t)p) & (a - 1)) == 0; // v は a の倍数である。
 }
 
 extern void* enabler;
