@@ -93,6 +93,21 @@ static inline bool IS_ALIGNED(const void *p, uintptr_t a)
 	return IS_ALIGNED((uintptr_t)p, a);
 }
 
+extern void* enabler;
+
+template<typename T, typename U, std::enable_if_t<std::is_integral_v<T>&& std::is_integral_v<U>>*& = enabler>
+static inline bool IS_MULTIPLE(T x, U a)
+{
+	_ASSERT(a > 0);
+	return x % a == 0;
+}
+
+template<typename U, std::enable_if_t<std::is_integral_v<U>>*& = enabler>
+static inline bool IS_MULTIPLE(const void* x, const void* y, U a)
+{
+	return IS_MULTIPLE((char*)x - (char*)y, a);
+}
+
 template<typename Iterator>
 static inline bool is_not_all_zero(Iterator begin, Iterator end)
 {
