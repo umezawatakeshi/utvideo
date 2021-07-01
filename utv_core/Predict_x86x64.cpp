@@ -243,22 +243,6 @@ static inline FORCEINLINE VECTOR2<__m512i> /* value0, nextprev */ tuned_RestoreL
 }
 
 template<int F>
-static inline FORCEINLINE VECTOR3<__m128i> /* value0, value1, nextprev */ tuned_RestoreLeft8Element(__m128i prev, __m128i s0, __m128i s1)
-{
-	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 1));
-	s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 1));
-	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 2));
-	s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 2));
-	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 4));
-	s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 4));
-	s0 = _mm_add_epi8(s0, _mm_slli_si128(s0, 8));
-	s1 = _mm_add_epi8(s1, _mm_slli_si128(s1, 8));
-	s0 = _mm_add_epi8(s0, prev);
-	s1 = _mm_add_epi8(s1, _mm_shuffle_epi8(s0, _mm_set1_epi8(15)));
-	return { s0, s1, _mm_shuffle_epi8(s1, _mm_set1_epi8(15)) };
-}
-
-template<int F>
 void tuned_RestoreCylindricalLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd)
 {
 	auto p = pSrcBegin;
@@ -266,14 +250,12 @@ void tuned_RestoreCylindricalLeft8(uint8_t *pDst, const uint8_t *pSrcBegin, cons
 
 	__m128i prev = _mm_set1_epi8((char)0x80);
 
-	for (; p <= pSrcEnd - 32; p += 32, q += 32)
+	for (; p <= pSrcEnd - 16; p += 16, q += 16)
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
-		__m128i s1 = _mm_loadu_si128((const __m128i *)(p+16));
-		auto result = tuned_RestoreLeft8Element<F>(prev, s0, s1);
+		auto result = tuned_RestoreLeft8Element<F>(prev, s0);
 		_mm_storeu_si128((__m128i *)q, result.v0);
-		_mm_storeu_si128((__m128i *)(q+16), result.v1);
-		prev = result.v2;
+		prev = result.v1;
 	}
 
 	for (; p < pSrcEnd; p++, q++)
@@ -352,25 +334,6 @@ static inline FORCEINLINE VECTOR2<__m128i> /* value0, nextprev */ tuned_RestoreL
 	return { s0, _mm_shuffle_epi8(s0, _mm_set2_epi8(15, 14)) };
 }
 
-template<int F, bool NeedMask = true>
-static inline FORCEINLINE VECTOR3<__m128i> /* value0, value1, nextprev */ tuned_RestoreLeft10Element(__m128i prev, __m128i s0, __m128i s1)
-{
-	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 2));
-	s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 2));
-	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 4));
-	s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 4));
-	s0 = _mm_add_epi16(s0, _mm_slli_si128(s0, 8));
-	s1 = _mm_add_epi16(s1, _mm_slli_si128(s1, 8));
-	s0 = _mm_add_epi16(s0, prev);
-	s1 = _mm_add_epi16(s1, _mm_shuffle_epi8(s0, _mm_set2_epi8(15, 14)));
-	if (NeedMask)
-	{
-		s0 = _mm_and_si128(s0, _mm_set1_epi16(CSymbolBits<10>::maskval));
-		s1 = _mm_and_si128(s1, _mm_set1_epi16(CSymbolBits<10>::maskval));
-	}
-	return { s0, s1, _mm_shuffle_epi8(s1, _mm_set2_epi8(15, 14)) };
-}
-
 template<int F>
 void tuned_RestoreCylindricalLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, const uint16_t *pSrcEnd)
 {
@@ -379,14 +342,12 @@ void tuned_RestoreCylindricalLeft10(uint16_t *pDst, const uint16_t *pSrcBegin, c
 
 	__m128i prev = _mm_set1_epi16(CSymbolBits<10>::midval);
 
-	for (; p <= pSrcEnd - 16; p += 16, q += 16)
+	for (; p <= pSrcEnd - 8; p += 8, q += 8)
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
-		__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 8));
-		auto result = tuned_RestoreLeft10Element<F>(prev, s0, s1);
+		auto result = tuned_RestoreLeft10Element<F>(prev, s0);
 		_mm_storeu_si128((__m128i *)q, result.v0);
-		_mm_storeu_si128((__m128i *)(q + 8), result.v1);
-		prev = result.v2;
+		prev = result.v1;
 	}
 
 	for (; p < pSrcEnd; p++, q++)
@@ -496,14 +457,12 @@ void tuned_RestoreCylindricalWrongMedian8(uint8_t *pDst, const uint8_t *pSrcBegi
 
 	__m128i prev = _mm_set1_epi8((char)0x80);
 
-	for (; p <= pSrcBegin + cbStride - 32; p += 32, q += 32)
+	for (; p <= pSrcBegin + cbStride - 16; p += 16, q += 16)
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
-		__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 16));
-		auto result = tuned_RestoreLeft8Element<F>(prev, s0, s1);
+		auto result = tuned_RestoreLeft8Element<F>(prev, s0);
 		_mm_storeu_si128((__m128i *)q, result.v0);
-		_mm_storeu_si128((__m128i *)(q + 16), result.v1);
-		prev = result.v2;
+		prev = result.v1;
 	}
 
 	for (; p < pSrcBegin + cbStride; p++, q++)
@@ -610,14 +569,12 @@ void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const
 
 	__m128i prev = _mm_set1_epi8((char)0x80);
 
-	for (; p <= pSrcBegin + cbStride - 32; p += 32, q += 32)
+	for (; p <= pSrcBegin + cbStride - 16; p += 16, q += 16)
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i *)p);
-		__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 16));
-		auto result = tuned_RestoreLeft8Element<F>(prev, s0, s1);
+		auto result = tuned_RestoreLeft8Element<F>(prev, s0);
 		_mm_storeu_si128((__m128i *)q, result.v0);
-		_mm_storeu_si128((__m128i *)(q + 16), result.v1);
-		prev = result.v2;
+		prev = result.v1;
 	}
 
 	for (; p < pSrcBegin + cbStride; p++, q++)
@@ -629,14 +586,12 @@ void tuned_RestorePlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const
 	{
 		prev = _mm_set1_epi8((char)0);
 
-		for (; p <= pp + cbStride - 32; p += 32, q += 32)
+		for (; p <= pp + cbStride - 16; p += 16, q += 16)
 		{
 			__m128i s0 = _mm_loadu_si128((const __m128i *)p);
-			__m128i s1 = _mm_loadu_si128((const __m128i *)(p + 16));
-			auto result = tuned_RestoreLeft8Element<F>(prev, s0, s1);
+			auto result = tuned_RestoreLeft8Element<F>(prev, s0);
 			_mm_storeu_si128((__m128i *)q, _mm_add_epi8(result.v0, _mm_loadu_si128((const __m128i *)(q - cbStride))));
-			_mm_storeu_si128((__m128i *)(q + 16), _mm_add_epi8(result.v1, _mm_loadu_si128((const __m128i *)(q - cbStride + 16))));
-			prev = result.v2;
+			prev = result.v1;
 		}
 
 		for (; p < pp + cbStride; p++, q++)
@@ -732,14 +687,12 @@ void tuned_RestorePlanarGradient10(uint16_t* pDst, const uint16_t* pSrcBegin, co
 
 	__m128i prev = _mm_set1_epi16(CSymbolBits<10>::midval);
 
-	for (; p <= pSrcBegin + nStride - 16; p += 16, q += 16)
+	for (; p <= pSrcBegin + nStride - 8; p += 8, q += 8)
 	{
 		__m128i s0 = _mm_loadu_si128((const __m128i*)p);
-		__m128i s1 = _mm_loadu_si128((const __m128i*)(p + 8));
-		auto result = tuned_RestoreLeft10Element<F>(prev, s0, s1);
+		auto result = tuned_RestoreLeft10Element<F>(prev, s0);
 		_mm_storeu_si128((__m128i*)q, result.v0);
-		_mm_storeu_si128((__m128i*)(q + 8), result.v1);
-		prev = result.v2;
+		prev = result.v1;
 	}
 
 	for (; p < pSrcBegin + nStride; p++, q++)
@@ -751,14 +704,12 @@ void tuned_RestorePlanarGradient10(uint16_t* pDst, const uint16_t* pSrcBegin, co
 	{
 		prev = _mm_set1_epi16((char)0);
 
-		for (; p <= pp + nStride - 16; p += 16, q += 16)
+		for (; p <= pp + nStride - 8; p += 8, q += 8)
 		{
 			__m128i s0 = _mm_loadu_si128((const __m128i*)p);
-			__m128i s1 = _mm_loadu_si128((const __m128i*)(p + 8));
-			auto result = tuned_RestoreLeft10Element<F, false>(prev, s0, s1);
+			auto result = tuned_RestoreLeft10Element<F, false>(prev, s0);
 			_mm_storeu_si128((__m128i*)q, _mm_and_si128(_mm_add_epi16(result.v0, _mm_loadu_si128((const __m128i*)(q - nStride))), _mm_set1_epi16(CSymbolBits<10>::maskval)));
-			_mm_storeu_si128((__m128i*)(q + 8), _mm_and_si128(_mm_add_epi16(result.v1, _mm_loadu_si128((const __m128i*)(q - nStride + 8))), _mm_set1_epi16(CSymbolBits<10>::maskval)));
-			prev = result.v2;
+			prev = result.v1;
 		}
 
 		for (; p < pp + nStride; p++, q++)

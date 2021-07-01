@@ -1037,14 +1037,15 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 		{
 			__m128i yy0 = _mm_loadu_si128((const __m128i *)y);
 			__m128i yy1 = _mm_loadu_si128((const __m128i *)(y + 16));
-			auto yvalue = tuned_RestoreLeft8Element<F>(yprev, yy0, yy1);
+			auto yvalue0 = tuned_RestoreLeft8Element<F>(yprev, yy0);
+			auto yvalue1 = tuned_RestoreLeft8Element<F>(yvalue0.v1, yy1);
 			__m128i uu = _mm_loadu_si128((const __m128i *)u);
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uu);
 			__m128i vv = _mm_loadu_si128((const __m128i *)v);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vv);
-			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue.v0, yvalue.v1, uvalue.v0, vvalue.v0);
+			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0);
 
-			yprev = yvalue.v2;
+			yprev = yvalue1.v1;
 			uprev = uvalue.v1;
 			vprev = vvalue.v1;
 
@@ -1082,14 +1083,15 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 		{
 			__m128i yy0 = _mm_loadu_si128((const __m128i *)y);
 			__m128i yy1 = _mm_loadu_si128((const __m128i *)(y + 16));
-			auto yvalue = tuned_RestoreLeft8Element<F>(yprev, yy0, yy1);
+			auto yvalue0 = tuned_RestoreLeft8Element<F>(yprev, yy0);
+			auto yvalue1 = tuned_RestoreLeft8Element<F>(yvalue0.v1, yy1);
 			__m128i uu = _mm_loadu_si128((const __m128i *)u);
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uu);
 			__m128i vv = _mm_loadu_si128((const __m128i *)v);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vv);
-			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue.v0, yvalue.v1, uvalue.v0, vvalue.v0, scbStride);
+			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0, scbStride);
 
-			yprev = yvalue.v2;
+			yprev = yvalue1.v1;
 			uprev = uvalue.v1;
 			vprev = vvalue.v1;
 
