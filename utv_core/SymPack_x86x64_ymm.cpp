@@ -290,23 +290,33 @@ static inline FORCEINLINE UNPACK_FOR_DELTA_RESULT UnpackForDelta(const uint8_t*&
 	return UnpackElement<F, true>(q, r, shift);
 }
 
-template<>
-void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, size_t cbStride)
+template<int F, bool NTSTORE>
+void tuned_Unpack8SymAndRestorePlanarGradient8Impl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, size_t cbStride)
 {
-	static constexpr int F = CODEFEATURE_AVX2;
-
 	int shift = 0;
 	auto q = pPacked;
 	auto r = pControl;
 
+	uint8_t* linebuf = NULL;
+	if (NTSTORE)
+		linebuf = (uint8_t*)_aligned_malloc(cbStride, 32);
+
 	{
 		__m256i prev = _mm256_set1_epi8((char)0x80);
 
-		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 32)
+		auto p = pDstBegin;
+		auto lb = linebuf;
+		for (; p != pDstBegin + cbStride; p += 32, lb += 32)
 		{
 			__m256i s0 = UnpackForIntra<F>(q, r, shift);
 			auto value = tuned_RestoreLeft8Element<F>(prev, s0);
-			_mm256_storeu_si256((__m256i *)p, value.v0);
+			if (!NTSTORE)
+				_mm256_storeu_si256((__m256i *)p, value.v0);
+			else
+			{
+				_mm256_storeu_si256((__m256i*)lb, value.v0);
+				_mm256_stream_si256((__m256i*)p, value.v0);
+			}
 			prev = value.v1;
 		}
 	}
@@ -315,15 +325,37 @@ void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>(uint8_t *pDstBe
 	{
 		__m256i prev = _mm256_set1_epi8((char)0);
 
-		for (auto p = pp; p != pp + cbStride; p += 32)
+		auto p = pp;
+		auto lb = linebuf;
+		for (; p != pp + cbStride; p += 32, lb += 32)
 		{
 			__m256i s0 = UnpackForIntra<F>(q, r, shift);
 			auto value = tuned_RestoreLeft8Element<F>(prev, s0);
-			_mm256_storeu_si256((__m256i*)p, _mm256_add_epi8(value.v0, _mm256_loadu_si256((const __m256i*)(p - cbStride))));
+			if (!NTSTORE)
+				_mm256_storeu_si256((__m256i*)p, _mm256_add_epi8(value.v0, _mm256_loadu_si256((const __m256i*)(p - cbStride))));
+			else
+			{
+				auto restored = _mm256_add_epi8(value.v0, _mm256_loadu_si256((const __m256i*)lb));
+				_mm256_storeu_si256((__m256i*)lb, restored);
+				_mm256_stream_si256((__m256i*)p, restored);
+			}
 			prev = value.v1;
 		}
 	}
 
+	if (NTSTORE)
+		_aligned_free(linebuf);
+}
+
+template<>
+void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX2>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pPacked, const uint8_t* pControl, size_t cbStride)
+{
+	static constexpr int F = CODEFEATURE_AVX2;
+
+	if (IS_ALIGNED(pDstBegin, 32))
+		tuned_Unpack8SymAndRestorePlanarGradient8Impl<F, true>(pDstBegin, pDstEnd, pPacked, pControl, cbStride);
+	else
+		tuned_Unpack8SymAndRestorePlanarGradient8Impl<F, false>(pDstBegin, pDstEnd, pPacked, pControl, cbStride);
 }
 
 
@@ -387,6 +419,8 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 	auto q = pPacked;
 	auto r = pControl;
 
+	uint8_t* linebuf = (uint8_t*)_aligned_malloc(cbStride, 32);
+
 	{
 		__m256i prev = _mm256_set_epi8(
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -394,7 +428,9 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 		);
 
 		auto t = pPrevBegin;
-		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 32, t += 32)
+		auto p = pDstBegin;
+		auto lb = linebuf;
+		for (; p != pDstBegin + cbStride; p += 32, t += 32, lb += 32)
 		{
 			auto [s0, m0] = UnpackForDelta<CODEFEATURE_AVX2>(q, r, shift);
 
@@ -409,7 +445,8 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 				15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
 				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 			))));
-			_mm256_storeu_si256((__m256i*)p, s0);
+			_mm256_stream_si256((__m256i*)p, s0);
+			_mm256_storeu_si256((__m256i*)lb, s0);
 			prev = _mm256_shuffle_epi8(_mm256_zextsi128_si256(_mm256_extracti128_si256(s0, 1)), _mm256_set_epi8(
 				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15, 15
@@ -423,11 +460,13 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 		__m256i prev = _mm256_set1_epi8((char)0);
 
 		auto t = tt;
-		for (auto p = pp; p != pp + cbStride; p += 32, t += 32)
+		auto p = pp;
+		auto lb = linebuf;
+		for (; p != pp + cbStride; p += 32, t += 32, lb += 32)
 		{
 			auto [s0, m0] = UnpackForDelta<CODEFEATURE_AVX2>(q, r, shift);
 
-			__m256i top = _mm256_loadu_si256((const __m256i*)(p - cbStride));
+			__m256i top = _mm256_loadu_si256((const __m256i*)lb);
 			__m256i t0 = _mm256_sub_epi8(_mm256_add_epi8(s0, _mm256_loadu_si256((const __m256i*)t)), top);
 			s0 = _mm256_add_epi8(_mm256_add_epi8(s0, prev), _mm256_slli_epi64(s0, 8));
 			s0 = _mm256_add_epi8(s0, _mm256_slli_epi64(s0, 16));
@@ -439,11 +478,15 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX2>(uint8_t *pDstBegin, uint8_t *pD
 				15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15,
 				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
 			))));
-			_mm256_storeu_si256((__m256i*)p, _mm256_add_epi8(s0, top));
+			auto restored = _mm256_add_epi8(s0, top);
+			_mm256_stream_si256((__m256i*)p, restored);
+			_mm256_storeu_si256((__m256i*)lb, restored);
 			prev = _mm256_shuffle_epi8(_mm256_zextsi128_si256(_mm256_extracti128_si256(s0, 1)), _mm256_set_epi8(
 				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 				-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15, 15
 			));
 		}
 	}
+
+	_aligned_free(linebuf);
 }
