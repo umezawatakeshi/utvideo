@@ -28,8 +28,10 @@ int CompareExtraDataWithMask(const void *p, size_t szp, const void *q, size_t sz
 	return 0;
 }
 
+const std::vector<size_t> vecNoAlignmentTest = { 0 };
+
 BOOST_TEST_DECORATOR(*depends_on("vcm_ICOpen_encoder"))
-BOOST_DATA_TEST_CASE(vcm_encode, make_data_from_tuple_container(vecEncodeClips) * data::make(vecAlignments), rawfilename, comfilename, config, mask, alignment)
+BOOST_DATA_TEST_CASE(vcm_encode, make_data_from_tuple_container(vecEncodeClips) * data::make(vecNoAlignmentTest), rawfilename, comfilename, config, mask, alignment)
 {
 	VideoClip comClip(comfilename);
 	VideoClip rawClip(rawfilename);
