@@ -277,21 +277,33 @@ static inline FORCEINLINE UNPACK_FOR_DELTA_RESULT UnpackForDelta(const uint8_t*&
 	return { _mm_unpacklo_epi64(x0.s, x1.s), _mm_unpacklo_epi64(x0.m, x1.m) };
 }
 
-template<int F>
-void tuned_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, size_t cbStride)
+template<int F, bool NTSTORE>
+void tuned_Unpack8SymAndRestorePlanarGradient8Impl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, size_t cbStride)
 {
 	int shift = 0;
 	auto q = pPacked;
 	auto r = pControl;
 
+	uint8_t* linebuf = NULL;
+	if (NTSTORE)
+		linebuf = (uint8_t*)_aligned_malloc(cbStride, 16);
+
 	{
 		__m128i prev = _mm_set1_epi8((char)0x80);
 
-		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 16)
+		auto p = pDstBegin;
+		auto lb = linebuf;
+		for (; p != pDstBegin + cbStride; p += 16, lb += 16)
 		{
 			__m128i s0 = UnpackForIntra<F>(q, r, shift);
 			auto value = tuned_RestoreLeft8Element<F>(prev, s0);
-			_mm_storeu_si128((__m128i *)p, value.v0);
+			if (!NTSTORE)
+				_mm_storeu_si128((__m128i *)p, value.v0);
+			else
+			{
+				_mm_storeu_si128((__m128i*)lb, value.v0);
+				_mm_stream_si128((__m128i*)p, value.v0);
+			}
 			prev = value.v1;
 		}
 	}
@@ -300,14 +312,35 @@ void tuned_Unpack8SymAndRestorePlanarGradient8(uint8_t *pDstBegin, uint8_t *pDst
 	{
 		__m128i prev = _mm_set1_epi8((char)0);
 
-		for (auto p = pp; p != pp + cbStride; p += 16)
+		auto p = pp;
+		auto lb = linebuf;
+		for (; p != pp + cbStride; p += 16, lb += 16)
 		{
 			__m128i s0 = UnpackForIntra<F>(q, r, shift);
 			auto value = tuned_RestoreLeft8Element<F>(prev, s0);
-			_mm_storeu_si128((__m128i *)p, _mm_add_epi8(value.v0, _mm_loadu_si128((const __m128i *)(p - cbStride))));
+			if (!NTSTORE)
+				_mm_storeu_si128((__m128i *)p, _mm_add_epi8(value.v0, _mm_loadu_si128((const __m128i *)(p - cbStride))));
+			else
+			{
+				__m128i restored = _mm_add_epi8(value.v0, _mm_loadu_si128((__m128i*)lb));
+				_mm_storeu_si128((__m128i*)lb, restored);
+				_mm_stream_si128((__m128i*)p, restored);
+			}
 			prev = value.v1;
 		}
 	}
+
+	if (NTSTORE)
+		_aligned_free(linebuf);
+}
+
+template<int F>
+void tuned_Unpack8SymAndRestorePlanarGradient8(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pPacked, const uint8_t* pControl, size_t cbStride)
+{
+	if (IS_ALIGNED(pDstBegin, 16))
+		tuned_Unpack8SymAndRestorePlanarGradient8Impl<F, true>(pDstBegin, pDstEnd, pPacked, pControl, cbStride);
+	else
+		tuned_Unpack8SymAndRestorePlanarGradient8Impl<F, false>(pDstBegin, pDstEnd, pPacked, pControl, cbStride);
 }
 
 #ifdef GENERATE_SSE41
@@ -383,11 +416,15 @@ void tuned_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8
 	auto q = pPacked;
 	auto r = pControl;
 
+	uint8_t* linebuf = (uint8_t*)_aligned_malloc(cbStride, 16);
+
 	{
 		__m128i prev = _mm_set_epi8(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)0x80, (char)0x80);
 
 		auto t = pPrevBegin;
-		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 16, t += 16)
+		auto p = pDstBegin;
+		auto lb = linebuf;
+		for (; p != pDstBegin + cbStride; p += 16, t += 16, lb += 16)
 		{
 			auto [s0, m0] = UnpackForDelta<F>(q, r, shift);
 
@@ -397,7 +434,8 @@ void tuned_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8
 			s0 = _mm_add_epi8(s0, _mm_slli_epi64(s0, 32));
 			s0 = _mm_blendv_epi8(s0, t0, m0);
 			s0 = _mm_add_epi8(s0, _mm_shuffle_epi8(s0, _mm_or_si128(_mm_set_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1), m0)));
-			_mm_storeu_si128((__m128i*)p, s0);
+			_mm_stream_si128((__m128i*)p, s0);
+			_mm_storeu_si128((__m128i*)lb, s0);
 			prev = _mm_shuffle_epi8(s0, _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15, 15));
 		}
 	}
@@ -408,21 +446,27 @@ void tuned_Unpack8SymWithDiff8(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8
 		__m128i prev = _mm_set1_epi8((char)0);
 
 		auto t = tt;
-		for (auto p = pp; p != pp + cbStride; p += 16, t += 16)
+		auto p = pp;
+		auto lb = linebuf;
+		for (; p != pp + cbStride; p += 16, t += 16, lb += 16)
 		{
 			auto [s0, m0] = UnpackForDelta<F>(q, r, shift);
 
-			__m128i top = _mm_loadu_si128((const __m128i*)(p - cbStride));
+			__m128i top = _mm_loadu_si128((const __m128i*)lb);
 			auto t0 = _mm_sub_epi8(_mm_add_epi8(s0, _mm_loadu_si128((const __m128i*)t)), top);
 			s0 = _mm_add_epi8(_mm_add_epi8(s0, prev), _mm_slli_epi64(s0, 8));
 			s0 = _mm_add_epi8(s0, _mm_slli_epi64(s0, 16));
 			s0 = _mm_add_epi8(s0, _mm_slli_epi64(s0, 32));
 			s0 = _mm_blendv_epi8(s0, t0, m0);
 			s0 = _mm_add_epi8(s0, _mm_shuffle_epi8(s0, _mm_or_si128(_mm_set_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1), m0)));
-			_mm_storeu_si128((__m128i*)p, _mm_add_epi8(s0, top));
+			auto restored = _mm_add_epi8(s0, top);
+			_mm_stream_si128((__m128i*)p, restored);
+			_mm_storeu_si128((__m128i*)lb, restored);
 			prev = _mm_shuffle_epi8(s0, _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 15, 15));
 		}
 	}
+
+	_aligned_free(linebuf);
 }
 
 #ifdef GENERATE_SSE41

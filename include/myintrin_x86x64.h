@@ -13,10 +13,20 @@
 
 template<typename VT> static inline VT _mmt_loadu(const void* p);
 template<typename VT> static inline void _mmt_storeu(void* p, VT v);
+template<typename VT> static inline void _mmt_stream(void* p, VT v);
 template<typename VT> static inline VT _mmt_set1_epi8(char e0);
 template<typename VT> static inline VT _mmt_set1_epi16(short e0);
 template<typename VT> static inline VT _mmt_add_epi8(VT v0, VT v1);
 template<typename VT> static inline VT _mmt_sub_epi8(VT v0, VT v1);
+template<typename VT> static inline VT _mmt_broadcast_msb_epi8(VT v);
+
+template<typename VT, bool NTSTORE> static inline void _mmt_store(void* p, VT v)
+{
+	if (!NTSTORE)
+		_mmt_storeu<VT>(p, v);
+	else
+		_mmt_stream<VT>(p, v);
+}
 
 
 static inline FORCEINLINE __m128i _mm_setone_si128()
@@ -83,6 +93,11 @@ template<> static inline FORCEINLINE void _mmt_storeu<__m128i>(void* p, __m128i 
 	_mm_storeu_si128((__m128i*)p, v);
 }
 
+template<> static inline FORCEINLINE void _mmt_stream<__m128i>(void* p, __m128i v)
+{
+	_mm_stream_si128((__m128i*)p, v);
+}
+
 template<> static inline FORCEINLINE __m128i _mmt_set1_epi8<__m128i>(char e0)
 {
 	return _mm_set1_epi8(e0);
@@ -101,6 +116,11 @@ template<> static inline FORCEINLINE __m128i _mmt_add_epi8<__m128i>(__m128i v0, 
 template<> static inline FORCEINLINE __m128i _mmt_sub_epi8<__m128i>(__m128i v0, __m128i v1)
 {
 	return _mm_sub_epi8(v0, v1);
+}
+
+template<> static inline FORCEINLINE __m128i _mmt_broadcast_msb_epi8<__m128i>(__m128i v)
+{
+	return _mm_shuffle_epi8(v, _mm_set1_epi8(15));
 }
 
 
@@ -162,6 +182,11 @@ template<> static inline FORCEINLINE void _mmt_storeu<__m256i>(void* p, __m256i 
 	_mm256_storeu_si256((__m256i*)p, v);
 }
 
+template<> static inline FORCEINLINE void _mmt_stream<__m256i>(void* p, __m256i v)
+{
+	_mm256_stream_si256((__m256i*)p, v);
+}
+
 template<> static inline FORCEINLINE __m256i _mmt_set1_epi8<__m256i>(char e0)
 {
 	return _mm256_set1_epi8(e0);
@@ -180,6 +205,11 @@ template<> static inline FORCEINLINE __m256i _mmt_add_epi8<__m256i>(__m256i v0, 
 template<> static inline FORCEINLINE __m256i _mmt_sub_epi8<__m256i>(__m256i v0, __m256i v1)
 {
 	return _mm256_sub_epi8(v0, v1);
+}
+
+template<> static inline FORCEINLINE __m256i _mmt_broadcast_msb_epi8<__m256i>(__m256i v)
+{
+	return _mm256_shuffle_epi8(_mm256_permute2x128_si256(v, v, 0x33), _mm256_set1_epi8(15));
 }
 
 #endif
@@ -258,6 +288,11 @@ template<> static inline FORCEINLINE void _mmt_storeu<__m512i>(void* p, __m512i 
 	_mm512_storeu_si512((__m512i*)p, v);
 }
 
+template<> static inline FORCEINLINE void _mmt_stream<__m512i>(void* p, __m512i v)
+{
+	_mm512_stream_si512((__m512i*)p, v);
+}
+
 template<> static inline FORCEINLINE __m512i _mmt_set1_epi8<__m512i>(char e0)
 {
 	return _mm512_set1_epi8(e0);
@@ -276,6 +311,11 @@ template<> static inline FORCEINLINE __m512i _mmt_add_epi8<__m512i>(__m512i v0, 
 template<> static inline FORCEINLINE __m512i _mmt_sub_epi8<__m512i>(__m512i v0, __m512i v1)
 {
 	return _mm512_sub_epi8(v0, v1);
+}
+
+template<> static inline FORCEINLINE __m512i _mmt_broadcast_msb_epi8<__m512i>(__m512i v)
+{
+	return _mm512_permutexvar_epi8(_mm512_set1_epi8(63), v);
 }
 
 #endif

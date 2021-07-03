@@ -153,8 +153,8 @@ static inline FORCEINLINE VECTOR_YUV422<VT> tuned_ConvertPackedYUV422ToPlanarEle
 	);
 }
 
-template<int F, class T>
-void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
+template<int F, class T, bool NTSTORE>
+void tuned_ConvertPackedYUV422ToULY2Impl(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
 {
 	using VT = std::conditional_t<F < CODEFEATURE_AVX2, __m128i, __m256i>;
 
@@ -166,35 +166,68 @@ void tuned_ConvertPackedYUV422ToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t
 
 		auto pp = p;
 
+		VT ylast, ulast, vlast;
+
 		for (; pp <= p + cbWidth - sizeof(VT) * 4; pp += sizeof(VT) * 4)
 		{
 			auto result = tuned_ConvertPackedYUV422ToPlanarElement<F, VT, T>(pp);
-			_mmt_storeu<VT>(y, result.y0);
-			_mmt_storeu<VT>(y + sizeof(VT), result.y1);
-			_mmt_storeu<VT>(u, result.u);
-			_mmt_storeu<VT>(v, result.v);
+			_mmt_store<VT, NTSTORE>(y, result.y0);
+			_mmt_store<VT, NTSTORE>(y + sizeof(VT), result.y1);
+			_mmt_store<VT, NTSTORE>(u, result.u);
+			_mmt_store<VT, NTSTORE>(v, result.v);
+
+			ylast = result.y1;
+			ulast = result.u;
+			vlast = result.v;
 
 			y += sizeof(VT) * 2;
 			u += sizeof(VT);
 			v += sizeof(VT);
 		}
 
-		for (; pp < p + cbWidth; pp += 4)
+		if (!NTSTORE)
 		{
-			y[0] = pp[T::Y0];
-			y[1] = pp[T::Y1];
-			u[0] = pp[T::U];
-			v[0] = pp[T::V];
+			for (; pp < p + cbWidth; pp += 4)
+			{
+				y[0] = pp[T::Y0];
+				y[1] = pp[T::Y1];
+				u[0] = pp[T::U];
+				v[0] = pp[T::V];
 
-			y += 2;
-			u += 1;
-			v += 1;
+				y += 2;
+				u += 1;
+				v += 1;
+			}
+
+			std::fill(y, pYBegin + cbYWidth, y[-1]);
+			std::fill(u, pUBegin + cbCWidth, u[-1]);
+			std::fill(v, pVBegin + cbCWidth, v[-1]);
 		}
+		else
+		{
+			ylast = _mmt_broadcast_msb_epi8(ylast);
+			ulast = _mmt_broadcast_msb_epi8(ulast);
+			vlast = _mmt_broadcast_msb_epi8(vlast);
 
-		std::fill(y, pYBegin + cbYWidth, y[-1]);
-		std::fill(u, pUBegin + cbCWidth, u[-1]);
-		std::fill(v, pVBegin + cbCWidth, v[-1]);
+			for (; y < pYBegin + cbYWidth; y += sizeof(VT))
+				_mmt_store<VT, NTSTORE>(y, ylast);
+			for (; u < pUBegin + cbCWidth; u += sizeof(VT))
+				_mmt_store<VT, NTSTORE>(u, ulast);
+			for (; v < pVBegin + cbCWidth; v += sizeof(VT))
+				_mmt_store<VT, NTSTORE>(v, vlast);
+		}
 	}
+}
+
+template<int F, class T>
+void tuned_ConvertPackedYUV422ToULY2(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
+{
+	using VT = std::conditional_t < F < CODEFEATURE_AVX2, __m128i, __m256i>;
+
+	if (IS_ALIGNED(pYBegin, sizeof(VT)) && IS_ALIGNED(pUBegin, sizeof(VT)) && IS_ALIGNED(pVBegin, sizeof(VT)) && IS_MULTIPLE(cbWidth, sizeof(VT) * 4) && IS_MULTIPLE(cbYWidth, sizeof(VT) * 2) && IS_MULTIPLE(cbCWidth, sizeof(VT)))
+		tuned_ConvertPackedYUV422ToULY2Impl<F, T, true>(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, cbYWidth, cbCWidth);
+	else
+		tuned_ConvertPackedYUV422ToULY2Impl<F, T, false>(pYBegin, pUBegin, pVBegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, cbYWidth, cbCWidth);
 }
 
 #ifdef GENERATE_SSE41
@@ -302,28 +335,60 @@ static inline FORCEINLINE VECTOR4<__m512i> VECTORCALL tuned_ConvertPlanarYUV422T
 	}
 }
 
-template<int F, typename VT, class T>
+template<int F, typename VT, class T, bool NTSTORE = false>
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(uint8_t* pp, VT yy0, VT yy1, VT uu, VT vv)
 {
 	auto result = tuned_ConvertPlanarYUV422ToPackedElement<F, VT, T>(yy0, yy1, uu, vv);
-	_mmt_storeu<VT>(pp,                  result.v0);
-	_mmt_storeu<VT>(pp + sizeof(VT),     result.v1);
-	_mmt_storeu<VT>(pp + sizeof(VT) * 2, result.v2);
-	_mmt_storeu<VT>(pp + sizeof(VT) * 3, result.v3);
+	_mmt_store<VT, NTSTORE>(pp,                  result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     result.v1);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 3, result.v3);
 }
 
-template<int F, typename VT, class T>
+template<int F, typename VT, class T, bool NTSTORE = false>
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(uint8_t* pp, VT yy0, VT yy1, VT uu, VT vv, ssize_t scbStride)
 {
 	auto result = tuned_ConvertPlanarYUV422ToPackedElement<F, VT, T>(yy0, yy1, uu, vv);
-	_mmt_storeu<VT>(pp,                  _mmt_add_epi8<VT>(result.v0, _mmt_loadu<VT>(pp - scbStride)));
-	_mmt_storeu<VT>(pp + sizeof(VT),     _mmt_add_epi8<VT>(result.v1, _mmt_loadu<VT>(pp - scbStride + sizeof(VT))));
-	_mmt_storeu<VT>(pp + sizeof(VT) * 2, _mmt_add_epi8<VT>(result.v2, _mmt_loadu<VT>(pp - scbStride + sizeof(VT) * 2)));
-	_mmt_storeu<VT>(pp + sizeof(VT) * 3, _mmt_add_epi8<VT>(result.v3, _mmt_loadu<VT>(pp - scbStride + sizeof(VT) * 3)));
+	_mmt_store<VT, NTSTORE>(pp,                  _mmt_add_epi8<VT>(result.v0, _mmt_loadu<VT>(pp - scbStride)));
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     _mmt_add_epi8<VT>(result.v1, _mmt_loadu<VT>(pp - scbStride + sizeof(VT))));
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, _mmt_add_epi8<VT>(result.v2, _mmt_loadu<VT>(pp - scbStride + sizeof(VT) * 2)));
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 3, _mmt_add_epi8<VT>(result.v3, _mmt_loadu<VT>(pp - scbStride + sizeof(VT) * 3)));
 }
 
-template<int F, class T>
-void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
+template<int F, typename VT, class T, bool NTSTORE = false>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(uint8_t* pp, uint8_t* lb, VT yy0, VT yy1, VT uu, VT vv)
+{
+	auto result = tuned_ConvertPlanarYUV422ToPackedElement<F, VT, T>(yy0, yy1, uu, vv);
+	_mmt_store<VT, NTSTORE>(pp,                  result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     result.v1);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 3, result.v3);
+	_mmt_store<VT, false>(lb,                  result.v0);
+	_mmt_store<VT, false>(lb + sizeof(VT),     result.v1);
+	_mmt_store<VT, false>(lb + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, false>(lb + sizeof(VT) * 3, result.v3);
+}
+
+template<int F, typename VT, class T, bool NTSTORE = false>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarYUV422ToPackedElement(uint8_t* pp, VT yy0, VT yy1, VT uu, VT vv, uint8_t* lb)
+{
+	auto result = tuned_ConvertPlanarYUV422ToPackedElement<F, VT, T>(yy0, yy1, uu, vv);
+	result.v0 = _mmt_add_epi8<VT>(result.v0, _mmt_loadu<VT>(lb));
+	result.v1 = _mmt_add_epi8<VT>(result.v1, _mmt_loadu<VT>(lb + sizeof(VT)));
+	result.v2 = _mmt_add_epi8<VT>(result.v2, _mmt_loadu<VT>(lb + sizeof(VT) * 2));
+	result.v3 = _mmt_add_epi8<VT>(result.v3, _mmt_loadu<VT>(lb + sizeof(VT) * 3));
+	_mmt_store<VT, NTSTORE>(pp,                  result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     result.v1);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 3, result.v3);
+	_mmt_store<VT, false>(lb,                  result.v0);
+	_mmt_store<VT, false>(lb + sizeof(VT),     result.v1);
+	_mmt_store<VT, false>(lb + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, false>(lb + sizeof(VT) * 3, result.v3);
+}
+
+template<int F, class T, bool NTSTORE>
+void tuned_ConvertULY2ToPackedYUV422Impl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
 {
 	using VT = std::conditional_t<F < CODEFEATURE_AVX2, __m128i, __m256i>;
 
@@ -341,25 +406,44 @@ void tuned_ConvertULY2ToPackedYUV422(uint8_t *pDstBegin, uint8_t *pDstEnd, const
 			VT yy1 = _mmt_loadu<VT>(y + sizeof(VT));
 			VT uu = _mmt_loadu<VT>(u);
 			VT vv = _mmt_loadu<VT>(v);
-			tuned_ConvertPlanarYUV422ToPackedElement<F, VT, T>(pp, yy0, yy1, uu, vv);
+			auto result = tuned_ConvertPlanarYUV422ToPackedElement<F, VT, T>(yy0, yy1, uu, vv);
+			_mmt_store<VT, NTSTORE>(pp, result.v0);
+			_mmt_store<VT, NTSTORE>(pp + sizeof(VT), result.v1);
+			_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
+			_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 3, result.v3);
+
 
 			y += sizeof(VT) * 2;
 			u += sizeof(VT);
 			v += sizeof(VT);
 		}
 
-		for (; pp < p + cbWidth; pp += 4)
+		if (!NTSTORE)
 		{
-			pp[T::Y0] = y[0];
-			pp[T::Y1] = y[1];
-			pp[T::U] = u[0];
-			pp[T::V] = v[0];
+			for (; pp < p + cbWidth; pp += 4)
+			{
+				pp[T::Y0] = y[0];
+				pp[T::Y1] = y[1];
+				pp[T::U] = u[0];
+				pp[T::V] = v[0];
 
-			y += 2;
-			u += 1;
-			v += 1;
+				y += 2;
+				u += 1;
+				v += 1;
+			}
 		}
 	}
+}
+
+template<int F, class T>
+void tuned_ConvertULY2ToPackedYUV422(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth)
+{
+	using VT = std::conditional_t < F < CODEFEATURE_AVX2, __m128i, __m256i>;
+
+	if (IS_ALIGNED(pDstBegin, sizeof(VT)) && IS_MULTIPLE(cbWidth, sizeof(VT) * 4) && IS_MULTIPLE(scbStride, sizeof(VT)))
+		tuned_ConvertULY2ToPackedYUV422Impl<F, T, true>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride, cbYWidth, cbCWidth);
+	else
+		tuned_ConvertULY2ToPackedYUV422Impl<F, T, false>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride, cbYWidth, cbCWidth);
 }
 
 #ifdef GENERATE_SSE41
@@ -669,8 +753,8 @@ static inline FORCEINLINE VECTOR_RGBA<VT> tuned_ConvertPackedRGBXToPlanarElement
 	return { ret.g, ret.b, ret.r, _mmt_set1_epi8<VT>((char)0xff) };
 }
 
-template<int F, class T, bool A>
-static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
+template<int F, class T, bool A, bool NTSTORE>
+static inline void tuned_ConvertRGBXToULRXImpl(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
 	using VT = std::conditional_t<F < CODEFEATURE_AVX2, __m128i, __m256i>;
 
@@ -683,14 +767,18 @@ static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 
 		auto pp = p;
 
+		VECTOR_RGBA<VT> last;
+
 		for (; pp <= p + cbWidth - T::BYPP * sizeof(VT); pp += T::BYPP * sizeof(VT))
 		{
 			auto result = tuned_ConvertPackedRGBXToPlanarElement<F, VT, T, true>(pp);
-			_mmt_storeu<VT>(b, result.b);
-			_mmt_storeu<VT>(g, result.g);
-			_mmt_storeu<VT>(r, result.r);
+			_mmt_store<VT, NTSTORE>(b, result.b);
+			_mmt_store<VT, NTSTORE>(g, result.g);
+			_mmt_store<VT, NTSTORE>(r, result.r);
 			if (A)
-				_mmt_storeu<VT>(a, result.a);
+				_mmt_store<VT, NTSTORE>(a, result.a);
+
+			last = result;
 
 			b += sizeof(VT);
 			g += sizeof(VT);
@@ -699,27 +787,59 @@ static inline void tuned_ConvertRGBXToULRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 				a += sizeof(VT);
 		}
 
-		for (; pp < p + cbWidth; pp += T::BYPP)
+		if (!NTSTORE)
 		{
-			*g = pp[T::G];
-			*b = pp[T::B] - pp[T::G] + 0x80;
-			*r = pp[T::R] - pp[T::G] + 0x80;
-			if (A)
-				*a = pp[T::A];
+			for (; pp < p + cbWidth; pp += T::BYPP)
+			{
+				*g = pp[T::G];
+				*b = pp[T::B] - pp[T::G] + 0x80;
+				*r = pp[T::R] - pp[T::G] + 0x80;
+				if (A)
+					*a = pp[T::A];
 
-			b += 1;
-			g += 1;
-			r += 1;
+				b += 1;
+				g += 1;
+				r += 1;
+				if (A)
+					a += 1;
+			}
+
+			std::fill(g, pGBegin + cbPlaneWidth, g[-1]);
+			std::fill(b, pBBegin + cbPlaneWidth, b[-1]);
+			std::fill(r, pRBegin + cbPlaneWidth, r[-1]);
 			if (A)
-				a += 1;
+				std::fill(a, pABegin + cbPlaneWidth, a[-1]);
 		}
+		else
+		{
+			last.g = _mmt_broadcast_msb_epi8(last.g);
+			last.b = _mmt_broadcast_msb_epi8(last.b);
+			last.r = _mmt_broadcast_msb_epi8(last.r);
+			if (A)
+				last.a = _mmt_broadcast_msb_epi8(last.a);
 
-		std::fill(g, pGBegin + cbPlaneWidth, g[-1]);
-		std::fill(b, pBBegin + cbPlaneWidth, b[-1]);
-		std::fill(r, pRBegin + cbPlaneWidth, r[-1]);
-		if (A)
-			std::fill(a, pABegin + cbPlaneWidth, a[-1]);
+			for (; g < pGBegin + cbPlaneWidth; g += sizeof(VT))
+				_mmt_store<VT, NTSTORE>(g, last.g);
+			for (; b < pBBegin + cbPlaneWidth; b += sizeof(VT))
+				_mmt_store<VT, NTSTORE>(b, last.b);
+			for (; r < pRBegin + cbPlaneWidth; r += sizeof(VT))
+				_mmt_store<VT, NTSTORE>(r, last.r);
+			if (A)
+				for (; a < pABegin + cbPlaneWidth; a += sizeof(VT))
+					_mmt_store<VT, NTSTORE>(a, last.a);
+		}
 	}
+}
+
+template<int F, class T, bool A>
+static inline void tuned_ConvertRGBXToULRX(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, uint8_t* pABegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
+{
+	using VT = std::conditional_t < F < CODEFEATURE_AVX2, __m128i, __m256i>;
+
+	if (IS_ALIGNED(pGBegin, sizeof(VT)) && IS_ALIGNED(pBBegin, sizeof(VT)) && IS_ALIGNED(pRBegin, sizeof(VT)) && IS_ALIGNED(pABegin, sizeof(VT)) && IS_MULTIPLE(cbWidth, sizeof(VT) * T::BYPP) && IS_MULTIPLE(cbPlaneWidth, sizeof(VT)))
+		tuned_ConvertRGBXToULRXImpl<F, T, A, true>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, cbPlaneWidth);
+	else
+		tuned_ConvertRGBXToULRXImpl<F, T, A, false>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride, cbPlaneWidth);
 }
 
 template<int F, class T>
@@ -965,23 +1085,23 @@ static inline FORCEINLINE VECTOR4<__m512i> VECTORCALL tuned_ConvertPlanarRGBXToP
 	};
 }
 
-template<int F, typename VT, class T, bool NeedOffset, typename std::enable_if<T::BYPP == 4>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
+template<int F, typename VT, class T, bool NeedOffset, bool NTSTORE = false, typename std::enable_if<T::BYPP == 4>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, VT gg, VT bb, VT rr, VT aa)
 {
 	auto result = tuned_ConvertPlanarRGBXToPackedElement<F, VT, T, NeedOffset>(gg, bb, rr, aa);
-	_mmt_storeu<VT>(pp,                  result.v0);
-	_mmt_storeu<VT>(pp + sizeof(VT),     result.v1);
-	_mmt_storeu<VT>(pp + sizeof(VT) * 2, result.v2);
-	_mmt_storeu<VT>(pp + sizeof(VT) * 3, result.v3);
+	_mmt_store<VT, NTSTORE>(pp,                  result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     result.v1);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 3, result.v3);
 }
 
-template<int F, typename VT, class T, bool NeedOffset, typename std::enable_if<std::is_same<T, CBGRColorOrder>::value>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
+template<int F, typename VT, class T, bool NeedOffset, bool NTSTORE = false, typename std::enable_if<std::is_same<T, CBGRColorOrder>::value>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, VT gg, VT bb, VT rr, VT aa)
 {
 	auto result = tuned_ConvertPlanarBGRToPackedElement<F, VT, NeedOffset>(gg, bb, rr);
-	_mmt_storeu<VT>(pp,                  result.v0);
-	_mmt_storeu<VT>(pp + sizeof(VT),     result.v1);
-	_mmt_storeu<VT>(pp + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, NTSTORE>(pp,                  result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     result.v1);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
 }
 
 template<int F, typename VT, class T, bool NeedOffset, typename std::enable_if<T::BYPP == 4>::type*& = enabler> /* A はテンプレートパラメータとしては要らない */
@@ -1003,8 +1123,67 @@ static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement
 	_mmt_storeu<VT>(pp + sizeof(VT) * 2, _mmt_add_epi8<VT>(result.v2, _mmt_loadu<VT>(pp - scbStride + sizeof(VT) * 2)));
 }
 
-template<int F, class T, bool A>
-static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
+template<int F, typename VT, class T, bool NeedOffset, bool NTSTORE = false, typename std::enable_if<T::BYPP == 4>::type*& = enabler>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, uint8_t* lb, VT gg, VT bb, VT rr, VT aa)
+{
+	auto result = tuned_ConvertPlanarRGBXToPackedElement<F, VT, T, NeedOffset>(gg, bb, rr, aa);
+	_mmt_store<VT, NTSTORE>(pp,                  result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     result.v1);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 3, result.v3);
+	_mmt_store<VT, false>(lb,                  result.v0);
+	_mmt_store<VT, false>(lb + sizeof(VT),     result.v1);
+	_mmt_store<VT, false>(lb + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, false>(lb + sizeof(VT) * 3, result.v3);
+}
+
+template<int F, typename VT, class T, bool NeedOffset, bool NTSTORE = false, typename std::enable_if<std::is_same<T, CBGRColorOrder>::value>::type*& = enabler>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, uint8_t* lb, VT gg, VT bb, VT rr, VT aa)
+{
+	auto result = tuned_ConvertPlanarBGRToPackedElement<F, VT, NeedOffset>(gg, bb, rr);
+	_mmt_store<VT, NTSTORE>(pp,                  result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     result.v1);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, false>(lb,                  result.v0);
+	_mmt_store<VT, false>(lb + sizeof(VT),     result.v1);
+	_mmt_store<VT, false>(lb + sizeof(VT) * 2, result.v2);
+}
+
+template<int F, typename VT, class T, bool NeedOffset, bool NTSTORE = false, typename std::enable_if<T::BYPP == 4>::type*& = enabler>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, VT gg, VT bb, VT rr, VT aa, uint8_t* lb)
+{
+	auto result = tuned_ConvertPlanarRGBXToPackedElement<F, VT, T, NeedOffset>(gg, bb, rr, aa);
+	result.v0 = _mmt_add_epi8<VT>(result.v0, _mmt_loadu<VT>(lb));
+	result.v1 = _mmt_add_epi8<VT>(result.v1, _mmt_loadu<VT>(lb + sizeof(VT)));
+	result.v2 = _mmt_add_epi8<VT>(result.v2, _mmt_loadu<VT>(lb + sizeof(VT) * 2));
+	result.v3 = _mmt_add_epi8<VT>(result.v3, _mmt_loadu<VT>(lb + sizeof(VT) * 3));
+	_mmt_store<VT, NTSTORE>(pp,                  result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     result.v1);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 3, result.v3);
+	_mmt_store<VT, false>(lb,                  result.v0);
+	_mmt_store<VT, false>(lb + sizeof(VT),     result.v1);
+	_mmt_store<VT, false>(lb + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, false>(lb + sizeof(VT) * 3, result.v3);
+}
+
+template<int F, typename VT, class T, bool NeedOffset, bool NTSTORE = false, typename std::enable_if<std::is_same<T, CBGRColorOrder>::value>::type*& = enabler>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToPackedElement(uint8_t* pp, VT gg, VT bb, VT rr, VT aa, uint8_t* lb)
+{
+	auto result = tuned_ConvertPlanarBGRToPackedElement<F, VT, NeedOffset>(gg, bb, rr);
+	result.v0 = _mmt_add_epi8<VT>(result.v0, _mmt_loadu<VT>(lb));
+	result.v1 = _mmt_add_epi8<VT>(result.v1, _mmt_loadu<VT>(lb + sizeof(VT)));
+	result.v2 = _mmt_add_epi8<VT>(result.v2, _mmt_loadu<VT>(lb + sizeof(VT) * 2));
+	_mmt_store<VT, NTSTORE>(pp,                  result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     result.v1);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, false>(lb,                  result.v0);
+	_mmt_store<VT, false>(lb + sizeof(VT),     result.v1);
+	_mmt_store<VT, false>(lb + sizeof(VT) * 2, result.v2);
+}
+
+template<int F, class T, bool A, bool NTSTORE>
+static inline void tuned_ConvertULRXToRGBXImpl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
 {
 	using VT = std::conditional_t<F < CODEFEATURE_AVX2, __m128i, __m256i>;
 
@@ -1022,7 +1201,7 @@ static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd,
 			VT gg = _mmt_loadu<VT>(g);
 			VT bb = _mmt_loadu<VT>(b);
 			VT rr = _mmt_loadu<VT>(r);
-			tuned_ConvertPlanarRGBXToPackedElement<F, VT, T, true>(pp, gg, bb, rr, A ? _mmt_loadu<VT>(a) : _mmt_set1_epi8<VT>((char)0xff));
+			tuned_ConvertPlanarRGBXToPackedElement<F, VT, T, true, NTSTORE>(pp, gg, bb, rr, A ? _mmt_loadu<VT>(a) : _mmt_set1_epi8<VT>((char)0xff));
 
 			b += sizeof(VT);
 			g += sizeof(VT);
@@ -1031,23 +1210,37 @@ static inline void tuned_ConvertULRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd,
 				a += sizeof(VT);
 		}
 
-		for (; pp < p + cbWidth; pp += T::BYPP)
+		if (!NTSTORE)
 		{
-			pp[T::G] = *g;
-			pp[T::B] = *b + *g - 0x80;
-			pp[T::R] = *r + *g - 0x80;
-			if (A)
-				pp[T::A] = *a;
-			else if (T::HAS_ALPHA)
-				pp[T::A] = 0xff;
+			for (; pp < p + cbWidth; pp += T::BYPP)
+			{
+				pp[T::G] = *g;
+				pp[T::B] = *b + *g - 0x80;
+				pp[T::R] = *r + *g - 0x80;
+				if (A)
+					pp[T::A] = *a;
+				else if (T::HAS_ALPHA)
+					pp[T::A] = 0xff;
 
-			b += 1;
-			g += 1;
-			r += 1;
-			if (A)
-				a += 1;
+				b += 1;
+				g += 1;
+				r += 1;
+				if (A)
+					a += 1;
+			}
 		}
 	}
+}
+
+template<int F, class T, bool A>
+static inline void tuned_ConvertULRXToRGBX(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, const uint8_t* pABegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth)
+{
+	using VT = std::conditional_t < F < CODEFEATURE_AVX2, __m128i, __m256i>;
+
+	if (IS_ALIGNED(pDstBegin, sizeof(VT)) && IS_MULTIPLE(cbWidth, sizeof(VT) * T::BYPP) && IS_MULTIPLE(scbStride, sizeof(VT)))
+		tuned_ConvertULRXToRGBXImpl<F, T, A, true>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride, cbPlaneWidth);
+	else
+		tuned_ConvertULRXToRGBXImpl<F, T, A, false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride, cbPlaneWidth);
 }
 
 template<int F, class T>
@@ -1131,20 +1324,42 @@ static inline FORCEINLINE VECTOR2<__m128i> VECTORCALL tuned_ConvertPlanarToPacke
 	};
 }
 
-template<int F, typename VT>
+template<int F, typename VT, bool NTSTORE = false>
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarToPackedUVElement(uint8_t* pp, VT uu, VT vv)
 {
 	auto result = tuned_ConvertPlanarToPackedUVElement<F, VT>(uu, vv);
-	_mmt_storeu<VT>(pp, result.v0);
-	_mmt_storeu<VT>(pp + sizeof(VT), result.v1);
+	_mmt_store<VT, NTSTORE>(pp,              result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT), result.v1);
 }
 
-template<int F, typename VT>
+template<int F, typename VT, bool NTSTORE = false>
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarToPackedUVElement(uint8_t* pp, VT uu, VT vv, ssize_t scbStride)
 {
 	auto result = tuned_ConvertPlanarToPackedUVElement<F, VT>(uu, vv);
-	_mmt_storeu<VT>(pp, _mmt_add_epi8<VT>(result.v0, _mmt_loadu<VT>(pp - scbStride)));
-	_mmt_storeu<VT>(pp + sizeof(VT), _mmt_add_epi8<VT>(result.v1, _mmt_loadu<VT>(pp - scbStride + sizeof(VT))));
+	_mmt_store<VT, NTSTORE>(pp,              _mmt_add_epi8<VT>(result.v0, _mmt_loadu<VT>(pp - scbStride)));
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT), _mmt_add_epi8<VT>(result.v1, _mmt_loadu<VT>(pp - scbStride + sizeof(VT))));
+}
+
+template<int F, typename VT, bool NTSTORE = false>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarToPackedUVElement(uint8_t* pp, uint8_t* lb, VT uu, VT vv)
+{
+	auto result = tuned_ConvertPlanarToPackedUVElement<F, VT>(uu, vv);
+	_mmt_store<VT, NTSTORE>(pp,              result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT), result.v1);
+	_mmt_store<VT, false>(lb,              result.v0);
+	_mmt_store<VT, false>(lb + sizeof(VT), result.v1);
+}
+
+template<int F, typename VT, bool NTSTORE = false>
+static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarToPackedUVElement(uint8_t* pp, VT uu, VT vv, uint8_t* lb)
+{
+	auto result = tuned_ConvertPlanarToPackedUVElement<F, VT>(uu, vv);
+	result.v0 = _mmt_add_epi8<VT>(result.v0, _mmt_loadu<VT>(lb));
+	result.v1 = _mmt_add_epi8<VT>(result.v1, _mmt_loadu<VT>(lb + sizeof(VT)));
+	_mmt_store<VT, NTSTORE>(pp,              result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT), result.v1);
+	_mmt_store<VT, false>(lb,              result.v0);
+	_mmt_store<VT, false>(lb + sizeof(VT), result.v1);
 }
 
 //
@@ -1244,8 +1459,8 @@ template<int F>
 static inline void tuned_ConvertB48rToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride);
 #endif
 
-template<int F, bool A>
-static inline void tuned_ConvertRGBXToUQRX(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
+template<int F, bool A, bool NTSTORE>
+static inline void tuned_ConvertRGBXToUQRXImpl(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, uint8_t *pABegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride)
 {
 	using VT = __m128i;
 
@@ -1262,11 +1477,11 @@ static inline void tuned_ConvertRGBXToUQRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 		{
 			auto result = tuned_ConvertB64aToPlanarElement10<F, VT, true>(pp);
 
-			_mmt_storeu<VT>(b, result.b);
-			_mmt_storeu<VT>(g, result.g);
-			_mmt_storeu<VT>(r, result.r);
+			_mmt_store<VT, NTSTORE>(b, result.b);
+			_mmt_store<VT, NTSTORE>(g, result.g);
+			_mmt_store<VT, NTSTORE>(r, result.r);
 			if (A)
-				_mmt_storeu<VT>(a, result.a);
+				_mmt_store<VT, NTSTORE>(a, result.a);
 
 			b += sizeof(VT) / 2;
 			g += sizeof(VT) / 2;
@@ -1275,26 +1490,40 @@ static inline void tuned_ConvertRGBXToUQRX(uint8_t *pGBegin, uint8_t *pBBegin, u
 				a += sizeof(VT) / 2;
 		}
 
-		for (; pp < p + cbWidth; pp += 8)
+		if (!NTSTORE)
 		{
-			uint16_t *ppp = (uint16_t *)pp;
-
-			uint16_t gg = Convert16To10Fullrange(btoh16(ppp[2]));
-			uint16_t bb = Convert16To10Fullrange(btoh16(ppp[3]));
-			uint16_t rr = Convert16To10Fullrange(btoh16(ppp[1]));
-
-			*g++ = gg;
-			*b++ = (bb - gg + 0x200) & 0x3ff;
-			*r++ = (rr - gg + 0x200) & 0x3ff;
-
-			if (A)
+			for (; pp < p + cbWidth; pp += 8)
 			{
-				uint16_t aa = Convert16To10Fullrange(btoh16(ppp[0]));
-				*a++ = aa;
+				uint16_t* ppp = (uint16_t*)pp;
+
+				uint16_t gg = Convert16To10Fullrange(btoh16(ppp[2]));
+				uint16_t bb = Convert16To10Fullrange(btoh16(ppp[3]));
+				uint16_t rr = Convert16To10Fullrange(btoh16(ppp[1]));
+
+				*g++ = gg;
+				*b++ = (bb - gg + 0x200) & 0x3ff;
+				*r++ = (rr - gg + 0x200) & 0x3ff;
+
+				if (A)
+				{
+					uint16_t aa = Convert16To10Fullrange(btoh16(ppp[0]));
+					*a++ = aa;
+				}
 			}
 		}
 	}
 
+}
+
+template<int F, bool A>
+static inline void tuned_ConvertRGBXToUQRX(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, uint8_t* pABegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride)
+{
+	using VT = __m128i;
+
+	if (IS_ALIGNED(pGBegin, sizeof(VT)) && IS_ALIGNED(pBBegin, sizeof(VT)) && IS_ALIGNED(pRBegin, sizeof(VT)) && IS_ALIGNED(pABegin, sizeof(VT)) && IS_MULTIPLE(cbWidth, sizeof(VT) * 4))
+		tuned_ConvertRGBXToUQRXImpl<F, A, true>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride);
+	else
+		tuned_ConvertRGBXToUQRXImpl<F, A, false>(pGBegin, pBBegin, pRBegin, pABegin, pSrcBegin, pSrcEnd, cbWidth, scbStride);
 }
 
 template<int F, class T>
@@ -1358,14 +1587,14 @@ static inline FORCEINLINE VECTOR4<__m128i> VECTORCALL tuned_ConvertPlanarRGBXToB
 	};
 }
 
-template<int F, typename VT, bool NeedOffset>
+template<int F, typename VT, bool NeedOffset, bool NTSTORE = false>
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToB64aElement10(uint8_t* pp, VT gg, VT bb, VT rr, VT aa)
 {
 	auto result = tuned_ConvertPlanarRGBXToB64aElement10<F, VT, NeedOffset>(gg, bb, rr, aa);
-	_mmt_storeu<VT>(pp,                  result.v0);
-	_mmt_storeu<VT>(pp + sizeof(VT),     result.v1);
-	_mmt_storeu<VT>(pp + sizeof(VT) * 2, result.v2);
-	_mmt_storeu<VT>(pp + sizeof(VT) * 3, result.v3);
+	_mmt_store<VT, NTSTORE>(pp,                  result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT),     result.v1);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 2, result.v2);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT) * 3, result.v3);
 }
 
 #if 0
@@ -1373,8 +1602,8 @@ template<int F>
 static inline void tuned_ConvertUQRGToB48r(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, size_t cbWidth, ssize_t scbStride);
 #endif
 
-template<int F, bool A>
-static inline void tuned_ConvertUQRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+template<int F, bool A, bool NTSTORE>
+static inline void tuned_ConvertUQRXToRGBXImpl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
 	using VT = __m128i;
 
@@ -1424,6 +1653,15 @@ static inline void tuned_ConvertUQRXToRGBX(uint8_t *pDstBegin, uint8_t *pDstEnd,
 				ppp[0] = 0xffff;
 		}
 	}
+}
+
+template<int F, bool A>
+static inline void tuned_ConvertUQRXToRGBX(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, const uint8_t* pABegin, size_t cbWidth, ssize_t scbStride)
+{
+	if (IS_ALIGNED(pDstBegin, 16) && IS_MULTIPLE(cbWidth, 64) && IS_MULTIPLE(scbStride, 16))
+		tuned_ConvertUQRXToRGBXImpl<F, A, true>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
+	else
+		tuned_ConvertUQRXToRGBXImpl<F, A, false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
 }
 
 template<int F, class T>
@@ -1486,8 +1724,8 @@ static inline FORCEINLINE VECTOR_RGB<VT> tuned_ConvertR210ToPlanarElement10(cons
 	);
 }
 
-template<int F>
-void tuned_ConvertR210ToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride)
+template<int F, bool NTSTORE>
+void tuned_ConvertR210ToUQRGImpl(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride)
 {
 	using VT = __m128i;
 
@@ -1526,6 +1764,15 @@ void tuned_ConvertR210ToUQRG(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegi
 	}
 }
 
+template<int F>
+void tuned_ConvertR210ToUQRG(uint8_t* pGBegin, uint8_t* pBBegin, uint8_t* pRBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, unsigned int nWidth, ssize_t scbStride)
+{
+	if (IS_ALIGNED(pGBegin, 16) && IS_ALIGNED(pBBegin, 16) && IS_ALIGNED(pRBegin, 16) && IS_MULTIPLE(nWidth, 8))
+		tuned_ConvertR210ToUQRGImpl<F, true>(pGBegin, pBBegin, pRBegin, pSrcBegin, pSrcEnd, nWidth, scbStride);
+	else
+		tuned_ConvertR210ToUQRGImpl<F, false>(pGBegin, pBBegin, pRBegin, pSrcBegin, pSrcEnd, nWidth, scbStride);
+}
+
 #ifdef GENERATE_SSE41
 template void tuned_ConvertR210ToUQRG<CODEFEATURE_SSE41>(uint8_t *pGBegin, uint8_t *pBBegin, uint8_t *pRBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, unsigned int nWidth, ssize_t scbStride);
 #endif
@@ -1561,16 +1808,16 @@ static inline FORCEINLINE VECTOR2<__m128i> VECTORCALL tuned_ConvertPlanarRGBXToR
 	};
 }
 
-template<int F, typename VT, bool NeedOffset>
+template<int F, typename VT, bool NeedOffset, bool NTSTORE = false>
 static inline FORCEINLINE void VECTORCALL tuned_ConvertPlanarRGBXToR210Element10(uint8_t* pp, VT gg, VT bb, VT rr)
 {
 	auto result = tuned_ConvertPlanarRGBXToR210Element10<F, VT, NeedOffset>(gg, bb, rr);
-	_mmt_storeu<VT>(pp,              result.v0);
-	_mmt_storeu<VT>(pp + sizeof(VT), result.v1);
+	_mmt_store<VT, NTSTORE>(pp,              result.v0);
+	_mmt_store<VT, NTSTORE>(pp + sizeof(VT), result.v1);
 }
 
-template<int F>
-void tuned_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
+template<int F, bool NTSTORE>
+void tuned_ConvertUQRGToR210Impl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
 {
 	using VT = __m128i;
 
@@ -1588,27 +1835,45 @@ void tuned_ConvertUQRGToR210(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t
 			VT gg = _mmt_loadu<VT>(g);
 			VT bb = _mmt_loadu<VT>(b);
 			VT rr = _mmt_loadu<VT>(r);
-			tuned_ConvertPlanarRGBXToR210Element10<F, VT, true>(p, gg, bb, rr);
+			tuned_ConvertPlanarRGBXToR210Element10<F, VT, true, NTSTORE>(p, gg, bb, rr);
 
 			g += sizeof(VT) / 2;
 			b += sizeof(VT) / 2;
 			r += sizeof(VT) / 2;
 		}
 
-		for (; p < pStrideEnd; p += 4)
+		if (!NTSTORE)
 		{
-			uint32_t gg = *g;
-			uint32_t bb = (*b + *g - 0x200) & 0x3ff;
-			uint32_t rr = (*r + *g - 0x200) & 0x3ff;
+			for (; p < pStrideEnd; p += 4)
+			{
+				uint32_t gg = *g;
+				uint32_t bb = (*b + *g - 0x200) & 0x3ff;
+				uint32_t rr = (*r + *g - 0x200) & 0x3ff;
 
-			*(uint32_t *)p = htob32((rr << 20) | (gg << 10) | bb);
-			g++;
-			b++;
-			r++;
+				*(uint32_t*)p = htob32((rr << 20) | (gg << 10) | bb);
+				g++;
+				b++;
+				r++;
+			}
+
+			memset(p, 0, pStrideBegin + ((nWidth + 63) / 64 * 256) - p);
 		}
-
-		memset(p, 0, pStrideBegin + ((nWidth + 63) / 64 * 256) - p);
+		else
+		{
+			auto pLineEnd = pStrideBegin + nWidth * 4;
+			for (; p < pLineEnd; p += sizeof(VT))
+				_mmt_store<VT, NTSTORE>(p, _mmt_set1_epi8<VT>(0));
+		}
 	}
+}
+
+template<int F>
+void tuned_ConvertUQRGToR210(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, unsigned int nWidth, ssize_t scbStride)
+{
+	if (IS_ALIGNED(pDstBegin, 16) && IS_MULTIPLE(nWidth, 8) && IS_MULTIPLE(scbStride, 16))
+		tuned_ConvertUQRGToR210Impl<F, true>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, nWidth, scbStride);
+	else
+		tuned_ConvertUQRGToR210Impl<F, false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, nWidth, scbStride);
 }
 
 #ifdef GENERATE_SSE41
@@ -1621,8 +1886,8 @@ template void tuned_ConvertUQRGToR210<CODEFEATURE_AVX1>(uint8_t *pDstBegin, uint
 
 //
 
-template<int F, VALUERANGE VR>
-void tuned_ConvertLittleEndian16ToHostEndian10(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
+template<int F, VALUERANGE VR, bool NTSTORE>
+void tuned_ConvertLittleEndian16ToHostEndian10Impl(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
 {
 	auto p = (const uint16_t*)pSrcBegin;
 	auto q = (uint16_t*)pDst;
@@ -1631,15 +1896,18 @@ void tuned_ConvertLittleEndian16ToHostEndian10(uint8_t* pDst, const uint8_t* pSr
 	{
 		auto v = _mm_loadu_si128((const __m128i*)p);
 		v = _mm_Convert16To10<VR>(v);
-		_mm_storeu_si128((__m128i*)q, v);
+		_mmt_store<__m128i, NTSTORE>((__m128i*)q, v);
 	}
 
-	for (; p < (const uint16_t*)pSrcEnd; ++p, ++q)
-		*q = Convert16To10<VR>(ltoh16(*p));
+	if (!NTSTORE)
+	{
+		for (; p < (const uint16_t*)pSrcEnd; ++p, ++q)
+			*q = Convert16To10<VR>(ltoh16(*p));
+	}
 }
 
-template<int F, VALUERANGE VR>
-void tuned_ConvertHostEndian10ToLittleEndian16(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc)
+template<int F, VALUERANGE VR, bool NTSTORE>
+void tuned_ConvertHostEndian10ToLittleEndian16Impl(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc)
 {
 	auto p = (const uint16_t*)pSrc;
 	auto q = (uint16_t*)pDstBegin;
@@ -1648,11 +1916,32 @@ void tuned_ConvertHostEndian10ToLittleEndian16(uint8_t* pDstBegin, uint8_t* pDst
 	{
 		auto v = _mm_loadu_si128((const __m128i*)p);
 		v = _mm_Convert10To16<VR>(v);
-		_mm_storeu_si128((__m128i*)q, v);
+		_mmt_store<__m128i, NTSTORE>((__m128i*)q, v);
 	}
 
-	for (; q < (uint16_t*)pDstEnd; ++p, ++q)
-		*q = htol16(Convert10To16<VR>(*p));
+	if (!NTSTORE)
+	{
+		for (; q < (uint16_t*)pDstEnd; ++p, ++q)
+			*q = htol16(Convert10To16<VR>(*p));
+	}
+}
+
+template<int F, VALUERANGE VR>
+void tuned_ConvertLittleEndian16ToHostEndian10(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
+{
+	if (IS_ALIGNED(pDst, 16) && IS_MULTIPLE(pSrcBegin, pSrcEnd, 16))
+		tuned_ConvertLittleEndian16ToHostEndian10Impl<F, VR, true>(pDst, pSrcBegin, pSrcEnd);
+	else
+		tuned_ConvertLittleEndian16ToHostEndian10Impl<F, VR, false>(pDst, pSrcBegin, pSrcEnd);
+}
+
+template<int F, VALUERANGE VR>
+void tuned_ConvertHostEndian10ToLittleEndian16(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrc)
+{
+	if (IS_ALIGNED(pDstBegin, 16) && IS_MULTIPLE(pDstBegin, pDstEnd, 16))
+		tuned_ConvertHostEndian10ToLittleEndian16Impl<F, VR, true>(pDstBegin, pDstEnd, pSrc);
+	else
+		tuned_ConvertHostEndian10ToLittleEndian16Impl<F, VR, false>(pDstBegin, pDstEnd, pSrc);
 }
 
 #ifdef GENERATE_SSE41
@@ -1669,8 +1958,8 @@ template void tuned_ConvertHostEndian10ToLittleEndian16<CODEFEATURE_AVX1, VALUER
 
 //
 
-template<int F, VALUERANGE VR>
-void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
+template<int F, VALUERANGE VR, bool NTSTORE>
+void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Impl(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
 {
 	auto u = (uint16_t*)pUBegin;
 	auto v = (uint16_t*)pVBegin;
@@ -1686,19 +1975,22 @@ void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10(uint8_t* pUBegin, u
 		m1 = _mm_shuffle_epi8(m1, _mm_set_epi8(15, 14, 11, 10, 7, 6, 3, 2, 13, 12, 9, 8, 5, 4, 1, 0));
 		auto uu = _mm_unpacklo_epi64(m0, m1);
 		auto vv = _mm_unpackhi_epi64(m0, m1);
-		_mm_storeu_si128((__m128i*)u, uu);
-		_mm_storeu_si128((__m128i*)v, vv);
+		_mmt_store<__m128i, NTSTORE>((__m128i*)u, uu);
+		_mmt_store<__m128i, NTSTORE>((__m128i*)v, vv);
 	}
 
-	for (; p < (const uint16_t*)pSrcEnd; p += 2, ++u, ++v)
+	if (!NTSTORE)
 	{
-		*u = Convert16To10<VR>(ltoh16(p[0]));
-		*v = Convert16To10<VR>(ltoh16(p[1]));
+		for (; p < (const uint16_t*)pSrcEnd; p += 2, ++u, ++v)
+		{
+			*u = Convert16To10<VR>(ltoh16(p[0]));
+			*v = Convert16To10<VR>(ltoh16(p[1]));
+		}
 	}
 }
 
-template<int F, VALUERANGE VR>
-void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin)
+template<int F, VALUERANGE VR, bool NTSTORE>
+void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Impl(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin)
 {
 	auto u = (const uint16_t*)pUBegin;
 	auto v = (const uint16_t*)pVBegin;
@@ -1712,15 +2004,40 @@ void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16(uint8_t* pDstBegin,
 		vv = _mm_Convert10To16<VR>(vv);
 		auto m0 = _mm_unpacklo_epi16(uu, vv);
 		auto m1 = _mm_unpackhi_epi16(uu, vv);
-		_mm_storeu_si128((__m128i*)p, m0);
-		_mm_storeu_si128((__m128i*)(p + 8), m1);
+		_mmt_store<__m128i, NTSTORE>((__m128i*)p, m0);
+		_mmt_store<__m128i, NTSTORE>((__m128i*)(p + 8), m1);
 	}
 
-	for (; p < (uint16_t*)pDstEnd; p += 2, ++u, ++v)
+	if (!NTSTORE)
 	{
-		p[0] = htol16(Convert10To16<VR>(*u));
-		p[1] = htol16(Convert10To16<VR>(*v));
+		for (; p < (uint16_t*)pDstEnd; p += 2, ++u, ++v)
+		{
+			p[0] = htol16(Convert10To16<VR>(*u));
+			p[1] = htol16(Convert10To16<VR>(*v));
+		}
 	}
+}
+
+template<int F, VALUERANGE VR>
+void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10(uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd)
+{
+	using VT = __m128i;
+
+	if (IS_ALIGNED(pUBegin, sizeof(VT)) && IS_ALIGNED(pVBegin, sizeof(VT)) && IS_MULTIPLE(pSrcBegin, pSrcEnd, sizeof(VT) * 2))
+		tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Impl<F, VR, true>(pUBegin, pVBegin, pSrcBegin, pSrcEnd);
+	else
+		tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10Impl<F, VR, false>(pUBegin, pVBegin, pSrcBegin, pSrcEnd);
+}
+
+template<int F, VALUERANGE VR>
+void tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin)
+{
+	using VT = __m128i;
+
+	if (IS_ALIGNED(pDstBegin, sizeof(VT)) && IS_MULTIPLE(pDstBegin, pDstEnd, sizeof(VT) * 2))
+		tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Impl<F, VR, true>(pDstBegin, pDstEnd, pUBegin, pVBegin);
+	else
+		tuned_ConvertPlanarHostEndian10ToPackedUVLittleEndian16Impl<F, VR, false>(pDstBegin, pDstEnd, pUBegin, pVBegin);
 }
 
 #ifdef GENERATE_SSE41

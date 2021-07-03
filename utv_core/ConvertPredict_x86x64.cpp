@@ -338,8 +338,8 @@ template void tuned_ConvertRGBAToULRA_PredictCylindricalWrongMedianAndCount<CODE
 
 //
 
-template<int F, class T, bool A, PREDICTION_TYPE Pred>
-static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+template<int F, class T, bool A, PREDICTION_TYPE Pred, bool NTSTORE>
+static inline void tuned_ConvertULRXToRGBX_RestoreImpl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint8_t gprevb = 0x80;
 	uint8_t bprevb = 0;
@@ -351,18 +351,32 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 	auto r = pRBegin;
 	auto a = pABegin;
 
+	uint8_t* linebuf = NULL;
+	if (NTSTORE && Pred == PLANAR_GRADIENT)
+		linebuf = (uint8_t*)_aligned_malloc(cbWidth, 16);
+
+	__m128i gprev = _mm_set1_epi8(gprevb);
+	__m128i bprev = _mm_set1_epi8(bprevb);
+	__m128i rprev = _mm_set1_epi8(rprevb);
+	__m128i aprev;
+	if (A)
+		aprev = _mm_set1_epi8(aprevb);
+
 	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pp = p;
 
-		__m128i gprev = _mm_set1_epi8(gprevb);
-		__m128i bprev = _mm_set1_epi8(bprevb);
-		__m128i rprev = _mm_set1_epi8(rprevb);
-		__m128i aprev;
-		if (A)
-			aprev = _mm_set1_epi8(aprevb);
+		if (!NTSTORE)
+		{
+			gprev = _mm_set1_epi8(gprevb);
+			bprev = _mm_set1_epi8(bprevb);
+			rprev = _mm_set1_epi8(rprevb);
+			if (A)
+				aprev = _mm_set1_epi8(aprevb);
+		}
 
-		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
+		auto lb = linebuf;
+		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16, lb += T::BYPP * 16)
 		{
 			__m128i gg = _mm_loadu_si128((const __m128i *)g);
 			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gg);
@@ -382,7 +396,10 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 			{
 				avalue_v0 = _mm_set1_epi8((char)0xff);
 			}
-			tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
+			if (!NTSTORE || Pred != PLANAR_GRADIENT)
+				tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false, NTSTORE>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
+			else
+				tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false, NTSTORE>(pp, lb, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
 
 
 			gprev = gvalue.v1;
@@ -396,27 +413,30 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 				a += 16;
 		}
 
-		gprevb = _mm_cvtsi128_si32(gprev);
-		bprevb = _mm_cvtsi128_si32(bprev);
-		rprevb = _mm_cvtsi128_si32(rprev);
-		if (A)
-			aprevb = _mm_cvtsi128_si32(aprev);
-
-		for (; pp < p + cbWidth; pp += T::BYPP)
+		if (!NTSTORE)
 		{
-			pp[T::G] = gprevb += g[0];
-			pp[T::B] = (bprevb += b[0]) + gprevb;
-			pp[T::R] = (rprevb += r[0]) + gprevb;
+			gprevb = _mm_cvtsi128_si32(gprev);
+			bprevb = _mm_cvtsi128_si32(bprev);
+			rprevb = _mm_cvtsi128_si32(rprev);
 			if (A)
-				pp[T::A] = aprevb += a[0];
-			else if (T::HAS_ALPHA)
-				pp[T::A] = 0xff;
+				aprevb = _mm_cvtsi128_si32(aprev);
 
-			g += 1;
-			b += 1;
-			r += 1;
-			if (A)
-				a += 1;
+			for (; pp < p + cbWidth; pp += T::BYPP)
+			{
+				pp[T::G] = gprevb += g[0];
+				pp[T::B] = (bprevb += b[0]) + gprevb;
+				pp[T::R] = (rprevb += r[0]) + gprevb;
+				if (A)
+					pp[T::A] = aprevb += a[0];
+				else if (T::HAS_ALPHA)
+					pp[T::A] = 0xff;
+
+				g += 1;
+				b += 1;
+				r += 1;
+				if (A)
+					a += 1;
+			}
 		}
 	}
 
@@ -431,7 +451,8 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 		if (A)
 			aprev = _mm_set1_epi8(0);
 
-		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16)
+		auto lb = linebuf;
+		for (; pp <= p + cbWidth - T::BYPP * 16; pp += T::BYPP * 16, lb += T::BYPP * 16)
 		{
 			__m128i gg = _mm_loadu_si128((const __m128i *)g);
 			auto gvalue = tuned_RestoreLeft8Element<F>(gprev, gg);
@@ -451,7 +472,10 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 			{
 				avalue_v0 = _mm_set1_epi8(0);
 			}
-			tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0, scbStride);
+			if (!NTSTORE)
+				tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0, scbStride);
+			else
+				tuned_ConvertPlanarRGBXToPackedElement<F, __m128i, T, false, NTSTORE>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0, lb);
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -464,27 +488,30 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 				a += 16;
 		}
 
-		gprevb = _mm_cvtsi128_si32(gprev);
-		bprevb = _mm_cvtsi128_si32(bprev);
-		rprevb = _mm_cvtsi128_si32(rprev);
-		if (A)
-			aprevb = _mm_cvtsi128_si32(aprev);
-
-		for (; pp < p + cbWidth; pp += T::BYPP)
+		if (!NTSTORE)
 		{
-			pp[T::G] = (gprevb += g[0]) + (pp - scbStride)[T::G];
-			pp[T::B] = (bprevb += b[0]) + (pp - scbStride)[T::B] + gprevb;
-			pp[T::R] = (rprevb += r[0]) + (pp - scbStride)[T::R] + gprevb;
+			gprevb = _mm_cvtsi128_si32(gprev);
+			bprevb = _mm_cvtsi128_si32(bprev);
+			rprevb = _mm_cvtsi128_si32(rprev);
 			if (A)
-				pp[T::A] = (aprevb += a[0]) + (pp - scbStride)[T::A];
-			else if (T::HAS_ALPHA)
-				pp[T::A] = 0xff;
+				aprevb = _mm_cvtsi128_si32(aprev);
 
-			g += 1;
-			b += 1;
-			r += 1;
-			if (A)
-				a += 1;
+			for (; pp < p + cbWidth; pp += T::BYPP)
+			{
+				pp[T::G] = (gprevb += g[0]) + (pp - scbStride)[T::G];
+				pp[T::B] = (bprevb += b[0]) + (pp - scbStride)[T::B] + gprevb;
+				pp[T::R] = (rprevb += r[0]) + (pp - scbStride)[T::R] + gprevb;
+				if (A)
+					pp[T::A] = (aprevb += a[0]) + (pp - scbStride)[T::A];
+				else if (T::HAS_ALPHA)
+					pp[T::A] = 0xff;
+
+				g += 1;
+				b += 1;
+				r += 1;
+				if (A)
+					a += 1;
+			}
 		}
 	}
 
@@ -701,6 +728,18 @@ static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t *pDstBegin, uint8_t *
 				a += 1;
 		}
 	}
+
+	if (NTSTORE && Pred == PLANAR_GRADIENT)
+		_aligned_free(linebuf);
+}
+
+template<int F, class T, bool A, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertULRXToRGBX_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, const uint8_t* pABegin, size_t cbWidth, ssize_t scbStride)
+{
+	if (Pred != CYLINDRICAL_WRONG_MEDIAN && IS_ALIGNED(pDstBegin, 16) && IS_MULTIPLE(cbWidth, T::BYPP * 16) && IS_MULTIPLE(scbStride, 16))
+		tuned_ConvertULRXToRGBX_RestoreImpl<F, T, A, Pred, true>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
+	else
+		tuned_ConvertULRXToRGBX_RestoreImpl<F, T, A, Pred, false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
 }
 
 template<int F, class T>
@@ -1014,8 +1053,8 @@ template void tuned_ConvertPackedYUV422ToULY2_PredictCylindricalWrongMedianAndCo
 
 //
 
-template<int F, class T, PREDICTION_TYPE Pred>
-static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
+template<int F, class T, PREDICTION_TYPE Pred, bool NTSTORE>
+static inline void tuned_ConvertULY2ToPackedYUV422_RestoreImpl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint8_t yprevb = 0x80;
 	uint8_t uprevb = 0x80;
@@ -1025,15 +1064,27 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 	auto u = pUBegin;
 	auto v = pVBegin;
 
+	uint8_t* linebuf = NULL;
+	if (NTSTORE && Pred == PLANAR_GRADIENT)
+		linebuf = (uint8_t*)_aligned_malloc(cbWidth, 16);
+
+	__m128i yprev = _mm_set1_epi8(yprevb);
+	__m128i uprev = _mm_set1_epi8(uprevb);
+	__m128i vprev = _mm_set1_epi8(vprevb);
+
 	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pp = p;
 
-		__m128i yprev = _mm_set1_epi8(yprevb);
-		__m128i uprev = _mm_set1_epi8(uprevb);
-		__m128i vprev = _mm_set1_epi8(vprevb);
+		if (!NTSTORE)
+		{
+			yprev = _mm_set1_epi8(yprevb);
+			uprev = _mm_set1_epi8(uprevb);
+			vprev = _mm_set1_epi8(vprevb);
+		}
 
-		for (; pp <= p + cbWidth - 64; pp += 64)
+		auto lb = linebuf;
+		for (; pp <= p + cbWidth - 64; pp += 64, lb += 64)
 		{
 			__m128i yy0 = _mm_loadu_si128((const __m128i *)y);
 			__m128i yy1 = _mm_loadu_si128((const __m128i *)(y + 16));
@@ -1043,7 +1094,10 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uu);
 			__m128i vv = _mm_loadu_si128((const __m128i *)v);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vv);
-			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0);
+			if (!NTSTORE || Pred != PLANAR_GRADIENT)
+				tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T, NTSTORE>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0);
+			else
+				tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T, NTSTORE>(pp, lb, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0);
 
 			yprev = yvalue1.v1;
 			uprev = uvalue.v1;
@@ -1054,20 +1108,23 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 			v += 16;
 		}
 
-		yprevb = _mm_cvtsi128_si32(yprev);
-		uprevb = _mm_cvtsi128_si32(uprev);
-		vprevb = _mm_cvtsi128_si32(vprev);
-
-		for (; pp < p + cbWidth; pp += 4)
+		if (!NTSTORE)
 		{
-			pp[T::Y0] = yprevb += y[0];
-			pp[T::Y1] = yprevb += y[1];
-			pp[T::U] = uprevb += u[0];
-			pp[T::V] = vprevb += v[0];
+			yprevb = _mm_cvtsi128_si32(yprev);
+			uprevb = _mm_cvtsi128_si32(uprev);
+			vprevb = _mm_cvtsi128_si32(vprev);
 
-			y += 2;
-			u += 1;
-			v += 1;
+			for (; pp < p + cbWidth; pp += 4)
+			{
+				pp[T::Y0] = yprevb += y[0];
+				pp[T::Y1] = yprevb += y[1];
+				pp[T::U] = uprevb += u[0];
+				pp[T::V] = vprevb += v[0];
+
+				y += 2;
+				u += 1;
+				v += 1;
+			}
 		}
 	}
 
@@ -1079,7 +1136,8 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 		__m128i uprev = _mm_set1_epi8(0);
 		__m128i vprev = _mm_set1_epi8(0);
 
-		for (; pp <= p + cbWidth - 64; pp += 64)
+		auto lb = linebuf;
+		for (; pp <= p + cbWidth - 64; pp += 64, lb += 64)
 		{
 			__m128i yy0 = _mm_loadu_si128((const __m128i *)y);
 			__m128i yy1 = _mm_loadu_si128((const __m128i *)(y + 16));
@@ -1089,7 +1147,10 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprev, uu);
 			__m128i vv = _mm_loadu_si128((const __m128i *)v);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprev, vv);
-			tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0, scbStride);
+			if (!NTSTORE)
+				tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0, scbStride);
+			else
+				tuned_ConvertPlanarYUV422ToPackedElement<F, __m128i, T, NTSTORE>(pp, yvalue0.v0, yvalue1.v0, uvalue.v0, vvalue.v0, lb);
 
 			yprev = yvalue1.v1;
 			uprev = uvalue.v1;
@@ -1175,6 +1236,18 @@ static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t *pDstBegin, u
 			v += 1;
 		}
 	}
+
+	if (NTSTORE && Pred == PLANAR_GRADIENT)
+		_aligned_free(linebuf);
+}
+
+template<int F, class T, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertULY2ToPackedYUV422_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	if (Pred != CYLINDRICAL_WRONG_MEDIAN && IS_ALIGNED(pDstBegin, 16) && IS_MULTIPLE(cbWidth, 4 * 16) && IS_MULTIPLE(scbStride, 16))
+		tuned_ConvertULY2ToPackedYUV422_RestoreImpl<F, T, Pred, true>(pDstBegin, pDstEnd,pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
+	else
+		tuned_ConvertULY2ToPackedYUV422_RestoreImpl<F, T, Pred, false>(pDstBegin, pDstEnd, pYBegin, pUBegin, pVBegin, cbWidth, scbStride);
 }
 
 template<int F, class T>
@@ -1382,8 +1455,8 @@ template void tuned_ConvertPackedUVToPlanar_PredictCylindricalWrongMedianAndCoun
 
 //
 
-template<int F, PREDICTION_TYPE Pred>
-static inline void tuned_ConvertPlanarToPackedUV_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+template<int F, PREDICTION_TYPE Pred, bool NTSTORE>
+static inline void tuned_ConvertPlanarToPackedUV_RestoreImpl(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint8_t uprev = 0x80;
 	uint8_t vprev = 0x80;
@@ -1391,20 +1464,34 @@ static inline void tuned_ConvertPlanarToPackedUV_Restore(uint8_t* pDstBegin, uin
 	auto u = pUBegin;
 	auto v = pVBegin;
 
+	uint8_t* linebuf = NULL;
+	if (NTSTORE && Pred == PLANAR_GRADIENT)
+		linebuf = (uint8_t*)_aligned_malloc(cbWidth, 16);
+
+	__m128i uprevv = _mm_set1_epi8(uprev);
+	__m128i vprevv = _mm_set1_epi8(vprev);
+
 	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pp = p;
 
-		__m128i uprevv = _mm_set1_epi8(uprev);
-		__m128i vprevv = _mm_set1_epi8(vprev);
+		if (!NTSTORE)
+		{
+			uprevv = _mm_set1_epi8(uprev);
+			vprevv = _mm_set1_epi8(vprev);
+		}
 
-		for (; pp <= p + cbWidth - 32; pp += 32)
+		auto lb = linebuf;
+		for (; pp <= p + cbWidth - 32; pp += 32, lb += 32)
 		{
 			__m128i uu = _mm_loadu_si128((const __m128i*)u);
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprevv, uu);
 			__m128i vv = _mm_loadu_si128((const __m128i*)v);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprevv, vv);
-			tuned_ConvertPlanarToPackedUVElement<F, __m128i>(pp, uvalue.v0, vvalue.v0);
+			if (!NTSTORE || Pred != PLANAR_GRADIENT)
+				tuned_ConvertPlanarToPackedUVElement<F, __m128i, NTSTORE>(pp, uvalue.v0, vvalue.v0);
+			else
+				tuned_ConvertPlanarToPackedUVElement<F, __m128i, NTSTORE>(pp, lb, uvalue.v0, vvalue.v0);
 
 			uprevv = uvalue.v1;
 			vprevv = vvalue.v1;
@@ -1413,16 +1500,19 @@ static inline void tuned_ConvertPlanarToPackedUV_Restore(uint8_t* pDstBegin, uin
 			v += 16;
 		}
 
-		uprev = _mm_cvtsi128_si32(uprevv);
-		vprev = _mm_cvtsi128_si32(vprevv);
-
-		for (; pp < p + cbWidth; pp += 2)
+		if (!NTSTORE)
 		{
-			pp[0] = uprev += *u;
-			pp[1] = vprev += *v;
+			uprev = _mm_cvtsi128_si32(uprevv);
+			vprev = _mm_cvtsi128_si32(vprevv);
 
-			++u;
-			++v;
+			for (; pp < p + cbWidth; pp += 2)
+			{
+				pp[0] = uprev += *u;
+				pp[1] = vprev += *v;
+
+				++u;
+				++v;
+			}
 		}
 	}
 
@@ -1433,13 +1523,17 @@ static inline void tuned_ConvertPlanarToPackedUV_Restore(uint8_t* pDstBegin, uin
 		__m128i uprevv = _mm_set1_epi8(0);
 		__m128i vprevv = _mm_set1_epi8(0);
 
-		for (; pp <= p + cbWidth - 32; pp += 32)
+		auto lb = linebuf;
+		for (; pp <= p + cbWidth - 32; pp += 32, lb += 32)
 		{
 			__m128i uu = _mm_loadu_si128((const __m128i*)u);
 			auto uvalue = tuned_RestoreLeft8Element<F>(uprevv, uu);
 			__m128i vv = _mm_loadu_si128((const __m128i*)v);
 			auto vvalue = tuned_RestoreLeft8Element<F>(vprevv, vv);
-			tuned_ConvertPlanarToPackedUVElement<F, __m128i>(pp, uvalue.v0, vvalue.v0, scbStride);
+			if (!NTSTORE)
+				tuned_ConvertPlanarToPackedUVElement<F, __m128i>(pp, uvalue.v0, vvalue.v0, scbStride);
+			else
+				tuned_ConvertPlanarToPackedUVElement<F, __m128i>(pp, uvalue.v0, vvalue.v0, lb);
 
 			uprevv = uvalue.v1;
 			vprevv = vvalue.v1;
@@ -1448,16 +1542,19 @@ static inline void tuned_ConvertPlanarToPackedUV_Restore(uint8_t* pDstBegin, uin
 			v += 16;
 		}
 
-		uprev = _mm_cvtsi128_si32(uprevv);
-		vprev = _mm_cvtsi128_si32(vprevv);
-
-		for (; pp < p + cbWidth; pp += 2)
+		if (!NTSTORE)
 		{
-			pp[0] = (uprev += *u) + (pp - scbStride)[0];
-			pp[1] = (vprev += *v) + (pp - scbStride)[1];
+			uprev = _mm_cvtsi128_si32(uprevv);
+			vprev = _mm_cvtsi128_si32(vprevv);
 
-			++u;
-			++v;
+			for (; pp < p + cbWidth; pp += 2)
+			{
+				pp[0] = (uprev += *u) + (pp - scbStride)[0];
+				pp[1] = (vprev += *v) + (pp - scbStride)[1];
+
+				++u;
+				++v;
+			}
 		}
 	}
 
@@ -1572,6 +1669,18 @@ static inline void tuned_ConvertPlanarToPackedUV_Restore(uint8_t* pDstBegin, uin
 			++v;
 		}
 	}
+
+	if (NTSTORE && Pred == PLANAR_GRADIENT)
+		_aligned_free(linebuf);
+}
+
+template<int F, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertPlanarToPackedUV_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	if (Pred != CYLINDRICAL_WRONG_MEDIAN && IS_ALIGNED(pDstBegin, 16) && IS_MULTIPLE(cbWidth, 2 * 16) && IS_MULTIPLE(scbStride, 16))
+		tuned_ConvertPlanarToPackedUV_RestoreImpl<F, Pred, true>(pDstBegin, pDstEnd, pUBegin, pVBegin, cbWidth, scbStride);
+	else
+		tuned_ConvertPlanarToPackedUV_RestoreImpl<F, Pred, false>(pDstBegin, pDstEnd, pUBegin, pVBegin, cbWidth, scbStride);
 }
 
 template<int F>
@@ -1864,8 +1973,8 @@ template void tuned_ConvertB64aToUQRA_PredictPlanarGradientAndCount<CODEFEATURE_
 
 //
 
-template<int F, bool A, PREDICTION_TYPE Pred>
-static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
+template<int F, bool A, PREDICTION_TYPE Pred, bool NTSTORE>
+static inline void tuned_ConvertUQRXToB64a_RestoreImpl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, const uint8_t *pABegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint16_t gprevb = 0x200;
 	uint16_t bprevb = 0;
@@ -1877,22 +1986,32 @@ static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t *pDstBegin, uint8_t *
 	uint16_t *r = (uint16_t *)pRBegin;
 	uint16_t *a = (uint16_t *)pABegin;
 
-	uint16_t* topbuf = NULL;
+	uint16_t* linebuf = NULL;
 	if (Pred != CYLINDRICAL_LEFT)
-		topbuf = (uint16_t*)_aligned_malloc(A ? cbWidth : cbWidth / 4 * 3, 16);
+		linebuf = (uint16_t*)_aligned_malloc(A ? cbWidth : cbWidth / 4 * 3, 16);
+
+	__m128i gprev = _mm_set1_epi16(gprevb);
+	__m128i bprev = _mm_set1_epi16(bprevb);
+	__m128i rprev = _mm_set1_epi16(rprevb);
+	__m128i aprev;
+	if (A)
+		aprev = _mm_set1_epi16(aprevb);
 
 	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pp = p;
-		auto tt = topbuf;
 
-		__m128i gprev = _mm_set1_epi16(gprevb);
-		__m128i bprev = _mm_set1_epi16(bprevb);
-		__m128i rprev = _mm_set1_epi16(rprevb);
-		__m128i aprev;
-		if (A)
-			aprev = _mm_set1_epi16(aprevb);
+		if (!NTSTORE)
+		{
+			gprev = _mm_set1_epi16(gprevb);
+			bprev = _mm_set1_epi16(bprevb);
+			rprev = _mm_set1_epi16(rprevb);
+			aprev;
+			if (A)
+				aprev = _mm_set1_epi16(aprevb);
+		}
 
+		auto lb = linebuf;
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
 			__m128i gg = _mm_loadu_si128((const __m128i *)g);
@@ -1903,9 +2022,9 @@ static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t *pDstBegin, uint8_t *
 			auto rvalue = tuned_RestoreLeft10Element<F, false>(rprev, rr);
 			if (Pred != CYLINDRICAL_LEFT)
 			{
-				_mm_store_si128((__m128i*)tt, gvalue.v0);
-				_mm_store_si128((__m128i*)(tt + 8), bvalue.v0);
-				_mm_store_si128((__m128i*)(tt + 16), rvalue.v0);
+				_mm_store_si128((__m128i*)lb, gvalue.v0);
+				_mm_store_si128((__m128i*)(lb + 8), bvalue.v0);
+				_mm_store_si128((__m128i*)(lb + 16), rvalue.v0);
 			}
 			__m128i avalue_v0;
 			if (A)
@@ -1915,15 +2034,15 @@ static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t *pDstBegin, uint8_t *
 				aprev = avalue.v1;
 				avalue_v0 = avalue.v0;
 				if (Pred != CYLINDRICAL_LEFT)
-					_mm_store_si128((__m128i*)(tt + 24), avalue.v0);
+					_mm_store_si128((__m128i*)(lb + 24), avalue.v0);
 			}
 			else
 			{
 				avalue_v0 = _mm_set1_epi16((short)0xffff);
 			}
-			tuned_ConvertPlanarRGBXToB64aElement10<F, __m128i, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
+			tuned_ConvertPlanarRGBXToB64aElement10<F, __m128i, false, NTSTORE>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
 			if (Pred != CYLINDRICAL_LEFT)
-				tt += A ? 32 : 24;
+				lb += A ? 32 : 24;
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -1936,51 +2055,53 @@ static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t *pDstBegin, uint8_t *
 				a += 8;
 		}
 
-		gprevb = _mm_cvtsi128_si32(gprev);
-		bprevb = _mm_cvtsi128_si32(bprev);
-		rprevb = _mm_cvtsi128_si32(rprev);
-		if (A)
-			aprevb = _mm_cvtsi128_si32(aprev);
-
-		for (; pp < p + cbWidth; pp += 8)
+		if (!NTSTORE)
 		{
-			
-			auto gg = gprevb += g[0];
-			auto bb = (bprevb += b[0]) + gprevb;
-			auto rr = (rprevb += r[0]) + gprevb;
-			if (Pred != CYLINDRICAL_LEFT)
-			{
-				tt[0] = gg;
-				tt[1] = bb;
-				tt[2] = rr;
-			}
-			((uint16_t*)pp)[2] = htob16(Convert10To16Fullrange(gg));
-			((uint16_t*)pp)[3] = htob16(Convert10To16Fullrange(bb));
-			((uint16_t*)pp)[1] = htob16(Convert10To16Fullrange(rr));
+			gprevb = _mm_cvtsi128_si32(gprev);
+			bprevb = _mm_cvtsi128_si32(bprev);
+			rprevb = _mm_cvtsi128_si32(rprev);
 			if (A)
-			{
-				auto aa = aprevb += a[0];
-				if (Pred != CYLINDRICAL_LEFT)
-					tt[3] = aa;
-				((uint16_t*)pp)[0] = htob16(Convert10To16Fullrange(aa));
-			}
-			else
-				((uint16_t *)pp)[0] = 0xffff;
-			if (Pred != CYLINDRICAL_LEFT)
-				tt += A ? 4 : 3;
+				aprevb = _mm_cvtsi128_si32(aprev);
 
-			g += 1;
-			b += 1;
-			r += 1;
-			if (A)
-				a += 1;
+			for (; pp < p + cbWidth; pp += 8)
+			{
+
+				auto gg = gprevb += g[0];
+				auto bb = (bprevb += b[0]) + gprevb;
+				auto rr = (rprevb += r[0]) + gprevb;
+				if (Pred != CYLINDRICAL_LEFT)
+				{
+					lb[0] = gg;
+					lb[1] = bb;
+					lb[2] = rr;
+				}
+				((uint16_t*)pp)[2] = htob16(Convert10To16Fullrange(gg));
+				((uint16_t*)pp)[3] = htob16(Convert10To16Fullrange(bb));
+				((uint16_t*)pp)[1] = htob16(Convert10To16Fullrange(rr));
+				if (A)
+				{
+					auto aa = aprevb += a[0];
+					if (Pred != CYLINDRICAL_LEFT)
+						lb[3] = aa;
+					((uint16_t*)pp)[0] = htob16(Convert10To16Fullrange(aa));
+				}
+				else
+					((uint16_t*)pp)[0] = 0xffff;
+				if (Pred != CYLINDRICAL_LEFT)
+					lb += A ? 4 : 3;
+
+				g += 1;
+				b += 1;
+				r += 1;
+				if (A)
+					a += 1;
+			}
 		}
 	}
 
 	if (Pred == PLANAR_GRADIENT) for (auto p = pDstBegin + scbStride; p != pDstEnd; p += scbStride)
 	{
 		auto pp = p;
-		auto tt = topbuf;
 
 		__m128i gprev = _mm_setzero_si128();
 		__m128i bprev = _mm_setzero_si128();
@@ -1989,6 +2110,7 @@ static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t *pDstBegin, uint8_t *
 		if (A)
 			aprev = _mm_setzero_si128();
 
+		auto lb = linebuf;
 		for (; pp <= p + cbWidth - 64; pp += 64)
 		{
 			__m128i gg = _mm_loadu_si128((const __m128i*)g);
@@ -1999,12 +2121,12 @@ static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t *pDstBegin, uint8_t *
 			auto rvalue = tuned_RestoreLeft10Element<F, false>(rprev, rr);
 			if (Pred != CYLINDRICAL_LEFT)
 			{
-				gvalue.v0 = _mm_add_epi16(gvalue.v0, _mm_load_si128((const __m128i*)tt));
-				bvalue.v0 = _mm_add_epi16(bvalue.v0, _mm_load_si128((const __m128i*)(tt + 8)));
-				rvalue.v0 = _mm_add_epi16(rvalue.v0, _mm_load_si128((const __m128i*)(tt + 16)));
-				_mm_store_si128((__m128i*)tt, gvalue.v0);
-				_mm_store_si128((__m128i*)(tt + 8), bvalue.v0);
-				_mm_store_si128((__m128i*)(tt + 16), rvalue.v0);
+				gvalue.v0 = _mm_add_epi16(gvalue.v0, _mm_load_si128((const __m128i*)lb));
+				bvalue.v0 = _mm_add_epi16(bvalue.v0, _mm_load_si128((const __m128i*)(lb + 8)));
+				rvalue.v0 = _mm_add_epi16(rvalue.v0, _mm_load_si128((const __m128i*)(lb + 16)));
+				_mm_store_si128((__m128i*)lb, gvalue.v0);
+				_mm_store_si128((__m128i*)(lb + 8), bvalue.v0);
+				_mm_store_si128((__m128i*)(lb + 16), rvalue.v0);
 			}
 			__m128i avalue_v0;
 			if (A)
@@ -2015,17 +2137,17 @@ static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t *pDstBegin, uint8_t *
 				avalue_v0 = avalue.v0;
 				if (Pred != CYLINDRICAL_LEFT)
 				{
-					avalue.v0 = _mm_add_epi16(avalue.v0, _mm_load_si128((const __m128i*)(tt + 16)));
-					_mm_store_si128((__m128i*)(tt + 24), avalue.v0);
+					avalue.v0 = _mm_add_epi16(avalue.v0, _mm_load_si128((const __m128i*)(lb + 16)));
+					_mm_store_si128((__m128i*)(lb + 24), avalue.v0);
 				}
 			}
 			else
 			{
 				avalue_v0 = _mm_set1_epi16((short)0xffff);
 			}
-			tuned_ConvertPlanarRGBXToB64aElement10<F, __m128i, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
+			tuned_ConvertPlanarRGBXToB64aElement10<F, __m128i, false, NTSTORE>(pp, gvalue.v0, bvalue.v0, rvalue.v0, avalue_v0);
 			if (Pred != CYLINDRICAL_LEFT)
-				tt += A ? 32 : 24;
+				lb += A ? 32 : 24;
 
 			gprev = gvalue.v1;
 			bprev = bvalue.v1;
@@ -2038,55 +2160,67 @@ static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t *pDstBegin, uint8_t *
 				a += 8;
 		}
 
-		gprevb = _mm_cvtsi128_si32(gprev);
-		bprevb = _mm_cvtsi128_si32(bprev);
-		rprevb = _mm_cvtsi128_si32(rprev);
-		if (A)
-			aprevb = _mm_cvtsi128_si32(aprev);
-
-		for (; pp < p + cbWidth; pp += 8)
+		if (!NTSTORE)
 		{
-
-			auto gg = gprevb += g[0];
-			auto bb = (bprevb += b[0]) + gprevb;
-			auto rr = (rprevb += r[0]) + gprevb;
-			if (Pred != CYLINDRICAL_LEFT)
-			{
-				gg += tt[0];
-				bb += tt[1];
-				rr += tt[2];
-				tt[0] = gg;
-				tt[1] = bb;
-				tt[2] = rr;
-			}
-			((uint16_t*)pp)[2] = htob16(Convert10To16Fullrange(gg));
-			((uint16_t*)pp)[3] = htob16(Convert10To16Fullrange(bb));
-			((uint16_t*)pp)[1] = htob16(Convert10To16Fullrange(rr));
+			gprevb = _mm_cvtsi128_si32(gprev);
+			bprevb = _mm_cvtsi128_si32(bprev);
+			rprevb = _mm_cvtsi128_si32(rprev);
 			if (A)
+				aprevb = _mm_cvtsi128_si32(aprev);
+
+			for (; pp < p + cbWidth; pp += 8)
 			{
-				auto aa = aprevb += a[0];
+
+				auto gg = gprevb += g[0];
+				auto bb = (bprevb += b[0]) + gprevb;
+				auto rr = (rprevb += r[0]) + gprevb;
 				if (Pred != CYLINDRICAL_LEFT)
 				{
-					aa += tt[3];
-					tt[3] = aa;
+					gg += lb[0];
+					bb += lb[1];
+					rr += lb[2];
+					lb[0] = gg;
+					lb[1] = bb;
+					lb[2] = rr;
 				}
-				((uint16_t*)pp)[0] = htob16(Convert10To16Fullrange(aa));
-			}
-			else
-				((uint16_t*)pp)[0] = 0xffff;
-			if (Pred != CYLINDRICAL_LEFT)
-				tt += A ? 4 : 3;
+				((uint16_t*)pp)[2] = htob16(Convert10To16Fullrange(gg));
+				((uint16_t*)pp)[3] = htob16(Convert10To16Fullrange(bb));
+				((uint16_t*)pp)[1] = htob16(Convert10To16Fullrange(rr));
+				if (A)
+				{
+					auto aa = aprevb += a[0];
+					if (Pred != CYLINDRICAL_LEFT)
+					{
+						aa += lb[3];
+						lb[3] = aa;
+					}
+					((uint16_t*)pp)[0] = htob16(Convert10To16Fullrange(aa));
+				}
+				else
+					((uint16_t*)pp)[0] = 0xffff;
+				if (Pred != CYLINDRICAL_LEFT)
+					lb += A ? 4 : 3;
 
-			g += 1;
-			b += 1;
-			r += 1;
-			if (A)
-				a += 1;
+				g += 1;
+				b += 1;
+				r += 1;
+				if (A)
+					a += 1;
+			}
 		}
 	}
 
 	if (Pred != CYLINDRICAL_LEFT)
-		_aligned_free(topbuf);
+		_aligned_free(linebuf);
+}
+
+template<int F, bool A, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertUQRXToB64a_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, const uint8_t* pABegin, size_t cbWidth, ssize_t scbStride)
+{
+	if (IS_ALIGNED(pDstBegin, 16) && IS_MULTIPLE(cbWidth, 16 * 4) && IS_MULTIPLE(scbStride, 16))
+		tuned_ConvertUQRXToB64a_RestoreImpl<F, A, Pred, true>(pDstBegin, pDstEnd, pGBegin, pBBegin,pRBegin, pABegin, cbWidth, scbStride);
+	else
+		tuned_ConvertUQRXToB64a_RestoreImpl<F, A, Pred, false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, pABegin, cbWidth, scbStride);
 }
 
 template<int F>
@@ -2314,8 +2448,8 @@ template void tuned_ConvertR210ToUQRG_PredictPlanarGradientAndCount<CODEFEATURE_
 
 //
 
-template<int F, PREDICTION_TYPE Pred>
-static inline void tuned_ConvertUQRGToR210_Restore(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
+template<int F, PREDICTION_TYPE Pred, bool NTSTORE>
+static inline void tuned_ConvertUQRGToR210_RestoreImpl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pGBegin, const uint8_t *pBBegin, const uint8_t *pRBegin, unsigned int nWidth, ssize_t scbStride)
 {
 	uint16_t gprevb = 0x200;
 	uint16_t bprevb = 0;
@@ -2325,20 +2459,27 @@ static inline void tuned_ConvertUQRGToR210_Restore(uint8_t *pDstBegin, uint8_t *
 	uint16_t *b = (uint16_t *)pBBegin;
 	uint16_t *r = (uint16_t *)pRBegin;
 
-	uint16_t* topbuf = NULL;
+	uint16_t* linebuf = NULL;
 	if (Pred != CYLINDRICAL_LEFT)
-		topbuf = (uint16_t*)_aligned_malloc(nWidth * 6, 16);
+		linebuf = (uint16_t*)_aligned_malloc(nWidth * 6, 16);
+
+	__m128i gprev = _mm_set1_epi16(gprevb);
+	__m128i bprev = _mm_set1_epi16(bprevb);
+	__m128i rprev = _mm_set1_epi16(rprevb);
 
 	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		uint8_t *pStrideEnd = p + nWidth * 4;
 		auto pp = p;
-		auto tt = topbuf;
 
-		__m128i gprev = _mm_set1_epi16(gprevb);
-		__m128i bprev = _mm_set1_epi16(bprevb);
-		__m128i rprev = _mm_set1_epi16(rprevb);
+		if (!NTSTORE)
+		{
+			gprev = _mm_set1_epi16(gprevb);
+			bprev = _mm_set1_epi16(bprevb);
+			rprev = _mm_set1_epi16(rprevb);
+		}
 
+		auto lb = linebuf;
 		for (; pp <= pStrideEnd - 32; pp += 32)
 		{
 			__m128i gg = _mm_loadu_si128((const __m128i *)g);
@@ -2347,13 +2488,13 @@ static inline void tuned_ConvertUQRGToR210_Restore(uint8_t *pDstBegin, uint8_t *
 			auto bvalue = tuned_RestoreLeft10Element<F>(bprev, bb);
 			__m128i rr = _mm_loadu_si128((const __m128i *)r);
 			auto rvalue = tuned_RestoreLeft10Element<F>(rprev, rr);
-			tuned_ConvertPlanarRGBXToR210Element10<F, __m128i, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0);
+			tuned_ConvertPlanarRGBXToR210Element10<F, __m128i, false, NTSTORE>(pp, gvalue.v0, bvalue.v0, rvalue.v0);
 			if (Pred != CYLINDRICAL_LEFT)
 			{
-				_mm_store_si128((__m128i*)tt, gvalue.v0);
-				_mm_store_si128((__m128i*)(tt + 8), bvalue.v0);
-				_mm_store_si128((__m128i*)(tt + 16), rvalue.v0);
-				tt += 24;
+				_mm_store_si128((__m128i*)lb, gvalue.v0);
+				_mm_store_si128((__m128i*)(lb + 8), bvalue.v0);
+				_mm_store_si128((__m128i*)(lb + 16), rvalue.v0);
+				lb += 24;
 			}
 
 			gprev = gvalue.v1;
@@ -2365,27 +2506,30 @@ static inline void tuned_ConvertUQRGToR210_Restore(uint8_t *pDstBegin, uint8_t *
 			r += 8;
 		}
 
-		gprevb = _mm_cvtsi128_si32(gprev);
-		bprevb = _mm_cvtsi128_si32(bprev);
-		rprevb = _mm_cvtsi128_si32(rprev);
-
-		for (; pp < pStrideEnd; pp += 4)
+		if (!NTSTORE)
 		{
-			uint32_t gg = (gprevb += g[0]) & 0x3ff;
-			uint32_t bb = ((bprevb += b[0]) + gprevb) & 0x3ff;
-			uint32_t rr = ((rprevb += r[0]) + gprevb) & 0x3ff;
-			*(uint32_t *)pp = htob32((rr << 20) | (gg << 10) | bb);
-			if (Pred != CYLINDRICAL_LEFT)
-			{
-				tt[0] = gg;
-				tt[1] = bb;
-				tt[2] = rr;
-				tt += 3;
-			}
+			gprevb = _mm_cvtsi128_si32(gprev);
+			bprevb = _mm_cvtsi128_si32(bprev);
+			rprevb = _mm_cvtsi128_si32(rprev);
 
-			g += 1;
-			b += 1;
-			r += 1;
+			for (; pp < pStrideEnd; pp += 4)
+			{
+				uint32_t gg = (gprevb += g[0]) & 0x3ff;
+				uint32_t bb = ((bprevb += b[0]) + gprevb) & 0x3ff;
+				uint32_t rr = ((rprevb += r[0]) + gprevb) & 0x3ff;
+				*(uint32_t*)pp = htob32((rr << 20) | (gg << 10) | bb);
+				if (Pred != CYLINDRICAL_LEFT)
+				{
+					lb[0] = gg;
+					lb[1] = bb;
+					lb[2] = rr;
+					lb += 3;
+				}
+
+				g += 1;
+				b += 1;
+				r += 1;
+			}
 		}
 	}
 
@@ -2393,12 +2537,12 @@ static inline void tuned_ConvertUQRGToR210_Restore(uint8_t *pDstBegin, uint8_t *
 	{
 		uint8_t* pStrideEnd = p + nWidth * 4;
 		auto pp = p;
-		auto tt = topbuf;
 
 		__m128i gprev = _mm_setzero_si128();
 		__m128i bprev = _mm_setzero_si128();
 		__m128i rprev = _mm_setzero_si128();
 
+		auto lb = linebuf;
 		for (; pp <= pStrideEnd - 32; pp += 32)
 		{
 			__m128i gg = _mm_loadu_si128((const __m128i*)g);
@@ -2409,17 +2553,17 @@ static inline void tuned_ConvertUQRGToR210_Restore(uint8_t *pDstBegin, uint8_t *
 			auto rvalue = tuned_RestoreLeft10Element<F>(rprev, rr);
 			if (Pred != CYLINDRICAL_LEFT)
 			{
-				gvalue.v0 = _mm_add_epi16(gvalue.v0, _mm_load_si128((const __m128i*)tt));
-				bvalue.v0 = _mm_add_epi16(bvalue.v0, _mm_load_si128((const __m128i*)(tt + 8)));
-				rvalue.v0 = _mm_add_epi16(rvalue.v0, _mm_load_si128((const __m128i*)(tt + 16)));
+				gvalue.v0 = _mm_add_epi16(gvalue.v0, _mm_load_si128((const __m128i*)lb));
+				bvalue.v0 = _mm_add_epi16(bvalue.v0, _mm_load_si128((const __m128i*)(lb + 8)));
+				rvalue.v0 = _mm_add_epi16(rvalue.v0, _mm_load_si128((const __m128i*)(lb + 16)));
 			}
-			tuned_ConvertPlanarRGBXToR210Element10<F, __m128i, false>(pp, gvalue.v0, bvalue.v0, rvalue.v0);
+			tuned_ConvertPlanarRGBXToR210Element10<F, __m128i, false, NTSTORE>(pp, gvalue.v0, bvalue.v0, rvalue.v0);
 			if (Pred != CYLINDRICAL_LEFT)
 			{
-				_mm_store_si128((__m128i*)tt, gvalue.v0);
-				_mm_store_si128((__m128i*)(tt + 8), bvalue.v0);
-				_mm_store_si128((__m128i*)(tt + 16), rvalue.v0);
-				tt += 24;
+				_mm_store_si128((__m128i*)lb, gvalue.v0);
+				_mm_store_si128((__m128i*)(lb + 8), bvalue.v0);
+				_mm_store_si128((__m128i*)(lb + 16), rvalue.v0);
+				lb += 24;
 			}
 
 			gprev = gvalue.v1;
@@ -2431,41 +2575,53 @@ static inline void tuned_ConvertUQRGToR210_Restore(uint8_t *pDstBegin, uint8_t *
 			r += 8;
 		}
 
-		gprevb = _mm_cvtsi128_si32(gprev);
-		bprevb = _mm_cvtsi128_si32(bprev);
-		rprevb = _mm_cvtsi128_si32(rprev);
-
-		for (; pp < pStrideEnd; pp += 4)
+		if (!NTSTORE)
 		{
-			uint32_t gg = (gprevb += g[0]);
-			uint32_t bb = ((bprevb += b[0]) + gprevb);
-			uint32_t rr = ((rprevb += r[0]) + gprevb);
-			if (Pred != CYLINDRICAL_LEFT)
-			{
-				gg += tt[0];
-				bb += tt[1];
-				rr += tt[2];
-			}
-			gg &= 0x3ff;
-			bb &= 0x3ff;
-			rr &= 0x3ff;
-			*(uint32_t*)pp = htob32((rr << 20) | (gg << 10) | bb);
-			if (Pred != CYLINDRICAL_LEFT)
-			{
-				tt[0] = gg;
-				tt[1] = bb;
-				tt[2] = rr;
-				tt += 3;
-			}
+			gprevb = _mm_cvtsi128_si32(gprev);
+			bprevb = _mm_cvtsi128_si32(bprev);
+			rprevb = _mm_cvtsi128_si32(rprev);
 
-			g += 1;
-			b += 1;
-			r += 1;
+			for (; pp < pStrideEnd; pp += 4)
+			{
+				uint32_t gg = (gprevb += g[0]);
+				uint32_t bb = ((bprevb += b[0]) + gprevb);
+				uint32_t rr = ((rprevb += r[0]) + gprevb);
+				if (Pred != CYLINDRICAL_LEFT)
+				{
+					gg += lb[0];
+					bb += lb[1];
+					rr += lb[2];
+				}
+				gg &= 0x3ff;
+				bb &= 0x3ff;
+				rr &= 0x3ff;
+				*(uint32_t*)pp = htob32((rr << 20) | (gg << 10) | bb);
+				if (Pred != CYLINDRICAL_LEFT)
+				{
+					lb[0] = gg;
+					lb[1] = bb;
+					lb[2] = rr;
+					lb += 3;
+				}
+
+				g += 1;
+				b += 1;
+				r += 1;
+			}
 		}
 	}
 
 	if (Pred != CYLINDRICAL_LEFT)
-		_aligned_free(topbuf);
+		_aligned_free(linebuf);
+}
+
+template<int F, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertUQRGToR210_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pGBegin, const uint8_t* pBBegin, const uint8_t* pRBegin, unsigned int nWidth, ssize_t scbStride)
+{
+	if (IS_ALIGNED(pDstBegin, 16) && IS_MULTIPLE(nWidth, 8) && IS_MULTIPLE(scbStride, 16))
+		tuned_ConvertUQRGToR210_RestoreImpl<F, Pred, true>(pDstBegin,  pDstEnd, pGBegin, pBBegin, pRBegin, nWidth, scbStride);
+	else
+		tuned_ConvertUQRGToR210_RestoreImpl<F, Pred, false>(pDstBegin, pDstEnd, pGBegin, pBBegin, pRBegin, nWidth, scbStride);
 }
 
 template<int F>
@@ -2591,36 +2747,51 @@ template void tuned_ConvertLittleEndian16ToHostEndian10_PredictPlanarGradientAnd
 
 //
 
-template<int F, PREDICTION_TYPE Pred>
-static inline void tuned_ConvertHostEndian16ToLittleEndian16_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride)
+template<int F, PREDICTION_TYPE Pred, bool NTSTORE>
+static inline void tuned_ConvertHostEndian16ToLittleEndian16_RestoreImpl(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint16_t prev = 0x8000;
 
 	auto q = (const uint16_t*)pSrcBegin;
+
+	uint16_t* linebuf = NULL;
+	if (NTSTORE && Pred != CYLINDRICAL_LEFT)
+		linebuf = (uint16_t*)_aligned_malloc(cbWidth, 16);
+
+	__m128i prevv = _mm_set1_epi16(prev);
 
 	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pStrideEnd = (uint16_t*)(p + cbWidth);
 		auto pp = (uint16_t*)p;
 
-		__m128i prevv = _mm_set1_epi16(prev);
-		for (; pp <= pStrideEnd - 8; pp += 8)
+		if (!NTSTORE)
+			prevv = _mm_set1_epi16(prev);
+
+		auto lb = linebuf;
+		for (; pp <= pStrideEnd - 8; pp += 8, lb += 8)
 		{
 			__m128i s0 = _mm_loadu_si128((const __m128i*)q);
 			auto value = tuned_RestoreLeft16Element<F>(prevv, s0);
-			_mm_storeu_si128((__m128i*)pp, value.v0);
+			_mmt_store<__m128i, NTSTORE>((__m128i*)pp, value.v0);
+			if (NTSTORE && Pred != CYLINDRICAL_LEFT)
+				_mm_storeu_si128((__m128i*)lb, value.v0);
 			prevv = value.v1;
 
 			q += 8;
 		}
-		prev = _mm_cvtsi128_si32(prevv);
 
-		for (; pp < pStrideEnd; ++pp)
+		if (!NTSTORE)
 		{
-			uint16_t cur = *q;
-			*pp = htol16(prev += cur);
+			prev = _mm_cvtsi128_si32(prevv);
 
-			++q;
+			for (; pp < pStrideEnd; ++pp)
+			{
+				uint16_t cur = *q;
+				*pp = htol16(prev += cur);
+
+				++q;
+			}
 		}
 	}
 
@@ -2630,25 +2801,50 @@ static inline void tuned_ConvertHostEndian16ToLittleEndian16_Restore(uint8_t* pD
 		auto pp = (uint16_t*)p;
 
 		__m128i prevv = _mm_setzero_si128();
-		for (; pp <= pStrideEnd - 8; pp += 8)
+
+		auto lb = linebuf;
+		for (; pp <= pStrideEnd - 8; pp += 8, lb += 8)
 		{
 			__m128i s0 = _mm_loadu_si128((const __m128i*)q);
 			auto value = tuned_RestoreLeft16Element<F>(prevv, s0);
-			_mm_storeu_si128((__m128i*)pp, _mm_add_epi16(value.v0, _mm_loadu_si128((const __m128i*)(pp - scbStride / 2))));
+			if (!NTSTORE)
+				_mm_storeu_si128((__m128i*)pp, _mm_add_epi16(value.v0, _mm_loadu_si128((const __m128i*)(pp - scbStride / 2))));
+			else
+			{
+				auto restored = _mm_add_epi16(value.v0, _mm_loadu_si128((const __m128i*)lb));
+				_mm_stream_si128((__m128i*)pp, restored);
+				_mm_storeu_si128((__m128i*)lb, restored);
+			}
 			prevv = value.v1;
 
 			q += 8;
 		}
-		prev = _mm_cvtsi128_si32(prevv);
 
-		for (; pp < pStrideEnd; ++pp)
+		if (!NTSTORE)
 		{
-			uint16_t cur = *q;
-			*pp = htol16((prev += cur) + ltoh16(*(pp - scbStride / 2)));
+			prev = _mm_cvtsi128_si32(prevv);
 
-			++q;
+			for (; pp < pStrideEnd; ++pp)
+			{
+				uint16_t cur = *q;
+				*pp = htol16((prev += cur) + ltoh16(*(pp - scbStride / 2)));
+
+				++q;
+			}
 		}
 	}
+
+	if (NTSTORE && Pred != CYLINDRICAL_LEFT)
+		_aligned_free(linebuf);
+}
+
+template<int F, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertHostEndian16ToLittleEndian16_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pSrcBegin, size_t cbWidth, ssize_t scbStride)
+{
+	if (IS_ALIGNED(pDstBegin, 16) && IS_MULTIPLE(cbWidth, 16) && IS_MULTIPLE(scbStride, 16))
+		tuned_ConvertHostEndian16ToLittleEndian16_RestoreImpl<F, Pred, true>(pDstBegin, pDstEnd, pSrcBegin, cbWidth, scbStride);
+	else
+		tuned_ConvertHostEndian16ToLittleEndian16_RestoreImpl<F, Pred, false>(pDstBegin, pDstEnd, pSrcBegin, cbWidth, scbStride);
 }
 
 template<int F>
@@ -2811,8 +3007,8 @@ template void tuned_ConvertPackedUVLittleEndian16ToPlanarHostEndian10_PredictPla
 
 //
 
-template<int F, PREDICTION_TYPE Pred>
-static inline void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+template<int F, PREDICTION_TYPE Pred, bool NTSTORE>
+static inline void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreImpl(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
 {
 	uint16_t uprev = 0x8000;
 	uint16_t vprev = 0x8000;
@@ -2820,14 +3016,26 @@ static inline void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_Resto
 	auto u = (const uint16_t*)pUBegin;
 	auto v = (const uint16_t*)pVBegin;
 
+	uint16_t* linebuf = NULL;
+	if (NTSTORE && Pred != CYLINDRICAL_LEFT)
+		linebuf = (uint16_t*)_aligned_malloc(cbWidth, 16);
+
+	__m128i uprevv = _mm_set1_epi16(uprev);
+	__m128i vprevv = _mm_set1_epi16(vprev);
+
 	for (auto p = pDstBegin; p != (Pred != CYLINDRICAL_LEFT ? pDstBegin + scbStride : pDstEnd); p += scbStride)
 	{
 		auto pStrideEnd = (uint16_t*)(p + cbWidth);
 		auto pp = (uint16_t*)p;
 
-		__m128i uprevv = _mm_set1_epi16(uprev);
-		__m128i vprevv = _mm_set1_epi16(vprev);
-		for (; pp <= pStrideEnd - 16; pp += 16)
+		if (!NTSTORE)
+		{
+			uprevv = _mm_set1_epi16(uprev);
+			vprevv = _mm_set1_epi16(vprev);
+		}
+
+		auto lb = linebuf;
+		for (; pp <= pStrideEnd - 16; pp += 16, lb += 16)
 		{
 			__m128i uu = _mm_loadu_si128((const __m128i*)u);
 			auto uvalue = tuned_RestoreLeft16Element<F>(uprevv, uu);
@@ -2835,24 +3043,33 @@ static inline void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_Resto
 			auto vvalue = tuned_RestoreLeft16Element<F>(vprevv, vv);
 			auto m0 = _mm_unpacklo_epi16(uvalue.v0, vvalue.v0);
 			auto m1 = _mm_unpackhi_epi16(uvalue.v0, vvalue.v0);
-			_mm_storeu_si128((__m128i*)pp, m0);
-			_mm_storeu_si128((__m128i*)(pp + 8), m1);
+			_mmt_store<__m128i, NTSTORE>((__m128i*)pp, m0);
+			_mmt_store<__m128i, NTSTORE>((__m128i*)(pp + 8), m1);
+			if (NTSTORE && Pred != CYLINDRICAL_LEFT)
+			{
+				_mm_storeu_si128((__m128i*)lb, m0);
+				_mm_storeu_si128((__m128i*)(lb + 8), m1);
+			}
 			uprevv = uvalue.v1;
 			vprevv = vvalue.v1;
 
 			u += 8;
 			v += 8;
 		}
-		uprev = _mm_cvtsi128_si32(uprevv);
-		vprev = _mm_cvtsi128_si32(vprevv);
 
-		for (; pp < pStrideEnd; pp += 2)
+		if (!NTSTORE)
 		{
-			pp[0] = htol16(uprev += *u);
-			pp[1] = htol16(vprev += *v);
+			uprev = _mm_cvtsi128_si32(uprevv);
+			vprev = _mm_cvtsi128_si32(vprevv);
 
-			++u;
-			++v;
+			for (; pp < pStrideEnd; pp += 2)
+			{
+				pp[0] = htol16(uprev += *u);
+				pp[1] = htol16(vprev += *v);
+
+				++u;
+				++v;
+			}
 		}
 	}
 
@@ -2864,7 +3081,8 @@ static inline void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_Resto
 		__m128i uprevv = _mm_setzero_si128();
 		__m128i vprevv = _mm_setzero_si128();
 
-		for (; pp <= pStrideEnd - 16; pp += 16)
+		auto lb = linebuf;
+		for (; pp <= pStrideEnd - 16; pp += 16, lb += 16)
 		{
 			__m128i uu = _mm_loadu_si128((const __m128i*)u);
 			auto uvalue = tuned_RestoreLeft16Element<F>(uprevv, uu);
@@ -2872,26 +3090,54 @@ static inline void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_Resto
 			auto vvalue = tuned_RestoreLeft16Element<F>(vprevv, vv);
 			auto m0 = _mm_unpacklo_epi16(uvalue.v0, vvalue.v0);
 			auto m1 = _mm_unpackhi_epi16(uvalue.v0, vvalue.v0);
-			_mm_storeu_si128((__m128i*)pp, _mm_add_epi16(m0, _mm_loadu_si128((const __m128i*)(pp - scbStride / 2))));
-			_mm_storeu_si128((__m128i*)(pp + 8), _mm_add_epi16(m1, _mm_loadu_si128((const __m128i*)(pp + 8 - scbStride / 2))));
+			if (!NTSTORE)
+			{
+				_mm_storeu_si128((__m128i*)pp, _mm_add_epi16(m0, _mm_loadu_si128((const __m128i*)(pp - scbStride / 2))));
+				_mm_storeu_si128((__m128i*)(pp + 8), _mm_add_epi16(m1, _mm_loadu_si128((const __m128i*)(pp + 8 - scbStride / 2))));
+			}
+			else
+			{
+				auto restored0 = _mm_add_epi16(m0, _mm_loadu_si128((const __m128i*)(lb)));
+				auto restored1 = _mm_add_epi16(m1, _mm_loadu_si128((const __m128i*)(lb + 8)));
+				_mm_stream_si128((__m128i*)pp, restored0);
+				_mm_stream_si128((__m128i*)(pp + 8), restored1);
+				_mm_storeu_si128((__m128i*)lb, restored0);
+				_mm_storeu_si128((__m128i*)(lb + 8), restored1);
+			}
 			uprevv = uvalue.v1;
 			vprevv = vvalue.v1;
 
 			u += 8;
 			v += 8;
 		}
-		uprev = _mm_cvtsi128_si32(uprevv);
-		vprev = _mm_cvtsi128_si32(vprevv);
 
-		for (; pp < pStrideEnd; pp += 2)
+		if (!NTSTORE)
 		{
-			pp[0] = htol16((uprev += *u) + ltoh16(pp[0 - scbStride / 2]));
-			pp[1] = htol16((vprev += *v) + ltoh16(pp[1 - scbStride / 2]));
+			uprev = _mm_cvtsi128_si32(uprevv);
+			vprev = _mm_cvtsi128_si32(vprevv);
 
-			++u;
-			++v;
+			for (; pp < pStrideEnd; pp += 2)
+			{
+				pp[0] = htol16((uprev += *u) + ltoh16(pp[0 - scbStride / 2]));
+				pp[1] = htol16((vprev += *v) + ltoh16(pp[1 - scbStride / 2]));
+
+				++u;
+				++v;
+			}
 		}
 	}
+
+	if (NTSTORE && Pred != CYLINDRICAL_LEFT)
+		_aligned_free(linebuf);
+}
+
+template<int F, PREDICTION_TYPE Pred>
+static inline void tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_Restore(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride)
+{
+	if (IS_ALIGNED(pDstBegin, 16) && IS_MULTIPLE(cbWidth, 32) && IS_MULTIPLE(scbStride, 16))
+		tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreImpl<F, Pred, true>(pDstBegin, pDstEnd, pUBegin, pVBegin, cbWidth, scbStride);
+	else
+		tuned_ConvertPlanarHostEndian16ToPackedUVLittleEndian16_RestoreImpl<F, Pred, false>(pDstBegin, pDstEnd, pUBegin, pVBegin, cbWidth, scbStride);
 }
 
 template<int F>
