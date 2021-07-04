@@ -234,22 +234,32 @@ static inline FORCEINLINE UNPACK_FOR_DELTA_RESULT UnpackForDelta(const uint8_t*&
 	return UnpackElement<F, true>(q, r);
 }
 
-template<>
-void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX512_ICL>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, size_t cbStride)
+template<int F, bool NTSTORE>
+void tuned_Unpack8SymAndRestorePlanarGradient8Impl(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pPacked, const uint8_t *pControl, size_t cbStride)
 {
-	constexpr int F = CODEFEATURE_AVX512_ICL;
-
 	auto q = pPacked;
 	auto r = pControl;
+
+	uint8_t* linebuf = NULL;
+	if (NTSTORE)
+		linebuf = (uint8_t*)_aligned_malloc(cbStride, 64);
 
 	{
 		__m512i prev = _mm512_set1_epi8((char)0x80);
 
-		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 64)
+		auto p = pDstBegin;
+		auto lb = linebuf;
+		for (; p != pDstBegin + cbStride; p += 64, lb += 64)
 		{
 			__m512i s0 = UnpackForIntra<F>(q, r);
 			auto result = tuned_RestoreLeft8Element<F>(prev, s0);
-			_mm512_storeu_si512((__m256i *)p, result.v0);
+			if (!NTSTORE)
+				_mm512_storeu_si512((__m512i*)p, result.v0);
+			else
+			{
+				_mm512_stream_si512((__m512i*)p, result.v0);
+				_mm512_storeu_si512((__m512i*)lb, result.v0);
+			}
 			prev = result.v1;
 		}
 	}
@@ -258,16 +268,38 @@ void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX512_ICL>(uint8_t *
 	{
 		__m512i prev = _mm512_set1_epi8((char)0);
 
-		for (auto p = pp; p != pp + cbStride; p += 64)
+		auto p = pp;
+		auto lb = linebuf;
+		for (; p != pp + cbStride; p += 64, lb += 64)
 		{
 			__m512i s0 = UnpackForIntra<F>(q, r);
 			auto result = tuned_RestoreLeft8Element<F>(prev, s0);
-			_mm512_storeu_si512((__m512i*)p, _mm512_add_epi8(result.v0, _mm512_loadu_si512((const __m512i*)(p - cbStride))));
+			if (!NTSTORE)
+				_mm512_storeu_si512((__m512i*)p, _mm512_add_epi8(result.v0, _mm512_loadu_si512((const __m512i*)(p - cbStride))));
+			else
+			{
+				auto restored = _mm512_add_epi8(result.v0, _mm512_loadu_si512((const __m512i*)lb));
+				_mm512_stream_si512((__m512i*)p, restored);
+				_mm512_storeu_si512((__m512i*)lb, restored);
+			}
 			prev = result.v1;
 		}
 	}
+
+	if (NTSTORE)
+		_aligned_free(linebuf);
 }
 
+template<>
+void tuned_Unpack8SymAndRestorePlanarGradient8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pPacked, const uint8_t* pControl, size_t cbStride)
+{
+	constexpr int F = CODEFEATURE_AVX512_ICL;
+
+	if (IS_ALIGNED(pDstBegin, 64))
+		tuned_Unpack8SymAndRestorePlanarGradient8Impl<F, true>(pDstBegin, pDstEnd, pPacked, pControl, cbStride);
+	else
+		tuned_Unpack8SymAndRestorePlanarGradient8Impl<F, false>(pDstBegin, pDstEnd, pPacked, pControl, cbStride);
+}
 
 
 template<>
@@ -377,6 +409,8 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 	auto q = pPacked;
 	auto r = pControl;
 
+	uint8_t* linebuf = (uint8_t*)_aligned_malloc(cbStride, 64);
+
 	{
 		__m512i prev = _mm512_set_epi8(
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -385,7 +419,9 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, (char)0x80, (char)0x80);
 
 		auto t = pPrevBegin;
-		for (auto p = pDstBegin; p != pDstBegin + cbStride; p += 64, t += 64)
+		auto p = pDstBegin;
+		auto lb = linebuf;
+		for (; p != pDstBegin + cbStride; p += 64, t += 64, lb += 64)
 		{
 			auto [s0, ktemporalq] = UnpackForDelta<CODEFEATURE_AVX512_ICL>(q, r);
 
@@ -418,7 +454,8 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 			), s0));
 			s0 = _mm512_mask_mov_epi64(stmp, (__mmask8)(am >> 8), s0);
 
-			_mm512_storeu_si512((__m512i*)p, s0);
+			_mm512_stream_si512((__m512i*)p, s0);
+			_mm512_storeu_si512((__m512i*)lb, s0);
 
 			/*
 			 * この maskz による追加のレイテンシ (2clk) は UnpackForDelta によって完全に隠蔽されるので、
@@ -446,11 +483,13 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 		__m512i prev = _mm512_set1_epi8((char)0);
 
 		auto t = tt;
-		for (auto p = pp; p != pp + cbStride; p += 64, t += 64)
+		auto p = pp;
+		auto lb = linebuf;
+		for (; p != pp + cbStride; p += 64, t += 64, lb += 64)
 		{
 			auto [s0, ktemporalq] = UnpackForDelta<CODEFEATURE_AVX512_ICL>(q, r);
 
-			__m512i top = _mm512_loadu_si512((const __m512i*)(p - cbStride));
+			__m512i top = _mm512_loadu_si512((const __m512i*)lb);
 			__m512i t0 = _mm512_sub_epi8(_mm512_add_epi8(s0, _mm512_loadu_si512((const __m512i*)t)), top);
 			auto am = addmask[ktemporalq];
 			__m512i ctl8 = _mm512_mask_mov_epi64(_mm512_set16_epi8(7, 7, 7, 7, 7, 7, 7, 7, -1, -1, -1, -1, -1, -1, -1, -1), ktemporalq, _mm512_set1_epi8(-1));
@@ -480,7 +519,9 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 			), s0));
 			s0 = _mm512_mask_mov_epi64(stmp, (__mmask8)(am >> 8), s0);
 
-			_mm512_storeu_si512((__m512i*)p, _mm512_add_epi8(s0, top));
+			auto restored = _mm512_add_epi8(s0, top);
+			_mm512_stream_si512((__m512i*)p, restored);
+			_mm512_storeu_si512((__m512i*)lb, restored);
 
 			prev = _mm512_maskz_permutexvar_epi8(3, _mm512_set_epi8(
 				-1, -1, -1, -1, -1, -1, -1, -1,
@@ -494,4 +535,6 @@ void tuned_Unpack8SymWithDiff8<CODEFEATURE_AVX512_ICL>(uint8_t* pDstBegin, uint8
 			), s0);
 		}
 	}
+
+	_aligned_free(linebuf);
 }
