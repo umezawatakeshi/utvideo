@@ -67,6 +67,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <h3>Windows</h3>
 <p>If version 10.2.0 or older is installed, you have to uninstall that version before you install this version.</p>
 <p>If VCM codec is not registered properly, merge utvideo.reg in install destination with registry as a last resort. This file assumes Windows directory is C:\Windows.</p>
+<h2 id="family">List of families</h2>
+<p>Ut Video Codec Suite includes several codecs using different internal process and internal format. The group using same internal process is called "family" in Ut Video Codec Suite.</p>
+<p>A list and summary of the families are as follows.</p>
+<h3>UtVideo (unmarked)</h3>
+<ul>
+<li>This family is available since the first version.</li>
+<li>It has a mode that performs compression suitable for interlaced video.</li>
+</ul>
+<h3>UtVideo T2</h3>
+<ul>
+<li>Compared to unmarked family, this family achieves lower compression ratio and higher speed in many cases.</li>
+<li>It supports inter-frame compression.</li>
+</ul>
+<h3>UtVideo Pro</h3>
+<ul>
+<li>This family supports deep color (color depth over 8bit). Currently, only 10bit is implemented.</li>
+<li>Colorspace conversion is not performed by the codec.</li>
+</ul>
 <h2 id="fourcc">List of FourCC</h2>
 <table>
 <tr><th rowspan="2">FourCC</th><th rowspan="2">Codec name</th><th rowspan="2">Internal format</th><th colspan="2">Supported input/output format (in order of priority)</th></tr>

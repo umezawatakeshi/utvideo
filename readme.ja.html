@@ -83,6 +83,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <h3>Windows</h3>
 <p>バージョン 10.2.0 またはそれ以前がインストールされている場合、それをアンインストールしてからこのバージョンをインストールしてください。</p>
 <p>VCM コーデックが正しく登録されないようであれば、最終手段としてインストール先ディレクトリに入っている utvideo.reg をレジストリに結合してください。なお、このファイルは Windows ディレクトリが C:\Windows であることを仮定しています。</p>
+<h2 id="family">ファミリー一覧</h2>
+<p>Ut Video Codec Suite には内部処理方式や内部保持形式の異なるいくつかのコーデックが含まれます。このうち、内部処理方式が同じものを Ut Video Codec Suite では「ファミリー」と呼んでいます。</p>
+<p>ファミリーの一覧と概要は以下のとおりです。</p>
+<h3>UtVideo （無印）</h3>
+<ul>
+<li>最初のバージョンからあるファミリーです。</li>
+<li>インターレース映像に適した処理を行うモードがあります。</li>
+</ul>
+<h3>UtVideo T2</h3>
+<ul>
+<li>無印と比較して、多くの場合に低圧縮で高速なファミリーです。</li>
+<li>フレーム間圧縮をサポートします。</li>
+</ul>
+<h3>UtVideo Pro</h3>
+<ul>
+<li>8bit を超える色深度をサポートするファミリーです。現状では 10bit のみが実装されています。</li>
+<li>コーデック側での色空間変換は行いません。</li>
+</ul>
 <h2 id="fourcc">FourCC 一覧</h2>
 <table>
 <tr><th rowspan="2">FourCC</th><th rowspan="2">コーデック名</th><th rowspan="2">内部保持形式</th><th colspan="2">対応入出力フォーマット（優先度順）</th></tr>
