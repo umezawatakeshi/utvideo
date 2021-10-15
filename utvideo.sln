@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tests", "tests\tests.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "utv_core_asm", "utv_core_asm\utv_core_asm.vcxproj", "{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fse", "fse\fse.vcxproj", "{0AF964F8-AA4C-4401-9C23-8A59C66E3455}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -89,8 +91,19 @@ Global
 		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Release|Win32.Build.0 = Release|Win32
 		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Release|x64.ActiveCfg = Release|x64
 		{3946D793-3E53-425B-9FF6-3F1EFB1CC3FF}.Release|x64.Build.0 = Release|x64
+		{0AF964F8-AA4C-4401-9C23-8A59C66E3455}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0AF964F8-AA4C-4401-9C23-8A59C66E3455}.Debug|Win32.Build.0 = Debug|Win32
+		{0AF964F8-AA4C-4401-9C23-8A59C66E3455}.Debug|x64.ActiveCfg = Debug|x64
+		{0AF964F8-AA4C-4401-9C23-8A59C66E3455}.Debug|x64.Build.0 = Debug|x64
+		{0AF964F8-AA4C-4401-9C23-8A59C66E3455}.Release|Win32.ActiveCfg = Release|Win32
+		{0AF964F8-AA4C-4401-9C23-8A59C66E3455}.Release|Win32.Build.0 = Release|Win32
+		{0AF964F8-AA4C-4401-9C23-8A59C66E3455}.Release|x64.ActiveCfg = Release|x64
+		{0AF964F8-AA4C-4401-9C23-8A59C66E3455}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {31E9AB84-953F-41DD-A54A-864BE39A3FE0}
 	EndGlobalSection
 EndGlobal
