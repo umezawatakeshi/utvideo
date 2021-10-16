@@ -50,6 +50,20 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 		SetWindowText(hwnd, buf);
 		wsprintf(buf, "%d", (pThis->m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_MASK) + 1);
 		SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
+		switch (pThis->m_ec.dwFlags0 & EC_FLAGS0_COMPRESS_MASK)
+		{
+		default:
+			_ASSERT(false);
+			/* FALLTHROUGH */
+		case EC_FLAGS0_COMPRESS_HUFFMAN:
+			CheckDlgButton(hwnd, IDC_ENTROPY_CODING_HUFFMAN_RADIO, BST_CHECKED);
+			break;
+		case EC_FLAGS0_COMPRESS_FSE:
+			CheckDlgButton(hwnd, IDC_ENTROPY_CODING_FSE_RADIO, BST_CHECKED);
+			EnableDlgItem(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO, FALSE);
+			EnableDlgItem(hwnd, IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO, FALSE);
+			break;
+		}
 		switch (pThis->m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK)
 		{
 		default:
@@ -94,6 +108,10 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 				}
 				pThis->m_ec.dwFlags0 |= (n - 1) & EC_FLAGS0_DIVIDE_COUNT_MASK;
 			}
+			if (IsDlgButtonChecked(hwnd, IDC_ENTROPY_CODING_HUFFMAN_RADIO))
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_COMPRESS_HUFFMAN;
+			else if (IsDlgButtonChecked(hwnd, IDC_ENTROPY_CODING_FSE_RADIO))
+				pThis->m_ec.dwFlags0 |= EC_FLAGS0_COMPRESS_FSE;
 			if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO))
 				pThis->m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_LEFT;
 			else if (IsDlgButtonChecked(hwnd, IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO))
@@ -116,6 +134,17 @@ INT_PTR CALLBACK CUL00Codec::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPA
 					wsprintf(buf, "%d", CThreadManager::GetNumProcessors());
 					SetDlgItemText(hwnd, IDC_DIVIDE_COUNT_EDIT, buf);
 				}
+			}
+			break;
+		case IDC_ENTROPY_CODING_HUFFMAN_RADIO:
+		case IDC_ENTROPY_CODING_FSE_RADIO:
+			if (HIWORD(wParam) == BN_CLICKED)
+			{
+				BOOL bFSE = IsDlgButtonChecked(hwnd, IDC_ENTROPY_CODING_FSE_RADIO);
+				EnableDlgItem(hwnd, IDC_INTRAFRAME_PREDICT_LEFT_RADIO, !bFSE);
+				EnableDlgItem(hwnd, IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO, !bFSE);
+				if (bFSE)
+					CheckRadioButton(hwnd, IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO, IDC_INTRAFRAME_PREDICT_LEFT_RADIO, IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO);
 			}
 			break;
 		}
@@ -359,7 +388,7 @@ int CUL00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, un
 	p->EncoderVersionAndImplementation = UTVIDEO_VERSION_AND_IMPLEMENTATION;
 	p->fccOriginalFormat               = htob32(infmt);
 	p->cbFrameInfo                     = sizeof(FRAMEINFO);
-	p->flags0                          = BIE_FLAGS0_COMPRESS_HUFFMAN_CODE | ((nDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT) | (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE ? BIE_FLAGS0_ASSUME_INTERLACE : 0);
+	p->flags0                          = BIE_FLAGS0_COMPRESS_HUFFMAN | ((nDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT) | (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE ? BIE_FLAGS0_ASSUME_INTERLACE : 0);
 
 	return 0;
 }

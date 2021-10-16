@@ -50,7 +50,7 @@ END
 // Dialog
 //
 
-IDD_UL00_CONFIG DIALOGEX 0, 0, 187, 105
+IDD_UL00_CONFIG DIALOGEX 0, 0, 187, 140
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -58,13 +58,16 @@ BEGIN
     LTEXT           "フレーム分割数",IDC_STATIC,7,7,50,8
     EDITTEXT        IDC_DIVIDE_COUNT_EDIT,67,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
     CONTROL         "自動で分割する",IDC_DIVIDE_COUNT_AUTO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,20,108,10
-    GROUPBOX        "フレーム内予測方式",IDC_STATIC,7,34,100,50
+    GROUPBOX        "エントロピー符号化",IDC_STATIC,7,34,100,35
+    CONTROL         "ハフマン符号",IDC_ENTROPY_CODING_HUFFMAN_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP,14,44,56,10
+    CONTROL         "FSE",IDC_ENTROPY_CODING_FSE_RADIO,"Button",BS_AUTORADIOBUTTON,14,56,28,10
+    GROUPBOX        "フレーム内予測方式",IDC_STATIC,7,73,100,47
     CONTROL         "Predict Median",IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,14,44,63,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,14,83,63,10
     CONTROL         "Predict Gradient",IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,14,56,67,10
-    CONTROL         "Predict Left",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,"Button",BS_AUTORADIOBUTTON,14,68,53,10
-    CONTROL         "インターレース映像としてエンコード",IDC_ASSUME_INTERLACE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,171,10
+                    "Button",BS_AUTORADIOBUTTON,14,95,67,10
+    CONTROL         "Predict Left",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,"Button",BS_AUTORADIOBUTTON,14,107,53,10
+    CONTROL         "インターレース映像としてエンコード",IDC_ASSUME_INTERLACE_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,123,171,10
     DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
     PUSHBUTTON      "キャンセル",IDCANCEL,129,24,50,14
 END
@@ -130,10 +133,7 @@ BEGIN
         RIGHTMARGIN, 186
         VERTGUIDE, 7
         VERTGUIDE, 14
-        BOTTOMMARGIN, 98
-        HORZGUIDE, 51
-        HORZGUIDE, 64
-        HORZGUIDE, 76
+        BOTTOMMARGIN, 133
     END
 
     IDD_GLOBAL_CONFIG, DIALOG
@@ -181,13 +181,13 @@ BEGIN
                             "インターレース映像とみなしてエンコードします。\n映像が実際にインターレースである場合、圧縮比が高くなります。\n映像が実際にはプログレッシブである場合、圧縮比は逆に低くなります。\n※ 内部保持形式が YUV420 の場合は、正しく設定しないとピクセルフォーマット間の変換が適切に行われません。"
     IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO 
                             """Predict Median"" フレーム内予測を行います。\n大抵の場合は圧縮比は最も高くなりますが、デコードは遅くなります。"
+    IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO 
+                            """Predict Gradient"" フレーム内予測を行います。\n圧縮比と処理速度のバランスが良く、大抵の場合に適切な設定となります。"
     IDC_INTRAFRAME_PREDICT_LEFT_RADIO 
                             """Predict Left"" フレーム内予測を行います。\n大抵の場合は圧縮比は最も低くなります。"
     IDC_DIVIDE_COUNT_AUTO   "フレーム分割数を自動的に設定します。"
     IDC_WORKER_THREAD_PRIORITY_SLIDER 
                             "ワーカースレッドのスレッド優先度を指定します。\n中央で通常の優先度になります。"
-    IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO 
-                            """Predict Gradient"" フレーム内予測を行います。\n圧縮比と処理速度のバランスが良く、大抵の場合に適切な設定となります。"
 END
 
 STRINGTABLE
@@ -197,6 +197,9 @@ BEGIN
                             "キーフレーム間隔を指定します。\n30 を指定すると、キーフレームの後に 29 個のデルタフレームが続きます。\n1 を指定すると、全てのフレームがキーフレームになります。"
     IDC_SAVE_CONFIG_CHECK   "コーデックの設定がグローバルに共有されるようにします。"
     IDC_IGNORE_SET_CONFIG_CHECK "コーデッククライアントからプログラム的に行われたコーデックの設定を無視します。"
+    IDC_ENTROPY_CODING_HUFFMAN_RADIO "エントロピー符号化にハフマン符号を使用します。"
+    IDC_ENTROPY_CODING_FSE_RADIO 
+                            "エントロピー符号化に FSE (Finite State Entropy) を使用します。\nハフマン符号より圧縮比は高くなりますが、処理速度は低下します。"
 END
 
 #endif    // 日本語 (日本) resources
@@ -215,7 +218,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-IDD_UL00_CONFIG DIALOGEX 0, 0, 187, 105
+IDD_UL00_CONFIG DIALOGEX 0, 0, 187, 140
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -223,14 +226,17 @@ BEGIN
     LTEXT           "Frame divide count",IDC_STATIC,7,7,62,8
     EDITTEXT        IDC_DIVIDE_COUNT_EDIT,75,7,35,13,ES_RIGHT | ES_AUTOHSCROLL | NOT WS_BORDER | WS_GROUP,WS_EX_CLIENTEDGE
     CONTROL         "Autmatic division",IDC_DIVIDE_COUNT_AUTO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,20,117,10
-    GROUPBOX        "Intra-frame prediction type",IDC_STATIC,7,34,100,50
+    GROUPBOX        "Entropy coding",IDC_STATIC,7,34,100,35
+    CONTROL         "Huffman",IDC_ENTROPY_CODING_HUFFMAN_RADIO,"Button",BS_AUTORADIOBUTTON | WS_GROUP,14,44,56,10
+    CONTROL         "FSE",IDC_ENTROPY_CODING_FSE_RADIO,"Button",BS_AUTORADIOBUTTON,14,56,28,10
+    GROUPBOX        "Intra-frame prediction type",IDC_STATIC,7,73,100,47
     CONTROL         "Predict Median",IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO,
-                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,14,44,63,10
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,14,83,63,10
     CONTROL         "Predict Gradient",IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO,
-                    "Button",BS_AUTORADIOBUTTON,14,56,67,10
-    CONTROL         "Predict Left",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,"Button",BS_AUTORADIOBUTTON,14,68,53,10
+                    "Button",BS_AUTORADIOBUTTON,14,95,67,10
+    CONTROL         "Predict Left",IDC_INTRAFRAME_PREDICT_LEFT_RADIO,"Button",BS_AUTORADIOBUTTON,14,107,53,10
     CONTROL         "Assume interlace video",IDC_ASSUME_INTERLACE_CHECK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,89,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,123,171,10
     DEFPUSHBUTTON   "OK",IDOK,129,7,50,14,WS_GROUP
     PUSHBUTTON      "Cancel",IDCANCEL,129,24,50,14
 END
@@ -341,13 +347,13 @@ BEGIN
                             "Encode input video as interlaced.\nIf the input video is really interlaced, the compression ratio will be higher.\nIf the input video is actually progressive, the compression ratio will be lower.\nNote: If the internal format is YUV420, the conversion from/to external formats will not be done properly unless this option set correctly."
     IDC_INTRAFRAME_PREDICT_WRONG_MEDIAN_RADIO 
                             "Use ""Predict Median"" intra-frame prediction method.\nIt makes compression ratio highest and decoding speed lowest in most cases."
+    IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO 
+                            "Use ""Predict Gradient"" intra-frame prediction method.\nIt has a good balance of compression ratio and processing speed, and is the right setting in most cases."
     IDC_INTRAFRAME_PREDICT_LEFT_RADIO 
                             "Use ""Predict Left"" intra-frame prediction method.\nIt makes compression ratio lowest in most cases."
     IDC_DIVIDE_COUNT_AUTO   "Configure frame divide count automatically."
     IDC_WORKER_THREAD_PRIORITY_SLIDER 
                             "Specify the thread priority of worker threads.\nIf you center the slider, worker threads will run at normal priority."
-    IDC_INTRAFRAME_PREDICT_GRADIENT_RADIO 
-                            "Use ""Predict Gradient"" intra-frame prediction method.\nIt has a good balance of compression ratio and processing speed, and is the right setting in most cases."
 END
 
 STRINGTABLE
@@ -359,6 +365,9 @@ BEGIN
     IDC_SAVE_CONFIG_CHECK   "Share codec configuration globally."
     IDC_IGNORE_SET_CONFIG_CHECK 
                             "Ignore codec configuration made programmatically by codec clients."
+    IDC_ENTROPY_CODING_HUFFMAN_RADIO "Use huffman coding for entropy coding."
+    IDC_ENTROPY_CODING_FSE_RADIO 
+                            "Use FSE (Finite State Entropy) for entropy coding.\nIt is slower than huffman coding but achieves better compression ratio."
 END
 
 #endif    // 英語 (米国) resources

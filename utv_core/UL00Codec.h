@@ -26,13 +26,14 @@ protected:
 	static const uint32_t BIE_FLAGS0_DIVIDE_COUNT_MASK     = 0xff000000;
 	static const uint32_t BIE_FLAGS0_DIVIDE_COUNT_SHIFT    = 24;
 
-	static const uint32_t BIE_FLAGS0_COMPRESS_MASK         = 0x00000001;
+	static const uint32_t BIE_FLAGS0_COMPRESS_MASK         = 0x00000003;
 	static const uint32_t BIE_FLAGS0_COMPRESS_NONE         = 0x00000000;
-	static const uint32_t BIE_FLAGS0_COMPRESS_HUFFMAN_CODE = 0x00000001;
+	static const uint32_t BIE_FLAGS0_COMPRESS_HUFFMAN      = 0x00000001;
+	static const uint32_t BIE_FLAGS0_COMPRESS_FSE          = 0x00000002;
 
 	static const uint32_t BIE_FLAGS0_ASSUME_INTERLACE      = 0x00000800;
 
-	static const uint32_t BIE_FLAGS0_RESERVED              = 0x00fff7fe;
+	static const uint32_t BIE_FLAGS0_RESERVED              = 0x00fff7fc;
 
 
 	struct FRAMEINFO
@@ -64,8 +65,11 @@ protected:
 
 	static const uint32_t EC_FLAGS0_ASSUME_INTERLACE                = 0x00000800;
 	static const uint32_t EC_FLAGS0_DIVIDE_COUNT_AUTO               = 0x00001000;
+	static const uint32_t EC_FLAGS0_COMPRESS_MASK                   = 0x00006000;
+	static const uint32_t EC_FLAGS0_COMPRESS_HUFFMAN                = 0x00000000;
+	static const uint32_t EC_FLAGS0_COMPRESS_FSE                    = 0x00004000;
 
-	static const uint32_t EC_FLAGS0_RESERVED                        = 0xffffe400;
+	static const uint32_t EC_FLAGS0_RESERVED                        = 0xffff8400;
 
 protected:
 	ENCODERCONF m_ec;
