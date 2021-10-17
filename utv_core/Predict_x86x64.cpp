@@ -421,8 +421,8 @@ static inline FORCEINLINE __m128i VECTORCALL tuned_PredictWrongMedianAndCount8El
 	return residual;
 }
 
-template<int F>
-void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
+template<int F, bool DoCount>
+void tuned_PredictCylindricalWrongMedianAndMayCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
 {
 	auto p = pSrcBegin;
 	auto q = pDst;
@@ -433,7 +433,7 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 	for (; p <= pSrcBegin + cbStride - 16; p += 16, q += 16)
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
-		__m128i residual = tuned_PredictLeftAndCount8Element<F, true, 1, 0>(prev, value, pCountTable);
+		__m128i residual = tuned_PredictLeftAndCount8Element<F, DoCount, 1, 0>(prev, value, pCountTable);
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 	}
@@ -441,7 +441,8 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = *p - *(p - 1);
-		++pCountTable[0][*q];
+		if (DoCount)
+			++pCountTable[0][*q];
 	}
 
 	prev = _mm_set1_epi8((char)0x80);
@@ -451,7 +452,7 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
 		__m128i top = _mm_loadu_si128((const __m128i *)(p - cbStride));
-		__m128i residual = tuned_PredictWrongMedianAndCount8Element<F, true, 1, 0>(topprev, top, prev, value, pCountTable);
+		__m128i residual = tuned_PredictWrongMedianAndCount8Element<F, DoCount, 1, 0>(topprev, top, prev, value, pCountTable);
 		_mm_storeu_si128((__m128i *)q, residual);
 		prev = value;
 		topprev = top;
@@ -460,16 +461,31 @@ void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t *pDst, const uint8_t *
 	for (; p < pSrcEnd; p++, q++)
 	{
 		*q = *p - median<uint8_t>(*(p - 1), *(p - cbStride), *(p - 1) + *(p - cbStride) - *(p - cbStride - 1));
-		++pCountTable[0][*q];
+		if (DoCount)
+			++pCountTable[0][*q];
 	}
+}
+
+template<int F>
+void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
+{
+	tuned_PredictCylindricalWrongMedianAndMayCount8<F, true>(pDst, pSrcBegin, pSrcEnd, cbStride, pCountTable);
+}
+
+template<int F>
+void tuned_PredictCylindricalWrongMedian8(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbStride)
+{
+	tuned_PredictCylindricalWrongMedianAndMayCount8<F, false>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
 }
 
 #ifdef GENERATE_SSE41
 template void tuned_PredictCylindricalWrongMedianAndCount8<CODEFEATURE_SSE41>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256]);
+template void tuned_PredictCylindricalWrongMedian8<CODEFEATURE_SSE41>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbStride);
 #endif
 
 #ifdef GENERATE_AVX1
 template void tuned_PredictCylindricalWrongMedianAndCount8<CODEFEATURE_AVX1>(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256]);
+template void tuned_PredictCylindricalWrongMedian8<CODEFEATURE_AVX1>(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbStride);
 #endif
 
 

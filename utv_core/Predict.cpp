@@ -6,14 +6,16 @@
 #include "Predict.h"
 #include "TunedFunc.h"
 
-void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
+template<bool DoCount>
+void cpp_PredictCylindricalWrongMedianAndMayCount(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
 {
 	const uint8_t *p = pSrcBegin;
 	uint8_t *q = pDst;
 
 	// 最初のラインの最初のピクセルは 0x80 を予測しておく。
 	*q = *p - 0x80;
-	pCountTable[0][*q]++;
+	if (DoCount)
+		pCountTable[0][*q]++;
 	p++;
 	q++;
 
@@ -21,7 +23,8 @@ void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSr
 	for (; p < pSrcBegin + cbStride; p++, q++)
 	{
 		*q = *p - *(p - 1);
-		pCountTable[0][*q]++;
+		if (DoCount)
+			pCountTable[0][*q]++;
 	}
 
 	// 1 ラインしかない場合はここで終了。
@@ -31,7 +34,8 @@ void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSr
 	// 次のラインの最初のピクセルは predict above。
 	// こうしておくとアセンブラ化した時に処理が若干簡単になる。
 	*q = *p - *(p - cbStride);
-	pCountTable[0][*q]++;
+	if (DoCount)
+		pCountTable[0][*q]++;
 	p++;
 	q++;
 
@@ -39,8 +43,19 @@ void cpp_PredictCylindricalWrongMedianAndCount(uint8_t *pDst, const uint8_t *pSr
 	for (; p < pSrcEnd; p++, q++)
 	{
 		*q = *p - median<uint8_t>(*(p - cbStride), *(p - 1), *(p - cbStride) + *(p - 1) - *(p - 1 - cbStride));
-		pCountTable[0][*q]++;
+		if (DoCount)
+			pCountTable[0][*q]++;
 	}
+}
+
+void cpp_PredictCylindricalWrongMedianAndCount(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
+{
+	cpp_PredictCylindricalWrongMedianAndMayCount<true>(pDst, pSrcBegin, pSrcEnd, cbStride, pCountTable);
+}
+
+void cpp_PredictCylindricalWrongMedian(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbStride)
+{
+	cpp_PredictCylindricalWrongMedianAndMayCount<false>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
 }
 
 void cpp_RestoreCylindricalWrongMedian(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride)
