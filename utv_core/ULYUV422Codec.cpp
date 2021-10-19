@@ -251,13 +251,19 @@ bool CULYUV422Codec<C>::PredictDirect(uint32_t nBandIndex)
 		case UTVF_YUYV:
 		case UTVF_YUNV:
 		case UTVF_yuvs:
-			ConvertYUYVToULY2_PredictCylindricalWrongMedianAndCount(y, u, v, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			if (m_bRequirePreCounting)
+				ConvertYUYVToULY2_PredictCylindricalWrongMedianAndCount(y, u, v, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			else
+				ConvertYUYVToULY2_PredictCylindricalWrongMedian(y, u, v, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_UYVY:
 		case UTVF_UYNV:
 		case UTVF_2vuy:
 		case UTVF_HDYC:
-			ConvertUYVYToULY2_PredictCylindricalWrongMedianAndCount(y, u, v, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			if (m_bRequirePreCounting)
+				ConvertUYVYToULY2_PredictCylindricalWrongMedianAndCount(y, u, v, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			else
+				ConvertUYVYToULY2_PredictCylindricalWrongMedian(y, u, v, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 		break;

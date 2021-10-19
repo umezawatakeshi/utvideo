@@ -159,17 +159,29 @@ bool CULRGCodec::PredictDirect(uint32_t nBandIndex)
 		{
 		case UTVF_NFCC_BGR_BU:
 		case UTVF_NFCC_BGR_TD:
-			ConvertBGRToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			if (m_bRequirePreCounting)
+				ConvertBGRToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			else
+				ConvertBGRToULRG_PredictCylindricalWrongMedian(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_BGRX_BU:
 		case UTVF_NFCC_BGRX_TD:
-			ConvertBGRXToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			if (m_bRequirePreCounting)
+				ConvertBGRXToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			else
+				ConvertBGRXToULRG_PredictCylindricalWrongMedian(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_RGB_TD:
-			ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			if (m_bRequirePreCounting)
+				ConvertRGBToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			else
+				ConvertRGBToULRG_PredictCylindricalWrongMedian(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertXRGBToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			if (m_bRequirePreCounting)
+				ConvertXRGBToULRG_PredictCylindricalWrongMedianAndCount(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+			else
+				ConvertXRGBToULRG_PredictCylindricalWrongMedian(g, b, r, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 		break;

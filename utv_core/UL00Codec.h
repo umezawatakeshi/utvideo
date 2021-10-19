@@ -94,7 +94,10 @@ protected:
 
 	FRAMEINFO m_fi;
 	std::vector<HUFFMAN_DECODE_TABLE<8>> m_hdt[4];
-	const uint8_t *m_pDecodeCode[4][256];
+	uint8_t* m_pEntropyCompressedStream[4][256];
+	size_t m_cbEntropyCompressedStream[4][256];
+	bool m_bRequireEntropyBuffer;
+	bool m_bRequirePreCounting;
 
 	EXTRADATA m_ed;
 

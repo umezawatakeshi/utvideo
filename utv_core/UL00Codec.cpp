@@ -10,6 +10,7 @@
 #include "resource.h"
 #include "ByteOrder.h"
 #include "WindowsDialogUtil.h"
+#include <fse.h>
 
 CUL00Codec::CUL00Codec(const char *pszTinyName, const char *pszInterfaceName) : CBandParallelCodec(pszTinyName, pszInterfaceName)
 {
@@ -193,6 +194,11 @@ int CUL00Codec::InternalSetState(const void *pState, size_t cb)
 
 	memcpy(&m_ec, &ec, sizeof(ENCODERCONF));
 
+	if ((m_ec.dwFlags0 & EC_FLAGS0_COMPRESS_MASK) == EC_FLAGS0_COMPRESS_FSE)
+	{
+		m_ec.dwFlags0 &= ~EC_FLAGS0_INTRAFRAME_PREDICT_MASK;
+		m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
+	}
 	if ((m_ec.dwFlags0 & EC_FLAGS0_INTRAFRAME_PREDICT_MASK) == EC_FLAGS0_INTRAFRAME_PREDICT_RESERVED)
 		m_ec.dwFlags0 |= EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN;
 	if (m_ec.dwFlags0 & EC_FLAGS0_DIVIDE_COUNT_AUTO)
@@ -236,38 +242,70 @@ size_t CUL00Codec::EncodeFrame(void *pOutput, bool *pbKeyFrame, const void *pInp
 
 	p = (uint8_t *)pOutput;
 
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	switch (m_ec.dwFlags0 & EC_FLAGS0_COMPRESS_MASK)
 	{
-		uint32_t dwCurrentOffset;
-		for (int i = 0; i < 256; i++)
-			count[i] = 0;
-		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-			for (int i = 0; i < 256; i++)
-				count[i] += m_counts[nBandIndex].dwCount[nPlaneIndex][0][i];
-		m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<8> *)p;
-		GenerateHuffmanCodeLengthTable<8>(m_pCodeLengthTable[nPlaneIndex], count);
-		GenerateHuffmanEncodeTable(&m_het[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
-		p += 256;
-		dwCurrentOffset = 0;
-		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+	default:
+	case EC_FLAGS0_COMPRESS_HUFFMAN:
+		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 		{
-			uint32_t dwBits;
-			dwBits = 0;
+			uint32_t dwCurrentOffset;
 			for (int i = 0; i < 256; i++)
-				dwBits += m_pCodeLengthTable[nPlaneIndex]->codelen[i] * m_counts[nBandIndex].dwCount[nPlaneIndex][0][i];
-			dwCurrentOffset += ROUNDUP(dwBits, 32) / 8;
-			*(uint32_t *)p = dwCurrentOffset;
-			p += 4;
+				count[i] = 0;
+			for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+				for (int i = 0; i < 256; i++)
+					count[i] += m_counts[nBandIndex].dwCount[nPlaneIndex][0][i];
+			m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<8> *)p;
+			GenerateHuffmanCodeLengthTable<8>(m_pCodeLengthTable[nPlaneIndex], count);
+			GenerateHuffmanEncodeTable(&m_het[nPlaneIndex], m_pCodeLengthTable[nPlaneIndex]);
+			p += 256;
+			dwCurrentOffset = 0;
+			uint8_t* q = p + sizeof(uint32_t) * m_dwDivideCount;
+			for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+			{
+				uint32_t dwBits;
+				dwBits = 0;
+				for (int i = 0; i < 256; i++)
+					dwBits += m_pCodeLengthTable[nPlaneIndex]->codelen[i] * m_counts[nBandIndex].dwCount[nPlaneIndex][0][i];
+				uint32_t dwBytes = ROUNDUP(dwBits, 32) / 8;
+				m_pEntropyCompressedStream[nPlaneIndex][nBandIndex] = q + dwCurrentOffset;
+				m_cbEntropyCompressedStream[nPlaneIndex][nBandIndex] = dwBytes;
+				dwCurrentOffset += dwBytes;
+				*(uint32_t*)p = dwCurrentOffset;
+				p += 4;
+			}
+			p += dwCurrentOffset;
 		}
-		p += dwCurrentOffset;
+
+		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+			m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::EncodeProc, nBandIndex), nBandIndex);
+		m_ptm->WaitForJobCompletion();
+		break;
+
+	case EC_FLAGS0_COMPRESS_FSE:
+		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+			m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::EncodeProc, nBandIndex), nBandIndex);
+		m_ptm->WaitForJobCompletion();
+
+		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+		{
+			uint32_t dwCurrentOffset = 0;
+			uint8_t* q = p + sizeof(uint32_t) * m_dwDivideCount;
+			for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
+			{
+				auto cbCurrentSize = m_cbEntropyCompressedStream[nPlaneIndex][nBandIndex];
+				memcpy(q, m_pEntropyCompressedStream[nPlaneIndex][nBandIndex], cbCurrentSize);
+				dwCurrentOffset += (uint32_t)cbCurrentSize;
+				*(uint32_t*)p = dwCurrentOffset;
+				q += cbCurrentSize;
+				p += sizeof(uint32_t);
+			}
+			p += dwCurrentOffset;
+		}
+		break;
 	}
 
 	memcpy(p, &fi, sizeof(FRAMEINFO));
 	p += sizeof(FRAMEINFO);
-
-	for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
-		m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::EncodeProc, nBandIndex), nBandIndex);
-	m_ptm->WaitForJobCompletion();
 
 	*pbKeyFrame = true;
 
@@ -331,6 +369,9 @@ int CUL00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 		return ret;
 	CalcBandMetric();
 
+	m_bRequireEntropyBuffer = (m_ec.dwFlags0 & EC_FLAGS0_COMPRESS_MASK) == EC_FLAGS0_COMPRESS_FSE;
+	m_bRequirePreCounting = !((m_ec.dwFlags0 & EC_FLAGS0_COMPRESS_MASK) == EC_FLAGS0_COMPRESS_FSE);
+
 	m_pCurFrame = std::make_unique<CFrameBuffer>();
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pCurFrame->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
@@ -339,29 +380,58 @@ int CUL00Codec::InternalEncodeBegin(utvf_t infmt, unsigned int width, unsigned i
 	for (int i = 0; i < GetNumPlanes(); i++)
 		m_pPredicted->AddPlane(m_cbPlaneSize[i], m_cbPlaneWidth[i]);
 
+	if (m_bRequirePreCounting)
+	{
 #ifdef _WIN32
-	m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+		m_counts = (COUNTS *)VirtualAlloc(NULL, sizeof(COUNTS) * m_dwDivideCount, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
 #endif
 #if defined(__APPLE__) || defined(__unix__)
-	m_counts = (COUNTS *)mmap(NULL, sizeof(COUNTS) * m_dwDivideCount, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
+		m_counts = (COUNTS *)mmap(NULL, sizeof(COUNTS) * m_dwDivideCount, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, -1, 0);
 #endif
+	}
 
 	m_ptm = std::make_unique<CThreadManager>();
+
+	if (m_bRequireEntropyBuffer)
+	{
+		for (int i = 0; i < GetNumPlanes(); i++)
+		{
+			for (unsigned int j = 0; j < m_dwDivideCount; ++j)
+			{
+				// XXX: FSE 以外のことは考慮していない
+				m_pEntropyCompressedStream[i][j] = (uint8_t*)malloc(FSE_compressBound(m_cbPlaneStripeSize[i] * (m_dwStripeEnd[j] - m_dwStripeBegin[j])));
+			}
+		}
+	}
 
 	return 0;
 }
 
 int CUL00Codec::InternalEncodeEnd(void)
 {
+	if (m_bRequireEntropyBuffer)
+	{
+		for (int i = 0; i < GetNumPlanes(); i++)
+		{
+			for (unsigned int j = 0; j < m_dwDivideCount; ++j)
+			{
+				free(m_pEntropyCompressedStream[i][j]);
+			}
+		}
+	}
+
 	m_pCurFrame.reset();
 	m_pPredicted.reset();
 
+	if (m_bRequirePreCounting)
+	{
 #ifdef _WIN32
-	VirtualFree(m_counts, 0, MEM_RELEASE);
+		VirtualFree(m_counts, 0, MEM_RELEASE);
 #endif
 #if defined(__APPLE__) || defined(__unix__)
-	munmap(m_counts, sizeof(COUNTS) * m_dwDivideCount);
+		munmap(m_counts, sizeof(COUNTS) * m_dwDivideCount);
 #endif
+	}
 
 	m_ptm.reset();
 
@@ -388,7 +458,20 @@ int CUL00Codec::EncodeGetExtraData(void *pExtraData, size_t cb, utvf_t infmt, un
 	p->EncoderVersionAndImplementation = UTVIDEO_VERSION_AND_IMPLEMENTATION;
 	p->fccOriginalFormat               = htob32(infmt);
 	p->cbFrameInfo                     = sizeof(FRAMEINFO);
-	p->flags0                          = BIE_FLAGS0_COMPRESS_HUFFMAN | ((nDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT) | (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE ? BIE_FLAGS0_ASSUME_INTERLACE : 0);
+
+	switch (m_ec.dwFlags0 & EC_FLAGS0_COMPRESS_MASK)
+	{
+	default:
+	case EC_FLAGS0_COMPRESS_HUFFMAN:
+		p->flags0 |= BIE_FLAGS0_COMPRESS_HUFFMAN;
+		break;
+	case EC_FLAGS0_COMPRESS_FSE:
+		p->flags0 |= BIE_FLAGS0_COMPRESS_FSE;
+		break;
+	}
+	p->flags0 |= ((nDivideCount - 1) << BIE_FLAGS0_DIVIDE_COUNT_SHIFT);
+	if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE)
+		p->flags0 |= BIE_FLAGS0_ASSUME_INTERLACE;
 
 	return 0;
 }
@@ -417,7 +500,8 @@ int CUL00Codec::InternalEncodeQuery(utvf_t infmt, unsigned int width, unsigned i
 
 void CUL00Codec::PredictProc(uint32_t nBandIndex)
 {
-	memset(&m_counts[nBandIndex], 0, sizeof(m_counts[nBandIndex]));
+	if (m_bRequirePreCounting)
+		memset(&m_counts[nBandIndex], 0, sizeof(m_counts[nBandIndex]));
 
 	if (!PredictDirect(nBandIndex))
 	{
@@ -429,12 +513,15 @@ void CUL00Codec::PredictProc(uint32_t nBandIndex)
 		PredictFromPlanar(nBandIndex, pSrcBegin);
 	}
 
-	// 理想的にはここベクトル化してほしいんだけどどうなるんだろう
-	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+	if (m_bRequirePreCounting)
 	{
-		for (int j = 1; j < NUM_COUNT_TABLES_PER_CHANNEL<8>; ++j)
-			for (int i = 0; i < 256; i++)
-				m_counts[nBandIndex].dwCount[nPlaneIndex][0][i] += m_counts[nBandIndex].dwCount[nPlaneIndex][j][i];
+		// 理想的にはここベクトル化してほしいんだけどどうなるんだろう
+		for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
+		{
+			for (int j = 1; j < NUM_COUNT_TABLES_PER_CHANNEL<8>; ++j)
+				for (int i = 0; i < 256; i++)
+					m_counts[nBandIndex].dwCount[nPlaneIndex][0][i] += m_counts[nBandIndex].dwCount[nPlaneIndex][j][i];
+		}
 	}
 }
 
@@ -454,7 +541,10 @@ void CUL00Codec::PredictFromPlanar(uint32_t nBandIndex, const uint8_t* const* pS
 			PredictPlanarGradientAndCount8(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
 			break;
 		case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
-			PredictCylindricalWrongMedianAndCount8(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			if (m_bRequirePreCounting)
+				PredictCylindricalWrongMedianAndCount8(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex], m_counts[nBandIndex].dwCount[nPlaneIndex]);
+			else
+				PredictCylindricalWrongMedian8(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneBegin, pSrcBegin[nPlaneIndex] + cbPlaneEnd, m_cbPlanePredictStride[nPlaneIndex]);
 			break;
 		default:
 			_ASSERT(false);
@@ -474,22 +564,34 @@ void CUL00Codec::EncodeProc(uint32_t nBandIndex)
 		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
-		uint32_t dwDstOffset;
+		switch (m_ec.dwFlags0 & EC_FLAGS0_COMPRESS_MASK)
+		{
+		default:
+		case EC_FLAGS0_COMPRESS_HUFFMAN:
+			{
 #ifdef _DEBUG
-		uint32_t dwDstEnd;
-		size_t dwEncodedSize;
+				size_t dwEncodedSize =
 #endif
-
-		if (nBandIndex == 0)
-			dwDstOffset = 0;
-		else
-			dwDstOffset = ((uint32_t *)((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
-#ifdef _DEBUG
-		dwDstEnd = ((uint32_t *)((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex];
-		dwEncodedSize =
-#endif
-		HuffmanEncode8((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256 + sizeof(uint32_t) * m_dwDivideCount + dwDstOffset, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, &m_het[nPlaneIndex]);
-		_ASSERT(dwEncodedSize == dwDstEnd - dwDstOffset);
+				HuffmanEncode8(m_pEntropyCompressedStream[nPlaneIndex][nBandIndex], m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, &m_het[nPlaneIndex]);
+				_ASSERT(dwEncodedSize == m_cbEntropyCompressedStream[nPlaneIndex][nBandIndex]);
+			}
+			break;
+		case EC_FLAGS0_COMPRESS_FSE:
+			{
+				size_t cbEncodedSize = FSE_compress(m_pEntropyCompressedStream[nPlaneIndex][nBandIndex], FSE_compressBound(cbPlaneEnd - cbPlaneBegin), m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, cbPlaneEnd - cbPlaneBegin);
+				if (cbEncodedSize == 0)
+				{
+					cbEncodedSize = cbPlaneEnd - cbPlaneBegin;
+					memcpy(m_pEntropyCompressedStream[nPlaneIndex][nBandIndex], m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, cbEncodedSize);
+				}
+				else if (cbEncodedSize == 1)
+				{
+					m_pEntropyCompressedStream[nPlaneIndex][nBandIndex][0] = *(uint8_t*)(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin);
+				}
+				m_cbEntropyCompressedStream[nPlaneIndex][nBandIndex] = cbEncodedSize;
+			}
+			break;
+		}
 	}
 }
 
@@ -500,10 +602,22 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput)
 	m_pInput = pInput;
 	m_pOutput = pOutput;
 
+	size_t cbPreSize;
+	switch (m_ed.flags0 & BIE_FLAGS0_COMPRESS_MASK)
+	{
+	default:
+	case BIE_FLAGS0_COMPRESS_HUFFMAN:
+		cbPreSize = 256;
+		break;
+	case BIE_FLAGS0_COMPRESS_FSE:
+		cbPreSize = 0;
+		break;
+	}
+
 	p = (uint8_t *)pInput;
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
-		p += 256 + sizeof(uint32_t) * m_dwDivideCount;
+		p += cbPreSize + sizeof(uint32_t) * m_dwDivideCount;
 		p += ((const uint32_t *)p)[-1];
 	}
 	memset(&m_fi, 0, sizeof(FRAMEINFO));
@@ -513,18 +627,24 @@ size_t CUL00Codec::DecodeFrame(void *pOutput, const void *pInput)
 	for (int nPlaneIndex = 0; nPlaneIndex < GetNumPlanes(); nPlaneIndex++)
 	{
 		m_pCodeLengthTable[nPlaneIndex] = (HUFFMAN_CODELEN_TABLE<8> *)p;
-		m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::GenerateDecodeTableProc, nPlaneIndex), nPlaneIndex);
-		p += 256 + sizeof(uint32_t) * m_dwDivideCount;
+		if ((m_ed.flags0 & BIE_FLAGS0_COMPRESS_MASK) == BIE_FLAGS0_COMPRESS_HUFFMAN)
+			m_ptm->SubmitJob(new CThreadJob(this, &CUL00Codec::GenerateDecodeTableProc, nPlaneIndex), nPlaneIndex);
+		p += cbPreSize;
+		const uint32_t* pOffsetTable = (const uint32_t*)p;
+		p += sizeof(uint32_t) * m_dwDivideCount;
 		for (uint32_t nBandIndex = 0; nBandIndex < m_dwDivideCount; nBandIndex++)
 		{
 			uint32_t dwCodeOffset;
+			uint32_t dwNextBandCodeOffset;
 
 			if (nBandIndex == 0)
 				dwCodeOffset = 0;
 			else
-				dwCodeOffset = ((const uint32_t *)((uint8_t *)m_pCodeLengthTable[nPlaneIndex] + 256))[nBandIndex - 1];
+				dwCodeOffset = pOffsetTable[nBandIndex - 1];
+			dwNextBandCodeOffset = pOffsetTable[nBandIndex];
 
-			m_pDecodeCode[nPlaneIndex][nBandIndex] = p + dwCodeOffset;
+			m_pEntropyCompressedStream[nPlaneIndex][nBandIndex] = p + dwCodeOffset;
+			m_cbEntropyCompressedStream[nPlaneIndex][nBandIndex] = dwNextBandCodeOffset - dwCodeOffset;
 		}
 		p += ((const uint32_t *)p)[-1];
 	}
@@ -662,12 +782,29 @@ void CUL00Codec::DecodeAndRestoreToPlanarImpl(uint32_t nBandIndex, uint8_t* cons
 		size_t cbPlaneBegin = m_dwStripeBegin[nBandIndex] * m_cbPlaneStripeSize[nPlaneIndex];
 		size_t cbPlaneEnd   = m_dwStripeEnd[nBandIndex]   * m_cbPlaneStripeSize[nPlaneIndex];
 
+		switch (m_ed.flags0 & BIE_FLAGS0_COMPRESS_MASK)
+		{
+		default:
+		case BIE_FLAGS0_COMPRESS_HUFFMAN:
+			{
 #ifdef _DEBUG
-		uint8_t *pRetExpected = m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd;
-		uint8_t *pRetActual =
+				uint8_t *pRetExpected = m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd;
+				uint8_t *pRetActual =
 #endif
-		HuffmanDecode<8>(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pDecodeCode[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex][0]);
-		_ASSERT(pRetActual == pRetExpected);
+				HuffmanDecode<8>(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneEnd, m_pEntropyCompressedStream[nPlaneIndex][nBandIndex], &m_hdt[nPlaneIndex][0]);
+				_ASSERT(pRetActual == pRetExpected);
+			}
+			break;
+
+		case BIE_FLAGS0_COMPRESS_FSE:
+			if (m_cbEntropyCompressedStream[nPlaneIndex][nBandIndex] == 1)
+				memset(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pEntropyCompressedStream[nPlaneIndex][nBandIndex][0], cbPlaneEnd - cbPlaneBegin);
+			else if (m_cbEntropyCompressedStream[nPlaneIndex][nBandIndex] == cbPlaneEnd - cbPlaneBegin)
+				memcpy(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, m_pEntropyCompressedStream[nPlaneIndex][nBandIndex], cbPlaneEnd - cbPlaneBegin);
+			else
+				FSE_decompress(m_pPredicted->GetPlane(nPlaneIndex) + cbPlaneBegin, cbPlaneEnd - cbPlaneBegin, m_pEntropyCompressedStream[nPlaneIndex][nBandIndex], m_cbEntropyCompressedStream[nPlaneIndex][nBandIndex]);
+			break;
+		}
 
 		if (DoRestore)
 		{

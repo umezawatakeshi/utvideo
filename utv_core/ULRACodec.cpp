@@ -136,10 +136,16 @@ bool CULRACodec::PredictDirect(uint32_t nBandIndex)
 		case UTVF_NFCC_BGRA_BU:
 		case UTVF_NFCC_BGRX_BU:
 		case UTVF_NFCC_BGRA_TD:
-			ConvertBGRAToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			if (m_bRequirePreCounting)
+				ConvertBGRAToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			else
+				ConvertBGRAToULRA_PredictCylindricalWrongMedian(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		case UTVF_NFCC_ARGB_TD:
-			ConvertARGBToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			if (m_bRequirePreCounting)
+				ConvertARGBToULRA_PredictCylindricalWrongMedianAndCount(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2], m_counts[nBandIndex].dwCount[3]);
+			else
+				ConvertARGBToULRA_PredictCylindricalWrongMedian(g, b, r, a, pRawBegin[0], pRawEnd[0], m_fmRaw.cbLineWidth[0], m_fmRaw.scbLineStride[0]);
 			return true;
 		}
 		break;

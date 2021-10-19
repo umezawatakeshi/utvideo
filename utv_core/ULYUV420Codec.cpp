@@ -316,8 +316,16 @@ bool CULYUV420Codec<C>::PredictDirect(uint32_t nBandIndex)
 			case EC_FLAGS0_INTRAFRAME_PREDICT_WRONG_MEDIAN:
 				if (m_ec.dwFlags0 & EC_FLAGS0_ASSUME_INTERLACE)
 					return false;
-				PredictCylindricalWrongMedianAndCount8(y, pRawBegin[0], pRawEnd[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
-				ConvertPackedUVToPlanar_PredictCylindricalWrongMedianAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+				if (m_bRequirePreCounting)
+				{
+					PredictCylindricalWrongMedianAndCount8(y, pRawBegin[0], pRawEnd[0], m_fmRaw.scbLineStride[0], m_counts[nBandIndex].dwCount[0]);
+					ConvertPackedUVToPlanar_PredictCylindricalWrongMedianAndCount(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1], m_counts[nBandIndex].dwCount[1], m_counts[nBandIndex].dwCount[2]);
+				}
+				else
+				{
+					PredictCylindricalWrongMedian8(y, pRawBegin[0], pRawEnd[0], m_fmRaw.scbLineStride[0]);
+					ConvertPackedUVToPlanar_PredictCylindricalWrongMedian(u, v, pRawBegin[1], pRawEnd[1], m_fmRaw.cbLineWidth[1], m_fmRaw.scbLineStride[1]);
+				}
 				return true;
 			}
 		}
