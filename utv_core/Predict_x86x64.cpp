@@ -421,7 +421,7 @@ static inline FORCEINLINE __m128i VECTORCALL tuned_PredictWrongMedianAndCount8El
 	return residual;
 }
 
-template<int F, bool DoCount>
+template<int F, bool DoCount, bool NTSTORE>
 void tuned_PredictCylindricalWrongMedianAndMayCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
 {
 	auto p = pSrcBegin;
@@ -434,7 +434,7 @@ void tuned_PredictCylindricalWrongMedianAndMayCount8(uint8_t *pDst, const uint8_
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
 		__m128i residual = tuned_PredictLeftAndCount8Element<F, DoCount, 1, 0>(prev, value, pCountTable);
-		_mm_storeu_si128((__m128i *)q, residual);
+		_mmt_store<__m128i, NTSTORE>((__m128i *)q, residual);
 		prev = value;
 	}
 
@@ -453,7 +453,7 @@ void tuned_PredictCylindricalWrongMedianAndMayCount8(uint8_t *pDst, const uint8_
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
 		__m128i top = _mm_loadu_si128((const __m128i *)(p - cbStride));
 		__m128i residual = tuned_PredictWrongMedianAndCount8Element<F, DoCount, 1, 0>(topprev, top, prev, value, pCountTable);
-		_mm_storeu_si128((__m128i *)q, residual);
+		_mmt_store<__m128i, NTSTORE>((__m128i *)q, residual);
 		prev = value;
 		topprev = top;
 	}
@@ -469,13 +469,16 @@ void tuned_PredictCylindricalWrongMedianAndMayCount8(uint8_t *pDst, const uint8_
 template<int F>
 void tuned_PredictCylindricalWrongMedianAndCount8(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
 {
-	tuned_PredictCylindricalWrongMedianAndMayCount8<F, true>(pDst, pSrcBegin, pSrcEnd, cbStride, pCountTable);
+	tuned_PredictCylindricalWrongMedianAndMayCount8<F, true, false>(pDst, pSrcBegin, pSrcEnd, cbStride, pCountTable);
 }
 
 template<int F>
 void tuned_PredictCylindricalWrongMedian8(uint8_t* pDst, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbStride)
 {
-	tuned_PredictCylindricalWrongMedianAndMayCount8<F, false>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
+	if (IS_ALIGNED(pDst, 16) && IS_MULTIPLE(cbStride, 16))
+		tuned_PredictCylindricalWrongMedianAndMayCount8<F, false, true>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
+	else
+		tuned_PredictCylindricalWrongMedianAndMayCount8<F, false, false>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
 }
 
 #ifdef GENERATE_SSE41
@@ -534,7 +537,7 @@ template void tuned_RestoreCylindricalWrongMedian8<CODEFEATURE_AVX1>(uint8_t *pD
 #endif
 
 
-template<int F, bool DoCount>
+template<int F, bool DoCount, bool NTSTORE>
 static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
 {
 	auto p = pSrcBegin;
@@ -546,7 +549,7 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 	{
 		__m128i value = _mm_loadu_si128((const __m128i *)p);
 		__m128i residual = tuned_PredictLeftAndCount8Element<F, DoCount, 1, 0>(prev, value, pCountTable);
-		_mm_storeu_si128((__m128i *)q, residual);
+		_mmt_store<__m128i, NTSTORE>((__m128i *)q, residual);
 		prev = value;
 	}
 
@@ -565,7 +568,7 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 		{
 			__m128i value = _mm_sub_epi8(_mm_loadu_si128((const __m128i *)p), _mm_loadu_si128((const __m128i *)(p - cbStride)));
 			__m128i residual = tuned_PredictLeftAndCount8Element<F, DoCount, 1, 0>(prev, value, pCountTable);
-			_mm_storeu_si128((__m128i *)q, residual);
+			_mmt_store<__m128i, NTSTORE>((__m128i *)q, residual);
 			prev = value;
 		}
 
@@ -581,13 +584,16 @@ static inline void tuned_PredictPlanarGradientAndMayCount8(uint8_t *pDst, const 
 template<int F>
 void tuned_PredictPlanarGradientAndCount8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride, uint32_t pCountTable[][256])
 {
-	tuned_PredictPlanarGradientAndMayCount8<F, true>(pDst, pSrcBegin, pSrcEnd, cbStride, pCountTable);
+	tuned_PredictPlanarGradientAndMayCount8<F, true, false>(pDst, pSrcBegin, pSrcEnd, cbStride, pCountTable);
 }
 
 template<int F>
 void tuned_PredictPlanarGradient8(uint8_t *pDst, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbStride)
 {
-	tuned_PredictPlanarGradientAndMayCount8<F, false>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
+	if (IS_ALIGNED(pDst, 16) && IS_MULTIPLE(cbStride, 16))
+		tuned_PredictPlanarGradientAndMayCount8<F, false, true>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
+	else
+		tuned_PredictPlanarGradientAndMayCount8<F, false, false>(pDst, pSrcBegin, pSrcEnd, cbStride, NULL);
 }
 
 #ifdef GENERATE_SSE41
