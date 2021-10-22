@@ -121,31 +121,24 @@ vector<tuple<string, string, unsigned int>> conv_clip000_ulxx(const vector<tuple
 {
 	vector<tuple<string, string, unsigned int>> r;
 
-	for (auto& i : v)
+	for (auto& [compbase, widthstep, heightstep, raws] : v)
 	{
-		auto& compbase = std::get<0>(i);
-		auto widthstep = std::get<1>(i);
-		auto heightstep = std::get<2>(i);
-		for (auto& j : std::get<3>(i))
+		for (auto& [rawbase, tolerance] : raws)
 		{
-			auto& rawbase = j.first;
-			auto& tolerance = j.second;
-			for (auto divpair : divs_ulxx)
+			for (auto& [divname, divconf] : divs_ulxx)
 			{
-				for (auto& predpair : preds_ulxx)
+				for (auto& [predname, predconf] : preds_ulxx)
 				{
-					for (auto& size : sz)
+					for (auto& [width, height] : sz)
 					{
-						auto width = size.first;
-						auto height = size.second;
 						if (width % widthstep != 0 || height % heightstep != 0)
 							continue;
 
 						char comp[256], raw[256];
 
-						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 						if (rawprop)
-							sprintf(raw, "%s-%s-%s-%dx%d.avi", rawbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+							sprintf(raw, "%s-%s-%s-%dx%d.avi", rawbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 						else
 							sprintf(raw, "%s-%dx%d.avi", rawbase.c_str(), width, height);
 						r.push_back(make_tuple(comp, raw, tolerance));
@@ -194,31 +187,24 @@ vector<tuple<string, string, unsigned int>> conv_clip000_uqxx(const vector<tuple
 {
 	vector<tuple<string, string, unsigned int>> r;
 
-	for (auto& i : v)
+	for (auto& [compbase, widthstep, heightstep, rows] : v)
 	{
-		auto& compbase = std::get<0>(i);
-		auto widthstep = std::get<1>(i);
-		auto heightstep = std::get<2>(i);
-		for (auto& j : std::get<3>(i))
+		for (auto& [rawbase, tolerance] : rows)
 		{
-			auto& rawbase = j.first;
-			auto& tolerance = j.second;
-			for (auto divpair : divs_uqxx)
+			for (auto& [divname, divconf] : divs_uqxx)
 			{
-				for (auto& predpair : preds_uqxx)
+				for (auto& [predname, predconf] : preds_uqxx)
 				{
-					for (auto& size : sz)
+					for (auto& [width, height] : sz)
 					{
-						auto width = size.first;
-						auto height = size.second;
 						if (width % widthstep != 0 || height % heightstep != 0)
 							continue;
 
 						char comp[256], raw[256];
 
-						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 						if (rawprop)
-							sprintf(raw, "%s-%s-%s-%dx%d.avi", rawbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+							sprintf(raw, "%s-%s-%s-%dx%d.avi", rawbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 						else
 							sprintf(raw, "%s-%dx%d.avi", rawbase.c_str(), width, height);
 						r.push_back(make_tuple(comp, raw, tolerance));
@@ -273,29 +259,22 @@ vector<tuple<string, string, unsigned int>> conv_clip000_umxx(const vector<tuple
 {
 	vector<tuple<string, string, unsigned int>> r;
 
-	for (auto& i : v)
+	for (auto& [compbase, widthstep, heightstep, rows] : v)
 	{
-		auto& compbase = std::get<0>(i);
-		auto widthstep = std::get<1>(i);
-		auto heightstep = std::get<2>(i);
-		for (auto& j : std::get<3>(i))
+		for (auto& [rawbase, tolerance] : rows)
 		{
-			auto& rawbase = j.first;
-			auto& tolerance = j.second;
-			for (auto divpair : divs_umxx)
+			for (auto& [divname, divconf] : divs_umxx)
 			{
-				for (auto& size : sz)
+				for (auto& [width, height] : sz)
 				{
-					auto width = size.first;
-					auto height = size.second;
 					if (width % widthstep != 0 || height % heightstep != 0)
 						continue;
 
 					char comp[256], raw[256];
 
-					sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divpair.first.c_str(), width, height);
+					sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divname.c_str(), width, height);
 					if (rawprop)
-						sprintf(raw, "%s-gradient-%s-%dx%d.avi", rawbase.c_str(), divpair.first.c_str(), width, height);
+						sprintf(raw, "%s-gradient-%s-%dx%d.avi", rawbase.c_str(), divname.c_str(), width, height);
 					else
 						sprintf(raw, "%s-%dx%d.avi", rawbase.c_str(), width, height);
 					r.push_back(make_tuple(comp, raw, tolerance));
@@ -322,28 +301,21 @@ vector<tuple<string, string, unsigned int>> conv_clip003_umxx(const vector<tuple
 {
 	vector<tuple<string, string, unsigned int>> r;
 
-	for (auto& i : v)
+	for (auto& [compbase, widthstep, heightstep, rows] : v)
 	{
-		auto& compbase = std::get<0>(i);
-		auto widthstep = std::get<1>(i);
-		auto heightstep = std::get<2>(i);
-		for (auto& j : std::get<3>(i))
+		for (auto& [rawbase, tolerance] : rows)
 		{
-			auto& rawbase = j.first;
-			auto& tolerance = j.second;
-			for (auto divpair : divs_umxx)
+			for (auto& [divname, divconf] : divs_umxx)
 			{
-				for (auto& size : sz)
+				for (auto& [width, height] : sz)
 				{
-					auto width = size.first;
-					auto height = size.second;
 					if (width % widthstep != 0 || height % heightstep != 0)
 						continue;
 
 					char comp[256], raw[256];
 
-					sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divpair.first.c_str(), width, height);
-					sprintf(raw, "%s-%s-%dx%d.avi", rawbase.c_str(), divpair.first.c_str(), width, height);
+					sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divname.c_str(), width, height);
+					sprintf(raw, "%s-%s-%dx%d.avi", rawbase.c_str(), divname.c_str(), width, height);
 					r.push_back(make_tuple(comp, raw, tolerance));
 				}
 			}
@@ -443,33 +415,27 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 {
 	vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> r;
 
-	for (auto& i : v)
+	for (auto& [compbase, confbase, widthstep, heightstep, rawbases] : v)
 	{
-		auto& compbase = std::get<0>(i);
-		auto& confbase = std::get<1>(i);
-		auto widthstep = std::get<2>(i);
-		auto heightstep = std::get<3>(i);
-		for (auto& rawbase : std::get<4>(i))
+		for (auto& rawbase : rawbases)
 		{
-			for (auto divpair : divs_ulxx)
+			for (auto& [divname, divconf] : divs_ulxx)
 			{
-				for (auto& predpair : preds_ulxx)
+				for (auto& [predname, predconf] : preds_ulxx)
 				{
-					for (auto& size : sz)
+					for (auto& [width, height] : sz)
 					{
-						auto width = size.first;
-						auto height = size.second;
 						if (width % widthstep != 0 || height % heightstep != 0)
 							continue;
 
 						char comp[256], raw[256];
 
-						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 						if (rawprop)
-							sprintf(raw, "%s-%s-%s-%dx%d.avi", rawbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+							sprintf(raw, "%s-%s-%s-%dx%d.avi", rawbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 						else
 							sprintf(raw, "%s-%dx%d.avi", rawbase.c_str(), width, height);
-						r.push_back(make_tuple(raw, comp, confbase | divpair.second | predpair.second, ulxx_extradata_mask));
+						r.push_back(make_tuple(raw, comp, confbase | divconf | predconf, ulxx_extradata_mask));
 					}
 				}
 			}
@@ -506,33 +472,27 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 {
 	vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> r;
 
-	for (auto& i : v)
+	for (auto& [compbase, confbase, widthstep, heightstep, rawbases] : v)
 	{
-		auto& compbase = std::get<0>(i);
-		auto& confbase = std::get<1>(i);
-		auto widthstep = std::get<2>(i);
-		auto heightstep = std::get<3>(i);
-		for (auto& rawbase : std::get<4>(i))
+		for (auto& rawbase : rawbases)
 		{
-			for (auto divpair : divs_uqxx)
+			for (auto& [divname, divconf] : divs_uqxx)
 			{
-				for (auto& size : sz)
+				for (auto& [predname, predconf] : preds_uqxx)
 				{
-					for (auto& predpair : preds_uqxx)
+					for (auto& [width, height] : sz)
 					{
-						auto width = size.first;
-						auto height = size.second;
 						if (width % widthstep != 0 || height % heightstep != 0)
 							continue;
 
 						char comp[256], raw[256];
 
-						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 						if (rawprop)
-							sprintf(raw, "%s-%s-%s-%dx%d.avi", rawbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+							sprintf(raw, "%s-%s-%s-%dx%d.avi", rawbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 						else
 							sprintf(raw, "%s-%dx%d.avi", rawbase.c_str(), width, height);
-						r.push_back(make_tuple(raw, comp, confbase | divpair.second | predpair.second, uqxx_extradata_mask));
+						r.push_back(make_tuple(raw, comp, confbase | divconf | predconf, uqxx_extradata_mask));
 					}
 				}
 			}
@@ -573,33 +533,27 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 {
 	vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> r;
 
-	for (auto& i : v)
+	for (auto& [compbase, confbase, widthstep, heightstep, rawbases] : v)
 	{
-		auto& compbase = std::get<0>(i);
-		auto& confbase = std::get<1>(i);
-		auto widthstep = std::get<2>(i);
-		auto heightstep = std::get<3>(i);
-		for (auto& rawbase : std::get<4>(i))
+		for (auto& rawbase : rawbases)
 		{
-			for (auto divpair : divs_umxx)
+			for (auto& [divname, divconf] : divs_umxx)
 			{
-				for (auto& size : sz)
+				for (auto& intra : intra_umxx)
 				{
-					for (auto intra : intra_umxx)
+					for (auto& [width, height] : sz)
 					{
-						auto width = size.first;
-						auto height = size.second;
 						if (width % widthstep != 0 || height % heightstep != 0)
 							continue;
 
 						char comp[256], raw[256];
 
-						sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divpair.first.c_str(), width, height);
+						sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divname.c_str(), width, height);
 						if (rawprop)
-							sprintf(raw, "%s-gradient-%s-%dx%d.avi", rawbase.c_str(), divpair.first.c_str(), width, height);
+							sprintf(raw, "%s-gradient-%s-%dx%d.avi", rawbase.c_str(), divname.c_str(), width, height);
 						else
 							sprintf(raw, "%s-%dx%d.avi", rawbase.c_str(), width, height);
-						r.push_back(make_tuple(raw, comp, confbase | divpair.second | intra, umxx_extradata_mask));
+						r.push_back(make_tuple(raw, comp, confbase | divconf | intra, umxx_extradata_mask));
 					}
 				}
 			}
@@ -622,28 +576,22 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip003
 {
 	vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> r;
 
-	for (auto& i : v)
+	for (auto& [compbase, confbase, widthstep, heightstep, rawbases] : v)
 	{
-		auto& compbase = std::get<0>(i);
-		auto& confbase = std::get<1>(i);
-		auto widthstep = std::get<2>(i);
-		auto heightstep = std::get<3>(i);
-		for (auto& rawbase : std::get<4>(i))
+		for (auto& rawbase : rawbases)
 		{
-			for (auto divpair : divs_umxx)
+			for (auto& [divname, divconf] : divs_umxx)
 			{
-				for (auto& size : sz)
+				for (auto& [width, height] : sz)
 				{
-					auto width = size.first;
-					auto height = size.second;
 					if (width % widthstep != 0 || height % heightstep != 0)
 						continue;
 
 					char comp[256], raw[256];
 
-					sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divpair.first.c_str(), width, height);
-					sprintf(raw, "%s-%s-%dx%d.avi", rawbase.c_str(), divpair.first.c_str(), width, height);
-					r.push_back(make_tuple(raw, comp, confbase | divpair.second | inter_umxx, umxx_extradata_mask));
+					sprintf(comp, "%s-%s-%dx%d.avi", compbase.c_str(), divname.c_str(), width, height);
+					sprintf(raw, "%s-%s-%dx%d.avi", rawbase.c_str(), divname.c_str(), width, height);
+					r.push_back(make_tuple(raw, comp, confbase | divconf | inter_umxx, umxx_extradata_mask));
 				}
 			}
 		}
@@ -729,39 +677,32 @@ vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> conv_encd
 {
 	vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> r;
 
-	for (auto& i : v)
+	for (auto& [srcbases, dstbases, codecfmt, confbase, widthstep, heightstep, tolerance] : v)
 	{
-		auto codecfmt = std::get<2>(i);
-		auto& confbase = std::get<3>(i);
-		auto widthstep = std::get<4>(i);
-		auto heightstep = std::get<5>(i);
-		auto tolerance = std::get<6>(i);
-		for (auto& srcbase : std::get<0>(i))
+		for (auto& srcbase : srcbases)
 		{
-			for (auto& dstbase : std::get<1>(i))
+			for (auto& dstbase : dstbases)
 			{
-				for (auto divpair : divs_ulxx)
+				for (auto& [divname, divconf] : divs_ulxx)
 				{
-					for (auto& predpair : preds_ulxx)
+					for (auto& [predname, predconf] : preds_ulxx)
 					{
-						for (auto& size : sz)
+						for (auto& [width, height] : sz)
 						{
-							auto width = size.first;
-							auto height = size.second;
 							if (width % widthstep != 0 || height % heightstep != 0)
 								continue;
 
 							char src[256], dst[256];
 
 							if (srcprop)
-								sprintf(src, "%s-%s-%s-%dx%d.avi", srcbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+								sprintf(src, "%s-%s-%s-%dx%d.avi", srcbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 							else
 								sprintf(src, "%s-%dx%d.avi", srcbase.c_str(), width, height);
 							if (dstprop)
-								sprintf(dst, "%s-%s-%s-%dx%d.avi", dstbase.c_str(), predpair.first.c_str(), divpair.first.c_str(), width, height);
+								sprintf(dst, "%s-%s-%s-%dx%d.avi", dstbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 							else
 								sprintf(dst, "%s-%dx%d.avi", dstbase.c_str(), width, height);
-							r.push_back(make_tuple(src, dst, codecfmt, confbase | divpair.second | predpair.second, tolerance));
+							r.push_back(make_tuple(src, dst, codecfmt, confbase | divconf | predconf, tolerance));
 						}
 					}
 				}
@@ -802,39 +743,32 @@ vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> conv_encd
 {
 	vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> r;
 
-	for (auto& i : v)
+	for (auto& [srcbases, dstbases, codecfmt, confbase, widthstep, heightstep, tolerance] : v)
 	{
-		auto codecfmt = std::get<2>(i);
-		auto& confbase = std::get<3>(i);
-		auto widthstep = std::get<4>(i);
-		auto heightstep = std::get<5>(i);
-		auto tolerance = std::get<6>(i);
-		for (auto& srcbase : std::get<0>(i))
+		for (auto& srcbase : srcbases)
 		{
-			for (auto& dstbase : std::get<1>(i))
+			for (auto& dstbase : dstbases)
 			{
-				for (auto divpair : divs_umxx)
+				for (auto& [divname, divconf] : divs_umxx)
 				{
-					for (auto& size : sz)
+					for (auto intra : intra_umxx)
 					{
-						for (auto intra : intra_umxx)
+						for (auto& [width, height] : sz)
 						{
-							auto width = size.first;
-							auto height = size.second;
 							if (width % widthstep != 0 || height % heightstep != 0)
 								continue;
 
 							char src[256], dst[256];
 
 							if (srcprop)
-								sprintf(src, "%s-%s-%dx%d.avi", srcbase.c_str(), divpair.first.c_str(), width, height);
+								sprintf(src, "%s-%s-%dx%d.avi", srcbase.c_str(), divname.c_str(), width, height);
 							else
 								sprintf(src, "%s-%dx%d.avi", srcbase.c_str(), width, height);
 							if (dstprop)
-								sprintf(dst, "%s-%s-%dx%d.avi", dstbase.c_str(), divpair.first.c_str(), width, height);
+								sprintf(dst, "%s-%s-%dx%d.avi", dstbase.c_str(), divname.c_str(), width, height);
 							else
 								sprintf(dst, "%s-%dx%d.avi", dstbase.c_str(), width, height);
-							r.push_back(make_tuple(src, dst, codecfmt, confbase | divpair.second | intra, tolerance));
+							r.push_back(make_tuple(src, dst, codecfmt, confbase | divconf | intra, tolerance));
 						}
 					}
 				}
