@@ -105,10 +105,11 @@ static const vector<tuple<string, int, int, vector<pair<string, unsigned int>>>>
 
 static const vector<pair<int, int>> sizes_clip000_ulxx = { { 384,256 },{ 383,256 },{ 382,256 },{ 381,256 },{ 384,255 },{ 384,254 },{ 384,253 },{ 384,512 } };
 
-static const vector<pair<string, vector<uint8_t>>> preds_ulxx = {
-	{ "left",{ 0x00, 0x01, 0x00, 0x00, } },
-	{ "gradient",{ 0x00, 0x02, 0x00, 0x00, } },
-	{ "median",{ 0x00, 0x03, 0x00, 0x00, } },
+static const vector<tuple<string, string, vector<uint8_t>>> preds_ulxx = {
+	{ "left", "left",{ 0x00, 0x01, 0x00, 0x00, } },
+	{ "gradient","gradient",{ 0x00, 0x02, 0x00, 0x00, } },
+	{ "median","median",{ 0x00, 0x03, 0x00, 0x00, } },
+	{ "fsemedian","median",{ 0x00, 0x43, 0x00, 0x00, } },
 };
 
 static const vector<pair<string, vector<uint8_t>>> divs_ulxx = {
@@ -127,7 +128,7 @@ vector<tuple<string, string, unsigned int>> conv_clip000_ulxx(const vector<tuple
 		{
 			for (auto& [divname, divconf] : divs_ulxx)
 			{
-				for (auto& [predname, predconf] : preds_ulxx)
+				for (auto& [comppredname, predname, predconf] : preds_ulxx)
 				{
 					for (auto& [width, height] : sz)
 					{
@@ -136,7 +137,7 @@ vector<tuple<string, string, unsigned int>> conv_clip000_ulxx(const vector<tuple
 
 						char comp[256], raw[256];
 
-						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), predname.c_str(), divname.c_str(), width, height);
+						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), comppredname.c_str(), divname.c_str(), width, height);
 						if (rawprop)
 							sprintf(raw, "%s-%s-%s-%dx%d.avi", rawbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 						else
@@ -421,7 +422,7 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 		{
 			for (auto& [divname, divconf] : divs_ulxx)
 			{
-				for (auto& [predname, predconf] : preds_ulxx)
+				for (auto& [comppredname, predname, predconf] : preds_ulxx)
 				{
 					for (auto& [width, height] : sz)
 					{
@@ -430,7 +431,7 @@ vector<tuple<string, string, vector<uint8_t>, vector<uint8_t>>> conv_enc_clip000
 
 						char comp[256], raw[256];
 
-						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), predname.c_str(), divname.c_str(), width, height);
+						sprintf(comp, "%s-%s-%s-%dx%d.avi", compbase.c_str(), comppredname.c_str(), divname.c_str(), width, height);
 						if (rawprop)
 							sprintf(raw, "%s-%s-%s-%dx%d.avi", rawbase.c_str(), predname.c_str(), divname.c_str(), width, height);
 						else
@@ -685,7 +686,7 @@ vector<tuple<string, string, uint32_t, vector<uint8_t>, unsigned int>> conv_encd
 			{
 				for (auto& [divname, divconf] : divs_ulxx)
 				{
-					for (auto& [predname, predconf] : preds_ulxx)
+					for (auto& [comppredname, predname, predconf] : preds_ulxx)
 					{
 						for (auto& [width, height] : sz)
 						{
