@@ -118,7 +118,8 @@ LRESULT CVCMCodec::GetInfo(ICINFO *icinfo, SIZE_T cb)
 
 LRESULT CVCMCodec::QueryConfigure(void)
 {
-	if (m_mode != ICMODE_COMPRESS)
+	// ICMODE_QUERY の場合でも設定ダイアログを出せる (Configure) & 設定ができる (SetState) べきかどうかは解釈が微妙なところではある。
+	if (m_mode != ICMODE_COMPRESS && m_mode != ICMODE_QUERY)
 		return ICERR_UNSUPPORTED;
 
 	return ICERR_OK;
@@ -126,7 +127,7 @@ LRESULT CVCMCodec::QueryConfigure(void)
 
 LRESULT CVCMCodec::Configure(HWND hwnd)
 {
-	if (m_mode != ICMODE_COMPRESS)
+	if (m_mode != ICMODE_COMPRESS && m_mode != ICMODE_QUERY)
 		return ICERR_UNSUPPORTED;
 
 	return m_pCodec->Configure(hwnd) == 0 ? ICERR_OK : ICERR_UNSUPPORTED;
@@ -150,7 +151,7 @@ LRESULT CVCMCodec::GetState(void *pState, SIZE_T cb)
 
 LRESULT CVCMCodec::SetState(const void *pState, SIZE_T cb)
 {
-	if (m_mode != ICMODE_COMPRESS)
+	if (m_mode != ICMODE_COMPRESS && m_mode != ICMODE_QUERY)
 		return ICERR_UNSUPPORTED;
 
 	return m_pCodec->SetState(pState, cb) == 0 ? cb : 0;
