@@ -31,7 +31,7 @@
 
 ## 著作権表示とライセンス
 
-Copyright &copy; 2008-2021 梅澤 威志
+Copyright &copy; 2008-2022 梅澤 威志
 
 **Ut Video Codec Suite** は [GNU 一般公衆利用許諾契約書 (GNU GPL) バージョン 2](gplv2.txt) （[日本語参考訳](gplv2.ja.utf8.txt)） またはそれ以降の下でライセンスされます。 詳細は [LICENSE](LICENSE) を参照してください。
 
