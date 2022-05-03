@@ -41,8 +41,8 @@ public:
 			{
 				DWORD err = GetLastError();
 				char* p;
-				FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&p, 0, NULL);
-				fprintf(stderr, "CKeepLibrary: LoadLibrary(%s) failed: GetLastError()=%d %s", name, GetLastError(), p);
+				FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, err, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), (LPSTR)&p, 0, NULL);
+				fprintf(stderr, "CKeepLibrary: LoadLibrary(%s) failed: GetLastError()=%u %s", name, err, p);
 				LocalFree(p);
 			}
 		}
