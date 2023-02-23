@@ -121,7 +121,12 @@ void tuned_ConvertULY4ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 			__m256i rgbtmp = _mm256_madd_epi16(xy, xy2rgb256);
 
 			auto xyuv2rgb = [rgbtmp, vu, shift](__m256i vu2rgb) -> __m256i {
-				__m256i rgb = _mm256_add_epi32(rgbtmp, _mm256_madd_epi16(vu, vu2rgb));
+				__m256i rgb =
+#if defined(__AVXVNNI__)
+					_mm256_dpwssd_avx_epi32(rgbtmp, vu, vu2rgb);
+#else
+					_mm256_add_epi32(rgbtmp, _mm256_madd_epi16(vu, vu2rgb));
+#endif
 				rgb = _mm256_srai_epi32(rgb, shift);
 				rgb = _mm256_packs_epi32(rgb, rgb);
 				rgb = _mm256_packus_epi16(rgb, rgb);
@@ -290,6 +295,17 @@ template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CBGRCo
 template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CRGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+#endif
+
+#ifdef GENERATE_AVX2_ADL
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRAColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CRGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CARGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRAColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CRGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CARGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 #endif
 
 #ifdef GENERATE_AVX512_ICL
@@ -463,7 +479,12 @@ void tuned_ConvertRGBToULY4(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 			}
 
 			auto xrgb2yuv = [rb, xg, shift](__m256i rb2yuv, __m256i xg2yuv) -> __m128i {
-				__m256i yuv = _mm256_add_epi32(_mm256_madd_epi16(rb, rb2yuv), _mm256_madd_epi16(xg, xg2yuv));
+				__m256i yuv =
+#if defined(__AVXVNNI__)
+					_mm256_dpwssd_avx_epi32(_mm256_madd_epi16(rb, rb2yuv), xg, xg2yuv);
+#else
+					_mm256_add_epi32(_mm256_madd_epi16(rb, rb2yuv), _mm256_madd_epi16(xg, xg2yuv));
+#endif
 				yuv = _mm256_srli_epi32(yuv, shift);
 				yuv = _mm256_shuffle_epi8(yuv, _mm256_set16_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 12, 8, 4, 0));
 				yuv = _mm256_permutevar8x32_epi32(yuv, _mm256_set_epi32(-1, -1, -1, -1, -1, -1, 4, 0));
@@ -608,6 +629,17 @@ template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2, CBT709Coefficient, CRGBCo
 template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2, CBT709Coefficient, CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 #endif
 
+#ifdef GENERATE_AVX2_ADL
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRAColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CRGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CARGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRAColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CRGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CARGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
+#endif
+
 #ifdef GENERATE_AVX512_ICL
 template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
 template void tuned_ConvertRGBToULY4<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRAColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbPlaneWidth);
@@ -736,7 +768,12 @@ void tuned_ConvertULY2ToRGB(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t 
 			__m256i rgbtmp = _mm256_madd_epi16(xy, xy2rgb256);
 
 			auto xyuv2rgb = [rgbtmp, vu, shift](__m256i vu2rgb) -> __m256i {
-				__m256i rgb = _mm256_add_epi32(rgbtmp, _mm256_madd_epi16(vu, vu2rgb));
+				__m256i rgb =
+#if defined(__AVXVNNI__)
+					_mm256_dpwssd_avx_epi32(rgbtmp, vu, vu2rgb);
+#else
+					_mm256_add_epi32(rgbtmp, _mm256_madd_epi16(vu, vu2rgb));
+#endif
 				rgb = _mm256_srai_epi32(rgb, shift);
 				rgb = _mm256_packs_epi32(rgb, rgb);
 				rgb = _mm256_packus_epi16(rgb, rgb);
@@ -914,6 +951,17 @@ template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CBGRCo
 template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CBGRAColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CRGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2, CBT709Coefficient, CARGBColorOrder>(uint8_t *pDstBegin, uint8_t *pDstEnd, const uint8_t *pYBegin, const uint8_t *pUBegin, const uint8_t *pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+#endif
+
+#ifdef GENERATE_AVX2_ADL
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRAColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CRGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CARGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRAColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CRGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CARGBColorOrder>(uint8_t* pDstBegin, uint8_t* pDstEnd, const uint8_t* pYBegin, const uint8_t* pUBegin, const uint8_t* pVBegin, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 #endif
 
 #ifdef GENERATE_AVX512_ICL
@@ -1096,7 +1144,12 @@ void tuned_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 				xg = _mm256_or_si256(_mm256_shuffle_epi8(m, _mm256_set16_epi8(-1, 10, -1, -1, -1, 7, -1, -1, -1, 4, -1, -1, -1, 1, -1, -1)), _mm256_set1_epi32(0x000000ff)); // 00 G3 00 ff 00 G2 00 ff 00 G1 00 ff 00 G0 00 ff
 			}
 
-			__m256i yy = _mm256_add_epi32(_mm256_madd_epi16(rb, rb2y256), _mm256_madd_epi16(xg, xg2y256));
+			__m256i yy =
+#if defined(__AVXVNNI__)
+				_mm256_dpwssd_avx_epi32(_mm256_madd_epi16(rb, rb2y256), xg, xg2y256);
+#else
+				_mm256_add_epi32(_mm256_madd_epi16(rb, rb2y256), _mm256_madd_epi16(xg, xg2y256));
+#endif
 			yy = _mm256_srli_epi32(yy, shift);
 			yy = _mm256_shuffle_epi8(yy, _mm256_set16_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 12, 8, 4, 0));
 			yy = _mm256_permutevar8x32_epi32(yy, _mm256_set_epi32(-1, -1, -1, -1, -1, -1, 4, 0));
@@ -1105,7 +1158,12 @@ void tuned_ConvertRGBToULY2(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin
 			rb = _mm256_add_epi16(rb, _mm256_srli_epi64(rb, 32));
 			xg = _mm256_add_epi16(xg, _mm256_srli_epi64(xg, 32));
 			auto xrgb2uv = [rb, xg, shift](__m256i rb2uv, __m256i xg2uv) -> uint32_t {
-				__m256i uv = _mm256_add_epi32(_mm256_madd_epi16(rb, rb2uv), _mm256_madd_epi16(xg, xg2uv));
+				__m256i uv =
+#if defined(__AVXVNNI__)
+					_mm256_dpwssd_avx_epi32(_mm256_madd_epi16(rb, rb2uv), xg, xg2uv);
+#else
+					_mm256_add_epi32(_mm256_madd_epi16(rb, rb2uv), _mm256_madd_epi16(xg, xg2uv));
+#endif
 				uv = _mm256_srli_epi32(uv, shift + 1);
 				uv = _mm256_permutevar8x32_epi32(uv, _mm256_set_epi32(-1, -1, -1, -1, 6, 4, 2, 0));
 				__m128i uv128 = _mm_shuffle_epi8(_mm256_castsi256_si128(uv), _mm_set_epi8(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 12, 8, 4, 0));
@@ -1260,6 +1318,17 @@ template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2, CBT709Coefficient, CBGRCo
 template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2, CBT709Coefficient, CBGRAColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2, CBT709Coefficient, CRGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2, CBT709Coefficient, CARGBColorOrder>(uint8_t *pYBegin, uint8_t *pUBegin, uint8_t *pVBegin, const uint8_t *pSrcBegin, const uint8_t *pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+#endif
+
+#ifdef GENERATE_AVX2_ADL
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRAColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CRGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CARGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRAColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CRGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
+template void tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CARGBColorOrder>(uint8_t* pYBegin, uint8_t* pUBegin, uint8_t* pVBegin, const uint8_t* pSrcBegin, const uint8_t* pSrcEnd, size_t cbWidth, ssize_t scbStride, size_t cbYWidth, size_t cbCWidth);
 #endif
 
 #ifdef GENERATE_AVX512_ICL

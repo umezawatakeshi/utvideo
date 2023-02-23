@@ -45,6 +45,7 @@
 #define FEATURE0_AVX512_VPOPCNTDQ       (1 << 20) /* AVX-512 VPOPCNTDQ */
 #define FEATURE0_AVX512_VBMI2           (1 << 21) /* AVX-512 VBMI2 */
 #define FEATURE0_AVX512_BITALG          (1 << 22) /* AVX-512 Bit Algorithms */
+#define FEATURE0_AVX_VNNI               (1 << 23) /* AVX VNNI */
 
 #define FEATURE1_MOVBE                  (1 <<  0)
 #define FEATURE1_POPCNT                 (1 <<  1)
@@ -324,8 +325,65 @@ const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBAVX2 = {
 	},
 };
 
-const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBAVX512ICL = {
+const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBAVX2ADL = {
 	&tfnConvertYUVRGBAVX2,
+	{ FEATURE0_AVX2 | FEATURE0_AVX_VNNI, 0 },
+	{
+		tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRColorOrder>,
+		tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRAColorOrder>,
+		tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CRGBColorOrder>,
+		tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CARGBColorOrder>,
+		tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRColorOrder>,
+		tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRAColorOrder>,
+		tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CRGBColorOrder>,
+		tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT601Coefficient, CARGBColorOrder>,
+		tuned_ConvertULY0ToRGB<CODEFEATURE_AVX1, CBT601Coefficient, CBGRColorOrder>,
+		tuned_ConvertULY0ToRGB<CODEFEATURE_AVX1, CBT601Coefficient, CBGRAColorOrder>,
+		tuned_ConvertULY0ToRGB<CODEFEATURE_AVX1, CBT601Coefficient, CRGBColorOrder>,
+		tuned_ConvertULY0ToRGB<CODEFEATURE_AVX1, CBT601Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT601Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT601Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT601Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT601Coefficient, CARGBColorOrder>,
+	},
+	{
+		tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRColorOrder>,
+		tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRAColorOrder>,
+		tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CRGBColorOrder>,
+		tuned_ConvertULY2ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY2<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CARGBColorOrder>,
+		tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRColorOrder>,
+		tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRAColorOrder>,
+		tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CRGBColorOrder>,
+		tuned_ConvertULY4ToRGB<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY4<CODEFEATURE_AVX2_ADL, CBT709Coefficient, CARGBColorOrder>,
+		tuned_ConvertULY0ToRGB<CODEFEATURE_AVX1, CBT709Coefficient, CBGRColorOrder>,
+		tuned_ConvertULY0ToRGB<CODEFEATURE_AVX1, CBT709Coefficient, CBGRAColorOrder>,
+		tuned_ConvertULY0ToRGB<CODEFEATURE_AVX1, CBT709Coefficient, CRGBColorOrder>,
+		tuned_ConvertULY0ToRGB<CODEFEATURE_AVX1, CBT709Coefficient, CARGBColorOrder>,
+		tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT709Coefficient, CBGRColorOrder>,
+		tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT709Coefficient, CBGRAColorOrder>,
+		tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT709Coefficient, CRGBColorOrder>,
+		tuned_ConvertRGBToULY0<CODEFEATURE_AVX1, CBT709Coefficient, CARGBColorOrder>,
+	},
+};
+
+const TUNEDFUNC_CONVERT_YUVRGB tfnConvertYUVRGBAVX512ICL = {
+	&tfnConvertYUVRGBAVX2ADL,
 	{ FEATURE0_AVX512F | FEATURE0_AVX512_VNNI | FEATURE0_AVX512_VBMI, 0 },
 	{
 		tuned_ConvertULY2ToRGB<CODEFEATURE_AVX512_ICL, CBT601Coefficient, CBGRColorOrder>,
@@ -820,6 +878,7 @@ public:
 		cpuid_result cpuid_0   = { 0, 0, 0, 0 };
 		cpuid_result cpuid_1   = { 0, 0, 0, 0 };
 		cpuid_result cpuid_7_0 = { 0, 0, 0, 0 };
+		cpuid_result cpuid_7_1 = { 0, 0, 0, 0 };
 		cpuid_result cpuid_ex0 = { 0, 0, 0, 0 };
 		cpuid_result cpuid_ex1 = { 0, 0, 0, 0 };
 		cpuid_result cpuid_ex2 = { 0, 0, 0, 0 };
@@ -877,6 +936,8 @@ public:
 		if (cpuid_0.eax >= 7)
 		{
 			cpuid(&cpuid_7_0, 7, 0);
+			if (cpuid_7_0.eax >= 1)
+				cpuid(&cpuid_7_1, 7, 1);
 		}
 
 
@@ -954,6 +1015,12 @@ ma_found:
 				{
 					LOGPRINTF("supports AVX1");
 					dwSupportedFeatures[0] |= FEATURE0_AVX1;
+				}
+
+				if (cpuid_7_1.eax & (1 << 4))
+				{
+					LOGPRINTF("supports AVX-VNNI");
+					dwSupportedFeatures[0] |= FEATURE0_AVX_VNNI;
 				}
 
 				if ((xgetbv_0.eax & 0xe0) == 0xe0)

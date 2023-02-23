@@ -13,3 +13,4 @@
 #define CODEFEATURE_AVX512_SKX  8 // Skylake-X:         F, CD, DQ, BW, VL
 #define CODEFEATURE_AVX512_CNL  9 // Cannon Lake: SKX + IFMA, VBMI
 #define CODEFEATURE_AVX512_ICL 10 // Ice Lake:    CNL + VNNI, VPOPCNTDQ, VBMI2, BITALG
+#define CODEFEATURE_AVX2_ADL   11 // Alder Lake:  AVX2 + AVX-VNNI
