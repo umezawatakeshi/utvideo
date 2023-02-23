@@ -52,6 +52,7 @@
 #define FEATURE1_LZCNT                  (1 <<  2)
 #define FEATURE1_BMI1                   (1 <<  3)
 #define FEATURE1_BMI2                   (1 <<  4)
+#define FEATURE1_HYBRID                 (1 << 30) /* Hybrid (e.g. Intel Hybrid Architecture) */
 
 
 #define MA_INVALID            0x00000000
@@ -861,6 +862,45 @@ const TUNEDFUNC tfnRoot = {
 
 uint32_t dwSupportedFeatures[FEATURESIZE];
 
+uint8_t u8CoreTypeMap[64];
+
+void FillCoreTypeMap()
+{
+	unsigned int nMaxProcessorNumber;
+	memset(u8CoreTypeMap, 0, sizeof(u8CoreTypeMap));
+
+#ifdef _WIN32
+	DWORD_PTR dwpProcessAffinityMask, dwpSystemAffinityMask;
+	GetProcessAffinityMask(GetCurrentProcess(), &dwpProcessAffinityMask, &dwpSystemAffinityMask);
+	DWORD_PTR dwpOriginalThreadAffinityMask;
+	dwpOriginalThreadAffinityMask = SetThreadAffinityMask(GetCurrentThread(), dwpProcessAffinityMask);
+	for (unsigned int i = 0; i < sizeof(dwpProcessAffinityMask) * 8; ++i)
+	{
+		DWORD_PTR dwpNewThreadAffinityMask = ((DWORD_PTR)1) << i;
+		if ((dwpProcessAffinityMask & dwpNewThreadAffinityMask) == 0)
+			continue;
+		SetThreadAffinityMask(GetCurrentThread(), dwpNewThreadAffinityMask);
+		cpuid_result cpuid_1a_0;
+		cpuid(&cpuid_1a_0, 0x1a, 0);
+		DWORD iProcessorNumber = GetCurrentProcessorNumber();
+		if (iProcessorNumber < sizeof(u8CoreTypeMap))
+		{
+			u8CoreTypeMap[iProcessorNumber] = cpuid_1a_0.eax >> 24;
+			nMaxProcessorNumber = iProcessorNumber + 1;
+		}
+	}
+	SetThreadAffinityMask(GetCurrentThread(), dwpOriginalThreadAffinityMask);
+#else
+#error
+#endif
+
+	char buf[sizeof(u8CoreTypeMap) * 3 + 1];
+	for (unsigned int i = 0; i < nMaxProcessorNumber; ++i)
+	{
+		sprintf(buf + i * 3, " %02X", u8CoreTypeMap[i]);
+	}
+	LOGPRINTF("hybrid core types =%s", buf);
+}
 
 class CTunedFuncInitializer
 {
@@ -1160,6 +1200,13 @@ ma_found:
 		{
 			LOGPRINTF("supports SSE2");
 			dwSupportedFeatures[0] |= FEATURE0_SSE2;
+		}
+
+		if (cpuid_7_0.edx & (1 << 15))
+		{
+			LOGPRINTF("supports Hybrid");
+			dwSupportedFeatures[1] |= FEATURE1_HYBRID;
+			FillCoreTypeMap();
 		}
 
 		ResolveTunedFunc(&tfnRoot, dwSupportedFeatures);

@@ -14,3 +14,8 @@
 #define CODEFEATURE_AVX512_CNL  9 // Cannon Lake: SKX + IFMA, VBMI
 #define CODEFEATURE_AVX512_ICL 10 // Ice Lake:    CNL + VNNI, VPOPCNTDQ, VBMI2, BITALG
 #define CODEFEATURE_AVX2_ADL   11 // Alder Lake:  AVX2 + AVX-VNNI
+
+extern uint8_t u8CoreTypeMap[64];
+
+#define CORE_TYPE_INTEL_ATOM 0x20
+#define CORE_TYPE_INTEL_CORE 0x40
