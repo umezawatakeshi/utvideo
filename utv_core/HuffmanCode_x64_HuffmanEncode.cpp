@@ -9,15 +9,21 @@
 	R"(
 	.intel_syntax noprefix
 
-.macro HUFFMAN_ENCODE symtype, symsize, ursymtype, ursymsize
+.macro HUFFMAN_ENCODE symtype, symsize, ursymtype, ursymsize, useshld
 
 	# rdi = pDstBegin
 	# rsi = pSrcBegin
 	# rax = pSrcEnd
 	# rdx = pEncodeTable
 
+.if \useshld
+.equ unroll_stride, 6
+.else
+.equ unroll_stride, 5
+.endif
+
 	mov			r8, rax
-	sub			r8, \ursymsize * 6 * 2
+	sub			r8, \ursymsize * unroll_stride * 2
 	mov			r9, rdi
 	cmp			qword ptr [rdx], 0
 	je			3f
@@ -33,16 +39,30 @@
 	mov			r12, qword ptr [rdx+r12*8 + %c[offsetof_dwtablemuxur]]
 	movzx		r13, \ursymtype ptr [rsi + \ursymsize * 3]
 	mov			r13, qword ptr [rdx+r13*8 + %c[offsetof_dwtablemuxur]]
+.if \useshld
 	movzx		r14, \ursymtype ptr [rsi + \ursymsize * 4]
 	mov			r14, qword ptr [rdx+r14*8 + %c[offsetof_dwtablemuxur]]
 	xor			r15, r15
+.else
+	xor			r14, r14
+.endif
 
 	.balign		64
 1:
+.if \useshld
 	shld		rax, r15, cl
 	movzx		r15, \ursymtype ptr [rsi + \ursymsize * 5]
 	mov			r15, qword ptr [rdx+r15*8 + %c[offsetof_dwtablemuxur]]
+.else
+	shl			rax, cl
+	neg			cl
+	shr			r14, cl
+	or			rax, r14
+	movzx		r14, \ursymtype ptr [rsi + \ursymsize * 4]
+	mov			r14, qword ptr [rdx+r14*8 + %c[offsetof_dwtablemuxur]]
+.endif
 .irp offset, 0, 1, 2, 3, 4, 5
+.if \offset < unroll_stride
 9\offset:
 .if \offset == 0
 	cmp			rsi, r8
@@ -50,34 +70,51 @@
 .endif
 
 	mov			rcx, r1\offset
-.if \offset == 5
-	add			rsi, 6 * \ursymsize
+.if \offset == unroll_stride - 1
+	add			rsi, unroll_stride * \ursymsize
 .endif
 	add			bl, cl
-.if \offset != 5
+.if \offset != unroll_stride - 1
 	jnc			2f
 .else
 	jnc			1b
 .endif
 	sub			cl, bl
+.if \useshld
 	shld		rax, r1\offset, cl
+.else
+	shl			rax, cl
+	mov			r15, r1\offset
+	neg			cl
+	shr			r15, cl
+	or			rax, r15
+.endif
+
 	mov			rcx, r1\offset
 	rol			rax, 32
 	mov			qword ptr [rdi], rax
 	add			rdi, 8
 	sub			bl, 64
-.if \offset == 5
+.if \offset == unroll_stride - 1
 	jmp			1b
 .else
 2:
+.if \useshld
 	shld		rax, r1\offset, cl
-	movzx		r1\offset, \ursymtype ptr [rsi + \ursymsize * (\offset + 6)]
+.else
+	shl			rax, cl
+	neg			cl
+	shr			r1\offset, cl
+	or			rax, r1\offset
+.endif
+	movzx		r1\offset, \ursymtype ptr [rsi + \ursymsize * (\offset + unroll_stride)]
 	mov			r1\offset, qword ptr [rdx + r1\offset * 8 + %c[offsetof_dwtablemuxur]]
+.endif
 .endif
 .endr
 
 4:
-	add			r8, \ursymsize * 6 * 2
+	add			r8, \ursymsize * unroll_stride * 2
 	xor			ecx, ecx
 1:
 	shld		rax, rcx, cl
