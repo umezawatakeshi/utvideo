@@ -2,16 +2,16 @@
 <html lang="ja">
 <!-- $Id$ -->
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=shift_jis">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" type="text/css" href="style.css">
-<title>Ut Video Codec Suite 23.1.0 readme �i���{��j</title>
+<title>Ut Video Codec Suite 23.1.0 readme （日本語）</title>
 </head>
 <body>
-<h1>Ut Video Codec Suite 23.1.0 readme �i���{��j</h1>
+<h1>Ut Video Codec Suite 23.1.0 readme （日本語）</h1>
 <hr>
-<h2 id="copyright_notice">���쌠�\��</h2>
-<h3>�p��</h3>
+<h2 id="copyright_notice">著作権表示</h2>
+<h3>英語</h3>
 <p>Ut Video Codec Suite<br>Copyright &copy; 2008-2024  UMEZAWA Takeshi</p>
 <p>This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,23 +24,23 @@ GNU General Public License for more details.</p>
 <p>You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA</p>
-<h3>���{��</h3>
-<p>Ut Video Codec Suite<br>Copyright &copy; 2008-2024  �~�V �Ўu</p>
-<p>���̃v���O�����̓t���[�\�t�g�E�F�A�ł��B
-���Ȃ��͂�����A�t���[�\�t�g�E�F�A���c�ɂ���Ĕ��s���ꂽ GNU ��ʌ��O���p�����_��
-(<a href="gplv2.ja.sjis.txt">�o�[�W����2</a>���A��]�ɂ���Ă͂���ȍ~�̃o�[�W�����̂����ǂꂩ)
-�̒�߂�����̉��ōĔЕz�܂��͉��ς��邱�Ƃ��ł��܂��B</p>
-<p>���̃v���O�����͗L�p�ł��邱�Ƃ�����ĔЕz����܂����A
-*�S���̖��ۏ�* �ł��B
-���Ɖ\���̕ۏ؂����̖ړI�ւ̓K�����́A���O�Ɏ����ꂽ���̂��܂ߑS�����݂��܂���B
-�ڂ�����GNU ��ʌ��O���p�����_�񏑂��������������B</p>
-<p>���Ȃ��͂��̃v���O�����Ƌ��ɁA
-GNU ��ʌ��O���p�����_�񏑂̕��������ꕔ�󂯎�����͂��ł��B
-�����󂯎���Ă��Ȃ���΁A�t���[�\�t�g�E�F�A���c�܂Ő������Ă�������
-(����� the Free Software Foundation, Inc.,
-59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)�B</p>
+<h3>日本語</h3>
+<p>Ut Video Codec Suite<br>Copyright &copy; 2008-2024  梅澤 威志</p>
+<p>このプログラムはフリーソフトウェアです。
+あなたはこれを、フリーソフトウェア財団によって発行された GNU 一般公衆利用許諾契約書
+(<a href="gplv2.ja.utf8.txt">バージョン2</a>か、希望によってはそれ以降のバージョンのうちどれか)
+の定める条件の下で再頒布または改変することができます。</p>
+<p>このプログラムは有用であることを願って頒布されますが、
+*全くの無保証* です。
+商業可能性の保証や特定の目的への適合性は、言外に示されたものも含め全く存在しません。
+詳しくはGNU 一般公衆利用許諾契約書をご覧ください。</p>
+<p>あなたはこのプログラムと共に、
+GNU 一般公衆利用許諾契約書の複製物を一部受け取ったはずです。
+もし受け取っていなければ、フリーソフトウェア財団まで請求してください
+(宛先は the Free Software Foundation, Inc.,
+59 Temple Place, Suite 330, Boston, MA 02111-1307 USA)。</p>
 <h3>LZ4 Library</h3>
-<p>Ut Video Codec Suite �� <a href="https://github.com/lz4/lz4">LZ4 Library</a> ���g�p���Ă��܂��B</p>
+<p>Ut Video Codec Suite は <a href="https://github.com/lz4/lz4">LZ4 Library</a> を使用しています。</p>
 <blockquote><pre>
 LZ4 Library
 Copyright (c) 2011-2016, Yann Collet
@@ -68,7 +68,7 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 </pre></blockquote>
 <h3>Zstandard Library</h3>
-<p>Ut Video Codec Suite �� <a href="https://github.com/facebook/zstd">Zstandared Library</a> �Ɋ܂܂�� FSE �������g�p���Ă��܂��B</p>
+<p>Ut Video Codec Suite は <a href="https://github.com/facebook/zstd">Zstandared Library</a> に含まれる FSE 実装を使用しています。</p>
 <blockquote><pre>
 BSD License
 
@@ -101,985 +101,985 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 </pre></blockquote>
-<h2 id="overview">�T�v</h2>
-<p>Ut Video Codec Suite �́A�����̃C���^�[�t�F�[�X���T�|�[�g���郍�X���X�f���R�[�f�b�N�ł��B�C���^�[�t�F�[�X�� VCM�ADMO ���T�|�[�g���܂��B�����ێ��`���� RGB�ARGBA�AYUV444�AYUV422�AYUV420 ���T�|�[�g���܂��B</p>
-<h2 id="environment">�����</h2>
-<h3>�T�|�[�g�� (Windows)</h3>
+<h2 id="overview">概要</h2>
+<p>Ut Video Codec Suite は、複数のインターフェースをサポートするロスレス映像コーデックです。インターフェースは VCM、DMO をサポートします。内部保持形式は RGB、RGBA、YUV444、YUV422、YUV420 をサポートします。</p>
+<h2 id="environment">動作環境</h2>
+<h3>サポート環境 (Windows)</h3>
 <dl>
-<dt>OS</dt><dd>Windows 10 (x64) �ȍ~</dd>
-<dt>CPU</dt><dd>SSE4.1 ���T�|�[�g���� CPU</dd>
+<dt>OS</dt><dd>Windows 10 (x64) 以降</dd>
+<dt>CPU</dt><dd>SSE4.1 をサポートする CPU</dd>
 </dl>
-<h3>������</h3>
+<h3>推奨環境</h3>
 <dl>
-<dt>CPU</dt><dd>��4���� Intel Core i �V���[�Y (Haswell) �ȍ~</dd>
+<dt>CPU</dt><dd>第4世代 Intel Core i シリーズ (Haswell) 以降</dd>
 </dl>
-<h2 id="installation">�C���X�g�[���Ɋւ��钍��</h2>
+<h2 id="installation">インストールに関する注意</h2>
 <h3>Windows</h3>
-<p>�o�[�W���� 10.2.0 �܂��͂���ȑO���C���X�g�[������Ă���ꍇ�A������A���C���X�g�[�����Ă��炱�̃o�[�W�������C���X�g�[�����Ă��������B</p>
-<p>VCM �R�[�f�b�N���������o�^����Ȃ��悤�ł���΁A�ŏI��i�Ƃ��ăC���X�g�[����f�B���N�g���ɓ����Ă��� utvideo.reg �����W�X�g���Ɍ������Ă��������B�Ȃ��A���̃t�@�C���� Windows �f�B���N�g���� C:\Windows �ł��邱�Ƃ����肵�Ă��܂��B</p>
-<h2 id="family">�t�@�~���[�ꗗ</h2>
-<p>Ut Video Codec Suite �ɂ͓�����������������ێ��`���̈قȂ邢�����̃R�[�f�b�N���܂܂�܂��B���̂����A���������������������̂� Ut Video Codec Suite �ł́u�t�@�~���[�v�ƌĂ�ł��܂��B</p>
-<p>�t�@�~���[�̈ꗗ�ƊT�v�͈ȉ��̂Ƃ���ł��B</p>
-<h3>UtVideo �i����j</h3>
+<p>バージョン 10.2.0 またはそれ以前がインストールされている場合、それをアンインストールしてからこのバージョンをインストールしてください。</p>
+<p>VCM コーデックが正しく登録されないようであれば、最終手段としてインストール先ディレクトリに入っている utvideo.reg をレジストリに結合してください。なお、このファイルは Windows ディレクトリが C:\Windows であることを仮定しています。</p>
+<h2 id="family">ファミリー一覧</h2>
+<p>Ut Video Codec Suite には内部処理方式や内部保持形式の異なるいくつかのコーデックが含まれます。このうち、内部処理方式が同じものを Ut Video Codec Suite では「ファミリー」と呼んでいます。</p>
+<p>ファミリーの一覧と概要は以下のとおりです。</p>
+<h3>UtVideo （無印）</h3>
 <ul>
-<li>�ŏ��̃o�[�W�������炠��t�@�~���[�ł��B</li>
-<li>�C���^�[���[�X�f���ɓK�����������s�����[�h������܂��B</li>
+<li>最初のバージョンからあるファミリーです。</li>
+<li>インターレース映像に適した処理を行うモードがあります。</li>
 </ul>
 <h3>UtVideo T2</h3>
 <ul>
-<li>����Ɣ�r���āA�����̏ꍇ�ɒሳ�k�ō����ȃt�@�~���[�ł��B</li>
-<li>�t���[���Ԉ��k���T�|�[�g���܂��B</li>
+<li>無印と比較して、多くの場合に低圧縮で高速なファミリーです。</li>
+<li>フレーム間圧縮をサポートします。</li>
 </ul>
 <h3>UtVideo Pro</h3>
 <ul>
-<li>8bit �𒴂���F�[�x���T�|�[�g����t�@�~���[�ł��B����ł� 10bit �݂̂���������Ă��܂��B</li>
-<li>�R�[�f�b�N���ł̐F��ԕϊ��͍s���܂���B</li>
+<li>8bit を超える色深度をサポートするファミリーです。現状では 10bit のみが実装されています。</li>
+<li>コーデック側での色空間変換は行いません。</li>
 </ul>
-<h2 id="fourcc">FourCC �ꗗ</h2>
+<h2 id="fourcc">FourCC 一覧</h2>
 <table>
-<tr><th rowspan="2">FourCC</th><th rowspan="2">�R�[�f�b�N��</th><th rowspan="2">�����ێ��`��</th><th colspan="2">�Ή����o�̓t�H�[�}�b�g�i�D��x���j</th></tr>
+<tr><th rowspan="2">FourCC</th><th rowspan="2">コーデック名</th><th rowspan="2">内部保持形式</th><th colspan="2">対応入出力フォーマット（優先度順）</th></tr>
 <tr><th>VCM / DMO</th></tr>
-<tr><td>ULRA</td><td>UtVideo RGBA</td><td rowspan="2">RGBA 4:4:4:4 8bit �t�������W</td><td rowspan="2"><strong>RGBA</strong></td></tr>
+<tr><td>ULRA</td><td>UtVideo RGBA</td><td rowspan="2">RGBA 4:4:4:4 8bit フルレンジ</td><td rowspan="2"><strong>RGBA</strong></td></tr>
 <tr><td>UMRA</td><td>UtVideo T2 RGBA</td></tr>
-<tr><td>ULRG</td><td>UtVideo RGB</td><td rowspan="2">RGB 4:4:4 8bit �t�������W</td><td rowspan="2"><strong>RGB24<br>RGB32</strong></td></tr>
+<tr><td>ULRG</td><td>UtVideo RGB</td><td rowspan="2">RGB 4:4:4 8bit フルレンジ</td><td rowspan="2"><strong>RGB24<br>RGB32</strong></td></tr>
 <tr><td>UMRG</td><td>UtVideo T2 RGB</td></tr>
-<tr><td>ULY4</td><td>UtVideo YUV444 BT.601</td><td rowspan="2">YCbCr (BT.601) 4:4:4 8bit ���~�e�b�h</td><td rowspan="2"><strong>YV24</strong><br>RGB24<br>RGB32</td></tr>
+<tr><td>ULY4</td><td>UtVideo YUV444 BT.601</td><td rowspan="2">YCbCr (BT.601) 4:4:4 8bit リミテッド</td><td rowspan="2"><strong>YV24</strong><br>RGB24<br>RGB32</td></tr>
 <tr><td>UMY4</td><td>UtVideo T2 YUV444 BT.601</td></tr>
-<tr><td>ULY2</td><td>UtVideo YUV422 BT.601</td><td rowspan="2">YCbCr (BT.601) 4:2:2 8bit ���~�e�b�h</td><td rowspan="2"><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td></tr>
+<tr><td>ULY2</td><td>UtVideo YUV422 BT.601</td><td rowspan="2">YCbCr (BT.601) 4:2:2 8bit リミテッド</td><td rowspan="2"><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td></tr>
 <tr><td>UMY2</td><td>UtVideo T2 YUV422 BT.601</td></tr>
-<tr><td>ULY0</td><td>UtVideo YUV420 BT.601</td><td>YCbCr (BT.601) 4:2:0 8bit ���~�e�b�h</td><td><strong>YV12<br>NV12<sup>*1</sup></strong><br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td></tr>
-<tr><td>ULH4</td><td>UtVideo YUV444 BT.709</td><td rowspan="2">YCbCr (BT.709) 4:4:4 8bit ���~�e�b�h</td><td rowspan="2"><strong>YV24</strong><br>RGB24<br>RGB32</td></tr>
+<tr><td>ULY0</td><td>UtVideo YUV420 BT.601</td><td>YCbCr (BT.601) 4:2:0 8bit リミテッド</td><td><strong>YV12<br>NV12<sup>*1</sup></strong><br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td></tr>
+<tr><td>ULH4</td><td>UtVideo YUV444 BT.709</td><td rowspan="2">YCbCr (BT.709) 4:4:4 8bit リミテッド</td><td rowspan="2"><strong>YV24</strong><br>RGB24<br>RGB32</td></tr>
 <tr><td>UMH4</td><td>UtVideo T2 YUV444 BT.709</td></tr>
-<tr><td>ULH2</td><td>UtVideo YUV422 BT.709</td><td rowspan="2">YCbCr (BT.709) 4:2:2 8bit ���~�e�b�h</td><td rowspan="2"><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td></tr>
+<tr><td>ULH2</td><td>UtVideo YUV422 BT.709</td><td rowspan="2">YCbCr (BT.709) 4:2:2 8bit リミテッド</td><td rowspan="2"><strong>HDYC</strong><br><strong>YUY2 (YUYV YUNV yuvs)</strong><br><strong>UYVY (UYNV 2vuy)</strong><br><strong>YV16</strong><br>RGB24<br>RGB32</td></tr>
 <tr><td>UMH2</td><td>UtVideo T2 YUV422 BT.709</td></tr>
-<tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit ���~�e�b�h</td><td><strong>YV12<br>NV12<sup>*1</sup></strong><br>HDYC<br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td></tr>
-<tr><td>UQRA</td><td>UtVideo Pro RGBA 10bit</td><td>RGBA 4:4:4:4 10bit �t�������W</td><td>b64a</td></tr>
-<tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit �t�������W</td><td><strong>r210</strong><br>b48r<br>b64a</td></tr>
-<tr><td>UQY2</td><td>UtVideo Pro YUV422 10bit</td><td>YCbCr 4:2:2 10bit ���~�e�b�h</td><td><strong>P210</strong><br>P216<br>YUV422P16<br><strong>v210</strong></td></tr>
-<tr><td>UQY0</td><td>UtVideo Pro YUV420 10bit</td><td>YCbCr 4:2:0 10bit ���~�e�b�h</td><td><strong>P010</strong><br>P016<br>YUV420P16</td></tr>
+<tr><td>ULH0</td><td>UtVideo YUV420 BT.709</td><td>YCbCr (BT.709) 4:2:0 8bit リミテッド</td><td><strong>YV12<br>NV12<sup>*1</sup></strong><br>HDYC<br>YUY2 (YUYV YUNV yuvs)<br>UYVY (UYNV 2vuy)<br>YV16<br>RGB24<br>RGB32</td></tr>
+<tr><td>UQRA</td><td>UtVideo Pro RGBA 10bit</td><td>RGBA 4:4:4:4 10bit フルレンジ</td><td>b64a</td></tr>
+<tr><td>UQRG</td><td>UtVideo Pro RGB 10bit</td><td>RGB 4:4:4 10bit フルレンジ</td><td><strong>r210</strong><br>b48r<br>b64a</td></tr>
+<tr><td>UQY2</td><td>UtVideo Pro YUV422 10bit</td><td>YCbCr 4:2:2 10bit リミテッド</td><td><strong>P210</strong><br>P216<br>YUV422P16<br><strong>v210</strong></td></tr>
+<tr><td>UQY0</td><td>UtVideo Pro YUV420 10bit</td><td>YCbCr 4:2:0 10bit リミテッド</td><td><strong>P010</strong><br>P016<br>YUV420P16</td></tr>
 </table>
 <ul>
-<li><strong>����</strong>�̓l�C�e�B�u�ȁi=�F��Ԃ̕ϊ����������Ȃ��j�t�H�[�}�b�g�ł��B�\�Ȍ��肱�̃t�H�[�}�b�g�œ��o�͂��邱�Ƃ���������܂��B</li>
-<li>�J�b�R���́A���̑O�ɏ����Ă�����̂� FourCC ���قȂ邾���Œ��g�������t�H�[�}�b�g�ł��B�Ⴆ�΁AYUY2 �� YUYV �� YUNV �͒��g�������t�H�[�}�b�g�ł��B</li>
-<li>*1 NV12 �͕���4�̔{���ł���K�v������܂��B</li>
+<li><strong>太字</strong>はネイティブな（=色空間の変換が発生しない）フォーマットです。可能な限りこのフォーマットで入出力することが推奨されます。</li>
+<li>カッコ内は、その前に書いてあるものと FourCC が異なるだけで中身が同じフォーマットです。例えば、YUY2 と YUYV と YUNV は中身が同じフォーマットです。</li>
+<li>*1 NV12 は幅が4の倍数である必要があります。</li>
 </ul>
-<h2 id="donations">��t�ɂ���</h2>
-<p>Ut Video Codec Suite �̓t���[�\�t�g�E�F�A�ł��B�J�����x�����邽�߂̊�t�͏�Ɋ��}���Ă���܂��B�ڍׂ͍�҂�blog��<a href="http://umezawa.dyndns.info/wordpress/?page_id=1565">�u��t�ɂ��āv�y�[�W</a>���������������B</p>
-<h2 id="nicovideo">�j�R�j�R����̃R���e���c�c���[�ɂ���</h2>
-<p>�j�R�j�R����ɂ����āA�R���e���c�c���[�̐e��i�Ƃ��Ďw�肷�邽�߂ɁA<a href="http://seiga.nicovideo.jp/seiga/im1922939">�É�</a>�𓊍e���Ă���܂��i2012�N4��2���ɍē��e���܂����j�BUt Video Codec Suite ���g�p���č쐬���ꂽ����𓊍e�̍ۂ́A�e��i�Ƃ��Ďw�肵�Ă���������Ɨ�݂ɂȂ�܂��B</p>
-<h2 id="history">���ŗ���</h2>
-<h3>�o�[�W���� 23.1.0</h3>
+<h2 id="donations">寄付について</h2>
+<p>Ut Video Codec Suite はフリーソフトウェアです。開発を支援するための寄付は常に歓迎しております。詳細は作者のblogの<a href="http://umezawa.dyndns.info/wordpress/?page_id=1565">「寄付について」ページ</a>をご覧ください。</p>
+<h2 id="nicovideo">ニコニコ動画のコンテンツツリーについて</h2>
+<p>ニコニコ動画において、コンテンツツリーの親作品として指定するために、<a href="http://seiga.nicovideo.jp/seiga/im1922939">静画</a>を投稿してあります（2012年4月2日に再投稿しました）。Ut Video Codec Suite を使用して作成された動画を投稿の際は、親作品として指定していただけると励みになります。</p>
+<h2 id="history">改版履歴</h2>
+<h3>バージョン 23.1.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>all: AVX-VNNI ���g������ł́A���� YUV444/YUV422 �̃o���A���g�� RGB24/32 �ł̓��o�͂������������B</li>
-<li>ULxx, UQxx: Hybrid ���ł� E �R�A�ł̃G���R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>all: AVX-VNNI が使える環境での、内部 YUV444/YUV422 のバリアントの RGB24/32 での入出力を高速化した。</li>
+<li>ULxx, UQxx: Hybrid 環境での E コアでのエンコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 23.0.1</h3>
+<h3>バージョン 23.0.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>VCM �C���^�[�t�F�[�X�ɂ����āAICMODE_QUERY �ŊJ�����ꍇ�ł� Configure �� SetState ���Ăׂ�悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>VCM インターフェースにおいて、ICMODE_QUERY で開いた場合でも Configure と SetState を呼べるようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 23.0.0</h3>
+<h3>バージョン 23.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULxx: ��荂�����k�䂪���҂���郂�[�h��ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULxx: より高い圧縮比が期待されるモードを追加した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 22.6.0</h3>
+<h3>バージョン 22.6.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULxx, UQxx: predict gradient ����� predict left �̃}���`�X���b�h���̃f�R�[�h�������������B</li>
-<li>UMxx: �}���`�X���b�h���̃f�R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULxx, UQxx: predict gradient および predict left のマルチスレッド時のデコードを高速化した。</li>
+<li>UMxx: マルチスレッド時のデコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 22.5.0</h3>
+<h3>バージョン 22.5.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>all: AVX512-VBMI2 ���g������ł́A���� YUV444/YUV422 �̃o���A���g�� RGB24/32 �ł̓��o�͂������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>all: AVX512-VBMI2 が使える環境での、内部 YUV444/YUV422 のバリアントの RGB24/32 での入出力を高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 22.4.0</h3>
+<h3>バージョン 22.4.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>UMxx: AVX512-VBMI2 ���g������ł̃G���R�[�h�������������B</li>
-<li>UMxx: �t���[���Ԉ��k�̃f�R�[�h�������������B</li>
-<li>all: AVX512-VBMI2 ���g������ł� RGB32/RGBA/YUY2/UYVY �ւ̃f�R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UMxx: AVX512-VBMI2 が使える環境でのエンコードを高速化した。</li>
+<li>UMxx: フレーム間圧縮のデコードを高速化した。</li>
+<li>all: AVX512-VBMI2 が使える環境での RGB32/RGBA/YUY2/UYVY へのデコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 22.3.0</h3>
+<h3>バージョン 22.3.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>UMxx: AVX512-VBMI2 ���g������ł̓��o�͂������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UMxx: AVX512-VBMI2 が使える環境での入出力を高速化した。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>�T�|�[�g������ѐ��������X�V�����B</li>
+<dt>その他</dt><dd><ul>
+<li>サポート環境および推奨環境を更新した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 22.2.0</h3>
+<h3>バージョン 22.2.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>UQxx: Predict gradient �ł̓��o�͂������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UQxx: Predict gradient での入出力を高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 22.1.0</h3>
+<h3>バージョン 22.1.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULY0, ULH0: NV12 �ł̓��o�͂�ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULY0, ULH0: NV12 での入出力を追加した。</li>
 </ul></dd>
-<dt>���\����</dt><dd><ul>
-<li>RGB32/RGBA, YUY2/UYVY �ւ̃l�C�e�B�u�ȓ����ێ��`������̃f�R�[�h���኱�����������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>RGB32/RGBA, YUY2/UYVY へのネイティブな内部保持形式からのデコードを若干高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 22.0.0</h3>
+<h3>バージョン 22.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>UQxx: Predict gradient �t���[�����\��������ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>UQxx: Predict gradient フレーム内予測方式を追加した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 21.3.1</h3>
+<h3>バージョン 21.3.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>�_�C�A���O�Ƀc�[���`�b�v��ǉ������B</li>
+<dt>その他</dt><dd><ul>
+<li>ダイアログにツールチップを追加した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 21.3.0</h3>
+<h3>バージョン 21.3.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULxx, UQxx: �G���R�[�h���኱�����������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULxx, UQxx: エンコードを若干高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 21.2.1</h3>
+<h3>バージョン 21.2.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>�C���X�g�[���[�� utv_logc.exe ���܂߂Ȃ��悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>インストーラーに utv_logc.exe を含めないようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 21.2.0</h3>
+<h3>バージョン 21.2.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULxx, UQxx: ���k�䂪�����f���̃G���R�[�h�ƃf�R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULxx, UQxx: 圧縮比が高い映像のエンコードとデコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 21.1.0</h3>
+<h3>バージョン 21.1.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>UQY2: P210, P216 �ł̓��o�͂ɑΉ������B</li>
-<li>UQY0: P010, P016 �ł̓��o�͂ɑΉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>UQY2: P210, P216 での入出力に対応した。</li>
+<li>UQY0: P010, P016 での入出力に対応した。</li>
 </ul></dd>
-<dt>���\����</dt><dd><ul>
-<li>UQY2: YUV422P16 �ł̓��o�͂������������B</li>
-<li>UQY0: YUV420P16 �ł̓��o�͂������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UQY2: YUV422P16 での入出力を高速化した。</li>
+<li>UQY0: YUV420P16 での入出力を高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 21.0.0</h3>
+<h3>バージョン 21.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>�����ێ��`���� YUV420 10bit �̃R�[�f�b�N (FourCC: UQY0) ��ǉ������B</li>
-<li>UQY2: YUV422P16 �ł̓��o�͂ɑΉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>内部保持形式が YUV420 10bit のコーデック (FourCC: UQY0) を追加した。</li>
+<li>UQY2: YUV422P16 での入出力に対応した。</li>
 </ul></dd>
-<dt>���\����</dt><dd><ul>
-<li>UQY2: v210 �ւ̃f�R�[�h���኱�����������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UQY2: v210 へのデコードを若干高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 20.6.1</h3>
+<h3>バージョン 20.6.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>�t���[���������� 64 ���傫���ݒ肷��Ɛ��������삵�Ă��Ȃ������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>フレーム分割数を 64 より大きく設定すると正しく動作していなかった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 20.6.0</h3>
+<h3>バージョン 20.6.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>UQRG, UQRA: ���o�͂������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UQRG, UQRA: 入出力を高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 20.5.1</h3>
+<h3>バージョン 20.5.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>UMRG, UMRA: SSE4.1 ���g���� AVX2 ���g���Ȃ����ɂ����āA���� 64 �Ŋ����� 32 �]�鐔�̏ꍇ�̃t���[�������k�̃G���R�[�h���ʂ�����Ă����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>UMRG, UMRA: SSE4.1 が使えて AVX2 が使えない環境において、幅が 64 で割って 32 余る数の場合のフレーム内圧縮のエンコード結果が誤っていた。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 20.5.0</h3>
+<h3>バージョン 20.5.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>UMxx: �t���[�������k�ł̃l�C�e�B�u�� packed �t�H�[�}�b�g�ł̓��o�͂������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UMxx: フレーム内圧縮でのネイティブな packed フォーマットでの入出力を高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 20.4.0</h3>
+<h3>バージョン 20.4.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>�v���Z�X���Ɋ�Â��āA���邢�͊��S�ɓ���̃R�[�f�b�N�C���^�[�t�F�[�X�𖳌�������@�\��ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>プロセス名に基づいて、あるいは完全に特定のコーデックインターフェースを無効化する機能を追加した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 20.3.0</h3>
+<h3>バージョン 20.3.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULxx: �l�C�e�B�u�� packed �t�H�[�}�b�g�ł̓��o�͂������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULxx: ネイティブな packed フォーマットでの入出力を高速化した。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>ULxx: �u�C���^�[���[�X�f���Ƃ��ăG���R�[�h�v��񐄏��@�\�Ƃ����B</li>
-<li>QuickTime �R���|�[�l���g�̎�����̔p�~�ɂƂ��Ȃ��Areadme ��������폜�����B</li>
+<dt>その他</dt><dd><ul>
+<li>ULxx: 「インターレース映像としてエンコード」を非推奨機能とした。</li>
+<li>QuickTime コンポーネントの事実上の廃止にともない、readme から情報を削除した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 20.2.0</h3>
+<h3>バージョン 20.2.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULxx: x64 �ł̃G���R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULxx: x64 でのエンコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 20.1.0</h3>
+<h3>バージョン 20.1.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>UQRG: r210 �ł̓��o�͂�ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>UQRG: r210 での入出力を追加した。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>all: �ݒ�����Z�b�g���鏈���Ɍ�肪�������B</li>
-<li>UQxx: ���� 8 �̔{���łȂ��ꍇ�ɃN���b�V�����邱�Ƃ��������B</li>
-<li>UQRG: b64a �ŏo�͂����ꍇ�ɃA���t�@���������Ȃ������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>all: 設定をリセットする処理に誤りがあった。</li>
+<li>UQxx: 幅が 8 の倍数でない場合にクラッシュすることがあった。</li>
+<li>UQRG: b64a で出力した場合にアルファが正しくなかった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 20.0.0</h3>
+<h3>バージョン 20.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>UMxx: �t���[���Ԉ��k�����������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>UMxx: フレーム間圧縮を実装した。</li>
 </ul></dd>
-<dt>���\����</dt><dd><ul>
-<li>UMxx: �S�̓I�ɍ����������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UMxx: 全体的に高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 19.1.0</h3>
+<h3>バージョン 19.1.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>UMxx: QuickTime �ł̃G���R�[�_��ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>UMxx: QuickTime 版のエンコーダを追加した。</li>
 </ul></dd>
-<dt>���\����</dt><dd><ul>
-<li>UMxx: �S�̓I�ɍ����������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UMxx: 全体的に高速化した。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULxx: �G���R�[�_�Ɍ�����ݒ�����Ă��G���[��Ԃ��Ȃ������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULxx: エンコーダに誤った設定をしてもエラーを返さなかった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 19.0.1</h3>
+<h3>バージョン 19.0.1</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>���x���d�������V�����R�[�f�b�N (FourCC: UMRA, UMRG, UMY4, UMY2, UMH4, UMH2) ��ǉ������BQuickTime �R���|�[�l���g�ł̓f�R�[�h�̂݁B</li>
+<dt>機能追加</dt><dd><ul>
+<li>速度を重視した新しいコーデック (FourCC: UMRA, UMRG, UMY4, UMY2, UMH4, UMH2) を追加した。QuickTime コンポーネントではデコードのみ。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 18.2.1</h3>
+<h3>バージョン 18.2.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>UQxx: �t���[���������̃f�t�H���g���_���v���Z�b�T���Ɠ����ɂȂ�悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>UQxx: フレーム分割数のデフォルトが論理プロセッサ数と同じになるようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 18.2.0</h3>
+<h3>バージョン 18.2.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>UQxx: �S�̓I�ɍ����������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UQxx: 全体的に高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 18.1.0</h3>
+<h3>バージョン 18.1.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULY0, ULH0: RGB �n�t�H�[�}�b�g����� YV16 �ł̓��o�͂������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULY0, ULH0: RGB 系フォーマットおよび YV16 での入出力を高速化した。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULY4, ULH4, ULY2, ULH2: QuickTime �� ARGB �Ƀf�R�[�h����ۂɌ�����A���t�@�l��ݒ肵�Ă����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY4, ULH4, ULY2, ULH2: QuickTime で ARGB にデコードする際に誤ったアルファ値を設定していた。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 18.0.0</h3>
+<h3>バージョン 18.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULxx: Predict Gradient �t���[�����\��������ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULxx: Predict Gradient フレーム内予測方式を追加した。</li>
 </ul></dd>
-<dt>���\����</dt><dd><ul>
-<li>ULxx: �G���R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULxx: エンコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 17.4.1</h3>
-<p>���[�U�[�Ɍ�����ύX�_�Ȃ�</p>
-<h3>�o�[�W���� 17.4.0</h3>
+<h3>バージョン 17.4.1</h3>
+<p>ユーザーに見える変更点なし</p>
+<h3>バージョン 17.4.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>UQY2, UQRG, UQRA: �G���R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UQY2, UQRG, UQRA: エンコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 17.3.0</h3>
+<h3>バージョン 17.3.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULY2, ULH2, ULY0, ULH0: YV16 �ł̓��o�͂ɑΉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULY2, ULH2, ULY0, ULH0: YV16 での入出力に対応した。</li>
 </ul></dd>
-<dt>���\����</dt><dd><ul>
-<li>ULY4, ULH4, ULY2, ULH2, ULY0, ULH0: �l�C�e�B�u�� planar �t�H�[�}�b�g�ł̓��o�͂������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULY4, ULH4, ULY2, ULH2, ULY0, ULH0: ネイティブな planar フォーマットでの入出力を高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 17.2.0</h3>
+<h3>バージョン 17.2.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>�f�R�[�h�����I�ɍ����������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>デコードを劇的に高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 17.1.0</h3>
+<h3>バージョン 17.1.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULY4,ULH4: RGB �n�t�H�[�}�b�g����̃G���R�[�h�������������B</li>
-<li>ULY4,ULH4: RGB �n�t�H�[�}�b�g�ւ̃f�R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULY4,ULH4: RGB 系フォーマットからのエンコードを高速化した。</li>
+<li>ULY4,ULH4: RGB 系フォーマットへのデコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 17.0.0</h3>
+<h3>バージョン 17.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>�����ێ��`���� YUV444 8bit �̃R�[�f�b�N (FourCC: ULY4, ULH4) ��ǉ������BRGB ���o�͂̏ꍇ�͂��܂葬���Ȃ��B</li>
+<dt>機能追加</dt><dd><ul>
+<li>内部保持形式が YUV444 8bit のコーデック (FourCC: ULY4, ULH4) を追加した。RGB 入出力の場合はあまり速くない。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 16.1.1</h3>
+<h3>バージョン 16.1.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>�u�C���^�[���[�X�f���Ƃ��ăG���R�[�h�v�I�v�V������L���ɂ���ƃG���R�[�_���N���b�V�����Ă����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>「インターレース映像としてエンコード」オプションを有効にするとエンコーダがクラッシュしていた。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>Windows �� QuickTime �ł̃R�[�f�b�N���폜�����B</li>
+<dt>その他</dt><dd><ul>
+<li>Windows の QuickTime 版のコーデックを削除した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 16.1.0</h3>
+<h3>バージョン 16.1.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>QuickTime �ł� Adobe �\�t�g�E�F�A�œK�؂ɗ��p�ł���悤�ɂȂ����B</li>
+<dt>機能追加</dt><dd><ul>
+<li>QuickTime 版を Adobe ソフトウェアで適切に利用できるようになった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 16.0.0</h3>
+<h3>バージョン 16.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>�����ێ��`���� RGB 10bit ����� RGBA 10bit �̃R�[�f�b�N (FourCC: UQRG, UQRA) ��ǉ������B�ƂĂ��x���B</li>
+<dt>機能追加</dt><dd><ul>
+<li>内部保持形式が RGB 10bit および RGBA 10bit のコーデック (FourCC: UQRG, UQRA) を追加した。とても遅い。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>DMO �R�[�f�b�N�ŁA�ꕔ�̑Ή����Ȃ����̓t�H�[�}�b�g�ɑ΂��āA�o�̓t�H�[�}�b�g��񎦂��Ă����B</li>
-<li>VCM ����� DMO �R�[�f�b�N�ŁA�ꕔ�̑Ή����Ă���ׂ����̓t�H�[�}�b�g�ɑ΂��āA�Ή����Ă��Ȃ��ƕԂ��Ă����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>DMO コーデックで、一部の対応しない入力フォーマットに対して、出力フォーマットを提示していた。</li>
+<li>VCM および DMO コーデックで、一部の対応しているべき入力フォーマットに対して、対応していないと返していた。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 15.5.0</h3>
+<h3>バージョン 15.5.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>Windows: ���[�J�[�X���b�h�̗D��x��ݒ肷��@�\��ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>Windows: ワーカースレッドの優先度を設定する機能を追加した。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>VCM �R�[�f�b�N�ŁA�ꕔ�̑Ή����Ȃ����̓t�H�[�}�b�g�ɑ΂��āA�o�̓t�H�[�}�b�g��񎦂��Ă����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>VCM コーデックで、一部の対応しない入力フォーマットに対して、出力フォーマットを提示していた。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 15.4.0</h3>
+<h3>バージョン 15.4.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>QuickTime �R���|�[�l���g�̏����������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>QuickTime コンポーネントの処理を効率化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 15.3.0</h3>
+<h3>バージョン 15.3.0</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>MFT �ł̃R�[�f�b�N���폜�����B</li>
+<dt>その他</dt><dd><ul>
+<li>MFT 版のコーデックを削除した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 15.2.0</h3>
+<h3>バージョン 15.2.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>�f�f�p���O���o�͂���@�\��ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>診断用ログを出力する機能を追加した。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULRA, ULRG: �u���k���D��v���C���^�[���[�X�ŃG���R�[�h�����f���� RGBA/RGB32 �ŏo�͂���Ɖ��Ă����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULRA, ULRG: 「圧縮率優先」かつインターレースでエンコードした映像を RGBA/RGB32 で出力すると壊れていた。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 15.1.0</h3>
+<h3>バージョン 15.1.0</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>Mac �łŁA�A�Z���u�����[�`�����g�p�����悤�ɍ\������Ă��Ȃ������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>Mac 版で、アセンブラルーチンが使用されるように構成されていなかった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 15.0.2</h3>
+<h3>バージョン 15.0.2</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>�E�C���X�΍�\�t�g�̌댟�m�ւ̑΍�̂��߁A�����\����ς����B</li>
+<dt>その他</dt><dd><ul>
+<li>ウイルス対策ソフトの誤検知への対策のため、多少構成を変えた。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 15.0.1</h3>
+<h3>バージョン 15.0.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>�E�C���X�΍�\�t�g�̌댟�m�ւ̑΍�̂��߁A���r���h���čăp�b�P�[�W�����B</li>
+<dt>その他</dt><dd><ul>
+<li>ウイルス対策ソフトの誤検知への対策のため、リビルドして再パッケージした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 15.0.0</h3>
+<h3>バージョン 15.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>QuickTime for Windows �p�R���|�[�l���g��ǉ������B</li>
-<li>ULY2, ULH2, ULY0, ULH0: QuickTime �R���|�[�l���g�ŁAYUV422 �œ��o�͂ł���悤�ɂ����B</li>
-<li>UQY2: QuickTime �R���|�[�l���g��ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>QuickTime for Windows 用コンポーネントを追加した。</li>
+<li>ULY2, ULH2, ULY0, ULH0: QuickTime コンポーネントで、YUV422 で入出力できるようにした。</li>
+<li>UQY2: QuickTime コンポーネントを追加した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 14.2.1</h3>
+<h3>バージョン 14.2.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>�O���[�o���ݒ�Łu�R�[�f�b�N���Őݒ���O���[�o���ɕێ�����v���`�F�b�N���Ă��Ă��A�R�[�f�b�N�̐ݒ肪�������ۑ�����Ă��Ȃ������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>グローバル設定で「コーデック側で設定をグローバルに保持する」をチェックしていても、コーデックの設定が正しく保存されていなかった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 14.2.0</h3>
+<h3>バージョン 14.2.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>UQY2: �t���[�����������w��ł���悤�ɂ��A�}���`�X���b�h����ł���悤�ɂ����B</li>
+<dt>性能向上</dt><dd><ul>
+<li>UQY2: フレーム分割数を指定できるようにし、マルチスレッド動作できるようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 14.1.1</h3>
+<h3>バージョン 14.1.1</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>UQY2: �f���̕��̐������u2�̔{���ł���v�Ɋɘa�����B</li>
+<dt>機能追加</dt><dd><ul>
+<li>UQY2: 映像の幅の制限を「2の倍数である」に緩和した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 14.0.0</h3>
+<h3>バージョン 14.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>�����ێ��`���� YUV422 10bit �̃R�[�f�b�N (FourCC: UQY2) ��ǉ������B�ƂĂ��x���B</li>
+<dt>機能追加</dt><dd><ul>
+<li>内部保持形式が YUV422 10bit のコーデック (FourCC: UQY2) を追加した。とても遅い。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>�R�[�f�b�N�̖��O��ύX�����B</li>
-<li>�K�{ OS (Windows) �� Vista �ȍ~�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>コーデックの名前を変更した。</li>
+<li>必須 OS (Windows) を Vista 以降にした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 13.3.1</h3>
+<h3>バージョン 13.3.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>AVX ���T�|�[�g���Ȃ��v���Z�b�T�ŃN���b�V�����邱�Ƃ��������B</li>
-<li>32�𒴂���_���v���Z�b�T�����V�X�e���ŃN���b�V�����邱�Ƃ��������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>AVX をサポートしないプロセッサでクラッシュすることがあった。</li>
+<li>32個を超える論理プロセッサを持つシステムでクラッシュすることがあった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 13.3.0</h3>
+<h3>バージョン 13.3.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULRG,ULRA: �u���k���D��v�ŃG���R�[�h���ꂽ�f���� RGB32/ARGB �ւ̃f�R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULRG,ULRA: 「圧縮率優先」でエンコードされた映像の RGB32/ARGB へのデコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 13.2.1</h3>
+<h3>バージョン 13.2.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>SSSE3 ���T�|�[�g���Ȃ��v���Z�b�T�ŃN���b�V�����邱�Ƃ��������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>SSSE3 をサポートしないプロセッサでクラッシュすることがあった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 13.2.0</h3>
+<h3>バージョン 13.2.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>����: x64 �o�[�W�����ŁA�f�R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>共通: x64 バージョンで、デコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 13.1.0</h3>
+<h3>バージョン 13.1.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULRG,ULRA,ULY2,ULH2: SSSE3 ���߂��g�p�\�Ȋ��ŁA�l�C�e�B�u�ȐF��Ԃ���̃G���R�[�h�������������B</li>
-<li>ULRG,ULRA,ULY2,ULH2: SSSE3 ���߂��g�p�\�Ȋ��ŁA�u���k���D��v�ŃG���R�[�h���ꂽ�f���̃l�C�e�B�u�ȐF��Ԃւ̃f�R�[�h�������������B</li>
-<li>ULY2,ULH2: SSSE3 ���߂��g�p�\�Ȋ��ŁARGB ����̃G���R�[�h�������������B</li>
-<li>ULY2,ULH2: SSE4.1 ���߂��g�p�\�Ȋ��ŁARGB �ւ̃f�R�[�h�������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULRG,ULRA,ULY2,ULH2: SSSE3 命令が使用可能な環境で、ネイティブな色空間からのエンコードを高速化した。</li>
+<li>ULRG,ULRA,ULY2,ULH2: SSSE3 命令が使用可能な環境で、「圧縮率優先」でエンコードされた映像のネイティブな色空間へのデコードを高速化した。</li>
+<li>ULY2,ULH2: SSSE3 命令が使用可能な環境で、RGB からのエンコードを高速化した。</li>
+<li>ULY2,ULH2: SSE4.1 命令が使用可能な環境で、RGB へのデコードを高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 13.0.1</h3>
+<h3>バージョン 13.0.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>13.0.0 �Ńp�b�P�[�W���O�Ƀ~�X�𔭌������̂ł��Ȃ������B</li>
+<dt>その他</dt><dd><ul>
+<li>13.0.0 でパッケージングにミスを発見したのでやりなおした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 13.0.0</h3>
+<h3>バージョン 13.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>�F��ԕϊ��W���� BT.709 �̂��̂��g���R�[�f�b�N (FourCC: ULH2, ULH0) ��ǉ������BULY2, ULY0 �Ɠ����x�ɃA�Z���u��������Ă���B</li>
+<dt>機能追加</dt><dd><ul>
+<li>色空間変換係数に BT.709 のものを使うコーデック (FourCC: ULH2, ULH0) を追加した。ULY2, ULY0 と同程度にアセンブラ化されている。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>�R�[�f�b�N�̖��O��ύX�����B</li>
-<li>���� CPU �� Nehalem �ȍ~�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>コーデックの名前を変更した。</li>
+<li>推奨 CPU を Nehalem 以降にした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 12.2.1</h3>
+<h3>バージョン 12.2.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULY0: �C���^�[���[�X�� YUV422 �œ��o�͂���Ƃ��̐F��ԕϊ��������Ԉ���Ă����Ǝv����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY0: インターレースで YUV422 で入出力するときの色空間変換処理が間違っていたと思われる。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 12.2.0</h3>
+<h3>バージョン 12.2.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>�u�f�R�[�h���x�D��v�ŃG���R�[�h���ꂽ�f���̃f�R�[�h�������������B5% ���� 10% ���x�B</li>
-<li>x64 �o�[�W�����ŁA�u���k���D��v�ŃG���R�[�h���ꂽ�f���̃f�R�[�h�������������B1% ���x�B</li>
-<li>ULY2: x64 �o�[�W�����ŁARGB ����̃G���R�[�h�������������B2% ���x�B</li>
+<dt>性能向上</dt><dd><ul>
+<li>「デコード速度優先」でエンコードされた映像のデコードを高速化した。5% から 10% 程度。</li>
+<li>x64 バージョンで、「圧縮率優先」でエンコードされた映像のデコードを高速化した。1% 程度。</li>
+<li>ULY2: x64 バージョンで、RGB からのエンコードを高速化した。2% 程度。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 12.1.0</h3>
+<h3>バージョン 12.1.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULRG,ULRA,ULY2: AVX ���߂��g�p�\�Ȋ��ŁA�l�C�e�B�u�ȐF��Ԃ���̃G���R�[�h�������������Bx86 �̏ꍇ�� 10% ���x�Ax64 �̏ꍇ�� 12% ���x�B</li>
-<li>ULRG,ULRA,ULY2: AVX ���߂��g�p�\�Ȋ��ŁA�u���k���D��v�ŃG���R�[�h���ꂽ�f���̃l�C�e�B�u�ȐF��Ԃւ̃f�R�[�h�������������Bx86 �� x64 �Ƃ��� 5% ���x�B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULRG,ULRA,ULY2: AVX 命令が使用可能な環境で、ネイティブな色空間からのエンコードを高速化した。x86 の場合は 10% 程度、x64 の場合は 12% 程度。</li>
+<li>ULRG,ULRA,ULY2: AVX 命令が使用可能な環境で、「圧縮率優先」でエンコードされた映像のネイティブな色空間へのデコードを高速化した。x86 と x64 ともに 5% 程度。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 12.0.1</h3>
+<h3>バージョン 12.0.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>Windows Vista �ȍ~�ŁA�A���C���X�g�[�������s����B</li>
-<li>x64 �o�[�W�����ŁA�f�R�[�h���ɃN���b�V�����邱�Ƃ�����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>Windows Vista 以降で、アンインストールが失敗する。</li>
+<li>x64 バージョンで、デコード時にクラッシュすることがある。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 12.0.0</h3>
+<h3>バージョン 12.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>Media Foundation �p�G���R�[�_����уf�R�[�_��ǉ������B�G���R�[�h�ݒ�_�C�A���O�͂܂����݂��Ȃ��B</li>
+<dt>機能追加</dt><dd><ul>
+<li>Media Foundation 用エンコーダおよびデコーダを追加した。エンコード設定ダイアログはまだ存在しない。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 11.1.1</h3>
+<h3>バージョン 11.1.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>Windows �ŁA�G���R�[�h������уf�R�[�h���ɁA�o�̓C���[�W�̃T�C�Y�i�o�C�g���j���������ݒ肳��Ȃ����Ƃ�����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>Windows で、エンコード時およびデコード時に、出力イメージのサイズ（バイト数）が正しく設定されないことがある。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 11.1.0</h3>
+<h3>バージョン 11.1.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>Mac �ŁARGB ���� ULY2 �ւ̃G���R�[�h���A�Z���u�������č����������B</li>
-<li>����: �f�R�[�h���������������������B</li>
-<li>����: x64 �ŁA�G���R�[�h�� 10% ���x�����������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>Mac で、RGB から ULY2 へのエンコードをアセンブラ化して高速化した。</li>
+<li>共通: デコードを少しだけ高速化した。</li>
+<li>共通: x64 で、エンコードを 10% 程度高速化した。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>Mac �ŁA���Ԉ��k�p�R�[�f�b�N�Ƃ��Ă͕s�v�ȃt���O���o�͂��Ȃ����Ƃɂ���āA�G���R�[�h��̃T�C�Y��������Ƃ��������������B</li>
+<dt>その他</dt><dd><ul>
+<li>Mac で、中間圧縮用コーデックとしては不要なフラグを出力しないことによって、エンコード後のサイズをちょっとだけ小さくした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 11.0.0</h3>
+<h3>バージョン 11.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>QuickTime for Mac �p�G���R�[�_�R���|�[�l���g��ǉ������BRGB24/ARGB32 ����̃G���R�[�h�̂݁B���܂葬���Ȃ��B�G���R�[�h�ݒ�_�C�A���O�͂܂����݂��Ȃ��B</li>
+<dt>機能追加</dt><dd><ul>
+<li>QuickTime for Mac 用エンコーダコンポーネントを追加した。RGB24/ARGB32 からのエンコードのみ。あまり速くない。エンコード設定ダイアログはまだ存在しない。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULY2: QuickTime �f�R�[�_�ŁA�f���̕���o�̓o�b�t�@�̐��@�ɂ���ẮA�f��������ăf�R�[�h�����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY2: QuickTime デコーダで、映像の幅や出力バッファの寸法によっては、映像が乱れてデコードされる。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 10.2.4</h3>
+<h3>バージョン 10.2.4</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>Windows �̃C���X�g�[���ŁA�C���X�g�[���O�̒��ӂ�\������悤�ɂ����B</li>
-<li>Mac �ŁA�R�[�f�b�N�������K�؂ɕ񍐂���悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>Windows のインストーラで、インストール前の注意を表示するようにした。</li>
+<li>Mac で、コーデック名をより適切に報告するようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 10.2.3</h3>
+<h3>バージョン 10.2.3</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>Windows �ŁAVCM �R�[�f�b�N�I�u�W�F�N�g�ɃR�[�f�b�N�ݒ��ݒ肵�����A���ۂɂ͐������Ă���ɂ�������炸���s���Ă���ƕԂ��Ă����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>Windows で、VCM コーデックオブジェクトにコーデック設定を設定した時、実際には成功しているにもかかわらず失敗していると返していた。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>Windows �ŁA�ǂ����Ă����܂��C���X�g�[���ł��Ȃ��Ƃ��̂��߂̋~�ϗp .reg �t�@�C�����Ēǉ������B</li>
+<dt>その他</dt><dd><ul>
+<li>Windows で、どうしてもうまくインストールできないときのための救済用 .reg ファイルを再追加した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 10.2.2</h3>
+<h3>バージョン 10.2.2</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>Windows Vista x64 �� Windows XP x64 �ŁAx86 VCM �R�[�f�b�N�̓o�^�Ɏ��s���Ă����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>Windows Vista x64 と Windows XP x64 で、x86 VCM コーデックの登録に失敗していた。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 10.2.1</h3>
+<h3>バージョン 10.2.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>Windows �ŁA�C���X�g�[���� Inno Setup �x�[�X�ɂ��Ax86 �� x64 �ŒP��̃C���X�g�[���ɂȂ�悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>Windows で、インストーラを Inno Setup ベースにし、x86 と x64 で単一のインストーラになるようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 10.2.0</h3>
+<h3>バージョン 10.2.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>Mac �ŁAWindows �łƓ����x�ɃA�Z���u���������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>Mac で、Windows 版と同程度にアセンブラ化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 10.1.0</h3>
+<h3>バージョン 10.1.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>Mac �ŁA�}���`�X���b�h�������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>Mac で、マルチスレッド化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 10.0.3</h3>
+<h3>バージョン 10.0.3</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>Windows �ŁA���o�͂̕��ƍ�������v���Ă��邱�Ƃ��`�F�b�N���Ă��Ȃ��B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>Windows で、入出力の幅と高さが一致していることをチェックしていない。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 10.0.2</h3>
+<h3>バージョン 10.0.2</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>Windows �ŁA�f�R�[�h���ɋH�ɃN���b�V�����邱�Ƃ�����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>Windows で、デコード時に稀にクラッシュすることがある。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 10.0.1</h3>
+<h3>バージョン 10.0.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>Windows �ŁA�O���[�o���ݒ�Łu�R�[�f�b�N���Őݒ���O���[�o���ɕێ�����v�ɂ��Ă���ƁA�R�[�f�b�N��ǂݍ��񂾂Ƃ��ɃN���b�V������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>Windows で、グローバル設定で「コーデック側で設定をグローバルに保持する」にしていると、コーデックを読み込んだときにクラッシュする。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>Mac �ŁA�x�[�X SDK �� 10.6 ���� 10.5 �ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>Mac で、ベース SDK を 10.6 から 10.5 にした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 10.0.0</h3>
+<h3>バージョン 10.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>QuickTime for Mac �p�R���|�[�l���g��ǉ������BRGB24/ARGB32 �ւ̃f�R�[�h�̂݁B�ƂĂ��x���B</li>
+<dt>機能追加</dt><dd><ul>
+<li>QuickTime for Mac 用コンポーネントを追加した。RGB24/ARGB32 へのデコードのみ。とても遅い。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>���o�̓t�H�[�}�b�g�̃`�F�b�N����萳�m�ɂȂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>入出力フォーマットのチェックがより正確になった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 9.0.3</h3>
+<h3>バージョン 9.0.3</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULY2: DMO �G���R�[�_�ŁARGB24/32 �ȊO�̃t�H�[�}�b�g�œ��͂���ƁA�����Œ񎦂����o�̓t�H�[�}�b�g���󂯓���Ă��Ȃ������B</li>
-<li>ULY0: DMO �G���R�[�_�ŁARGB24/32 �ȊO�̃t�H�[�}�b�g�œ��͂���ƁA�����Œ񎦂����o�̓t�H�[�}�b�g���󂯓���Ă��Ȃ������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY2: DMO エンコーダで、RGB24/32 以外のフォーマットで入力すると、自分で提示した出力フォーマットを受け入れていなかった。</li>
+<li>ULY0: DMO エンコーダで、RGB24/32 以外のフォーマットで入力すると、自分で提示した出力フォーマットを受け入れていなかった。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>DMO �G���R�[�_����уf�R�[�_�ŁA���o�̓t�H�[�}�b�g���`�F�b�N����ۂɁA�ꕔ�̃p�����[�^���`�F�b�N���Ȃ��悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>DMO エンコーダおよびデコーダで、入出力フォーマットをチェックする際に、一部のパラメータをチェックしないようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 9.0.1</h3>
+<h3>バージョン 9.0.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>DMO �f�R�[�_�ŁA�o�̓t�H�[�}�b�g��񋓂���ۂɖ��������t�H�[�}�b�g��Ԃ��Ă����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>DMO デコーダで、出力フォーマットを列挙する際に矛盾したフォーマットを返していた。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 9.0.0</h3>
+<h3>バージョン 9.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>DMO �C���^�[�t�F�[�X�Ńf�R�[�_���g����悤�ɂ����B</li>
+<dt>機能追加</dt><dd><ul>
+<li>DMO インターフェースでデコーダを使えるようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 8.5.2</h3>
+<h3>バージョン 8.5.2</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>utv_vcm.dll �̃C���X�g�[���悪�Ԉ���Ă���AVCM �C���^�[�t�F�[�X�ŃR�[�f�b�N���g���Ȃ������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>utv_vcm.dll のインストール先が間違っており、VCM インターフェースでコーデックが使えなかった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 8.5.1</h3>
+<h3>バージョン 8.5.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULY2: x64 �ł� RGB ����G���R�[�h���鎞�ɁA�f������ꂽ��G���R�[�_���N���b�V�������肷��\��������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY2: x64 版で RGB からエンコードする時に、映像が壊れたりエンコーダがクラッシュしたりする可能性がある。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>utvideo.dll ���� VCM �C���^�[�t�F�[�X�𕪗����� utv_vcm.dll �Ƃ����B</li>
+<dt>その他</dt><dd><ul>
+<li>utvideo.dll から VCM インターフェースを分離して utv_vcm.dll とした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 8.5.0</h3>
+<h3>バージョン 8.5.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>����: x86 �ł̃f�R�[�h�� 10% �قǍ����������B</li>
-<li>����: x64 �ł��A�Z���u�������A�����ނ� x86 �łƓ����x�̑��x�ɂ����B</li>
+<dt>性能向上</dt><dd><ul>
+<li>共通: x86 でのデコードを 10% ほど高速化した。</li>
+<li>共通: x64 版をアセンブラ化し、おおむね x86 版と同程度の速度にした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 8.4.0</h3>
+<h3>バージョン 8.4.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULRG: �f�R�[�h���x�D��ŃG���R�[�h���ꂽ���̂� RGB24 �� RGB32 �ւ̃f�R�[�h�������������BCore 2 �� x86 �̏ꍇ 14% �قǁAx64 �̏ꍇ 6% �قǁB</li>
-<li>ULRA: �f�R�[�h���x�D��ŃG���R�[�h���ꂽ���̂� RGBA �ւ̃f�R�[�h�������������BCore 2 �� x86 �̏ꍇ 17% �قǁAx64 �̏ꍇ 6% �قǁB</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULRG: デコード速度優先でエンコードされたものの RGB24 や RGB32 へのデコードを高速化した。Core 2 で x86 の場合 14% ほど、x64 の場合 6% ほど。</li>
+<li>ULRA: デコード速度優先でエンコードされたものの RGBA へのデコードを高速化した。Core 2 で x86 の場合 17% ほど、x64 の場合 6% ほど。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 8.3.0</h3>
+<h3>バージョン 8.3.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULY2: �f�R�[�h���x�D��ŃG���R�[�h���ꂽ���̂� YUY2 �� UYVY �ւ̃f�R�[�h�������������BCore 2 �� 12% �قǁB</li>
-<li>ULY0: �f�R�[�h���x�D��ŃG���R�[�h���ꂽ���̂� YV12 �ւ̃f�R�[�h�������������BCore 2 �� 5% �قǁB</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULY2: デコード速度優先でエンコードされたものの YUY2 や UYVY へのデコードを高速化した。Core 2 で 12% ほど。</li>
+<li>ULY0: デコード速度優先でエンコードされたものの YV12 へのデコードを高速化した。Core 2 で 5% ほど。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>ULY2: YVYU �� VYUY �ł̓��o�͂̃T�|�[�g��p�~�����B</li>
-<li>ULY0: YVYU �� VYUY �ł̓��o�͂̃T�|�[�g��p�~�����B</li>
+<dt>その他</dt><dd><ul>
+<li>ULY2: YVYU と VYUY での入出力のサポートを廃止した。</li>
+<li>ULY0: YVYU と VYUY での入出力のサポートを廃止した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 8.2.1</h3>
+<h3>バージョン 8.2.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>ULY2: �f�R�[�h���� RGB32 �ŏo�͂���ꍇ�A���S�̂��߃A���t�@�`�����l���Ɖ��߂��ꂤ��t�B�[���h�� 255 �Ŗ��߂�悤�ɂ����B</li>
-<li>ULY0: �f�R�[�h���� RGB32 �ŏo�͂���ꍇ�A���S�̂��߃A���t�@�`�����l���Ɖ��߂��ꂤ��t�B�[���h�� 255 �Ŗ��߂�悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>ULY2: デコード時に RGB32 で出力する場合、安全のためアルファチャンネルと解釈されうるフィールドは 255 で埋めるようにした。</li>
+<li>ULY0: デコード時に RGB32 で出力する場合、安全のためアルファチャンネルと解釈されうるフィールドは 255 で埋めるようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 8.2.0</h3>
+<h3>バージョン 8.2.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>����: �f�R�[�h�������������BCore 2 �� x86 �̏ꍇ 20�`30% �قǁAx64 �̏ꍇ 20�`40% �قǁB</li>
+<dt>性能向上</dt><dd><ul>
+<li>共通: デコードを高速化した。Core 2 で x86 の場合 20～30% ほど、x64 の場合 20～40% ほど。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 8.1.0</h3>
+<h3>バージョン 8.1.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>�G���R�[�_�̐ݒ���R�[�f�b�N���ŃO���[�o���ɕێ��ł���悤�ɂ����B</li>
-<li>�R�[�f�b�N���g�����i�ҏW�\�t�g�Ȃǁj����̐ݒ�ύX�𖳎��ł���悤�ɂ����B</li>
+<dt>機能追加</dt><dd><ul>
+<li>エンコーダの設定をコーデック側でグローバルに保持できるようにした。</li>
+<li>コーデックを使う側（編集ソフトなど）からの設定変更を無視できるようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 8.0.0</h3>
+<h3>バージョン 8.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>DMO �C���^�[�t�F�[�X�ŃG���R�[�_���g����悤�ɂ����B</li>
+<dt>機能追加</dt><dd><ul>
+<li>DMO インターフェースでエンコーダを使えるようにした。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>x64 �ł̃C���X�g�[���ɂ� x64 �o�[�W������ DLL �݂̂��܂܂��悤�ɂ����B</li>
-<li>x86 �ł̃C���X�g�[���� x64 Windows �ɃC���X�g�[���ł���悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>x64 版のインストーラには x64 バージョンの DLL のみが含まれるようにした。</li>
+<li>x86 版のインストーラを x64 Windows にインストールできるようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 7.1.1</h3>
+<h3>バージョン 7.1.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>DLL ���t���p�X�œo�^����悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>DLL をフルパスで登録するようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 7.1.0</h3>
+<h3>バージョン 7.1.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>Athlon �n�v���Z�b�T�Ŕ�������p�t�H�[�}���X�̌��I�Ȓቺ�����P�����B</li>
+<dt>性能向上</dt><dd><ul>
+<li>Athlon 系プロセッサで発生するパフォーマンスの劇的な低下を改善した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 7.0.4</h3>
+<h3>バージョン 7.0.4</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>�R�[�f�b�N���V�X�e���ɓo�^������@���i�܂������I�Ɂj�ύX�����B</li>
+<dt>その他</dt><dd><ul>
+<li>コーデックをシステムに登録する方法を（また試験的に）変更した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 7.0.3</h3>
+<h3>バージョン 7.0.3</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>�R�[�f�b�N���V�X�e���ɓo�^������@���i�����I�Ɂj�ύX�����B</li>
+<dt>その他</dt><dd><ul>
+<li>コーデックをシステムに登録する方法を（試験的に）変更した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 7.0.2</h3>
+<h3>バージョン 7.0.2</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>x86 �ł̃C���X�g�[���� x64 Windows �ɃC���X�g�[���ł��Ȃ��悤�ɂ����B</li>
-<li>�����𑽏����������B</li>
+<dt>その他</dt><dd><ul>
+<li>x86 版のインストーラで x64 Windows にインストールできないようにした。</li>
+<li>文言を多少調整した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 7.0.1</h3>
+<h3>バージョン 7.0.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>x64 �ł̃C���X�g�[���ŁA���ɂ���Ă� DLL �����Ғʂ�ɓo�^����Ȃ��B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>x64 版のインストーラで、環境によっては DLL が期待通りに登録されない。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>�R�[�f�b�N�̕\�������������āA���O��\������Ƃ���Ɏ��܂�Ȃ����Ƃ����邽�߁A�\������Z�������B</li>
+<dt>その他</dt><dd><ul>
+<li>コーデックの表示名が長すぎて、名前を表示するところに収まらないことがあるため、表示名を短くした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 7.0.0</h3>
+<h3>バージョン 7.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>x64 �o�[�W������ǉ������Bx64 �o�[�W�����̃C���X�g�[���ɂ� x64 �o�[�W������ x86 �o�[�W�����̗����� DLL ���܂܂��B</li>
+<dt>機能追加</dt><dd><ul>
+<li>x64 バージョンを追加した。x64 バージョンのインストーラには x64 バージョンと x86 バージョンの両方の DLL が含まれる。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>DLL �̃C���X�g�[����� Program Files �ȉ����� System32/SysWOW64 �ȉ��ɕύX�����B</li>
+<dt>その他</dt><dd><ul>
+<li>DLL のインストール先を Program Files 以下から System32/SysWOW64 以下に変更した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 6.1.0</h3>
+<h3>バージョン 6.1.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>����: �t���[����������_���v���Z�b�T���Ɠ����ɂ���I�v�V������ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>共通: フレーム分割数を論理プロセッサ数と同じにするオプションを追加した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 6.0.2</h3>
+<h3>バージョン 6.0.2</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>6.0.1 �Ńp�b�P�[�W���O�Ƀ~�X�𔭌������̂ł��Ȃ������B</li>
+<dt>その他</dt><dd><ul>
+<li>6.0.1 でパッケージングにミスを発見したのでやりなおした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 6.0.1</h3>
+<h3>バージョン 6.0.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>�_�C�i�~�b�N�����N����X�^�e�B�b�N�����N�ɕύX�����B</li>
+<dt>その他</dt><dd><ul>
+<li>ダイナミックリンクからスタティックリンクに変更した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 6.0.0</h3>
+<h3>バージョン 6.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>����: �C���^�[���[�X�f���ɑ΂�����ʂȏ�����ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>共通: インターレース映像に対する特別な処理を追加した。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULY0: �c���̉f���������ƃN���b�V������\�����������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY0: 縦長の映像を扱うとクラッシュする可能性があった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 5.3.1</h3>
+<h3>バージョン 5.3.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULY0: �t���[�������̕��@���Ԉ���Ă����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY0: フレーム分割の方法が間違っていた。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 5.3.0</h3>
+<h3>バージョン 5.3.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULY0: �G���R�[�h���� YUY2 �œ��͂ł���悤�ɂ����B�Ƃ肠��������������Ȃ̂ŁAYUY2 ���͎��̃G���R�[�h�͒x���B</li>
-<li>ULY0: �f�R�[�h���� YUY2 �ŏo�͂ł���悤�ɂ����B�Ƃ肠��������������Ȃ̂ŁAYUY2 �o�͎��̃f�R�[�h�͒x���B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULY0: エンコード時に YUY2 で入力できるようにした。とりあえず作っただけなので、YUY2 入力時のエンコードは遅い。</li>
+<li>ULY0: デコード時に YUY2 で出力できるようにした。とりあえず作っただけなので、YUY2 出力時のデコードは遅い。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 5.2.3</h3>
+<h3>バージョン 5.2.3</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>����: ����̐��������t���[�����G���R�[�h����ۂɁA�H�Ƀt���[�����j������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>共通: 特定の性質を持つフレームをエンコードする際に、稀にフレームが破損する。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 5.2.2</h3>
+<h3>バージョン 5.2.2</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>5.2.1 �Ńp�b�P�[�W���O�Ƀ~�X�𔭌������̂ł��Ȃ������B</li>
+<dt>その他</dt><dd><ul>
+<li>5.2.1 でパッケージングにミスを発見したのでやりなおした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 5.2.1</h3>
+<h3>バージョン 5.2.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>5.2.0 �Ńp�b�P�[�W���O�Ƀ~�X�𔭌������̂ł��Ȃ������B</li>
+<dt>その他</dt><dd><ul>
+<li>5.2.0 でパッケージングにミスを発見したのでやりなおした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 5.2.0</h3>
+<h3>バージョン 5.2.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULY2: �G���R�[�h���� RGB32 �œ��͂ł���悤�ɂ����B�A�Z���u�����ς݁B</li>
-<li>ULY0: �G���R�[�h���� RGB32 �œ��͂ł���悤�ɂ����B�Ƃ肠��������������Ȃ̂ŁARGB32 ���͎��̃G���R�[�h�͒x���B</li>
-<li>ULY0: �f�R�[�h���� RGB32 �ŏo�͂ł���悤�ɂ����B�Ƃ肠��������������Ȃ̂ŁARGB32 �o�͎��̃f�R�[�h�͒x���B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULY2: エンコード時に RGB32 で入力できるようにした。アセンブラ化済み。</li>
+<li>ULY0: エンコード時に RGB32 で入力できるようにした。とりあえず作っただけなので、RGB32 入力時のエンコードは遅い。</li>
+<li>ULY0: デコード時に RGB32 で出力できるようにした。とりあえず作っただけなので、RGB32 出力時のデコードは遅い。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 5.1.2</h3>
+<h3>バージョン 5.1.2</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>5.1.1 �Ńp�b�P�[�W���O�Ƀ~�X�𔭌������̂ł��Ȃ������B</li>
+<dt>その他</dt><dd><ul>
+<li>5.1.1 でパッケージングにミスを発見したのでやりなおした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 5.1.1</h3>
+<h3>バージョン 5.1.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULY0: �f�R�[�h���ɁA�o�̓C���[�W�̃T�C�Y�i�o�C�g���j���������ݒ肳��Ȃ����Ƃ�����BULY0 �ȊO�ł͂��̖��͂Ȃ��B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY0: デコード時に、出力イメージのサイズ（バイト数）が正しく設定されないことがある。ULY0 以外ではこの問題はない。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 5.1.0</h3>
+<h3>バージョン 5.1.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULY0: �G���R�[�h���� RGB24 �œ��͂ł���悤�ɂ����B�Ƃ肠��������������Ȃ̂ŁARGB24 ���͎��̃G���R�[�h�͒x���B</li>
-<li>ULY0: �f�R�[�h���� RGB24 �ŏo�͂ł���悤�ɂ����B�Ƃ肠��������������Ȃ̂ŁARGB24 �o�͎��̃f�R�[�h�͒x���B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULY0: エンコード時に RGB24 で入力できるようにした。とりあえず作っただけなので、RGB24 入力時のエンコードは遅い。</li>
+<li>ULY0: デコード時に RGB24 で出力できるようにした。とりあえず作っただけなので、RGB24 出力時のデコードは遅い。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 5.0.0</h3>
+<h3>バージョン 5.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>YUV420 �̂��߂̃R�[�f�b�N (FourCC: ULY0) ��ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>YUV420 のためのコーデック (FourCC: ULY0) を追加した。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>�ݒ���s��Ȃ��ꍇ�́u�f�R�[�h���x�D��v�œ��삷��悤�ɂ����B</li>
-<li>ULY2: �����������̂��݈̂̂�����悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>設定を行わない場合は「デコード速度優先」で動作するようにした。</li>
+<li>ULY2: 横幅が偶数のもののみ扱えるようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 4.1.0</h3>
+<h3>バージョン 4.1.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>����: �G���R�[�h���ق�̂킸�����������������B</li>
-<li>����: �f�R�[�h���ق�̂킸�����������������B</li>
+<dt>性能向上</dt><dd><ul>
+<li>共通: エンコードをほんのわずかだけ高速化した。</li>
+<li>共通: デコードをほんのわずかだけ高速化した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 4.0.2</h3>
+<h3>バージョン 4.0.2</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>ULRG: �f�R�[�h���� RGB32 �ŏo�͂���ꍇ�A���S�̂��߃A���t�@�`�����l���Ɖ��߂��ꂤ��t�B�[���h�� 255 �Ŗ��߂�悤�ɂ����B</li>
-<li>����: �G���R�[�h���ɏo�͂� biBitCount �ɂ͓��͂̎����r�b�g����ݒ肷��悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>ULRG: デコード時に RGB32 で出力する場合、安全のためアルファチャンネルと解釈されうるフィールドは 255 で埋めるようにした。</li>
+<li>共通: エンコード時に出力の biBitCount には入力の実効ビット数を設定するようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 4.0.1</h3>
+<h3>バージョン 4.0.1</h3>
 <dl>
-<dt>���̑�</dt><dd><ul>
-<li>4.0.0 �Ńp�b�P�[�W���O�Ƀ~�X�𔭌������̂ł��Ȃ������B</li>
+<dt>その他</dt><dd><ul>
+<li>4.0.0 でパッケージングにミスを発見したのでやりなおした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 4.0.0</h3>
+<h3>バージョン 4.0.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>RGBA �̂��߂̃R�[�f�b�N (FourCC: ULRA) ��ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>RGBA のためのコーデック (FourCC: ULRA) を追加した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 3.8.0</h3>
+<h3>バージョン 3.8.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>����: Predict left �t���[�����\��������ǉ������B�茳�̌v���ł́A���܂ł̎����iPredict median�j�Ɣ�r���āA�G���R�[�h���x�قړ����A���k�� 10% �ቺ�i�t�@�C���T�C�Y�� 10% ������j�A�f�R�[�h���x 50% ����i�f�R�[�h���Ԃ� 30% ���Z���Ȃ�j�B</li>
+<dt>機能追加</dt><dd><ul>
+<li>共通: Predict left フレーム内予測方式を追加した。手元の計測では、今までの実装（Predict median）と比較して、エンコード速度ほぼ同じ、圧縮率 10% 低下（ファイルサイズが 10% 増える）、デコード速度 50% 向上（デコード時間が 30% 強短くなる）。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 3.7.0</h3>
+<h3>バージョン 3.7.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>����: �f�R�[�h�������������BCore 2 �̏ꍇ�� 9% ���x�B</li>
-<li>ULY2: RGB24 ����̃G���R�[�h�������������BCore 2 �̏ꍇ�� 9% ���x�B</li>
+<dt>性能向上</dt><dd><ul>
+<li>共通: デコードを高速化した。Core 2 の場合で 9% 程度。</li>
+<li>ULY2: RGB24 からのエンコードを高速化した。Core 2 の場合で 9% 程度。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 3.6.0</h3>
+<h3>バージョン 3.6.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>ULY2: RGB24 ����̃G���R�[�h���A�Z���u�����ɂ�荂���������BCore 2 �̏ꍇ�� 42% ���x�B����ŃV���O���X���b�h�ł� Huffyuv (Predict median) ���L�ӂɑ����Ȃ����B</li>
+<dt>性能向上</dt><dd><ul>
+<li>ULY2: RGB24 からのエンコードをアセンブラ化により高速化した。Core 2 の場合で 42% 程度。これでシングルスレッドでも Huffyuv (Predict median) より有意に速くなった。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 3.5.0</h3>
+<h3>バージョン 3.5.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULY2: �f�R�[�h���� RGB24 �ŏo�͂ł���悤�ɂ����B�ŏ�����A�Z���u���o�[�W����������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULY2: デコード時に RGB24 で出力できるようにした。最初からアセンブラバージョンがある。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULY2: RGB24 �G���R�[�h���ɁA������ 4 �̔{���ł͂Ȃ��ꍇ�A�f���̉E�[�ɃS�~����������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY2: RGB24 エンコード時に、横幅が 4 の倍数ではない場合、映像の右端にゴミが発生する。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 3.4.0</h3>
+<h3>バージョン 3.4.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULY2: �G���R�[�h���� RGB24 �œ��͂ł���悤�ɂ����B��ɂ���ĂƂ肠��������������Ȃ̂ŁARGB24 ���͎��̃G���R�[�h�͒x���B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULY2: エンコード時に RGB24 で入力できるようにした。例によってとりあえず作っただけなので、RGB24 入力時のエンコードは遅い。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULY2: RGB32 �f�R�[�h���ɏo�̓t�H�[�}�b�g�� biHeight �̐��������Ă��Ȃ����߁A���ɂ���Ă͏㉺�����]���ăf�R�[�h�����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULY2: RGB32 デコード時に出力フォーマットの biHeight の正負を見ていないため、環境によっては上下が反転してデコードされる。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 3.3.1</h3>
+<h3>バージョン 3.3.1</h3>
 <dl>
-<dt>�o�O�C��</dt><dd><ul>
-<li>����: �G���R�[�_���g�����̃\�t�g�ɂ���ẮA�G���R�[�h���J�n����ƕs���ȏ����ŗ�����B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>共通: エンコーダを使う側のソフトによっては、エンコードを開始すると不正な処理で落ちる。</li>
 </ul></dd>
-<dt>���̑�</dt><dd><ul>
-<li>�ݒ�_�C�A���O�̃^�C�g���������K�؂Ȃ��̂ɕύX�����B</li>
-<li>�o�[�W�������_�C�A���O�Ƀo�[�W������\������悤�ɂ����B</li>
+<dt>その他</dt><dd><ul>
+<li>設定ダイアログのタイトル文字列を適切なものに変更した。</li>
+<li>バージョン情報ダイアログにバージョンを表示するようにした。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 3.3.0</h3>
+<h3>バージョン 3.3.0</h3>
 <dl>
-<dt>���\����</dt><dd><ul>
-<li>����: �f�R�[�h�������������BCore 2 �̏ꍇ�� 20% ���x�B����ŃV���O���X���b�h�ł� Huffyuv (Predict median) ���L�ӂɑ����Ȃ����B</li>
-<li>����: �G���R�[�h�������������BCore 2 �̏ꍇ�� 8% ���x�B</li>
-<li>ULY2: RGB32 �ւ̃f�R�[�h���A�Z���u�����ɂ�荂���������BCore 2 �̏ꍇ�� 47% ���x�i�O�q�̋��ʂ̍������̌��ʂ��܂ށj�B</li>
+<dt>性能向上</dt><dd><ul>
+<li>共通: デコードを高速化した。Core 2 の場合で 20% 程度。これでシングルスレッドでも Huffyuv (Predict median) より有意に速くなった。</li>
+<li>共通: エンコードを高速化した。Core 2 の場合で 8% 程度。</li>
+<li>ULY2: RGB32 へのデコードをアセンブラ化により高速化した。Core 2 の場合で 47% 程度（前述の共通の高速化の効果を含む）。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>����: �����ł��Ȃ��t�H�[�}�b�g��n���ăG���R�[�h/�f�R�[�h���J�n���悤�Ƃ��Ă��G���[�ɂȂ�Ȃ��B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>共通: 処理できないフォーマットを渡してエンコード/デコードを開始しようとしてもエラーにならない。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 3.2.0</h3>
+<h3>バージョン 3.2.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULY2: �f�R�[�h���� RGB32 �ŏo�͂ł���悤�ɂ����B�Ƃ肠��������������Ȃ̂ŁARGB32 �o�͎��̃f�R�[�h�͒x���B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULY2: デコード時に RGB32 で出力できるようにした。とりあえず作っただけなので、RGB32 出力時のデコードは遅い。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULRG: �t���[�������̕��@���Ԉ���Ă����B<strong>���̏C���ɂ��A�t���[���������� 1 �ł͂Ȃ��ꍇ�A3.1.0 �ȑO�� ULRG �Ƃ̌݊����͎�����B</strong></li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULRG: フレーム分割の方法が間違っていた。<strong>この修正により、フレーム分割数が 1 ではない場合、3.1.0 以前の ULRG との互換性は失われる。</strong></li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 3.1.0</h3>
+<h3>バージョン 3.1.0</h3>
 <dl>
-<dt>�@�\�ǉ�</dt><dd><ul>
-<li>ULY2: YUYV, YUNV, UYVY, UYNV, YVYU, VYUY �̃T�|�[�g��ǉ������B</li>
-<li>ULRG: RGB32 �̃T�|�[�g��ǉ������B</li>
+<dt>機能追加</dt><dd><ul>
+<li>ULY2: YUYV, YUNV, UYVY, UYNV, YVYU, VYUY のサポートを追加した。</li>
+<li>ULRG: RGB32 のサポートを追加した。</li>
 </ul></dd>
-<dt>�o�O�C��</dt><dd><ul>
-<li>ULRG: WMP �ōĐ����悤�Ƃ���ƕs���ȏ����ŗ�����̂��C�������B</li>
+<dt>バグ修正</dt><dd><ul>
+<li>ULRG: WMP で再生しようとすると不正な処理で落ちるのを修正した。</li>
 </ul></dd>
 </dl>
-<h3>�o�[�W���� 3.0.0</h3>
+<h3>バージョン 3.0.0</h3>
 <ul>
-<li>RGB �̂��߂̃R�[�f�b�N (FourCC: ULRG) ��ǉ������B</li>
+<li>RGB のためのコーデック (FourCC: ULRG) を追加した。</li>
 </ul>
-<h3>�o�[�W���� 2.2.0</h3>
+<h3>バージョン 2.2.0</h3>
 <ul>
-<li>�����̏������A�Z���u���������B</li>
+<li>多くの処理をアセンブラ化した。</li>
 </ul>
-<h3>�o�[�W���� 2.1.0</h3>
+<h3>バージョン 2.1.0</h3>
 <ul>
-<li>�}���`�X���b�h�������B</li>
+<li>マルチスレッド化した。</li>
 </ul>
-<h3>�o�[�W���� 2.0.0</h3>
+<h3>バージョン 2.0.0</h3>
 <ul>
-<li>�t���[���𕪊����ď�������悤�ɂ����B</li>
+<li>フレームを分割して処理するようにした。</li>
 </ul>
-<h3>�o�[�W���� 1.1.3</h3>
-<p>��ʌ��J���ꂽ�ŏ��̃o�[�W�����B</p>
+<h3>バージョン 1.1.3</h3>
+<p>一般公開された最初のバージョン。</p>
 <hr>
-<address><a href="http://umezawa.dyndns.info/">����҂̃T�C�g</a></address>
+<address><a href="http://umezawa.dyndns.info/">製作者のサイト</a></address>
 </body>
 </html>
