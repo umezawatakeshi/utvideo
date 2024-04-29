@@ -1,5 +1,5 @@
 - 英語版は [README.md](README.md) です。
-- このファイルは開発者向けです。エンドユーザ向けのファイルは readme.ja.html です。
+- このファイルは開発者向けです。エンドユーザ向けのファイルは [readme.ja.html](readme.ja.html) です。
 
 # Ut Video Codec Suite - 高速なロスレス映像コーデック
 

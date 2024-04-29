@@ -1,5 +1,5 @@
 - Japanese version is [README.ja.md](README.ja.md).
-- This file is for developers. readme.en.html is for end users.
+- This file is for developers. [readme.en.html](readme.en.html) is for end users.
 
 # Ut Video Codec Suite - fast lossless video codec.
 
