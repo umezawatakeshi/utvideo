@@ -50,22 +50,22 @@
 
 4:
 .if \bmi2
-	shlx		rax, rdx, rcx
+	shlx		r11, rdx, rcx
 .else
-	mov			rax, rdx
-	shl			rax, cl
+	mov			r11, rdx
+	shl			r11, cl
 .endif
-	shr			rax, 64 - %c[lookup_bits]
+	shr			r11, 64 - %c[lookup_bits]
+	movzx		eax, byte ptr [rbx + %c[offsetof_cslen] + r11*2]
+	add			cl, byte ptr [rbx + %c[offsetof_cslen] + r11*2 + 1]
 .if %c[sizeof_combined_t] == 4
-	mov			r11d, dword ptr [rbx + %c[offsetof_sym] + rax*4]
+	mov			r11d, dword ptr [rbx + %c[offsetof_sym] + r11*4]
 .elseif %c[sizeof_combined_t] == 8
-	mov			r11, qword ptr [rbx + %c[offsetof_sym] + rax*8]
+	mov			r11, qword ptr [rbx + %c[offsetof_sym] + r11*8]
 .else
 .err
 .endif
-	movzx		eax, word ptr [rbx + %c[offsetof_cslen] + rax*2]
 
-	add			cl, ah
 	cmp			al, 0
 	je			0b
 	mov			rbx, r12
@@ -78,7 +78,6 @@
 .else
 .err
 .endif
-	movzx		rax, al
 .if %c[sizeof_sym_t] == 1
 	add			rdi, rax
 .elseif %c[sizeof_sym_t] == 2

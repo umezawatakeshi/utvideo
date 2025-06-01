@@ -45,17 +45,17 @@
 	add			esi, 4
 
 4:
-	mov			eax, dword ptr [esi]
-	shld		eax, ebp, cl
-	shr			eax, 32 - %c[lookup_bits]
+	mov			edx, dword ptr [esi]
+	shld		edx, ebp, cl
+	shr			edx, 32 - %c[lookup_bits]
+	movzx		eax, byte ptr [ebx + %c[offsetof_cslen] + edx*2]
+	add			cl, byte ptr [ebx + %c[offsetof_cslen] + edx*2 + 1]
 .if %c[sizeof_combined_t] == 4
-	mov			edx, dword ptr [ebx + %c[offsetof_sym] + eax*4]
+	mov			edx, dword ptr [ebx + %c[offsetof_sym] + edx*4]
 .else
 .err
 .endif
-	movzx		eax, word ptr [ebx + %c[offsetof_cslen] + eax*2]
 
-	add			cl, ah
 	cmp			al, 0
 	je			0b
 	mov			ebx, dword ptr [esp + 4]
@@ -66,7 +66,6 @@
 .else
 .err
 .endif
-	movzx		eax, al
 .if %c[sizeof_sym_t] == 1
 	add			edi, eax
 .elseif %c[sizeof_sym_t] == 2
