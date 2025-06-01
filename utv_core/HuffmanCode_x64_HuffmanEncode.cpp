@@ -9,7 +9,7 @@
 	R"(
 	.intel_syntax noprefix
 
-.macro HUFFMAN_ENCODE symtype, symsize, ursymtype, ursymsize, useshld
+.macro HUFFMAN_ENCODE symtype, symsize, ursymtype, ursymsize
 
 	# rdi = pDstBegin
 	# rsi = pSrcBegin
@@ -17,12 +17,8 @@
 	# rdx = pEncodeTable
 
 .equ regfirst, 8
-.if \useshld
 .equ unroll_stride, 8
-.else
-.equ unroll_stride, 7
-.endif
-
+	push		rbp
 	push		rdi
 	mov			r8, rax
 	sub			r8, \ursymsize * unroll_stride * 2
@@ -31,12 +27,10 @@
 	je			3f
 
 	mov			bl, -64
-	xor			ecx, ecx
+	xor			eax, eax
 
 .irp regidx, 8, 9, 10, 11, 12, 13, 14, 15
-.if (\regidx - regfirst) == unroll_stride - 1
-	xor			r\regidx, r\regidx
-.elseif (\regidx - regfirst) < unroll_stride - 1
+.if (\regidx - regfirst) != unroll_stride - 1
 	movzx		r\regidx, \ursymtype ptr [rsi + \ursymsize * (\regidx - regfirst)]
 	mov			r\regidx, qword ptr [rdx+r\regidx*8 + %c[offsetof_dwtablemuxur]]
 .endif
@@ -44,108 +38,81 @@
 
 	.balign		64
 1:
-.if \useshld
-	shld		rax, r15, cl
 	movzx		r15, \ursymtype ptr [rsi + \ursymsize * (unroll_stride - 1)]
 	mov			r15, qword ptr [rdx+r15*8 + %c[offsetof_dwtablemuxur]]
-.else
-	shl			rax, cl
-	neg			cl
-	shr			r14, cl
-	or			rax, r14
-	movzx		r14, \ursymtype ptr [rsi + \ursymsize * (unroll_stride - 1)]
-	mov			r14, qword ptr [rdx+r14*8 + %c[offsetof_dwtablemuxur]]
-.endif
 .irp regidx, 8, 9, 10, 11, 12, 13, 14, 15
-.if (\regidx - regfirst) < unroll_stride
-9\regidx:
 .if (\regidx - regfirst) == 0
 	cmp			rsi, qword ptr [rsp]
 	jnb			4f
 .endif
 
-	mov			rcx, r\regidx
 .if (\regidx - regfirst) == unroll_stride - 1
 	add			rsi, unroll_stride * \ursymsize
 .endif
-	add			bl, cl
+	mov			rbp, r\regidx
+	and			rbp, -256
+	shrx		rcx, rbp, rbx
+	or			rax, rcx
+	add			bl, r\regidx\(\())b
 .if (\regidx - regfirst) != unroll_stride - 1
 	jnc			2f
 .else
 	jnc			1b
 .endif
-	sub			cl, bl
-.if \useshld
-	shld		rax, r\regidx, cl
-.else
-	shl			rax, cl
-	mov			r15, r\regidx
-	neg			cl
-	shr			r15, cl
-	or			rax, r15
-.endif
 
-	mov			rcx, r\regidx
-	rol			rax, 32
+	rorx		rax, rax, 32
 	mov			qword ptr [rdi], rax
 	add			rdi, 8
+	sub			r\regidx\(\())b, bl
+	shlx		rax, rbp, r\regidx
 	sub			bl, 64
 .if (\regidx - regfirst) == unroll_stride - 1
 	jmp			1b
 .else
 2:
-.if \useshld
-	shld		rax, r\regidx, cl
-.else
-	shl			rax, cl
-	neg			cl
-	shr			r\regidx, cl
-	or			rax, r\regidx
-.endif
 	movzx		r\regidx, \ursymtype ptr [rsi + \ursymsize * ((\regidx - regfirst) + unroll_stride)]
 	mov			r\regidx, qword ptr [rdx + r\regidx * 8 + %c[offsetof_dwtablemuxur]]
-.endif
 .endif
 .endr
 
 4:
 	add			qword ptr [rsp], \ursymsize * unroll_stride * 2
-	xor			ecx, ecx
 1:
-	shld		rax, rcx, cl
 	cmp			rsi, qword ptr [rsp]
 	jnb			4f
-	movzx		rcx, \symtype ptr [rsi]
+	movzx		r8, \symtype ptr [rsi]
 	add			rsi, \symsize
-	mov			rcx, qword ptr [rdx+rcx*8 + %c[offsetof_dwtablemux]]
-	add			bl, cl
+	mov			r8, qword ptr [rdx+r8*8 + %c[offsetof_dwtablemux]]
+	mov			rbp, r8
+	and			rbp, -256
+	shrx		rcx, rbp, rbx
+	or			rax, rcx
+	add			bl, r8b
 	jnc			1b
-	sub			cl, bl
-	shld		rax, rcx, cl
-	rol			rax, 32
+
+	rorx		rax, rax, 32
 	mov			qword ptr [rdi], rax
 	add			rdi, 8
-	add			cl, bl
+	sub			r8b, bl
+	shlx		rax, rbp, r8
 	sub			bl, 64
 	jmp			1b
 
 4:
 	test		bl, 0x3f
 	jz			3f
-	neg			bl
-	mov			cl, bl
-	shl			rax, cl
-	rol			rax, 32
+	rorx		rax, rax, 32
 	mov			dword ptr [rdi], eax
 	add			rdi, 4
-	cmp			bl, 32
-	jae			3f
-	rol			rax, 32
+	cmp			bl, -32
+	jbe			3f
+	shr			rax, 32
 	mov			dword ptr [rdi], eax
 	add			rdi, 4
 3:
 	pop			rax
 	pop			rbx
+	pop			rbp
 	mov			rax, rdi
 	sub			rax, rbx
 .endm

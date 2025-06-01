@@ -130,19 +130,21 @@ const TUNEDFUNC_PREDICT tfnPredictAVX1 = {
 };
 
 
+#ifdef __i386__
 const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeI686 = {
 	NULL,
 	{ 0, 0 },
 	i686_HuffmanEncode8,
 	i686_HuffmanEncode10,
 };
+#endif
 
-#if defined(__x86_64__)
-const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeI686Hybrid = {
-	&tfnHuffmanEncodeI686,
-	{ 0, FEATURE1_HYBRID },
-	i686hybrid_HuffmanEncode8,
-	i686hybrid_HuffmanEncode10,
+#ifdef __x86_64__
+const TUNEDFUNC_HUFFMAN_ENCODE tfnHuffmanEncodeBMI2 = {
+	NULL,
+	{ 0, FEATURE1_BMI2 },
+	bmi2_HuffmanEncode8,
+	bmi2_HuffmanEncode10,
 };
 #endif
 
@@ -847,7 +849,7 @@ const TUNEDFUNC_CONVERT_SYMPACK tfnConvertSymPackAVX512ICL = {
 const TUNEDFUNC tfnRoot = {
 	&tfnPredictAVX1,
 #ifdef __x86_64__
-	&tfnHuffmanEncodeI686Hybrid,
+	&tfnHuffmanEncodeBMI2,
 	&tfnHuffmanDecodeBMI2,
 	&tfnConvertYUVRGBAVX512ICL,
 #else
