@@ -55,6 +55,7 @@
 	mov			r11, rdx
 	shl			r11, cl
 .endif
+
 	shr			r11, 64 - %c[lookup_bits]
 	movzx		eax, byte ptr [rbx + %c[offsetof_cslen] + r11*2]
 	add			cl, byte ptr [rbx + %c[offsetof_cslen] + r11*2 + 1]

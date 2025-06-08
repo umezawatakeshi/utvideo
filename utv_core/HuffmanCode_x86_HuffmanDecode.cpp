@@ -47,6 +47,7 @@
 4:
 	mov			edx, dword ptr [esi]
 	shld		edx, ebp, cl
+
 	shr			edx, 32 - %c[lookup_bits]
 	movzx		eax, byte ptr [ebx + %c[offsetof_cslen] + edx*2]
 	add			cl, byte ptr [ebx + %c[offsetof_cslen] + edx*2 + 1]
@@ -91,6 +92,7 @@
 	ja			5b
 	jmp			1b
 .endif
+
 3:
 .endr
 
