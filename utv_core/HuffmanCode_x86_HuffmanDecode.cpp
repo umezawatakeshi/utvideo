@@ -76,7 +76,6 @@
 	jmp			1b
 .else
 5:
-.if %c[sizeof_combined_t] == 4
 .if %c[sizeof_sym_t] == 1
 	mov			byte ptr [edi], dl
 .elseif %c[sizeof_sym_t] == 2
@@ -85,9 +84,6 @@
 .err
 .endif
 	shr			edx, 8 * %c[sizeof_sym_t]
-.else
-.err
-.endif
 	add			edi, %c[sizeof_sym_t]
 	cmp			edi, dword ptr [esp]
 	jae			3f
