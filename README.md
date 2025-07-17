@@ -16,8 +16,8 @@ The following interfaces are supported.
 
 ### Windows
 
-- Windows 10 x64
-- Visual Studio 2019
+- Windows 11 x64
+- Visual Studio 2022
 - [vcpkg](https://github.com/microsoft/vcpkg) (integrated with Visual Studio)
   - lz4:x86-windows-static
   - lz4:x64-windows-static

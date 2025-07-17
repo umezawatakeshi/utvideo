@@ -16,8 +16,8 @@
 
 ### Windows の場合
 
-- Windows 10 x64
-- Visual Studio 2019
+- Windows 11 x64
+- Visual Studio 2022
 - [vcpkg](https://github.com/microsoft/vcpkg) （Visual Studio に integrate されていること）
   - lz4:x86-windows-static
   - lz4:x64-windows-static
