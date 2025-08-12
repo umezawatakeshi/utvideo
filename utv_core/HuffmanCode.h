@@ -39,7 +39,7 @@ template<int B>
 struct HUFFMAN_ENCODE_TABLE
 {
 	union {
-		uintenc_t dwTableMuxMulti;
+		uintenc_t dwTableMuxMulti[1 << B];
 		uintenc_t dwTableMux[1 << B];
 	};
 };
