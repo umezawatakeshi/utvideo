@@ -159,7 +159,7 @@ void GenerateHuffmanEncodeTable<8>(HUFFMAN_ENCODE_TABLE<8> *pEncodeTable, const 
 		uintenc_t curcodej = 0;
 		for (int j = ub; j >= 0; j--)
 		{
-			pEncodeTable->dwTableMuxUnrolled[cls[i].symbol + (cls[j].symbol << 8)] = curcode | (curcodej >> cls[i].codelen) | (cls[i].codelen + cls[j].codelen);
+			pEncodeTable->dwTableMuxMulti[cls[i].symbol + (cls[j].symbol << 8)] = curcode | (curcodej >> cls[i].codelen) | (cls[i].codelen + cls[j].codelen);
 			curcodej += UINTENC_MSB >> (cls[j].codelen - 1);
 		}
 		pEncodeTable->dwTableMux[cls[i].symbol] = curcode | cls[i].codelen;

@@ -9,7 +9,7 @@
 	R"(
 	.intel_syntax noprefix
 
-.macro HUFFMAN_ENCODE symtype, symsize, ursymtype, ursymsize
+.macro HUFFMAN_ENCODE symtype, symsize, msymtype, msymsize
 
 	# rdi = pDstBegin
 	# rsi = pSrcBegin
@@ -21,7 +21,7 @@
 	push		rbp
 	push		rdi
 	mov			r8, rax
-	sub			r8, \ursymsize * unroll_stride * 2
+	sub			r8, \msymsize * unroll_stride * 2
 	push		r8
 	cmp			qword ptr [rdx], 0
 	je			3f
@@ -31,15 +31,15 @@
 
 .irp regidx, 8, 9, 10, 11, 12, 13, 14, 15
 .if (\regidx - regfirst) != unroll_stride - 1
-	movzx		r\regidx, \ursymtype ptr [rsi + \ursymsize * (\regidx - regfirst)]
-	mov			r\regidx, qword ptr [rdx+r\regidx*8 + %c[offsetof_dwtablemuxur]]
+	movzx		r\regidx, \msymtype ptr [rsi + \msymsize * (\regidx - regfirst)]
+	mov			r\regidx, qword ptr [rdx+r\regidx*8 + %c[offsetof_dwtablemuxmulti]]
 .endif
 .endr
 
 	.balign		64
 1:
-	movzx		r15, \ursymtype ptr [rsi + \ursymsize * (unroll_stride - 1)]
-	mov			r15, qword ptr [rdx+r15*8 + %c[offsetof_dwtablemuxur]]
+	movzx		r15, \msymtype ptr [rsi + \msymsize * (unroll_stride - 1)]
+	mov			r15, qword ptr [rdx+r15*8 + %c[offsetof_dwtablemuxmulti]]
 .irp regidx, 8, 9, 10, 11, 12, 13, 14, 15
 .if (\regidx - regfirst) == 0
 	cmp			rsi, qword ptr [rsp]
@@ -47,7 +47,7 @@
 .endif
 
 .if (\regidx - regfirst) == unroll_stride - 1
-	add			rsi, unroll_stride * \ursymsize
+	add			rsi, unroll_stride * \msymsize
 .endif
 	mov			rbp, r\regidx
 	and			rbp, -256
@@ -70,13 +70,13 @@
 	jmp			1b
 .else
 2:
-	movzx		r\regidx, \ursymtype ptr [rsi + \ursymsize * ((\regidx - regfirst) + unroll_stride)]
-	mov			r\regidx, qword ptr [rdx + r\regidx * 8 + %c[offsetof_dwtablemuxur]]
+	movzx		r\regidx, \msymtype ptr [rsi + \msymsize * ((\regidx - regfirst) + unroll_stride)]
+	mov			r\regidx, qword ptr [rdx + r\regidx * 8 + %c[offsetof_dwtablemuxmulti]]
 .endif
 .endr
 
 4:
-	add			qword ptr [rsp], \ursymsize * unroll_stride * 2
+	add			qword ptr [rsp], \msymsize * unroll_stride * 2
 1:
 	cmp			rsi, qword ptr [rsp]
 	jnb			4f
@@ -122,7 +122,7 @@
 		: "=a"(ret), "=D"(clobber), "=S"(clobber), "=d"(clobber)
 		: "D"(pDstBegin), "S"(pSrcBegin), "a"(pSrcEnd), "d"(pEncodeTable),
 		  [offsetof_dwtablemux]"i"(offsetof(encodetable_t, dwTableMux)),
-		  [offsetof_dwtablemuxur]"i"(offsetof(encodetable_t, dwTableMuxUnrolled))
+		  [offsetof_dwtablemuxmulti]"i"(offsetof(encodetable_t, dwTableMuxMulti))
 		: "rbx", "rcx", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15");
 #endif
 	return ret;
